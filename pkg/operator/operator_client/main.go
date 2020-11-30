@@ -24,7 +24,7 @@ import (
 	"log"
 	"time"
 
-	pb "gitlab.inspr.com/ptcar/core/pkg/operator/comunication"
+	pb "gitlab.inspr.dev/inspr/core/pkg/operator/comunication"
 	"google.golang.org/grpc"
 )
 

@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	k8soperator "gitlab.inspr.com/ptcar/core/cmd/operator/k8s/k8soperator"
-	meta "gitlab.inspr.com/ptcar/core/pkg/meta"
+	k8soperator "gitlab.inspr.dev/inspr/core/cmd/operator/k8s/k8soperator"
+	meta "gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
 type appStatus struct {

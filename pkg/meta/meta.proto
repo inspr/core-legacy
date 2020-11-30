@@ -4,7 +4,7 @@ package meta;
 //import "k8s.io/api/core/v1/generated.proto";
 //import "/home/gleison/inspr-repos/apimachinery/pkg/apis/meta/v1/generated.proto";
 
-option go_package = "gitlab.inspr.com/ptcar/core/pkg/meta";
+option go_package = "gitlab.inspr.dev/inspr/core/pkg/meta";
 
 //option java_multiple_files = true;
 //option java_package = "io.grpc.insprd.meta";

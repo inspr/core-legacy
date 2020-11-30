@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-option go_package = "gitlab.inspr.com/ptcar/core/pkg/meta";
+option go_package = "gitlab.inspr.dev/inspr/core/pkg/meta";
 option java_multiple_files = true;
 option java_package = "io.grpc.insprd.meta";
 option java_outer_classname = "InsprDMetaProto";

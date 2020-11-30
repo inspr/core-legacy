@@ -3,8 +3,8 @@ package core
 import (
 	"testing"
 
-	meta "gitlab.inspr.com/ptcar/core/pkg/meta"
-	"gitlab.inspr.com/ptcar/core/pkg/test"
+	meta "gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/test"
 )
 
 func Test_newRoot(t *testing.T) {

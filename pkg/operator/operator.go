@@ -1,7 +1,7 @@
 package operator
 
 import (
-	meta "gitlab.inspr.com/ptcar/core/pkg/meta"
+	meta "gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
 // ClusterOperator defines an interface to operate on cluster
