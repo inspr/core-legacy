@@ -8,14 +8,14 @@ import (
 
 // Pod is used to build a pod with a deployment.
 type Pod interface {
-	WithObjectMetadata(name string, namespace string, labels map[string]string)
-	WithPodTemplateSpec(containerName string, containerImage string)
+	WithObjectMetadata(name string, namespace string, labels map[string]string) Pod
+	WithPodTemplateSpec(containerName string, containerImage string) Pod
 	WithPodTemplateObjectMetadata(
 		templateName string,
 		templateNamespace string,
 		templateLabels map[string]string,
-	)
-	WithPodSelectorMatchLabels(matchLabels map[string]string)
+	) Pod
+	WithPodSelectorMatchLabels(matchLabels map[string]string) Pod
 	GetDeployment() *v1.Deployment
 }
 
@@ -32,16 +32,17 @@ func NewPod() Pod {
 
 //WithObejctMetadata return a Object Metadata to a pod
 func (builder *builderPod) WithObjectMetadata(name string, namespace string,
-	labels map[string]string) {
+	labels map[string]string) Pod {
 	builder.pod.ObjectMeta = metav1.ObjectMeta{
 		Name:      name,
 		Namespace: namespace,
 		Labels:    labels,
 	}
+	return builder
 }
 
 // WithPodSpec specify the pod spec to a pod template.
-func (builder *builderPod) WithPodTemplateSpec(containerName string, containerImage string) {
+func (builder *builderPod) WithPodTemplateSpec(containerName string, containerImage string) Pod {
 	builder.pod.Spec.Template.Spec = apiv1.PodSpec{
 		Containers: []apiv1.Container{
 			{
@@ -52,23 +53,26 @@ func (builder *builderPod) WithPodTemplateSpec(containerName string, containerIm
 			},
 		},
 	}
+	return builder
 }
 
 // WithObjectMetadata specify the metadata to a pod template.
 func (builder *builderPod) WithPodTemplateObjectMetadata(templateName string, templateNamespace string,
-	templateLabels map[string]string) {
+	templateLabels map[string]string) Pod {
 	builder.pod.Spec.Template.ObjectMeta = metav1.ObjectMeta{
 		Name:      templateName,
 		Namespace: templateNamespace,
 		Labels:    templateLabels,
 	}
+	return builder
 }
 
 // WithPodSelectorMatchLabels create a Match label for a given pod.
-func (builder *builderPod) WithPodSelectorMatchLabels(matchLabels map[string]string) {
+func (builder *builderPod) WithPodSelectorMatchLabels(matchLabels map[string]string) Pod {
 	builder.pod.Spec.Selector = &metav1.LabelSelector{
 		MatchLabels: matchLabels,
 	}
+	return builder
 }
 
 // GetDeployment returns the created object
