@@ -24,11 +24,11 @@ type NodeOperatorClient interface {
 	// Performs a node update operation
 	UpdateNode(ctx context.Context, in *NodeWithDescription, opts ...grpc.CallOption) (*NodeReply, error)
 	// Performs a node search / recover operation
-	GetNode(ctx context.Context, in *NodeDescription, opts ...grpc.CallOption) (*NodeDescription, error)
+	GetNode(ctx context.Context, in *NodeDescription, opts ...grpc.CallOption) (*Node, error)
 	// Performs a node list operation
-	ListNodes(ctx context.Context, in *Stub, opts ...grpc.CallOption) (*NodeDescriptionArray, error)
+	ListNodes(ctx context.Context, in *Stub, opts ...grpc.CallOption) (*NodeArray, error)
 	// Returns the node status for each app
-	UpdateNodeStatus(ctx context.Context, in *Stub, opts ...grpc.CallOption) (*NodeStatus, error)
+	UpdateNodeStatus(ctx context.Context, in *Stub, opts ...grpc.CallOption) (*NodeArray, error)
 }
 
 type nodeOperatorClient struct {
@@ -66,8 +66,8 @@ func (c *nodeOperatorClient) UpdateNode(ctx context.Context, in *NodeWithDescrip
 	return out, nil
 }
 
-func (c *nodeOperatorClient) GetNode(ctx context.Context, in *NodeDescription, opts ...grpc.CallOption) (*NodeDescription, error) {
-	out := new(NodeDescription)
+func (c *nodeOperatorClient) GetNode(ctx context.Context, in *NodeDescription, opts ...grpc.CallOption) (*Node, error) {
+	out := new(Node)
 	err := c.cc.Invoke(ctx, "/meta.NodeOperator/GetNode", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -75,8 +75,8 @@ func (c *nodeOperatorClient) GetNode(ctx context.Context, in *NodeDescription, o
 	return out, nil
 }
 
-func (c *nodeOperatorClient) ListNodes(ctx context.Context, in *Stub, opts ...grpc.CallOption) (*NodeDescriptionArray, error) {
-	out := new(NodeDescriptionArray)
+func (c *nodeOperatorClient) ListNodes(ctx context.Context, in *Stub, opts ...grpc.CallOption) (*NodeArray, error) {
+	out := new(NodeArray)
 	err := c.cc.Invoke(ctx, "/meta.NodeOperator/ListNodes", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -84,8 +84,8 @@ func (c *nodeOperatorClient) ListNodes(ctx context.Context, in *Stub, opts ...gr
 	return out, nil
 }
 
-func (c *nodeOperatorClient) UpdateNodeStatus(ctx context.Context, in *Stub, opts ...grpc.CallOption) (*NodeStatus, error) {
-	out := new(NodeStatus)
+func (c *nodeOperatorClient) UpdateNodeStatus(ctx context.Context, in *Stub, opts ...grpc.CallOption) (*NodeArray, error) {
+	out := new(NodeArray)
 	err := c.cc.Invoke(ctx, "/meta.NodeOperator/UpdateNodeStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -104,11 +104,11 @@ type NodeOperatorServer interface {
 	// Performs a node update operation
 	UpdateNode(context.Context, *NodeWithDescription) (*NodeReply, error)
 	// Performs a node search / recover operation
-	GetNode(context.Context, *NodeDescription) (*NodeDescription, error)
+	GetNode(context.Context, *NodeDescription) (*Node, error)
 	// Performs a node list operation
-	ListNodes(context.Context, *Stub) (*NodeDescriptionArray, error)
+	ListNodes(context.Context, *Stub) (*NodeArray, error)
 	// Returns the node status for each app
-	UpdateNodeStatus(context.Context, *Stub) (*NodeStatus, error)
+	UpdateNodeStatus(context.Context, *Stub) (*NodeArray, error)
 	mustEmbedUnimplementedNodeOperatorServer()
 }
 
@@ -125,13 +125,13 @@ func (UnimplementedNodeOperatorServer) DeleteNode(context.Context, *NodeDescript
 func (UnimplementedNodeOperatorServer) UpdateNode(context.Context, *NodeWithDescription) (*NodeReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateNode not implemented")
 }
-func (UnimplementedNodeOperatorServer) GetNode(context.Context, *NodeDescription) (*NodeDescription, error) {
+func (UnimplementedNodeOperatorServer) GetNode(context.Context, *NodeDescription) (*Node, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNode not implemented")
 }
-func (UnimplementedNodeOperatorServer) ListNodes(context.Context, *Stub) (*NodeDescriptionArray, error) {
+func (UnimplementedNodeOperatorServer) ListNodes(context.Context, *Stub) (*NodeArray, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListNodes not implemented")
 }
-func (UnimplementedNodeOperatorServer) UpdateNodeStatus(context.Context, *Stub) (*NodeStatus, error) {
+func (UnimplementedNodeOperatorServer) UpdateNodeStatus(context.Context, *Stub) (*NodeArray, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodeStatus not implemented")
 }
 func (UnimplementedNodeOperatorServer) mustEmbedUnimplementedNodeOperatorServer() {}

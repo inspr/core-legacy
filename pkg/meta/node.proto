@@ -32,31 +32,25 @@ service NodeOperator {
   rpc UpdateNode (nodeWithDescription) returns (nodeReply) {}
 
   // Performs a node search / recover operation
-  rpc GetNode (nodeDescription) returns (nodeDescription) {}
+  rpc GetNode (nodeDescription) returns (Node) {}
 
   // Performs a node list operation
-  rpc ListNodes (stub) returns (nodeDescriptionArray) {}
+  rpc ListNodes (stub) returns (nodeArray) {}
 
   // Returns the node status for each app
-  rpc UpdateNodeStatus (stub) returns (nodeStatus) {}
-}
-
-// The request message containing the node description and its ID
-message nodeStatus {
-    string name = 1;
-    string status = 2;
-    string description = 3;
+  rpc UpdateNodeStatus (stub) returns (nodeArray) {}
 }
 
 // The request message containing and array of node description
-message nodeDescriptionArray {
-    repeated Node nodeDescription = 1;
+message nodeArray {
+    repeated Node node = 1;
+    repeated string status = 2;
 }
 
 // The request message containing the Channel description
 message nodeWithDescription {
-    string channelDescription = 1;
-    Node targetChannel = 2;
+    string nodeDescription = 1;
+    Node targetNode = 2;
 }
 
 
