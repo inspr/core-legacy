@@ -5,8 +5,10 @@ import (
 
 	pb "gitlab.inspr.dev/inspr/core/pkg/meta"
 	appsv1 "k8s.io/api/apps/v1"
-	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"gitlab.inspr.dev/inspr/core/cmd/operator/k8s/builder"
+
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -25,6 +27,14 @@ type server struct {
 type Server interface {
 	createKubeDeployment() *appsv1.Deployment
 	CreateNode(ctx context.Context, in *pb.Node) (*pb.NodeReply, error)
+	DeleteNode(ctx context.Context, in *pb.NodeDescription) (*pb.NodeReply, error)
+}
+
+func newNodeReply(err error, value string) (*pb.NodeReply, error) {
+	return &pb.NodeReply{
+		Error: err.Error(),
+		Value: string,
+	}, err
 }
 
 // NewServer instanciate a new server
@@ -47,42 +57,13 @@ func NewServer() (Server, error) {
 
 func (s *server) createKubeDeployment() *appsv1.Deployment {
 	nodeName := s.node.Metadata.Name + s.node.Metadata.Sha256
-	return &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      nodeName,
-			Namespace: s.node.Metadata.Parent,
-			Labels:    map[string]string{"app": nodeName},
-		},
-		Spec: appsv1.DeploymentSpec{
-			Replicas: &s.replicas,
-			Selector: &metav1.LabelSelector{
-				MatchLabels: map[string]string{"app": nodeName},
-			},
-			Strategy: appsv1.DeploymentStrategy{
-				Type: appsv1.RollingUpdateDeploymentStrategyType,
-			},
-			Template: apiv1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{"app": nodeName},
-				},
-				Spec: apiv1.PodSpec{
-					Containers: []apiv1.Container{
-						{
-							Name: nodeName,
-							// parse from master env var to kube env vars
-							ImagePullPolicy: apiv1.PullAlways,
-							Env: []apiv1.EnvVar{
-								{
-									Name:  "UUID",
-									Value: s.node.Metadata.Sha256,
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+	labels := map[string]string{"app": nodeName}
+	return builder.NewPod().
+		WithObjectMetadata(nodeName, s.namespace, labels).
+		WithPodSelectorMatchLabels(labels).
+		WithPodTemplateObjectMetadata(nodeName, s.namespace, labels).
+		WithPodTemplateSpec(nodeName, s.node.Spec.Image).
+		GetDeployment()
 }
 
 // CreateNode implements server.CreateNode
@@ -93,34 +74,24 @@ func (s *server) CreateNode(ctx context.Context, in *pb.Node) (*pb.NodeReply, er
 	kubeDeployment := s.createKubeDeployment()
 	deployment, err := s.kubeClient.AppsV1().Deployments(namespace).Create(kubeDeployment)
 	if err != nil {
-		return &pb.NodeReply{
-			Error: err.Error(),
-			Value: "",
-		}, nil
+		return newNodeReply(err, "")
 	}
 
 	nodeName := s.node.Metadata.Name + s.node.Metadata.Sha256
 	s.deployments[nodeName] = deployment
 
-	return &pb.NodeReply{
-		Error: "",
-		Value: nodeName,
-	}, nil
+	return newNodeReply(nil, nodeName)
 }
 
-/*
-func main() {
-	//even = 0
-	lis, err := net.Listen("tcp", port)
+// DeleteNode implements server.CreateNode
+func (s *server) DeleteNode(ctx context.Context, in *pb.NodeDescription) (*pb.NodeReply, error) {
+	nodeName := in.NodeDescription
+	err := s.kubeClient.AppsV1().Deployments(s.namespace).Delete(nodeName, nil)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return newNodeReply(err, "")
 	}
-	s := grpc.NewServer()
-	pb.RegisterOperatorServer(s, &server{})
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
-}*/
+	return newNodeReply(nil, nodeName)
+}
 
 // UpdateNodeStatus returns the up to date pod status for each node
 func UpdateNodeStatus() map[string]string {
