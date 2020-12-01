@@ -14,55 +14,44 @@
 
 syntax = "proto3";
 
-option go_package = "google.golang.org/grpc/examples/helloworld/helloworld";
-option java_multiple_files = true;
-option java_package = "io.grpc.examples.helloworld";
-option java_outer_classname = "HelloWorldProto";
+option go_package = "gitlab.inspr.dev/inspr/core/pkg/meta";
 
-import "gitlab.inspr.dev/core/pkg/meta"
+import "meta.proto";
 
-package comunication;
+package meta;
 
-// The Channel service definition.
-service Operator {
+// The Channel service definition.22
+service ChannelOperator {
   // Performs a Channel create operation
-  rpc CreateChannel (channelDescription) returns (channelReply) {}
+  rpc CreateChannel (Channel) returns (channelReply) {}
 
   // Performs a Channel delete operation
-  rpc DeleteChannel (channelID) returns (channelReply) {}
+  rpc DeleteChannel (channelDescription) returns (channelReply) {}
 
   // Performs a Channel update operation
-  rpc UpdateChannel (channel) returns (channelReply) {}
+  rpc UpdateChannel (channelWithDescription) returns (channelReply) {}
 
   // Performs a Channel search / recover operation
-  rpc GetChannel (channelID) returns (channelDescription) {}
+  rpc GetChannel (channelDescription) returns (Channel) {}
 
   // Performs a Channel list operation
   rpc ListChannels (stub) returns (channelDescriptionArray) {}
 }
 
-// A stub message to search data
-message stub {}
-
-// The request message containing the Channel description and its ID
-message channel {
-    string name = 1;
-    string channelDescription = 2;
-}
-
 // The request message containing and array of Channel description
 message channelDescriptionArray {
-    repeated string channelDescription = 1;
+    repeated Channel channelDescription = 1;
+}
+
+// The request message containing the Channel description
+message channelWithDescription {
+    string channelDescription = 1;
+    Channel targetChannel = 2;
 }
 
 // The request message containing the Channel description
 message channelDescription {
     string channelDescription = 1;
-}
-
-// The request message containing the Channel ID
-message channelID {
-    string name = 1;
 }
 
 // The response message containing the response

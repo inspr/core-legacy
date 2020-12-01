@@ -1,5 +1,6 @@
 package core
 
+/*
 import (
 	"strings"
 	"sync"
@@ -286,3 +287,4 @@ func (m *insprdMemory) MonitoreApps() {
 func (m *insprdMemory) getStruct() *insprdMemory {
 	return m
 }
+*/

@@ -14,41 +14,31 @@
 
 syntax = "proto3";
 
-option go_package = "google.golang.org/grpc/examples/helloworld/helloworld";
-option java_multiple_files = true;
-option java_package = "io.grpc.examples.helloworld";
-option java_outer_classname = "HelloWorldProto";
+option go_package = "gitlab.inspr.dev/inspr/core/pkg/meta";
 
-package comunication;
+import "meta.proto";
+
+package meta;
 
 // The node service definition.
-service Operator {
+service NodeOperator {
   // Performs a node create operation
-  rpc CreateNode (nodeDescription) returns (nodeReply) {}
+  rpc CreateNode (Node) returns (nodeReply) {}
 
   // Performs a node de;ete operation
-  rpc DeleteNode (nodeID) returns (nodeReply) {}
+  rpc DeleteNode (nodeDescription) returns (nodeReply) {}
 
   // Performs a node update operation
-  rpc UpdateNode (node) returns (nodeReply) {}
+  rpc UpdateNode (nodeWithDescription) returns (nodeReply) {}
 
   // Performs a node search / recover operation
-  rpc GetNode (nodeID) returns (nodeDescription) {}
+  rpc GetNode (nodeDescription) returns (nodeDescription) {}
 
   // Performs a node list operation
   rpc ListNodes (stub) returns (nodeDescriptionArray) {}
 
   // Returns the node status for each app
   rpc UpdateNodeStatus (stub) returns (nodeStatus) {}
-}
-
-// A stub message to search data
-message stub {}
-
-// The request message containing the node description and its ID
-message node {
-    string name = 1;
-    string nodeDescription = 2;
 }
 
 // The request message containing the node description and its ID
@@ -60,17 +50,19 @@ message nodeStatus {
 
 // The request message containing and array of node description
 message nodeDescriptionArray {
-    repeated string nodeDescription = 1;
+    repeated Node nodeDescription = 1;
 }
+
+// The request message containing the Channel description
+message nodeWithDescription {
+    string channelDescription = 1;
+    Node targetChannel = 2;
+}
+
 
 // The request message containing the node description
 message nodeDescription {
     string nodeDescription = 1;
-}
-
-// The request message containing the node ID
-message nodeID {
-    string name = 1;
 }
 
 // The response message containing the response
