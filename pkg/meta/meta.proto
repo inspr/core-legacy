@@ -1,10 +1,11 @@
-syntax = "proto3";
-package meta;
+
 
 //import "k8s.io/api/core/v1/generated.proto";
 //import "/home/gleison/inspr-repos/apimachinery/pkg/apis/meta/v1/generated.proto";
 
-option go_package = "gitlab.inspr.dev/inspr/core/pkg/meta";
+syntax = "proto3";
+package meta;
+option go_package = "pkg/meta";
 
 //option java_multiple_files = true;
 //option java_package = "io.grpc.insprd.meta";
