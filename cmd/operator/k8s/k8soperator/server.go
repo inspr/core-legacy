@@ -66,7 +66,7 @@ func NewServer() (Server, error) {
 }
 
 func (s *ServerStruct) createKubeDeployment(node *pb.Node) *appsv1.Deployment {
-	nodeName := node.Metadata.Name + node.Metadata.Sha256
+	nodeName := node.Metadata.Name
 	labels := map[string]string{"app": nodeName}
 	return builder.NewPod().
 		WithObjectMetadata(nodeName, s.namespace, labels).
@@ -85,7 +85,7 @@ func (s *ServerStruct) CreateNode(ctx context.Context, in *pb.Node) (*pb.NodeRep
 		return newNodeReply(err, "")
 	}
 
-	nodeName := in.Metadata.Name + in.Metadata.Sha256
+	nodeName := in.Metadata.Name
 	s.deployments[nodeName] = deployment
 	s.nodes[nodeName] = in
 
