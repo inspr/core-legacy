@@ -95,5 +95,5 @@ var _Operator_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "comunication/comunication.proto",
+	Metadata: "comunication.proto",
 }

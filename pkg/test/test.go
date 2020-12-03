@@ -26,7 +26,6 @@ type Suite interface {
 
 // NewSuite represents a new suite
 func NewSuite(name string, t *testing.T) Suite {
-
 	return &testSuite{
 		t:         t,
 		testCases: make(map[string]func(t *testing.T)),
