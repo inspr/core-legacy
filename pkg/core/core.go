@@ -1,13 +1,15 @@
 package core
 
-/*
 import (
+	"context"
+	"errors"
+	"log"
 	"strings"
 	"sync"
 	"time"
 
-	k8soperator "gitlab.inspr.dev/inspr/core/cmd/operator/k8s/k8soperator"
 	meta "gitlab.inspr.dev/inspr/core/pkg/meta"
+	"google.golang.org/grpc"
 )
 
 type appStatus struct {
@@ -23,11 +25,6 @@ type appStatus struct {
 //  names
 //---------------------------------------------------------
 type insprdMemory struct {
-	// An empty string represents a channel that exists in memory
-	// Example:    ch01 -> "" represents that ch01 exists in memory
-	// Example:    ch02 -> ch01 represents that ch02 is alias to ch01
-	aliasChannel map[string]string
-
 	// An identifier that maps App's ID to apps.
 	apps     map[string]*meta.App
 	channels map[string]*meta.Channel
@@ -55,33 +52,60 @@ type insprdMemory struct {
 	// Kind of app status
 	// Valid kinds are:
 	statusKind string
+
+	// The address of a cluster operator
+	clusterOperatorAddrress       string
+	clusterOperatorCancelFunction context.CancelFunc
+	clusterOperator               meta.NodeOperatorClient
+	clusterOperatorContext        context.Context
 }
 
 // InsprDTree defines the interface to operate inspr's memory objects
 type InsprDTree interface {
-	CreateApp(scopeName string, app *meta.App)
-	DeleteApp(appName string)
-	UpdateApp(app *meta.App)
-	CreateChannel(scopeName string, channel *meta.Channel)
-	DeleteChannel(channelName string)
-	CreateAliasChannel(channelFrom string, channelTo string)
-	DeleteAliasChannel(channelFrom string)
+	CloseMemoryConnections()
+
+	CreateApp(scopeName string, app *meta.App) error
+	DeleteApp(appName string) error
+	UpdateApp(app *meta.App) error
+
+	CreateChannel(scopeName string, channel *meta.Channel) error
+	DeleteChannel(channelName string) error
+	CreateAliasChannel(channelFrom string, channelTo string) error
+	DeleteAliasChannel(channelFrom string) error
 	getStruct() *insprdMemory
 }
 
 func newRoot() *meta.App {
 	app := meta.App{}
 	app.Metadata.Name = "inspr"
-	app.Parent = ""
+	app.Metadata.Parent = ""
 	app.Spec.Apps = make([]*meta.App, 0)
 	app.Spec.Channels = make([]*meta.Channel, 0)
 	return &app
 }
 
+func (m *insprdMemory) instantiateOperator() {
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(m.clusterOperatorAddrress,
+		grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	m.clusterOperator = meta.NewNodeOperatorClient(conn)
+
+	m.clusterOperatorContext, m.clusterOperatorCancelFunction =
+		context.WithTimeout(context.Background(), time.Second)
+}
+
+func (m *insprdMemory) CloseMemoryConnections() {
+	m.clusterOperatorCancelFunction()
+}
+
 // NewInsprDTree instanciate a new Inspr Tree object
 func NewInsprDTree() InsprDTree {
 	tree := insprdMemory{
-		aliasChannel:  make(map[string]string),
+		//aliasChannel:  make(map[string]string),
 		apps:          make(map[string]*meta.App),
 		channels:      make(map[string]*meta.Channel),
 		channelScopes: make(map[string]string),
@@ -91,25 +115,37 @@ func NewInsprDTree() InsprDTree {
 	tree.apps["inspr"] = tree.tree
 	tree.appScopes["inspr"] = ""
 	tree.stopSubProcess = false
+	tree.clusterOperatorAddrress = "localhost:50050"
+	tree.instantiateOperator()
 	return &tree
 }
 
-func (m *insprdMemory) CreateApp(scopeName string, app *meta.App) {
+func (m *insprdMemory) CreateApp(scopeName string, app *meta.App) error {
 	m.Lock()
 	appName := app.Metadata.Name
 	m.apps[appName] = app
 	m.appScopes[appName] = scopeName
 	m.apps[scopeName].Spec.Apps =
 		append(m.apps[scopeName].Spec.Apps, app)
-	// TODO: code to create the app on kubernetes
+	// Code to create the app into the cluster
+	nodeReply, err := m.clusterOperator.CreateNode(m.clusterOperatorContext, app.Spec.Node)
+	if err != nil {
+		m.Unlock()
+		return err
+	} else if nodeReply.Error != "" {
+		m.Unlock()
+		return errors.New(nodeReply.Error)
+	}
+
 	m.Unlock()
+	return nil
 }
 
-func (m *insprdMemory) DeleteApp(appName string) {
+func (m *insprdMemory) DeleteApp(appName string) error {
 	m.Lock()
 	if _, ok := m.apps[appName]; !ok {
 		m.Unlock()
-		return
+		return nil
 	}
 	// Delete the app dependencies for apps
 	for index := 0; index < len(m.apps[appName].Spec.Apps); index++ {
@@ -130,7 +166,7 @@ func (m *insprdMemory) DeleteApp(appName string) {
 	}
 	// Delete the app dependencies for channels
 	for index := 0; index < len(m.apps[appName].Spec.Channels); index++ {
-		key := m.apps[appName].Spec.Channels[index].Meta.Name
+		key := m.apps[appName].Spec.Channels[index].Metadata.Name
 		m.Unlock()
 		m.DeleteChannel(key)
 		m.Lock()
@@ -150,104 +186,108 @@ func (m *insprdMemory) DeleteApp(appName string) {
 		delete(m.appScopes, appName)
 	}
 	// TODO: code to delete the app on kubernetes
+	nodeDescription := meta.NodeDescription{
+		NodeDescription: appName,
+	}
+	nodeReply, err := m.clusterOperator.DeleteNode(m.clusterOperatorContext, &nodeDescription)
+	if err != nil {
+		m.Unlock()
+		return err
+	} else if nodeReply.Error != "" {
+		m.Unlock()
+		return errors.New(nodeReply.Error)
+	}
 	m.Unlock()
+	return nil
 }
 
-func (m *insprdMemory) UpdateApp(app *meta.App) {
-	name := app.Metadata.Name
+func (m *insprdMemory) UpdateApp(app *meta.App) error {
 	m.Lock()
-	scope := app.Metadata.Parent
 	m.Unlock()
-	m.DeleteApp(name)
-	m.CreateApp(scope, app)
+	err := m.UpdateApp(app)
+	if err != nil {
+		m.Unlock()
+		return err
+	}
+	m.Unlock()
+	return err
 }
 
-func (m *insprdMemory) CreateChannel(scopeName string, channel *meta.Channel) {
+func (m *insprdMemory) CreateChannel(scopeName string, channel *meta.Channel) error {
 	m.Lock()
-	channelName := channel.Meta.Name
+	channelName := channel.Metadata.Name
 	m.channelScopes[channelName] = scopeName
 	m.apps[scopeName].Spec.Channels =
 		append(m.apps[scopeName].Spec.Channels, channel)
 	m.channels[channelName] = channel
-	// TODO: code to create the channel on kubernetes
+	// TODO: code to create the channel on message Broker
 	m.Unlock()
+	return nil
 }
 
-func (m *insprdMemory) DeleteChannel(channelName string) {
+func (m *insprdMemory) DeleteChannel(channelName string) error {
 	m.Lock()
 	delete(m.channelScopes, channelName)
 	delete(m.channels, channelName)
-	// TODO: code to delete the channel on kubernetes
+	// TODO: code to delete the channel on message Broker
 	m.Unlock()
+	return nil
 }
 
-func (m *insprdMemory) recoverChannelTarget(channelTo string) string {
+func (m *insprdMemory) CreateAliasChannel(channelFrom string, channelTo string) error {
 	m.Lock()
-	key := channelTo
-	for {
-		if _, ok := m.aliasChannel[key]; !ok {
-			break
-		}
-		if m.aliasChannel[key] != "" {
-			key = m.aliasChannel[key]
-		} else {
-			break
-		}
-	}
-	m.Unlock()
-	return key
-}
-
-func (m *insprdMemory) CreateAliasChannel(channelFrom string, channelTo string) {
-	m.Lock()
-	m.aliasChannel[channelFrom] = channelTo
-	m.Unlock()
-	channelTarget := m.recoverChannelTarget(channelTo)
-	m.Lock()
+	// TODO: create a alias just if the app use the channel.
+	// At this point, we do not know the list of channels used by an app
 	for k := range m.apps {
-		// --------------------------------------------------------------------
-		// Delete the unused Channel:
-		// Kube.delete(m.apps[k].Spec.Channels[channelFrom])
-
-		// TODO: Add code to propagatete the change to kubernetes nodes
-
-		// --------------------------------------------------------------------
-		//
-		//
 		// --------------------------------------------------------------------
 		// Update all alias to the target reference:
-		for index := range m.apps[k].Spec.Channels {
-			if m.apps[k].Spec.Channels[index].Meta.Name == channelFrom {
-				m.apps[k].Spec.Channels[index] = m.channels[channelTarget]
+		for index := 0; index < len(m.apps[k].Spec.ChannelAlias.Reference); index++ {
+			if m.apps[k].Spec.ChannelAlias.Reference[index] == channelFrom {
+				m.apps[k].Spec.ChannelAlias.Reference =
+					append(m.apps[k].Spec.ChannelAlias.Reference[:index],
+						m.apps[k].Spec.ChannelAlias.Reference[index+1:]...)
+
+				m.apps[k].Spec.ChannelAlias.Target =
+					append(m.apps[k].Spec.ChannelAlias.Target[:index],
+						m.apps[k].Spec.ChannelAlias.Target[index+1:]...)
+				index = index - 1
 			}
 		}
-		// TODO: Add code to propagatete the change to kubernetes nodes
-		// --------------------------------------------------------------------
-
-	}
-
-	for k := range m.apps {
-		// Delete duplicated channels:
-		count := 0
-		for index := range m.apps[k].Spec.Channels {
-			if m.apps[k].Spec.Channels[index].Meta.Name == channelTarget {
-				if count >= 1 {
-					copy(m.apps[k].Spec.Channels[index:],
-						m.apps[k].Spec.Channels[index+1:])
-					m.apps[k].Spec.Channels =
-						m.apps[k].Spec.Channels[:len(m.apps[k].Spec.Channels)-1]
-				}
-				count++
-			}
-		}
+		m.apps[k].Spec.ChannelAlias.Reference =
+			append(m.apps[k].Spec.ChannelAlias.Reference, channelFrom)
+		m.apps[k].Spec.ChannelAlias.Target =
+			append(m.apps[k].Spec.ChannelAlias.Target, channelTo)
 	}
 	m.Unlock()
+	return nil
 }
 
-func (m *insprdMemory) DeleteAliasChannel(channelFrom string) {
+func (m *insprdMemory) DeleteAliasChannel(channelFrom string) error {
 	m.Lock()
-	delete(m.aliasChannel, channelFrom)
+	// TODO: create a alias just if the app use the channel.
+	// At this point, we do not know the list of channels used by an app
+	for k := range m.apps {
+		// --------------------------------------------------------------------
+		// Update all alias to the target reference:
+		for index := 0; index < len(m.apps[k].Spec.ChannelAlias.Reference); index++ {
+			if m.apps[k].Spec.ChannelAlias.Reference[index] == channelFrom {
+				m.apps[k].Spec.ChannelAlias.Reference =
+					append(m.apps[k].Spec.ChannelAlias.Reference[:index],
+						m.apps[k].Spec.ChannelAlias.Reference[index+1:]...)
+
+				m.apps[k].Spec.ChannelAlias.Target =
+					append(m.apps[k].Spec.ChannelAlias.Target[:index],
+						m.apps[k].Spec.ChannelAlias.Target[index+1:]...)
+				index = index - 1
+			}
+		}
+		m.apps[k].Spec.ChannelAlias.Reference =
+			append(m.apps[k].Spec.ChannelAlias.Reference, channelFrom)
+		m.apps[k].Spec.ChannelAlias.Target =
+			append(m.apps[k].Spec.ChannelAlias.Target, channelFrom)
+	}
 	m.Unlock()
+	return nil
 }
 
 func (m *insprdMemory) MonitoreApps() {
@@ -261,7 +301,14 @@ func (m *insprdMemory) MonitoreApps() {
 			}
 			m.monitor.Lock()
 			var toUpdate []string
-			for key, value := range k8soperator.UpdateNodeStatus() {
+			nodes, err := m.clusterOperator.UpdateNodeStatus(m.clusterOperatorContext, &meta.Stub{})
+			if err != nil {
+				return
+			}
+
+			for index := 0; index < len(nodes.Node); index++ {
+				key := nodes.Node[index].Metadata.Name
+				value := nodes.Status[index]
 				m.monitor.status[key] = value
 				if value != "running" {
 					if m.statusKind == "hard" {
@@ -287,4 +334,3 @@ func (m *insprdMemory) MonitoreApps() {
 func (m *insprdMemory) getStruct() *insprdMemory {
 	return m
 }
-*/
