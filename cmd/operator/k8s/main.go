@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	k8sop "gitlab.inspr.dev/inspr/core/cmd/operator/k8s/k8soperator"
+	k8sop "gitlab.inspr.dev/inspr/core/cmd/operator/k8s/server"
 	pb "gitlab.inspr.dev/inspr/core/pkg/meta"
 
 	"google.golang.org/grpc"
