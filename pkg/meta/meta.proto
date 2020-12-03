@@ -46,6 +46,12 @@ message Node {
     NodeSpec spec = 2;
 }
 
+// Channel alias
+message ChannelAlias {
+    repeated string reference = 1;
+    repeated string target = 2;
+}
+
 // AppBoundary represents the connections this app can make to other apps. These are the fields that can be overriten
 // by the ChannelAliases when instantiating the app.
 message AppBoundary {
@@ -62,8 +68,9 @@ message AppBoundary {
 message AppSpec {
     Node node = 1;
     repeated App apps = 2;
-    repeated Channel channel = 3;
-    AppBoundary boundary = 4;
+    repeated Channel channels = 3;
+    ChannelAlias channelAlias = 4;
+    AppBoundary boundary = 5;
 }
 
 // App is an inspr component that represents an App. An App can contain other apps, channels and other components.

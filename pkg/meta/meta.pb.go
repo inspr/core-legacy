@@ -306,6 +306,62 @@ func (x *Node) GetSpec() *NodeSpec {
 	return nil
 }
 
+// Channel alias
+type ChannelAlias struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Reference []string `protobuf:"bytes,1,rep,name=reference,proto3" json:"reference,omitempty"`
+	Target    []string `protobuf:"bytes,2,rep,name=target,proto3" json:"target,omitempty"`
+}
+
+func (x *ChannelAlias) Reset() {
+	*x = ChannelAlias{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_meta_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChannelAlias) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChannelAlias) ProtoMessage() {}
+
+func (x *ChannelAlias) ProtoReflect() protoreflect.Message {
+	mi := &file_meta_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChannelAlias.ProtoReflect.Descriptor instead.
+func (*ChannelAlias) Descriptor() ([]byte, []int) {
+	return file_meta_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ChannelAlias) GetReference() []string {
+	if x != nil {
+		return x.Reference
+	}
+	return nil
+}
+
+func (x *ChannelAlias) GetTarget() []string {
+	if x != nil {
+		return x.Target
+	}
+	return nil
+}
+
 // AppBoundary represents the connections this app can make to other apps. These are the fields that can be overriten
 // by the ChannelAliases when instantiating the app.
 type AppBoundary struct {
@@ -320,7 +376,7 @@ type AppBoundary struct {
 func (x *AppBoundary) Reset() {
 	*x = AppBoundary{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_meta_proto_msgTypes[5]
+		mi := &file_meta_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -333,7 +389,7 @@ func (x *AppBoundary) String() string {
 func (*AppBoundary) ProtoMessage() {}
 
 func (x *AppBoundary) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_proto_msgTypes[5]
+	mi := &file_meta_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -346,7 +402,7 @@ func (x *AppBoundary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppBoundary.ProtoReflect.Descriptor instead.
 func (*AppBoundary) Descriptor() ([]byte, []int) {
-	return file_meta_proto_rawDescGZIP(), []int{5}
+	return file_meta_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *AppBoundary) GetInput() []string {
@@ -374,16 +430,17 @@ type AppSpec struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Node     *Node        `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
-	Apps     []*App       `protobuf:"bytes,2,rep,name=apps,proto3" json:"apps,omitempty"`
-	Channel  []*Channel   `protobuf:"bytes,3,rep,name=channel,proto3" json:"channel,omitempty"`
-	Boundary *AppBoundary `protobuf:"bytes,4,opt,name=boundary,proto3" json:"boundary,omitempty"`
+	Node         *Node         `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
+	Apps         []*App        `protobuf:"bytes,2,rep,name=apps,proto3" json:"apps,omitempty"`
+	Channels     []*Channel    `protobuf:"bytes,3,rep,name=channels,proto3" json:"channels,omitempty"`
+	ChannelAlias *ChannelAlias `protobuf:"bytes,4,opt,name=channelAlias,proto3" json:"channelAlias,omitempty"`
+	Boundary     *AppBoundary  `protobuf:"bytes,5,opt,name=boundary,proto3" json:"boundary,omitempty"`
 }
 
 func (x *AppSpec) Reset() {
 	*x = AppSpec{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_meta_proto_msgTypes[6]
+		mi := &file_meta_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -396,7 +453,7 @@ func (x *AppSpec) String() string {
 func (*AppSpec) ProtoMessage() {}
 
 func (x *AppSpec) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_proto_msgTypes[6]
+	mi := &file_meta_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -409,7 +466,7 @@ func (x *AppSpec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppSpec.ProtoReflect.Descriptor instead.
 func (*AppSpec) Descriptor() ([]byte, []int) {
-	return file_meta_proto_rawDescGZIP(), []int{6}
+	return file_meta_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *AppSpec) GetNode() *Node {
@@ -426,9 +483,16 @@ func (x *AppSpec) GetApps() []*App {
 	return nil
 }
 
-func (x *AppSpec) GetChannel() []*Channel {
+func (x *AppSpec) GetChannels() []*Channel {
 	if x != nil {
-		return x.Channel
+		return x.Channels
+	}
+	return nil
+}
+
+func (x *AppSpec) GetChannelAlias() *ChannelAlias {
+	if x != nil {
+		return x.ChannelAlias
 	}
 	return nil
 }
@@ -453,7 +517,7 @@ type App struct {
 func (x *App) Reset() {
 	*x = App{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_meta_proto_msgTypes[7]
+		mi := &file_meta_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -466,7 +530,7 @@ func (x *App) String() string {
 func (*App) ProtoMessage() {}
 
 func (x *App) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_proto_msgTypes[7]
+	mi := &file_meta_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -479,7 +543,7 @@ func (x *App) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use App.ProtoReflect.Descriptor instead.
 func (*App) Descriptor() ([]byte, []int) {
-	return file_meta_proto_rawDescGZIP(), []int{7}
+	return file_meta_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *App) GetMetadata() *Metadata {
@@ -511,7 +575,7 @@ type ChannelType struct {
 func (x *ChannelType) Reset() {
 	*x = ChannelType{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_meta_proto_msgTypes[8]
+		mi := &file_meta_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -524,7 +588,7 @@ func (x *ChannelType) String() string {
 func (*ChannelType) ProtoMessage() {}
 
 func (x *ChannelType) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_proto_msgTypes[8]
+	mi := &file_meta_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -537,7 +601,7 @@ func (x *ChannelType) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelType.ProtoReflect.Descriptor instead.
 func (*ChannelType) Descriptor() ([]byte, []int) {
-	return file_meta_proto_rawDescGZIP(), []int{8}
+	return file_meta_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ChannelType) GetReference() string {
@@ -574,7 +638,7 @@ type ChannelSpec struct {
 func (x *ChannelSpec) Reset() {
 	*x = ChannelSpec{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_meta_proto_msgTypes[9]
+		mi := &file_meta_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -587,7 +651,7 @@ func (x *ChannelSpec) String() string {
 func (*ChannelSpec) ProtoMessage() {}
 
 func (x *ChannelSpec) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_proto_msgTypes[9]
+	mi := &file_meta_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -600,7 +664,7 @@ func (x *ChannelSpec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelSpec.ProtoReflect.Descriptor instead.
 func (*ChannelSpec) Descriptor() ([]byte, []int) {
-	return file_meta_proto_rawDescGZIP(), []int{9}
+	return file_meta_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ChannelSpec) GetType() *ChannelType {
@@ -631,7 +695,7 @@ type Channel struct {
 func (x *Channel) Reset() {
 	*x = Channel{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_meta_proto_msgTypes[10]
+		mi := &file_meta_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -644,7 +708,7 @@ func (x *Channel) String() string {
 func (*Channel) ProtoMessage() {}
 
 func (x *Channel) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_proto_msgTypes[10]
+	mi := &file_meta_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -657,7 +721,7 @@ func (x *Channel) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Channel.ProtoReflect.Descriptor instead.
 func (*Channel) Descriptor() ([]byte, []int) {
-	return file_meta_proto_rawDescGZIP(), []int{10}
+	return file_meta_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *Channel) GetMetadata() *Metadata {
@@ -700,18 +764,26 @@ var file_meta_proto_rawDesc = []byte{
 	0x61, 0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x22, 0x0a, 0x04, 0x73,
 	0x70, 0x65, 0x63, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x6d, 0x65, 0x74, 0x61,
 	0x2e, 0x4e, 0x6f, 0x64, 0x65, 0x53, 0x70, 0x65, 0x63, 0x52, 0x04, 0x73, 0x70, 0x65, 0x63, 0x22,
-	0x39, 0x0a, 0x0b, 0x41, 0x70, 0x70, 0x42, 0x6f, 0x75, 0x6e, 0x64, 0x61, 0x72, 0x79, 0x12, 0x14,
-	0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x05, 0x69,
-	0x6e, 0x70, 0x75, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x6f, 0x75, 0x70, 0x75, 0x74, 0x18, 0x02, 0x20,
-	0x03, 0x28, 0x09, 0x52, 0x05, 0x6f, 0x75, 0x70, 0x75, 0x74, 0x22, 0xa0, 0x01, 0x0a, 0x07, 0x41,
-	0x70, 0x70, 0x53, 0x70, 0x65, 0x63, 0x12, 0x1e, 0x0a, 0x04, 0x6e, 0x6f, 0x64, 0x65, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x6d, 0x65, 0x74, 0x61, 0x2e, 0x4e, 0x6f, 0x64, 0x65,
-	0x52, 0x04, 0x6e, 0x6f, 0x64, 0x65, 0x12, 0x1d, 0x0a, 0x04, 0x61, 0x70, 0x70, 0x73, 0x18, 0x02,
-	0x20, 0x03, 0x28, 0x0b, 0x32, 0x09, 0x2e, 0x6d, 0x65, 0x74, 0x61, 0x2e, 0x41, 0x70, 0x70, 0x52,
-	0x04, 0x61, 0x70, 0x70, 0x73, 0x12, 0x27, 0x0a, 0x07, 0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c,
-	0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0d, 0x2e, 0x6d, 0x65, 0x74, 0x61, 0x2e, 0x43, 0x68,
-	0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x07, 0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x2d,
-	0x0a, 0x08, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x61, 0x72, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b,
+	0x44, 0x0a, 0x0c, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x12,
+	0x1c, 0x0a, 0x09, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x09, 0x52, 0x09, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x12, 0x16, 0x0a,
+	0x06, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x74,
+	0x61, 0x72, 0x67, 0x65, 0x74, 0x22, 0x39, 0x0a, 0x0b, 0x41, 0x70, 0x70, 0x42, 0x6f, 0x75, 0x6e,
+	0x64, 0x61, 0x72, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x6f, 0x75,
+	0x70, 0x75, 0x74, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x05, 0x6f, 0x75, 0x70, 0x75, 0x74,
+	0x22, 0xda, 0x01, 0x0a, 0x07, 0x41, 0x70, 0x70, 0x53, 0x70, 0x65, 0x63, 0x12, 0x1e, 0x0a, 0x04,
+	0x6e, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x6d, 0x65, 0x74,
+	0x61, 0x2e, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x04, 0x6e, 0x6f, 0x64, 0x65, 0x12, 0x1d, 0x0a, 0x04,
+	0x61, 0x70, 0x70, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x09, 0x2e, 0x6d, 0x65, 0x74,
+	0x61, 0x2e, 0x41, 0x70, 0x70, 0x52, 0x04, 0x61, 0x70, 0x70, 0x73, 0x12, 0x29, 0x0a, 0x08, 0x63,
+	0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0d, 0x2e,
+	0x6d, 0x65, 0x74, 0x61, 0x2e, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x08, 0x63, 0x68,
+	0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x73, 0x12, 0x36, 0x0a, 0x0c, 0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65,
+	0x6c, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x6d,
+	0x65, 0x74, 0x61, 0x2e, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x41, 0x6c, 0x69, 0x61, 0x73,
+	0x52, 0x0c, 0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x12, 0x2d,
+	0x0a, 0x08, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x61, 0x72, 0x79, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x11, 0x2e, 0x6d, 0x65, 0x74, 0x61, 0x2e, 0x41, 0x70, 0x70, 0x42, 0x6f, 0x75, 0x6e, 0x64,
 	0x61, 0x72, 0x79, 0x52, 0x08, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x61, 0x72, 0x79, 0x22, 0x54, 0x0a,
 	0x03, 0x41, 0x70, 0x70, 0x12, 0x2a, 0x0a, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
@@ -754,38 +826,40 @@ func file_meta_proto_rawDescGZIP() []byte {
 	return file_meta_proto_rawDescData
 }
 
-var file_meta_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_meta_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_meta_proto_goTypes = []interface{}{
-	(*Stub)(nil),        // 0: meta.stub
-	(*Annotation)(nil),  // 1: meta.Annotation
-	(*Metadata)(nil),    // 2: meta.Metadata
-	(*NodeSpec)(nil),    // 3: meta.NodeSpec
-	(*Node)(nil),        // 4: meta.Node
-	(*AppBoundary)(nil), // 5: meta.AppBoundary
-	(*AppSpec)(nil),     // 6: meta.AppSpec
-	(*App)(nil),         // 7: meta.App
-	(*ChannelType)(nil), // 8: meta.ChannelType
-	(*ChannelSpec)(nil), // 9: meta.ChannelSpec
-	(*Channel)(nil),     // 10: meta.Channel
+	(*Stub)(nil),         // 0: meta.stub
+	(*Annotation)(nil),   // 1: meta.Annotation
+	(*Metadata)(nil),     // 2: meta.Metadata
+	(*NodeSpec)(nil),     // 3: meta.NodeSpec
+	(*Node)(nil),         // 4: meta.Node
+	(*ChannelAlias)(nil), // 5: meta.ChannelAlias
+	(*AppBoundary)(nil),  // 6: meta.AppBoundary
+	(*AppSpec)(nil),      // 7: meta.AppSpec
+	(*App)(nil),          // 8: meta.App
+	(*ChannelType)(nil),  // 9: meta.ChannelType
+	(*ChannelSpec)(nil),  // 10: meta.ChannelSpec
+	(*Channel)(nil),      // 11: meta.Channel
 }
 var file_meta_proto_depIdxs = []int32{
 	1,  // 0: meta.Metadata.annotations:type_name -> meta.Annotation
 	2,  // 1: meta.Node.metadata:type_name -> meta.Metadata
 	3,  // 2: meta.Node.spec:type_name -> meta.NodeSpec
 	4,  // 3: meta.AppSpec.node:type_name -> meta.Node
-	7,  // 4: meta.AppSpec.apps:type_name -> meta.App
-	10, // 5: meta.AppSpec.channel:type_name -> meta.Channel
-	5,  // 6: meta.AppSpec.boundary:type_name -> meta.AppBoundary
-	2,  // 7: meta.App.metadata:type_name -> meta.Metadata
-	6,  // 8: meta.App.spec:type_name -> meta.AppSpec
-	8,  // 9: meta.ChannelSpec.type:type_name -> meta.ChannelType
-	2,  // 10: meta.Channel.metadata:type_name -> meta.Metadata
-	9,  // 11: meta.Channel.spec:type_name -> meta.ChannelSpec
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	8,  // 4: meta.AppSpec.apps:type_name -> meta.App
+	11, // 5: meta.AppSpec.channels:type_name -> meta.Channel
+	5,  // 6: meta.AppSpec.channelAlias:type_name -> meta.ChannelAlias
+	6,  // 7: meta.AppSpec.boundary:type_name -> meta.AppBoundary
+	2,  // 8: meta.App.metadata:type_name -> meta.Metadata
+	7,  // 9: meta.App.spec:type_name -> meta.AppSpec
+	9,  // 10: meta.ChannelSpec.type:type_name -> meta.ChannelType
+	2,  // 11: meta.Channel.metadata:type_name -> meta.Metadata
+	10, // 12: meta.Channel.spec:type_name -> meta.ChannelSpec
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_meta_proto_init() }
@@ -855,7 +929,7 @@ func file_meta_proto_init() {
 			}
 		}
 		file_meta_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AppBoundary); i {
+			switch v := v.(*ChannelAlias); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -867,7 +941,7 @@ func file_meta_proto_init() {
 			}
 		}
 		file_meta_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AppSpec); i {
+			switch v := v.(*AppBoundary); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -879,7 +953,7 @@ func file_meta_proto_init() {
 			}
 		}
 		file_meta_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*App); i {
+			switch v := v.(*AppSpec); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -891,7 +965,7 @@ func file_meta_proto_init() {
 			}
 		}
 		file_meta_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ChannelType); i {
+			switch v := v.(*App); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -903,7 +977,7 @@ func file_meta_proto_init() {
 			}
 		}
 		file_meta_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ChannelSpec); i {
+			switch v := v.(*ChannelType); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -915,6 +989,18 @@ func file_meta_proto_init() {
 			}
 		}
 		file_meta_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ChannelSpec); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_meta_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Channel); i {
 			case 0:
 				return &v.state
@@ -933,7 +1019,7 @@ func file_meta_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_meta_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
