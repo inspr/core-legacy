@@ -49,7 +49,7 @@ func main() {
 		log.Println(nodeArray.Node[0])
 	}
 
-	// Create a node into the cluster
+	// Update the current node into the cluster
 	r, err = c.UpdateNode(ctx, &pb.NodeWithDescription{
 		TargetNode: &pb.Node{
 			Metadata: &pb.Metadata{
@@ -90,7 +90,7 @@ func main() {
 		}
 	}
 
-	// Create a node into the cluster
+	// Delete the node of the cluster
 	r, err = c.DeleteNode(ctx, &pb.NodeDescription{NodeDescription: "app01"})
 	if err != nil {
 		log.Fatalf("could not create app01: %v", err)
