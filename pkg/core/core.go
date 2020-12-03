@@ -319,6 +319,8 @@ func (m *insprdMemory) MonitoreApps() {
 			if m.statusKind == "hard" {
 				for i := 0; i < len(toUpdate); i++ {
 					for key := range m.monitor.status {
+						// Check if the name contain the app that should be updated.
+						// In affirmative case, update it with the patent's status.
 						if strings.Contains(key, toUpdate[i]) {
 							m.monitor.status[key] = m.monitor.status[toUpdate[i]]
 						}
