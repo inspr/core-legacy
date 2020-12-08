@@ -115,7 +115,7 @@ func NewInsprDTree() InsprDTree {
 	tree.apps["inspr"] = tree.tree
 	tree.appScopes["inspr"] = ""
 	tree.stopSubProcess = false
-	tree.clusterOperatorAddrress = "localhost:50050"
+	tree.clusterOperatorAddrress = "localhost:50000"
 	tree.instantiateOperator()
 	return &tree
 }
