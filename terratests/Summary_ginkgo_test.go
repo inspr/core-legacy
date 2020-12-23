@@ -1,5 +1,5 @@
 /*
-Tasks track small, distinct pieces of work.
+
 */
 package inspr_example
 
