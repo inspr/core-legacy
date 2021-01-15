@@ -1,1 +1,0 @@
-echo "Welcome to Inspr!"
