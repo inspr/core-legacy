@@ -1,89 +1,89 @@
 package errors
 
-import (
-	"errors"
-	"fmt"
-)
+import "fmt"
 
 // InsprError is an error that happened inside inspr
 type InsprError struct {
-	Value string         `json:"value,omitempty" xml:"value" avro:"value"  xml:"value"  avro:"value"`
-	Err   error          `json:"-"`
-	Code  InsprErrorCode `json:"code,omitempty" xml:"code" avro:"code"  xml:"code"  avro:"code"`
-	Stack string         `json:"stack,omitempty"  xml:"stack"  avro:"stack"`
+	Message string
+	Err     error
+	Code    InsprErrorCode
 }
 
+// Error returns the InsprError Message
 func (err *InsprError) Error() string {
-	return err.Value
+	return err.Message
 }
 
-// NewNotFoundError creates a not found error for the given thing
-func NewNotFoundError(name string, namespace string) *InsprError {
+// NewCustomError provides a method to create a custom error, given the error code and the error message
+func NewCustomError(errCode InsprErrorCode, errMsg string) *InsprError {
 	return &InsprError{
-		fmt.Sprintf("component %v in namespace %v not found.", name, namespace),
+		errMsg,
 		nil,
+		errCode,
+	}
+}
+
+// NewNotFoundError creates a new Not Found Inspr Error
+func NewNotFoundError(name string, err error) *InsprError {
+	return &InsprError{
+		fmt.Sprintf("Component %v not found.", name),
+		err,
 		NotFound,
-		"",
 	}
 }
 
-// IsNotFound tests if an error is a not found error
-func IsNotFound(err error) bool {
-	if converted, ok := err.(*InsprError); ok {
-		return converted.Code == NotFound
-	}
-	return false
-}
-
-// NewEncodingError returns an error message for ecoding errors
-func NewEncodingError(msg string, innerError error) *InsprError {
+// NewAlreadyExistsError creates a new Already Exists Inspr Error
+func NewAlreadyExistsError(name string, err error) *InsprError {
 	return &InsprError{
-		msg,
-		innerError,
-		Encoding,
-		innerError.Error(),
-	}
-}
-
-// IsEncoding tests if an error is an encoding error
-func IsEncoding(err error) (value bool) {
-	if converted, ok := err.(*InsprError); ok {
-		value = value || converted.Code == Encoding
-	}
-	return
-}
-
-// IsConfiguration tests if an error is a configuration error
-func IsConfiguration(err error) (value bool) {
-	if converted, ok := err.(*InsprError); ok {
-		value = value || converted.Code == ChannelConfiguration
-		value = value || converted.Code == PipelineConfiguration
-		value = value || converted.Code == NodeConfiguration
-	}
-	return
-}
-
-// NewAlreadyExistsError creates a not found error for the given thing
-func NewAlreadyExistsError(name string, namespace string) *InsprError {
-	return &InsprError{
-		fmt.Sprintf("component %v in namespace %v already exists.", name, namespace),
-		nil,
+		fmt.Sprintf("Component %v already exists.", name),
+		err,
 		AlreadyExists,
-		"",
 	}
 }
 
-// IsAlreadyExists tests if an error is a not found error
-func IsAlreadyExists(err error) bool {
-	if converted, ok := err.(*InsprError); ok {
-		return converted.Code == AlreadyExists
+// NewInternalServerError creates a new Internal Server Inspr Error
+func NewInternalServerError(err error) *InsprError {
+	return &InsprError{
+		fmt.Sprintf("There was a internal server error."),
+		err,
+		InternalServer,
 	}
-	return false
 }
 
-// Unwrap unwrapps the error
-func (err *InsprError) Unwrap() error {
-	return errors.Unwrap(err.Err)
+// NewInvalidNameError creates a new Invalid Name Inspr Error
+func NewInvalidNameError(name string, err error) *InsprError {
+	return &InsprError{
+		fmt.Sprintf("The name '%v' is invalid.", name),
+		err,
+		InvalidName,
+	}
+}
+
+// NewInvalidChannelError creates a new Invalid Channel Inspr Error
+func NewInvalidChannelError() *InsprError {
+	return &InsprError{
+		fmt.Sprintf("The channel is invalid."),
+		nil,
+		InvalidChannel,
+	}
+}
+
+// NewInvalidAppError creates a new Invalid App Inspr Error
+func NewInvalidAppError() *InsprError {
+	return &InsprError{
+		fmt.Sprintf("The app is invalid."),
+		nil,
+		InvalidApp,
+	}
+}
+
+// NewInvalidChannelTypeError creates a new Invalid ChannelType Inspr Error
+func NewInvalidChannelTypeError() *InsprError {
+	return &InsprError{
+		fmt.Sprintf("The ChannelType is invalid."),
+		nil,
+		InvalidChannelType,
+	}
 }
 
 // Is Compares errors
@@ -95,33 +95,7 @@ func (err *InsprError) Is(target error) bool {
 	return t.Code == err.Code
 }
 
-// ToNative converts an error to native golang format
-func (err *InsprError) ToNative() interface{} {
-	return map[string]interface{}{
-		"code": err.Code,
-		"err": func() string {
-			if err.Err == nil {
-				return ""
-			}
-			return fmt.Sprint(err.Err)
-		}(),
-		"value": err.Value,
-	}
+// HasCode Compares error with error code
+func (err *InsprError) HasCode(code InsprErrorCode) bool {
+	return code == err.Code
 }
-
-// InsprErrorCode is error codes for inspr errors
-type InsprErrorCode int32
-
-// Error codes for inspr errors
-const (
-	NotFound InsprErrorCode = iota + 1
-	Encoding
-	AlreadyExists
-	NodeConfiguration
-	PipelineConfiguration
-	ChannelConfiguration
-	ServiceCreation
-	DeploymentCreation
-	ServiceDeletion
-	Connection
-)
