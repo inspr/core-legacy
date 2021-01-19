@@ -9,6 +9,5 @@ type Channel struct {
 
 // ChannelSpec is the specification of a channel. (the external variable is just an idea)
 type ChannelSpec struct {
-	Type     ChannelType `yaml:"type"  json:"type"`
-	External bool        `yaml:"external"  json:"external"`
+	Type ChannelType `yaml:"type"  json:"type"`
 }

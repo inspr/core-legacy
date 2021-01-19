@@ -1,7 +1,5 @@
 package meta
 
-import v1 "k8s.io/api/core/v1"
-
 // Node represents an inspr component that is a node.
 type Node struct {
 	Meta Metadata `yaml:"meta"  json:"meta"`
@@ -12,8 +10,7 @@ type Node struct {
 // If the node has an specific Kubernetes configuration, the configuration can be injected via the Kubernetes field. When
 // Kubernetes is set, the Image field gets igored.
 type NodeSpec struct {
-	Image      string     `yaml:"image"  json:"image"`
-	Kubernetes v1.PodSpec `yaml:"kubernetes"  json:"kubernetes"`
+	Image string `yaml:"image"  json:"image"`
 }
 
 // App is an inspr component that represents an App. An App can contain other apps, channels and other components.
