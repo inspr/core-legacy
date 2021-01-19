@@ -7,15 +7,13 @@ type Node struct {
 }
 
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.
-// If the node has an specific Kubernetes configuration, the configuration can be injected via the Kubernetes field. When
-// Kubernetes is set, the Image field gets igored.
 type NodeSpec struct {
 	Image string `yaml:"image"  json:"image"`
 }
 
 // App is an inspr component that represents an App. An App can contain other apps, channels and other components.
 type App struct {
-	Metadata `yaml:"metadata" json:"metadata"`
+	Metadata `yaml:"meta" json:"meta"`
 	Spec     AppSpec `yaml:"spec" json:"spec"`
 }
 
