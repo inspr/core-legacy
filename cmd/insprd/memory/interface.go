@@ -1,5 +1,5 @@
 // Package memory provides simple interfaces for the
-// in memory managment of the cluster.
+// in memory management of the cluster.
 package memory
 
 import "gitlab.inspr.dev/inspr/core/pkg/meta"
