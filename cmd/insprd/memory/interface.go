@@ -2,7 +2,8 @@ package memory
 
 import "gitlab.inspr.dev/inspr/core/pkg/meta"
 
-// ChannelMemory In memory channel methods
+// ChannelMemory is the interface that allows to obtain or change information
+// related to the stored state of the Channels in the cluster
 type ChannelMemory interface {
 	GetChannel(ref string) (*meta.Channel, error)
 	CreateChannel(ch *meta.Channel) error
@@ -10,7 +11,8 @@ type ChannelMemory interface {
 	UpdateChannel(ch *meta.Channel, ref string) error
 }
 
-// AppMemory In memory app methods
+// AppMemory is the interface that allows to obtain or change information
+// related to the current state of the DApps in the cluster
 type AppMemory interface {
 	GetApp(ref string) (*meta.DApp, error)
 	CreateApp(app *meta.DApp) error
@@ -18,7 +20,8 @@ type AppMemory interface {
 	UpdateApp(app *meta.DApp, ref string) error
 }
 
-// ChannelTypeMemory In memory channelType methods
+// ChannelTypeMemory is the interface that allows to obtain or change information
+// related to the current state of the ChannelTypes in the cluster
 type ChannelTypeMemory interface {
 	GetChannelType(ref string) (*meta.ChannelType, error)
 	CreateChannelType(ct *meta.ChannelType) error
@@ -26,9 +29,11 @@ type ChannelTypeMemory interface {
 	UpdateChannelType(ct *meta.ChannelType, ref string) error
 }
 
-// Interface In memory general methods
-type Interface interface {
-	Channel() ChannelMemory
-	App() AppMemory
-	ChannelType() ChannelTypeMemory
+// Manager is the interface that allows the management of the
+// current state of the cluster. Permiting the modification
+// of Channels, DApps and ChannelTypes
+type Manager interface {
+	Channels() ChannelMemory
+	Apps() AppMemory
+	ChannelTypes() ChannelTypeMemory
 }
