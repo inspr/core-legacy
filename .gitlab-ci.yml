@@ -12,6 +12,6 @@ stages:
 unit-tests:
   stage: test
   script:
-    - go test -coverpkg=./... ./...
+    - go test -v -coverpkg=./... ./...
   coverage: /^coverage:\s(\d+\.\d+%)\sof\sstatements\sin\s\.\/\.\.\.$/
 
