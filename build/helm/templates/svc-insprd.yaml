@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.insprd_name }}
+  labels:
+    {{- include "insprd.labels" . | nindent 4 }}
+    app: {{ .Values.service.insprd_name }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.service.insprd_port }}
+      targetPort: {{ .Values.service.insprd_targetport }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Values.service.insprd_name }}
+    {{- include "insprd.selectorLabels" . | nindent 4 }}
