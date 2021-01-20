@@ -9,6 +9,7 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
+  insprd_pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
@@ -36,9 +37,17 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+deployment:
+  insprd_name: insprd-deployment
+
+insprd_repository: gcr.io/red-inspr/insprd
+
 service:
   type: ClusterIP
-  ingress-port: 80
+  port: 80
+  insprd_name: insprd-svc
+  insprd_port: 80
+  insprd_targetport: 8080
 
 ingress:
   enabled: false
