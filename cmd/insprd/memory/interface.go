@@ -9,7 +9,7 @@ import "gitlab.inspr.dev/inspr/core/pkg/meta"
 // the Channels in the cluster
 type ChannelMemory interface {
 	GetChannel(query string) (*meta.Channel, error)
-	CreateChannel(ch *meta.Channel, context ...string) error
+	CreateChannel(ch *meta.Channel, context string) error
 	DeleteChannel(query string) error
 	UpdateChannel(ch *meta.Channel, query string) error
 }
@@ -19,7 +19,7 @@ type ChannelMemory interface {
 // the DApps in the cluster
 type AppMemory interface {
 	GetApp(query string) (*meta.App, error)
-	CreateApp(app *meta.App, context ...string) error
+	CreateApp(app *meta.App, context string) error
 	DeleteApp(query string) error
 	UpdateApp(app *meta.App, query string) error
 }
@@ -29,7 +29,7 @@ type AppMemory interface {
 // state of the ChannelTypes in the cluster
 type ChannelTypeMemory interface {
 	GetChannelType(query string) (*meta.ChannelType, error)
-	CreateChannelType(ct *meta.ChannelType, context ...string) error
+	CreateChannelType(ct *meta.ChannelType, context string) error
 	DeleteChannelType(query string) error
 	UpdateChannelType(ct *meta.ChannelType, query string) error
 }
