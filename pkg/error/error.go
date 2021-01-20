@@ -24,49 +24,49 @@ func NewError() *ErrBuilder {
 	}
 }
 
-// NotFound creates a new Not Found Inspr Error
+// NotFound adds Not Found code to Inspr Error
 func (b *ErrBuilder) NotFound() *ErrBuilder {
 	b.err.Code = NotFound
 	return b
 }
 
-// AlreadyExists creates a new Already Exists Inspr Error
+// AlreadyExists adds Already Exists code to Inspr Error
 func (b *ErrBuilder) AlreadyExists() *ErrBuilder {
 	b.err.Code = AlreadyExists
 	return b
 }
 
-// BadRequest creates a new Bad Request Inspr Error
+// BadRequest adds Bad Request code to Inspr Error
 func (b *ErrBuilder) BadRequest() *ErrBuilder {
 	b.err.Code = BadRequest
 	return b
 }
 
-// InternalServer creates a new Internal Server Inspr Error
+// InternalServer adds Internal Server code to Inspr Error
 func (b *ErrBuilder) InternalServer() *ErrBuilder {
 	b.err.Code = InternalServer
 	return b
 }
 
-// InvalidName creates a new Invalid Name Inspr Error
+// InvalidName adds Invalid Name code to Inspr Error
 func (b *ErrBuilder) InvalidName() *ErrBuilder {
 	b.err.Code = InvalidName
 	return b
 }
 
-// InvalidApp creates a new Invalid App Inspr Error
+// InvalidApp adds Invalid App code to Inspr Error
 func (b *ErrBuilder) InvalidApp() *ErrBuilder {
 	b.err.Code = InvalidApp
 	return b
 }
 
-// InvalidChannel creates a new Invalid Channel Inspr Error
+// InvalidChannel adds Invalid Channel code to Inspr Error
 func (b *ErrBuilder) InvalidChannel() *ErrBuilder {
 	b.err.Code = InvalidChannel
 	return b
 }
 
-// InvalidChannelType creates a new Invalid Channel Type Inspr Error
+// InvalidChannelType adds Invalid Channel Type code to Inspr Error
 func (b *ErrBuilder) InvalidChannelType() *ErrBuilder {
 	b.err.Code = InvalidChannelType
 	return b
