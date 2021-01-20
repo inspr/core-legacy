@@ -6,10 +6,10 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-  - host: "inspr.com"
+  - host: {{ .Values.insprIngress.host }}
     http:
       paths:
       - path: /
         backend:
-          serviceName: insprd-svc
+          serviceName: {{ .Values.service.insprd_name }}
           servicePort: 80
