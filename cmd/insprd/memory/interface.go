@@ -18,10 +18,10 @@ type ChannelMemory interface {
 // change information related to the current state of
 // the DApps in the cluster
 type AppMemory interface {
-	GetApp(ref string) (*meta.DApp, error)
-	CreateApp(app *meta.DApp) error
+	GetApp(ref string) (*meta.AppSpec, error)
+	CreateApp(app *meta.AppSpec) error
 	DeleteApp(ref string) error
-	UpdateApp(app *meta.DApp, ref string) error
+	UpdateApp(app *meta.AppSpec, ref string) error
 }
 
 // ChannelTypeMemory is the interface that allows to
