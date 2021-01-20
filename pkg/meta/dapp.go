@@ -31,8 +31,8 @@ type AppBoundary struct {
 //
 // The boundary represent the possible connections to other apps, and the fields that can be overriten when instantiating the app.
 type AppSpec struct {
-	Node     Node               `yaml:"node" json:"node"`
-	Apps     map[string]App     `yaml:"apps" json:"apps"`
-	Channels map[string]Channel `yaml:"channels" json:"channels"`
-	Boundary AppBoundary        `yaml:"boundary" json:"boundary"`
+	Node     Node                `yaml:"node" json:"node"`
+	Apps     map[string]*App     `yaml:"apps" json:"apps"`
+	Channels map[string]*Channel `yaml:"channels" json:"channels"`
+	Boundary AppBoundary         `yaml:"boundary" json:"boundary"`
 }
