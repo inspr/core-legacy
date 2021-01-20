@@ -27,7 +27,7 @@ spec:
         - name: {{ .Values.deployment.insprd_name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.insprd_repository }}"
+          image: {{ .Values.insprd_repository }}
           imagePullPolicy: {{ .Values.image.insprd_pullPolicy }}
           ports:
             - name: http
