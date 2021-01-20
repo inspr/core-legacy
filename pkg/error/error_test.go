@@ -40,228 +40,404 @@ func TestInsprError_Error(t *testing.T) {
 	}
 }
 
-func TestNewCustomError(t *testing.T) {
-	type args struct {
-		errCode InsprErrorCode
-		errMsg  string
-	}
+func TestNewError(t *testing.T) {
 	tests := []struct {
 		name string
-		args args
-		want *InsprError
+		want *ErrBuilder
 	}{
 		{
-			name: "It should create a new Custom Inspr Error",
-			args: args{
-				errCode: BadRequest,
-				errMsg:  "A brand new bad request error message",
-			},
-			want: &InsprError{
-				Code:    BadRequest,
-				Message: "A brand new bad request error message",
-				Err:     nil,
+			name: "It should return a empty Inspr Err Build",
+			want: &ErrBuilder{
+				err: &InsprError{},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewCustomError(tt.args.errCode, tt.args.errMsg); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewCustomError() = %v, want %v", got, tt.want)
+			if got := NewError(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewError() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestNewNotFoundError(t *testing.T) {
-	type args struct {
-		name string
-		err  error
+func TestErrBuilder_NotFound(t *testing.T) {
+	type fields struct {
+		err *InsprError
 	}
 	tests := []struct {
-		name string
-		args args
-		want *InsprError
+		name   string
+		fields fields
+		want   *ErrBuilder
 	}{
 		{
-			name: "It should create a new Not Found Error",
-			args: args{
-				name: "Example",
-				err:  nil,
+			name: "It should add the code Not Found to the new error",
+			fields: fields{
+				err: &InsprError{},
 			},
-			want: &InsprError{
-				Code:    NotFound,
-				Message: "Component Example not found.",
-				Err:     nil,
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: NotFound,
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewNotFoundError(tt.args.name, tt.args.err); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewNotFoundError() = %v, want %v", got, tt.want)
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.NotFound(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.NotFound() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestNewAlreadyExistsError(t *testing.T) {
-	type args struct {
-		name string
-		err  error
+func TestErrBuilder_AlreadyExists(t *testing.T) {
+	type fields struct {
+		err *InsprError
 	}
 	tests := []struct {
-		name string
-		args args
-		want *InsprError
+		name   string
+		fields fields
+		want   *ErrBuilder
 	}{
 		{
-			name: "It should create a new Already Exists Error",
-			args: args{
-				name: "Example",
-				err:  nil,
+			name: "It should add the code Already Exists to the new error",
+			fields: fields{
+				err: &InsprError{},
 			},
-			want: &InsprError{
-				Code:    AlreadyExists,
-				Message: "Component Example already exists.",
-				Err:     nil,
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: AlreadyExists,
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewAlreadyExistsError(tt.args.name, tt.args.err); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewAlreadyExistsError() = %v, want %v", got, tt.want)
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.AlreadyExists(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.AlreadyExists() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestNewInternalServerError(t *testing.T) {
+func TestErrBuilder_BadRequest(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *ErrBuilder
+	}{
+		{
+			name: "It should add the code Bad Request to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: BadRequest,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.BadRequest(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.BadRequest() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestErrBuilder_InternalServer(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *ErrBuilder
+	}{
+		{
+			name: "It should add the code Internal Server to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InternalServer,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.InternalServer(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.InternalServer() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestErrBuilder_InvalidName(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *ErrBuilder
+	}{
+		{
+			name: "It should add the code Invalid Name to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InvalidName,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.InvalidName(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.InvalidName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestErrBuilder_InvalidApp(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *ErrBuilder
+	}{
+		{
+			name: "It should add the code Invalid App to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InvalidApp,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.InvalidApp(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.InvalidApp() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestErrBuilder_InvalidChannel(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *ErrBuilder
+	}{
+		{
+			name: "It should add the code Invalid Channel to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InvalidChannel,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.InvalidChannel(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.InvalidChannel() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestErrBuilder_InvalidChannelType(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *ErrBuilder
+	}{
+		{
+			name: "It should add the code Invalid Channel Type to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InvalidChannelType,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.InvalidChannelType(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.InvalidChannelType() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestErrBuilder_Message(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
+	type args struct {
+		msg string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *ErrBuilder
+	}{
+		{
+			name: "It should add a message to the new Inspr Error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			args: args{
+				msg: "A brand new error message",
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Message: "A brand new error message",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.Message(tt.args.msg); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.Message() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestErrBuilder_InnerError(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
 	type args struct {
 		err error
 	}
 	tests := []struct {
-		name string
-		args args
-		want *InsprError
+		name   string
+		fields fields
+		args   args
+		want   *ErrBuilder
 	}{
 		{
-			name: "It should create a new Internal Server Error",
+			name: "It should add a inner error to the new Inspr Error",
+			fields: fields{
+				err: &InsprError{},
+			},
 			args: args{
-				err: nil,
+				err: NewError().AlreadyExists().Message("Hello").Build(),
 			},
-			want: &InsprError{
-				Code:    InternalServer,
-				Message: "There was a internal server error.",
-				Err:     nil,
+			want: &ErrBuilder{
+				err: &InsprError{
+					Err: &InsprError{
+						Code:    AlreadyExists,
+						Message: "Hello",
+					},
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewInternalServerError(tt.args.err); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewInternalServerError() = %v, want %v", got, tt.want)
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.InnerError(tt.args.err); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.InnerError() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestNewInvalidNameError(t *testing.T) {
-	type args struct {
-		name string
-		err  error
+func TestErrBuilder_Build(t *testing.T) {
+	type fields struct {
+		err *InsprError
 	}
 	tests := []struct {
-		name string
-		args args
-		want *InsprError
+		name   string
+		fields fields
+		want   *InsprError
 	}{
 		{
-			name: "It should create a new Invalid Name Error",
-			args: args{
-				name: "A invalid name example",
-				err:  nil,
+			name: "It should return the created error",
+			fields: fields{
+				err: &InsprError{
+					Code:    NotFound,
+					Message: "A brand new error message",
+				},
 			},
 			want: &InsprError{
-				Code:    InvalidName,
-				Message: "The name 'A invalid name example' is invalid.",
-				Err:     nil,
+				Code:    NotFound,
+				Message: "A brand new error message",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewInvalidNameError(tt.args.name, tt.args.err); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewInvalidNameError() = %v, want %v", got, tt.want)
+			b := &ErrBuilder{
+				err: tt.fields.err,
 			}
-		})
-	}
-}
-
-func TestNewInvalidChannelError(t *testing.T) {
-	tests := []struct {
-		name string
-		want *InsprError
-	}{
-		{
-			name: "It should create a new Invalid Channel Error",
-			want: &InsprError{
-				Code:    InvalidChannel,
-				Message: "The channel is invalid.",
-				Err:     nil,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewInvalidChannelError(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewInvalidChannelError() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestNewInvalidAppError(t *testing.T) {
-	tests := []struct {
-		name string
-		want *InsprError
-	}{
-		{
-			name: "It should create a new Invalid app Error",
-			want: &InsprError{
-				Code:    InvalidApp,
-				Message: "The app is invalid.",
-				Err:     nil,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewInvalidAppError(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewInvalidAppError() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestNewInvalidChannelTypeError(t *testing.T) {
-	tests := []struct {
-		name string
-		want *InsprError
-	}{
-		{
-			name: "It should create a new Invalid Channel Type Error",
-			want: &InsprError{
-				Code:    InvalidChannelType,
-				Message: "The ChannelType is invalid.",
-				Err:     nil,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewInvalidChannelTypeError(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewInvalidChannelTypeError() = %v, want %v", got, tt.want)
+			if got := b.Build(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.Build() = %v, want %v", got, tt.want)
 			}
 		})
 	}

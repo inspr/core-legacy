@@ -1,7 +1,5 @@
 package errors
 
-import "fmt"
-
 // InsprError is an error that happened inside inspr
 type InsprError struct {
 	Message string
@@ -9,81 +7,86 @@ type InsprError struct {
 	Code    InsprErrorCode
 }
 
+// ErrBuilder is an Inspr Error Creator
+type ErrBuilder struct {
+	err *InsprError
+}
+
 // Error returns the InsprError Message
 func (err *InsprError) Error() string {
 	return err.Message
 }
 
-// NewCustomError provides a method to create a custom error, given the error code and the error message
-func NewCustomError(errCode InsprErrorCode, errMsg string) *InsprError {
-	return &InsprError{
-		errMsg,
-		nil,
-		errCode,
+// NewError is the start function to create a New Error
+func NewError() *ErrBuilder {
+	return &ErrBuilder{
+		err: &InsprError{},
 	}
 }
 
-// NewNotFoundError creates a new Not Found Inspr Error
-func NewNotFoundError(name string, err error) *InsprError {
-	return &InsprError{
-		fmt.Sprintf("Component %v not found.", name),
-		err,
-		NotFound,
-	}
+// NotFound creates a new Not Found Inspr Error
+func (b *ErrBuilder) NotFound() *ErrBuilder {
+	b.err.Code = NotFound
+	return b
 }
 
-// NewAlreadyExistsError creates a new Already Exists Inspr Error
-func NewAlreadyExistsError(name string, err error) *InsprError {
-	return &InsprError{
-		fmt.Sprintf("Component %v already exists.", name),
-		err,
-		AlreadyExists,
-	}
+// AlreadyExists creates a new Already Exists Inspr Error
+func (b *ErrBuilder) AlreadyExists() *ErrBuilder {
+	b.err.Code = AlreadyExists
+	return b
 }
 
-// NewInternalServerError creates a new Internal Server Inspr Error
-func NewInternalServerError(err error) *InsprError {
-	return &InsprError{
-		fmt.Sprintf("There was a internal server error."),
-		err,
-		InternalServer,
-	}
+// BadRequest creates a new Bad Request Inspr Error
+func (b *ErrBuilder) BadRequest() *ErrBuilder {
+	b.err.Code = BadRequest
+	return b
 }
 
-// NewInvalidNameError creates a new Invalid Name Inspr Error
-func NewInvalidNameError(name string, err error) *InsprError {
-	return &InsprError{
-		fmt.Sprintf("The name '%v' is invalid.", name),
-		err,
-		InvalidName,
-	}
+// InternalServer creates a new Internal Server Inspr Error
+func (b *ErrBuilder) InternalServer() *ErrBuilder {
+	b.err.Code = InternalServer
+	return b
 }
 
-// NewInvalidChannelError creates a new Invalid Channel Inspr Error
-func NewInvalidChannelError() *InsprError {
-	return &InsprError{
-		fmt.Sprintf("The channel is invalid."),
-		nil,
-		InvalidChannel,
-	}
+// InvalidName creates a new Invalid Name Inspr Error
+func (b *ErrBuilder) InvalidName() *ErrBuilder {
+	b.err.Code = InvalidName
+	return b
 }
 
-// NewInvalidAppError creates a new Invalid App Inspr Error
-func NewInvalidAppError() *InsprError {
-	return &InsprError{
-		fmt.Sprintf("The app is invalid."),
-		nil,
-		InvalidApp,
-	}
+// InvalidApp creates a new Invalid App Inspr Error
+func (b *ErrBuilder) InvalidApp() *ErrBuilder {
+	b.err.Code = InvalidApp
+	return b
 }
 
-// NewInvalidChannelTypeError creates a new Invalid ChannelType Inspr Error
-func NewInvalidChannelTypeError() *InsprError {
-	return &InsprError{
-		fmt.Sprintf("The ChannelType is invalid."),
-		nil,
-		InvalidChannelType,
-	}
+// InvalidChannel creates a new Invalid Channel Inspr Error
+func (b *ErrBuilder) InvalidChannel() *ErrBuilder {
+	b.err.Code = InvalidChannel
+	return b
+}
+
+// InvalidChannelType creates a new Invalid Channel Type Inspr Error
+func (b *ErrBuilder) InvalidChannelType() *ErrBuilder {
+	b.err.Code = InvalidChannelType
+	return b
+}
+
+// Message adds a message to the error
+func (b *ErrBuilder) Message(msg string) *ErrBuilder {
+	b.err.Message = msg
+	return b
+}
+
+// InnerError adds a inner error to the error
+func (b *ErrBuilder) InnerError(err error) *ErrBuilder {
+	b.err.Err = err
+	return b
+}
+
+// Build returns the created Inspr Error
+func (b *ErrBuilder) Build() *InsprError {
+	return b.err
 }
 
 // Is Compares errors
