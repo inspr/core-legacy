@@ -102,5 +102,4 @@ func (s *Server) initRoutes() {
 	// s.Mux.HandleFunc("/channeltypes/{ref}", handler.ChannelHandler.GetChannelByRef().Get())
 	// s.Mux.HandleFunc("/channeltypes/{ref}", handler.ChannelHandler.UpdateChannel().Put())
 	// s.Mux.HandleFunc("/channeltypes/{ref}", handler.ChannelHandler.DeleteChannel().Delete())
-
 }

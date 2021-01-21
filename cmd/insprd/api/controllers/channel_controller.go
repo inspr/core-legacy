@@ -1,33 +1,54 @@
 package controller
 
-import "gitlab.inspr.dev/inspr/core/pkg/meta"
-
-// GetAllChannels return all channels in the cluster's memory
-func (s *Server) GetAllChannels() {
-	// channel, err := s.MemoryManager.Channels().GetChannel(".")
-	// if err != nil {
-	// 	// handle error
-	// }
-}
+import (
+	ierrors "gitlab.inspr.dev/inspr/core/pkg/error"
+	"gitlab.inspr.dev/inspr/core/pkg/meta"
+)
 
 // GetChannel returns the channels found in the path './channel/path'
-func (s *Server) GetChannel(ref string) (*meta.Channel, error) {
-	channel, err := s.MemoryManager.Channels().GetChannel(ref)
+func (s *Server) GetChannel(query string) (*meta.Channel, error) {
+	channel, err := s.MemoryManager.Channels().GetChannel(query)
 	if err != nil {
-		// error package
+		serverErr := ierrors.NewError().InnerError(err).Message(
+			"Couldn't get a channel in this path",
+		).InternalServer().Build()
+		return nil, serverErr
 	}
 	return channel, nil
 }
 
 // CreateChannel creates a new channel in the stored structure of the cluster
-func (s *Server) CreateChannel(ch *meta.Channel) error {
-	err := s.MemoryManager.Channels().CreateChannel(ch)
+func (s *Server) CreateChannel(ch *meta.Channel, ctx string) error {
+	err := s.MemoryManager.Channels().CreateChannel(ch, ctx)
 	if err != nil {
-
+		serverErr := ierrors.NewError().InnerError(err).Message(
+			"Couldn't create a channel in this context and with these values",
+		).InternalServer().Build()
+		return serverErr
 	}
 	return nil
 }
 
-// CreateChannel(ch *meta.Channel) error
-// DeleteChannel(ref string) error
-// UpdateChannel(ch *meta.Channel, ref string) error
+// DeleteChannel todo doc
+func (s *Server) DeleteChannel(query string) error {
+	err := s.MemoryManager.Channels().DeleteChannel(query)
+	if err != nil {
+		serverErr := ierrors.NewError().InnerError(err).Message(
+			"Couldn't delete the channel in this path",
+		).InternalServer().Build()
+		return serverErr
+	}
+	return nil
+}
+
+// UpdateChannel todo doc
+func (s *Server) UpdateChannel(ch *meta.Channel, ctx string) error {
+	err := s.MemoryManager.Channels().CreateChannel(ch, ctx)
+	if err != nil {
+		serverErr := ierrors.NewError().InnerError(err).Message(
+			"Couldn't modify the channel in this context",
+		).InternalServer().Build()
+		return serverErr
+	}
+	return nil
+}
