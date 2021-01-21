@@ -4,30 +4,38 @@ import (
 	"fmt"
 	"net/http"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
-type channelHandler struct{}
+// ChannelHandler todo doc
+type ChannelHandler struct {
+	memory.ChannelMemory
+}
 
-// ChannelHandler is an empty object to separate route functions
-var ChannelHandler channelHandler = struct{}{}
+// NewChannelHandler exports
+func NewChannelHandler(memManager memory.Manager) *ChannelHandler {
+	return &ChannelHandler{
+		ChannelMemory: memManager.Channels(),
+	}
+}
 
-// GetAllChannels returns all channels
-func (ch *channelHandler) GetAllChannels() rest.Handler {
+// HandleGetAllChannels returns all channels
+func (ch *ChannelHandler) HandleGetAllChannels() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 	}
 	return rest.Handler(handler)
 }
 
-// CreateInfo informs the data needed to create a channel
-func (ch *channelHandler) CreateInfo() rest.Handler {
+// HandleCreateInfo informs the data needed to create a channel
+func (ch *ChannelHandler) HandleCreateInfo() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 	}
 	return rest.Handler(handler)
 }
 
-// CreateChannel todo doc
-func (ch *channelHandler) CreateChannel() rest.Handler {
+// HandleCreateChannel todo doc
+func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		// couldn't parse the request body
@@ -41,8 +49,8 @@ func (ch *channelHandler) CreateChannel() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// GetChannelByRef todo doc
-func (ch *channelHandler) GetChannelByRef() rest.Handler {
+// HandleGetChannelByRef todo doc
+func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		// couldn't parse the request body
@@ -56,15 +64,15 @@ func (ch *channelHandler) GetChannelByRef() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// UpdateChannel todo doc
-func (ch *channelHandler) UpdateChannel() rest.Handler {
+// HandleUpdateChannel todo doc
+func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 	}
 	return rest.Handler(handler)
 }
 
-// GetAllChannels todo doc
-func (ch *channelHandler) DeleteChannel() rest.Handler {
+// HandleDeleteChannel todo doc
+func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 	}
 	return rest.Handler(handler)

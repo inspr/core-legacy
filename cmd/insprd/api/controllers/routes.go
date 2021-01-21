@@ -6,100 +6,88 @@ import (
 	handler "gitlab.inspr.dev/inspr/core/cmd/insprd/api/handlers"
 )
 
-// todo routes
-// GET 		/channels 			->	returns all channels
-// GET 		/channels/new		->	returns how to make a new channel
-// POST		/channels 			->	creates a new channel
-// GET		/channels/ref	->	returns info about one channel in ref
-// PUT		/channels/ref	-> 	modifies the existing channel
-// DELETE	/channels/ref	->	deletes a specific channel
-
 func (s *Server) initRoutes() {
 	s.Mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 	})
+
+	chandler := handler.NewChannelHandler(s.MemoryManager)
 	s.Mux.HandleFunc("/channels", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			handler.ChannelHandler.GetAllChannels()(w, r)
+			chandler.HandleGetAllChannels()(w, r)
 		case http.MethodPost:
-			handler.ChannelHandler.CreateChannel()(w, r)
+			chandler.HandleCreateChannel()(w, r)
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 	})
-	s.Mux.HandleFunc("/channels/info", handler.ChannelHandler.CreateInfo().Get())
+	s.Mux.HandleFunc("/channels/info", chandler.HandleCreateInfo().Get())
 	s.Mux.HandleFunc("/channels/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			handler.ChannelHandler.GetChannelByRef()(w, r)
+			chandler.HandleGetChannelByRef()(w, r)
 		case http.MethodPut:
-			handler.ChannelHandler.UpdateChannel()(w, r)
+			chandler.HandleUpdateChannel()(w, r)
 		case http.MethodDelete:
-			handler.ChannelHandler.DeleteChannel()(w, r)
+			chandler.HandleDeleteChannel()(w, r)
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 	})
 
+	ahandler := handler.NewAppHandler(s.MemoryManager)
 	s.Mux.HandleFunc("/apps", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			handler.AppHandler.GetAllApps()(w, r)
+			ahandler.HandleGetAllApps()(w, r)
 		case http.MethodPost:
-			handler.AppHandler.CreateApp()(w, r)
+			ahandler.HandleCreateApp()(w, r)
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 	})
-	s.Mux.HandleFunc("/apps/info", handler.AppHandler.CreateInfo().Get())
+	s.Mux.HandleFunc("/apps/info", ahandler.HandleCreateInfo().Get())
 	s.Mux.HandleFunc("/apps/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			handler.AppHandler.GetAppByRef()(w, r)
+			ahandler.HandleGetAppByRef()(w, r)
 		case http.MethodPut:
-			handler.AppHandler.UpdateApp()(w, r)
+			ahandler.HandleUpdateApp()(w, r)
 		case http.MethodDelete:
-			handler.AppHandler.DeleteApp()(w, r)
+			ahandler.HandleDeleteApp()(w, r)
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 	})
 
+	cthandler := handler.NewChannelTypeHandler(s.MemoryManager)
 	s.Mux.HandleFunc("/channeltypes", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			handler.ChannelTypeHandler.GetAllChannelTypes()(w, r)
+			cthandler.HandleGetAllChannelTypes()(w, r)
 		case http.MethodPost:
-			handler.ChannelTypeHandler.CreateChannelType()(w, r)
+			cthandler.HandleCreateChannelType()(w, r)
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 	})
-	s.Mux.HandleFunc("/channeltypes/info", handler.ChannelTypeHandler.CreateInfo().Get())
+	s.Mux.HandleFunc("/channeltypes/info", cthandler.HandleCreateInfo().Get())
 	s.Mux.HandleFunc("/channeltypes/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			handler.ChannelTypeHandler.GetChannelTypeByRef()(w, r)
+			cthandler.HandleGetChannelTypeByRef()(w, r)
 		case http.MethodPut:
-			handler.ChannelTypeHandler.UpdateChannelType()(w, r)
+			cthandler.HandleUpdateChannelType()(w, r)
 		case http.MethodDelete:
-			handler.ChannelTypeHandler.DeleteChannelType()(w, r)
+			cthandler.HandleDeleteChannelType()(w, r)
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 	})
-
-	// // create/delete/update/get routes for channel types.
-	// s.Mux.HandleFunc("/channeltypes", handler.ChannelHandler.GetAllChannels().Get())
-	// s.Mux.HandleFunc("/channeltypes/new", handler.ChannelHandler.CreateInfo().Get())
-	// s.Mux.HandleFunc("/channeltypes", handler.ChannelHandler.CreateChannel().Post())
-	// s.Mux.HandleFunc("/channeltypes/{ref}", handler.ChannelHandler.GetChannelByRef().Get())
-	// s.Mux.HandleFunc("/channeltypes/{ref}", handler.ChannelHandler.UpdateChannel().Put())
-	// s.Mux.HandleFunc("/channeltypes/{ref}", handler.ChannelHandler.DeleteChannel().Delete())
 }
