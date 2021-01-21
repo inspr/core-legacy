@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
@@ -28,6 +29,14 @@ func (ch *channelHandler) CreateInfo() rest.Handler {
 // CreateChannel todo doc
 func (ch *channelHandler) CreateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		// couldn't parse the request body
+		if err != nil {
+			fmt.Fprintf(w, "ParseForm() err: %v", err)
+		}
+
+		fmt.Fprintf(w, "Create Channel\n")
+		fmt.Fprintf(w, "Info received %v\n", r.Form.Get("info"))
 	}
 	return rest.Handler(handler)
 }
@@ -35,6 +44,14 @@ func (ch *channelHandler) CreateChannel() rest.Handler {
 // GetChannelByRef todo doc
 func (ch *channelHandler) GetChannelByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		// couldn't parse the request body
+		if err != nil {
+			fmt.Fprintf(w, "ParseForm() err: %v", err)
+		}
+
+		fmt.Fprintf(w, "Get Channel By Ref\n")
+		fmt.Fprintf(w, "Id received %v\n", r.Form.Get("id"))
 	}
 	return rest.Handler(handler)
 }
