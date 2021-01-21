@@ -6,7 +6,8 @@ type Channel struct {
 	Spec ChannelSpec `yaml:"spec"  json:"spec"`
 }
 
-// ChannelSpec is the specification of a channel. (the external variable is just an idea)
+// ChannelSpec is the specification of a channel.
+// 'Type' string references a Channel Type structure name
 type ChannelSpec struct {
-	Type ChannelType `yaml:"type"  json:"type"`
+	Type string `yaml:"type"  json:"type"`
 }
