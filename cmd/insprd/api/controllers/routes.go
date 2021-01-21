@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	handler "gitlab.inspr.dev/inspr/core/cmd/insprd/api/handlers"
+	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 func (s *Server) initRoutes() {
@@ -14,9 +15,9 @@ func (s *Server) initRoutes() {
 	s.Mux.HandleFunc("/channels", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			chandler.HandleGetAllChannels()(w, r)
+			rest.SetMiddlewareJSON(chandler.HandleGetAllChannels())(w, r)
 		case http.MethodPost:
-			chandler.HandleCreateChannel()(w, r)
+			rest.SetMiddlewareJSON(chandler.HandleCreateChannel())(w, r)
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
