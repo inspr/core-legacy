@@ -28,9 +28,9 @@ type AppMemory interface {
 // obtain or change information related to the current
 // state of the ChannelTypes in the cluster
 type ChannelTypeMemory interface {
-	GetChannelType(query string) (*meta.ChannelType, error)
+	GetChannelType(context string, ctName string) (*meta.ChannelType, error)
 	CreateChannelType(ct *meta.ChannelType, context string) error
-	DeleteChannelType(query string) error
+	DeleteChannelType(context string, ctName string) error
 	UpdateChannelType(ct *meta.ChannelType, query string) error
 }
 
