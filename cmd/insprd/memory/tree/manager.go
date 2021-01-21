@@ -9,7 +9,16 @@ type TreeMemoryManager struct {
 	root *meta.App
 }
 
-func NewTreeMemory() memory.Manager {
+var tree *TreeMemoryManager
+
+func GetTreeMemory() memory.Manager {
+	if tree == nil {
+		tree = newTreeMemory()
+	}
+	return tree
+}
+
+func newTreeMemory() *TreeMemoryManager {
 	return &TreeMemoryManager{
 		root: &meta.App{},
 	}
@@ -19,6 +28,6 @@ func (tmm *TreeMemoryManager) Channels() memory.ChannelMemory {
 	return nil
 }
 
-func (tmm *TreeMemoryManager) ChannelTypes() memory.ChannelTypeMemory {
+func (tmm *TreeMemoryManager) Apps() memory.AppMemory {
 	return nil
 }
