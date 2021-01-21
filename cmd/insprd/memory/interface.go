@@ -8,10 +8,10 @@ import "gitlab.inspr.dev/inspr/core/pkg/meta"
 // or change information related to the stored state of
 // the Channels in the cluster
 type ChannelMemory interface {
-	GetChannel(query string) (*meta.Channel, error)
+	GetChannel(context string, chName string) (*meta.Channel, error)
 	CreateChannel(ch *meta.Channel, context string) error
-	DeleteChannel(query string) error
-	UpdateChannel(ch *meta.Channel, query string) error
+	DeleteChannel(context string, chName string) error
+	UpdateChannel(ch *meta.Channel, context string) error
 }
 
 // AppMemory is the interface that allows to obtain or
