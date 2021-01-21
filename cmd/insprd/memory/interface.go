@@ -31,7 +31,7 @@ type ChannelTypeMemory interface {
 	GetChannelType(context string, ctName string) (*meta.ChannelType, error)
 	CreateChannelType(ct *meta.ChannelType, context string) error
 	DeleteChannelType(context string, ctName string) error
-	UpdateChannelType(ct *meta.ChannelType, query string) error
+	UpdateChannelType(ct *meta.ChannelType, context string) error
 }
 
 // Manager is the interface that allows the management
