@@ -9,6 +9,9 @@ build:
     docker:
       dockerfile: cmd/insprd/Dockerfile
 deploy:
-  kubectl:
-    manifests:
-    - build/k8s/*.yaml
+  helm:
+    releases:
+    - name: insprd
+      artifactOverrides:
+        insprd_repository: gcr.io/red-inspr/insprd
+      chartPath: build/helm
