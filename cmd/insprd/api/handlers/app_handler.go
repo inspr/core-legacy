@@ -54,14 +54,9 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 		}{}
 		json.Unmarshal(body, &data)
 
-		/// testing
-		fmt.Println(data.App)
-		fmt.Println(data.Ctx)
-
 		err = ah.CreateApp(&data.App, data.Ctx)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "%v", err)
+			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -74,24 +69,23 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Couldn't process the request body")
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		data := struct {
 			Query string `json:"query"`
 		}{}
-		json.Unmarshal(body, &data)
-		app, err := ah.GetApp(data.Query)
+		err = json.Unmarshal(body, &data)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "%v", err)
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
-		// respond with json
-		fmt.Fprintf(w, "%v", app)
-		w.WriteHeader(http.StatusOK)
+		app, err := ah.GetApp(data.Query)
+		if err != nil {
+			rest.ERROR(w, http.StatusConflict, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, app)
 	}
 	return rest.Handler(handler)
 }
@@ -101,21 +95,22 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Couldn't process the request body")
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		data := struct {
 			App meta.App `json:"app"`
 			Ctx string   `json:"ctx"`
 		}{}
-		json.Unmarshal(body, &data)
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			rest.ERROR(w, http.StatusBadRequest, err)
+			return
+		}
 
 		err = ah.UpdateApp(&data.App, data.Ctx)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "%v", err)
-			return
+			rest.ERROR(w, http.StatusInternalServerError, err)
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -127,18 +122,20 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Couldn't process the request body")
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		data := struct {
 			Query string `json:"query"`
 		}{}
-		json.Unmarshal(body, &data)
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			rest.ERROR(w, http.StatusBadRequest, err)
+			return
+		}
 		err = ah.DeleteApp(data.Query)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "%v", err)
+			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -43,20 +42,22 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Couldn't process the request body")
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		data := struct {
 			Channel meta.Channel `json:"channel"`
 			Ctx     string       `json:"ctx"`
 		}{}
-		json.Unmarshal(body, &data)
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			rest.ERROR(w, http.StatusBadRequest, err)
+			return
+		}
 
 		err = ch.CreateChannel(&data.Channel, data.Ctx)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "%v", err)
+			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -69,24 +70,23 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Couldn't process the request body")
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		data := struct {
 			Query string `json:"query"`
 		}{}
-		json.Unmarshal(body, &data)
-		app, err := ch.GetChannel(data.Query)
+		err = json.Unmarshal(body, &data)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "%v", err)
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
-		// respond with json
-		fmt.Fprintf(w, "%v", app)
-		w.WriteHeader(http.StatusOK)
+		channel, err := ch.GetChannel(data.Query)
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, channel)
 	}
 	return rest.Handler(handler)
 }
@@ -96,20 +96,22 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Couldn't process the request body")
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		data := struct {
 			Channel meta.Channel `json:"channel"`
 			Ctx     string       `json:"ctx"`
 		}{}
-		json.Unmarshal(body, &data)
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			rest.ERROR(w, http.StatusBadRequest, err)
+			return
+		}
 
 		err = ch.UpdateChannel(&data.Channel, data.Ctx)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "%v", err)
+			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -122,18 +124,20 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Couldn't process the request body")
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		data := struct {
 			Query string `json:"query"`
 		}{}
-		json.Unmarshal(body, &data)
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			rest.ERROR(w, http.StatusBadRequest, err)
+			return
+		}
 		err = ch.DeleteChannel(data.Query)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "%v", err)
+			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
