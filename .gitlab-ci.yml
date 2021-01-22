@@ -1,0 +1,22 @@
+# This file is a template, and might need editing before it works on your project.
+image: golang:latest
+
+variables:
+  # Please edit to your GitLab project
+  REPO_NAME: gitlab.inspr.dev/inspr/core
+
+stages:
+  - test
+
+
+unit-tests:
+  stage: test
+  script:
+    - go test -v -coverpkg=./... ./...
+  coverage: /^coverage:\s(\d+\.\d+%)\sof\sstatements\sin\s\.\/\.\.\.$/
+
+lint:
+  stage: test
+  script:
+    - go get -u golang.org/x/lint/golint
+    - golint --set_exit_status ./...
