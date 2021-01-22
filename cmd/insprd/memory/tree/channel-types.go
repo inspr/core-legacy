@@ -19,12 +19,9 @@ func (tmm *TreeMemoryManager) ChannelTypes() memory.ChannelTypeMemory {
 func (ctm *ChannelTypeMemoryManager) CreateChannelType(ct *meta.ChannelType, context string) error {
 
 	cur_ct, err := ctm.GetChannelType(context, ct.Meta.Name)
-	if cur_ct != nil {
+	if cur_ct != nil || err == nil {
 		return ierrors.NewError().AlreadyExists().
 			Message("Target app already has a '" + context + "' ChannelType").Build()
-	}
-	if err != nil {
-		return err
 	}
 
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
