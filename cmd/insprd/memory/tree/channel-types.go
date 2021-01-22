@@ -78,12 +78,9 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 func (ctm *ChannelTypeMemoryManager) UpdateChannelType(ct *meta.ChannelType, context string) error {
 
 	cur_ct, err := ctm.GetChannelType(context, ct.Meta.Name)
-	if cur_ct == nil {
+	if cur_ct == nil || err != nil {
 		return ierrors.NewError().BadRequest().
 			Message("Target app doesn't contain a '" + context + "' ChannelType").Build()
-	}
-	if err != nil {
-		return err
 	}
 
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
