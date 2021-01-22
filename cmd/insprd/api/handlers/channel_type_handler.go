@@ -22,14 +22,6 @@ func NewChannelTypeHandler(memManager memory.Manager) *ChannelTypeHandler {
 	}
 }
 
-// HandleCreateInfo informs the data needed to create a App
-func (cth *ChannelTypeHandler) HandleCreateInfo() rest.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		// not implemented yet
-	}
-	return rest.Handler(handler)
-}
-
 // HandleCreateChannelType todo doc
 func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +61,7 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		channelType, err := cth.GetChannelType(data.Query)
+		channelType, err := cth.GetChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -118,7 +110,7 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		err = cth.DeleteChannelType(data.Query)
+		err = cth.DeleteChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return

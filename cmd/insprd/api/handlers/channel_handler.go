@@ -22,13 +22,6 @@ func NewChannelHandler(memManager memory.Manager) *ChannelHandler {
 	}
 }
 
-// HandleCreateInfo informs the data needed to create a channel
-func (ch *ChannelHandler) HandleCreateInfo() rest.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-	}
-	return rest.Handler(handler)
-}
-
 // HandleCreateChannel - returns the handle function that
 // manages the creation of a channel
 func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
@@ -70,7 +63,7 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		channel, err := ch.GetChannel(data.Query)
+		channel, err := ch.GetChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -121,7 +114,7 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		err = ch.DeleteChannel(data.Query)
+		err = ch.DeleteChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return

@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -12,8 +13,55 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
+
+type appAPITest struct {
+	name string
+	ah   *AppHandler
+	send struct{ reqBody []byte }
+	want struct{ status int }
+}
+
+func appDICases(funcName string) []appAPITest {
+	parsedAppDI, _ := json.Marshal(models.AppDI{
+		App: meta.App{},
+		Ctx: "",
+	})
+	return []appAPITest{
+		{
+			name: "successful_request_" + funcName,
+			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			send: struct{ reqBody []byte }{reqBody: parsedAppDI},
+			want: struct{ status int }{status: http.StatusOK},
+		},
+		{
+			name: "unsuccessful_request_" + funcName,
+			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			send: struct{ reqBody []byte }{reqBody: parsedAppDI},
+			want: struct{ status int }{status: http.StatusInternalServerError},
+		},
+	}
+}
+
+func appQueryDICases(funcName string) []appAPITest {
+	parsedAppQueryDI, _ := json.Marshal(models.AppQueryDI{
+		Query: "",
+	})
+	return []appAPITest{
+		{
+			name: "successful_request_" + funcName,
+			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			send: struct{ reqBody []byte }{reqBody: parsedAppQueryDI},
+			want: struct{ status int }{status: http.StatusOK},
+		},
+		{
+			name: "unsuccessful_request_" + funcName,
+			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			send: struct{ reqBody []byte }{reqBody: parsedAppQueryDI},
+			want: struct{ status int }{status: http.StatusInternalServerError},
+		},
+	}
+}
 
 func TestNewAppHandler(t *testing.T) {
 	type args struct {
@@ -25,7 +73,7 @@ func TestNewAppHandler(t *testing.T) {
 		want *AppHandler
 	}{
 		{
-			name: "success - HandleCreateInfo",
+			name: "success_TestNewAppHandler",
 			args: args{
 				memManager: mocks.MockMemoryManager(nil),
 			},
@@ -43,133 +91,85 @@ func TestNewAppHandler(t *testing.T) {
 	}
 }
 
-func TestAppHandler_HandleCreateInfo(t *testing.T) {
-	tests := []struct {
-		name string
-		ah   *AppHandler
-		want rest.Handler
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.ah.HandleCreateInfo(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AppHandler.HandleCreateInfo() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestAppHandler_HandleCreateApp(t *testing.T) {
-	parsedAppDI, _ := json.Marshal(models.AppDI{
-		App: meta.App{},
-		Ctx: "",
-	})
-	tests := []struct {
-		name string
-		ah   *AppHandler
-		send struct {
-			reqBody []byte
-		}
-		want struct {
-			status int
-			err    error
-		}
-	}{
-		{
-			name: "successful_request",
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{
-				reqBody: parsedAppDI,
-			},
-			want: struct {
-				status int
-				err    error
-			}{
-				status: http.StatusOK,
-				err:    nil,
-			},
-		},
-		{
-			name: "unsuccessful_request",
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{
-				reqBody: parsedAppDI,
-			},
-			want: struct {
-				status int
-				err    error
-			}{
-				status: http.StatusOK,
-				err:    nil,
-			},
-		},
-	}
+	tests := appDICases("HandleCreateApp")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			handlerFunc := tt.ah.HandleCreateApp()
-			ts := httptest.NewServer(http.HandlerFunc((handlerFunc)))
+			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
 			defer ts.Close()
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
-			if err != tt.want.err {
-				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", err, tt.want.err)
+			if err != nil {
+				t.Log("error making a POST in the httptest server")
+				return
 			}
 			defer res.Body.Close()
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", http.StatusOK, tt.want.status)
+				t.Errorf("AppHandler.HandleCreateApp() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
 }
 
 func TestAppHandler_HandleGetAppByRef(t *testing.T) {
-	tests := []struct {
-		name string
-		ah   *AppHandler
-		want rest.Handler
-	}{
-		{
-			name: "working handler",
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
-			want: func(w http.ResponseWriter, r *http.Request) {},
-		},
-	}
+	tests := appQueryDICases("HandleGetAppByRef")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			handlerFunc := tt.ah.HandleGetAppByRef()
+			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			defer ts.Close()
+			client := ts.Client()
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			if err != nil {
+				t.Log("error making a POST in the httptest server")
+				return
+			}
+			defer res.Body.Close()
+			if res.StatusCode != tt.want.status {
+				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", res.StatusCode, tt.want.status)
+			}
 		})
 	}
 }
 
 func TestAppHandler_HandleUpdateApp(t *testing.T) {
-	tests := []struct {
-		name string
-		ah   *AppHandler
-		want rest.Handler
-	}{
-		// TODO: Add test cases.
-	}
+	tests := appDICases("HandleUpdateApp")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.ah.HandleUpdateApp(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AppHandler.HandleUpdateApp() = %v, want %v", got, tt.want)
+			handlerFunc := tt.ah.HandleUpdateApp()
+			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			defer ts.Close()
+			client := ts.Client()
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			if err != nil {
+				t.Log("error making a POST in the httptest server")
+				return
+			}
+			defer res.Body.Close()
+			if res.StatusCode != tt.want.status {
+				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
 }
 
 func TestAppHandler_HandleDeleteApp(t *testing.T) {
-	tests := []struct {
-		name string
-		ah   *AppHandler
-		want rest.Handler
-	}{
-		// TODO: Add test cases.
-	}
+	tests := appQueryDICases("HandleDeleteApp")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.ah.HandleDeleteApp(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", got, tt.want)
+			handlerFunc := tt.ah.HandleDeleteApp()
+			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			defer ts.Close()
+			client := ts.Client()
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			if err != nil {
+				t.Log("error making a POST in the httptest server")
+				return
+			}
+			defer res.Body.Close()
+			if res.StatusCode != tt.want.status {
+				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}

@@ -22,14 +22,6 @@ func NewAppHandler(memManager memory.Manager) *AppHandler {
 	}
 }
 
-// HandleCreateInfo informs the data needed to create a App
-func (ah *AppHandler) HandleCreateInfo() rest.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		// not implemented yet
-	}
-	return rest.Handler(handler)
-}
-
 // HandleCreateApp - handler that generates the rest.Handle
 // func to manage the http request
 func (ah *AppHandler) HandleCreateApp() rest.Handler {
@@ -69,7 +61,7 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 		}
 		app, err := ah.GetApp(data.Query)
 		if err != nil {
-			rest.ERROR(w, http.StatusConflict, err)
+			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, app)
@@ -96,8 +88,9 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 		err = ah.UpdateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
+		} else {
+			w.WriteHeader(http.StatusOK)
 		}
-		w.WriteHeader(http.StatusOK)
 	}
 	return rest.Handler(handler)
 }
