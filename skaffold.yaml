@@ -13,5 +13,5 @@ deploy:
     releases:
     - name: insprd
       artifactOverrides:
-        insprd_repository: gcr.io/red-inspr/insprd
+        insprdRepository: gcr.io/red-inspr/insprd
       chartPath: build/helm

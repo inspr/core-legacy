@@ -11,5 +11,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{ .Values.service.insprd_name }}
-          servicePort: {{ .Values.service.insprd_port }}
+          serviceName: {{ .Values.service.insprdName }}
+          servicePort: {{ .Values.service.insprdPort }}

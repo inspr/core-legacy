@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.deployment.insprd_name }}
+  name: {{ .Values.deployment.insprdName }}
   labels:
     {{- include "insprd.labels" . | nindent 4 }}
-    app: {{ .Values.service.insprd_name }}
+    app: {{ .Values.service.insprdName }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "insprd.selectorLabels" . | nindent 6 }}
-      app: {{ .Values.service.insprd_name }}
+      app: {{ .Values.service.insprdName }}
   template:
     metadata:
       labels:
         {{- include "insprd.selectorLabels" . | nindent 8 }}
-        app: {{ .Values.service.insprd_name }}
+        app: {{ .Values.service.insprdName }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -24,14 +24,14 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Values.deployment.insprd_name }}
+        - name: {{ .Values.deployment.insprdName }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: {{ .Values.insprd_repository }}
-          imagePullPolicy: {{ .Values.image.insprd_pullPolicy }}
+          image: {{ .Values.insprdRepository }}
+          imagePullPolicy: {{ .Values.image.insprdPullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.insprd_targetport }}
+              containerPort: {{ .Values.service.insprdTargetport }}
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
