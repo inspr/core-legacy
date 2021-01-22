@@ -20,14 +20,14 @@ spec:
         ports:
         - name: insprd-port
           containerPort: 8080
-        # livenessProbe:
-        #   httpGet:
-        #     path: /healthz
-        #     port: insprd-port
-        # readinessProbe:
-        #   httpGet:
-        #     path: /healthz
-        #     port: insprd-port
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: insprd-port
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: insprd-port
         resources:
           requests:
             memory: "64Mi"
