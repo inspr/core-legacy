@@ -51,11 +51,6 @@ func (chh *ChannelMemoryManager) CreateChannel(ch *meta.Channel, context string)
 		return newError
 	}
 
-	// Validate Channel Structure
-	if !validateChannel(ch) {
-		return ierrors.NewError().InvalidChannel().Message("Invalid Channel Structure").Build()
-	}
-
 	// Add pointer to channel in the app
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
@@ -95,8 +90,4 @@ func (chh *ChannelMemoryManager) UpdateChannel(ch *meta.Channel, context string)
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
 	return nil
-}
-
-func validateChannel(ch *meta.Channel) bool {
-	return true
 }
