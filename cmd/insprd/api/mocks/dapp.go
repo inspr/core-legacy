@@ -1,31 +1,42 @@
 package mocks
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-// Apps todo doc
+// Apps - mocks the implementation of the AppMemory interface methods
 type Apps struct {
-	memory.AppMemory
+	fail error
 }
 
-// GetApp todo doc
+// GetApp - simple mock
 func (apps *Apps) GetApp(query string) (*meta.App, error) {
+	if apps.fail != nil {
+		return &meta.App{}, apps.fail
+	}
 	return &meta.App{}, nil
 }
 
-// CreateApp todo doc
+// CreateApp - simple mock
 func (apps *Apps) CreateApp(app *meta.App, context string) error {
+	if apps.fail != nil {
+		return apps.fail
+	}
 	return nil
 }
 
-// DeleteApp todo doc
+// DeleteApp - simple mock
 func (apps *Apps) DeleteApp(query string) error {
+	if apps.fail != nil {
+		return apps.fail
+	}
 	return nil
 }
 
-// UpdateApp todo doc
+// UpdateApp - simple mock
 func (apps *Apps) UpdateApp(app *meta.App, query string) error {
+	if apps.fail != nil {
+		return apps.fail
+	}
 	return nil
 }

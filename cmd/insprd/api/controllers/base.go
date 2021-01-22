@@ -16,10 +16,10 @@ type Server struct {
 	MemoryManager memory.Manager
 }
 
-// Init todo doc
+// Init - configures the server
 func (s *Server) Init() {
 	s.Mux = http.NewServeMux()
-	s.MemoryManager = mocks.MockMemoryManager()
+	s.MemoryManager = mocks.MockMemoryManager(nil)
 	s.initRoutes()
 }
 

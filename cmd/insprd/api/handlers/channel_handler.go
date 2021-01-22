@@ -10,7 +10,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
-// ChannelHandler todo doc
+// ChannelHandler - contains handlers that uses the ChannelMemory interface methods
 type ChannelHandler struct {
 	memory.ChannelMemory
 }

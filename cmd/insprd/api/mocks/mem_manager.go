@@ -10,12 +10,21 @@ type MemManager struct {
 	channelType ChannelTypes
 	channel     Channels
 	app         Apps
-	memory.Manager
 }
 
-// MockMemoryManager mock exported
-func MockMemoryManager() memory.Manager {
-	return &MemManager{}
+// MockMemoryManager mock exported with propagated error throught the functions
+func MockMemoryManager(failErr error) memory.Manager {
+	return &MemManager{
+		channelType: ChannelTypes{
+			fail: failErr,
+		},
+		channel: Channels{
+			fail: failErr,
+		},
+		app: Apps{
+			fail: failErr,
+		},
+	}
 }
 
 // Apps returns manager of DApps

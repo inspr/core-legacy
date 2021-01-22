@@ -21,10 +21,10 @@ func TestNewAppHandler(t *testing.T) {
 		{
 			name: "success - HandleCreateInfo",
 			args: args{
-				memManager: mocks.MockMemoryManager(),
+				memManager: mocks.MockMemoryManager(nil),
 			},
 			want: &AppHandler{
-				AppMemory: mocks.MockMemoryManager().Apps(),
+				AppMemory: mocks.MockMemoryManager(nil).Apps(),
 			},
 		},
 	}
@@ -60,7 +60,11 @@ func TestAppHandler_HandleCreateApp(t *testing.T) {
 		ah   *AppHandler
 		want rest.Handler
 	}{
-		// TODO: Add test cases.
+		{
+			name: "t",
+			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -1,31 +1,42 @@
 package mocks
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-// ChannelTypes todo doc
+// ChannelTypes - mocks the implementation of the ChannelTypeMemory interface methods
 type ChannelTypes struct {
-	memory.ChannelTypeMemory
+	fail error
 }
 
-// GetChannelType todo doc
+// GetChannelType - simple mock
 func (chType *ChannelTypes) GetChannelType(query string) (*meta.ChannelType, error) {
+	if chType.fail != nil {
+		return &meta.ChannelType{}, chType.fail
+	}
 	return &meta.ChannelType{}, nil
 }
 
-// CreateChannelType todo doc
+// CreateChannelType - simple mock
 func (chType *ChannelTypes) CreateChannelType(ct *meta.ChannelType, context string) error {
+	if chType.fail != nil {
+		return chType.fail
+	}
 	return nil
 }
 
-// DeleteChannelType todo doc
+// DeleteChannelType - simple mock
 func (chType *ChannelTypes) DeleteChannelType(query string) error {
+	if chType.fail != nil {
+		return chType.fail
+	}
 	return nil
 }
 
-// UpdateChannelType todo doc
+// UpdateChannelType - simple mock
 func (chType *ChannelTypes) UpdateChannelType(ct *meta.ChannelType, query string) error {
+	if chType.fail != nil {
+		return chType.fail
+	}
 	return nil
 }

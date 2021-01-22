@@ -10,12 +10,12 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
-// AppHandler todo doc
+// AppHandler - contains handlers that uses the AppMemory interface methods
 type AppHandler struct {
 	memory.AppMemory
 }
 
-// NewAppHandler todo doc
+// NewAppHandler - generates a new AppHandler through the memoryManager interface
 func NewAppHandler(memManager memory.Manager) *AppHandler {
 	return &AppHandler{
 		AppMemory: memManager.Apps(),
@@ -30,7 +30,8 @@ func (ah *AppHandler) HandleCreateInfo() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleCreateApp todo doc
+// HandleCreateApp - handler that generates the rest.Handle
+// func to manage the http request
 func (ah *AppHandler) HandleCreateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
@@ -51,7 +52,8 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetAppByRef todo doc
+// HandleGetAppByRef - handler that generates the rest.Handle
+// func to manage the http request
 func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
@@ -75,7 +77,8 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleUpdateApp todo doc
+// HandleUpdateApp - handler that generates the rest.Handle
+// func to manage the http request
 func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
@@ -99,7 +102,8 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleDeleteApp todo doc
+// HandleDeleteApp - handler that generates the rest.Handle
+// func to manage the http request
 func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
