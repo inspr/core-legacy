@@ -1,4 +1,4 @@
-package mock
+package mocks
 
 import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"

@@ -22,14 +22,6 @@ func NewChannelTypeHandler(memManager memory.Manager) *ChannelTypeHandler {
 	}
 }
 
-// HandleGetAllChannelTypes returns all ChannelTypes that exists
-func (cth *ChannelTypeHandler) HandleGetAllChannelTypes() rest.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		// not implemented yet
-	}
-	return rest.Handler(handler)
-}
-
 // HandleCreateInfo informs the data needed to create a App
 func (cth *ChannelTypeHandler) HandleCreateInfo() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {

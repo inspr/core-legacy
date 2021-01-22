@@ -22,14 +22,6 @@ func NewChannelHandler(memManager memory.Manager) *ChannelHandler {
 	}
 }
 
-// HandleGetAllChannels returns all channels
-func (ch *ChannelHandler) HandleGetAllChannels() rest.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		// not implemented yet
-	}
-	return rest.Handler(handler)
-}
-
 // HandleCreateInfo informs the data needed to create a channel
 func (ch *ChannelHandler) HandleCreateInfo() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {

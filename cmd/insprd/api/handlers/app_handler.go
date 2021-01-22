@@ -22,14 +22,6 @@ func NewAppHandler(memManager memory.Manager) *AppHandler {
 	}
 }
 
-// HandleGetAllApps returns all Apps
-func (ah *AppHandler) HandleGetAllApps() rest.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		// not implemented yet
-	}
-	return rest.Handler(handler)
-}
-
 // HandleCreateInfo informs the data needed to create a App
 func (ah *AppHandler) HandleCreateInfo() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {

@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/mock"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/mocks"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 )
 
@@ -19,7 +19,7 @@ type Server struct {
 // Init todo doc
 func (s *Server) Init() {
 	s.Mux = http.NewServeMux()
-	s.MemoryManager = mock.MockMemoryManager()
+	s.MemoryManager = mocks.MockMemoryManager()
 	s.initRoutes()
 }
 
