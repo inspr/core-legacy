@@ -46,8 +46,7 @@ func (chh *ChannelMemoryManager) GetChannel(context string, chName string) (*met
 CreateChannel receives a context that defines a path to the App
 in which to add a pointer to the channel passed as an argument
 */
-func (chh *ChannelMemoryManager) CreateChannel(ch *meta.Channel, context string) error {
-
+func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel) error {
 	chAlreadyExist, _ := chh.GetChannel(context, ch.Meta.Name)
 	if chAlreadyExist != nil {
 		return ierrors.NewError().AlreadyExists().Message("channel with name " + ch.Meta.Name + " already exists in the context " + context).Build()
@@ -71,7 +70,6 @@ has a pointer to a channel that has the same name as the name passed
 as an argument, that pointer is removed from the list of App channels
 */
 func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) error {
-
 	_, err := chh.GetChannel(context, chName)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
@@ -91,8 +89,7 @@ defines the path to the App that will have the Update. If the App has
 a channel pointer that has the same name as that passed as an argument,
 this pointer will be replaced by the new one
 */
-func (chh *ChannelMemoryManager) UpdateChannel(ch *meta.Channel, context string) error {
-
+func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel) error {
 	_, err := chh.GetChannel(context, ch.Meta.Name)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
