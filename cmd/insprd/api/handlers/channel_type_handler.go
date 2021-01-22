@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
@@ -46,10 +46,7 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			ChannelType meta.ChannelType `json:"channel-type"`
-			Ctx         string           `json:"ctx"`
-		}{}
+		data := models.ChannelTypeDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)
@@ -74,9 +71,7 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			Query string `json:"query"`
-		}{}
+		data := models.ChannelTypeQueryDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)
@@ -100,10 +95,7 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			ChannelType meta.ChannelType `json:"channel-type"`
-			Ctx         string           `json:"ctx"`
-		}{}
+		data := models.ChannelTypeDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)
@@ -128,9 +120,7 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			Query string `json:"query"`
-		}{}
+		data := models.ChannelTypeQueryDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)

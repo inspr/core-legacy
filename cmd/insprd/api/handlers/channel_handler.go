@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
@@ -37,7 +37,8 @@ func (ch *ChannelHandler) HandleCreateInfo() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleCreateChannel todo doc
+// HandleCreateChannel - returns the handle function that
+// manages the creation of a channel
 func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
@@ -45,10 +46,7 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			Channel meta.Channel `json:"channel"`
-			Ctx     string       `json:"ctx"`
-		}{}
+		data := models.ChannelDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)
@@ -65,7 +63,8 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetChannelByRef todo doc
+// HandleGetChannelByRef - return a handle function that obtains
+// a channel by the reference given
 func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
@@ -73,9 +72,7 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			Query string `json:"query"`
-		}{}
+		data := models.ChannelQueryDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)
@@ -91,7 +88,8 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleUpdateChannel todo doc
+// HandleUpdateChannel - returns a handle function that
+// updates the channel with the parameters given in the request
 func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
@@ -99,10 +97,7 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			Channel meta.Channel `json:"channel"`
-			Ctx     string       `json:"ctx"`
-		}{}
+		data := models.ChannelDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)
@@ -119,7 +114,8 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleDeleteChannel todo doc
+// HandleDeleteChannel - returns a handle function that
+// deletes the channel of the given path
 func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
@@ -127,9 +123,7 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			Query string `json:"query"`
-		}{}
+		data := models.ChannelQueryDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)

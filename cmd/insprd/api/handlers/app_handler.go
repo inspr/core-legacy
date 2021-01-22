@@ -2,12 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
@@ -44,14 +43,10 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Couldn't process the request body")
+			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			App meta.App `json:"app"`
-			Ctx string   `json:"ctx"`
-		}{}
+		data := models.AppDI{}
 		json.Unmarshal(body, &data)
 
 		err = ah.CreateApp(&data.App, data.Ctx)
@@ -72,9 +67,7 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			Query string `json:"query"`
-		}{}
+		data := models.AppQueryDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)
@@ -98,10 +91,7 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			App meta.App `json:"app"`
-			Ctx string   `json:"ctx"`
-		}{}
+		data := models.AppDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)
@@ -125,9 +115,7 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		data := struct {
-			Query string `json:"query"`
-		}{}
+		data := models.AppQueryDI{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			rest.ERROR(w, http.StatusBadRequest, err)
