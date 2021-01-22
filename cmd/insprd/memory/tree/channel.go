@@ -6,23 +6,30 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-// ChannelMemoryManager DOC TODO
+/*
+ChannelMemoryManager implements the channel interface and
+provides methods for operating on Channels
+*/
 type ChannelMemoryManager struct {
 	root *meta.App
 }
 
-// Channels Doc TODO
+// Channels return a pointer to ChannelMemoryManager
 func (tmm *TreeMemoryManager) Channels() memory.ChannelMemory {
 	return &ChannelMemoryManager{
 		root: tmm.root,
 	}
 }
 
-// GetChannel DOC TODO
+/*
+GetChannel receives a context and a channel name. The context defines
+the path to an App. If this App has a pointer to a channel that has the
+same name as the name passed as an argument, the pointer to that channel is returned
+*/
 func (chh *ChannelMemoryManager) GetChannel(context string, chName string) (*meta.Channel, error) {
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("Channel not found").Build()
+		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel was not found because the app context has an error").Build()
 		return nil, newError
 	}
 
@@ -31,42 +38,46 @@ func (chh *ChannelMemoryManager) GetChannel(context string, chName string) (*met
 		return ch, nil
 	}
 
-	newError := ierrors.NewError().NotFound().Message("Channel not found").Build()
+	newError := ierrors.NewError().NotFound().Message("channel not found").Build()
 	return nil, newError
 }
 
-// CreateChannel DOC TODO
+/*
+CreateChannel receives a context that defines a path to the App
+in which to add a pointer to the channel passed as an argument
+*/
 func (chh *ChannelMemoryManager) CreateChannel(ch *meta.Channel, context string) error {
 
-	// Check if channel already exists
 	chAlreadyExist, _ := chh.GetChannel(context, ch.Meta.Name)
 	if chAlreadyExist != nil {
-		return ierrors.NewError().AlreadyExists().Message("Channel with name " + ch.Meta.Name + " already exists in the context " + context).Build()
+		return ierrors.NewError().AlreadyExists().Message("channel with name " + ch.Meta.Name + " already exists in the context " + context).Build()
 	}
 
-	// Get context app to add the channel to it
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).InvalidChannel().Message("App for channel creation not found").Build()
+		newError := ierrors.NewError().InnerError(err).InvalidChannel().Message("app for channel creation not found").Build()
 		return newError
 	}
 
-	// Add pointer to channel in the app
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
 	return nil
 }
 
-// DeleteChannel DOC TODO
+/*
+DeleteChannel receives a context and a channel name. The context
+defines the path to the App that will have the Delete. If the App
+has a pointer to a channel that has the same name as the name passed
+as an argument, that pointer is removed from the list of App channels
+*/
 func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) error {
 
-	// Get channel
 	_, err := chh.GetChannel(context, chName)
 	if err != nil {
-		return err
+		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
+		return newError
 	}
 
-	// Get context app to delete the channel from
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)
 
 	delete(parentApp.Spec.Channels, chName)
@@ -74,19 +85,22 @@ func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) er
 	return nil
 }
 
-// UpdateChannel DOC TODO
+/*
+UpdateChannel receives a context and a channel pointer. The context
+defines the path to the App that will have the Update. If the App has
+a channel pointer that has the same name as that passed as an argument,
+this pointer will be replaced by the new one
+*/
 func (chh *ChannelMemoryManager) UpdateChannel(ch *meta.Channel, context string) error {
 
-	// Check if channel exists
 	_, err := chh.GetChannel(context, ch.Meta.Name)
 	if err != nil {
-		return err
+		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
+		return newError
 	}
 
-	// Get context app to update the channel from
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)
 
-	// Update channel
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
 	return nil
