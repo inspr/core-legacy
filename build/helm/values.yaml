@@ -16,6 +16,8 @@ serviceAccount:
   annotations: {}
   name: ""
 
+image:
+  insprd_pullPolicy: IfNotPresent
 
 securityContext: {}
 
