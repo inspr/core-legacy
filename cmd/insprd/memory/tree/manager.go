@@ -15,6 +15,10 @@ func NewTreeMemory() memory.Manager {
 	}
 }
 
+func (tmm *TreeMemoryManager) Apps() memory.ChannelMemory {
+	return nil
+}
+
 func (tmm *TreeMemoryManager) Channels() memory.ChannelMemory {
 	return nil
 }

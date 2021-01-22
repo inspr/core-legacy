@@ -10,6 +10,6 @@ type ChannelTypeDI struct {
 
 // ChannelTypeQueryDI - Data Input format for queries requests
 type ChannelTypeQueryDI struct {
-	Query  string `json:"query"`
+	Ctx    string `json:"ctx"`
 	CtName string `json:"ctname"`
 }

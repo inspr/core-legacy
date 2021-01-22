@@ -23,9 +23,6 @@ func (s *Server) initRoutes() {
 			return
 		}
 	})
-	s.Mux.HandleFunc("/channels/info",
-		rest.SetMiddlewareJSON(chandler.HandleCreateInfo()).Get(),
-	)
 	s.Mux.HandleFunc("/channels/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -52,9 +49,6 @@ func (s *Server) initRoutes() {
 			return
 		}
 	})
-	s.Mux.HandleFunc("/apps/info",
-		rest.SetMiddlewareJSON(ahandler.HandleCreateInfo()).Get(),
-	)
 	s.Mux.HandleFunc("/apps/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -81,9 +75,6 @@ func (s *Server) initRoutes() {
 			return
 		}
 	})
-	s.Mux.HandleFunc("/channeltypes/info",
-		rest.SetMiddlewareJSON(cthandler.HandleCreateInfo()).Get(),
-	)
 	s.Mux.HandleFunc("/channeltypes/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:

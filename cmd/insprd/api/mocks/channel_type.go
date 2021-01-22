@@ -10,7 +10,7 @@ type ChannelTypes struct {
 }
 
 // GetChannelType - simple mock
-func (chType *ChannelTypes) GetChannelType(query string) (*meta.ChannelType, error) {
+func (chType *ChannelTypes) GetChannelType(context string, ctName string) (*meta.ChannelType, error) {
 	if chType.fail != nil {
 		return &meta.ChannelType{}, chType.fail
 	}
@@ -26,7 +26,7 @@ func (chType *ChannelTypes) CreateChannelType(ct *meta.ChannelType, context stri
 }
 
 // DeleteChannelType - simple mock
-func (chType *ChannelTypes) DeleteChannelType(query string) error {
+func (chType *ChannelTypes) DeleteChannelType(context string, ctName string) error {
 	if chType.fail != nil {
 		return chType.fail
 	}
@@ -34,7 +34,7 @@ func (chType *ChannelTypes) DeleteChannelType(query string) error {
 }
 
 // UpdateChannelType - simple mock
-func (chType *ChannelTypes) UpdateChannelType(ct *meta.ChannelType, query string) error {
+func (chType *ChannelTypes) UpdateChannelType(ct *meta.ChannelType, context string) error {
 	if chType.fail != nil {
 		return chType.fail
 	}

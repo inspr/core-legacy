@@ -1,6 +1,8 @@
 package models
 
-import "gitlab.inspr.dev/inspr/core/pkg/meta"
+import (
+	"gitlab.inspr.dev/inspr/core/pkg/meta"
+)
 
 // AppDI - Data Input format for requests that pass the app data
 type AppDI struct {

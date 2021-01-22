@@ -23,6 +23,7 @@ func ERROR(w http.ResponseWriter, statusCode int, err error) {
 		}{
 			Error: err.Error(),
 		})
+	} else {
+		JSON(w, statusCode, err)
 	}
-	JSON(w, statusCode, err)
 }
