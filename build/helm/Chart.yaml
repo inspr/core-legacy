@@ -1,6 +1,6 @@
 apiVersion: v2
 name: insprd
-description: A Helm chart for Kubernetes
+description: Helm chart for installing Inspr's Deamon application. Image tags are injected via skaffold.
 
 # A chart can be either an 'application' or a 'library' chart.
 #
