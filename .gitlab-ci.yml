@@ -15,3 +15,8 @@ unit-tests:
     - go test -v -coverpkg=./... ./...
   coverage: /^coverage:\s(\d+\.\d+%)\sof\sstatements\sin\s\.\/\.\.\.$/
 
+lint:
+  stage: test
+  script:
+    - go get -u golang.org/x/lint/golint
+    - golint --set_exit_status ./...
