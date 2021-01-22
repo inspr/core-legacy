@@ -3,12 +3,12 @@ entries:
   insprd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2021-01-22T10:49:41.626999991-03:00"
+    created: "2021-01-22T10:57:53.854517966-03:00"
     description: A Helm chart for Kubernetes
-    digest: 1c7bf986a5c45a29f74f90a9c3e4f4e912f9ac3916c08021a2db3436bf8733bf
+    digest: 3c79ed744b71a2994b2ea85ed23822c45b819bb1c01cd4b6cd982439b8a3fa73
     name: insprd
     type: application
     urls:
     - https://inspr-charts.storage.googleapis.com/insprd-0.0.1.tgz
     version: 0.0.1
-generated: "2021-01-22T10:49:41.626423238-03:00"
+generated: "2021-01-22T10:57:53.85373656-03:00"
