@@ -17,7 +17,15 @@ func TestTreeMemoryManager_ChannelTypes(t *testing.T) {
 		fields fields
 		want   memory.ChannelTypeMemory
 	}{
-		// TODO: Add test cases.
+		{
+			name: "creating a ChannelTypeMemortMannager",
+			fields: fields{
+				root: getRootApp(),
+			},
+			want: &ChannelTypeMemoryManager{
+				root: getRootApp(),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -45,7 +53,25 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Creating a new ChannelType on a valid app",
+			fields: fields{
+				root: getRootApp(),
+			},
+			args: args{
+				ct: {
+					Meta: meta.Metadata{
+						Name:        "ct1",
+						Reference:   "root.ct1",
+						Annotations: map[string]string{},
+						Parent:      "root",
+						SHA256:      "",
+					},
+					Schema: []byte{},
+				},
+				context: "root",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -147,4 +173,51 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 			}
 		})
 	}
+}
+
+func getRootApp() *meta.App {
+	root := meta.App{
+		Meta: meta.Metadata{
+			Name:        "root",
+			Reference:   "",
+			Annotations: map[string]string{},
+			Parent:      "",
+			SHA256:      "",
+		},
+		Spec: meta.AppSpec{
+			Node: &meta.Node{},
+			Apps: map[string]*meta.App{
+				"app1": {},
+				"app2": {},
+			},
+			Channels: map[string]*meta.Channel{},
+			ChannelTypes: map[string]*meta.ChannelType{
+				"ct1": {
+					Meta: meta.Metadata{
+						Name:        "ct1",
+						Reference:   "root.ct1",
+						Annotations: map[string]string{},
+						Parent:      "root",
+						SHA256:      "",
+					},
+					Schema: []byte{},
+				},
+				"ct2": {
+					Meta: meta.Metadata{
+						Name:        "ct2",
+						Reference:   "root.ct2",
+						Annotations: map[string]string{},
+						Parent:      "root",
+						SHA256:      "",
+					},
+					Schema: []byte{},
+				},
+			},
+			Boundary: &meta.AppBoundary{
+				Input:  []string{},
+				Output: []string{},
+			},
+		},
+	}
+	return &root
 }

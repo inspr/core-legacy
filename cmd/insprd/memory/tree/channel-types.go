@@ -7,7 +7,8 @@ import (
 )
 
 /*
-ChannelTypeMemoryManager implements ChannelType and provides methos for operating on ChannelTypes
+ChannelTypeMemoryManager implements the ChannelType interface
+and provides methos for operating on ChannelTypes
 */
 type ChannelTypeMemoryManager struct {
 	root *meta.App
