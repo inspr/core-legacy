@@ -9,19 +9,24 @@ type TreeMemoryManager struct {
 	root *meta.App
 }
 
-var dappTree *TreeMemoryManager
+var tree memory.Manager
 
 func GetTreeMemory() memory.Manager {
-	if dappTree == nil {
-		dappTree = newTreeMemory()
+	if tree == nil {
+		// tree = newTreeMemory()
+		setTree(newTreeMemory())
 	}
-	return dappTree
+	return tree
 }
 
 func newTreeMemory() *TreeMemoryManager {
 	return &TreeMemoryManager{
 		root: &meta.App{},
 	}
+}
+
+func setTree(tmm memory.Manager) {
+	tree = tmm
 }
 
 func (tmm *TreeMemoryManager) Channels() memory.ChannelMemory {

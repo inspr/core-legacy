@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -20,10 +21,10 @@ func TestTreeMemoryManager_ChannelTypes(t *testing.T) {
 		{
 			name: "creating a ChannelTypeMemortMannager",
 			fields: fields{
-				root: getRootApp(),
+				root: getMockRootApp(),
 			},
 			want: &ChannelTypeMemoryManager{
-				root: getRootApp(),
+				root: getMockRootApp(),
 			},
 		},
 	}
@@ -39,55 +40,13 @@ func TestTreeMemoryManager_ChannelTypes(t *testing.T) {
 	}
 }
 
-func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
-	type fields struct {
-		root *meta.App
-	}
-	type args struct {
-		ct      *meta.ChannelType
-		context string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "Creating a new ChannelType on a valid app",
-			fields: fields{
-				root: getRootApp(),
-			},
-			args: args{
-				ct: {
-					Meta: meta.Metadata{
-						Name:        "ct1",
-						Reference:   "root.ct1",
-						Annotations: map[string]string{},
-						Parent:      "root",
-						SHA256:      "",
-					},
-					Schema: []byte{},
-				},
-				context: "root",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctm := &ChannelTypeMemoryManager{
-				root: tt.fields.root,
-			}
-			if err := ctm.CreateChannelType(tt.args.ct, tt.args.context); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.CreateChannelType() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 	type fields struct {
-		root *meta.App
+		root   *meta.App
+		appErr error
+		mockA  bool
+		mockC  bool
+		mockCT bool
 	}
 	type args struct {
 		context string
@@ -100,13 +59,74 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 		want    *meta.ChannelType
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Getting a valid ChannelType on a valid app",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				context: "root",
+				ctName:  "ct1",
+			},
+			wantErr: false,
+			want: &meta.ChannelType{
+				Meta: meta.Metadata{
+					Name:        "ct1",
+					Reference:   "root.ct1",
+					Annotations: map[string]string{},
+					Parent:      "root",
+					SHA256:      "",
+				},
+				Schema: []byte{},
+			},
+		},
+		{
+			name: "Getting a invalid ChannelType on a valid app",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				context: "root",
+				ctName:  "ct3",
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Getting any ChannelType on a invalid app",
+			fields: fields{
+				root:   nil,
+				appErr: ierrors.NewError().NotFound().Build(),
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				context: "root",
+				ctName:  "ct42",
+			},
+			wantErr: true,
+			want:    nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctm := &ChannelTypeMemoryManager{
-				root: tt.fields.root,
-			}
+			setTree(&TreeMockManager{
+				root:   tt.fields.root,
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+			ctm := GetTreeMemory().ChannelTypes()
 			got, err := ctm.GetChannelType(tt.args.context, tt.args.ctName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ChannelTypeMemoryManager.GetChannelType() error = %v, wantErr %v", err, tt.wantErr)
@@ -119,37 +139,13 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 	}
 }
 
-func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
+func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 	type fields struct {
-		root *meta.App
-	}
-	type args struct {
-		context string
-		ctName  string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctm := &ChannelTypeMemoryManager{
-				root: tt.fields.root,
-			}
-			if err := ctm.DeleteChannelType(tt.args.context, tt.args.ctName); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.DeleteChannelType() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
-	type fields struct {
-		root *meta.App
+		root   *meta.App
+		appErr error
+		mockA  bool
+		mockC  bool
+		mockCT bool
 	}
 	type args struct {
 		ct      *meta.ChannelType
@@ -160,39 +156,53 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 		fields  fields
 		args    args
 		wantErr bool
+		want    *meta.ChannelType
 	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctm := &ChannelTypeMemoryManager{
-				root: tt.fields.root,
-			}
-			if err := ctm.UpdateChannelType(tt.args.ct, tt.args.context); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.UpdateChannelType() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func getRootApp() *meta.App {
-	root := meta.App{
-		Meta: meta.Metadata{
-			Name:        "root",
-			Reference:   "",
-			Annotations: map[string]string{},
-			Parent:      "",
-			SHA256:      "",
-		},
-		Spec: meta.AppSpec{
-			Node: &meta.Node{},
-			Apps: map[string]*meta.App{
-				"app1": {},
-				"app2": {},
+		{
+			name: "Creating a new ChannelType on a valid app",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
 			},
-			Channels: map[string]*meta.Channel{},
-			ChannelTypes: map[string]*meta.ChannelType{
-				"ct1": {
+			args: args{
+				ct: &meta.ChannelType{
+					Meta: meta.Metadata{
+						Name:        "ct3",
+						Reference:   "root.ct1",
+						Annotations: map[string]string{},
+						Parent:      "root",
+						SHA256:      "",
+					},
+					Schema: []byte{},
+				},
+				context: "root",
+			},
+			wantErr: false,
+			want: &meta.ChannelType{
+				Meta: meta.Metadata{
+					Name:        "ct3",
+					Reference:   "root.ct1",
+					Annotations: map[string]string{},
+					Parent:      "root",
+					SHA256:      "",
+				},
+				Schema: []byte{},
+			},
+		},
+		{
+			name: "Trying to create an old ChannelType on a valid app",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				ct: &meta.ChannelType{
 					Meta: meta.Metadata{
 						Name:        "ct1",
 						Reference:   "root.ct1",
@@ -202,22 +212,286 @@ func getRootApp() *meta.App {
 					},
 					Schema: []byte{},
 				},
-				"ct2": {
+				context: "root",
+			},
+			wantErr: true,
+			want: &meta.ChannelType{
+				Meta: meta.Metadata{
+					Name:        "ct1",
+					Reference:   "root.ct1",
+					Annotations: map[string]string{},
+					Parent:      "root",
+					SHA256:      "",
+				},
+				Schema: []byte{},
+			},
+		},
+		{
+			name: "Trying to create an ChannelType on a invalid app",
+			fields: fields{
+				root:   nil,
+				appErr: ierrors.NewError().NotFound().Build(),
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				ct: &meta.ChannelType{
 					Meta: meta.Metadata{
-						Name:        "ct2",
-						Reference:   "root.ct2",
+						Name:        "ct1",
+						Reference:   "root.ct1",
 						Annotations: map[string]string{},
 						Parent:      "root",
 						SHA256:      "",
 					},
 					Schema: []byte{},
 				},
+				context: "root",
 			},
-			Boundary: &meta.AppBoundary{
-				Input:  []string{},
-				Output: []string{},
-			},
+			wantErr: true,
+			want:    nil,
 		},
 	}
-	return &root
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			setTree(&TreeMockManager{
+				root:   tt.fields.root,
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+			ctm := GetTreeMemory().ChannelTypes()
+			err := ctm.CreateChannelType(tt.args.ct, tt.args.context)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ChannelTypeMemoryManager.CreateChannelType() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if tt.want != nil {
+				got, err := ctm.GetChannelType(tt.args.context, tt.want.Meta.Name)
+				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("ChannelTypeMemoryManager.GetChannelType() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
+	type fields struct {
+		root   *meta.App
+		appErr error
+		mockA  bool
+		mockC  bool
+		mockCT bool
+	}
+	type args struct {
+		context string
+		ctName  string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+		want    *meta.ChannelType
+	}{
+		{
+			name: "Deleting a valid ChannelType on a valid app",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				ctName:  "ct1",
+				context: "root",
+			},
+			wantErr: false,
+			want:    nil,
+		},
+		{
+			name: "Deleting a invalid ChannelType on a valid app",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				ctName:  "ct3",
+				context: "root",
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Deleting any ChannelType on a invalid app",
+			fields: fields{
+				root:   nil,
+				appErr: ierrors.NewError().NotFound().Build(),
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				context: "root",
+				ctName:  "ct42",
+			},
+			wantErr: true,
+			want:    nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			setTree(&TreeMockManager{
+				root:   tt.fields.root,
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+			ctm := GetTreeMemory().ChannelTypes()
+			if err := ctm.DeleteChannelType(tt.args.context, tt.args.ctName); (err != nil) != tt.wantErr {
+				t.Errorf("ChannelTypeMemoryManager.DeleteChannelType() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			got, _ := ctm.GetChannelType(tt.args.context, tt.args.ctName)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ChannelTypeMemoryManager.GetChannelType() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
+	type fields struct {
+		root   *meta.App
+		appErr error
+		mockA  bool
+		mockC  bool
+		mockCT bool
+	}
+	type args struct {
+		ct      *meta.ChannelType
+		context string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+		want    *meta.ChannelType
+	}{
+		{
+			name: "Updating a valid ChannelType on a valid app",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				ct: &meta.ChannelType{
+					Meta: meta.Metadata{
+						Name:        "ct1",
+						Reference:   "root.ct1",
+						Annotations: map[string]string{},
+						Parent:      "root",
+						SHA256:      "alalalalalalaa",
+					},
+					Schema: []byte{},
+				},
+				context: "root",
+			},
+			wantErr: false,
+			want: &meta.ChannelType{
+				Meta: meta.Metadata{
+					Name:        "ct1",
+					Reference:   "root.ct1",
+					Annotations: map[string]string{},
+					Parent:      "root",
+					SHA256:      "alalalalalalaa",
+				},
+				Schema: []byte{},
+			},
+		},
+		{
+			name: "Updating a invalid ChannelType on a valid app",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				ct: &meta.ChannelType{
+					Meta: meta.Metadata{
+						Name:        "ct42",
+						Reference:   "root.ct42",
+						Annotations: map[string]string{},
+						Parent:      "root",
+						SHA256:      "",
+					},
+					Schema: []byte{},
+				},
+				context: "root",
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Updating any ChannelType on a invalid app",
+			fields: fields{
+				root:   nil,
+				appErr: ierrors.NewError().NotFound().Build(),
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				ct: &meta.ChannelType{
+					Meta: meta.Metadata{
+						Name:        "ct3",
+						Reference:   "root.ct1",
+						Annotations: map[string]string{},
+						Parent:      "root",
+						SHA256:      "",
+					},
+					Schema: []byte{},
+				},
+				context: "root",
+			},
+			wantErr: true,
+			want:    nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			setTree(&TreeMockManager{
+				root:   tt.fields.root,
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+			ctm := GetTreeMemory().ChannelTypes()
+			if err := ctm.UpdateChannelType(tt.args.ct, tt.args.context); (err != nil) != tt.wantErr {
+				t.Errorf("ChannelTypeMemoryManager.UpdateChannelType() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if tt.want != nil {
+				got, err := ctm.GetChannelType(tt.args.context, tt.want.Meta.Name)
+				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("ChannelTypeMemoryManager.GetChannelType() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
 }

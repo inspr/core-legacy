@@ -33,7 +33,7 @@ func (ctm *ChannelTypeMemoryManager) CreateChannelType(ct *meta.ChannelType, con
 	curCt, err := ctm.GetChannelType(context, ct.Meta.Name)
 	if curCt != nil || err == nil {
 		return ierrors.NewError().AlreadyExists().
-			Message("Target app already has a '" + context + "' ChannelType").Build()
+			Message("Target app already has a '" + ct.Meta.Name + "' ChannelType").Build()
 	}
 
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
@@ -82,7 +82,7 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
 	if err != nil {
-		return ierrors.NewError().BadRequest().InnerError(err).
+		return ierrors.NewError().InternalServer().InnerError(err).
 			Message("Target app doesn't exist").Build()
 	}
 
@@ -92,9 +92,6 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 	if curCt != nil {
 		return ierrors.NewError().InternalServer().
 			Message("Couldn't delete '" + context + "' ChannelType from target app").Build()
-	}
-	if err != nil {
-		return err
 	}
 	return nil
 }
@@ -114,8 +111,8 @@ func (ctm *ChannelTypeMemoryManager) UpdateChannelType(ct *meta.ChannelType, con
 
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
 	if err != nil {
-		return ierrors.NewError().BadRequest().InnerError(err).
-			Message("TTarget app doesn't exist").Build()
+		return ierrors.NewError().InternalServer().InnerError(err).
+			Message("Target app doesn't exist").Build()
 	}
 
 	parentApp.Spec.ChannelTypes[ct.Meta.Name] = ct
