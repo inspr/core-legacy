@@ -8,21 +8,10 @@ import (
 )
 
 func (s *Server) initRoutes() {
-	s.Mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	})
+	s.Mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {})
 
 	chandler := handler.NewChannelHandler(s.MemoryManager)
-	s.Mux.HandleFunc("/channels", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			// rest.SetMiddlewareJSON(chandler.HandleGetAllChannels())(w, r)
-		case http.MethodPost:
-			rest.SetMiddlewareJSON(chandler.HandleCreateChannel())(w, r)
-		default:
-			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-	})
+	s.Mux.HandleFunc("/channels", rest.SetMiddlewareJSON(chandler.HandleCreateChannel()).Post())
 	s.Mux.HandleFunc("/channels/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -38,17 +27,7 @@ func (s *Server) initRoutes() {
 	})
 
 	ahandler := handler.NewAppHandler(s.MemoryManager)
-	s.Mux.HandleFunc("/apps", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			// rest.SetMiddlewareJSON(ahandler.HandleGetAllApps())(w, r)
-		case http.MethodPost:
-			rest.SetMiddlewareJSON(ahandler.HandleCreateApp())(w, r)
-		default:
-			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-	})
+	s.Mux.HandleFunc("/apps", rest.SetMiddlewareJSON(ahandler.HandleCreateApp()).Post())
 	s.Mux.HandleFunc("/apps/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -64,17 +43,7 @@ func (s *Server) initRoutes() {
 	})
 
 	cthandler := handler.NewChannelTypeHandler(s.MemoryManager)
-	s.Mux.HandleFunc("/channeltypes", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			// rest.SetMiddlewareJSON(cthandler.HandleGetAllChannelTypes())(w, r)
-		case http.MethodPost:
-			rest.SetMiddlewareJSON(cthandler.HandleCreateChannelType())(w, r)
-		default:
-			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-	})
+	s.Mux.HandleFunc("/channeltypes", rest.SetMiddlewareJSON(cthandler.HandleCreateChannelType()).Post())
 	s.Mux.HandleFunc("/channeltypes/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:

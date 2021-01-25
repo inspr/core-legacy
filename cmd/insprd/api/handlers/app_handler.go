@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
@@ -26,14 +25,10 @@ func NewAppHandler(memManager memory.Manager) *AppHandler {
 // func to manage the http request
 func (ah *AppHandler) HandleCreateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.AppDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil || data.Setup == false {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -52,14 +47,10 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 // func to manage the http request
 func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.AppQueryDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil || data.Setup == false {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -77,14 +68,10 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 // func to manage the http request
 func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.AppDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil || data.Setup == false {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -103,17 +90,14 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 // func to manage the http request
 func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.AppQueryDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil || data.Setup == false {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
+
 		err = ah.DeleteApp(data.Query)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)

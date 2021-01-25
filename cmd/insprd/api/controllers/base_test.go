@@ -1,35 +1,36 @@
 package controller
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/mocks"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+)
 
 func TestServer_Init(t *testing.T) {
-	tests := []struct {
-		name string
-		s    *Server
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.s.Init()
-		})
-	}
-}
-
-func TestServer_Run(t *testing.T) {
 	type args struct {
-		addr string
+		mm memory.Manager
 	}
 	tests := []struct {
 		name string
 		s    *Server
 		args args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "successful_server_init",
+			s:    &Server{},
+			args: args{
+				mm: mocks.MockMemoryManager(nil),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.s.Run(tt.args.addr)
+			tt.s.Init(tt.args.mm)
+			if !reflect.DeepEqual(tt.s.MemoryManager, mocks.MockMemoryManager(nil)) {
+				t.Errorf("TestServer_Init() = %v, want %v", tt.s.MemoryManager, nil)
+			}
 		})
 	}
 }

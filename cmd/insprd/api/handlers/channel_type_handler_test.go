@@ -22,11 +22,17 @@ type channelTypeAPITest struct {
 	want struct{ status int }
 }
 
+// channelTypeDICases - generates the test cases to be used in functions
+// that handle the use the channelTypeDI struct of the models package.
+// For example, HandleCreateChannelType and HandleUpdateChannelType
+// use these test cases
 func channelTypeDICases(funcName string) []channelTypeAPITest {
 	parsedCTDI, _ := json.Marshal(models.ChannelTypeDI{
 		ChannelType: meta.ChannelType{},
 		Ctx:         "",
+		Setup:       true,
 	})
+	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []channelTypeAPITest{
 		{
 			name: "successful_request_" + funcName,
@@ -39,15 +45,27 @@ func channelTypeDICases(funcName string) []channelTypeAPITest {
 			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(errors.New("test_error"))),
 			send: struct{ reqBody []byte }{reqBody: parsedCTDI},
 			want: struct{ status int }{status: http.StatusInternalServerError},
+		},
+		{
+			name: "bad_request_" + funcName,
+			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
+			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
+			want: struct{ status int }{status: http.StatusBadRequest},
 		},
 	}
 }
 
+// channelTypeQueryDICases - generates the test cases to be used in functions
+// that handle the use the ChannelTypeQueryDI struct of the models package.
+// For example, HandleGetChannelTypeByRef and HandleDeleteChannelType
+// use these test cases
 func channelTypeQueryDICases(funcName string) []channelTypeAPITest {
 	parsedCTQDI, _ := json.Marshal(models.ChannelTypeQueryDI{
 		Ctx:    "",
 		CtName: "",
+		Setup:  true,
 	})
+	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []channelTypeAPITest{
 		{
 			name: "successful_request_" + funcName,
@@ -60,6 +78,12 @@ func channelTypeQueryDICases(funcName string) []channelTypeAPITest {
 			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(errors.New("test_error"))),
 			send: struct{ reqBody []byte }{reqBody: parsedCTQDI},
 			want: struct{ status int }{status: http.StatusInternalServerError},
+		},
+		{
+			name: "bad_request_" + funcName,
+			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
+			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
+			want: struct{ status int }{status: http.StatusBadRequest},
 		},
 	}
 }

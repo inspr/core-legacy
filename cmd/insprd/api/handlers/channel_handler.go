@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
@@ -26,14 +25,10 @@ func NewChannelHandler(memManager memory.Manager) *ChannelHandler {
 // manages the creation of a channel
 func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.ChannelDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -52,17 +47,14 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 // a channel by the reference given
 func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.ChannelQueryDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
+
 		channel, err := ch.GetChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
@@ -77,14 +69,10 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 // updates the channel with the parameters given in the request
 func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.ChannelDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -103,17 +91,14 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 // deletes the channel of the given path
 func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.ChannelQueryDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
+
 		err = ch.DeleteChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)

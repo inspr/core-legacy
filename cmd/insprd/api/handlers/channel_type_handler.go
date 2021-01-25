@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
@@ -27,14 +26,10 @@ func NewChannelTypeHandler(memManager memory.Manager) *ChannelTypeHandler {
 // HandleCreateChannelType todo doc
 func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.ChannelTypeDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -52,17 +47,14 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 // HandleGetChannelTypeByRef todo doc
 func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.ChannelTypeQueryDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
+
 		channelType, err := cth.GetChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
@@ -76,14 +68,10 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 // HandleUpdateChannelType todo doc
 func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.ChannelTypeDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -101,17 +89,14 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 // HandleDeleteChannelType todo doc
 func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
 		data := models.ChannelTypeQueryDI{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&data)
+		if err != nil || !data.Setup {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
+
 		err = cth.DeleteChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)

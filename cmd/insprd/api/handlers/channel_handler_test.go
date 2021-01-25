@@ -22,11 +22,16 @@ type channelAPITest struct {
 	want struct{ status int }
 }
 
+// channelDICases - generates the test cases to be used in functions that
+// handle the use the channelDI struct of the models package.
+// For example, HandleCreateChannel and HandleUpdateChannel use these test cases
 func channelDICases(funcName string) []channelAPITest {
 	parsedChannelDI, _ := json.Marshal(models.ChannelDI{
 		Channel: meta.Channel{},
 		Ctx:     "",
+		Setup:   true,
 	})
+	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []channelAPITest{
 		{
 			name: "successful_request_" + funcName,
@@ -39,15 +44,26 @@ func channelDICases(funcName string) []channelAPITest {
 			ch:   NewChannelHandler(mocks.MockMemoryManager(errors.New("test_error"))),
 			send: struct{ reqBody []byte }{reqBody: parsedChannelDI},
 			want: struct{ status int }{status: http.StatusInternalServerError},
+		},
+		{
+			name: "bad_request_" + funcName,
+			ch:   NewChannelHandler(mocks.MockMemoryManager(nil)),
+			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
+			want: struct{ status int }{status: http.StatusBadRequest},
 		},
 	}
 }
 
+// channelQueryDICases - generates the test cases to be used in functions
+// that handle the use the channelQueryDI struct of the models package.
+// For example, HandleGetChannelByRef and HandleDeleteChannel use these test cases
 func channelQueryDICases(funcName string) []channelAPITest {
 	parsedChannelQueryDI, _ := json.Marshal(models.ChannelQueryDI{
 		Ctx:    "",
 		ChName: "",
+		Setup:  true,
 	})
+	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []channelAPITest{
 		{
 			name: "successful_request_" + funcName,
@@ -60,6 +76,12 @@ func channelQueryDICases(funcName string) []channelAPITest {
 			ch:   NewChannelHandler(mocks.MockMemoryManager(errors.New("test_error"))),
 			send: struct{ reqBody []byte }{reqBody: parsedChannelQueryDI},
 			want: struct{ status int }{status: http.StatusInternalServerError},
+		},
+		{
+			name: "bad_request_" + funcName,
+			ch:   NewChannelHandler(mocks.MockMemoryManager(nil)),
+			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
+			want: struct{ status int }{status: http.StatusBadRequest},
 		},
 	}
 }

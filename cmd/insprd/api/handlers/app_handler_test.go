@@ -22,6 +22,9 @@ type appAPITest struct {
 	want struct{ status int }
 }
 
+// appDICases - generates the test cases to be used in functions that handle
+// the use the appDI struct of the models package.
+// For example, HandleCreateApp and HandleUpdateApp use these test cases
 func appDICases(funcName string) []appAPITest {
 	parsedAppDI, _ := json.Marshal(models.AppDI{
 		App:   meta.App{},
@@ -51,6 +54,9 @@ func appDICases(funcName string) []appAPITest {
 	}
 }
 
+// appQueryDICases - generates the test cases to be used in functions that
+// handle the use the appQueryDI struct of the models package.
+// For example, HandleGetAppByRef and HandleDeleteApp use these test cases
 func appQueryDICases(funcName string) []appAPITest {
 	parsedAppQueryDI, _ := json.Marshal(models.AppQueryDI{
 		Query: "",
