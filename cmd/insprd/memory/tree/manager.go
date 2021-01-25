@@ -9,7 +9,7 @@ type TreeMemoryManager struct {
 	root *meta.App
 }
 
-var tree *TreeMemoryManager
+var tree memory.Manager
 
 func GetTreeMemory() memory.Manager {
 	if tree == nil {
@@ -22,4 +22,8 @@ func newTreeMemory() *TreeMemoryManager {
 	return &TreeMemoryManager{
 		root: &meta.App{},
 	}
+}
+
+func setTree(tmm memory.Manager) {
+	tree = tmm
 }
