@@ -24,9 +24,11 @@ type appAPITest struct {
 
 func appDICases(funcName string) []appAPITest {
 	parsedAppDI, _ := json.Marshal(models.AppDI{
-		App: meta.App{},
-		Ctx: "",
+		App:   meta.App{},
+		Ctx:   "",
+		Setup: true,
 	})
+	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
@@ -39,6 +41,12 @@ func appDICases(funcName string) []appAPITest {
 			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
 			send: struct{ reqBody []byte }{reqBody: parsedAppDI},
 			want: struct{ status int }{status: http.StatusInternalServerError},
+		},
+		{
+			name: "bad_request_" + funcName,
+			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
+			want: struct{ status int }{status: http.StatusBadRequest},
 		},
 	}
 }
@@ -46,7 +54,9 @@ func appDICases(funcName string) []appAPITest {
 func appQueryDICases(funcName string) []appAPITest {
 	parsedAppQueryDI, _ := json.Marshal(models.AppQueryDI{
 		Query: "",
+		Setup: true,
 	})
+	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
@@ -59,6 +69,12 @@ func appQueryDICases(funcName string) []appAPITest {
 			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
 			send: struct{ reqBody []byte }{reqBody: parsedAppQueryDI},
 			want: struct{ status int }{status: http.StatusInternalServerError},
+		},
+		{
+			name: "bad_request_" + funcName,
+			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
+			want: struct{ status int }{status: http.StatusBadRequest},
 		},
 	}
 }

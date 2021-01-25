@@ -32,7 +32,11 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			return
 		}
 		data := models.AppDI{}
-		json.Unmarshal(body, &data)
+		err = json.Unmarshal(body, &data)
+		if err != nil || data.Setup == false {
+			rest.ERROR(w, http.StatusBadRequest, err)
+			return
+		}
 
 		err = ah.CreateApp(&data.App, data.Ctx)
 		if err != nil {
@@ -55,7 +59,7 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 		}
 		data := models.AppQueryDI{}
 		err = json.Unmarshal(body, &data)
-		if err != nil {
+		if err != nil || data.Setup == false {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -80,7 +84,7 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 		}
 		data := models.AppDI{}
 		err = json.Unmarshal(body, &data)
-		if err != nil {
+		if err != nil || data.Setup == false {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -106,7 +110,7 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 		}
 		data := models.AppQueryDI{}
 		err = json.Unmarshal(body, &data)
-		if err != nil {
+		if err != nil || data.Setup == false {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}

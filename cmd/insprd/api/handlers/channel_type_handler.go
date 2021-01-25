@@ -10,12 +10,14 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
-// ChannelTypeHandler todo doc
+// ChannelTypeHandler - contains handlers that uses the
+// ChannelTypeMemory interface methods
 type ChannelTypeHandler struct {
 	memory.ChannelTypeMemory
 }
 
-// NewChannelTypeHandler todo fix
+// NewChannelTypeHandler - returns the handle function that
+// manages the creation of a channel
 func NewChannelTypeHandler(memManager memory.Manager) *ChannelTypeHandler {
 	return &ChannelTypeHandler{
 		ChannelTypeMemory: memManager.ChannelTypes(),
