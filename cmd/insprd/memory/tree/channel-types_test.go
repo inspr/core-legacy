@@ -21,10 +21,10 @@ func TestTreeMemoryManager_ChannelTypes(t *testing.T) {
 		{
 			name: "creating a ChannelTypeMemortMannager",
 			fields: fields{
-				root: getMockRootApp(),
+				root: getMockChannelTypes(),
 			},
 			want: &ChannelTypeMemoryManager{
-				root: getMockRootApp(),
+				root: getMockChannelTypes(),
 			},
 		},
 	}
@@ -62,7 +62,7 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 		{
 			name: "Getting a valid ChannelType on a valid app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannelTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -87,7 +87,7 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 		{
 			name: "Getting a invalid ChannelType on a valid app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannelTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -161,7 +161,7 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 		{
 			name: "Creating a new ChannelType on a valid app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannelTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -195,7 +195,7 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 		{
 			name: "Trying to create an old ChannelType on a valid app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannelTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -300,7 +300,7 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 		{
 			name: "Deleting a valid ChannelType on a valid app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannelTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -316,7 +316,7 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 		{
 			name: "Deleting a invalid ChannelType on a valid app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannelTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -390,7 +390,7 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 		{
 			name: "Updating a valid ChannelType on a valid app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannelTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -424,7 +424,7 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 		{
 			name: "Updating a invalid ChannelType on a valid app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannelTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -496,7 +496,7 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 	}
 }
 
-func getMockRootApp() *meta.App {
+func getMockChannelTypes() *meta.App {
 	root := meta.App{
 		Meta: meta.Metadata{
 			Name:        "root",

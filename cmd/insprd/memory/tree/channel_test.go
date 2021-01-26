@@ -21,10 +21,10 @@ func TestTreeMemoryManager_Channels(t *testing.T) {
 		{
 			name: "It should return a pointer to ChannelMemoryManager.",
 			fields: fields{
-				root: getMockRootApp(),
+				root: getMockChannels(),
 			},
 			want: &ChannelMemoryManager{
-				root: getMockRootApp(),
+				root: getMockChannels(),
 			},
 		},
 	}
@@ -62,7 +62,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 		{
 			name: "It should return a valid Channel",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  false,
@@ -84,7 +84,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 		{
 			name: "It should return a invalid Channel on a valid App",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  false,
@@ -99,7 +99,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 		{
 			name: "It should return a invalid Channel on a invalid App",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: ierrors.NewError().NotFound().Build(),
 				mockA:  true,
 				mockC:  false,
@@ -156,7 +156,7 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 		{
 			name: "It should create a new Channel on a valid App",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  false,
@@ -184,7 +184,7 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 		{
 			name: "It should not create a new Channel because it already exists",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  false,
@@ -206,7 +206,7 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 		{
 			name: "It should not create a new Channel because the context is invalid",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: ierrors.NewError().NotFound().Build(),
 				mockA:  true,
 				mockC:  false,
@@ -273,7 +273,7 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 		{
 			name: "It should delete a Channel on a valid App",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  false,
@@ -289,7 +289,7 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 		{
 			name: "It should not delete the channel, because it does not exist",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  false,
@@ -363,7 +363,7 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 		{
 			name: "It should update a Channel on a valid App",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  false,
@@ -397,7 +397,7 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 		{
 			name: "It should not update a Channel because it does not exist",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  false,
@@ -422,7 +422,7 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 		{
 			name: "It should not update a Channel because the context is invalid",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockChannels(),
 				appErr: ierrors.NewError().NotFound().Build(),
 				mockA:  true,
 				mockC:  false,
@@ -469,7 +469,7 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 	}
 }
 
-func getMockRootApp() *meta.App {
+func getMockChannels() *meta.App {
 	root := meta.App{
 		Meta: meta.Metadata{
 			Name:        "",

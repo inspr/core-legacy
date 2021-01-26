@@ -58,13 +58,11 @@ func (ctm *ChannelTypeMemoryManager) GetChannelType(context string, ctName strin
 
 	}
 
-	err = ierrors.NewError().NotFound().Message("No ChannelType found for query.").Build()
-
-	ct := parentApp.Spec.ChannelTypes[ctName]
-	if ct != nil {
+	if ct, ok := parentApp.Spec.ChannelTypes[ctName]; ok {
 		return ct, nil
 	}
 
+	err = ierrors.NewError().NotFound().Message("No ChannelType found for query.").Build()
 	return nil, err
 }
 

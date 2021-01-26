@@ -35,8 +35,3 @@ func setTree(tmm memory.Manager) {
 func (tmm *TreeMemoryManager) Apps() memory.AppMemory {
 	return nil
 }
-
-// ChannelTypes doc todo
-func (tmm *TreeMemoryManager) ChannelTypes() memory.ChannelTypeMemory {
-	return nil
-}

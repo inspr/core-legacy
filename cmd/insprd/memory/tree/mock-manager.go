@@ -29,7 +29,9 @@ func (tmm *TreeMockManager) ChannelTypes() memory.ChannelTypeMemory {
 	if tmm.mockCT {
 		return nil
 	}
-	return nil
+	return &ChannelTypeMemoryManager{
+		root: tmm.root,
+	}
 }
 
 // Apps Mock Apps
