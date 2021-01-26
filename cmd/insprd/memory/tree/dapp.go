@@ -68,6 +68,10 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 		app.Meta.Parent = parentApp.Meta.Name
 		parentApp.Spec.Apps[app.Meta.Name] = app
 
+		if !nodeIsEmpty(app.Spec.Node) {
+			app.Spec.Node.Meta.Parent = app.Meta.Name
+		}
+
 		newContext := context + app.Meta.Name
 		// If new dApp has dApps inside of it, creates them recursively
 		if len(app.Spec.Apps) > 0 {
@@ -182,7 +186,7 @@ func validAppStructure(app, parentApp meta.App) string {
 	}
 
 	if !validName {
-		errDescription = errDescription + "Invalid name;"
+		errDescription = errDescription + "Invalid dApp name;"
 	}
 	if !validSubstructure {
 		errDescription = errDescription + "Invalid substructure;"

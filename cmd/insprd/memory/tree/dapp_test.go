@@ -836,6 +836,129 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			wantErr: true,
 			want:    nil,
 		},
+		{
+			name: "Creating app with node and other apps in it",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				context:     "app2",
+				searchQuery: "app2.app2",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app2",
+						Reference:   "",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Meta: meta.Metadata{
+								Name:        "nodeApp2-2",
+								Reference:   "",
+								Annotations: map[string]string{},
+								Parent:      "app2",
+								SHA256:      "",
+							},
+							Spec: meta.NodeSpec{
+								Image: "imageNodeAppTest",
+							},
+						},
+						Apps: map[string]*meta.App{
+							"appTest1": {},
+						},
+						Channels:     map[string]*meta.Channel{},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Creating app with Node",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				context:     "app2",
+				searchQuery: "app2.app2",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app2",
+						Reference:   "",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Meta: meta.Metadata{
+								Name:        "nodeApp2-2",
+								Reference:   "",
+								Annotations: map[string]string{},
+								Parent:      "",
+								SHA256:      "",
+							},
+							Spec: meta.NodeSpec{
+								Image: "imageNodeAppTest",
+							},
+						},
+						Apps:         map[string]*meta.App{},
+						Channels:     map[string]*meta.Channel{},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+					},
+				},
+			},
+			wantErr: false,
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:        "app2",
+					Reference:   "",
+					Annotations: map[string]string{},
+					Parent:      "app2",
+					SHA256:      "",
+				},
+				Spec: meta.AppSpec{
+					Node: meta.Node{
+						Meta: meta.Metadata{
+							Name:        "nodeApp2-2",
+							Reference:   "",
+							Annotations: map[string]string{},
+							Parent:      "app2",
+							SHA256:      "",
+						},
+						Spec: meta.NodeSpec{
+							Image: "imageNodeAppTest",
+						},
+					},
+					Apps:         map[string]*meta.App{},
+					Channels:     map[string]*meta.Channel{},
+					ChannelTypes: map[string]*meta.ChannelType{},
+					Boundary: meta.AppBoundary{
+						Input:  []string{},
+						Output: []string{},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
