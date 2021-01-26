@@ -26,7 +26,7 @@ func (tmm *TreeMemoryManager) ChannelTypes() memory.ChannelTypeMemory {
 /*
 CreateChannelType creates, if it doesn't already exist, a new ChannellType for a given app.
 ct: ChannetType to be created.
-contex: Path to reference app (x.y.z...)
+context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) CreateChannelType(ct *meta.ChannelType, context string) error {
 
@@ -48,7 +48,7 @@ func (ctm *ChannelTypeMemoryManager) CreateChannelType(ct *meta.ChannelType, con
 /*
 GetChannelType returns, if it exists, a specific ChannellType from a given app.
 ctName: Name of desired Channel Type.
-contex: Path to reference app (x.y.z...)
+context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) GetChannelType(context string, ctName string) (*meta.ChannelType, error) {
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
@@ -71,7 +71,7 @@ func (ctm *ChannelTypeMemoryManager) GetChannelType(context string, ctName strin
 /*
 DeleteChannelType deletes, if it exists, a ChannellType from a given app.
 ctName: Name of desired Channel Type.
-contex: Path to reference app (x.y.z...)
+context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName string) error {
 	curCt, err := ctm.GetChannelType(context, ctName)
@@ -99,12 +99,12 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 /*
 UpdateChannelType updates, if it exists, a ChannellType of a given app.
 ct: Updated ChannetType to be updated on app
-contex: Path to reference app (x.y.z...)
+context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) UpdateChannelType(ct *meta.ChannelType, context string) error {
 
-	curCt, err := ctm.GetChannelType(context, ct.Meta.Name)
-	if curCt == nil || err != nil {
+	_, err := ctm.GetChannelType(context, ct.Meta.Name)
+	if err != nil {
 		return ierrors.NewError().BadRequest().
 			Message("Target app doesn't contain a '" + context + "' ChannelType").Build()
 	}
