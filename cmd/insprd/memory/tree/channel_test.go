@@ -69,14 +69,14 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				chName:  "channel1",
 			},
 			wantErr: false,
 			want: &meta.Channel{
 				Meta: meta.Metadata{
 					Name:   "channel1",
-					Parent: "root",
+					Parent: "",
 				},
 				Spec: meta.ChannelSpec{},
 			},
@@ -91,7 +91,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				chName:  "channel3",
 			},
 			wantErr: true,
@@ -163,11 +163,11 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				ch: &meta.Channel{
 					Meta: meta.Metadata{
 						Name:   "channel3",
-						Parent: "root",
+						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
 				},
@@ -176,7 +176,7 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 			want: &meta.Channel{
 				Meta: meta.Metadata{
 					Name:   "channel3",
-					Parent: "root",
+					Parent: "",
 				},
 				Spec: meta.ChannelSpec{},
 			},
@@ -191,11 +191,11 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				ch: &meta.Channel{
 					Meta: meta.Metadata{
 						Name:   "channel1",
-						Parent: "root",
+						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
 				},
@@ -213,11 +213,11 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				ch: &meta.Channel{
 					Meta: meta.Metadata{
 						Name:   "channel3",
-						Parent: "root",
+						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
 				},
@@ -280,7 +280,7 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				chName:  "channel1",
 			},
 			wantErr: false,
@@ -297,7 +297,7 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 			},
 			args: args{
 				chName:  "channel3",
-				context: "root",
+				context: "",
 			},
 			wantErr: true,
 			want:    nil,
@@ -370,14 +370,14 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				ch: &meta.Channel{
 					Meta: meta.Metadata{
 						Name: "channel1",
 						Annotations: map[string]string{
 							"update1": "update1",
 						},
-						Parent: "root",
+						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
 				},
@@ -389,7 +389,7 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 					Annotations: map[string]string{
 						"update1": "update1",
 					},
-					Parent: "root",
+					Parent: "",
 				},
 				Spec: meta.ChannelSpec{},
 			},
@@ -404,14 +404,14 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				ch: &meta.Channel{
 					Meta: meta.Metadata{
 						Name: "channel3",
 						Annotations: map[string]string{
 							"update1": "update1",
 						},
-						Parent: "root",
+						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
 				},
@@ -429,14 +429,14 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				ch: &meta.Channel{
 					Meta: meta.Metadata{
 						Name: "channel1",
 						Annotations: map[string]string{
 							"update1": "update1",
 						},
-						Parent: "root",
+						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
 				},
@@ -472,7 +472,7 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 func getMockRootApp() *meta.App {
 	root := meta.App{
 		Metadata: meta.Metadata{
-			Name:        "root",
+			Name:        "",
 			Reference:   "",
 			Annotations: map[string]string{},
 			Parent:      "",
@@ -488,14 +488,14 @@ func getMockRootApp() *meta.App {
 				"channel1": {
 					Meta: meta.Metadata{
 						Name:   "channel1",
-						Parent: "root",
+						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
 				},
 				"channel2": {
 					Meta: meta.Metadata{
 						Name:   "channel2",
-						Parent: "root",
+						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
 				},
