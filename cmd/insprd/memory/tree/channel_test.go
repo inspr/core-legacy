@@ -471,7 +471,7 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 
 func getMockRootApp() *meta.App {
 	root := meta.App{
-		Metadata: meta.Metadata{
+		Meta: meta.Metadata{
 			Name:        "",
 			Reference:   "",
 			Annotations: map[string]string{},
@@ -479,7 +479,7 @@ func getMockRootApp() *meta.App {
 			SHA256:      "",
 		},
 		Spec: meta.AppSpec{
-			Node: meta.Node{},
+			Node: &meta.Node{},
 			Apps: map[string]*meta.App{
 				"app1": {},
 				"app2": {},
@@ -501,7 +501,7 @@ func getMockRootApp() *meta.App {
 				},
 			},
 			ChannelTypes: map[string]*meta.ChannelType{},
-			Boundary: meta.AppBoundary{
+			Boundary: &meta.AppBoundary{
 				Input:  []string{},
 				Output: []string{},
 			},
