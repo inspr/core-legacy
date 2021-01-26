@@ -20,7 +20,13 @@ func TestServer_initRoutes(t *testing.T) {
 		MemoryManager: mocks.MockMemoryManager(nil),
 	}
 	testServer.initRoutes()
-	defaultMethods := [...]string{"GET", "POST", "PUT", "DELETE"}
+	defaultMethods := [...]string{
+		http.MethodGet,
+		http.MethodPost,
+		http.MethodPut,
+		http.MethodDelete,
+		http.MethodPatch,
+	}
 	tests := []struct {
 		name string
 		want [len(defaultMethods)]int
@@ -28,55 +34,31 @@ func TestServer_initRoutes(t *testing.T) {
 		{
 			name: "apps",
 			want: [...]int{
-				http.StatusMethodNotAllowed,
-				http.StatusBadRequest,
-				http.StatusMethodNotAllowed,
-				http.StatusMethodNotAllowed,
-			},
-		},
-		{
-			name: "apps/ref",
-			want: [...]int{
-				http.StatusBadRequest,
-				http.StatusMethodNotAllowed,
 				http.StatusBadRequest,
 				http.StatusBadRequest,
+				http.StatusBadRequest,
+				http.StatusBadRequest,
+				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channels",
 			want: [...]int{
-				http.StatusMethodNotAllowed,
-				http.StatusBadRequest,
-				http.StatusMethodNotAllowed,
-				http.StatusMethodNotAllowed,
-			},
-		},
-		{
-			name: "channels/ref",
-			want: [...]int{
-				http.StatusBadRequest,
-				http.StatusMethodNotAllowed,
 				http.StatusBadRequest,
 				http.StatusBadRequest,
+				http.StatusBadRequest,
+				http.StatusBadRequest,
+				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channeltypes",
 			want: [...]int{
-				http.StatusMethodNotAllowed,
-				http.StatusBadRequest,
-				http.StatusMethodNotAllowed,
-				http.StatusMethodNotAllowed,
-			},
-		},
-		{
-			name: "channeltypes/ref",
-			want: [...]int{
-				http.StatusBadRequest,
-				http.StatusMethodNotAllowed,
 				http.StatusBadRequest,
 				http.StatusBadRequest,
+				http.StatusBadRequest,
+				http.StatusBadRequest,
+				http.StatusMethodNotAllowed,
 			},
 		},
 	}
@@ -87,19 +69,7 @@ func TestServer_initRoutes(t *testing.T) {
 			client := ts.Client()
 			for i, statusCodeResult := range tt.want {
 				reqURL := ts.URL + "/" + tt.name
-				var req *http.Request
-				var err error
-				switch defaultMethods[i] {
-				case "GET":
-					req, err = http.NewRequest(http.MethodGet, reqURL, nil)
-				case "POST":
-					req, err = http.NewRequest(http.MethodPost, reqURL, nil)
-				case "PUT":
-					req, err = http.NewRequest(http.MethodPut, reqURL, nil)
-				case "DELETE":
-					req, err = http.NewRequest(http.MethodDelete, reqURL, nil)
-				default:
-				}
+				req, err := http.NewRequest(defaultMethods[i], reqURL, nil)
 				if err != nil {
 					t.Error("error creating request")
 				}
