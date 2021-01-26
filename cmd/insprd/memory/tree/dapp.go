@@ -63,7 +63,8 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 		return err
 	}
 
-	if validAppStructure(*app, *parentApp) {
+	structureErrors := validAppStructure(*app, *parentApp)
+	if structureErrors == "" {
 		app.Meta.Parent = parentApp.Meta.Name
 		parentApp.Spec.Apps[app.Meta.Name] = app
 
@@ -96,7 +97,7 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 		return nil
 	}
 
-	return ierrors.NewError().InvalidApp().Message("Invalid dApp structure").Build()
+	return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
 }
 
 // DeleteApp receives a query and searches for the specified dApp through the tree.
@@ -168,17 +169,33 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 }
 
 // Auxiliar unexported functions
-func validAppStructure(app, parentApp meta.App) bool {
-	var validName, validSubstructure, validBoundary bool
+func validAppStructure(app, parentApp meta.App) string {
+	errDescription := ""
+	var validName, validSubstructure, validBoundary, parentWithoutNode bool
 
 	validName = (app.Meta.Name != "") && (parentApp.Spec.Apps[app.Meta.Name] == nil)
+	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
 	if boundariesExist {
 		validBoundary = validBoundaries(app.Spec.Boundary, parentApp.Spec.Channels)
+	} else {
+		validBoundary = true
+	}
+	if !validName {
+		errDescription = errDescription + "Invalid name;"
+	}
+	if !validSubstructure {
+		errDescription = errDescription + "Invalid substructure;"
+	}
+	if !parentWithoutNode {
+		errDescription = errDescription + "Parent has Node;"
+	}
+	if !validBoundary {
+		errDescription = errDescription + "Invalid boundary;"
 	}
 
-	return validName && validSubstructure && validBoundary
+	return errDescription
 }
 
 func nodeIsEmpty(node meta.Node) bool {
