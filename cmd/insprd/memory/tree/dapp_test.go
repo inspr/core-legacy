@@ -1003,7 +1003,51 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 		wantErr bool
 		want    *meta.App
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Deleting leaf app from root",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				query: "app1",
+			},
+			wantErr: false,
+			want:    nil,
+		},
+		{
+			name: "Deleting leaf app from another app",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				query: "app2.app3",
+			},
+			wantErr: false,
+			want:    nil,
+		},
+		{
+			name: "Deleting root - Invalid deletion",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockC:  true,
+				mockCT: true,
+				mockA:  false,
+			},
+			args: args{
+				query: "",
+			},
+			wantErr: true,
+			want:    nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1017,12 +1061,12 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			am := GetTreeMemory().Apps()
 			err := am.DeleteApp(tt.args.query)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AppMemoryManager.DeleteApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if tt.want != nil {
+			if !tt.wantErr {
 				got, err := am.GetApp(tt.args.query)
-				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+				if err == nil {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
@@ -1119,26 +1163,6 @@ func Test_nodeIsEmpty(t *testing.T) {
 // 		})
 // 	}
 // }
-
-func Test_deleteApp(t *testing.T) {
-	type args struct {
-		app *meta.App
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := deleteApp(tt.args.app); (err != nil) != tt.wantErr {
-				t.Errorf("deleteApp() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
 
 func Test_getParentApp(t *testing.T) {
 	type args struct {

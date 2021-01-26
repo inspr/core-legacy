@@ -111,6 +111,10 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 // dApp's reference inside of it's parent is also deleted.
 // In case of dApp not found an error is returned.
 func (amm *AppMemoryManager) DeleteApp(query string) error {
+	if query == "" {
+		return ierrors.NewError().BadRequest().Message("Can't delete root dApp").Build()
+	}
+
 	app, err := amm.GetApp(query)
 	if err != nil {
 		return err
@@ -135,12 +139,11 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 			GetTreeMemory().Apps().DeleteApp(newQuery)
 		}
 	}
-
 	parent, errParent := getParentApp(query)
 	if errParent != nil {
 		return errParent
 	}
-	deleteApp(app)
+
 	delete(parent.Spec.Apps, app.Meta.Name)
 
 	return nil
@@ -232,15 +235,6 @@ func validBoundaries(bound meta.AppBoundary, parentChannels map[string]*meta.Cha
 	}
 
 	return boundaryErrors
-}
-
-func deleteApp(app *meta.App) error {
-	app.Meta = meta.Metadata{}
-	app.Spec.Node = meta.Node{}
-	app.Spec.Apps = nil
-	app.Spec.Channels = nil
-	app.Spec.Boundary = meta.AppBoundary{}
-	return nil
 }
 
 func getParentApp(sonQuery string) (*meta.App, error) {
