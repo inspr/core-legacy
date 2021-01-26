@@ -5,12 +5,14 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
+// TreeMemoryManager DOC TODO
 type TreeMemoryManager struct {
 	root *meta.App
 }
 
 var tree memory.Manager
 
+// GetTreeMemory DOC TODO
 func GetTreeMemory() memory.Manager {
 	if tree == nil {
 		// tree = newTreeMemory()
@@ -29,10 +31,12 @@ func setTree(tmm memory.Manager) {
 	tree = tmm
 }
 
-func (tmm *TreeMemoryManager) Channels() memory.ChannelMemory {
+// Apps doc todo
+func (tmm *TreeMemoryManager) Apps() memory.AppMemory {
 	return nil
 }
 
-func (tmm *TreeMemoryManager) Apps() memory.AppMemory {
+// ChannelTypes doc todo
+func (tmm *TreeMemoryManager) ChannelTypes() memory.ChannelTypeMemory {
 	return nil
 }

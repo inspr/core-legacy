@@ -2,13 +2,13 @@ package tree
 
 import "gitlab.inspr.dev/inspr/core/pkg/meta"
 
-//MockAppManager Mock
+// MockAppManager to Mock App Manager
 type MockAppManager struct {
 	root *meta.App
 	err  error
 }
 
-//GetApp mock
+// GetApp Mock
 func (mock *MockAppManager) GetApp(query string) (*meta.App, error) {
 	if mock.err != nil {
 		return nil, mock.err
@@ -16,17 +16,17 @@ func (mock *MockAppManager) GetApp(query string) (*meta.App, error) {
 	return mock.root, nil
 }
 
-//CreateApp mock
+// CreateApp Mock
 func (mock *MockAppManager) CreateApp(app *meta.App, context string) error {
 	return nil
 }
 
-//DeleteApp mock
+// DeleteApp Mock
 func (mock *MockAppManager) DeleteApp(query string) error {
 	return nil
 }
 
-//UpdateApp mock
+// UpdateApp Mock
 func (mock *MockAppManager) UpdateApp(app *meta.App, query string) error {
 	return nil
 }

@@ -5,7 +5,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-//TreeMockManager is a TreeMemoryManager mock struct
+// TreeMockManager mock tree manager
 type TreeMockManager struct {
 	root   *meta.App
 	appErr error
@@ -14,25 +14,25 @@ type TreeMockManager struct {
 	mockA  bool
 }
 
-//Channels mock
+// Channels MockChannel
 func (tmm *TreeMockManager) Channels() memory.ChannelMemory {
 	if tmm.mockC {
 		return nil
 	}
-	return nil // ChannelMemoryManager
-}
-
-//ChannelTypes mock
-func (tmm *TreeMockManager) ChannelTypes() memory.ChannelTypeMemory {
-	if tmm.mockCT {
-		return nil
-	}
-	return &ChannelTypeMemoryManager{
+	return &ChannelMemoryManager{
 		root: tmm.root,
 	}
 }
 
-//Apps mock
+// ChannelTypes Mock channel types
+func (tmm *TreeMockManager) ChannelTypes() memory.ChannelTypeMemory {
+	if tmm.mockCT {
+		return nil
+	}
+	return nil
+}
+
+// Apps Mock Apps
 func (tmm *TreeMockManager) Apps() memory.AppMemory {
 	if tmm.mockA {
 		return &MockAppManager{
