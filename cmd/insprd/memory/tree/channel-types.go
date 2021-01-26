@@ -30,8 +30,8 @@ context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) CreateChannelType(ct *meta.ChannelType, context string) error {
 
-	curCt, err := ctm.GetChannelType(context, ct.Meta.Name)
-	if curCt != nil || err == nil {
+	_, err := ctm.GetChannelType(context, ct.Meta.Name)
+	if err == nil {
 		return ierrors.NewError().AlreadyExists().
 			Message("Target app already has a '" + ct.Meta.Name + "' ChannelType").Build()
 	}
