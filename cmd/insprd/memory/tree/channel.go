@@ -33,8 +33,7 @@ func (chh *ChannelMemoryManager) GetChannel(context string, chName string) (*met
 		return nil, newError
 	}
 
-	ch := parentApp.Spec.Channels[chName]
-	if ch != nil {
+	if ch, ok := parentApp.Spec.Channels[chName]; ok {
 		return ch, nil
 	}
 
