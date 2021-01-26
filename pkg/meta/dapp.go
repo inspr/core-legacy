@@ -13,8 +13,8 @@ type NodeSpec struct {
 
 // App is an inspr component that represents an App. An App can contain other apps, channels and other components.
 type App struct {
-	Metadata `yaml:"meta" json:"meta"`
-	Spec     AppSpec `yaml:"spec" json:"spec"`
+	Meta Metadata `yaml:"meta" json:"meta"`
+	Spec AppSpec  `yaml:"spec" json:"spec"`
 }
 
 // AppBoundary represents the connections this app can make to other apps. These are the fields that can be overriten
@@ -31,9 +31,9 @@ type AppBoundary struct {
 //
 // The boundary represent the possible connections to other apps, and the fields that can be overriten when instantiating the app.
 type AppSpec struct {
-	Node         Node                    `yaml:"node" json:"node"`
+	Node         *Node                   `yaml:"node" json:"node"`
 	Apps         map[string]*App         `yaml:"apps" json:"apps"`
 	Channels     map[string]*Channel     `yaml:"channels" json:"channels"`
 	ChannelTypes map[string]*ChannelType `yaml:"channeltypes" json:"channeltypes"`
-	Boundary     AppBoundary             `yaml:"boundary" json:"boundary"`
+	Boundary     *AppBoundary            `yaml:"boundary" json:"boundary"`
 }
