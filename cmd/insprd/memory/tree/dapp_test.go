@@ -92,7 +92,22 @@ func getMockRootApp() *meta.App {
 								},
 							},
 						},
-						Channels:     map[string]*meta.Channel{},
+						Channels: map[string]*meta.Channel{
+							"ch1app2": {
+								Meta: meta.Metadata{
+									Name:   "ch1app2",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+							"ch2app2": {
+								Meta: meta.Metadata{
+									Name:   "ch2app2",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+						},
 						ChannelTypes: map[string]*meta.ChannelType{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
@@ -733,6 +748,94 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Creating app with valid boundary",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				context:     "app2",
+				searchQuery: "app2.app2",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app2",
+						Reference:   "",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node:         meta.Node{},
+						Apps:         map[string]*meta.App{},
+						Channels:     map[string]*meta.Channel{},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1app2"},
+							Output: []string{"ch2app2"},
+						},
+					},
+				},
+			},
+			wantErr: false,
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:        "app2",
+					Reference:   "",
+					Annotations: map[string]string{},
+					Parent:      "app2",
+					SHA256:      "",
+				},
+				Spec: meta.AppSpec{
+					Node:         meta.Node{},
+					Apps:         map[string]*meta.App{},
+					Channels:     map[string]*meta.Channel{},
+					ChannelTypes: map[string]*meta.ChannelType{},
+					Boundary: meta.AppBoundary{
+						Input:  []string{"ch1app2"},
+						Output: []string{"ch2app2"},
+					},
+				},
+			},
+		},
+		{
+			name: "Creating app with invalid boundary",
+			fields: fields{
+				root:   getMockRootApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				context:     "app2",
+				searchQuery: "app2.app2",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app2",
+						Reference:   "",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node:         meta.Node{},
+						Apps:         map[string]*meta.App{},
+						Channels:     map[string]*meta.Channel{},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1app2invalid"},
+							Output: []string{"ch2app2"},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -761,7 +864,11 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 
 func TestAppMemoryManager_DeleteApp(t *testing.T) {
 	type fields struct {
-		root *meta.App
+		root   *meta.App
+		appErr error
+		mockA  bool
+		mockC  bool
+		mockCT bool
 	}
 	type args struct {
 		query string
@@ -771,16 +878,30 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 		fields  fields
 		args    args
 		wantErr bool
+		want    *meta.App
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			amm := &AppMemoryManager{
-				root: tt.fields.root,
+			setTree(&TreeMockManager{
+				root:   tt.fields.root,
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+			am := GetTreeMemory().Apps()
+			err := am.DeleteApp(tt.args.query)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("AppMemoryManager.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
-			if err := amm.DeleteApp(tt.args.query); (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.DeleteApp() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.want != nil {
+				got, err := am.GetApp(tt.args.query)
+				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
+				}
 			}
 		})
 	}
@@ -855,26 +976,26 @@ func Test_nodeIsEmpty(t *testing.T) {
 	}
 }
 
-func Test_validBoundaries(t *testing.T) {
-	type args struct {
-		bound          meta.AppBoundary
-		parentChannels map[string]*meta.Channel
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := validBoundaries(tt.args.bound, tt.args.parentChannels); got != tt.want {
-				t.Errorf("validBoundaries() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+// func Test_validBoundaries(t *testing.T) {
+// 	type args struct {
+// 		bound          meta.AppBoundary
+// 		parentChannels map[string]*meta.Channel
+// 	}
+// 	tests := []struct {
+// 		name string
+// 		args args
+// 		want bool
+// 	}{
+// 		// TODO: Add test cases.
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			if got := validBoundaries(tt.args.bound, tt.args.parentChannels); got != tt.want {
+// 				t.Errorf("validBoundaries() = %v, want %v", got, tt.want)
+// 			}
+// 		})
+// 	}
+// }
 
 func Test_deleteApp(t *testing.T) {
 	type args struct {

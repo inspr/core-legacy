@@ -171,17 +171,16 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 // Auxiliar unexported functions
 func validAppStructure(app, parentApp meta.App) string {
 	errDescription := ""
-	var validName, validSubstructure, validBoundary, parentWithoutNode bool
+	var validName, validSubstructure, parentWithoutNode bool
 
 	validName = (app.Meta.Name != "") && (parentApp.Spec.Apps[app.Meta.Name] == nil)
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
 	if boundariesExist {
-		validBoundary = validBoundaries(app.Spec.Boundary, parentApp.Spec.Channels)
-	} else {
-		validBoundary = true
+		errDescription = errDescription + validBoundaries(app.Spec.Boundary, parentApp.Spec.Channels)
 	}
+
 	if !validName {
 		errDescription = errDescription + "Invalid name;"
 	}
@@ -190,9 +189,6 @@ func validAppStructure(app, parentApp meta.App) string {
 	}
 	if !parentWithoutNode {
 		errDescription = errDescription + "Parent has Node;"
-	}
-	if !validBoundary {
-		errDescription = errDescription + "Invalid boundary;"
 	}
 
 	return errDescription
@@ -207,31 +203,31 @@ func nodeIsEmpty(node meta.Node) bool {
 	return noAnnotations && noName && noParent && noImage
 }
 
-func validBoundaries(bound meta.AppBoundary, parentChannels map[string]*meta.Channel) bool {
-	var parentHasChannels, validInputs, validOutputs bool
-	parentHasChannels = len(parentChannels) > 0
+func validBoundaries(bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
+	boundaryErrors := ""
+	if len(parentChannels) == 0 {
+		boundaryErrors = boundaryErrors + "Parent doesn't have Channels;"
+	}
 
 	if len(bound.Input) > 0 {
 		for _, input := range bound.Input {
 			if parentChannels[input] == nil {
-				validInputs = false
+				boundaryErrors = boundaryErrors + "Invalid input boundary;"
+				break
 			}
 		}
-	} else {
-		validInputs = true
 	}
 
 	if len(bound.Output) > 0 {
 		for _, output := range bound.Output {
 			if parentChannels[output] == nil {
-				validInputs = false
+				boundaryErrors = boundaryErrors + "Invalid output boundary;"
+				break
 			}
 		}
-	} else {
-		validOutputs = true
 	}
 
-	return parentHasChannels && validInputs && validOutputs
+	return boundaryErrors
 }
 
 func deleteApp(app *meta.App) error {
@@ -273,8 +269,10 @@ func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
 		if errParent != nil {
 			return errParent
 		}
-		if !validBoundaries(newApp.Spec.Boundary, parent.Spec.Channels) {
-			return ierrors.NewError().InvalidApp().Message("Invalid dApp boundary").Build()
+
+		boundError := validBoundaries(newApp.Spec.Boundary, parent.Spec.Channels)
+		if boundError != "" {
+			return ierrors.NewError().InvalidApp().Message(boundError).Build()
 		}
 	}
 
