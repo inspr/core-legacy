@@ -8,14 +8,12 @@ import (
 )
 
 func (s *Server) initRoutes() {
-	s.Mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {})
-
 	chandler := handler.NewChannelHandler(s.MemoryManager)
 	s.Mux.HandleFunc("/channels", rest.SetMiddlewareJSON(chandler.HandleCreateChannel()).Post())
 	s.Mux.HandleFunc("/channels/ref", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			rest.SetMiddlewareJSON(rest.SetMiddlewareJSON(chandler.HandleGetChannelByRef()))(w, r)
+			rest.SetMiddlewareJSON(chandler.HandleGetChannelByRef())(w, r)
 		case http.MethodPut:
 			rest.SetMiddlewareJSON(chandler.HandleUpdateChannel())(w, r)
 		case http.MethodDelete:

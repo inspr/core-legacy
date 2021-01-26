@@ -6,12 +6,12 @@ import "gitlab.inspr.dev/inspr/core/pkg/meta"
 type ChannelTypeDI struct {
 	ChannelType meta.ChannelType `json:"channel"`
 	Ctx         string           `json:"ctx"`
-	Setup       bool
+	Setup       bool             `json:"setup"`
 }
 
 // ChannelTypeQueryDI - Data Input format for queries requests
 type ChannelTypeQueryDI struct {
 	Ctx    string `json:"ctx"`
 	CtName string `json:"ctname"`
-	Setup  bool
+	Setup  bool   `json:"setup"`
 }

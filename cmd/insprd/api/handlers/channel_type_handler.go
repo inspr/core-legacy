@@ -16,14 +16,15 @@ type ChannelTypeHandler struct {
 }
 
 // NewChannelTypeHandler - returns the handle function that
-// manages the creation of a channel
+// manages the creation of a channelType
 func NewChannelTypeHandler(memManager memory.Manager) *ChannelTypeHandler {
 	return &ChannelTypeHandler{
 		ChannelTypeMemory: memManager.ChannelTypes(),
 	}
 }
 
-// HandleCreateChannelType todo doc
+// HandleCreateChannelType - returns the handle function that
+// manages the creation of a channelType
 func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeDI{}
@@ -44,7 +45,8 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetChannelTypeByRef todo doc
+// HandleGetChannelTypeByRef - return a handle function that obtains
+// a channelType by the reference given
 func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
@@ -65,7 +67,8 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleUpdateChannelType todo doc
+// HandleUpdateChannelType - returns a handle function that
+// updates the channelType with the parameters given in the request
 func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeDI{}
@@ -86,7 +89,8 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleDeleteChannelType todo doc
+// HandleDeleteChannelType - returns a handle function that
+// deletes the channelType of the given path
 func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
