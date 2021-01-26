@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insprd-deployment
+  labels:
+    app: insprd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: insprd
+  template:
+    metadata:
+      labels:
+        app: insprd
+    spec:
+      containers:
+      - name: insprd
+        image: gcr.io/red-inspr/insprd
+        ports:
+        - name: insprd-port
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: insprd-port
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: insprd-port
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"

@@ -1,0 +1,17 @@
+apiVersion: skaffold/v2beta10
+kind: Config
+metadata:
+  name: core
+build:
+  artifacts:
+  - image: gcr.io/red-inspr/insprd
+    context: .
+    docker:
+      dockerfile: cmd/insprd/Dockerfile
+deploy:
+  helm:
+    releases:
+    - name: insprd
+      artifactOverrides:
+        insprdRepository: gcr.io/red-inspr/insprd
+      chartPath: build/helm

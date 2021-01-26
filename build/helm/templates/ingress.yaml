@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: inspr-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: {{ .Values.insprIngress.host }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Values.service.insprdName }}
+          servicePort: {{ .Values.service.insprdPort }}

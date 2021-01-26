@@ -1,0 +1,48 @@
+# Default values for insprd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+insprIngress:
+  host: "inspr.com"
+
+image:
+  insprdPullPolicy: IfNotPresent
+
+securityContext: {}
+
+
+deployment:
+  insprdName: insprd-deployment
+
+insprdRepository: gcr.io/red-inspr/insprd:e807184-dirty
+
+service:
+  type: ClusterIP
+  port: 80
+  insprdName: insprd-svc
+  insprdPort: 80
+  insprdTargetport: 8080
+
+ingress:
+  enabled: false
+  annotations: {}
+
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
