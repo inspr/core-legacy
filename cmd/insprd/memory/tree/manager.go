@@ -13,7 +13,8 @@ var tree memory.Manager
 
 func GetTreeMemory() memory.Manager {
 	if tree == nil {
-		tree = newTreeMemory()
+		// tree = newTreeMemory()
+		setTree(newTreeMemory())
 	}
 	return tree
 }

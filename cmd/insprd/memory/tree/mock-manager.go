@@ -15,18 +15,20 @@ type TreeMockManager struct {
 
 func (tmm *TreeMockManager) Channels() memory.ChannelMemory {
 	if tmm.mockC {
-		return nil
+		return &ChannelMockManager{
+			root: tmm.root,
+		}
 	}
-	return nil // ChannelMemoryManager
+	return nil
 }
 
 func (tmm *TreeMockManager) ChannelTypes() memory.ChannelTypeMemory {
 	if tmm.mockCT {
-		return nil
+		return &ChannelTypeMockManager{
+			root: tmm.root,
+		}
 	}
-	return &ChannelTypeMemoryManager{
-		root: tmm.root,
-	}
+	return nil
 }
 
 func (tmm *TreeMockManager) Apps() memory.AppMemory {

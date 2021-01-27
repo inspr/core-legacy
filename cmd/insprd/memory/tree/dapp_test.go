@@ -8,7 +8,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-func getMockRootApp() *meta.App {
+func getMockApp() *meta.App {
 	root := meta.App{
 		Meta: meta.Metadata{
 			Name:        "",
@@ -163,10 +163,10 @@ func TestTreeMemoryManager_Apps(t *testing.T) {
 		{
 			name: "creating a AppMemoryManager",
 			fields: fields{
-				root: getMockRootApp(),
+				root: getMockApp(),
 			},
 			want: &AppMemoryManager{
-				root: getMockRootApp(),
+				root: getMockApp(),
 			},
 		},
 	}
@@ -203,7 +203,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 		{
 			name: "Getting root app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -341,7 +341,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 		{
 			name: "Getting a root's child app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -385,7 +385,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 		{
 			name: "Getting app inside non-root app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -429,7 +429,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 		{
 			name: "Using invalid query",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -487,7 +487,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app inside of root",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -540,7 +540,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app inside of non-root app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -593,7 +593,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app with invalid context",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -628,7 +628,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app inside of app with Node",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -663,7 +663,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app with conflicting name",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -698,7 +698,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app with existing name but not in the same context",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -751,7 +751,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app with valid boundary",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -804,7 +804,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app with invalid boundary",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -839,7 +839,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app with node and other apps in it",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -887,7 +887,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		{
 			name: "Creating app with Node",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -1006,7 +1006,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 		{
 			name: "Deleting leaf app from root",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -1021,7 +1021,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 		{
 			name: "Deleting leaf app from another app",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  false,
 				mockCT: false,
@@ -1034,9 +1034,24 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			want:    nil,
 		},
 		{
+			name: "Deleting app with child apps and channels",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  true,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				query: "app2",
+			},
+			wantErr: false,
+			want:    nil,
+		},
+		{
 			name: "Deleting root - Invalid deletion",
 			fields: fields{
-				root:   getMockRootApp(),
+				root:   getMockApp(),
 				appErr: nil,
 				mockC:  true,
 				mockCT: true,
@@ -1044,6 +1059,21 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			},
 			args: args{
 				query: "",
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Deleting with invalid query - Invalid deletion",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  true,
+				mockCT: true,
+				mockA:  false,
+			},
+			args: args{
+				query: "invalid.query.to.app",
 			},
 			wantErr: true,
 			want:    nil,
