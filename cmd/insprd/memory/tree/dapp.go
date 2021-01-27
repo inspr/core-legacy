@@ -171,11 +171,12 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 	if err != nil {
 		return err
 	}
+
 	if currentApp.Meta.Name != app.Meta.Name {
 		return ierrors.NewError().InvalidName().Message("dApp's name mustn't change when updating").Build()
 	}
 	if !nodeIsEmpty(app.Spec.Node) && !(len(app.Spec.Apps) == 0) {
-		return ierrors.NewError().InvalidApp().Message("dApp mustn't have a Node and other dApps in it's structure").Build()
+		return ierrors.NewError().InvalidApp().Message("dApp mustn't have a Node and other dApps at the same time").Build()
 	}
 
 	structureError := validUpdateChanges(currentApp, app, query)
@@ -184,7 +185,9 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 	}
 
 	amm.DeleteApp(query)
-	amm.CreateApp(app, query)
+	sonRef := strings.Split(query, ".")
+	parentQuery := strings.Join(sonRef[:len(sonRef)-1], ".")
+	amm.CreateApp(app, parentQuery)
 
 	return nil
 }
@@ -271,11 +274,6 @@ func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
 		return diffError(err)
 	}
 
-	structuresChangelog, err := checkForChildStructureChanges(currentApp.Spec, newApp.Spec)
-	if err != nil {
-		return diffError(err)
-	}
-
 	if len(boundChangelog) != 0 {
 		parent, errParent := getParentApp(query)
 		if errParent != nil {
@@ -288,6 +286,10 @@ func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
 		}
 	}
 
+	structuresChangelog, err := checkForChildStructureChanges(currentApp.Spec, newApp.Spec)
+	if err != nil {
+		return diffError(err)
+	}
 	// if len(nodeChangelog) != 0 {
 	// 	for _, change := range nodeChangelog {
 	// 		if change.Type == "update" && change.Path[0] == "nodemeta" {
@@ -302,7 +304,6 @@ func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
 	// 	invalidCtypeChanges(structuresChangelog["ctype"], currentApp.Spec.ChannelTypes, newApp.Spec.ChannelTypes) {
 	// 	// sem restrição, mudanças só deletam e criam um novo
 	// }
-
 	if len(structuresChangelog["channel"]) > 0 && invalidChannelChanges(structuresChangelog["channel"], newApp) {
 		return ierrors.NewError().InvalidChannel().Message("Channel's parent dApp doesn't contain specified channel type").Build()
 	}
@@ -372,6 +373,9 @@ func diffError(err error) error {
 	return ierrors.NewError().InnerError(err).InternalServer().Message("Couldn't create diff to update dApp").Build()
 }
 
+// invalidChannelChanges checks if the channels to be updated have the app as their parent. If so,
+// the app must contain the channel types used by the channels. Returns true if these conditions are
+// not met. Returns false otherwise
 func invalidChannelChanges(changedChannels Set, newApp *meta.App) bool {
 	invalidChanges := false
 	channels := newApp.Spec.Channels

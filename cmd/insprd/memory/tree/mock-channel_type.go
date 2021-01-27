@@ -10,7 +10,6 @@ type ChannelTypeMockManager struct {
 }
 
 func (tmm *TreeMemoryManager) ChannelTypes() memory.ChannelTypeMemory {
-
 	return &ChannelTypeMockManager{
 		root: tmm.root,
 	}

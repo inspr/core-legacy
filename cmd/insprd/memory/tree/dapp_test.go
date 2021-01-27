@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -1023,8 +1024,8 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
-				mockC:  false,
-				mockCT: false,
+				mockC:  true,
+				mockCT: true,
 				mockA:  false,
 			},
 			args: args{
@@ -1038,8 +1039,8 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
-				mockC:  false,
-				mockCT: false,
+				mockC:  true,
+				mockCT: true,
 				mockA:  false,
 			},
 			args: args{
@@ -1054,7 +1055,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 				root:   getMockApp(),
 				appErr: nil,
 				mockC:  true,
-				mockCT: false,
+				mockCT: true,
 				mockA:  false,
 			},
 			args: args{
@@ -1121,7 +1122,11 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 
 func TestAppMemoryManager_UpdateApp(t *testing.T) {
 	type fields struct {
-		root *meta.App
+		root   *meta.App
+		appErr error
+		mockA  bool
+		mockC  bool
+		mockCT bool
 	}
 	type args struct {
 		app   *meta.App
@@ -1132,16 +1137,229 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 		fields  fields
 		args    args
 		wantErr bool
+		want    *meta.App
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Invalid - update changing apps' name",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				query: "app1",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app1Invalid",
+						Reference:   "app1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Meta: meta.Metadata{
+								Name:        "nodeApp1",
+								Reference:   "app1.nodeApp1",
+								Annotations: map[string]string{},
+								Parent:      "app1",
+								SHA256:      "",
+							},
+							Spec: meta.NodeSpec{
+								Image: "imageNodeApp1",
+							},
+						},
+						Apps: map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{
+							"ch1app1": {
+								Meta: meta.Metadata{
+									Name:   "ch1app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+							"ch2app1": {
+								Meta: meta.Metadata{
+									Name:   "ch2app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1"},
+							Output: []string{"ch2"},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Invalid - updated app has node and child apps",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				query: "app1",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app1",
+						Reference:   "app1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Meta: meta.Metadata{
+								Name:        "nodeApp1",
+								Reference:   "app1.nodeApp1",
+								Annotations: map[string]string{},
+								Parent:      "app1",
+								SHA256:      "",
+							},
+							Spec: meta.NodeSpec{
+								Image: "imageNodeApp1",
+							},
+						},
+						Apps: map[string]*meta.App{
+							"invalidChildApp": {},
+						},
+						Channels: map[string]*meta.Channel{
+							"ch1app1": {
+								Meta: meta.Metadata{
+									Name:   "ch1app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+							"ch2app1": {
+								Meta: meta.Metadata{
+									Name:   "ch2app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1"},
+							Output: []string{"ch2"},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Invalid - has structural errors",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				query: "app1",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app1Invalid",
+						Reference:   "app1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Meta: meta.Metadata{
+								Name:        "nodeApp1",
+								Reference:   "app1.nodeApp1",
+								Annotations: map[string]string{},
+								Parent:      "app1",
+								SHA256:      "",
+							},
+							Spec: meta.NodeSpec{
+								Image: "imageNodeApp1",
+							},
+						},
+						Apps: map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{
+							"ch1app1Invalid": {
+								Meta: meta.Metadata{
+									Name:   "ch1app1",
+									Parent: "app1",
+								},
+								Spec: meta.ChannelSpec{
+									Type: "dsntExist",
+								},
+							},
+							"ch2app1": {
+								Meta: meta.Metadata{
+									Name:   "ch2app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1"},
+							Output: []string{"ch2"},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Valid - updated app doesn't have changes",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  true,
+				mockCT: true,
+				mockA:  false,
+			},
+			args: args{
+				query: "app1",
+				app:   getMockApp().Spec.Apps["app1"],
+			},
+			wantErr: false,
+			want:    getMockApp().Spec.Apps["app1"],
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			amm := &AppMemoryManager{
-				root: tt.fields.root,
+			setTree(&TreeMockManager{
+				root:   tt.fields.root,
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+			am := GetTreeMemory().Apps()
+			err := am.UpdateApp(tt.args.app, tt.args.query)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("AppMemoryManager.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
-			if err := amm.UpdateApp(tt.args.app, tt.args.query); (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.UpdateApp() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.want != nil {
+				got, err := am.GetApp(tt.args.query)
+				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
+				}
 			}
 		})
 	}
@@ -1363,7 +1581,31 @@ func Test_nodeIsEmpty(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Node is empty",
+			args: args{
+				node: meta.Node{},
+			},
+			want: true,
+		},
+		{
+			name: "Node isn't empty",
+			args: args{
+				node: meta.Node{
+					Meta: meta.Metadata{
+						Name:        "nodeApp1",
+						Reference:   "app1.nodeApp1",
+						Annotations: map[string]string{},
+						Parent:      "app1",
+						SHA256:      "",
+					},
+					Spec: meta.NodeSpec{
+						Image: "imageNodeApp1",
+					},
+				},
+			},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1396,7 +1638,7 @@ func Test_validBoundaries(t *testing.T) {
 			want: "",
 		},
 		{
-			name: "Parent without channels",
+			name: "Invalid boundary - parent without channels",
 			args: args{
 				bound: meta.AppBoundary{
 					Input:  []string{"ch1app2"},
@@ -1428,19 +1670,78 @@ func Test_validBoundaries(t *testing.T) {
 }
 
 func Test_getParentApp(t *testing.T) {
+	type fields struct {
+		root   *meta.App
+		appErr error
+		mockC  bool
+		mockCT bool
+		mockA  bool
+	}
 	type args struct {
 		sonQuery string
 	}
 	tests := []struct {
 		name    string
+		fields  fields
 		args    args
 		want    *meta.App
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Parent is the root",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				sonQuery: "app1",
+			},
+			wantErr: false,
+			want:    getMockApp(),
+		},
+		{
+			name: "Parent is another app",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				sonQuery: "app2.app3",
+			},
+			wantErr: false,
+			want:    getMockApp().Spec.Apps["app2"],
+		},
+		{
+			name: "Invalid query",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				sonQuery: "invalid.query",
+			},
+			wantErr: true,
+			want:    nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			setTree(&TreeMockManager{
+				root:   tt.fields.root,
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
 			got, err := getParentApp(tt.args.sonQuery)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getParentApp() error = %v, wantErr %v", err, tt.wantErr)
@@ -1511,7 +1812,13 @@ func Test_diffError(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Returns ierror",
+			args: args{
+				err: ierrors.NewError().Build(),
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
