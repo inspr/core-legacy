@@ -228,22 +228,22 @@ func validBoundaries(bound meta.AppBoundary, parentChannels map[string]*meta.Cha
 	boundaryErrors := ""
 	if len(parentChannels) == 0 {
 		boundaryErrors = boundaryErrors + "Parent doesn't have Channels;"
-	}
-
-	if len(bound.Input) > 0 {
-		for _, input := range bound.Input {
-			if parentChannels[input] == nil {
-				boundaryErrors = boundaryErrors + "Invalid input boundary;"
-				break
+	} else {
+		if len(bound.Input) > 0 {
+			for _, input := range bound.Input {
+				if parentChannels[input] == nil {
+					boundaryErrors = boundaryErrors + "Invalid input boundary;"
+					break
+				}
 			}
 		}
-	}
 
-	if len(bound.Output) > 0 {
-		for _, output := range bound.Output {
-			if parentChannels[output] == nil {
-				boundaryErrors = boundaryErrors + "Invalid output boundary;"
-				break
+		if len(bound.Output) > 0 {
+			for _, output := range bound.Output {
+				if parentChannels[output] == nil {
+					boundaryErrors = boundaryErrors + "Invalid output boundary;"
+					break
+				}
 			}
 		}
 	}
