@@ -107,6 +107,63 @@ func getMockApp() *meta.App {
 									},
 								},
 							},
+							"app4": {
+								Meta: meta.Metadata{
+									Name:        "app4",
+									Reference:   "app2.app4",
+									Annotations: map[string]string{},
+									Parent:      "app2",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "nodeApp4",
+											Reference:   "app4.nodeApp4",
+											Annotations: map[string]string{},
+											Parent:      "app4",
+											SHA256:      "",
+										},
+										Spec: meta.NodeSpec{
+											Image: "imageNodeApp4",
+										},
+									},
+									Apps: map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{
+										"ch1app4": {
+											Meta: meta.Metadata{
+												Name:   "ch1app4",
+												Parent: "app4",
+											},
+											Spec: meta.ChannelSpec{
+												Type: "ctapp4",
+											},
+										},
+										"ch2app4": {
+											Meta: meta.Metadata{
+												Name:   "ch2app4",
+												Parent: "",
+											},
+											Spec: meta.ChannelSpec{},
+										},
+									},
+									ChannelTypes: map[string]*meta.ChannelType{
+										"ctapp4": {
+											Meta: meta.Metadata{
+												Name:        "ctUpdate1",
+												Reference:   "app1.ctUpdate1",
+												Annotations: map[string]string{},
+												Parent:      "app1",
+												SHA256:      "",
+											},
+										},
+									},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"ch1app2"},
+										Output: []string{"ch2app2"},
+									},
+								},
+							},
 						},
 						Channels: map[string]*meta.Channel{
 							"ch1app2": {
@@ -1339,6 +1396,118 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 			wantErr: false,
 			want:    getMockApp().Spec.Apps["app1"],
 		},
+		{
+			name: "Valid - updated app has changes",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  true,
+				mockCT: true,
+				mockA:  false,
+			},
+			args: args{
+				query: "app1",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app1",
+						Reference:   "app1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{
+							"appUpdate1": {},
+							"appUpdate2": {},
+						},
+						Channels: map[string]*meta.Channel{
+							"ch1app1": {
+								Meta: meta.Metadata{
+									Name:   "ch1app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+							"ch2app1Update": {
+								Meta: meta.Metadata{
+									Name:   "ch2app1Update",
+									Parent: "app1",
+								},
+								Spec: meta.ChannelSpec{
+									Type: "ctUpdate1",
+								},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{
+							"ctUpdate1": {
+								Meta: meta.Metadata{
+									Name:        "ctUpdate1",
+									Reference:   "app1.ctUpdate1",
+									Annotations: map[string]string{},
+									Parent:      "app1",
+									SHA256:      "",
+								},
+							},
+						},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1"},
+							Output: []string{"ch2"},
+						},
+					},
+				},
+			},
+			wantErr: false,
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:        "app1",
+					Reference:   "app1",
+					Annotations: map[string]string{},
+					Parent:      "",
+					SHA256:      "",
+				},
+				Spec: meta.AppSpec{
+					Node: meta.Node{},
+					Apps: map[string]*meta.App{
+						"appUpdate1": {},
+						"appUpdate2": {},
+					},
+					Channels: map[string]*meta.Channel{
+						"ch1app1": {
+							Meta: meta.Metadata{
+								Name:   "ch1app1",
+								Parent: "",
+							},
+							Spec: meta.ChannelSpec{},
+						},
+						"ch2app1Update": {
+							Meta: meta.Metadata{
+								Name:   "ch2app1Update",
+								Parent: "app1",
+							},
+							Spec: meta.ChannelSpec{
+								Type: "ctUpdate1",
+							},
+						},
+					},
+					ChannelTypes: map[string]*meta.ChannelType{
+						"ctUpdate1": {
+							Meta: meta.Metadata{
+								Name:        "ctUpdate1",
+								Reference:   "app1.ctUpdate1",
+								Annotations: map[string]string{},
+								Parent:      "app1",
+								SHA256:      "",
+							},
+						},
+					},
+					Boundary: meta.AppBoundary{
+						Input:  []string{"ch1"},
+						Output: []string{"ch2"},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1839,7 +2008,54 @@ func Test_invalidChannelChanges(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Valid channel change",
+			args: args{
+				changedChannels: Set{
+					"ch1app4": true,
+				},
+				newApp: getMockApp().Spec.Apps["app2"].Spec.Apps["app4"],
+			},
+			want: false,
+		},
+		{
+			name: "App is channel's parent but doesn't have channel type",
+			args: args{
+				changedChannels: Set{
+					"ch1app4": true,
+				},
+				newApp: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app4",
+						Reference:   "app4",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{
+							"ch1app4": {
+								Meta: meta.Metadata{
+									Name:   "ch1app4",
+									Parent: "app4",
+								},
+								Spec: meta.ChannelSpec{
+									Type: "ctapp4",
+								},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1app2"},
+							Output: []string{"ch2app2"},
+						},
+					},
+				},
+			},
+			want: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

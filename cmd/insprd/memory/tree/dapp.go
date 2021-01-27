@@ -377,19 +377,21 @@ func diffError(err error) error {
 // the app must contain the channel types used by the channels. Returns true if these conditions are
 // not met. Returns false otherwise
 func invalidChannelChanges(changedChannels Set, newApp *meta.App) bool {
-	invalidChanges := false
 	channels := newApp.Spec.Channels
 	ctypes := newApp.Spec.ChannelTypes
 
-	for change := range changedChannels {
-		if channels[change].Meta.Parent == newApp.Meta.Name &&
-			ctypes[channels[change].Spec.Type].Meta.Name == "" {
+	if len(ctypes) > 0 {
+		for change := range changedChannels {
+			_, ctypeExists := ctypes[channels[change].Spec.Type]
+			if channels[change].Meta.Parent == newApp.Meta.Name &&
+				!ctypeExists {
 
-			return true
+				return true
+			}
 		}
+		return false
 	}
-
-	return invalidChanges
+	return true
 }
 
 // func invalidCtypeChanges(changedCtypes Set, currentCtypes, newCtypes map[string]*meta.ChannelType) bool {
