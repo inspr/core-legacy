@@ -941,7 +941,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Deleting root - Invalid deletion",
+			name: "Deleting root - invalid deletion",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -956,7 +956,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Deleting with invalid query - Invalid deletion",
+			name: "Deleting with invalid query - invalid deletion",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -1016,7 +1016,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 		want    *meta.App
 	}{
 		{
-			name: "Invalid - update changing apps' name",
+			name: "invalid- update changing apps' name",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -1076,7 +1076,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Invalid - updated app has node and child apps",
+			name: "invalid- updated app has node and child apps",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -1138,7 +1138,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Invalid - has structural errors",
+			name: "invalid- has structural errors",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -1401,7 +1401,7 @@ func Test_validAppStructure(t *testing.T) {
 			want: "",
 		},
 		{
-			name: "Invalid app name - empty",
+			name: "invalidapp name - empty",
 			args: args{
 				app: meta.App{
 					Meta: meta.Metadata{
@@ -1435,10 +1435,10 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "Invalid dApp name;",
+			want: "invalid dApp name;",
 		},
 		{
-			name: "Invalid app name - equal to another existing app",
+			name: "invalidapp name - equal to another existing app",
 			args: args{
 				app: meta.App{
 					Meta: meta.Metadata{
@@ -1472,10 +1472,10 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "Invalid dApp name;",
+			want: "invalid dApp name;",
 		},
 		{
-			name: "Invalid app substructure",
+			name: "invalidapp substructure",
 			args: args{
 				app: meta.App{
 					Meta: meta.Metadata{
@@ -1511,10 +1511,10 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "Invalid substructure;",
+			want: "invalid substructure;",
 		},
 		{
-			name: "Invalid app - parent has Node structure",
+			name: "invalidapp - parent has Node structure",
 			args: args{
 				app: meta.App{
 					Meta: meta.Metadata{
@@ -1548,7 +1548,7 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app1"],
 			},
-			want: "Parent has Node;",
+			want: "parent has Node;",
 		},
 	}
 	for _, tt := range tests {
@@ -1626,7 +1626,7 @@ func Test_validBoundaries(t *testing.T) {
 			want: "",
 		},
 		{
-			name: "Invalid boundary - parent without channels",
+			name: "invalidboundary - parent without channels",
 			args: args{
 				bound: meta.AppBoundary{
 					Input:  []string{"ch1app2"},
@@ -1634,10 +1634,10 @@ func Test_validBoundaries(t *testing.T) {
 				},
 				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Apps["app3"].Spec.Channels,
 			},
-			want: "Parent doesn't have Channels;",
+			want: "parent doesn't have Channels;",
 		},
 		{
-			name: "Invalid input and output boundary",
+			name: "invalid input and output boundary",
 			args: args{
 				bound: meta.AppBoundary{
 					Input:  []string{"ch1app1"},
@@ -1645,7 +1645,7 @@ func Test_validBoundaries(t *testing.T) {
 				},
 				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Channels,
 			},
-			want: "Invalid input boundary;Invalid output boundary;",
+			want: "invalid input boundary;invalid output boundary;",
 		},
 	}
 	for _, tt := range tests {
@@ -1706,7 +1706,7 @@ func Test_getParentApp(t *testing.T) {
 			want:    getMockApp().Spec.Apps["app2"],
 		},
 		{
-			name: "Invalid query",
+			name: "invalidquery",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -1847,7 +1847,7 @@ func Test_validUpdateChanges(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Invalid boundary changes",
+			name: "invalidboundary changes",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -2087,7 +2087,7 @@ func Test_validUpdateChanges(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Invalid channel changes",
+			name: "invalidchannel changes",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -2131,7 +2131,7 @@ func Test_validUpdateChanges(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Invalid app changes",
+			name: "invalidapp changes",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
