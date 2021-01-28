@@ -15,11 +15,19 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
+// sendInRequest is a struct used for all the testing files in this package
+// it's contents is a simple { body []byte }
+type sendInRequest struct{ body []byte }
+
+// expectedResponse is a struct used for all the testing files in this package
+// it's contents is a simple { status int }
+type expectedResponse struct{ status int }
+
 type appAPITest struct {
 	name string
 	ah   *AppHandler
-	send struct{ reqBody []byte }
-	want struct{ status int }
+	send sendInRequest
+	want expectedResponse
 }
 
 // appDICases - generates the test cases to be used in functions that handle
@@ -29,27 +37,27 @@ func appDICases(funcName string) []appAPITest {
 	parsedAppDI, _ := json.Marshal(models.AppDI{
 		App:   meta.App{},
 		Ctx:   "",
-		Setup: true,
+		Valid: true,
 	})
 	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
 			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{reqBody: parsedAppDI},
-			want: struct{ status int }{status: http.StatusOK},
+			send: sendInRequest{body: parsedAppDI},
+			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
 			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
-			send: struct{ reqBody []byte }{reqBody: parsedAppDI},
-			want: struct{ status int }{status: http.StatusInternalServerError},
+			send: sendInRequest{body: parsedAppDI},
+			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
 			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
-			want: struct{ status int }{status: http.StatusBadRequest},
+			send: sendInRequest{body: wrongFormatData},
+			want: expectedResponse{status: http.StatusBadRequest},
 		},
 	}
 }
@@ -60,27 +68,27 @@ func appDICases(funcName string) []appAPITest {
 func appQueryDICases(funcName string) []appAPITest {
 	parsedAppQueryDI, _ := json.Marshal(models.AppQueryDI{
 		Query: "",
-		Setup: true,
+		Valid: true,
 	})
 	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
 			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{reqBody: parsedAppQueryDI},
-			want: struct{ status int }{status: http.StatusOK},
+			send: sendInRequest{body: parsedAppQueryDI},
+			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
 			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
-			send: struct{ reqBody []byte }{reqBody: parsedAppQueryDI},
-			want: struct{ status int }{status: http.StatusInternalServerError},
+			send: sendInRequest{body: parsedAppQueryDI},
+			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
 			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
-			want: struct{ status int }{status: http.StatusBadRequest},
+			send: sendInRequest{body: wrongFormatData},
+			want: expectedResponse{status: http.StatusBadRequest},
 		},
 	}
 }
@@ -117,16 +125,18 @@ func TestAppHandler_HandleCreateApp(t *testing.T) {
 	tests := appDICases("HandleCreateApp")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleCreateApp()
-			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			handlerFunc := tt.ah.HandleCreateApp().HTTPHandlerFunc()
+			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
+
 			if res.StatusCode != tt.want.status {
 				t.Errorf("AppHandler.HandleCreateApp() = %v, want %v", res.StatusCode, tt.want.status)
 			}
@@ -138,16 +148,18 @@ func TestAppHandler_HandleGetAppByRef(t *testing.T) {
 	tests := appQueryDICases("HandleGetAppByRef")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleGetAppByRef()
-			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			handlerFunc := tt.ah.HandleGetAppByRef().HTTPHandlerFunc()
+			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
+
 			if res.StatusCode != tt.want.status {
 				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", res.StatusCode, tt.want.status)
 			}
@@ -159,16 +171,18 @@ func TestAppHandler_HandleUpdateApp(t *testing.T) {
 	tests := appDICases("HandleUpdateApp")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleUpdateApp()
-			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			handlerFunc := tt.ah.HandleUpdateApp().HTTPHandlerFunc()
+			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
+
 			if res.StatusCode != tt.want.status {
 				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", res.StatusCode, tt.want.status)
 			}
@@ -180,16 +194,18 @@ func TestAppHandler_HandleDeleteApp(t *testing.T) {
 	tests := appQueryDICases("HandleDeleteApp")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleDeleteApp()
-			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			handlerFunc := tt.ah.HandleDeleteApp().HTTPHandlerFunc()
+			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
+
 			if res.StatusCode != tt.want.status {
 				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", res.StatusCode, tt.want.status)
 			}

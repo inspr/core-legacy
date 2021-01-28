@@ -27,8 +27,9 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppDI{}
 		decoder := json.NewDecoder(r.Body)
+
 		err := decoder.Decode(&data)
-		if err != nil || !data.Setup {
+		if err != nil || !data.Valid {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -49,8 +50,9 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
+
 		err := decoder.Decode(&data)
-		if err != nil || !data.Setup {
+		if err != nil || !data.Valid {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -70,8 +72,9 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppDI{}
 		decoder := json.NewDecoder(r.Body)
+
 		err := decoder.Decode(&data)
-		if err != nil || !data.Setup {
+		if err != nil || !data.Valid {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
@@ -92,8 +95,9 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
+
 		err := decoder.Decode(&data)
-		if err != nil || !data.Setup {
+		if err != nil || !data.Valid {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}

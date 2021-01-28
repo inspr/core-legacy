@@ -8,11 +8,11 @@ import (
 type AppDI struct {
 	App   meta.App `json:"app"`
 	Ctx   string   `json:"ctx"`
-	Setup bool     `json:"setup"`
+	Valid bool     `json:"valid"`
 }
 
 // AppQueryDI - Data Input format for queries requests
 type AppQueryDI struct {
 	Query string `json:"query"`
-	Setup bool   `json:"setup"`
+	Valid bool   `json:"valid"`
 }

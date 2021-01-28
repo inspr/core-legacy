@@ -18,8 +18,8 @@ import (
 type channelTypeAPITest struct {
 	name string
 	cth  *ChannelTypeHandler
-	send struct{ reqBody []byte }
-	want struct{ status int }
+	send sendInRequest
+	want expectedResponse
 }
 
 // channelTypeDICases - generates the test cases to be used in functions
@@ -30,27 +30,27 @@ func channelTypeDICases(funcName string) []channelTypeAPITest {
 	parsedCTDI, _ := json.Marshal(models.ChannelTypeDI{
 		ChannelType: meta.ChannelType{},
 		Ctx:         "",
-		Setup:       true,
+		Valid:       true,
 	})
 	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []channelTypeAPITest{
 		{
 			name: "successful_request_" + funcName,
 			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{reqBody: parsedCTDI},
-			want: struct{ status int }{status: http.StatusOK},
+			send: sendInRequest{body: parsedCTDI},
+			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
 			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(errors.New("test_error"))),
-			send: struct{ reqBody []byte }{reqBody: parsedCTDI},
-			want: struct{ status int }{status: http.StatusInternalServerError},
+			send: sendInRequest{body: parsedCTDI},
+			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
 			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
-			want: struct{ status int }{status: http.StatusBadRequest},
+			send: sendInRequest{body: wrongFormatData},
+			want: expectedResponse{status: http.StatusBadRequest},
 		},
 	}
 }
@@ -63,27 +63,27 @@ func channelTypeQueryDICases(funcName string) []channelTypeAPITest {
 	parsedCTQDI, _ := json.Marshal(models.ChannelTypeQueryDI{
 		Ctx:    "",
 		CtName: "",
-		Setup:  true,
+		Valid:  true,
 	})
 	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []channelTypeAPITest{
 		{
 			name: "successful_request_" + funcName,
 			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{reqBody: parsedCTQDI},
-			want: struct{ status int }{status: http.StatusOK},
+			send: sendInRequest{body: parsedCTQDI},
+			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
 			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(errors.New("test_error"))),
-			send: struct{ reqBody []byte }{reqBody: parsedCTQDI},
-			want: struct{ status int }{status: http.StatusInternalServerError},
+			send: sendInRequest{body: parsedCTQDI},
+			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
 			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
-			send: struct{ reqBody []byte }{reqBody: wrongFormatData},
-			want: struct{ status int }{status: http.StatusBadRequest},
+			send: sendInRequest{body: wrongFormatData},
+			want: expectedResponse{status: http.StatusBadRequest},
 		},
 	}
 }
@@ -120,16 +120,18 @@ func TestChannelTypeHandler_HandleCreateChannelType(t *testing.T) {
 	tests := channelTypeDICases("HandleCreateChannelType")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.cth.HandleCreateChannelType()
-			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			handlerFunc := tt.cth.HandleCreateChannelType().HTTPHandlerFunc()
+			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
+
 			if res.StatusCode != tt.want.status {
 				t.Errorf("ChannelHandler.HandleCreateChannelType() = %v, want %v", res.StatusCode, tt.want.status)
 			}
@@ -141,16 +143,18 @@ func TestChannelTypeHandler_HandleGetChannelTypeByRef(t *testing.T) {
 	tests := channelTypeQueryDICases("HandleGetChannelTypeByRef")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.cth.HandleGetChannelTypeByRef()
-			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			handlerFunc := tt.cth.HandleGetChannelTypeByRef().HTTPHandlerFunc()
+			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
+
 			if res.StatusCode != tt.want.status {
 				t.Errorf("ChannelHandler.HandleGetChannelTypeByRef() = %v, want %v", res.StatusCode, tt.want.status)
 			}
@@ -162,16 +166,18 @@ func TestChannelTypeHandler_HandleUpdateChannelType(t *testing.T) {
 	tests := channelTypeDICases("HandleUpdateChannelType")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.cth.HandleUpdateChannelType()
-			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			handlerFunc := tt.cth.HandleUpdateChannelType().HTTPHandlerFunc()
+			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
+
 			if res.StatusCode != tt.want.status {
 				t.Errorf("ChannelHandler.HandleUpdateChannelType() = %v, want %v", res.StatusCode, tt.want.status)
 			}
@@ -183,16 +189,18 @@ func TestChannelTypeHandler_HandleDeleteChannelType(t *testing.T) {
 	tests := channelTypeQueryDICases("HandleDeleteChannelType")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.cth.HandleDeleteChannelType()
-			ts := httptest.NewServer(http.HandlerFunc(handlerFunc))
+			handlerFunc := tt.cth.HandleDeleteChannelType().HTTPHandlerFunc()
+			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.reqBody))
+			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
+
 			if res.StatusCode != tt.want.status {
 				t.Errorf("ChannelHandler.HandleDeleteChannelType() = %v, want %v", res.StatusCode, tt.want.status)
 			}
