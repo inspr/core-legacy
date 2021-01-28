@@ -310,10 +310,17 @@ func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
 		for changedApp := range structuresChangelog["app"] {
 			currApp := currentApp.Spec.Apps[changedApp]
 			modifiedApp := newApp.Spec.Apps[changedApp]
-			newQuery := query + changedApp
-			structureError := validUpdateChanges(currApp, modifiedApp, newQuery)
-			if structureError != nil {
-				return structureError
+			if currApp != nil {
+				newQuery := query + "." + changedApp
+				structureError := validUpdateChanges(currApp, modifiedApp, newQuery)
+				if structureError != nil {
+					return structureError
+				}
+			} else {
+				childAppErr := validAppStructure(*modifiedApp, *newApp)
+				if childAppErr != "" {
+					return ierrors.NewError().InvalidApp().Message("Invalid child dApp: " + childAppErr).Build()
+				}
 			}
 		}
 	}
@@ -372,8 +379,8 @@ func diffError(err error) error {
 }
 
 // invalidChannelChanges checks if the channels to be updated have the app as their parent. If so,
-// the app must contain the channel types used by the channels. Returns true if these conditions are
-// not met. Returns false otherwise
+// the app must contain the channel types used by the channels, or the channel's Type fiel must be empty.
+// Returns true if these conditions are not met. Returns false otherwise
 func invalidChannelChanges(changedChannels Set, newApp *meta.App) bool {
 	channels := newApp.Spec.Channels
 	ctypes := newApp.Spec.ChannelTypes

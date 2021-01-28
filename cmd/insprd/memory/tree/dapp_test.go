@@ -2216,6 +2216,56 @@ func Test_validUpdateChanges(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "Invalid app changes",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				currentApp: getMockApp().Spec.Apps["app2"].Spec.Apps["app4"],
+				query:      "app2.app4",
+				newApp: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app4",
+						Reference:   "app2.app4",
+						Annotations: map[string]string{},
+						Parent:      "app2",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{
+							"newApp4-1": {
+								Meta: meta.Metadata{
+									Name:        "newApp4-1",
+									Reference:   "app4.newApp4-1",
+									Annotations: map[string]string{},
+									Parent:      "app4",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node:         meta.Node{},
+									Apps:         map[string]*meta.App{},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input: []string{"invalidInput"},
+									},
+								},
+							},
+						},
+						Channels:     map[string]*meta.Channel{},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary:     meta.AppBoundary{},
+					},
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
