@@ -1924,6 +1924,13 @@ func Test_getParentApp(t *testing.T) {
 }
 
 func Test_validUpdateChanges(t *testing.T) {
+	type fields struct {
+		root   *meta.App
+		appErr error
+		mockC  bool
+		mockCT bool
+		mockA  bool
+	}
 	type args struct {
 		currentApp *meta.App
 		newApp     *meta.App
@@ -1931,13 +1938,294 @@ func Test_validUpdateChanges(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
+		fields  fields
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		// {
+		// 	name: "App without changes",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		currentApp: getMockApp().Spec.Apps["app2"].Spec.Apps["app4"],
+		// 		newApp:     getMockApp().Spec.Apps["app2"].Spec.Apps["app4"],
+		// 		query:      "app2.app4",
+		// 	},
+		// 	wantErr: false,
+		// },
+		// {
+		// 	name: "Valid boundary changes",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		currentApp: getMockApp().Spec.Apps["app2"].Spec.Apps["app4"],
+		// 		query:      "app2.app4",
+		// 		newApp: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app4",
+		// 				Reference:   "app2.app4",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "app2",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{
+		// 					Meta: meta.Metadata{
+		// 						Name:        "nodeApp4",
+		// 						Reference:   "app4.nodeApp4",
+		// 						Annotations: map[string]string{},
+		// 						Parent:      "app4",
+		// 						SHA256:      "",
+		// 					},
+		// 					Spec: meta.NodeSpec{
+		// 						Image: "imageNodeApp4",
+		// 					},
+		// 				},
+		// 				Apps: map[string]*meta.App{},
+		// 				Channels: map[string]*meta.Channel{
+		// 					"ch1app4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:   "ch1app4",
+		// 							Parent: "app4",
+		// 						},
+		// 						Spec: meta.ChannelSpec{
+		// 							Type: "ctapp4",
+		// 						},
+		// 					},
+		// 					"ch2app4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:   "ch2app4",
+		// 							Parent: "",
+		// 						},
+		// 						Spec: meta.ChannelSpec{},
+		// 					},
+		// 				},
+		// 				ChannelTypes: map[string]*meta.ChannelType{
+		// 					"ctapp4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:        "ctUpdate1",
+		// 							Reference:   "app1.ctUpdate1",
+		// 							Annotations: map[string]string{},
+		// 							Parent:      "app1",
+		// 							SHA256:      "",
+		// 						},
+		// 					},
+		// 				},
+		// 				Boundary: meta.AppBoundary{},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// },
+		// {
+		// 	name: "Invalid boundary changes",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		currentApp: getMockApp().Spec.Apps["app2"].Spec.Apps["app4"],
+		// 		query:      "app2.app4",
+		// 		newApp: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app4",
+		// 				Reference:   "app2.app4",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "app2",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{
+		// 					Meta: meta.Metadata{
+		// 						Name:        "nodeApp4",
+		// 						Reference:   "app4.nodeApp4",
+		// 						Annotations: map[string]string{},
+		// 						Parent:      "app4",
+		// 						SHA256:      "",
+		// 					},
+		// 					Spec: meta.NodeSpec{
+		// 						Image: "imageNodeApp4",
+		// 					},
+		// 				},
+		// 				Apps: map[string]*meta.App{},
+		// 				Channels: map[string]*meta.Channel{
+		// 					"ch1app4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:   "ch1app4",
+		// 							Parent: "app4",
+		// 						},
+		// 						Spec: meta.ChannelSpec{
+		// 							Type: "ctapp4",
+		// 						},
+		// 					},
+		// 					"ch2app4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:   "ch2app4",
+		// 							Parent: "",
+		// 						},
+		// 						Spec: meta.ChannelSpec{},
+		// 					},
+		// 				},
+		// 				ChannelTypes: map[string]*meta.ChannelType{
+		// 					"ctapp4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:        "ctUpdate1",
+		// 							Reference:   "app1.ctUpdate1",
+		// 							Annotations: map[string]string{},
+		// 							Parent:      "app1",
+		// 							SHA256:      "",
+		// 						},
+		// 					},
+		// 				},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{"InvalidInput"},
+		// 					Output: []string{"ch2app2"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// },
+		// {
+		// 	name: "Valid structural changes",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		currentApp: getMockApp().Spec.Apps["app2"].Spec.Apps["app4"],
+		// 		query:      "app2.app4",
+		// 		newApp: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app4",
+		// 				Reference:   "app2.app4",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "app2",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{},
+		// 				Apps: map[string]*meta.App{
+		// 					"newApp4-1": {},
+		// 					"newApp4-2": {},
+		// 				},
+		// 				Channels: map[string]*meta.Channel{
+		// 					"ch1app4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:   "ch1app4",
+		// 							Parent: "app4",
+		// 						},
+		// 						Spec: meta.ChannelSpec{
+		// 							Type: "ctapp4",
+		// 						},
+		// 					},
+		// 					"newch2app4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:   "newch2app4",
+		// 							Parent: "app4",
+		// 						},
+		// 						Spec: meta.ChannelSpec{
+		// 							Type: "ctapp4",
+		// 						},
+		// 					},
+		// 					"newch3app4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:   "newch3app4",
+		// 							Parent: "app4",
+		// 						},
+		// 						Spec: meta.ChannelSpec{},
+		// 					},
+		// 				},
+		// 				ChannelTypes: map[string]*meta.ChannelType{
+		// 					"ctapp4": {
+		// 						Meta: meta.Metadata{
+		// 							Name:        "ctUpdate1",
+		// 							Reference:   "app4.ctUpdate1",
+		// 							Annotations: map[string]string{},
+		// 							Parent:      "app4",
+		// 							SHA256:      "",
+		// 						},
+		// 					},
+		// 				},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{"ch1app2"},
+		// 					Output: []string{"ch1app2"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// },
+		{
+			name: "Invalid channel changes",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				currentApp: getMockApp().Spec.Apps["app2"].Spec.Apps["app4"],
+				query:      "app2.app4",
+				newApp: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app4",
+						Reference:   "app2.app4",
+						Annotations: map[string]string{},
+						Parent:      "app2",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{
+							"newApp4-1": {},
+							"newApp4-2": {},
+						},
+						Channels: map[string]*meta.Channel{
+							"newch3app4": {
+								Meta: meta.Metadata{
+									Name:   "newch3app4",
+									Parent: "app4",
+								},
+								Spec: meta.ChannelSpec{
+									Type: "invalidChannelType",
+								},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary:     meta.AppBoundary{},
+					},
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			setTree(&TreeMockManager{
+				root:   tt.fields.root,
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
 			if err := validUpdateChanges(tt.args.currentApp, tt.args.newApp, tt.args.query); (err != nil) != tt.wantErr {
 				t.Errorf("validUpdateChanges() error = %v, wantErr %v", err, tt.wantErr)
 			}

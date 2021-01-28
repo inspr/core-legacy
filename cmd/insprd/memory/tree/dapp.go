@@ -268,7 +268,6 @@ func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
 	// if err != nil {
 	// 	return diffError(err)
 	// }
-
 	boundChangelog, err := diff.Diff(currentApp.Spec.Boundary, newApp.Spec.Boundary)
 	if err != nil {
 		return diffError(err)
@@ -299,7 +298,6 @@ func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
 	// 		}
 	// 	}
 	// }
-
 	// if len(structuresChangelog["ctype"]) > 0 &&
 	// 	invalidCtypeChanges(structuresChangelog["ctype"], currentApp.Spec.ChannelTypes, newApp.Spec.ChannelTypes) {
 	// 	// sem restrição, mudanças só deletam e criam um novo
@@ -336,7 +334,7 @@ func checkForChildStructureChanges(currentStruct, newStruct meta.AppSpec) (map[s
 	}
 	if len(appChangelog) != 0 {
 		for _, change := range appChangelog {
-			if changedStructures["app"][change.Path[0]] {
+			if change.Type != "delete" && !changedStructures["app"][change.Path[0]] {
 				changedStructures["app"][change.Path[0]] = true
 			}
 		}
@@ -348,7 +346,7 @@ func checkForChildStructureChanges(currentStruct, newStruct meta.AppSpec) (map[s
 	}
 	if len(channelChangelog) != 0 {
 		for _, change := range channelChangelog {
-			if changedStructures["channel"][change.Path[0]] {
+			if change.Type != "delete" && !changedStructures["channel"][change.Path[0]] {
 				changedStructures["channel"][change.Path[0]] = true
 			}
 		}
@@ -360,7 +358,7 @@ func checkForChildStructureChanges(currentStruct, newStruct meta.AppSpec) (map[s
 	}
 	if len(ctypeChangelog) != 0 {
 		for _, change := range ctypeChangelog {
-			if changedStructures["ctype"][change.Path[0]] {
+			if change.Type != "delete" && !changedStructures["ctype"][change.Path[0]] {
 				changedStructures["ctype"][change.Path[0]] = true
 			}
 		}
