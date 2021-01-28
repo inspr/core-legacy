@@ -1,20 +1,12 @@
 package tree
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
 // ChannelTypeMockManager mocks a channelType interface for testing
 type ChannelTypeMockManager struct {
 	root *meta.App
-}
-
-// ChannelTypes returns a mocked channelType interface for testing
-func (tmm *TreeMemoryManager) ChannelTypes() memory.ChannelTypeMemory {
-	return &ChannelTypeMockManager{
-		root: tmm.root,
-	}
 }
 
 // CreateChannelType mocks a channelType method for testing

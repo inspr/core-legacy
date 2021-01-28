@@ -21,7 +21,9 @@ func (tmm *TreeMockManager) Channels() memory.ChannelMemory {
 			root: tmm.root,
 		}
 	}
-	return nil
+	return &ChannelMemoryManager{
+		root: tmm.root,
+	}
 }
 
 // ChannelTypes mocks a channelType interface for testing
@@ -31,13 +33,18 @@ func (tmm *TreeMockManager) ChannelTypes() memory.ChannelTypeMemory {
 			root: tmm.root,
 		}
 	}
-	return nil
+	return &ChannelTypeMemoryManager{
+		root: tmm.root,
+	}
 }
 
 // Apps mocks an app interface for testing
 func (tmm *TreeMockManager) Apps() memory.AppMemory {
 	if tmm.mockA {
-		return nil
+		return &MockAppManager{
+			root: tmm.root,
+			err:  tmm.appErr,
+		}
 	}
 	return &AppMemoryManager{
 		root: tmm.root,

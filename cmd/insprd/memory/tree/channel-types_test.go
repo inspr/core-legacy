@@ -506,7 +506,7 @@ func getMockChannelTypes() *meta.App {
 			SHA256:      "",
 		},
 		Spec: meta.AppSpec{
-			Node: &meta.Node{},
+			Node: meta.Node{},
 			Apps: map[string]*meta.App{
 				"app1": {},
 				"app2": {},
@@ -534,7 +534,7 @@ func getMockChannelTypes() *meta.App {
 					Schema: []byte{},
 				},
 			},
-			Boundary: &meta.AppBoundary{
+			Boundary: meta.AppBoundary{
 				Input:  []string{},
 				Output: []string{},
 			},

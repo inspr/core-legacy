@@ -83,7 +83,7 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 		// If new dApp has Channels inside of it, creates them
 		if len(app.Spec.Channels) > 0 {
 			for _, newChannel := range app.Spec.Channels {
-				errCh := GetTreeMemory().Channels().CreateChannel(newChannel, newContext)
+				errCh := GetTreeMemory().Channels().CreateChannel(newContext, newChannel)
 				if errCh != nil {
 					return ierrors.NewError().InvalidChannel().Message("invalid Channel inside dApp structure").Build()
 				}

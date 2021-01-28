@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -10,20 +9,13 @@ type ChannelMockManager struct {
 	root *meta.App
 }
 
-// Channels returns a mocked channel interface for testing
-func (tmm *TreeMemoryManager) Channels() memory.ChannelMemory {
-	return &ChannelMockManager{
-		root: tmm.root,
-	}
-}
-
 // GetChannel mocks a channel method for testing
 func (cmm *ChannelMockManager) GetChannel(context string, chName string) (*meta.Channel, error) {
 	return nil, nil
 }
 
 // CreateChannel mocks a channel method for testing
-func (cmm *ChannelMockManager) CreateChannel(ch *meta.Channel, context string) error {
+func (cmm *ChannelMockManager) CreateChannel(context string, ch *meta.Channel) error {
 	return nil
 }
 
@@ -33,6 +25,6 @@ func (cmm *ChannelMockManager) DeleteChannel(context string, chName string) erro
 }
 
 // UpdateChannel mocks a channel method for testing
-func (cmm *ChannelMockManager) UpdateChannel(ch *meta.Channel, query string) error {
+func (cmm *ChannelMockManager) UpdateChannel(query string, ch *meta.Channel) error {
 	return nil
 }
