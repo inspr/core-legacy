@@ -382,7 +382,7 @@ func invalidChannelChanges(changedChannels Set, newApp *meta.App) bool {
 		for change := range changedChannels {
 			_, ctypeExists := ctypes[channels[change].Spec.Type]
 			if channels[change].Meta.Parent == newApp.Meta.Name &&
-				!ctypeExists {
+				channels[change].Spec.Type != "" && !ctypeExists {
 
 				return true
 			}
