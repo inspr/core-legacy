@@ -179,7 +179,7 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 		return ierrors.NewError().InvalidApp().Message("dApp mustn't have a Node and other dApps at the same time").Build()
 	}
 
-	structureError := validUpdateChanges(currentApp, app, query)
+	structureError := validUpdateChanges(*currentApp, *app, query)
 	if structureError != nil {
 		return structureError
 	}
@@ -196,8 +196,8 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 func validAppStructure(app, parentApp meta.App) string {
 	errDescription := ""
 	var validName, validSubstructure, parentWithoutNode bool
-	_, notInParentRef := parentApp.Spec.Apps[app.Meta.Name]
-	validName = (app.Meta.Name != "") && notInParentRef
+	_, inParentRef := parentApp.Spec.Apps[app.Meta.Name]
+	validName = (app.Meta.Name != "") && !inParentRef
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
@@ -263,7 +263,7 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 	return parentApp, err
 }
 
-func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
+func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 	// nodeChangelog, err := diff.Diff(currentApp.Spec.Node, newApp.Spec.Node)
 	// if err != nil {
 	// 	return diffError(err)
@@ -302,7 +302,7 @@ func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
 	// 	invalidCtypeChanges(structuresChangelog["ctype"], currentApp.Spec.ChannelTypes, newApp.Spec.ChannelTypes) {
 	// 	// sem restrição, mudanças só deletam e criam um novo
 	// }
-	if len(structuresChangelog["channel"]) > 0 && invalidChannelChanges(structuresChangelog["channel"], newApp) {
+	if len(structuresChangelog["channel"]) > 0 && invalidChannelChanges(structuresChangelog["channel"], &newApp) {
 		return ierrors.NewError().InvalidChannel().Message("Channel's parent dApp doesn't contain specified channel type").Build()
 	}
 
@@ -312,12 +312,13 @@ func validUpdateChanges(currentApp, newApp *meta.App, query string) error {
 			modifiedApp := newApp.Spec.Apps[changedApp]
 			if currApp != nil {
 				newQuery := query + "." + changedApp
-				structureError := validUpdateChanges(currApp, modifiedApp, newQuery)
+				structureError := validUpdateChanges(*currApp, *modifiedApp, newQuery)
 				if structureError != nil {
 					return structureError
 				}
 			} else {
-				childAppErr := validAppStructure(*modifiedApp, *newApp)
+				delete(newApp.Spec.Apps, modifiedApp.Meta.Name)
+				childAppErr := validAppStructure(*modifiedApp, newApp)
 				if childAppErr != "" {
 					return ierrors.NewError().InvalidApp().Message("Invalid child dApp: " + childAppErr).Build()
 				}
