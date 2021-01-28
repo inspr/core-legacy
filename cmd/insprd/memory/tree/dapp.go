@@ -37,13 +37,9 @@ func (amm *AppMemoryManager) GetApp(query string) (*meta.App, error) {
 	reference := strings.Split(query, ".")
 	err := ierrors.NewError().NotFound().Message("dApp not found for given query").Build()
 
-	if len(reference) == 1 && amm.root.Spec.Apps[reference[0]] != nil {
-		return amm.root.Spec.Apps[reference[0]], nil
-	}
-
-	nxtApp := amm.root.Spec.Apps[reference[0]]
+	nxtApp := amm.root
 	if nxtApp != nil {
-		for _, element := range reference[1:] {
+		for _, element := range reference {
 			nxtApp = nxtApp.Spec.Apps[element]
 			if nxtApp == nil {
 				return nil, err
