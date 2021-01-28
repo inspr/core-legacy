@@ -123,26 +123,6 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 	if err != nil {
 		return err
 	}
-
-	// Delete dApp's Channels (channel dependencies are validated inside 'DeleteChannel" function)
-	if len(app.Spec.Channels) > 0 {
-		for _, channel := range app.Spec.Channels {
-			err = GetTreeMemory().Channels().DeleteChannel(query, channel.Meta.Name)
-			if err != nil {
-				return ierrors.NewError().InnerError(err).Message("Error while deleting Channels").Build()
-			}
-		}
-	}
-
-	// Delete dApp's Channel Types
-	if len(app.Spec.ChannelTypes) > 0 {
-		for _, channeltype := range app.Spec.ChannelTypes {
-			err = GetTreeMemory().Channels().DeleteChannel(query, channeltype.Meta.Name)
-			if err != nil {
-				return ierrors.NewError().InnerError(err).Message("Error while deleting Channel Types").Build()
-			}
-		}
-	}
 	// If this dApps contain another dApps inside of it, deletes them recursively
 	if len(app.Spec.Apps) > 0 {
 		for _, nxtApp := range app.Spec.Apps {
