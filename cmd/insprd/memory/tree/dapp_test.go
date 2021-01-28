@@ -2100,7 +2100,88 @@ func Test_validUpdateChanges(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Valid structural changes",
+			name: "Valid structural changes - app with node",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				currentApp: getMockApp().Spec.Apps["app2"].Spec.Apps["app4"],
+				query:      "app2.app4",
+				newApp: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app4",
+						Reference:   "app2.app4",
+						Annotations: map[string]string{},
+						Parent:      "app2",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Meta: meta.Metadata{
+								Name:        "nodeApp4",
+								Reference:   "app4.nodeApp4",
+								Annotations: map[string]string{},
+								Parent:      "app4",
+								SHA256:      "",
+							},
+							Spec: meta.NodeSpec{
+								Image: "imageNodeAppChanged4",
+							},
+						},
+						Apps: map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{
+							"ch1app4": {
+								Meta: meta.Metadata{
+									Name:   "ch1app4",
+									Parent: "app4",
+								},
+								Spec: meta.ChannelSpec{
+									Type: "ctapp4",
+								},
+							},
+							"newch2app4": {
+								Meta: meta.Metadata{
+									Name:   "newch2app4",
+									Parent: "app4",
+								},
+								Spec: meta.ChannelSpec{
+									Type: "ctapp4",
+								},
+							},
+							"newch3app4": {
+								Meta: meta.Metadata{
+									Name:   "newch3app4",
+									Parent: "app4",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{
+							"ctapp4": {
+								Meta: meta.Metadata{
+									Name:        "ctUpdate1",
+									Reference:   "app4.ctUpdate1",
+									Annotations: map[string]string{},
+									Parent:      "app4",
+									SHA256:      "",
+								},
+							},
+						},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1app2"},
+							Output: []string{"ch1app2"},
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Valid structural changes - app with subapps",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -2122,8 +2203,22 @@ func Test_validUpdateChanges(t *testing.T) {
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
 						Apps: map[string]*meta.App{
-							"newApp4-1": {},
-							"newApp4-2": {},
+							"newApp4-1": {
+								Meta: meta.Metadata{
+									Name:        "newApp4-1",
+									Reference:   "app4.newApp4-1",
+									Annotations: map[string]string{},
+									Parent:      "app4",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node:         meta.Node{},
+									Apps:         map[string]*meta.App{},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary:     meta.AppBoundary{},
+								},
+							},
 						},
 						Channels: map[string]*meta.Channel{
 							"ch1app4": {

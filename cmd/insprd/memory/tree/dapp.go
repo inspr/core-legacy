@@ -196,8 +196,8 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 func validAppStructure(app, parentApp meta.App) string {
 	errDescription := ""
 	var validName, validSubstructure, parentWithoutNode bool
-
-	validName = (app.Meta.Name != "") && (parentApp.Spec.Apps[app.Meta.Name] == nil)
+	_, notInParentRef := parentApp.Spec.Apps[app.Meta.Name]
+	validName = (app.Meta.Name != "") && notInParentRef
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
