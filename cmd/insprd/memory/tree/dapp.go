@@ -30,27 +30,28 @@ type Set map[string]bool
 // The root app is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 func (amm *AppMemoryManager) GetApp(query string) (*meta.App, error) {
+	if query == "" {
+		return amm.root, nil
+	}
+
 	reference := strings.Split(query, ".")
 	err := ierrors.NewError().NotFound().Message("dApp not found for given query").Build()
 
-	if len(reference) == 1 {
-		if reference[0] == "" {
-			return amm.root, nil
-		} else if amm.root.Spec.Apps[reference[0]] != nil {
-			return amm.root.Spec.Apps[reference[0]], nil
-		}
-	} else {
-		nxtApp := amm.root.Spec.Apps[reference[0]]
-		if nxtApp != nil {
-			for _, element := range reference[1:] {
-				nxtApp = nxtApp.Spec.Apps[element]
-				if nxtApp == nil {
-					return nil, err
-				}
-			}
-			return nxtApp, nil
-		}
+	if len(reference) == 1 && amm.root.Spec.Apps[reference[0]] != nil {
+		return amm.root.Spec.Apps[reference[0]], nil
 	}
+
+	nxtApp := amm.root.Spec.Apps[reference[0]]
+	if nxtApp != nil {
+		for _, element := range reference[1:] {
+			nxtApp = nxtApp.Spec.Apps[element]
+			if nxtApp == nil {
+				return nil, err
+			}
+		}
+		return nxtApp, nil
+	}
+
 	return nil, err
 }
 
@@ -59,7 +60,7 @@ func (amm *AppMemoryManager) GetApp(query string) (*meta.App, error) {
 // In case of context being an empty string, the dApp is created inside the root dApp.
 func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 	if strings.Contains(app.Meta.Name, ".") {
-		ierrors.NewError().InvalidName().Message("Invalid character '.' in dApp's name").Build()
+		ierrors.NewError().InvalidName().Message("invalid character '.' in dApp's name").Build()
 	}
 
 	parentApp, err := amm.GetApp(context)
@@ -76,7 +77,7 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 			app.Spec.Node.Meta.Parent = app.Meta.Name
 		}
 
-		newContext := context + app.Meta.Name
+		newContext := context + "." + app.Meta.Name
 		// If new dApp has dApps inside of it, creates them recursively
 		if len(app.Spec.Apps) > 0 {
 			for _, newApp := range app.Spec.Apps {
@@ -88,7 +89,7 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 			for _, newChannel := range app.Spec.Channels {
 				errCh := GetTreeMemory().Channels().CreateChannel(newChannel, newContext)
 				if errCh != nil {
-					return ierrors.NewError().InvalidChannel().Message("Invalid Channel inside dApp structure").Build()
+					return ierrors.NewError().InvalidChannel().Message("invalid Channel inside dApp structure").Build()
 				}
 			}
 		}
@@ -97,7 +98,7 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 			for _, newChannelType := range app.Spec.ChannelTypes {
 				errChTy := GetTreeMemory().ChannelTypes().CreateChannelType(newChannelType, newContext)
 				if errChTy != nil {
-					return ierrors.NewError().InvalidChannelType().Message("Invalid ChannelType inside dApp structure").Build()
+					return ierrors.NewError().InvalidChannelType().Message("invalid ChannelType inside dApp structure").Build()
 				}
 			}
 		}
@@ -116,7 +117,7 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 // In case of dApp not found an error is returned.
 func (amm *AppMemoryManager) DeleteApp(query string) error {
 	if query == "" {
-		return ierrors.NewError().BadRequest().Message("Can't delete root dApp").Build()
+		return ierrors.NewError().BadRequest().Message("can't delete root dApp").Build()
 	}
 
 	app, err := amm.GetApp(query)
@@ -129,7 +130,7 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 			newQuery := query + "." + nxtApp.Meta.Name
 			err = GetTreeMemory().Apps().DeleteApp(newQuery)
 			if err != nil {
-				return ierrors.NewError().InnerError(err).Message("Error while deleting inner dApps").Build()
+				return ierrors.NewError().InnerError(err).Message("error while deleting inner dApps").Build()
 			}
 		}
 	}
@@ -186,13 +187,13 @@ func validAppStructure(app, parentApp meta.App) string {
 	}
 
 	if !validName {
-		errDescription = errDescription + "Invalid dApp name;"
+		errDescription = errDescription + "invalid dApp name;"
 	}
 	if !validSubstructure {
-		errDescription = errDescription + "Invalid substructure;"
+		errDescription = errDescription + "invalid substructure;"
 	}
 	if !parentWithoutNode {
-		errDescription = errDescription + "Parent has Node;"
+		errDescription = errDescription + "parent has Node;"
 	}
 
 	return errDescription
@@ -210,12 +211,12 @@ func nodeIsEmpty(node meta.Node) bool {
 func validBoundaries(bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
 	boundaryErrors := ""
 	if len(parentChannels) == 0 {
-		boundaryErrors = boundaryErrors + "Parent doesn't have Channels;"
+		boundaryErrors = boundaryErrors + "parent doesn't have Channels;"
 	} else {
 		if len(bound.Input) > 0 {
 			for _, input := range bound.Input {
 				if parentChannels[input] == nil {
-					boundaryErrors = boundaryErrors + "Invalid input boundary;"
+					boundaryErrors = boundaryErrors + "invalid input boundary;"
 					break
 				}
 			}
@@ -224,7 +225,7 @@ func validBoundaries(bound meta.AppBoundary, parentChannels map[string]*meta.Cha
 		if len(bound.Output) > 0 {
 			for _, output := range bound.Output {
 				if parentChannels[output] == nil {
-					boundaryErrors = boundaryErrors + "Invalid output boundary;"
+					boundaryErrors = boundaryErrors + "invalid output boundary;"
 					break
 				}
 			}
@@ -244,10 +245,6 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 }
 
 func validUpdateChanges(currentApp, newApp meta.App, query string) error {
-	// nodeChangelog, err := diff.Diff(currentApp.Spec.Node, newApp.Spec.Node)
-	// if err != nil {
-	// 	return diffError(err)
-	// }
 	boundChangelog, err := diff.Diff(currentApp.Spec.Boundary, newApp.Spec.Boundary)
 	if err != nil {
 		return diffError(err)
@@ -269,21 +266,9 @@ func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 	if err != nil {
 		return diffError(err)
 	}
-	// if len(nodeChangelog) != 0 {
-	// 	for _, change := range nodeChangelog {
-	// 		if change.Type == "update" && change.Path[0] == "nodemeta" {
-	// 			if change.Path[2] == "name" {
-	// 				return ierrors.NewError().InvalidApp().Message("Node name mustn't change").Build()
-	// 			}
-	// 		}
-	// 	}
-	// }
-	// if len(structuresChangelog["ctype"]) > 0 &&
-	// 	invalidCtypeChanges(structuresChangelog["ctype"], currentApp.Spec.ChannelTypes, newApp.Spec.ChannelTypes) {
-	// 	// sem restrição, mudanças só deletam e criam um novo
-	// }
+
 	if len(structuresChangelog["channel"]) > 0 && invalidChannelChanges(structuresChangelog["channel"], &newApp) {
-		return ierrors.NewError().InvalidChannel().Message("Channel's parent dApp doesn't contain specified channel type").Build()
+		return ierrors.NewError().InvalidChannel().Message("channel's parent dApp doesn't contain specified channel type").Build()
 	}
 
 	if len(structuresChangelog["app"]) > 0 {
@@ -300,7 +285,7 @@ func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 				delete(newApp.Spec.Apps, modifiedApp.Meta.Name)
 				childAppErr := validAppStructure(*modifiedApp, newApp)
 				if childAppErr != "" {
-					return ierrors.NewError().InvalidApp().Message("Invalid child dApp: " + childAppErr).Build()
+					return ierrors.NewError().InvalidApp().Message("invalid child dApp: " + childAppErr).Build()
 				}
 			}
 		}
@@ -356,7 +341,7 @@ func checkForChildStructureChanges(currentStruct, newStruct meta.AppSpec) (map[s
 }
 
 func diffError(err error) error {
-	return ierrors.NewError().InnerError(err).InternalServer().Message("Couldn't create diff to update dApp").Build()
+	return ierrors.NewError().InnerError(err).InternalServer().Message("couldn't create diff to update dApp").Build()
 }
 
 // invalidChannelChanges checks if the channels to be updated have the app as their parent. If so,
@@ -379,13 +364,6 @@ func invalidChannelChanges(changedChannels Set, newApp *meta.App) bool {
 	}
 	return true
 }
-
-// func invalidCtypeChanges(changedCtypes Set, currentCtypes, newCtypes map[string]*meta.ChannelType) bool {
-// 	invalidChange := false
-// 	for changed, _ := range changedCtypes {
-// 	}
-// 	return invalidChange
-// }
 
 /*
 ESTRUTURAS PARA CHECAGEM DE DIFFS VÁLIDOS:

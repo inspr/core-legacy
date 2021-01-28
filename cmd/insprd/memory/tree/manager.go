@@ -15,7 +15,6 @@ var tree memory.Manager
 // GetTreeMemory returns a memory manager interface
 func GetTreeMemory() memory.Manager {
 	if tree == nil {
-		// tree = newTreeMemory()
 		setTree(newTreeMemory())
 	}
 	return tree
