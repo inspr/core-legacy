@@ -120,16 +120,6 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 	if err != nil {
 		return err
 	}
-	// If this dApps contain another dApps inside of it, deletes them recursively
-	if len(app.Spec.Apps) > 0 {
-		for _, nxtApp := range app.Spec.Apps {
-			newQuery := query + "." + nxtApp.Meta.Name
-			err = GetTreeMemory().Apps().DeleteApp(newQuery)
-			if err != nil {
-				return ierrors.NewError().InnerError(err).Message("error while deleting inner dApps").Build()
-			}
-		}
-	}
 	parent, errParent := getParentApp(query)
 	if errParent != nil {
 		return errParent
