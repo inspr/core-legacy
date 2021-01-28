@@ -5,12 +5,14 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
+// TreeMemoryManager defines a memory manager interface
 type TreeMemoryManager struct {
 	root *meta.App
 }
 
 var tree memory.Manager
 
+// GetTreeMemory returns a memory manager interface
 func GetTreeMemory() memory.Manager {
 	if tree == nil {
 		// tree = newTreeMemory()
