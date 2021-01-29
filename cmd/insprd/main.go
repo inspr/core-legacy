@@ -1,11 +1,8 @@
 // THIS IS THE MASTER
 package main
 
-import "fmt"
+import "gitlab.inspr.dev/inspr/core/cmd/insprd/api"
 
 func main() {
-	fmt.Println("Insprd is up!")
-	for {
-
-	}
+	api.Run()
 }
