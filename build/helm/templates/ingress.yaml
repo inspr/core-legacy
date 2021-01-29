@@ -9,7 +9,15 @@ spec:
   - host: {{ .Values.insprIngress.host }}
     http:
       paths:
-      - path: /
+      - path: /channels
+        backend:
+          serviceName: {{ .Values.service.insprdName }}
+          servicePort: {{ .Values.service.insprdPort }}
+      - path: /apps
+        backend:
+          serviceName: {{ .Values.service.insprdName }}
+          servicePort: {{ .Values.service.insprdPort }}
+      - path: /channeltypes
         backend:
           serviceName: {{ .Values.service.insprdName }}
           servicePort: {{ .Values.service.insprdPort }}
