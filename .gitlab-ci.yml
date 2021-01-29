@@ -12,7 +12,8 @@ stages:
 unit-tests:
   stage: test
   script:
-    - go test -v -coverpkg=./... ./...
+    - go test -v -coverprofile=profile.cov -coverpkg=./... ./...
+    - go tool cover -func profile.cov
   coverage: /^coverage:\s(\d+\.\d+%)\sof\sstatements\sin\s\.\/\.\.\.$/
 
 lint:
