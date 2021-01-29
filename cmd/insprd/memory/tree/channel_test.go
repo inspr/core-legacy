@@ -213,7 +213,7 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "",
+				context: "invalid.context",
 				ch: &meta.Channel{
 					Meta: meta.Metadata{
 						Name:   "channel3",
@@ -429,7 +429,7 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 				mockCT: true,
 			},
 			args: args{
-				context: "",
+				context: "invalid.context",
 				ch: &meta.Channel{
 					Meta: meta.Metadata{
 						Name: "channel1",
