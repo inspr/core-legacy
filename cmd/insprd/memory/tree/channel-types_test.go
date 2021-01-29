@@ -69,16 +69,16 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 				mockCT: false,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				ctName:  "ct1",
 			},
 			wantErr: false,
 			want: &meta.ChannelType{
 				Meta: meta.Metadata{
 					Name:        "ct1",
-					Reference:   "root.ct1",
+					Reference:   "ct1",
 					Annotations: map[string]string{},
-					Parent:      "root",
+					Parent:      "",
 					SHA256:      "",
 				},
 				Schema: []byte{},
@@ -94,7 +94,7 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 				mockCT: false,
 			},
 			args: args{
-				context: "root",
+				context: "",
 				ctName:  "ct3",
 			},
 			wantErr: true,
@@ -103,14 +103,14 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 		{
 			name: "Getting any ChannelType on a invalid app",
 			fields: fields{
-				root:   nil,
+				root:   getMockChannelTypes(),
 				appErr: ierrors.NewError().NotFound().Build(),
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
 			},
 			args: args{
-				context: "root",
+				context: "invalid.context",
 				ctName:  "ct42",
 			},
 			wantErr: true,
@@ -171,22 +171,22 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 				ct: &meta.ChannelType{
 					Meta: meta.Metadata{
 						Name:        "ct3",
-						Reference:   "root.ct1",
+						Reference:   "ct1",
 						Annotations: map[string]string{},
-						Parent:      "root",
+						Parent:      "",
 						SHA256:      "",
 					},
 					Schema: []byte{},
 				},
-				context: "root",
+				context: "",
 			},
 			wantErr: false,
 			want: &meta.ChannelType{
 				Meta: meta.Metadata{
 					Name:        "ct3",
-					Reference:   "root.ct1",
+					Reference:   "ct1",
 					Annotations: map[string]string{},
-					Parent:      "root",
+					Parent:      "",
 					SHA256:      "",
 				},
 				Schema: []byte{},
@@ -205,22 +205,22 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 				ct: &meta.ChannelType{
 					Meta: meta.Metadata{
 						Name:        "ct1",
-						Reference:   "root.ct1",
+						Reference:   "ct1",
 						Annotations: map[string]string{},
-						Parent:      "root",
+						Parent:      "",
 						SHA256:      "",
 					},
 					Schema: []byte{},
 				},
-				context: "root",
+				context: "",
 			},
 			wantErr: true,
 			want: &meta.ChannelType{
 				Meta: meta.Metadata{
 					Name:        "ct1",
-					Reference:   "root.ct1",
+					Reference:   "ct1",
 					Annotations: map[string]string{},
-					Parent:      "root",
+					Parent:      "",
 					SHA256:      "",
 				},
 				Schema: []byte{},
@@ -229,7 +229,7 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 		{
 			name: "Trying to create an ChannelType on a invalid app",
 			fields: fields{
-				root:   nil,
+				root:   getMockChannelTypes(),
 				appErr: ierrors.NewError().NotFound().Build(),
 				mockA:  true,
 				mockC:  true,
@@ -239,14 +239,14 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 				ct: &meta.ChannelType{
 					Meta: meta.Metadata{
 						Name:        "ct1",
-						Reference:   "root.ct1",
+						Reference:   "ct1",
 						Annotations: map[string]string{},
-						Parent:      "root",
+						Parent:      "",
 						SHA256:      "",
 					},
 					Schema: []byte{},
 				},
-				context: "root",
+				context: "invalid.context",
 			},
 			wantErr: true,
 			want:    nil,
@@ -308,7 +308,7 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 			},
 			args: args{
 				ctName:  "ct1",
-				context: "root",
+				context: "",
 			},
 			wantErr: false,
 			want:    nil,
@@ -324,7 +324,7 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 			},
 			args: args{
 				ctName:  "ct3",
-				context: "root",
+				context: "",
 			},
 			wantErr: true,
 			want:    nil,
@@ -332,14 +332,14 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 		{
 			name: "Deleting any ChannelType on a invalid app",
 			fields: fields{
-				root:   nil,
+				root:   getMockChannelTypes(),
 				appErr: ierrors.NewError().NotFound().Build(),
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
 			},
 			args: args{
-				context: "root",
+				context: "invalid.context",
 				ctName:  "ct42",
 			},
 			wantErr: true,
@@ -400,22 +400,22 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 				ct: &meta.ChannelType{
 					Meta: meta.Metadata{
 						Name:        "ct1",
-						Reference:   "root.ct1",
+						Reference:   "ct1",
 						Annotations: map[string]string{},
-						Parent:      "root",
+						Parent:      "",
 						SHA256:      "",
 					},
 					Schema: []byte{0, 1, 0, 1},
 				},
-				context: "root",
+				context: "",
 			},
 			wantErr: false,
 			want: &meta.ChannelType{
 				Meta: meta.Metadata{
 					Name:        "ct1",
-					Reference:   "root.ct1",
+					Reference:   "ct1",
 					Annotations: map[string]string{},
-					Parent:      "root",
+					Parent:      "",
 					SHA256:      "",
 				},
 				Schema: []byte{0, 1, 0, 1},
@@ -434,14 +434,14 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 				ct: &meta.ChannelType{
 					Meta: meta.Metadata{
 						Name:        "ct42",
-						Reference:   "root.ct42",
+						Reference:   "ct42",
 						Annotations: map[string]string{},
-						Parent:      "root",
+						Parent:      "",
 						SHA256:      "",
 					},
 					Schema: []byte{},
 				},
-				context: "root",
+				context: "",
 			},
 			wantErr: true,
 			want:    nil,
@@ -459,14 +459,14 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 				ct: &meta.ChannelType{
 					Meta: meta.Metadata{
 						Name:        "ct3",
-						Reference:   "root.ct1",
+						Reference:   "ct1",
 						Annotations: map[string]string{},
-						Parent:      "root",
+						Parent:      "",
 						SHA256:      "",
 					},
 					Schema: []byte{},
 				},
-				context: "root",
+				context: "invalid.context",
 			},
 			wantErr: true,
 			want:    nil,
@@ -499,7 +499,7 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 func getMockChannelTypes() *meta.App {
 	root := meta.App{
 		Meta: meta.Metadata{
-			Name:        "root",
+			Name:        "",
 			Reference:   "",
 			Annotations: map[string]string{},
 			Parent:      "",
@@ -516,9 +516,9 @@ func getMockChannelTypes() *meta.App {
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",
-						Reference:   "root.ct1",
+						Reference:   "ct1",
 						Annotations: map[string]string{},
-						Parent:      "root",
+						Parent:      "",
 						SHA256:      "",
 					},
 					Schema: []byte{},
@@ -526,9 +526,9 @@ func getMockChannelTypes() *meta.App {
 				"ct2": {
 					Meta: meta.Metadata{
 						Name:        "ct2",
-						Reference:   "root.ct2",
+						Reference:   "ct2",
 						Annotations: map[string]string{},
-						Parent:      "root",
+						Parent:      "",
 						SHA256:      "",
 					},
 					Schema: []byte{},
