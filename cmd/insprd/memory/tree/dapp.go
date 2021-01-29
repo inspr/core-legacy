@@ -66,36 +66,16 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 
 	structureErrors := validAppStructure(*app, *parentApp)
 	if structureErrors == "" {
+		if app.Spec.Apps == nil {
+			app.Spec.Apps = map[string]*meta.App{}
+		}
 		app.Meta.Parent = parentApp.Meta.Name
 		parentApp.Spec.Apps[app.Meta.Name] = app
 
 		if !nodeIsEmpty(app.Spec.Node) {
 			app.Spec.Node.Meta.Parent = app.Meta.Name
-		}
-
-		newContext := context + "." + app.Meta.Name
-		// If new dApp has dApps inside of it, creates them recursively
-		if len(app.Spec.Apps) > 0 {
-			for _, newApp := range app.Spec.Apps {
-				amm.CreateApp(newApp, newContext)
-			}
-		}
-		// If new dApp has Channels inside of it, creates them
-		if len(app.Spec.Channels) > 0 {
-			for _, newChannel := range app.Spec.Channels {
-				errCh := GetTreeMemory().Channels().CreateChannel(newContext, newChannel)
-				if errCh != nil {
-					return ierrors.NewError().InvalidChannel().Message("invalid Channel inside dApp structure").Build()
-				}
-			}
-		}
-		// If new dApp has ChannelTypes inside of it, creates them
-		if len(app.Spec.ChannelTypes) > 0 {
-			for _, newChannelType := range app.Spec.ChannelTypes {
-				errChTy := GetTreeMemory().ChannelTypes().CreateChannelType(newChannelType, newContext)
-				if errChTy != nil {
-					return ierrors.NewError().InvalidChannelType().Message("invalid ChannelType inside dApp structure").Build()
-				}
+			if app.Spec.Node.Meta.Annotations == nil {
+				app.Spec.Node.Meta.Annotations = map[string]string{}
 			}
 		}
 

@@ -33,8 +33,10 @@ func (chh *ChannelMemoryManager) GetChannel(context string, chName string) (*met
 		return nil, newError
 	}
 
-	if ch, ok := parentApp.Spec.Channels[chName]; ok {
-		return ch, nil
+	if parentApp.Spec.Channels != nil {
+		if ch, ok := parentApp.Spec.Channels[chName]; ok {
+			return ch, nil
+		}
 	}
 
 	newError := ierrors.NewError().NotFound().Message("channel not found").Build()
@@ -57,6 +59,13 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 		return newError
 	}
 
+	if _, ok := parentApp.Spec.ChannelTypes[ch.Spec.Type]; !ok {
+		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
+	}
+
+	if parentApp.Spec.Channels == nil {
+		parentApp.Spec.Channels = map[string]*meta.Channel{}
+	}
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
 	return nil
@@ -96,6 +105,10 @@ func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel)
 	}
 
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)
+
+	if _, ok := parentApp.Spec.ChannelTypes[ch.Spec.Type]; !ok {
+		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
+	}
 
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 

@@ -22,7 +22,16 @@ func GetTreeMemory() memory.Manager {
 
 func newTreeMemory() *TreeMemoryManager {
 	return &TreeMemoryManager{
-		root: &meta.App{},
+		root: &meta.App{
+			Meta: meta.Metadata{
+				Annotations: map[string]string{},
+			},
+			Spec: meta.AppSpec{
+				Apps:         map[string]*meta.App{},
+				Channels:     map[string]*meta.Channel{},
+				ChannelTypes: map[string]*meta.ChannelType{},
+			},
+		},
 	}
 }
 

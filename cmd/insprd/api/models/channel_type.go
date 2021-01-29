@@ -4,7 +4,7 @@ import "gitlab.inspr.dev/inspr/core/pkg/meta"
 
 // ChannelTypeDI - Data Input format for requests that pass the channelType data
 type ChannelTypeDI struct {
-	ChannelType meta.ChannelType `json:"channel"`
+	ChannelType meta.ChannelType `json:"channeltype"`
 	Ctx         string           `json:"ctx"`
 	Valid       bool             `json:"valid"`
 }
