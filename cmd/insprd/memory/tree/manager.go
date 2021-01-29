@@ -5,8 +5,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-// TreeMemoryManager defines a memory manager interface
-type TreeMemoryManager struct {
+// MemoryManager defines a memory manager interface
+type MemoryManager struct {
 	root *meta.App
 }
 
@@ -20,8 +20,8 @@ func GetTreeMemory() memory.Manager {
 	return tree
 }
 
-func newTreeMemory() *TreeMemoryManager {
-	return &TreeMemoryManager{
+func newTreeMemory() *MemoryManager {
+	return &MemoryManager{
 		root: &meta.App{
 			Meta: meta.Metadata{
 				Annotations: map[string]string{},

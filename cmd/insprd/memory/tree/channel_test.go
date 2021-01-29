@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"crypto/sha256"
 	"reflect"
 	"testing"
 
@@ -9,7 +10,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-func TestTreeMemoryManager_Channels(t *testing.T) {
+func TestMemoryManager_Channels(t *testing.T) {
 	type fields struct {
 		root *meta.App
 	}
@@ -30,11 +31,11 @@ func TestTreeMemoryManager_Channels(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmm := &TreeMemoryManager{
+			tmm := &MemoryManager{
 				root: tt.fields.root,
 			}
 			if got := tmm.Channels(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TreeMemoryManager.Channels() = %v, want %v", got, tt.want)
+				t.Errorf("MemoryManager.Channels() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -114,7 +115,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -169,7 +170,9 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 						Name:   "channel3",
 						Parent: "",
 					},
-					Spec: meta.ChannelSpec{},
+					Spec: meta.ChannelSpec{
+						Type: "channelType1",
+					},
 				},
 			},
 			wantErr: false,
@@ -178,7 +181,9 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 					Name:   "channel3",
 					Parent: "",
 				},
-				Spec: meta.ChannelSpec{},
+				Spec: meta.ChannelSpec{
+					Type: "channelType1",
+				},
 			},
 		},
 		{
@@ -228,7 +233,7 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -321,7 +326,7 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -379,7 +384,9 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 						},
 						Parent: "",
 					},
-					Spec: meta.ChannelSpec{},
+					Spec: meta.ChannelSpec{
+						Type: "channelType1",
+					},
 				},
 			},
 			wantErr: false,
@@ -391,7 +398,9 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 					},
 					Parent: "",
 				},
-				Spec: meta.ChannelSpec{},
+				Spec: meta.ChannelSpec{
+					Type: "channelType1",
+				},
 			},
 		},
 		{
@@ -447,7 +456,7 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -500,7 +509,14 @@ func getMockChannels() *meta.App {
 					Spec: meta.ChannelSpec{},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{},
+			ChannelTypes: map[string]*meta.ChannelType{
+				"channelType1": {
+					Meta: meta.Metadata{
+						Name: "channelType1",
+					},
+					Schema: sha256.New().Sum([]byte("hello")),
+				},
+			},
 			Boundary: meta.AppBoundary{
 				Input:  []string{},
 				Output: []string{},

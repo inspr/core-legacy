@@ -15,7 +15,7 @@ type ChannelMemoryManager struct {
 }
 
 // Channels return a pointer to ChannelMemoryManager
-func (tmm *TreeMemoryManager) Channels() memory.ChannelMemory {
+func (tmm *MemoryManager) Channels() memory.ChannelMemory {
 	return &ChannelMemoryManager{
 		root: tmm.root,
 	}

@@ -9,7 +9,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-func TestTreeMemoryManager_ChannelTypes(t *testing.T) {
+func TestMemoryManager_ChannelTypes(t *testing.T) {
 	type fields struct {
 		root *meta.App
 	}
@@ -30,11 +30,11 @@ func TestTreeMemoryManager_ChannelTypes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmm := &TreeMemoryManager{
+			tmm := &MemoryManager{
 				root: tt.fields.root,
 			}
 			if got := tmm.ChannelTypes(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TreeMemoryManager.ChannelTypes() = %v, want %v", got, tt.want)
+				t.Errorf("MemoryManager.ChannelTypes() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -119,7 +119,7 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -255,7 +255,7 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -348,7 +348,7 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -474,7 +474,7 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,

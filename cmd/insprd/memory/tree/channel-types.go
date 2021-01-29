@@ -15,9 +15,9 @@ type ChannelTypeMemoryManager struct {
 }
 
 /*
-ChannelTypes is a TreeMemoryManager method that provides an access point for ChannelTypes
+ChannelTypes is a MemoryManager method that provides an access point for ChannelTypes
 */
-func (tmm *TreeMemoryManager) ChannelTypes() memory.ChannelTypeMemory {
+func (tmm *MemoryManager) ChannelTypes() memory.ChannelTypeMemory {
 	return &ChannelTypeMemoryManager{
 		root: tmm.root,
 	}

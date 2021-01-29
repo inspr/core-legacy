@@ -224,7 +224,7 @@ func getMockApp() *meta.App {
 	return &root
 }
 
-func TestTreeMemoryManager_Apps(t *testing.T) {
+func TestMemoryManager_Apps(t *testing.T) {
 	type fields struct {
 		root *meta.App
 	}
@@ -245,11 +245,11 @@ func TestTreeMemoryManager_Apps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmm := &TreeMemoryManager{
+			tmm := &MemoryManager{
 				root: tt.fields.root,
 			}
 			if got := tmm.Apps(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TreeMemoryManager.Apps() = %v, want %v", got, tt.want)
+				t.Errorf("MemoryManager.Apps() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -336,7 +336,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -854,7 +854,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -973,7 +973,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -1330,7 +1330,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -1723,7 +1723,7 @@ func Test_getParentApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -2183,7 +2183,7 @@ func Test_validUpdateChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -2503,7 +2503,7 @@ func Test_checkForChildStructureChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&TreeMockManager{
+			setTree(&MockManager{
 				root:   tt.fields.root,
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,

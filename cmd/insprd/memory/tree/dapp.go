@@ -15,8 +15,8 @@ type AppMemoryManager struct {
 	root *meta.App
 }
 
-// Apps is a TreeMemoryManager method that provides an access point for Apps
-func (tmm *TreeMemoryManager) Apps() memory.AppMemory {
+// Apps is a MemoryManager method that provides an access point for Apps
+func (tmm *MemoryManager) Apps() memory.AppMemory {
 	return &AppMemoryManager{
 		root: tmm.root,
 	}
