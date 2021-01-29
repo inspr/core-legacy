@@ -34,7 +34,7 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			return
 		}
 
-		err = ch.CreateChannel(&data.Channel, data.Ctx)
+		err = ch.CreateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -80,7 +80,7 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			return
 		}
 
-		err = ch.UpdateChannel(&data.Channel, data.Ctx)
+		err = ch.UpdateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return

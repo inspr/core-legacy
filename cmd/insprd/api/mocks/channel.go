@@ -18,7 +18,7 @@ func (chs *Channels) GetChannel(context string, chName string) (*meta.Channel, e
 }
 
 // CreateChannel - simple mock
-func (chs *Channels) CreateChannel(ch *meta.Channel, context string) error {
+func (chs *Channels) CreateChannel(context string, ch *meta.Channel) error {
 	if chs.fail != nil {
 		return chs.fail
 	}
@@ -34,7 +34,7 @@ func (chs *Channels) DeleteChannel(context string, chName string) error {
 }
 
 // UpdateChannel - simple mock
-func (chs *Channels) UpdateChannel(ch *meta.Channel, context string) error {
+func (chs *Channels) UpdateChannel(context string, ch *meta.Channel) error {
 	if chs.fail != nil {
 		return chs.fail
 	}
