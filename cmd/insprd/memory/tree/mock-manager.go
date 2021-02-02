@@ -50,3 +50,9 @@ func (tmm *MockManager) Apps() memory.AppMemory {
 		root: tmm.root,
 	}
 }
+
+func (tmm *MockManager) InitTransaction() error {
+	return nil
+}
+
+func (tmm MockManager) Commit() {}

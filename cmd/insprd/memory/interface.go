@@ -41,4 +41,6 @@ type Manager interface {
 	Channels() ChannelMemory
 	Apps() AppMemory
 	ChannelTypes() ChannelTypeMemory
+	InitTransaction() error
+	Commit()
 }

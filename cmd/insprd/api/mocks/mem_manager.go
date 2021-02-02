@@ -41,3 +41,9 @@ func (mm *MemManager) Channels() memory.ChannelMemory {
 func (mm *MemManager) ChannelTypes() memory.ChannelTypeMemory {
 	return &mm.channelType
 }
+
+func (tmm *MemManager) InitTransaction() error {
+	return nil
+}
+
+func (tmm MemManager) Commit() {}
