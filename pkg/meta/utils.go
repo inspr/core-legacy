@@ -8,7 +8,7 @@ import (
 
 // StructureNameIsValid checks if the given name is valid for naming Channels, CTypes and dApps
 func StructureNameIsValid(name string) (bool, error) {
-	if len(name) > 64 {
+	if len(name) >= 64 {
 		return false, ierrors.NewError().BadRequest().Message("name is too long").Build()
 	}
 	qnameCharFmt := "[A-Za-z0-9]"
