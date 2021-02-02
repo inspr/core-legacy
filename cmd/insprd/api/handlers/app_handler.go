@@ -41,7 +41,7 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		if data.DryRun {
+		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
 		}
 		w.WriteHeader(http.StatusOK)
@@ -88,7 +88,7 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 		} else {
-			if data.DryRun {
+			if !data.DryRun {
 				tree.GetTreeMemory().Commit()
 			}
 			w.WriteHeader(http.StatusOK)
@@ -115,7 +115,7 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		if data.DryRun {
+		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
 		}
 		w.WriteHeader(http.StatusOK)

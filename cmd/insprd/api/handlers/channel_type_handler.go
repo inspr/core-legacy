@@ -43,7 +43,7 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		if data.DryRun {
+		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
 		}
 		w.WriteHeader(http.StatusOK)
@@ -93,7 +93,7 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		if data.DryRun {
+		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
 		}
 		w.WriteHeader(http.StatusOK)
@@ -120,7 +120,7 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		if data.DryRun {
+		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
 		}
 		w.WriteHeader(http.StatusOK)
