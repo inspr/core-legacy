@@ -7,7 +7,7 @@ type ChannelTypeDI struct {
 	ChannelType meta.ChannelType `json:"channeltype"`
 	Ctx         string           `json:"ctx"`
 	Valid       bool             `json:"valid"`
-	Dry         bool             `json:"dry"`
+	DryRun      bool             `json:"dry"`
 }
 
 // ChannelTypeQueryDI - Data Input format for queries requests
@@ -15,5 +15,5 @@ type ChannelTypeQueryDI struct {
 	Ctx    string `json:"ctx"`
 	CtName string `json:"ctname"`
 	Valid  bool   `json:"valid"`
-	Dry    bool   `json:"dry"`
+	DryRun bool   `json:"dry"`
 }
