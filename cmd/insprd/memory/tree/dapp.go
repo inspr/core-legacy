@@ -55,8 +55,9 @@ func (amm *AppMemoryManager) GetApp(query string) (*meta.App, error) {
 // If the dApp's information is invalid, returns an error. The same goes for an invalid context.
 // In case of context being an empty string, the dApp is created inside the root dApp.
 func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
-	if strings.Contains(app.Meta.Name, ".") {
-		ierrors.NewError().InvalidName().Message("invalid character '.' in dApp's name").Build()
+	nameErr := meta.StructureNameIsValid(app.Meta.Name)
+	if nameErr != nil {
+		ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
 	parentApp, err := amm.GetApp(context)

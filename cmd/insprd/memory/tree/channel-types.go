@@ -29,6 +29,10 @@ ct: ChannetType to be created.
 context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) CreateChannelType(ct *meta.ChannelType, context string) error {
+	nameErr := meta.StructureNameIsValid(ct.Meta.Name)
+	if nameErr != nil {
+		ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
+	}
 
 	_, err := ctm.GetChannelType(context, ct.Meta.Name)
 	if err == nil {
