@@ -67,7 +67,7 @@ func appDICases(funcName string) []appAPITest {
 // For example, HandleGetAppByRef and HandleDeleteApp use these test cases
 func appQueryDICases(funcName string) []appAPITest {
 	parsedAppQueryDI, _ := json.Marshal(models.AppQueryDI{
-		Query: "",
+		Ctx:   "",
 		Valid: true,
 	})
 	wrongFormatData, _ := json.Marshal(struct{}{})

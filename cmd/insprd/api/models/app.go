@@ -14,7 +14,7 @@ type AppDI struct {
 
 // AppQueryDI - Data Input format for queries requests
 type AppQueryDI struct {
-	Query  string `json:"query"`
+	Ctx    string `json:"ctx"`
 	Valid  bool   `json:"valid"`
 	DryRun bool   `json:"dry"`
 }
