@@ -6,6 +6,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
@@ -34,11 +35,14 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
+		tree.GetTreeMemory().InitTransaction()
 		err = ah.CreateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
+		}
+		if data.DryRun {
+			tree.GetTreeMemory().Commit()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -57,7 +61,7 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		app, err := ah.GetApp(data.Query)
+		app, err := ah.GetApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -79,11 +83,14 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
+		tree.GetTreeMemory().InitTransaction()
 		err = ah.UpdateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 		} else {
+			if data.DryRun {
+				tree.GetTreeMemory().Commit()
+			}
 			w.WriteHeader(http.StatusOK)
 		}
 	}
@@ -102,11 +109,14 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
-		err = ah.DeleteApp(data.Query)
+		tree.GetTreeMemory().InitTransaction()
+		err = ah.DeleteApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
+		}
+		if data.DryRun {
+			tree.GetTreeMemory().Commit()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
