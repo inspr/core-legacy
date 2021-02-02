@@ -77,7 +77,7 @@ func TestStructureNameIsValid(t *testing.T) {
 		{
 			name: "Invalid app name with '/'",
 			args: args{
-				name: "ONE1-two/2-TREE3",
+				name: "ONE1-two2-TREE3/",
 			},
 			wantErr: true,
 		},

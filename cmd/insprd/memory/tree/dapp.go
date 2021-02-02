@@ -57,7 +57,7 @@ func (amm *AppMemoryManager) GetApp(query string) (*meta.App, error) {
 func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 	nameErr := meta.StructureNameIsValid(app.Meta.Name)
 	if nameErr != nil {
-		ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
+		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
 	parentApp, err := amm.GetApp(context)
