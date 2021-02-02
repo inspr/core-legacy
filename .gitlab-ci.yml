@@ -14,7 +14,7 @@ unit-tests:
   script:
     - go test -v -coverprofile=profile.cov -coverpkg=./... ./...
     - go tool cover -func profile.cov
-  coverage: /^coverage:\s(\d+\.\d+%)\sof\sstatements\sin\s\.\/\.\.\.$/
+  coverage: /^"total:\s+\(statements\)\s+(\d+\.\d+\%)"$/
 
 lint:
   stage: test
