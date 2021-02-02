@@ -851,6 +851,41 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Invalid name - doesn't create app",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				context:     "",
+				searchQuery: "appCr1",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app%Cr1",
+						Reference:   "appCr1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node:         meta.Node{},
+						Apps:         map[string]*meta.App{},
+						Channels:     map[string]*meta.Channel{},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
