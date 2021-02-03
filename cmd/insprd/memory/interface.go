@@ -43,5 +43,5 @@ type Manager interface {
 	Channels() ChannelMemory
 	ChannelTypes() ChannelTypeMemory
 	Commit()
-	InitTransaction() error
+	InitTransaction()
 }
