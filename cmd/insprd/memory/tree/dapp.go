@@ -79,6 +79,14 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 			}
 		}
 
+		for _, chName := range app.Spec.Boundary.Input {
+			parentApp.Spec.Channels[chName].ConnectedApps[app.Meta.Name] = app
+		}
+
+		for _, chName := range app.Spec.Boundary.Output {
+			parentApp.Spec.Channels[chName].ConnectedApps[app.Meta.Name] = app
+		}
+
 		return nil
 	}
 
@@ -103,6 +111,14 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 	parent, errParent := getParentApp(query)
 	if errParent != nil {
 		return errParent
+	}
+
+	for _, chName := range app.Spec.Boundary.Input {
+		delete(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
+	}
+
+	for _, chName := range app.Spec.Boundary.Output {
+		delete(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
 	}
 
 	delete(parent.Spec.Apps, app.Meta.Name)
@@ -142,11 +158,12 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 // Auxiliar unexported functions
 func validAppStructure(app, parentApp meta.App) string {
 	errDescription := ""
-	var validName, validSubstructure, parentWithoutNode bool
+	var validName, validSubstructure, parentWithoutNode, validChannels bool
 	_, inParentRef := parentApp.Spec.Apps[app.Meta.Name]
 	validName = (app.Meta.Name != "") && !inParentRef
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
+	validChannels = checkChannels(app.Spec.Channels, app.Spec.ChannelTypes)
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
 	if boundariesExist {
 		errDescription = errDescription + validBoundaries(app.Spec.Boundary, parentApp.Spec.Channels)
@@ -161,8 +178,22 @@ func validAppStructure(app, parentApp meta.App) string {
 	if !parentWithoutNode {
 		errDescription = errDescription + "parent has Node;"
 	}
+	if !validChannels {
+		errDescription = errDescription + "invalid channel: using non-existent channel type;"
+	}
 
 	return errDescription
+}
+
+func checkChannels(channels map[string]*meta.Channel, chTypes map[string]*meta.ChannelType) bool {
+	for _, channel := range channels {
+		if channel.Spec.Type != "" {
+			if _, ok := chTypes[channel.Spec.Type]; !ok {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func nodeIsEmpty(node meta.Node) bool {

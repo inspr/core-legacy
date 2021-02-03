@@ -1,6 +1,8 @@
 package tree
 
 import (
+	"reflect"
+
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -63,6 +65,8 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
 	}
 
+	parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels[ch.Meta.Name] = ch
+
 	if parentApp.Spec.Channels == nil {
 		parentApp.Spec.Channels = map[string]*meta.Channel{}
 	}
@@ -78,10 +82,17 @@ has a pointer to a channel that has the same name as the name passed
 as an argument, that pointer is removed from the list of App channels
 */
 func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) error {
-	_, err := chh.GetChannel(context, chName)
+	channel, err := chh.GetChannel(context, chName)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
 		return newError
+	}
+
+	if len(channel.ConnectedApps) > 0 {
+		return ierrors.NewError().
+			BadRequest().
+			Message("channel cannot be deleted as it is being used by other apps").
+			Build()
 	}
 
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)
@@ -98,10 +109,17 @@ a channel pointer that has the same name as that passed as an argument,
 this pointer will be replaced by the new one
 */
 func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel) error {
-	_, err := chh.GetChannel(context, ch.Meta.Name)
+	oldCh, err := chh.GetChannel(context, ch.Meta.Name)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
 		return newError
+	}
+
+	if ok := reflect.DeepEqual(oldCh.ConnectedApps, ch.ConnectedApps); !ok {
+		return ierrors.NewError().
+			InvalidChannel().
+			Message("new channel must have the same connectedApps as old channel").
+			Build()
 	}
 
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)

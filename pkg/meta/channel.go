@@ -4,7 +4,7 @@ package meta
 type Channel struct {
 	Meta          Metadata        `yaml:"meta"  json:"meta" diff:"channelmeta"`
 	Spec          ChannelSpec     `yaml:"spec"  json:"spec" diff:"channelspec"`
-	ConnectedApps map[string]*App `yaml:"connectedapps"  json:"connectedapps" diff:"chconnectedapps"`
+	ConnectedApps map[string]*App `yaml:"connectedapps"  json:"connectedapps" diff:"connectedapps"`
 }
 
 // ChannelSpec is the specification of a channel.

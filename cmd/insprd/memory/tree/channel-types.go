@@ -1,6 +1,8 @@
 package tree
 
 import (
+	"reflect"
+
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -84,6 +86,13 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 			Message("target app doesn't contain a '" + context + "' ChannelType").Build()
 	}
 
+	if len(curCt.ConnectedChannels) > 0 {
+		return ierrors.NewError().
+			BadRequest().
+			Message("channelType cannot be deleted as it is being used by other channels").
+			Build()
+	}
+
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
 	if err != nil {
 		return ierrors.NewError().InternalServer().InnerError(err).
@@ -107,10 +116,17 @@ context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) UpdateChannelType(ct *meta.ChannelType, context string) error {
 
-	_, err := ctm.GetChannelType(context, ct.Meta.Name)
+	oldChType, err := ctm.GetChannelType(context, ct.Meta.Name)
 	if err != nil {
 		return ierrors.NewError().BadRequest().
 			Message("target app doesn't contain a '" + context + "' ChannelType").Build()
+	}
+
+	if ok := reflect.DeepEqual(oldChType.ConnectedChannels, ct.ConnectedChannels); !ok {
+		return ierrors.NewError().
+			InvalidChannelType().
+			Message("new channelType must have the same connectedChannel as old channelType").
+			Build()
 	}
 
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
