@@ -38,9 +38,10 @@ type ChannelTypeMemory interface {
 // of the current state of the cluster. Permiting the
 // modification of Channels, DApps and ChannelTypes
 type Manager interface {
-	Channels() ChannelMemory
 	Apps() AppMemory
+	Cancel()
+	Channels() ChannelMemory
 	ChannelTypes() ChannelTypeMemory
-	InitTransaction() error
 	Commit()
+	InitTransaction() error
 }

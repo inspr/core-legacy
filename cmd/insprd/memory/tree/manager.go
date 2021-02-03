@@ -58,3 +58,9 @@ func (mm *MemoryManager) Commit() {
 	mm.root = mm.curr
 	mm.curr = nil
 }
+
+//Cancel discarts changes made in the last transaction
+func (mm *MemoryManager) Cancel() {
+	defer mm.Unlock()
+	mm.curr = nil
+}
