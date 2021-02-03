@@ -19,7 +19,7 @@ ChannelTypes is a MemoryManager method that provides an access point for Channel
 */
 func (tmm *MemoryManager) ChannelTypes() memory.ChannelTypeMemory {
 	return &ChannelTypeMemoryManager{
-		root: tmm.root,
+		root: tmm.curr,
 	}
 }
 
