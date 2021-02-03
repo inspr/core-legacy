@@ -43,6 +43,8 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 		}
 		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
+		} else {
+			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -90,6 +92,8 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 		} else {
 			if !data.DryRun {
 				tree.GetTreeMemory().Commit()
+			} else {
+				tree.GetTreeMemory().Cancel()
 			}
 			w.WriteHeader(http.StatusOK)
 		}
@@ -117,6 +121,8 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 		}
 		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
+		} else {
+			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}

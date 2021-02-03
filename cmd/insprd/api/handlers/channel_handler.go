@@ -42,6 +42,8 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 		}
 		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
+		} else {
+			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -91,6 +93,8 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 		}
 		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
+		} else {
+			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -117,6 +121,8 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 		}
 		if !data.DryRun {
 			tree.GetTreeMemory().Commit()
+		} else {
+			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
