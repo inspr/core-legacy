@@ -1,10 +1,9 @@
 package tree
 
 import (
-	"encoding/json"
-
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 // MemoryManager defines a memory manager interface
@@ -43,15 +42,9 @@ func setTree(tmm memory.Manager) {
 }
 
 func (mm *MemoryManager) InitTransaction() error {
-	rootObj, err := json.Marshal(*mm.root)
-	if err != nil {
-		return err
-	}
-
-	temp := meta.App{}
-	json.Unmarshal(rootObj, &temp)
-	mm.curr = &temp
-	return nil
+	var err error
+	mm.curr, err = utils.DCopy(mm.root)
+	return err
 }
 
 func (mm *MemoryManager) Commit() {
