@@ -29,13 +29,9 @@ func TestDCopy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := DCopy(tt.args.root)
+			got := DCopy(tt.args.root)
 			jsgot, _ := json.MarshalIndent(*got, "", "	")
 			jswant, _ := json.MarshalIndent(*tt.want, "", "	")
-			if (err != nil) != tt.wantErr {
-				t.Errorf("DCopy() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DCopy() = %v, want %v", string(jsgot), string(jswant))
 			}

@@ -18,7 +18,7 @@ type AppMemoryManager struct {
 // Apps is a MemoryManager method that provides an access point for Apps
 func (tmm *MemoryManager) Apps() memory.AppMemory {
 	return &AppMemoryManager{
-		root: tmm.curr,
+		root: tmm.root,
 	}
 }
 

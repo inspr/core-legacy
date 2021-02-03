@@ -11,7 +11,7 @@ import (
 // MemoryManager defines a memory manager interface
 type MemoryManager struct {
 	root *meta.App
-	curr *meta.App
+	tree *meta.App
 	sync.Mutex
 }
 
@@ -27,7 +27,7 @@ func GetTreeMemory() memory.Manager {
 
 func newTreeMemory() *MemoryManager {
 	return &MemoryManager{
-		root: &meta.App{
+		tree: &meta.App{
 			Meta: meta.Metadata{
 				Annotations: map[string]string{},
 			},
@@ -48,19 +48,19 @@ func setTree(tmm memory.Manager) {
 func (mm *MemoryManager) InitTransaction() error {
 	var err error
 	mm.Lock()
-	mm.curr, err = utils.DCopy(mm.root)
+	mm.root = utils.DCopy(mm.tree)
 	return err
 }
 
 //Commit applies changes from a transaction in to the tree structure
 func (mm *MemoryManager) Commit() {
 	defer mm.Unlock()
-	mm.root = mm.curr
-	mm.curr = nil
+	mm.tree = mm.root
+	mm.root = nil
 }
 
 //Cancel discarts changes made in the last transaction
 func (mm *MemoryManager) Cancel() {
 	defer mm.Unlock()
-	mm.curr = nil
+	mm.root = nil
 }

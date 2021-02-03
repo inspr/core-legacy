@@ -6,14 +6,10 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-func DCopy(root *meta.App) (*meta.App, error) {
-	rootObj, err := json.Marshal(*root)
+func DCopy(root *meta.App) *meta.App {
+	rootObj, _ := json.Marshal(*root)
 	temp := meta.App{}
 
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(rootObj, &temp)
-	return &temp, err
+	_ = json.Unmarshal(rootObj, &temp)
+	return &temp
 }
