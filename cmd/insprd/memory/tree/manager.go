@@ -1,6 +1,8 @@
 package tree
 
 import (
+	"sync"
+
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
@@ -10,6 +12,7 @@ import (
 type MemoryManager struct {
 	root *meta.App
 	curr *meta.App
+	sync.Mutex
 }
 
 var dapptree memory.Manager
@@ -43,11 +46,13 @@ func setTree(tmm memory.Manager) {
 
 func (mm *MemoryManager) InitTransaction() error {
 	var err error
+	mm.Lock()
 	mm.curr, err = utils.DCopy(mm.root)
 	return err
 }
 
 func (mm *MemoryManager) Commit() {
+	defer mm.Unlock()
 	mm.root = mm.curr
 	mm.curr = nil
 }
