@@ -36,15 +36,15 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			return
 		}
 		tree.GetTreeMemory().InitTransaction()
+		if !data.DryRun {
+			defer tree.GetTreeMemory().Commit()
+		} else {
+			defer tree.GetTreeMemory().Cancel()
+		}
 		err = ah.CreateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
-		}
-		if !data.DryRun {
-			tree.GetTreeMemory().Commit()
-		} else {
-			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -86,15 +86,15 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 			return
 		}
 		tree.GetTreeMemory().InitTransaction()
+		if !data.DryRun {
+			defer tree.GetTreeMemory().Commit()
+		} else {
+			defer tree.GetTreeMemory().Cancel()
+		}
 		err = ah.UpdateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 		} else {
-			if !data.DryRun {
-				tree.GetTreeMemory().Commit()
-			} else {
-				tree.GetTreeMemory().Cancel()
-			}
 			w.WriteHeader(http.StatusOK)
 		}
 	}
@@ -114,15 +114,15 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			return
 		}
 		tree.GetTreeMemory().InitTransaction()
+		if !data.DryRun {
+			defer tree.GetTreeMemory().Commit()
+		} else {
+			defer tree.GetTreeMemory().Cancel()
+		}
 		err = ah.DeleteApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
-		}
-		if !data.DryRun {
-			tree.GetTreeMemory().Commit()
-		} else {
-			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}

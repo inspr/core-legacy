@@ -35,15 +35,15 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			return
 		}
 		tree.GetTreeMemory().InitTransaction()
+		if !data.DryRun {
+			defer tree.GetTreeMemory().Commit()
+		} else {
+			defer tree.GetTreeMemory().Cancel()
+		}
 		err = ch.CreateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
-		}
-		if !data.DryRun {
-			tree.GetTreeMemory().Commit()
-		} else {
-			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -86,15 +86,15 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			return
 		}
 		tree.GetTreeMemory().InitTransaction()
+		if !data.DryRun {
+			defer tree.GetTreeMemory().Commit()
+		} else {
+			defer tree.GetTreeMemory().Cancel()
+		}
 		err = ch.UpdateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
-		}
-		if !data.DryRun {
-			tree.GetTreeMemory().Commit()
-		} else {
-			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -114,15 +114,15 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 			return
 		}
 		tree.GetTreeMemory().InitTransaction()
+		if !data.DryRun {
+			defer tree.GetTreeMemory().Commit()
+		} else {
+			defer tree.GetTreeMemory().Cancel()
+		}
 		err = ch.DeleteChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
-		}
-		if !data.DryRun {
-			tree.GetTreeMemory().Commit()
-		} else {
-			tree.GetTreeMemory().Cancel()
 		}
 		w.WriteHeader(http.StatusOK)
 	}
