@@ -35,9 +35,10 @@ type appAPITest struct {
 // For example, HandleCreateApp and HandleUpdateApp use these test cases
 func appDICases(funcName string) []appAPITest {
 	parsedAppDI, _ := json.Marshal(models.AppDI{
-		App:   meta.App{},
-		Ctx:   "",
-		Valid: true,
+		App:    meta.App{},
+		Ctx:    "",
+		Valid:  true,
+		DryRun: false,
 	})
 	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []appAPITest{
@@ -67,8 +68,9 @@ func appDICases(funcName string) []appAPITest {
 // For example, HandleGetAppByRef and HandleDeleteApp use these test cases
 func appQueryDICases(funcName string) []appAPITest {
 	parsedAppQueryDI, _ := json.Marshal(models.AppQueryDI{
-		Ctx:   "",
-		Valid: true,
+		Ctx:    "",
+		Valid:  true,
+		DryRun: false,
 	})
 	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []appAPITest{
