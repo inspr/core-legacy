@@ -41,3 +41,12 @@ func (mm *MemManager) Channels() memory.ChannelMemory {
 func (mm *MemManager) ChannelTypes() memory.ChannelTypeMemory {
 	return &mm.channelType
 }
+
+//InitTransaction mock interface structure
+func (mm *MemManager) InitTransaction() {}
+
+//Commit mock interface structure
+func (mm *MemManager) Commit() {}
+
+//Cancel mock interface structure
+func (mm *MemManager) Cancel() {}

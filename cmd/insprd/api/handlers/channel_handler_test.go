@@ -30,6 +30,7 @@ func channelDICases(funcName string) []channelAPITest {
 		Channel: meta.Channel{},
 		Ctx:     "",
 		Valid:   true,
+		DryRun:  false,
 	})
 	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []channelAPITest{
@@ -62,6 +63,7 @@ func channelQueryDICases(funcName string) []channelAPITest {
 		Ctx:    "",
 		ChName: "",
 		Valid:  true,
+		DryRun: false,
 	})
 	wrongFormatData, _ := json.Marshal(struct{}{})
 	return []channelAPITest{
