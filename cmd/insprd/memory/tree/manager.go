@@ -44,6 +44,7 @@ func setTree(tmm memory.Manager) {
 	dapptree = tmm
 }
 
+//InitTransaction copies and reserves the current tree structure so that changes can be reversed
 func (mm *MemoryManager) InitTransaction() error {
 	var err error
 	mm.Lock()
@@ -51,6 +52,7 @@ func (mm *MemoryManager) InitTransaction() error {
 	return err
 }
 
+//Commit applies changes from a transaction in to the tree structure
 func (mm *MemoryManager) Commit() {
 	defer mm.Unlock()
 	mm.root = mm.curr

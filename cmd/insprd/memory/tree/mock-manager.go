@@ -51,8 +51,10 @@ func (tmm *MockManager) Apps() memory.AppMemory {
 	}
 }
 
+//InitTransaction mock interface structure
 func (tmm *MockManager) InitTransaction() error {
 	return nil
 }
 
+//Commit mock interface structure
 func (tmm MockManager) Commit() {}
