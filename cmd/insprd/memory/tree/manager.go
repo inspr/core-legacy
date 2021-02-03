@@ -45,11 +45,9 @@ func setTree(tmm memory.Manager) {
 }
 
 //InitTransaction copies and reserves the current tree structure so that changes can be reversed
-func (mm *MemoryManager) InitTransaction() error {
-	var err error
+func (mm *MemoryManager) InitTransaction() {
 	mm.Lock()
 	mm.root = utils.DCopy(mm.tree)
-	return err
 }
 
 //Commit applies changes from a transaction in to the tree structure
