@@ -1,4 +1,4 @@
-package sidecar
+package models
 
 // Message represents a Inspr message
 type Message struct {
