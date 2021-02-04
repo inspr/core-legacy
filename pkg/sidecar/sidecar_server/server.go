@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
 
@@ -56,7 +57,7 @@ func (s *Server) Run(ctx context.Context) {
 	// 		return err
 	// 	}
 	// }
-	listenerAddr := os.Getenv("UNIX_SOCKET_ADDR_ENV")
+	listenerAddr := environment.GetEnvironment().UnixSocketAddr
 
 	// todo: replace this with a interface that returns a listener
 	listener, err := net.Listen("unix", listenerAddr)

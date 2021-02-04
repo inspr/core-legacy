@@ -8,23 +8,26 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/transports"
 )
 
-// Client struct that implements the methods of the AppClient interface
+// Client is the struct which implements the methods of AppClient interface
 type Client struct {
 	addr  string
 	httpc http.Client
 }
 
+// clientMessage is the struct that represents the client's request format
 type clientMessage struct {
 	Message models.Message `json:"message"`
 	Channel string         `json:"channel"`
 }
 
+// requestReturn is the struct that represents the sidecar server's response
 type requestReturn struct {
 	Error   error          `json:"error"`
 	Message models.Message `json:"message"`
@@ -33,7 +36,7 @@ type requestReturn struct {
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
 	// todo get env var
-	envAddr := "/"
+	envAddr := environment.GetEnvironment().UnixSocketAddr
 	return &Client{
 		addr:  envAddr,
 		httpc: transports.NewUnixSocketClient(envAddr),

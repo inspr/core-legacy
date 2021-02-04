@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 
+	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
@@ -26,7 +28,7 @@ func (s *Server) writeMessageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// todo use the environment method when is ready
-	existingChannels := []string{"environment.GetEnvironment().OutputChannels"}
+	existingChannels := strings.Split(environment.GetEnvironment().OutputChannels, ";")
 
 	// todo separate function
 	exists := false
@@ -64,7 +66,7 @@ func (s *Server) readMessageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// todo use the environment method when is ready
-	existingChannels := []string{"environment.GetEnvironment().InputChannels"}
+	existingChannels := strings.Split(environment.GetEnvironment().InputChannels, ";")
 
 	// todo make it not hideous
 	exists := false
@@ -105,7 +107,7 @@ func (s *Server) commitMessageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// todo use the environment method when is ready
-	existingChannels := []string{"environment.GetEnvironment().OutputChannels"}
+	existingChannels := strings.Split(environment.GetEnvironment().OutputChannels, ";")
 
 	// todo make it not hideous
 	exists := false
