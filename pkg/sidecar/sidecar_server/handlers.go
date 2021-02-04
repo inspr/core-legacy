@@ -86,7 +86,7 @@ func (s *Server) readMessageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// todo return in body the msg
-	s.Messages <- msg
+	rest.JSON(w, http.StatusOK, msg)
 }
 
 // handles the /commit route in the server

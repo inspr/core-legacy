@@ -1,10 +1,14 @@
 package sidecarserv
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
+	"os"
 	"sync"
+	"time"
 
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
@@ -14,22 +18,14 @@ import (
 type Server struct {
 	Mux *http.ServeMux
 	sync.Mutex
-	Messages   chan models.Message
-	listenAddr string
-	Reader     models.Reader
-	Writer     models.Writer
+	Reader models.Reader
+	Writer models.Writer
 }
 
 // Init - configures the server
-func (s *Server) Init(listenAddr string, r models.Reader, w models.Writer) {
+func (s *Server) Init(r models.Reader, w models.Writer) {
 	// server requests related
 	s.Mux = http.NewServeMux()
-
-	// listener and destination routes
-	s.listenAddr = listenAddr
-
-	// limits the amount of messages to 100
-	s.Messages = make(chan models.Message, 100)
 
 	// implementations of write and read for a specific sidecar
 	s.Reader = r
@@ -43,12 +39,15 @@ func (s *Server) InitRoutes() {
 	s.Mux.HandleFunc("/writeMessage", s.writeMessageHandler)
 
 	s.Mux.HandleFunc("/readMessage", s.readMessageHandler)
-	s.Mux.HandleFunc("/commmit", s.commitMessageHandler)
+	s.Mux.HandleFunc("/commit", s.commitMessageHandler)
 
 }
 
 // Run starts the server on the port given in addr
-func (s *Server) Run() {
+func (s *Server) Run(ctx context.Context) {
+	server := &http.Server{
+		Handler: s.Mux,
+	}
 	// todo: check if it can listen to the unix socket, os -> folder exists
 	// logrus.Infoln("running write")
 	// if _, err := os.Stat(WriteAddress); !os.IsNotExist(err) {
@@ -57,11 +56,42 @@ func (s *Server) Run() {
 	// 		return err
 	// 	}
 	// }
+	listenerAddr := os.Getenv("UNIX_SOCKET_ADDR_ENV")
 
-	fmt.Printf("SideCart listener is up...")
 	// todo: replace this with a interface that returns a listener
-	listen, _ := net.Listen("unix", s.listenAddr)
-	http.Serve(listen, s.Mux)
+	listener, err := net.Listen("unix", listenerAddr)
+	if err != nil {
+		log.Println("couldn't listen to address: " + listenerAddr)
+		return
+	}
 
-	// todo: log of chan error
+	go func() {
+		if err = server.Serve(listener); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen:%v", err)
+		}
+	}()
+
+	fmt.Printf("SideCar listener is up...")
+	<-ctx.Done()
+	log.Printf("Gracefully shutting down...")
+
+	ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
+	defer func() {
+		cancel()
+	}()
+
+	if err = server.Shutdown(ctxShutdown); err != nil {
+		log.Fatal("error shutting down server")
+	}
+
+	err = os.RemoveAll(listenerAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("server shutdown complete")
+	if err == http.ErrServerClosed {
+		err = nil
+	}
+	return
 }
