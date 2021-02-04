@@ -37,11 +37,12 @@ func (s *Server) Init(r models.Reader, w models.Writer) {
 
 // InitRoutes establishes the routes of the server
 func (s *Server) InitRoutes() {
-	s.Mux.HandleFunc("/writeMessage", s.writeMessageHandler)
+	handler := newCustomHandlers(s)
 
-	s.Mux.HandleFunc("/readMessage", s.readMessageHandler)
-	s.Mux.HandleFunc("/commit", s.commitMessageHandler)
+	s.Mux.HandleFunc("/writeMessage", handler.writeMessageHandler)
 
+	s.Mux.HandleFunc("/readMessage", handler.readMessageHandler)
+	s.Mux.HandleFunc("/commit", handler.commitMessageHandler)
 }
 
 // Run starts the server on the port given in addr
@@ -49,6 +50,7 @@ func (s *Server) Run(ctx context.Context) {
 	server := &http.Server{
 		Handler: s.Mux,
 	}
+
 	// todo: check if it can listen to the unix socket, os -> folder exists
 	// logrus.Infoln("running write")
 	// if _, err := os.Stat(WriteAddress); !os.IsNotExist(err) {
@@ -57,6 +59,7 @@ func (s *Server) Run(ctx context.Context) {
 	// 		return err
 	// 	}
 	// }
+
 	listenerAddr := environment.GetEnvironment().UnixSocketAddr
 
 	// todo: replace this with a interface that returns a listener

@@ -11,10 +11,22 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
 
+// customHandlers is a struct that contains the handlers
+//  to be used to server
+type customHandlers struct {
+	*Server
+}
+
+// newCustomHandlers returns a struct composed of the
+// Reader and Writer given in the parameters
+func newCustomHandlers(server *Server) *customHandlers {
+	return &customHandlers{server}
+}
+
 // handles the /message route in the server
-func (s *Server) writeMessageHandler(w http.ResponseWriter, r *http.Request) {
-	s.Lock()
-	defer s.Unlock()
+func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Request) {
+	ch.Lock()
+	defer ch.Unlock()
 
 	decoder := json.NewDecoder(r.Body)
 	body := models.RequestBody{}
@@ -41,16 +53,15 @@ func (s *Server) writeMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.Writer.WriteMessage(body.Channel, body.Message); err != nil {
+	if err := ch.Writer.WriteMessage(body.Channel, body.Message); err != nil {
 		rest.ERROR(w, http.StatusInternalServerError, err)
-		return
 	}
 }
 
 // handles the /message route in the server
-func (s *Server) readMessageHandler(w http.ResponseWriter, r *http.Request) {
-	s.Lock()
-	defer s.Unlock()
+func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Request) {
+	ch.Lock()
+	defer ch.Unlock()
 
 	decoder := json.NewDecoder(r.Body)
 	body := models.RequestBody{}
@@ -76,7 +87,7 @@ func (s *Server) readMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg, err := s.Reader.ReadMessage(body.Channel)
+	msg, err := ch.Reader.ReadMessage(body.Channel)
 	if err != nil {
 		rest.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -87,9 +98,9 @@ func (s *Server) readMessageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // handles the /commit route in the server
-func (s *Server) commitMessageHandler(w http.ResponseWriter, r *http.Request) {
-	s.Lock()
-	defer s.Unlock()
+func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Request) {
+	ch.Lock()
+	defer ch.Unlock()
 
 	decoder := json.NewDecoder(r.Body)
 	body := models.RequestBody{}
@@ -115,7 +126,7 @@ func (s *Server) commitMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.Reader.CommitMessage(body.Channel); err != nil {
+	if err := ch.Reader.CommitMessage(body.Channel); err != nil {
 		rest.ERROR(w, http.StatusInternalServerError, err)
 	}
 
