@@ -7,7 +7,4 @@ import (
 
 func main() {
 	api.Run()
-	// 	ctx := context.Context(context.Background())
-	// 	clientApp := dappclient.NewAppClient()
-	// 	clientApp.WriteMessage(ctx)
 }
