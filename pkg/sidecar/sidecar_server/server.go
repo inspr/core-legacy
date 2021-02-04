@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"sync"
 
-	"gitlab.inspr.dev/inspr/core/pkg/sidecars/models"
+	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
 
 // Server is a struct that contains the variables necessary

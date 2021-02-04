@@ -1,6 +1,8 @@
 package dappclient
 
-import "gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
+import (
+	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
+)
 
 // AppClient todo doc
 type AppClient interface {
