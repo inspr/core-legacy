@@ -7,3 +7,9 @@ type Message struct {
 	Data    interface{} `json:"data,omitempty"`
 	Error   error       `json:"error,omitempty"`
 }
+
+// RequestBody represents a an http request structure
+type RequestBody struct {
+	Message Message `json:"message"`
+	Channel string  `json:"channel"`
+}

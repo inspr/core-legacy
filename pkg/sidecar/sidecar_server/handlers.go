@@ -17,10 +17,7 @@ func (s *Server) writeMessageHandler(w http.ResponseWriter, r *http.Request) {
 	defer s.Unlock()
 
 	decoder := json.NewDecoder(r.Body)
-	body := struct {
-		msg     models.Message `json:"msg"`
-		channel string         `json:"channel"`
-	}{}
+	body := models.RequestBody{}
 
 	if err := decoder.Decode(&body); err != nil {
 		rest.ERROR(w, http.StatusBadRequest, err)
@@ -33,7 +30,7 @@ func (s *Server) writeMessageHandler(w http.ResponseWriter, r *http.Request) {
 	// todo separate function
 	exists := false
 	for _, envChan := range existingChannels {
-		if body.channel == envChan {
+		if body.Channel == envChan {
 			exists = true
 			break
 		}
@@ -44,7 +41,7 @@ func (s *Server) writeMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.Writer.WriteMessage(body.channel, body.msg); err != nil {
+	if err := s.Writer.WriteMessage(body.Channel, body.Message); err != nil {
 		rest.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -56,9 +53,7 @@ func (s *Server) readMessageHandler(w http.ResponseWriter, r *http.Request) {
 	defer s.Unlock()
 
 	decoder := json.NewDecoder(r.Body)
-	body := struct {
-		channel string `json:"channel"`
-	}{}
+	body := models.RequestBody{}
 
 	if err := decoder.Decode(&body); err != nil {
 		rest.ERROR(w, http.StatusBadRequest, err)
@@ -71,7 +66,7 @@ func (s *Server) readMessageHandler(w http.ResponseWriter, r *http.Request) {
 	// todo make it not hideous
 	exists := false
 	for _, envChan := range existingChannels {
-		if body.channel == envChan {
+		if body.Channel == envChan {
 			exists = true
 			break
 		}
@@ -81,7 +76,7 @@ func (s *Server) readMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg, err := s.Reader.ReadMessage(body.channel)
+	msg, err := s.Reader.ReadMessage(body.Channel)
 	if err != nil {
 		rest.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -97,9 +92,7 @@ func (s *Server) commitMessageHandler(w http.ResponseWriter, r *http.Request) {
 	defer s.Unlock()
 
 	decoder := json.NewDecoder(r.Body)
-	body := struct {
-		channel string `json:"channel"`
-	}{}
+	body := models.RequestBody{}
 
 	if err := decoder.Decode(&body); err != nil {
 		rest.ERROR(w, http.StatusBadRequest, err)
@@ -112,7 +105,7 @@ func (s *Server) commitMessageHandler(w http.ResponseWriter, r *http.Request) {
 	// todo make it not hideous
 	exists := false
 	for _, envChan := range existingChannels {
-		if body.channel == envChan {
+		if body.Channel == envChan {
 			exists = true
 			break
 		}
@@ -122,7 +115,7 @@ func (s *Server) commitMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.Reader.CommitMessage(body.channel); err != nil {
+	if err := s.Reader.CommitMessage(body.Channel); err != nil {
 		rest.ERROR(w, http.StatusInternalServerError, err)
 	}
 
