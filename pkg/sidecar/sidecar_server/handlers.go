@@ -36,19 +36,9 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// todo use the environment method when is ready
 	existingChannels := strings.Split(environment.GetEnvironment().OutputChannels, ";")
 
-	// todo separate function
-	exists := false
-	for _, envChan := range existingChannels {
-		if body.Channel == envChan {
-			exists = true
-			break
-		}
-	}
-
-	if !exists {
+	if !existsInSlice(body.Channel, existingChannels) {
 		rest.ERROR(w, http.StatusBadRequest, errors.New("channel doesn't exist"))
 		return
 	}
@@ -71,18 +61,9 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// todo use the environment method when is ready
 	existingChannels := strings.Split(environment.GetEnvironment().InputChannels, ";")
 
-	// todo make it not hideous
-	exists := false
-	for _, envChan := range existingChannels {
-		if body.Channel == envChan {
-			exists = true
-			break
-		}
-	}
-	if !exists {
+	if !existsInSlice(body.Channel, existingChannels) {
 		rest.ERROR(w, http.StatusBadRequest, errors.New("channel doesn't exist"))
 		return
 	}
@@ -110,18 +91,9 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// todo use the environment method when is ready
 	existingChannels := strings.Split(environment.GetEnvironment().OutputChannels, ";")
 
-	// todo make it not hideous
-	exists := false
-	for _, envChan := range existingChannels {
-		if body.Channel == envChan {
-			exists = true
-			break
-		}
-	}
-	if !exists {
+	if !existsInSlice(body.Channel, existingChannels) {
 		rest.ERROR(w, http.StatusBadRequest, errors.New("channel doesn't exist"))
 		return
 	}
@@ -130,4 +102,16 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		rest.ERROR(w, http.StatusInternalServerError, err)
 	}
 
+}
+
+// existsInSlice checks if a channel belongs to a slice of channel
+func existsInSlice(channel string, channelList []string) bool {
+	exists := false
+	for _, c := range channelList {
+		if channel == c {
+			exists = true
+			break
+		}
+	}
+	return exists
 }

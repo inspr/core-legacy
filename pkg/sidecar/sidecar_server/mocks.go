@@ -23,9 +23,19 @@ type mockWriter struct {
 
 func (mr *mockReader) ReadMessage(channel string) (models.Message, error) {
 	if mr.err != nil {
-		return models.Message{}, mr.err
+		return models.Message{
+			Commit:  true,
+			Channel: channel,
+			Data:    "mock_data",
+			Error:   mr.err,
+		}, mr.err
 	}
-	return models.Message{}, nil
+	return models.Message{
+		Commit:  true,
+		Channel: channel,
+		Data:    "mock_data",
+		Error:   nil,
+	}, nil
 }
 
 func (mr *mockReader) CommitMessage(channel string) error {

@@ -10,8 +10,13 @@ import (
 	"reflect"
 	"testing"
 
+	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
+
+func testCases() {
+
+}
 
 func Test_newCustomHandlers(t *testing.T) {
 	type args struct {
@@ -45,7 +50,28 @@ type sendInRequest struct{ body []byte }
 // it's contents is a simple { status int }
 type wantedResponse struct{ status int }
 
-func Test_customHandlers_writeMessageHandler(t *testing.T) {
+// args is a struct to setup the values to be sent and the ones
+// that are expected in the request
+type args struct {
+	send sendInRequest
+	want wantedResponse
+}
+
+// testCaseStruct stores the complete struct used in testing
+// containing all the structs defined in the testing file
+// sets the name of the test, it's handler and it's args
+type testCaseStruct struct {
+	name string
+	ch   *customHandlers
+	args args
+}
+
+// generateTestCases returns the tests cases values to be used in each
+// handle test, the reason for them to share tests cases is because of
+// the models.RequestBody that sets a standard struct to be sent in each
+// request made in the handler func.
+func generateTestCases() []testCaseStruct {
+	// default values used in the test cases
 	parsedBody, _ := json.Marshal(models.RequestBody{
 		Message: models.Message{},
 		Channel: "chan",
@@ -56,20 +82,7 @@ func Test_customHandlers_writeMessageHandler(t *testing.T) {
 	})
 	badBody := []byte{0}
 
-	customEnvValues := "chan;testing;banana"
-	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
-	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
-	os.Setenv("UNIX_SOCKET_ADDRESS", customEnvValues)
-
-	type args struct {
-		send sendInRequest
-		want wantedResponse
-	}
-	tests := []struct {
-		name string
-		ch   *customHandlers
-		args args
-	}{
+	return []testCaseStruct{
 		{
 			name: "successful_request",
 			ch:   newCustomHandlers(mockServer(nil)),
@@ -103,6 +116,15 @@ func Test_customHandlers_writeMessageHandler(t *testing.T) {
 			},
 		},
 	}
+}
+
+func Test_customHandlers_writeMessageHandler(t *testing.T) {
+	customEnvValues := "chan;testing;banana"
+	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
+	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
+	os.Setenv("UNIX_SOCKET_ADDRESS", customEnvValues)
+
+	tests := generateTestCases()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// tt.ch.writeMessageHandler(tt.args.w, tt.args.r)
@@ -128,83 +150,72 @@ func Test_customHandlers_writeMessageHandler(t *testing.T) {
 	os.Unsetenv("UNIX_SOCKET_ADDRESS")
 }
 
-// func Test_customHandlers_readMessageHandler(t *testing.T) {
-// 	type args struct {
-// 		send sendInRequest
-// 		want wantedResponse
-// 	}
-// 	tests := []struct {
-// 		name string
-// 		ch   *customHandlers
-// 		args args
-// 	}{
-// 		// TODO: Add test cases.
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			tt.ch.readMessageHandler(tt.args.w, tt.args.r)
-// 		})
-// 	}
-// }
-
-func Test_customHandlers_commitMessageHandler(t *testing.T) {
-	parsedBody, _ := json.Marshal(models.RequestBody{
-		Message: models.Message{},
-		Channel: "chan",
-	})
-	noChanBody, _ := json.Marshal(models.RequestBody{
-		Message: models.Message{},
-		Channel: "donExist",
-	})
-	badBody := []byte{0}
-
+func Test_customHandlers_readMessageHandler(t *testing.T) {
 	customEnvValues := "chan;testing;banana"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
 	os.Setenv("UNIX_SOCKET_ADDRESS", customEnvValues)
 
-	type args struct {
-		send sendInRequest
-		want wantedResponse
+	tests := generateTestCases()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			handlerFunc := http.HandlerFunc(tt.ch.readMessageHandler)
+			ts := httptest.NewServer(handlerFunc)
+			defer ts.Close()
+
+			client := ts.Client()
+			res, err := client.Post(ts.URL, "", bytes.NewBuffer(tt.args.send.body))
+			if err != nil {
+				t.Errorf("error making a POST in the httptest server")
+			}
+			defer res.Body.Close()
+
+			// identifies if it responded properly
+			if res.StatusCode != tt.args.want.status {
+				t.Errorf("readMessageHandler = %v, want %v", res, tt.args.want.status)
+			}
+
+			if res.StatusCode != http.StatusOK { // reading error
+				err := rest.UnmarshalERROR(res.Body)
+				if err == nil {
+					t.Errorf("readMessageHandler.Body error = %v, want 'nil'", err)
+				}
+			} else { //reading message
+
+				// reads response and checks for the default mock values
+				msg := models.Message{}
+				err := json.NewDecoder(res.Body).Decode(&msg)
+
+				// if it failed to parse body
+				if err != nil {
+					t.Log("Failed to parse the receive message")
+					t.Errorf("readMessageHandler.Body error = %v, want %v", err, nil)
+				}
+
+				// if it commit field isn't 'true'
+				if !msg.Commit {
+					t.Errorf("readMessageHandler.Body error, field 'commit' = %v, want 'true'", msg.Commit)
+				}
+
+				// if channel isn't 'chan'
+				if msg.Channel != "chan" {
+					t.Errorf("readMessageHandler.Body error, field 'channel' = %v, want 'chan'", msg.Commit)
+				}
+			}
+		})
 	}
-	tests := []struct {
-		name string
-		ch   *customHandlers
-		args args
-	}{
-		{
-			name: "successful_request",
-			ch:   newCustomHandlers(mockServer(nil)),
-			args: args{
-				send: sendInRequest{parsedBody},
-				want: wantedResponse{http.StatusOK},
-			},
-		},
-		{
-			name: "unsuccessful_request",
-			ch:   newCustomHandlers(mockServer(errors.New("error"))),
-			args: args{
-				send: sendInRequest{parsedBody},
-				want: wantedResponse{http.StatusInternalServerError},
-			},
-		},
-		{
-			name: "bad_request",
-			ch:   newCustomHandlers(mockServer(nil)),
-			args: args{
-				send: sendInRequest{badBody},
-				want: wantedResponse{http.StatusBadRequest},
-			},
-		},
-		{
-			name: "no_channel_request",
-			ch:   newCustomHandlers(mockServer(nil)),
-			args: args{
-				send: sendInRequest{noChanBody},
-				want: wantedResponse{http.StatusBadRequest},
-			},
-		},
-	}
+	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
+	os.Unsetenv("INSPR_INPUT_CHANNELS")
+	os.Unsetenv("UNIX_SOCKET_ADDRESS")
+}
+
+func Test_customHandlers_commitMessageHandler(t *testing.T) {
+	customEnvValues := "chan;testing;banana"
+	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
+	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
+	os.Setenv("UNIX_SOCKET_ADDRESS", customEnvValues)
+
+	tests := generateTestCases()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			handlerFunc := http.HandlerFunc(tt.ch.commitMessageHandler)
