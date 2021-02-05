@@ -192,13 +192,13 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 // Auxiliar unexported functions
 func validAppStructure(app, parentApp meta.App) string {
 	errDescription := ""
-	var validName, validSubstructure, parentWithoutNode, validChannels bool
+	var validName, validSubstructure, parentWithoutNode bool
 	_, inParentRef := parentApp.Spec.Apps[app.Meta.Name]
 
 	validName = (app.Meta.Name != "") && !inParentRef
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
-	validChannels = checkChannels(app.Spec.Channels, app.Spec.ChannelTypes)
+	validChannels, msg := checkChannels(app.Spec.Channels, app.Spec.ChannelTypes, parentApp)
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
 	if boundariesExist {
 		errDescription = errDescription + validBoundaries(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
@@ -214,17 +214,27 @@ func validAppStructure(app, parentApp meta.App) string {
 		errDescription = errDescription + "parent has Node;"
 	}
 	if !validChannels {
-		errDescription = errDescription + "invalid channel: using non-existent channel type;"
+		errDescription = errDescription + msg
 	}
 
 	return errDescription
 }
 
-func checkChannels(channels map[string]*meta.Channel, chTypes map[string]*meta.ChannelType) bool {
+func checkChannels(channels map[string]*meta.Channel, chTypes map[string]*meta.ChannelType, parentApp meta.App) (bool, string) {
 	for _, channel := range channels {
 		if channel.Spec.Type != "" {
 			if _, ok := chTypes[channel.Spec.Type]; !ok {
-				return false
+				return false, "invalid channel: using non-existent channel type;"
+			}
+
+			for _, app := range channel.ConnectedApps {
+				if _, ok := parentApp.Spec.Apps[app]; !ok {
+					return false, "invalid channel: it contains a connectedApp that don't exists;"
+				}
+				appBoundary := utils.StringSliceUnion(parentApp.Spec.Apps[app].Spec.Boundary.Input, parentApp.Spec.Apps[app].Spec.Boundary.Output)
+				if !utils.Include(appBoundary, channel.Meta.Name) {
+					return false, "invalid channel: it contains a connectedApp thats not truly connected to it;"
+				}
 			}
 
 			connectedChannels := chTypes[channel.Spec.Type].ConnectedChannels
@@ -234,7 +244,7 @@ func checkChannels(channels map[string]*meta.Channel, chTypes map[string]*meta.C
 
 		}
 	}
-	return true
+	return true, ""
 }
 
 func nodeIsEmpty(node meta.Node) bool {

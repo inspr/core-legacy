@@ -33,3 +33,21 @@ func Removes(vs []string, t string) []string {
 	}
 	return newSlice
 }
+
+/*
+StringSliceUnion returns the union of the two string slices.
+Remember that union dont have repeated elements
+*/
+func StringSliceUnion(a, b []string) []string {
+	check := make(map[string]int)
+	d := append(a, b...)
+	res := make([]string, 0)
+	for _, val := range d {
+		check[val] = 1
+	}
+
+	for letter := range check {
+		res = append(res, letter)
+	}
+	return res
+}
