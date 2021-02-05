@@ -6,6 +6,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 /*
@@ -65,7 +66,10 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
 	}
 
-	parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels[ch.Meta.Name] = ch
+	connectedChannels := parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels
+	if !utils.Include(connectedChannels, ch.Meta.Name) {
+		parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels = append(connectedChannels, ch.Meta.Name)
+	}
 
 	if parentApp.Spec.Channels == nil {
 		parentApp.Spec.Channels = map[string]*meta.Channel{}

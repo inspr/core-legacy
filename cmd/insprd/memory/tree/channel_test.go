@@ -8,6 +8,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func TestMemoryManager_Channels(t *testing.T) {
@@ -148,11 +149,12 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 		ch      *meta.Channel
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		want    *meta.Channel
+		name          string
+		fields        fields
+		args          args
+		wantErr       bool
+		want          *meta.Channel
+		checkFunction func() (bool, string)
 	}{
 		{
 			name: "It should create a new Channel on a valid App",
@@ -230,6 +232,66 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 			wantErr: true,
 			want:    nil,
 		},
+		{
+			name: "It should not create a channel because the channelType is invalid",
+			fields: fields{
+				root:   getMockChannels(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  false,
+				mockCT: true,
+			},
+			args: args{
+				context: "",
+				ch: &meta.Channel{
+					Meta: meta.Metadata{
+						Name:   "channel3",
+						Parent: "",
+					},
+					Spec: meta.ChannelSpec{
+						Type: "ct1",
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "It should create a channel because the channelType is valid",
+			fields: fields{
+				root:   getMockChannels(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  false,
+				mockCT: false,
+			},
+			args: args{
+				context: "",
+				ch: &meta.Channel{
+					Meta: meta.Metadata{
+						Name:   "channel3",
+						Parent: "",
+					},
+					Spec: meta.ChannelSpec{
+						Type: "channelType1",
+					},
+				},
+			},
+			wantErr: false,
+			want:    nil,
+			checkFunction: func() (bool, string) {
+				am := GetTreeMemory().ChannelTypes()
+				ct, err := am.GetChannelType("", "channelType1")
+				if err != nil {
+					return false, "cant get channelType 'channelType1'"
+				}
+
+				if !utils.Include(ct.ConnectedChannels, "channel3") {
+					return false, "connectedChannels of channelType1 dont have channel3"
+				}
+				return true, ""
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -250,6 +312,11 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 				got, err := chh.GetChannel(tt.args.context, tt.want.Meta.Name)
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("ChannelMemoryManager.GetChannel() = %v, want %v", got, tt.want)
+				}
+			}
+			if tt.checkFunction != nil {
+				if passed, msg := tt.checkFunction(); !passed {
+					t.Errorf("check function not passed: " + msg)
 				}
 			}
 		})
