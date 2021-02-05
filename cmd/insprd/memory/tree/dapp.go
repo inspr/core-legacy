@@ -165,7 +165,23 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 		return structureError
 	}
 
-	amm.DeleteApp(query)
+	parent, errParent := getParentApp(query)
+	if errParent != nil {
+		return errParent
+	}
+
+	for _, chName := range currentApp.Spec.Boundary.Input {
+		parent.Spec.Channels[chName].ConnectedApps = utils.
+			Removes(parent.Spec.Channels[chName].ConnectedApps, currentApp.Meta.Name)
+	}
+
+	for _, chName := range currentApp.Spec.Boundary.Output {
+		parent.Spec.Channels[chName].ConnectedApps = utils.
+			Removes(parent.Spec.Channels[chName].ConnectedApps, currentApp.Meta.Name)
+	}
+
+	delete(parent.Spec.Apps, currentApp.Meta.Name)
+
 	sonRef := strings.Split(query, ".")
 	parentQuery := strings.Join(sonRef[:len(sonRef)-1], ".")
 	amm.CreateApp(app, parentQuery)
