@@ -275,7 +275,7 @@ func GetMockRootApp2() *meta.App {
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",
-						Reference:   "root.ct1",
+						Reference:   "root.ct1diff",
 						Annotations: map[string]string{},
 						Parent:      "root",
 						SHA256:      "",
