@@ -203,7 +203,7 @@ func GetMockRootApp2() *meta.App {
 				"app2": {
 					Meta: meta.Metadata{
 						Name:        "app2",
-						Reference:   "app2",
+						Reference:   "app2diff",
 						Annotations: map[string]string{},
 						Parent:      "",
 						SHA256:      "",
@@ -247,6 +247,7 @@ func GetMockRootApp2() *meta.App {
 								Meta: meta.Metadata{
 									Name:   "ch1app2",
 									Parent: "",
+									SHA256: "diff",
 								},
 								Spec: meta.ChannelSpec{},
 							},
