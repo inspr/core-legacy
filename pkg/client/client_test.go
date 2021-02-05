@@ -3,12 +3,14 @@ package dappclient
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
@@ -61,6 +63,12 @@ func mockHandlerFunc(path string, expectedData interface{}) http.HandlerFunc {
 	})
 }
 
+func mockHandlerFuncTimeout() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(time.Second * 5)
+	})
+}
+
 func TestNewAppClient(t *testing.T) {
 	tests := []struct {
 		name string
@@ -92,7 +100,6 @@ func TestNewAppClient(t *testing.T) {
 
 func TestClient_WriteMessage(t *testing.T) {
 	type args struct {
-		ctx     context.Context
 		channel string
 		msg     models.Message
 	}
@@ -101,30 +108,45 @@ func TestClient_WriteMessage(t *testing.T) {
 		args            args
 		wantErr         bool
 		interruptServer bool
+		cancelContext   bool
 	}{
 		{
 			name: "Valid request",
 			args: args{
-				ctx:     context.Background(),
 				channel: "chan1",
 				msg:     mockMessage(),
 			},
 			wantErr: false,
 		},
 		{
-			name: "Invalid request",
+			name: "Invalid request - server died",
 			args: args{
-				ctx:     nil,
 				channel: "chan1",
 				msg:     models.Message{},
 			},
 			wantErr:         true,
 			interruptServer: true,
 		},
+		{
+			name: "Invalid request - context canceled",
+			args: args{
+				channel: "chan1",
+				msg:     models.Message{},
+			},
+			wantErr:       true,
+			cancelContext: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := mockHandlerFunc("/writeMessage", tt.args)
+			var handler http.HandlerFunc
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			if tt.cancelContext {
+				handler = mockHandlerFuncTimeout()
+			} else {
+				handler = mockHandlerFunc("/writeMessage", tt.args)
+			}
 
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
@@ -136,8 +158,15 @@ func TestClient_WriteMessage(t *testing.T) {
 			if tt.interruptServer {
 				s.Close()
 			}
+			if tt.cancelContext {
+				go func() {
+					time.Sleep(time.Second * 2)
+					cancel()
+				}()
+			}
 
-			err := c.WriteMessage(context.Background(), "chan1", mockMessage())
+			err := c.WriteMessage(ctx, "chan1", mockMessage())
+			fmt.Println(err)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.WriteMessage() error = %v, wantErr %v", err, tt.wantErr)
 			}
