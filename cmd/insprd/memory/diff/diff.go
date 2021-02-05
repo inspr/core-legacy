@@ -9,17 +9,27 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
+/*
+Difference is the most basic diff structure, it represents a difference between two apps.
+The object carries information abaout what field differs from one app to another,
+the value of that field on the original app and the value of that field on the current app.
+*/
 type Difference struct {
-	Field string
-	From  string
-	Curr  string
+	Field string `json:"field"`
+	From  string `json:"from"`
+	Curr  string `json:"curr"`
 }
 
+/*
+Change encapsulates all differences between two apps and carries the
+information about the context those apps exist in the app tree.
+*/
 type Change struct {
-	Context string
-	Diff    []Difference
+	Context string       `json:"context"`
+	Diff    []Difference `json:"diff"`
 }
 
+//Changelog log of all changes between two app trees.
 type Changelog []Change
 
 type void struct{}
@@ -30,6 +40,7 @@ type apps map[string]*meta.App
 type channels map[string]*meta.Channel
 type types map[string]*meta.ChannelType
 
+//Diff returns the changelog betwen two app trees.
 func Diff(appOrgn *meta.App, appCurr *meta.App) (Changelog, error) {
 	var err error
 	cl := Changelog{}
@@ -37,6 +48,7 @@ func Diff(appOrgn *meta.App, appCurr *meta.App) (Changelog, error) {
 	return cl, err
 }
 
+//Print is an auxiliar method used for displaying a Changelog
 func (cl Changelog) Print() {
 	var w *tabwriter.Writer
 
