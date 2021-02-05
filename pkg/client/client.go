@@ -35,7 +35,6 @@ type requestReturn struct {
 
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
-	// todo get env var
 	envAddr := environment.GetEnvironment().UnixSocketAddr
 	return &Client{
 		addr:  envAddr,
