@@ -304,8 +304,8 @@ func getMockRootApp2() *meta.App {
 
 func main() {
 	// api.Run()
-	tree1 := GetMockRootApp()
-	tree2 := GetMockRootApp2()
+	tree1 := getMockRootApp()
+	tree2 := getMockRootApp2()
 	changelog, err := diff.Diff(tree1, tree2)
 	if err != nil {
 		fmt.Println(err.Error())
