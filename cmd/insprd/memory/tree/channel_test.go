@@ -287,7 +287,7 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 					return false, "cant get channelType 'channelType1'"
 				}
 
-				if !utils.Include(ct.ConnectedChannels, "channel3") {
+				if !utils.Includes(ct.ConnectedChannels, "channel3") {
 					return false, "connectedChannels of channelType1 dont have channel3"
 				}
 				return true, ""

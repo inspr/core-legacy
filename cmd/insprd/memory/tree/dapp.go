@@ -83,7 +83,7 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 		appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
 		for _, chName := range appBoundary {
 			connectedApps := parentApp.Spec.Channels[chName].ConnectedApps
-			if !utils.Include(connectedApps, app.Meta.Name) {
+			if !utils.Includes(connectedApps, app.Meta.Name) {
 				parentApp.Spec.Channels[chName].ConnectedApps = append(connectedApps, app.Meta.Name)
 			}
 		}
@@ -118,7 +118,7 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 
 	for _, chName := range appBoundary {
 		parent.Spec.Channels[chName].ConnectedApps = utils.
-			Removes(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
+			Remove(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
 	}
 
 	delete(parent.Spec.Apps, app.Meta.Name)
@@ -156,7 +156,7 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 
 	for _, chName := range appBoundary {
 		parent.Spec.Channels[chName].ConnectedApps = utils.
-			Removes(parent.Spec.Channels[chName].ConnectedApps, currentApp.Meta.Name)
+			Remove(parent.Spec.Channels[chName].ConnectedApps, currentApp.Meta.Name)
 	}
 
 	delete(parent.Spec.Apps, currentApp.Meta.Name)
@@ -210,16 +210,16 @@ func checkChannels(app *meta.App) (bool, string) {
 
 			for _, appName := range channel.ConnectedApps {
 				if _, ok := app.Spec.Apps[appName]; !ok {
-					app.Spec.Channels[channel.Meta.Name].ConnectedApps = utils.Removes(channel.ConnectedApps, appName)
+					app.Spec.Channels[channel.Meta.Name].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
 				}
 				appBoundary := utils.StringSliceUnion(app.Spec.Apps[appName].Spec.Boundary.Input, app.Spec.Apps[appName].Spec.Boundary.Output)
-				if !utils.Include(appBoundary, channel.Meta.Name) {
-					app.Spec.Channels[channel.Meta.Name].ConnectedApps = utils.Removes(channel.ConnectedApps, appName)
+				if !utils.Includes(appBoundary, channel.Meta.Name) {
+					app.Spec.Channels[channel.Meta.Name].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
 				}
 			}
 
 			connectedChannels := chTypes[channel.Spec.Type].ConnectedChannels
-			if !utils.Include(connectedChannels, channel.Meta.Name) {
+			if !utils.Includes(connectedChannels, channel.Meta.Name) {
 				chTypes[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channel.Meta.Name)
 			}
 
@@ -249,7 +249,7 @@ func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[
 					break
 				}
 
-				if !utils.Include(parentChannels[input].ConnectedApps, appName) {
+				if !utils.Includes(parentChannels[input].ConnectedApps, appName) {
 					parentChannels[input].ConnectedApps = append(parentChannels[input].ConnectedApps, appName)
 				}
 			}
@@ -262,7 +262,7 @@ func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[
 					break
 				}
 
-				if !utils.Include(parentChannels[output].ConnectedApps, appName) {
+				if !utils.Includes(parentChannels[output].ConnectedApps, appName) {
 					parentChannels[output].ConnectedApps = append(parentChannels[output].ConnectedApps, appName)
 				}
 			}
@@ -399,7 +399,7 @@ func invalidChannelChanges(changedChannels Set, newApp *meta.App) bool {
 				if !ctypeExists {
 					return true
 				}
-				if !utils.Include(ct.ConnectedChannels, change) {
+				if !utils.Includes(ct.ConnectedChannels, change) {
 					ct.ConnectedChannels = append(ct.ConnectedChannels, change)
 				}
 			}

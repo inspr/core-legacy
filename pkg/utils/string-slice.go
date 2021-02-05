@@ -14,17 +14,17 @@ func Index(vs []string, t string) int {
 }
 
 /*
-Include returns true if the target string t is in the slice.
+Includes returns true if the target string t is in the slice.
 */
-func Include(vs []string, t string) bool {
+func Includes(vs []string, t string) bool {
 	return Index(vs, t) >= 0
 }
 
 /*
-Removes return a new slice without any occurence of the
+Remove return a new slice without any occurence of the
 target string t
 */
-func Removes(vs []string, t string) []string {
+func Remove(vs []string, t string) []string {
 	var newSlice []string
 	for _, v := range vs {
 		if v != t {

@@ -955,7 +955,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				if err != nil {
 					t.Errorf("cant get channel ch1app2")
 				}
-				if !utils.Include(ch.ConnectedApps, "app2") {
+				if !utils.Includes(ch.ConnectedApps, "app2") {
 					t.Errorf("connectedApps of ch1app2 dont have app2")
 				}
 
@@ -963,7 +963,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				if err2 != nil {
 					t.Errorf("cant get channel ch2app2")
 				}
-				if !utils.Include(ch2.ConnectedApps, "app2") {
+				if !utils.Includes(ch2.ConnectedApps, "app2") {
 					t.Errorf("connectedApps of chapp2 dont have app2")
 				}
 			},
@@ -1073,7 +1073,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				if err != nil {
 					t.Errorf("cant get channelType ct1")
 				}
-				if !utils.Include(ct.ConnectedChannels, "channel1") {
+				if !utils.Includes(ct.ConnectedChannels, "channel1") {
 					t.Errorf("connectedChannels of ct1 dont have channel1")
 				}
 			},
@@ -1221,7 +1221,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 				if err != nil {
 					t.Errorf("cant get channel ch1app1")
 				}
-				if utils.Include(ch.ConnectedApps, "thenewapp") {
+				if utils.Includes(ch.ConnectedApps, "thenewapp") {
 					t.Errorf("connectedApps of ch1app1 still have thenewapp")
 				}
 			},
@@ -1654,7 +1654,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 					t.Errorf("cant get channel ch1app1")
 				}
 
-				if utils.Include(ch.ConnectedApps, "thenewapp") {
+				if utils.Includes(ch.ConnectedApps, "thenewapp") {
 					t.Errorf("connectedApps of ch1app1 still have 'thenewapp'")
 				}
 			},
