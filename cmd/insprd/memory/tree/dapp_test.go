@@ -2001,7 +2001,7 @@ func Test_validBoundaries(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := validBoundaries(tt.args.appName, tt.args.bound, tt.args.parentChannels); got != tt.want {
+			if got := validAndUpdateBoundaries(tt.args.appName, tt.args.bound, tt.args.parentChannels); got != tt.want {
 				t.Errorf("validBoundaries() = %v, want %v", got, tt.want)
 			}
 		})
@@ -3104,7 +3104,7 @@ func Test_checkChannels(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := checkChannels(tt.args.app)
+			got, got1 := checkAndUpdateChannels(tt.args.app)
 			if got != tt.want {
 				t.Errorf("checkChannels() got = %v, want %v", got, tt.want)
 			}
