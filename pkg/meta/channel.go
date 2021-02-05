@@ -2,8 +2,9 @@ package meta
 
 // Channel is an Inspr component that represents a Channel.
 type Channel struct {
-	Meta Metadata    `yaml:"meta"  json:"meta" diff:"channelmeta"`
-	Spec ChannelSpec `yaml:"spec"  json:"spec" diff:"channelspec"`
+	Meta          Metadata    `yaml:"meta"  json:"meta" diff:"channelmeta"`
+	Spec          ChannelSpec `yaml:"spec"  json:"spec" diff:"channelspec"`
+	ConnectedApps []string    `yaml:"connectedapps"  json:"connectedapps" diff:"connectedapps"`
 }
 
 // ChannelSpec is the specification of a channel.

@@ -84,6 +84,13 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 			Message("target app doesn't contain a '" + context + "' ChannelType").Build()
 	}
 
+	if len(curCt.ConnectedChannels) > 0 {
+		return ierrors.NewError().
+			BadRequest().
+			Message("channelType cannot be deleted as it is being used by other channels").
+			Build()
+	}
+
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
 	if err != nil {
 		return ierrors.NewError().InternalServer().InnerError(err).
@@ -107,11 +114,13 @@ context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) UpdateChannelType(ct *meta.ChannelType, context string) error {
 
-	_, err := ctm.GetChannelType(context, ct.Meta.Name)
+	oldChType, err := ctm.GetChannelType(context, ct.Meta.Name)
 	if err != nil {
 		return ierrors.NewError().BadRequest().
 			Message("target app doesn't contain a '" + context + "' ChannelType").Build()
 	}
+
+	ct.ConnectedChannels = oldChType.ConnectedChannels
 
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
 	if err != nil {

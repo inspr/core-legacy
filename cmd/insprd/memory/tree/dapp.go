@@ -7,6 +7,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 // AppMemoryManager implements the App interface
@@ -79,6 +80,14 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 			}
 		}
 
+		appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+		for _, chName := range appBoundary {
+			connectedApps := parentApp.Spec.Channels[chName].ConnectedApps
+			if !utils.Include(connectedApps, app.Meta.Name) {
+				parentApp.Spec.Channels[chName].ConnectedApps = append(connectedApps, app.Meta.Name)
+			}
+		}
+
 		return nil
 	}
 
@@ -103,6 +112,22 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 	parent, errParent := getParentApp(query)
 	if errParent != nil {
 		return errParent
+	}
+
+	for _, ch := range app.Spec.Channels {
+		if len(ch.ConnectedApps) > 0 {
+			return ierrors.NewError().
+				BadRequest().
+				Message("cannot delete app: it contain some channel(s) that are been used by other apps.").
+				Build()
+		}
+	}
+
+	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+
+	for _, chName := range appBoundary {
+		parent.Spec.Channels[chName].ConnectedApps = utils.
+			Removes(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
 	}
 
 	delete(parent.Spec.Apps, app.Meta.Name)
@@ -131,7 +156,20 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 		return structureError
 	}
 
-	amm.DeleteApp(query)
+	parent, errParent := getParentApp(query)
+	if errParent != nil {
+		return errParent
+	}
+
+	appBoundary := utils.StringSliceUnion(currentApp.Spec.Boundary.Input, currentApp.Spec.Boundary.Output)
+
+	for _, chName := range appBoundary {
+		parent.Spec.Channels[chName].ConnectedApps = utils.
+			Removes(parent.Spec.Channels[chName].ConnectedApps, currentApp.Meta.Name)
+	}
+
+	delete(parent.Spec.Apps, currentApp.Meta.Name)
+
 	sonRef := strings.Split(query, ".")
 	parentQuery := strings.Join(sonRef[:len(sonRef)-1], ".")
 	amm.CreateApp(app, parentQuery)
@@ -144,12 +182,14 @@ func validAppStructure(app, parentApp meta.App) string {
 	errDescription := ""
 	var validName, validSubstructure, parentWithoutNode bool
 	_, inParentRef := parentApp.Spec.Apps[app.Meta.Name]
+
 	validName = (app.Meta.Name != "") && !inParentRef
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
+	validChannels, msg := checkChannels(app)
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
 	if boundariesExist {
-		errDescription = errDescription + validBoundaries(app.Spec.Boundary, parentApp.Spec.Channels)
+		errDescription = errDescription + validBoundaries(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
 	}
 
 	if !validName {
@@ -161,8 +201,40 @@ func validAppStructure(app, parentApp meta.App) string {
 	if !parentWithoutNode {
 		errDescription = errDescription + "parent has Node;"
 	}
+	if !validChannels {
+		errDescription = errDescription + msg
+	}
 
 	return errDescription
+}
+
+func checkChannels(app meta.App) (bool, string) {
+	channels := app.Spec.Channels
+	chTypes := app.Spec.ChannelTypes
+	for _, channel := range channels {
+		if channel.Spec.Type != "" {
+			if _, ok := chTypes[channel.Spec.Type]; !ok {
+				return false, "invalid channel: using non-existent channel type;"
+			}
+
+			for _, appName := range channel.ConnectedApps {
+				if _, ok := app.Spec.Apps[appName]; !ok {
+					return false, "invalid channel: it contains a connectedApp that don't exists;"
+				}
+				appBoundary := utils.StringSliceUnion(app.Spec.Apps[appName].Spec.Boundary.Input, app.Spec.Apps[appName].Spec.Boundary.Output)
+				if !utils.Include(appBoundary, channel.Meta.Name) {
+					return false, "invalid channel: it contains a connectedApp thats not truly connected to it;"
+				}
+			}
+
+			connectedChannels := chTypes[channel.Spec.Type].ConnectedChannels
+			if !utils.Include(connectedChannels, channel.Meta.Name) {
+				chTypes[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channel.Meta.Name)
+			}
+
+		}
+	}
+	return true, ""
 }
 
 func nodeIsEmpty(node meta.Node) bool {
@@ -174,7 +246,7 @@ func nodeIsEmpty(node meta.Node) bool {
 	return noAnnotations && noName && noParent && noImage
 }
 
-func validBoundaries(bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
+func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
 	boundaryErrors := ""
 	if len(parentChannels) == 0 {
 		boundaryErrors = boundaryErrors + "parent doesn't have Channels;"
@@ -185,6 +257,10 @@ func validBoundaries(bound meta.AppBoundary, parentChannels map[string]*meta.Cha
 					boundaryErrors = boundaryErrors + "invalid input boundary;"
 					break
 				}
+
+				if !utils.Include(parentChannels[input].ConnectedApps, appName) {
+					parentChannels[input].ConnectedApps = append(parentChannels[input].ConnectedApps, appName)
+				}
 			}
 		}
 
@@ -193,6 +269,10 @@ func validBoundaries(bound meta.AppBoundary, parentChannels map[string]*meta.Cha
 				if parentChannels[output] == nil {
 					boundaryErrors = boundaryErrors + "invalid output boundary;"
 					break
+				}
+
+				if !utils.Include(parentChannels[output].ConnectedApps, appName) {
+					parentChannels[output].ConnectedApps = append(parentChannels[output].ConnectedApps, appName)
 				}
 			}
 		}
@@ -222,7 +302,7 @@ func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 			return errParent
 		}
 
-		boundError := validBoundaries(newApp.Spec.Boundary, parent.Spec.Channels)
+		boundError := validBoundaries(newApp.Meta.Name, newApp.Spec.Boundary, parent.Spec.Channels)
 		if boundError != "" {
 			return ierrors.NewError().InvalidApp().Message(boundError).Build()
 		}
@@ -235,6 +315,10 @@ func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 
 	if len(structuresChangelog["channel"]) > 0 && invalidChannelChanges(structuresChangelog["channel"], &newApp) {
 		return ierrors.NewError().InvalidChannel().Message("channel's parent dApp doesn't contain specified channel type").Build()
+	}
+
+	if valid, msg := checkChannels(newApp); !valid {
+		return ierrors.NewError().InvalidChannel().Message(msg).Build()
 	}
 
 	if len(structuresChangelog["app"]) > 0 {
@@ -319,12 +403,16 @@ func invalidChannelChanges(changedChannels Set, newApp *meta.App) bool {
 
 	if len(ctypes) > 0 {
 		for change := range changedChannels {
-			_, ctypeExists := ctypes[channels[change].Spec.Type]
-			if channels[change].Meta.Parent == newApp.Meta.Name &&
-				channels[change].Spec.Type != "" && !ctypeExists {
-
-				return true
+			ct, ctypeExists := ctypes[channels[change].Spec.Type]
+			if channels[change].Meta.Parent == newApp.Meta.Name && channels[change].Spec.Type != "" {
+				if !ctypeExists {
+					return true
+				}
+				if !utils.Include(ct.ConnectedChannels, change) {
+					ct.ConnectedChannels = append(ct.ConnectedChannels, change)
+				}
 			}
+
 		}
 		return false
 	}
