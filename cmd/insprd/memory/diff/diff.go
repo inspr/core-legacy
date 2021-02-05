@@ -17,7 +17,7 @@ the value of that field on the original app and the value of that field on the c
 type Difference struct {
 	Field string `json:"field"`
 	From  string `json:"from"`
-	Curr  string `json:"curr"`
+	To    string `json:"curr"`
 }
 
 /*
@@ -41,10 +41,10 @@ type channels map[string]*meta.Channel
 type types map[string]*meta.ChannelType
 
 //Diff returns the changelog betwen two app trees.
-func Diff(appOrgn *meta.App, appCurr *meta.App) (Changelog, error) {
+func Diff(appOrig *meta.App, appCurr *meta.App) (Changelog, error) {
 	var err error
 	cl := Changelog{}
-	cl, err = cl.diff(appOrgn, appCurr, "")
+	cl, err = cl.diff(appOrig, appCurr, "")
 	return cl, err
 }
 
@@ -58,267 +58,307 @@ func (cl Changelog) Print() {
 		fmt.Fprintf(w, "Field\t From\t To\n")
 		for _, diff := range change.Diff {
 			fmt.Fprintf(w, "%s\t %s\t %s\n",
-				diff.Field, diff.From, diff.Curr)
+				diff.Field, diff.From, diff.To)
 		}
 		w.Flush()
 	}
 }
 
-func (cl Changelog) diff(appOrgn *meta.App, appCurr *meta.App, ctx string) (Changelog, error) {
+func (cl Changelog) diff(appOrig *meta.App, appCurr *meta.App, ctx string) (Changelog, error) {
 	if ctx == "" {
-		ctx = "->"
+		ctx = "*"
 	}
+
 	change := Change{
 		Context: ctx,
 	}
-	_, err := change.diffMetadata(appOrgn.Meta, appCurr.Meta, "")
+
+	_, err := change.diffMetadata(appOrig.Meta, appCurr.Meta, "")
 	if err != nil {
 		return Changelog{}, err
 	}
-	change.Context = change.Context + "." + appCurr.Meta.Name
-	_, err = change.diffAppSpec(appOrgn.Spec, appCurr.Spec)
+
+	if appCurr.Meta.Name != "" {
+		change.Context = fmt.Sprintf("%s.%s", change.Context, appCurr.Meta.Name)
+	}
+
+	_, err = change.diffAppSpec(appOrig.Spec, appCurr.Spec)
 	if err != nil {
 		return Changelog{}, err
 	}
+
 	if len(change.Diff) > 0 {
 		cl = append(cl, change)
 	}
+
 	set := make(map[string]void)
-	for k := range appOrgn.Spec.Apps {
+
+	for k := range appOrig.Spec.Apps {
 		set[k] = exists
 	}
+
 	for k := range appCurr.Spec.Apps {
 		set[k] = exists
 	}
+
 	for k := range set {
-		newOrgn, orgn := appOrgn.Spec.Apps[k]
+		newOrig, orig := appOrig.Spec.Apps[k]
 		newCurr, curr := appCurr.Spec.Apps[k]
 
-		if orgn && curr {
-			cl, err = cl.diff(newOrgn, newCurr, change.Context+"Spec.Apps")
+		if orig && curr {
+			cl, err = cl.diff(newOrig, newCurr, change.Context+"Spec.Apps")
 			if err != nil {
 				return Changelog{}, err
 			}
 		}
 	}
+
 	return cl, nil
 }
 
-func (change *Change) diffAppSpec(specOrgn meta.AppSpec, specCurr meta.AppSpec) (bool, error) {
+func (change *Change) diffAppSpec(specOrig meta.AppSpec, specCurr meta.AppSpec) (bool, error) {
 	specsDiffer := false
-	_, err := change.diffApps(specOrgn.Apps, specCurr.Apps)
+	_, err := change.diffApps(specOrig.Apps, specCurr.Apps)
 	if err != nil {
 		return false, err
 	}
-	_, err = change.diffChannels(specOrgn.Channels, specCurr.Channels)
+
+	_, err = change.diffChannels(specOrig.Channels, specCurr.Channels)
 	if err != nil {
 		return false, err
 	}
-	_, err = change.diffChannelTypes(specOrgn.ChannelTypes, specCurr.ChannelTypes)
+
+	_, err = change.diffChannelTypes(specOrig.ChannelTypes, specCurr.ChannelTypes)
 	if err != nil {
 		return false, err
 	}
+
 	return specsDiffer, nil
 }
 
-func (change *Change) diffApps(appsOrgn apps, appsCurr apps) (bool, error) {
+func (change *Change) diffApps(appsOrig apps, appsCurr apps) (bool, error) {
 	appsDiffer := false
 
 	set := make(map[string]void)
-	for k := range appsOrgn {
+
+	for k := range appsOrig {
 		set[k] = exists
 	}
+
 	for k := range appsCurr {
 		set[k] = exists
 	}
+
 	for k := range set {
-		_, orgn := appsOrgn[k]
+		_, orig := appsOrig[k]
 		_, curr := appsCurr[k]
-		orgnAppStatus := "<nil>"
+
+		origAppStatus := "<nil>"
 		currAppStatus := "<nil>"
-		if orgn {
-			orgnAppStatus = "{...}"
+
+		if orig {
+			origAppStatus = "{...}"
 		}
 
 		if curr {
 			currAppStatus = "{...}"
 		}
 
-		if orgn != curr {
+		if orig != curr {
 			appsDiffer = true
 			change.Diff = append(change.Diff, Difference{
 				Field: "Spec.Apps[" + k + "]",
-				From:  orgnAppStatus,
-				Curr:  currAppStatus,
+				From:  origAppStatus,
+				To:    currAppStatus,
 			})
 		}
 	}
-	return appsDiffer, nil
 
+	return appsDiffer, nil
 }
 
-func (change *Change) diffChannels(chOrgn channels, chCurr channels) (bool, error) {
+func (change *Change) diffChannels(chOrig channels, chCurr channels) (bool, error) {
 	channelsDiffer := false
 
 	set := make(map[string]void)
-	for k := range chOrgn {
+
+	for k := range chOrig {
 		set[k] = exists
 	}
+
 	for k := range chCurr {
 		set[k] = exists
 	}
+
 	for k := range set {
-		orgnCh, orgn := chOrgn[k]
+		origCh, orig := chOrig[k]
 		currCh, curr := chCurr[k]
 
-		if orgn != curr {
-			orgnChStatus := "<nil>"
+		if orig != curr {
+			origChStatus := "<nil>"
 			currChStatus := "<nil>"
-			if orgn {
-				orgnChStatus = "{...}"
+
+			if orig {
+				origChStatus = "{...}"
 			}
+
 			if curr {
 				currChStatus = "{...}"
 			}
+
 			channelsDiffer = true
 			change.Diff = append(change.Diff, Difference{
 				Field: "Spec.Channels[" + k + "]",
-				From:  orgnChStatus,
-				Curr:  currChStatus,
+				From:  origChStatus,
+				To:    currChStatus,
 			})
-		} else if orgn && curr {
-			if orgnCh.Spec.Type != currCh.Spec.Type {
+
+		} else if orig && curr {
+
+			if origCh.Spec.Type != currCh.Spec.Type {
 				channelsDiffer = true
 				change.Diff = append(change.Diff, Difference{
 					Field: "Spec.Channels[" + k + "].Spec.Type",
-					From:  orgnCh.Spec.Type,
-					Curr:  currCh.Spec.Type,
+					From:  origCh.Spec.Type,
+					To:    currCh.Spec.Type,
 				})
 			}
 
-			_, err := change.diffMetadata(orgnCh.Meta, currCh.Meta, "Spec.Channels["+k+"].")
+			_, err := change.diffMetadata(origCh.Meta, currCh.Meta, "Spec.Channels["+k+"].")
 			if err != nil {
 				return channelsDiffer, err
 			}
-
 		}
 	}
+
 	return channelsDiffer, nil
 }
 
-func (change *Change) diffChannelTypes(chtOrgn types, chtCurr types) (bool, error) {
+func (change *Change) diffChannelTypes(chtOrig types, chtCurr types) (bool, error) {
 	channelsDiffer := false
 
 	set := make(map[string]void)
-	for k := range chtOrgn {
+
+	for k := range chtOrig {
 		set[k] = exists
 	}
+
 	for k := range chtCurr {
 		set[k] = exists
 	}
+
 	for k := range set {
-		orgnCht, orgn := chtOrgn[k]
+		origCht, orig := chtOrig[k]
 		currCht, curr := chtCurr[k]
 
-		if orgn != curr {
-			orgnChtStatus := "<nil>"
+		if orig != curr {
+			origChtStatus := "<nil>"
 			currChtStatus := "<nil>"
-			if orgn {
-				orgnChtStatus = "{...}"
+
+			if orig {
+				origChtStatus = "{...}"
 			}
+
 			if curr {
 				currChtStatus = "{...}"
 			}
+
 			channelsDiffer = true
 			change.Diff = append(change.Diff, Difference{
 				Field: "Spec.ChannelTypes[" + k + "]",
-				From:  orgnChtStatus,
-				Curr:  currChtStatus,
+				From:  origChtStatus,
+				To:    currChtStatus,
 			})
-		} else if orgn && curr {
-			if string(orgnCht.Schema) != string(currCht.Schema) {
+		} else if orig && curr {
+			if string(origCht.Schema) != string(currCht.Schema) {
 				channelsDiffer = true
 				change.Diff = append(change.Diff, Difference{
 					Field: "Spec.ChannelTypes[" + k + "].Spec.Schema",
-					From:  string(orgnCht.Schema),
-					Curr:  string(currCht.Schema),
+					From:  string(origCht.Schema),
+					To:    string(currCht.Schema),
 				})
 			}
 
-			_, err := change.diffMetadata(orgnCht.Meta, currCht.Meta, "Spec.ChannelTypes["+k+"].")
+			_, err := change.diffMetadata(origCht.Meta, currCht.Meta, "Spec.ChannelTypes["+k+"].")
+
 			if err != nil {
 				return channelsDiffer, err
 			}
-
 		}
 	}
 	return channelsDiffer, nil
 }
 
-func (change *Change) diffMetadata(metaOrgn meta.Metadata, metaCurr meta.Metadata, ctx string) (bool, error) {
+func (change *Change) diffMetadata(metaOrig meta.Metadata, metaCurr meta.Metadata, ctx string) (bool, error) {
 	var err error
 	differs := false
 	err = nil
-	if metaOrgn.Name != metaCurr.Name {
+	if metaOrig.Name != metaCurr.Name {
 		differs = true
 		err = errors.New("Diffrent name")
 		change.Diff = append(change.Diff, Difference{
 			Field: ctx + "Meta.Name",
-			From:  metaOrgn.Name,
-			Curr:  metaCurr.Name,
+			From:  metaOrig.Name,
+			To:    metaCurr.Name,
 		})
 	}
 
-	if metaOrgn.Reference != metaCurr.Reference {
+	if metaOrig.Reference != metaCurr.Reference {
 		differs = true
 		change.Diff = append(change.Diff, Difference{
 			Field: ctx + "Meta.Reference",
-			From:  metaOrgn.Reference,
-			Curr:  metaCurr.Reference,
+			From:  metaOrig.Reference,
+			To:    metaCurr.Reference,
 		})
 	}
 
-	if metaOrgn.Parent != metaCurr.Parent {
+	if metaOrig.Parent != metaCurr.Parent {
 		differs = true
 		err = errors.New("Diffrent parent")
 		change.Diff = append(change.Diff, Difference{
 			Field: ctx + "Meta.Parent",
-			From:  metaOrgn.Parent,
-			Curr:  metaCurr.Parent,
+			From:  metaOrig.Parent,
+			To:    metaCurr.Parent,
 		})
 	}
 
-	if metaOrgn.SHA256 != metaCurr.SHA256 {
+	if metaOrig.SHA256 != metaCurr.SHA256 {
 		differs = true
 		change.Diff = append(change.Diff, Difference{
 			Field: ctx + "Meta.SHA256",
-			From:  metaOrgn.SHA256,
-			Curr:  metaCurr.SHA256,
+			From:  metaOrig.SHA256,
+			To:    metaCurr.SHA256,
 		})
 	}
 
 	set := make(map[string]void)
-	for k := range metaOrgn.Annotations {
+
+	for k := range metaOrig.Annotations {
 		set[k] = exists
 	}
+
 	for k := range metaCurr.Annotations {
 		set[k] = exists
 	}
+
 	for k := range set {
-		orgVal, org := metaOrgn.Annotations[k]
+		origVal, orig := metaOrig.Annotations[k]
 		currVal, curr := metaCurr.Annotations[k]
-		if orgVal == "" {
-			orgVal = "<nil>"
+
+		if origVal == "" {
+			origVal = "<nil>"
 		}
+
 		if currVal == "" {
 			currVal = "<nil>"
 		}
-		if org != curr {
+
+		if orig != curr {
 			differs = true
 			change.Diff = append(change.Diff, Difference{
 				Field: ctx + "Meta.Annotations[" + k + "]",
-				From:  orgVal,
-				Curr:  currVal,
+				From:  origVal,
+				To:    currVal,
 			})
 		}
 	}
