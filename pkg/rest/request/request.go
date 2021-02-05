@@ -1,4 +1,4 @@
-package rest
+package request
 
 import (
 	"bytes"
@@ -11,10 +11,10 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
-// SendRequest sends a request to the url specified in instantiation, with the given route and method, using
+// Send sends a request to the url specified in instantiation, with the given route and method, using
 // the encoder to encode the body and the decoder to decode the response into the responsePtr
-func (c *Client) SendRequest(ctx context.Context, route string, method string, body interface{}, responsePtr interface{}) (err error) {
-	buf, err := c.middleware(body)
+func (c *Client) Send(ctx context.Context, route string, method string, body interface{}, responsePtr interface{}) (err error) {
+	buf, err := c.encoder(body)
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message("error encoding body to json").InnerError(err).Build()
 	}
@@ -64,7 +64,7 @@ type Decoder interface {
 type Client struct {
 	c                http.Client
 	baseURL          string
-	middleware       Encoder
+	encoder          Encoder
 	decoderGenerator DecoderGenerator
 }
 

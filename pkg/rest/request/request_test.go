@@ -1,4 +1,4 @@
-package rest
+package request
 
 import (
 	"bytes"
@@ -14,7 +14,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
-func TestClient_SendRequest(t *testing.T) {
+func TestClient_Send(t *testing.T) {
 	type fields struct {
 		c                http.Client
 		middleware       Encoder
@@ -138,11 +138,11 @@ func TestClient_SendRequest(t *testing.T) {
 			c := &Client{
 				c:                tt.fields.c,
 				baseURL:          s.URL,
-				middleware:       tt.fields.middleware,
+				encoder:          tt.fields.middleware,
 				decoderGenerator: tt.fields.decoderGenerator,
 			}
 
-			if err := c.SendRequest(tt.args.ctx, tt.args.route, tt.args.method, tt.args.body, &tt.response); (err != nil) != tt.wantErr {
+			if err := c.Send(tt.args.ctx, tt.args.route, tt.args.method, tt.args.body, &tt.response); (err != nil) != tt.wantErr {
 				t.Errorf("Client.SendRequest() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(tt.response, tt.want) {
@@ -222,11 +222,52 @@ func TestClient_handleResponseErr(t *testing.T) {
 			c := &Client{
 				c:                tt.fields.c,
 				baseURL:          tt.fields.baseURL,
-				middleware:       tt.fields.middleware,
+				encoder:          tt.fields.middleware,
 				decoderGenerator: tt.fields.decoderGenerator,
 			}
 			if err := c.handleResponseErr(tt.args.resp); (err != nil) != tt.wantErr {
 				t.Errorf("Client.handleResponseErr() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestClient_routeToURL(t *testing.T) {
+	type args struct {
+		route string
+	}
+	tests := []struct {
+		name string
+		c    *Client
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.c.routeToURL(tt.args.route); got != tt.want {
+				t.Errorf("Client.routeToURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestJSONDecoderGenerator(t *testing.T) {
+	type args struct {
+		r io.Reader
+	}
+	tests := []struct {
+		name string
+		args args
+		want Decoder
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := JSONDecoderGenerator(tt.args.r); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("JSONDecoderGenerator() = %v, want %v", got, tt.want)
 			}
 		})
 	}
