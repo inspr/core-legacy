@@ -333,6 +333,10 @@ func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 		return ierrors.NewError().InvalidChannel().Message("channel's parent dApp doesn't contain specified channel type").Build()
 	}
 
+	if valid, msg := checkChannels(newApp); !valid {
+		return ierrors.NewError().InvalidChannel().Message(msg).Build()
+	}
+
 	if len(structuresChangelog["app"]) > 0 {
 		for changedApp := range structuresChangelog["app"] {
 			currApp := currentApp.Spec.Apps[changedApp]

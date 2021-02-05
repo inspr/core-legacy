@@ -1585,6 +1585,87 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Invalid - updated app has invalid changes in channel structure",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  true,
+				mockCT: true,
+				mockA:  false,
+			},
+			args: args{
+				query: "app1",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app1",
+						Reference:   "app1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{
+							"thenewapp": {
+								Meta: meta.Metadata{
+									Name:        "thenewapp",
+									Reference:   "app1.thenewapp",
+									Annotations: map[string]string{},
+									Parent:      "app1",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Apps:         map[string]*meta.App{},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{},
+										Output: []string{},
+									},
+								},
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"ch1app1": {
+								Meta: meta.Metadata{
+									Name:   "ch1app1",
+									Parent: "",
+								},
+								ConnectedApps: []string{"thenewapp"},
+								Spec: meta.ChannelSpec{
+									Type: "newChannelType",
+								},
+							},
+							"ch2app1": {
+								Meta: meta.Metadata{
+									Name:   "ch2app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{
+							"newChannelType": {
+								Meta: meta.Metadata{
+									Name:        "newChannelType",
+									Reference:   "app1.newChannelType",
+									Annotations: map[string]string{},
+									Parent:      "app1",
+									SHA256:      "",
+								},
+							},
+						},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
