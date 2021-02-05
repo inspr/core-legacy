@@ -68,7 +68,8 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 
 	connectedChannels := parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels
 	if !utils.Include(connectedChannels, ch.Meta.Name) {
-		parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels = append(connectedChannels, ch.Meta.Name)
+		connectedChannels = append(connectedChannels, ch.Meta.Name)
+		parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels = connectedChannels
 	}
 
 	if parentApp.Spec.Channels == nil {
