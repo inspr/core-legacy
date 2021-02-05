@@ -8,6 +8,7 @@ import (
 // MockManager mocks a tree structure for testing
 type MockManager struct {
 	root   *meta.App
+	tree   *meta.App
 	appErr error
 	mockC  bool
 	mockCT bool
@@ -50,3 +51,12 @@ func (tmm *MockManager) Apps() memory.AppMemory {
 		root: tmm.root,
 	}
 }
+
+//InitTransaction mock interface structure
+func (tmm *MockManager) InitTransaction() {}
+
+//Commit mock interface structure
+func (tmm *MockManager) Commit() {}
+
+//Cancel mock interface structure
+func (tmm *MockManager) Cancel() {}

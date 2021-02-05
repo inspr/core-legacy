@@ -6,6 +6,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
@@ -33,7 +34,12 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
+		tree.GetTreeMemory().InitTransaction()
+		if !data.DryRun {
+			defer tree.GetTreeMemory().Commit()
+		} else {
+			defer tree.GetTreeMemory().Cancel()
+		}
 		err = ch.CreateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
@@ -79,7 +85,12 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
+		tree.GetTreeMemory().InitTransaction()
+		if !data.DryRun {
+			defer tree.GetTreeMemory().Commit()
+		} else {
+			defer tree.GetTreeMemory().Cancel()
+		}
 		err = ch.UpdateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
@@ -102,7 +113,12 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
+		tree.GetTreeMemory().InitTransaction()
+		if !data.DryRun {
+			defer tree.GetTreeMemory().Commit()
+		} else {
+			defer tree.GetTreeMemory().Cancel()
+		}
 		err = ch.DeleteChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)

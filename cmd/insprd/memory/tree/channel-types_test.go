@@ -251,6 +251,31 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 			wantErr: true,
 			want:    nil,
 		},
+		{
+			name: "Invalid name - doesn't create channel type",
+			fields: fields{
+				root:   getMockChannelTypes(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				ct: &meta.ChannelType{
+					Meta: meta.Metadata{
+						Name:        "-ct3-",
+						Reference:   "ct1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Schema: []byte{},
+				},
+				context: "",
+			},
+			wantErr: true,
+			want:    nil,
+		},
 	}
 
 	for _, tt := range tests {
