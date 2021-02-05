@@ -47,7 +47,11 @@ func (s *Server) InitRoutes() {
 // Run starts the server on the port given in addr
 func (s *Server) Run(ctx context.Context) {
 	server := &http.Server{
-		Handler: s.Mux,
+		ReadTimeout:       1 * time.Second,
+		WriteTimeout:      1 * time.Second,
+		IdleTimeout:       30 * time.Second,
+		ReadHeaderTimeout: 2 * time.Second,
+		Handler:           s.Mux,
 	}
 
 	listenerAddr := environment.GetEnvironment().UnixSocketAddr
@@ -66,25 +70,26 @@ func (s *Server) Run(ctx context.Context) {
 	}()
 
 	log.Printf("SideCar listener is up...")
-	<-ctx.Done()
-	log.Println("Gracefully shutting down...")
+	select {
+	case <-ctx.Done():
+		log.Println("Gracefully shutting down...")
 
-	ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
-	defer cancel()
+		ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
+		defer cancel()
 
-	if err = server.Shutdown(ctxShutdown); err != nil {
-		log.Fatal("error shutting down server")
+		if err = server.Shutdown(ctxShutdown); err != nil {
+			log.Fatal("error shutting down server")
+		}
+
+		err = os.RemoveAll(listenerAddr)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("server shutdown complete")
+		if err == http.ErrServerClosed {
+			err = nil
+		}
+		return
 	}
-
-	err = os.RemoveAll(listenerAddr)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("server shutdown complete")
-	if err == http.ErrServerClosed {
-		err = nil
-	}
-	return
-
 }
