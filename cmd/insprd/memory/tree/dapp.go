@@ -172,15 +172,17 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 func validAppStructure(app, parentApp meta.App) string {
 	errDescription := ""
 	var validName, validSubstructure, parentWithoutNode bool
+
 	_, inParentRef := parentApp.Spec.Apps[app.Meta.Name]
 
 	validName = (app.Meta.Name != "") && !inParentRef
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
-	validChannels, msg := checkChannels(&app)
+	validChannels, msg := checkAndUpdateChannels(&app)
+
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
 	if boundariesExist {
-		errDescription = errDescription + validBoundaries(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
+		errDescription = errDescription + validAndUpdateBoundaries(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
 	}
 
 	if !validName {
@@ -199,7 +201,7 @@ func validAppStructure(app, parentApp meta.App) string {
 	return errDescription
 }
 
-func checkChannels(app *meta.App) (bool, string) {
+func checkAndUpdateChannels(app *meta.App) (bool, string) {
 	channels := app.Spec.Channels
 	chTypes := app.Spec.ChannelTypes
 	for _, channel := range channels {
@@ -237,7 +239,7 @@ func nodeIsEmpty(node meta.Node) bool {
 	return noAnnotations && noName && noParent && noImage
 }
 
-func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
+func validAndUpdateBoundaries(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
 	boundaryErrors := ""
 	if len(parentChannels) == 0 {
 		boundaryErrors = boundaryErrors + "parent doesn't have Channels;"
@@ -293,7 +295,7 @@ func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 			return errParent
 		}
 
-		boundError := validBoundaries(newApp.Meta.Name, newApp.Spec.Boundary, parent.Spec.Channels)
+		boundError := validAndUpdateBoundaries(newApp.Meta.Name, newApp.Spec.Boundary, parent.Spec.Channels)
 		if boundError != "" {
 			return ierrors.NewError().InvalidApp().Message(boundError).Build()
 		}
@@ -308,7 +310,7 @@ func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 		return ierrors.NewError().InvalidChannel().Message("channel's parent dApp doesn't contain specified channel type").Build()
 	}
 
-	if valid, msg := checkChannels(&newApp); !valid {
+	if valid, msg := checkAndUpdateChannels(&newApp); !valid {
 		return ierrors.NewError().InvalidChannel().Message(msg).Build()
 	}
 
