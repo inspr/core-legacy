@@ -392,7 +392,7 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "It should not delete the Channel because it's been used by some app.",
+			name: "It should not delete the Channel because it's been used by an app.",
 			fields: fields{
 				root:   getMockChannels(),
 				appErr: nil,

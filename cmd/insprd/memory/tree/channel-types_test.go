@@ -346,7 +346,7 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "It should not delete the channelType because it's been used by some channel",
+			name: "It should not delete the channelType because it's been used by a channel",
 			fields: fields{
 				root:   getMockChannelTypes(),
 				appErr: nil,
