@@ -80,14 +80,8 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 			}
 		}
 
-		for _, chName := range app.Spec.Boundary.Input {
-			connectedApps := parentApp.Spec.Channels[chName].ConnectedApps
-			if !utils.Include(connectedApps, app.Meta.Name) {
-				parentApp.Spec.Channels[chName].ConnectedApps = append(connectedApps, app.Meta.Name)
-			}
-		}
-
-		for _, chName := range app.Spec.Boundary.Output {
+		appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+		for _, chName := range appBoundary {
 			connectedApps := parentApp.Spec.Channels[chName].ConnectedApps
 			if !utils.Include(connectedApps, app.Meta.Name) {
 				parentApp.Spec.Channels[chName].ConnectedApps = append(connectedApps, app.Meta.Name)
@@ -129,12 +123,9 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 		}
 	}
 
-	for _, chName := range app.Spec.Boundary.Input {
-		parent.Spec.Channels[chName].ConnectedApps = utils.
-			Removes(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
-	}
+	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
 
-	for _, chName := range app.Spec.Boundary.Output {
+	for _, chName := range appBoundary {
 		parent.Spec.Channels[chName].ConnectedApps = utils.
 			Removes(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
 	}
@@ -170,12 +161,9 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 		return errParent
 	}
 
-	for _, chName := range currentApp.Spec.Boundary.Input {
-		parent.Spec.Channels[chName].ConnectedApps = utils.
-			Removes(parent.Spec.Channels[chName].ConnectedApps, currentApp.Meta.Name)
-	}
+	appBoundary := utils.StringSliceUnion(currentApp.Spec.Boundary.Input, currentApp.Spec.Boundary.Output)
 
-	for _, chName := range currentApp.Spec.Boundary.Output {
+	for _, chName := range appBoundary {
 		parent.Spec.Channels[chName].ConnectedApps = utils.
 			Removes(parent.Spec.Channels[chName].ConnectedApps, currentApp.Meta.Name)
 	}
@@ -272,8 +260,6 @@ func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[
 
 				if !utils.Include(parentChannels[input].ConnectedApps, appName) {
 					parentChannels[input].ConnectedApps = append(parentChannels[input].ConnectedApps, appName)
-					// boundaryErrors = boundaryErrors + "invalid input boundary - channel doesnt have this app in connectedApps list;"
-					// break
 				}
 			}
 		}
@@ -287,8 +273,6 @@ func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[
 
 				if !utils.Include(parentChannels[output].ConnectedApps, appName) {
 					parentChannels[output].ConnectedApps = append(parentChannels[output].ConnectedApps, appName)
-					// boundaryErrors = boundaryErrors + "invalid output boundary - channel doesnt have this app in connectedApps list;"
-					// break
 				}
 			}
 		}
