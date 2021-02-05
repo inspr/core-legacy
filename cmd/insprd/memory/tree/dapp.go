@@ -114,15 +114,6 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 		return errParent
 	}
 
-	for _, ch := range app.Spec.Channels {
-		if len(ch.ConnectedApps) > 0 {
-			return ierrors.NewError().
-				BadRequest().
-				Message("cannot delete app: it contain some channel(s) that are been used by other apps.").
-				Build()
-		}
-	}
-
 	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
 
 	for _, chName := range appBoundary {
@@ -186,7 +177,7 @@ func validAppStructure(app, parentApp meta.App) string {
 	validName = (app.Meta.Name != "") && !inParentRef
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
-	validChannels, msg := checkChannels(app)
+	validChannels, msg := checkChannels(&app)
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
 	if boundariesExist {
 		errDescription = errDescription + validBoundaries(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
@@ -208,7 +199,7 @@ func validAppStructure(app, parentApp meta.App) string {
 	return errDescription
 }
 
-func checkChannels(app meta.App) (bool, string) {
+func checkChannels(app *meta.App) (bool, string) {
 	channels := app.Spec.Channels
 	chTypes := app.Spec.ChannelTypes
 	for _, channel := range channels {
@@ -219,11 +210,11 @@ func checkChannels(app meta.App) (bool, string) {
 
 			for _, appName := range channel.ConnectedApps {
 				if _, ok := app.Spec.Apps[appName]; !ok {
-					return false, "invalid channel: it contains a connectedApp that don't exists;"
+					app.Spec.Channels[channel.Meta.Name].ConnectedApps = utils.Removes(channel.ConnectedApps, appName)
 				}
 				appBoundary := utils.StringSliceUnion(app.Spec.Apps[appName].Spec.Boundary.Input, app.Spec.Apps[appName].Spec.Boundary.Output)
 				if !utils.Include(appBoundary, channel.Meta.Name) {
-					return false, "invalid channel: it contains a connectedApp thats not truly connected to it;"
+					app.Spec.Channels[channel.Meta.Name].ConnectedApps = utils.Removes(channel.ConnectedApps, appName)
 				}
 			}
 
@@ -317,7 +308,7 @@ func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 		return ierrors.NewError().InvalidChannel().Message("channel's parent dApp doesn't contain specified channel type").Build()
 	}
 
-	if valid, msg := checkChannels(newApp); !valid {
+	if valid, msg := checkChannels(&newApp); !valid {
 		return ierrors.NewError().InvalidChannel().Message(msg).Build()
 	}
 

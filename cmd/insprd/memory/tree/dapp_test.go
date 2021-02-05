@@ -439,7 +439,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		args          args
 		wantErr       bool
 		want          *meta.App
-		checkFunction func() (bool, string)
+		checkFunction func(t *testing.T)
 	}{
 		{
 			name: "Creating app inside of root",
@@ -948,25 +948,24 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				},
 			},
 			wantErr: false,
-			checkFunction: func() (bool, string) {
+			checkFunction: func(t *testing.T) {
 				am := GetTreeMemory().Channels()
 
 				ch, err := am.GetChannel("app2", "ch1app2")
 				if err != nil {
-					return false, "cant get channel ch1app2"
+					t.Errorf("cant get channel ch1app2")
 				}
 				if !utils.Include(ch.ConnectedApps, "app2") {
-					return false, "connectedApps of ch1app2 dont have app2"
+					t.Errorf("connectedApps of ch1app2 dont have app2")
 				}
 
 				ch2, err2 := am.GetChannel("app2", "ch2app2")
 				if err2 != nil {
-					return false, "cant get channel ch2app2"
+					t.Errorf("cant get channel ch2app2")
 				}
 				if !utils.Include(ch2.ConnectedApps, "app2") {
-					return false, "connectedApps of chapp2 dont have app2"
+					t.Errorf("connectedApps of chapp2 dont have app2")
 				}
-				return true, ""
 			},
 		},
 		{
@@ -1068,16 +1067,15 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				},
 			},
 			wantErr: false,
-			checkFunction: func() (bool, string) {
+			checkFunction: func(t *testing.T) {
 				am := GetTreeMemory().ChannelTypes()
 				ct, err := am.GetChannelType("app2.app2", "ct1")
 				if err != nil {
-					return false, "cant get channelType ct1"
+					t.Errorf("cant get channelType ct1")
 				}
 				if !utils.Include(ct.ConnectedChannels, "channel1") {
-					return false, "connectedChannels of ct1 dont have channel1"
+					t.Errorf("connectedChannels of ct1 dont have channel1")
 				}
-				return true, ""
 			},
 		},
 	}
@@ -1102,10 +1100,9 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
+
 			if tt.checkFunction != nil {
-				if passed, msg := tt.checkFunction(); !passed {
-					t.Errorf("check function not passed: " + msg)
-				}
+				tt.checkFunction(t)
 			}
 		})
 	}
@@ -1128,7 +1125,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 		args          args
 		wantErr       bool
 		want          *meta.App
-		checkFunction func() (bool, string)
+		checkFunction func(t *testing.T)
 	}{
 		{
 			name: "Deleting leaf app from root",
@@ -1206,20 +1203,6 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Try to delete App that has some channel that's been used",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				query: "app1",
-			},
-			wantErr: true,
-		},
-		{
 			name: "It should update the channel's connectedApps",
 			fields: fields{
 				root:   getMockApp(),
@@ -1232,16 +1215,15 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 				query: "app1.thenewapp",
 			},
 			wantErr: false,
-			checkFunction: func() (bool, string) {
+			checkFunction: func(t *testing.T) {
 				am := GetTreeMemory().Channels()
 				ch, err := am.GetChannel("app1", "ch1app1")
 				if err != nil {
-					return false, "cant get channel ch1app1"
+					t.Errorf("cant get channel ch1app1")
 				}
 				if utils.Include(ch.ConnectedApps, "thenewapp") {
-					return false, "connectedApps of ch1app1 still have thenewapp"
+					t.Errorf("connectedApps of ch1app1 still have thenewapp")
 				}
-				return true, ""
 			},
 		},
 	}
@@ -1267,9 +1249,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 				}
 			}
 			if tt.checkFunction != nil {
-				if passed, msg := tt.checkFunction(); !passed {
-					t.Errorf("check function not passed: " + msg)
-				}
+				tt.checkFunction(t)
 			}
 		})
 	}
@@ -1288,11 +1268,12 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 		query string
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		want    *meta.App
+		name          string
+		fields        fields
+		args          args
+		wantErr       bool
+		want          *meta.App
+		checkFunction func(t *testing.T)
 	}{
 		{
 			name: "invalid- update changing apps' name",
@@ -1586,12 +1567,12 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 			},
 		},
 		{
-			name: "Invalid - updated app has invalid changes in channel structure",
+			name: "Valid -  check if connectedApps is updated due to invalid changes in channel structure",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
-				mockC:  true,
-				mockCT: true,
+				mockC:  false,
+				mockCT: false,
 				mockA:  false,
 			},
 			args: args{
@@ -1663,8 +1644,20 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 			want:    nil,
+			checkFunction: func(t *testing.T) {
+				am := GetTreeMemory().Channels()
+
+				ch, err := am.GetChannel("app1", "ch1app1")
+				if err != nil {
+					t.Errorf("cant get channel ch1app1")
+				}
+
+				if utils.Include(ch.ConnectedApps, "thenewapp") {
+					t.Errorf("connectedApps of ch1app1 still have 'thenewapp'")
+				}
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -1687,6 +1680,9 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
+			}
+			if tt.checkFunction != nil {
+				tt.checkFunction(t)
 			}
 		})
 	}
@@ -2951,7 +2947,7 @@ func Test_invalidChannelChanges(t *testing.T) {
 
 func Test_checkChannels(t *testing.T) {
 	type args struct {
-		app meta.App
+		app *meta.App
 	}
 	tests := []struct {
 		name  string
@@ -2962,7 +2958,7 @@ func Test_checkChannels(t *testing.T) {
 		{
 			name: "valid channel structure - it shouldn't return a error",
 			args: args{
-				app: meta.App{
+				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
 						Reference:   "app1",
@@ -3035,7 +3031,7 @@ func Test_checkChannels(t *testing.T) {
 		{
 			name: "invalid channel: using non-existent channel type",
 			args: args{
-				app: meta.App{
+				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
 						Reference:   "app1",
@@ -3104,152 +3100,6 @@ func Test_checkChannels(t *testing.T) {
 			},
 			want:  false,
 			want1: "invalid channel: using non-existent channel type;",
-		},
-		{
-			name: "invalid channel: it contains a connectedApp that don't exists",
-			args: args{
-				app: meta.App{
-					Meta: meta.Metadata{
-						Name:        "app1",
-						Reference:   "app1",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node: meta.Node{},
-						Apps: map[string]*meta.App{
-							"thenewapp": {
-								Meta: meta.Metadata{
-									Name:        "thenewapp",
-									Reference:   "app1.thenewapp",
-									Annotations: map[string]string{},
-									Parent:      "app1",
-									SHA256:      "",
-								},
-								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
-									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app1"},
-										Output: []string{},
-									},
-								},
-							},
-						},
-						Channels: map[string]*meta.Channel{
-							"ch1app1": {
-								Meta: meta.Metadata{
-									Name:   "ch1app1",
-									Parent: "",
-								},
-								ConnectedApps: []string{"invalidApp"},
-								Spec: meta.ChannelSpec{
-									Type: "newChannelType",
-								},
-							},
-							"ch2app1": {
-								Meta: meta.Metadata{
-									Name:   "ch2app1",
-									Parent: "",
-								},
-								Spec: meta.ChannelSpec{},
-							},
-						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"newChannelType": {
-								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
-									Annotations: map[string]string{},
-									Parent:      "app1",
-									SHA256:      "",
-								},
-							},
-						},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			want:  false,
-			want1: "invalid channel: it contains a connectedApp that don't exists;",
-		},
-		{
-			name: "invalid channel: it contains a connectedApp thats not truly connected to it",
-			args: args{
-				app: meta.App{
-					Meta: meta.Metadata{
-						Name:        "app1",
-						Reference:   "app1",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node: meta.Node{},
-						Apps: map[string]*meta.App{
-							"thenewapp": {
-								Meta: meta.Metadata{
-									Name:        "thenewapp",
-									Reference:   "app1.thenewapp",
-									Annotations: map[string]string{},
-									Parent:      "app1",
-									SHA256:      "",
-								},
-								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
-									Boundary: meta.AppBoundary{
-										Input:  []string{},
-										Output: []string{},
-									},
-								},
-							},
-						},
-						Channels: map[string]*meta.Channel{
-							"ch1app1": {
-								Meta: meta.Metadata{
-									Name:   "ch1app1",
-									Parent: "",
-								},
-								ConnectedApps: []string{"thenewapp"},
-								Spec: meta.ChannelSpec{
-									Type: "newChannelType",
-								},
-							},
-							"ch2app1": {
-								Meta: meta.Metadata{
-									Name:   "ch2app1",
-									Parent: "",
-								},
-								Spec: meta.ChannelSpec{},
-							},
-						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"newChannelType": {
-								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
-									Annotations: map[string]string{},
-									Parent:      "app1",
-									SHA256:      "",
-								},
-							},
-						},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			want:  false,
-			want1: "invalid channel: it contains a connectedApp thats not truly connected to it;",
 		},
 	}
 	for _, tt := range tests {
