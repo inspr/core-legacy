@@ -2,7 +2,6 @@ package sidecarserv
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -51,18 +50,9 @@ func (s *Server) Run(ctx context.Context) {
 		Handler: s.Mux,
 	}
 
-	// todo: check if it can listen to the unix socket, os -> folder exists
-	// logrus.Infoln("running write")
-	// if _, err := os.Stat(WriteAddress); !os.IsNotExist(err) {
-	// 	os.RemoveAll(WriteAddress)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-
 	listenerAddr := environment.GetEnvironment().UnixSocketAddr
+	os.Remove(listenerAddr)
 
-	// todo: replace this with a interface that returns a listener
 	listener, err := net.Listen("unix", listenerAddr)
 	if err != nil {
 		log.Println("couldn't listen to address: " + listenerAddr)
@@ -75,14 +65,12 @@ func (s *Server) Run(ctx context.Context) {
 		}
 	}()
 
-	fmt.Printf("SideCar listener is up...")
+	log.Printf("SideCar listener is up...")
 	<-ctx.Done()
-	log.Printf("Gracefully shutting down...")
+	log.Println("Gracefully shutting down...")
 
 	ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
-	defer func() {
-		cancel()
-	}()
+	defer cancel()
 
 	if err = server.Shutdown(ctxShutdown); err != nil {
 		log.Fatal("error shutting down server")
@@ -98,4 +86,5 @@ func (s *Server) Run(ctx context.Context) {
 		err = nil
 	}
 	return
+
 }

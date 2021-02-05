@@ -6,7 +6,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
 
-func mockServer(err error) *Server {
+// MockServer returns a mocked server to do tests
+func MockServer(err error) *Server {
 	return &Server{
 		Mux:    http.NewServeMux(),
 		Reader: &mockReader{err},

@@ -74,7 +74,6 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// todo return in body the msg
 	rest.JSON(w, http.StatusOK, msg)
 }
 

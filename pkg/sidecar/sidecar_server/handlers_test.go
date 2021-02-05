@@ -14,34 +14,6 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
 
-func testCases() {
-
-}
-
-func Test_newCustomHandlers(t *testing.T) {
-	type args struct {
-		server *Server
-	}
-	tests := []struct {
-		name string
-		args args
-		want *customHandlers
-	}{
-		{
-			name: "successfully_created_custom_handlers",
-			args: args{mockServer(nil)},
-			want: &customHandlers{Server: mockServer(nil)},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newCustomHandlers(tt.args.server); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newCustomHandlers() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 // sendInRequest is a struct used for all the testing files in this package
 // it's contents is a simple { body []byte }
 type sendInRequest struct{ body []byte }
@@ -66,6 +38,8 @@ type testCaseStruct struct {
 	args args
 }
 
+var unixSocketAddr = "/tmp/insprd.sock"
+
 // generateTestCases returns the tests cases values to be used in each
 // handle test, the reason for them to share tests cases is because of
 // the models.RequestBody that sets a standard struct to be sent in each
@@ -85,7 +59,7 @@ func generateTestCases() []testCaseStruct {
 	return []testCaseStruct{
 		{
 			name: "successful_request",
-			ch:   newCustomHandlers(mockServer(nil)),
+			ch:   newCustomHandlers(MockServer(nil)),
 			args: args{
 				send: sendInRequest{parsedBody},
 				want: wantedResponse{http.StatusOK},
@@ -93,7 +67,7 @@ func generateTestCases() []testCaseStruct {
 		},
 		{
 			name: "unsuccessful_request",
-			ch:   newCustomHandlers(mockServer(errors.New("error"))),
+			ch:   newCustomHandlers(MockServer(errors.New("error"))),
 			args: args{
 				send: sendInRequest{parsedBody},
 				want: wantedResponse{http.StatusInternalServerError},
@@ -101,7 +75,7 @@ func generateTestCases() []testCaseStruct {
 		},
 		{
 			name: "bad_request",
-			ch:   newCustomHandlers(mockServer(nil)),
+			ch:   newCustomHandlers(MockServer(nil)),
 			args: args{
 				send: sendInRequest{badBody},
 				want: wantedResponse{http.StatusBadRequest},
@@ -109,7 +83,7 @@ func generateTestCases() []testCaseStruct {
 		},
 		{
 			name: "no_channel_request",
-			ch:   newCustomHandlers(mockServer(nil)),
+			ch:   newCustomHandlers(MockServer(nil)),
 			args: args{
 				send: sendInRequest{noChanBody},
 				want: wantedResponse{http.StatusBadRequest},
@@ -118,11 +92,35 @@ func generateTestCases() []testCaseStruct {
 	}
 }
 
+func Test_newCustomHandlers(t *testing.T) {
+	type args struct {
+		server *Server
+	}
+	tests := []struct {
+		name string
+		args args
+		want *customHandlers
+	}{
+		{
+			name: "successfully_created_custom_handlers",
+			args: args{MockServer(nil)},
+			want: &customHandlers{Server: MockServer(nil)},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := newCustomHandlers(tt.args.server); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("newCustomHandlers() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_customHandlers_writeMessageHandler(t *testing.T) {
 	customEnvValues := "chan;testing;banana"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
-	os.Setenv("UNIX_SOCKET_ADDRESS", customEnvValues)
+	os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
 
 	tests := generateTestCases()
 	for _, tt := range tests {
@@ -154,7 +152,7 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 	customEnvValues := "chan;testing;banana"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
-	os.Setenv("UNIX_SOCKET_ADDRESS", customEnvValues)
+	os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
 
 	tests := generateTestCases()
 	for _, tt := range tests {
@@ -213,7 +211,7 @@ func Test_customHandlers_commitMessageHandler(t *testing.T) {
 	customEnvValues := "chan;testing;banana"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
-	os.Setenv("UNIX_SOCKET_ADDRESS", customEnvValues)
+	os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
 
 	tests := generateTestCases()
 	for _, tt := range tests {
