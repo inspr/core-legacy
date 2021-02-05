@@ -1,8 +1,6 @@
 package tree
 
 import (
-	"reflect"
-
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -122,12 +120,7 @@ func (ctm *ChannelTypeMemoryManager) UpdateChannelType(ct *meta.ChannelType, con
 			Message("target app doesn't contain a '" + context + "' ChannelType").Build()
 	}
 
-	if ok := reflect.DeepEqual(oldChType.ConnectedChannels, ct.ConnectedChannels); !ok {
-		return ierrors.NewError().
-			InvalidChannelType().
-			Message("new channelType must have the same connectedChannel as old channelType").
-			Build()
-	}
+	ct.ConnectedChannels = oldChType.ConnectedChannels
 
 	parentApp, err := GetTreeMemory().Apps().GetApp(context)
 	if err != nil {

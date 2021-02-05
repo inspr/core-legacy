@@ -497,32 +497,6 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 			wantErr: true,
 			want:    nil,
 		},
-		{
-			name: "It should not update because the new channelType doesn't have the same connectedChannels.",
-			fields: fields{
-				root:   getMockChannelTypes(),
-				appErr: nil,
-				mockA:  true,
-				mockC:  true,
-				mockCT: false,
-			},
-			args: args{
-				ct: &meta.ChannelType{
-					Meta: meta.Metadata{
-						Name:        "ct3",
-						Reference:   "ct3",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					ConnectedChannels: []string{},
-					Schema:            []byte{0, 1, 0, 1},
-				},
-				context: "",
-			},
-			wantErr: true,
-			want:    nil,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
