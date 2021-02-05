@@ -1,7 +1,5 @@
 package dappclient
 
-// todo check if Post methods are capable of receiving contexts
-
 import (
 	"bytes"
 	"context"
@@ -42,7 +40,7 @@ func NewAppClient() *Client {
 	}
 }
 
-// WriteMessage TODO DOC
+// WriteMessage receives a channel and a message and sends it in a request to the sidecar server
 func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Message) error {
 	data := clientMessage{
 		Channel: channel,
@@ -52,7 +50,7 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Me
 	return err
 }
 
-// ReadMessage TODO DOC
+// ReadMessage receives a channel and sends it in a request to the sidecar server
 func (c *Client) ReadMessage(ctx context.Context, channel string) (models.Message, error) {
 	data := clientMessage{
 		Channel: channel,
@@ -61,7 +59,7 @@ func (c *Client) ReadMessage(ctx context.Context, channel string) (models.Messag
 	return msg, err
 }
 
-// CommitMessage TODO DOC
+// CommitMessage receives a channel and sends it in a request to the sidecar server
 func (c *Client) CommitMessage(ctx context.Context, channel string) error {
 	data := clientMessage{
 		Channel: channel,
