@@ -13,7 +13,7 @@ type person struct {
 	age  int
 }
 
-func GetMockRootApp() *meta.App {
+func getMockRootApp() *meta.App {
 	root := meta.App{
 		Meta: meta.Metadata{
 			Name:        "",
@@ -155,7 +155,7 @@ func GetMockRootApp() *meta.App {
 	}
 	return &root
 }
-func GetMockRootApp2() *meta.App {
+func getMockRootApp2() *meta.App {
 	root := meta.App{
 		Meta: meta.Metadata{
 			Name:      "",
