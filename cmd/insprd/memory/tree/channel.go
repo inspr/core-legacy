@@ -1,8 +1,6 @@
 package tree
 
 import (
-	"reflect"
-
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -120,12 +118,7 @@ func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel)
 		return newError
 	}
 
-	if ok := reflect.DeepEqual(oldCh.ConnectedApps, ch.ConnectedApps); !ok {
-		return ierrors.NewError().
-			InvalidChannel().
-			Message("new channel must have the same connectedApps as old channel").
-			Build()
-	}
+	ch.ConnectedApps = oldCh.ConnectedApps
 
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)
 
