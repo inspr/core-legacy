@@ -65,7 +65,7 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 		return ierrors.NewError().InvalidApp().Message("this app already exists in parentApp").Build()
 	}
 
-	structureErrors := amm.recursiveApps(app, parentApp)
+	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp)
 	if structureErrors == "" {
 		if app.Spec.Apps == nil {
 			app.Spec.Apps = map[string]*meta.App{}
@@ -77,14 +77,6 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 			app.Spec.Node.Meta.Parent = app.Meta.Name
 			if app.Spec.Node.Meta.Annotations == nil {
 				app.Spec.Node.Meta.Annotations = map[string]string{}
-			}
-		}
-
-		appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
-		for _, chName := range appBoundary {
-			connectedApps := parentApp.Spec.Channels[chName].ConnectedApps
-			if !utils.Includes(connectedApps, app.Meta.Name) {
-				parentApp.Spec.Channels[chName].ConnectedApps = append(connectedApps, app.Meta.Name)
 			}
 		}
 
@@ -147,7 +139,7 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 		return errParent
 	}
 
-	structureError := amm.recursiveApps(app, parent)
+	structureError := amm.recursiveCheckAndRefineApp(app, parent)
 	if structureError != "" {
 		return ierrors.NewError().InvalidApp().Message(structureError).Build()
 	}
@@ -172,10 +164,10 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 }
 
 // Auxiliar unexported functions
-func (amm *AppMemoryManager) recursiveApps(app *meta.App, parentApp *meta.App) string {
+func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app *meta.App, parentApp *meta.App) string {
 	structureErrors := validAppStructure(app, parentApp)
 	for _, childApp := range app.Spec.Apps {
-		return amm.recursiveApps(childApp, app)
+		return amm.recursiveCheckAndRefineApp(childApp, app)
 	}
 	return structureErrors
 }
