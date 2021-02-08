@@ -46,7 +46,7 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Me
 		Channel: channel,
 		Message: msg,
 	}
-	_, err := c.sendRequest(ctx, http.MethodPost, c.addr+"/writeMessage", data)
+	_, err := c.sendRequest(ctx, http.MethodPost, "/writeMessage", data)
 	return err
 }
 
@@ -55,7 +55,7 @@ func (c *Client) ReadMessage(ctx context.Context, channel string) (models.Messag
 	data := clientMessage{
 		Channel: channel,
 	}
-	msg, err := c.sendRequest(ctx, http.MethodPost, c.addr+"/readMessage", data)
+	msg, err := c.sendRequest(ctx, http.MethodPost, "/readMessage", data)
 	return msg, err
 }
 
@@ -64,12 +64,13 @@ func (c *Client) CommitMessage(ctx context.Context, channel string) error {
 	data := clientMessage{
 		Channel: channel,
 	}
-	_, err := c.sendRequest(ctx, http.MethodPost, c.addr+"/commit", data)
+	_, err := c.sendRequest(ctx, http.MethodPost, "/commit", data)
 	return err
 }
 
-func (c *Client) sendRequest(ctx context.Context, method, addr string, reqData clientMessage) (models.Message, error) {
+func (c *Client) sendRequest(ctx context.Context, method, route string, reqData clientMessage) (models.Message, error) {
 	ret := make(chan requestReturn)
+	addr := c.addr + route
 
 	go func() {
 		reqBytes, err := json.Marshal(reqData)
@@ -102,12 +103,11 @@ func (c *Client) sendRequest(ctx context.Context, method, addr string, reqData c
 		ret <- requestReturn{nil, msg}
 	}()
 
-	for {
-		select {
-		case rmErr := <-ret:
-			return rmErr.Message, rmErr.Error
-		case <-ctx.Done():
-			return models.Message{}, ierrors.NewError().InternalServer().Message("server died mid request").Build()
-		}
+	select {
+	case rmErr := <-ret:
+		return rmErr.Message, rmErr.Error
+	case <-ctx.Done():
+		return models.Message{}, ierrors.NewError().InternalServer().Message("server died mid request").Build()
 	}
+
 }
