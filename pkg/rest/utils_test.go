@@ -25,7 +25,7 @@ func TestJSON(t *testing.T) {
 			name: "success_test",
 			args: args{
 				w:          rr,
-				statusCode: 200,
+				statusCode: http.StatusOK,
 				data:       "testing",
 			},
 		},
