@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"sync"
 
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -14,15 +15,19 @@ import (
 // customHandlers is a struct that contains the handlers
 //  to be used to server
 type customHandlers struct {
-	*Server
+	sync.Locker
+	r         models.Reader
+	w         models.Writer
 	insprVars *environment.InsprEnvironment
 }
 
 // newCustomHandlers returns a struct composed of the
 // Reader and Writer given in the parameters
-func newCustomHandlers(server *Server) *customHandlers {
+func newCustomHandlers(l sync.Locker, r models.Reader, w models.Writer) *customHandlers {
 	return &customHandlers{
-		Server:    server,
+		Locker:    l,
+		r:         r,
+		w:         w,
 		insprVars: environment.GetEnvironment(),
 	}
 }
@@ -47,7 +52,7 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if err := ch.Writer.WriteMessage(body.Channel, body.Message); err != nil {
+	if err := ch.w.WriteMessage(body.Channel, body.Message); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's writeMessage failed")
 		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
 	}
@@ -74,7 +79,7 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	brokerResp, err := ch.Reader.ReadMessage(body.Channel)
+	brokerResp, err := ch.r.ReadMessage(body.Channel)
 	if err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's ReadMessage returned an error")
 		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
@@ -104,7 +109,7 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if err := ch.Reader.CommitMessage(body.Channel); err != nil {
+	if err := ch.r.CommitMessage(body.Channel); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's commitMessage failed")
 		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
 	}

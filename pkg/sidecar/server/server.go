@@ -36,7 +36,7 @@ func (s *Server) Init(r models.Reader, w models.Writer) {
 
 // InitRoutes establishes the routes of the server
 func (s *Server) InitRoutes() {
-	handler := newCustomHandlers(s)
+	handler := newCustomHandlers(&s.Mutex, s.Reader, s.Writer)
 
 	s.Mux.HandleFunc("/writeMessage", handler.writeMessageHandler)
 

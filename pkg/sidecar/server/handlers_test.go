@@ -55,10 +55,15 @@ func generateTestCases() []testCaseStruct {
 	})
 	badBody := []byte{0}
 
+	// constants used in the tests
+	normalCustomHandler := newCustomHandlers(&MockServer(nil).Mutex, MockServer(nil).Reader, MockServer(nil).Writer)
+	err := errors.New("error")
+	throwCustomHandler := newCustomHandlers(&MockServer(err).Mutex, MockServer(err).Reader, MockServer(err).Writer)
+
 	return []testCaseStruct{
 		{
 			name: "successful_request",
-			ch:   newCustomHandlers(MockServer(nil)),
+			ch:   normalCustomHandler,
 			args: args{
 				send: sendInRequest{parsedBody},
 				want: wantedResponse{http.StatusOK},
@@ -66,7 +71,7 @@ func generateTestCases() []testCaseStruct {
 		},
 		{
 			name: "unsuccessful_request",
-			ch:   newCustomHandlers(MockServer(errors.New("error"))),
+			ch:   throwCustomHandler,
 			args: args{
 				send: sendInRequest{parsedBody},
 				want: wantedResponse{http.StatusInternalServerError},
@@ -74,7 +79,7 @@ func generateTestCases() []testCaseStruct {
 		},
 		{
 			name: "bad_request",
-			ch:   newCustomHandlers(MockServer(nil)),
+			ch:   normalCustomHandler,
 			args: args{
 				send: sendInRequest{badBody},
 				want: wantedResponse{http.StatusBadRequest},
@@ -82,7 +87,7 @@ func generateTestCases() []testCaseStruct {
 		},
 		{
 			name: "no_channel_request",
-			ch:   newCustomHandlers(MockServer(nil)),
+			ch:   normalCustomHandler,
 			args: args{
 				send: sendInRequest{noChanBody},
 				want: wantedResponse{http.StatusBadRequest},
@@ -121,14 +126,18 @@ func Test_newCustomHandlers(t *testing.T) {
 			name: "successfully_created_custom_handlers",
 			args: args{MockServer(nil)},
 			want: &customHandlers{
-				Server:    MockServer(nil),
+				Locker:    &MockServer(nil).Mutex,
+				r:         MockServer(nil).Reader,
+				w:         MockServer(nil).Writer,
 				insprVars: environment.GetEnvironment(),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := newCustomHandlers(tt.args.server); !reflect.DeepEqual(got, tt.want) {
+
+			got := newCustomHandlers(&MockServer(nil).Mutex, MockServer(nil).Reader, MockServer(nil).Writer)
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("newCustomHandlers() = %v, want %v", got, tt.want)
 			}
 		})
