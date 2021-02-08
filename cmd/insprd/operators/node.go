@@ -7,10 +7,10 @@ import (
 // NodeOperatorInterface is the interface that allows to obtain or change
 // node information inside a deployment
 type NodeOperatorInterface interface {
-	CreateNode(node *meta.Node) error
-	GetNode(nodeName string) (*meta.Node, error)
-	UpdateNode(node *meta.Node) error
-	DeleteNode(nodeName string) error
+	CreateNode(context string, node *meta.Node) error
+	GetNode(context string, nodeName string) (*meta.Node, error)
+	UpdateNode(context string, node *meta.Node) error
+	DeleteNode(context, nodeName string) error
 	GetAllNodes() []*meta.Node
 }
 
@@ -26,26 +26,26 @@ func (no *NodeOperator) Nodes() NodeOperatorInterface {
 	}
 }
 
-// GetNode returns the node with the given name, if it exists.
-// Otherwise, returns an error
-func (no *NodeOperator) GetNode(nodeName string) (*meta.Node, error) {
-	return &meta.Node{}, nil
-}
-
 // CreateNode deploys a new node structure, if it's information is valid.
 // Otherwise, returns an error
-func (no *NodeOperator) CreateNode(node *meta.Node) error {
+func (no *NodeOperator) CreateNode(context string, node *meta.Node) error {
 	return nil
 }
 
-// DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
-func (no *NodeOperator) DeleteNode(nodeName string) error {
-	return nil
+// GetNode returns the node with the given name, if it exists.
+// Otherwise, returns an error
+func (no *NodeOperator) GetNode(context string, nodeName string) (*meta.Node, error) {
+	return &meta.Node{}, nil
 }
 
 // UpdateNode updates a node that already exists, if the new structure is valid.
 // Otherwise, returns an error.
-func (no *NodeOperator) UpdateNode(node *meta.Node) error {
+func (no *NodeOperator) UpdateNode(context string, node *meta.Node) error {
+	return nil
+}
+
+// DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
+func (no *NodeOperator) DeleteNode(context, nodeName string) error {
 	return nil
 }
 
