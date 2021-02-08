@@ -2017,7 +2017,7 @@ func Test_validBoundaries(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := validAndUpdateBoundaries(tt.args.appName, tt.args.bound, tt.args.parentChannels); got != tt.want {
+			if got := validBoundaries(tt.args.appName, tt.args.bound, tt.args.parentChannels); got != tt.want {
 				t.Errorf("validBoundaries() = %v, want %v", got, tt.want)
 			}
 		})

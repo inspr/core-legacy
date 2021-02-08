@@ -165,7 +165,7 @@ func validAppStructure(app, parentApp *meta.App) string {
 
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
 	if boundariesExist {
-		errDescription = errDescription + validAndUpdateBoundaries(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
+		errDescription = errDescription + validBoundaries(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
 	}
 
 	if !validName {
@@ -193,6 +193,7 @@ func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
 }
 
 func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
+	updateAppBoundary(app, parentApp)
 	if app.Spec.Apps == nil {
 		app.Spec.Apps = map[string]*meta.App{}
 	}
@@ -245,7 +246,7 @@ func nodeIsEmpty(node meta.Node) bool {
 	return noAnnotations && noName && noParent && noImage
 }
 
-func validAndUpdateBoundaries(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
+func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
 	if len(parentChannels) == 0 {
 		return "parent doesn't have Channels;"
 	}
@@ -257,13 +258,24 @@ func validAndUpdateBoundaries(appName string, bound meta.AppBoundary, parentChan
 			return "invalid app boundary;"
 		}
 	}
+
+	return ""
+}
+
+func updateAppBoundary(app *meta.App, parentApp *meta.App) {
+	for _, childApp := range app.Spec.Apps {
+		updateAppBoundary(childApp, app)
+	}
+	updateSingleBoundary(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
+}
+
+func updateSingleBoundary(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) {
+	appBoundary := utils.StringSliceUnion(bound.Input, bound.Output)
 	for _, chName := range appBoundary {
 		if !utils.Includes(parentChannels[chName].ConnectedApps, appName) {
 			parentChannels[chName].ConnectedApps = append(parentChannels[chName].ConnectedApps, appName)
 		}
 	}
-
-	return ""
 }
 
 func getParentApp(sonQuery string) (*meta.App, error) {
