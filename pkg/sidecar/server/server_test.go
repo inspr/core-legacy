@@ -3,23 +3,21 @@ package sidecarserv
 import (
 	"context"
 	"net/http"
-	"os"
 	"sync"
 	"testing"
 	"time"
 
+	env "gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/transports"
 )
 
 func TestServer_Run(t *testing.T) {
 	routes := []string{"commit", "writeMessage", "readMessage"}
-	for _, r := range routes {
+	// ENV variables
+	createMockEnvVars()
 
+	for _, r := range routes {
 		t.Run("run_test/"+r, func(t *testing.T) {
-			// ENV variables
-			os.Setenv("INSPR_INPUT_CHANNELS", "")
-			os.Setenv("INSPR_OUTPUT_CHANNELS", "")
-			os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
 
 			// SERVER
 			var wg sync.WaitGroup
@@ -36,7 +34,7 @@ func TestServer_Run(t *testing.T) {
 				defer wg.Done()
 				time.Sleep(500 * time.Microsecond)
 
-				c := transports.NewUnixSocketClient(unixSocketAddr)
+				c := transports.NewUnixSocketClient(env.GetEnvironment().UnixSocketAddr)
 
 				resp, err := c.Post("http://unix/"+r, "", nil)
 				if err != nil {
@@ -48,15 +46,14 @@ func TestServer_Run(t *testing.T) {
 			}()
 		})
 	}
+	deleteMockEnvVars()
 }
 
 func TestServer_Cancel(t *testing.T) {
-	t.Run("run_test/timeout", func(t *testing.T) {
-		// ENV variables
-		os.Setenv("INSPR_INPUT_CHANNELS", "")
-		os.Setenv("INSPR_OUTPUT_CHANNELS", "")
-		os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
+	// ENV variables
+	createMockEnvVars()
 
+	t.Run("run_test/timeout", func(t *testing.T) {
 		// SERVER
 		var wg sync.WaitGroup
 		wg.Add(1)
@@ -76,7 +73,7 @@ func TestServer_Cancel(t *testing.T) {
 			cancel()
 			time.Sleep(500 * time.Microsecond)
 
-			c := transports.NewUnixSocketClient(unixSocketAddr)
+			c := transports.NewUnixSocketClient(env.GetEnvironment().UnixSocketAddr)
 
 			_, err := c.Post("http://unix/commit", "", nil)
 			if err == nil {
@@ -84,4 +81,5 @@ func TestServer_Cancel(t *testing.T) {
 			}
 		}()
 	})
+	deleteMockEnvVars()
 }

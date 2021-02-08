@@ -38,8 +38,6 @@ type testCaseStruct struct {
 	args args
 }
 
-var unixSocketAddr = "/tmp/insprd.sock"
-
 // generateTestCases returns the tests cases values to be used in each
 // handle test, the reason for them to share tests cases is because of
 // the models.RequestBody that sets a standard struct to be sent in each
@@ -92,6 +90,22 @@ func generateTestCases() []testCaseStruct {
 	}
 }
 
+// createMockEnvVars - sets up the env values to be used in the tests functions
+func createMockEnvVars() {
+	customEnvValues := "chan;testing;banana"
+	var unixSocketAddr = "/tmp/insprd.sock"
+	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
+	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
+	os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
+}
+
+// deleteMockEnvVars - deletes the env values used in the tests functions
+func deleteMockEnvVars() {
+	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
+	os.Unsetenv("INSPR_INPUT_CHANNELS")
+	os.Unsetenv("UNIX_SOCKET_ADDRESS")
+}
+
 func Test_newCustomHandlers(t *testing.T) {
 	type args struct {
 		server *Server
@@ -117,12 +131,9 @@ func Test_newCustomHandlers(t *testing.T) {
 }
 
 func Test_customHandlers_writeMessageHandler(t *testing.T) {
-	customEnvValues := "chan;testing;banana"
-	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
-	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
-	os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
-
+	createMockEnvVars()
 	tests := generateTestCases()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// tt.ch.writeMessageHandler(tt.args.w, tt.args.r)
@@ -143,18 +154,13 @@ func Test_customHandlers_writeMessageHandler(t *testing.T) {
 
 		})
 	}
-	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
-	os.Unsetenv("INSPR_INPUT_CHANNELS")
-	os.Unsetenv("UNIX_SOCKET_ADDRESS")
+	deleteMockEnvVars()
 }
 
 func Test_customHandlers_readMessageHandler(t *testing.T) {
-	customEnvValues := "chan;testing;banana"
-	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
-	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
-	os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
-
+	createMockEnvVars()
 	tests := generateTestCases()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			handlerFunc := http.HandlerFunc(tt.ch.readMessageHandler)
@@ -202,16 +208,11 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 			}
 		})
 	}
-	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
-	os.Unsetenv("INSPR_INPUT_CHANNELS")
-	os.Unsetenv("UNIX_SOCKET_ADDRESS")
+	deleteMockEnvVars()
 }
 
 func Test_customHandlers_commitMessageHandler(t *testing.T) {
-	customEnvValues := "chan;testing;banana"
-	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
-	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
-	os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
+	createMockEnvVars()
 
 	tests := generateTestCases()
 	for _, tt := range tests {
@@ -233,7 +234,40 @@ func Test_customHandlers_commitMessageHandler(t *testing.T) {
 
 		})
 	}
-	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
-	os.Unsetenv("INSPR_INPUT_CHANNELS")
-	os.Unsetenv("UNIX_SOCKET_ADDRESS")
+	deleteMockEnvVars()
+}
+
+func Test_handlers_existsInSlice(t *testing.T) {
+	tests := []struct {
+		testName    string
+		channel     string
+		channelList []string
+		want        bool
+	}{
+		{
+			testName:    "found_channel",
+			channel:     "a",
+			channelList: []string{"a", "b", "c", "d"},
+			want:        true,
+		},
+		{
+			testName:    "no_channel_found",
+			channel:     "non-existant",
+			channelList: []string{"a", "b", "c", "d"},
+			want:        false,
+		},
+		{
+			testName:    "empty_channelList",
+			channel:     "empty",
+			channelList: []string{},
+			want:        false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			if got := existsInSlice(tt.channel, tt.channelList); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("newCustomHandlers() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

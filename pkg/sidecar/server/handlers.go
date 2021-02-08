@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
@@ -15,12 +16,16 @@ import (
 //  to be used to server
 type customHandlers struct {
 	*Server
+	insprVars *environment.InsprEnvironment
 }
 
 // newCustomHandlers returns a struct composed of the
 // Reader and Writer given in the parameters
 func newCustomHandlers(server *Server) *customHandlers {
-	return &customHandlers{server}
+	return &customHandlers{
+		Server:    server,
+		insprVars: environment.GetEnvironment(),
+	}
 }
 
 // handles the /message route in the server
@@ -32,11 +37,14 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 	body := models.RequestBody{}
 
 	if err := decoder.Decode(&body); err != nil {
-		rest.ERROR(w, http.StatusBadRequest, err)
+		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
+		// TODO See if it's apropriatte to change rest.Error parameters to insprErrors
+		// that implies in changing the code for the master's api
+		rest.ERROR(w, http.StatusBadRequest, insprError.Build().Err)
 		return
 	}
 
-	existingChannels := strings.Split(environment.GetEnvironment().OutputChannels, ";")
+	existingChannels := strings.Split(ch.insprVars.OutputChannels, ";")
 
 	if !existsInSlice(body.Channel, existingChannels) {
 		rest.ERROR(w, http.StatusBadRequest, errors.New("channel doesn't exist"))
@@ -61,7 +69,7 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	existingChannels := strings.Split(environment.GetEnvironment().InputChannels, ";")
+	existingChannels := strings.Split(ch.insprVars.InputChannels, ";")
 
 	if !existsInSlice(body.Channel, existingChannels) {
 		rest.ERROR(w, http.StatusBadRequest, errors.New("channel doesn't exist"))
@@ -82,15 +90,13 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 	ch.Lock()
 	defer ch.Unlock()
 
-	decoder := json.NewDecoder(r.Body)
 	body := models.RequestBody{}
-
-	if err := decoder.Decode(&body); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		rest.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
 
-	existingChannels := strings.Split(environment.GetEnvironment().OutputChannels, ";")
+	existingChannels := strings.Split(ch.insprVars.OutputChannels, ";")
 
 	if !existsInSlice(body.Channel, existingChannels) {
 		rest.ERROR(w, http.StatusBadRequest, errors.New("channel doesn't exist"))
