@@ -36,8 +36,6 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 	body := models.RequestBody{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
-		// TODO See if it's apropriatte to change rest.Error parameters to insprErrors
-		// that implies in changing the code for the master's api
 		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
@@ -45,12 +43,14 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 	existingChannels := strings.Split(ch.insprVars.OutputChannels, ";")
 
 	if !existsInSlice(body.Channel, existingChannels) {
-		rest.ERROR(w, http.StatusBadRequest, errors.New("channel doesn't exist"))
+		insprError := ierrors.NewError().BadRequest().Message("channel doesn't exist")
+		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
 
 	if err := ch.Writer.WriteMessage(body.Channel, body.Message); err != nil {
-		rest.ERROR(w, http.StatusInternalServerError, err)
+		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's writeMessage failed")
+		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
 	}
 }
 
