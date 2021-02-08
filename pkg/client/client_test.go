@@ -3,7 +3,6 @@ package dappclient
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -166,7 +165,6 @@ func TestClient_WriteMessage(t *testing.T) {
 			}
 
 			err := c.WriteMessage(ctx, "chan1", mockMessage())
-			fmt.Println(err)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.WriteMessage() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -304,7 +302,7 @@ func TestClient_sendRequest(t *testing.T) {
 		{
 			name: "Valid request",
 			args: args{
-				route:  "/",
+				route:  "/commit",
 				ctx:    context.Background(),
 				method: http.MethodPost,
 				reqData: clientMessage{
@@ -361,7 +359,7 @@ func TestClient_sendRequest(t *testing.T) {
 				s.Close()
 			}
 
-			got, err := c.sendRequest(tt.args.ctx, tt.args.method, c.addr+tt.args.route, tt.args.reqData)
+			got, err := c.sendRequest(tt.args.ctx, tt.args.method, tt.args.route, tt.args.reqData)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.sendRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return
