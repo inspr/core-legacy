@@ -28,10 +28,7 @@ func mockHTTPClient(addr string) *http.Client {
 
 func mockMessage() models.Message {
 	return models.Message{
-		Commit:  false,
-		Channel: "chan1",
-		Data:    nil,
-		Error:   nil,
+		Data: nil,
 	}
 }
 
