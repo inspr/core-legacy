@@ -1,8 +1,6 @@
 package environment
 
-import (
-	"strings"
-)
+import "strings"
 
 // IsInInputChannel - checks if a word exists in the insprEnv.InputChannels
 func (insprEnv *InsprEnvironment) IsInInputChannel(word string, separator string) bool {
