@@ -5,8 +5,7 @@ package models
 // BrokerResponse - is the struct that represents
 // the return of the interface methods
 type BrokerResponse struct {
-	Data  interface{} `json:"data,omitempty"`
-	Error error       `json:"error,omitempty"`
+	Data interface{} `json:"data,omitempty"`
 }
 
 // RECEIVED BY DAPP CLIENT

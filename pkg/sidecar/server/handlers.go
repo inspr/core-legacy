@@ -2,7 +2,6 @@ package sidecarserv
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strings"
 
@@ -62,20 +61,23 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 	body := models.RequestBody{}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		rest.ERROR(w, http.StatusBadRequest, err)
+		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
+		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
 
 	existingChannels := strings.Split(ch.insprVars.InputChannels, ";")
 
 	if !existsInSlice(body.Channel, existingChannels) {
-		rest.ERROR(w, http.StatusBadRequest, errors.New("channel doesn't exist"))
+		insprError := ierrors.NewError().BadRequest().Message("channel doesn't exist")
+		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
 
-	brokerResp := ch.Reader.ReadMessage(body.Channel)
-	if brokerResp.Error != nil {
-		rest.ERROR(w, http.StatusInternalServerError, brokerResp.Error)
+	brokerResp, err := ch.Reader.ReadMessage(body.Channel)
+	if err != nil {
+		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's ReadMessage returned an error")
+		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
 		return
 	}
 
@@ -89,19 +91,22 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 
 	body := models.RequestBody{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		rest.ERROR(w, http.StatusBadRequest, err)
+		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
+		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
 
 	existingChannels := strings.Split(ch.insprVars.OutputChannels, ";")
 
 	if !existsInSlice(body.Channel, existingChannels) {
-		rest.ERROR(w, http.StatusBadRequest, errors.New("channel doesn't exist"))
+		insprError := ierrors.NewError().BadRequest().Message("channel doesn't exist")
+		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
 
 	if err := ch.Reader.CommitMessage(body.Channel); err != nil {
-		rest.ERROR(w, http.StatusInternalServerError, err)
+		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's commitMessage failed")
+		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
 	}
 
 }

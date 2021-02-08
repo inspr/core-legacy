@@ -203,8 +203,8 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 				}
 
 				// if channel isn't 'chan'
-				expectedData := MockServer(nil).Reader.ReadMessage("").Data
-				if msg.Data != expectedData {
+				expectedData, _ := MockServer(nil).Reader.ReadMessage("")
+				if msg.Data != expectedData.Data {
 					t.Errorf("readMessageHandler.Body error, field 'data' = %v, want %v", msg.Data, expectedData)
 				}
 			}

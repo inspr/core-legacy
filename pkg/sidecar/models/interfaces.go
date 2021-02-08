@@ -4,7 +4,7 @@ package models
 
 // Reader reads from a message broker
 type Reader interface {
-	ReadMessage(channel string) BrokerResponse
+	ReadMessage(channel string) (BrokerResponse, error)
 	CommitMessage(channel string) error
 }
 
