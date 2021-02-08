@@ -2012,7 +2012,7 @@ func Test_validBoundaries(t *testing.T) {
 				},
 				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Channels,
 			},
-			want: "invalid input boundary;invalid output boundary;",
+			want: "invalid app boundary;",
 		},
 	}
 	for _, tt := range tests {

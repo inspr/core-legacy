@@ -65,25 +65,12 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 		return ierrors.NewError().InvalidApp().Message("this app already exists in parentApp").Build()
 	}
 
-	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp)
-	if structureErrors == "" {
-		if app.Spec.Apps == nil {
-			app.Spec.Apps = map[string]*meta.App{}
-		}
-		app.Meta.Parent = parentApp.Meta.Name
-		parentApp.Spec.Apps[app.Meta.Name] = app
-
-		if !nodeIsEmpty(app.Spec.Node) {
-			app.Spec.Node.Meta.Parent = app.Meta.Name
-			if app.Spec.Node.Meta.Annotations == nil {
-				app.Spec.Node.Meta.Annotations = map[string]string{}
-			}
-		}
-
-		return nil
+	appErr := amm.checkApp(app, parentApp)
+	if appErr != nil {
+		return appErr
 	}
-
-	return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
+	amm.addAppInTree(app, parentApp)
+	return nil
 }
 
 // DeleteApp receives a query and searches for the specified dApp through the tree.
@@ -139,9 +126,9 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 		return errParent
 	}
 
-	structureError := amm.recursiveCheckAndRefineApp(app, parent)
-	if structureError != "" {
-		return ierrors.NewError().InvalidApp().Message(structureError).Build()
+	appErr := amm.checkApp(app, parent)
+	if appErr != nil {
+		return appErr
 	}
 
 	appBoundary := utils.StringSliceUnion(currentApp.Spec.Boundary.Input, currentApp.Spec.Boundary.Output)
@@ -153,12 +140,7 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 
 	delete(parent.Spec.Apps, currentApp.Meta.Name)
 
-	sonRef := strings.Split(query, ".")
-	parentQuery := strings.Join(sonRef[:len(sonRef)-1], ".")
-	erro := amm.CreateApp(app, parentQuery)
-	if erro != nil {
-		return erro
-	}
+	amm.addAppInTree(app, parent)
 
 	return nil
 }
@@ -202,6 +184,29 @@ func validAppStructure(app, parentApp *meta.App) string {
 	return errDescription
 }
 
+func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
+	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp)
+	if structureErrors == "" {
+		return nil
+	}
+	return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
+}
+
+func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
+	if app.Spec.Apps == nil {
+		app.Spec.Apps = map[string]*meta.App{}
+	}
+	app.Meta.Parent = parentApp.Meta.Name
+	parentApp.Spec.Apps[app.Meta.Name] = app
+
+	if !nodeIsEmpty(app.Spec.Node) {
+		app.Spec.Node.Meta.Parent = app.Meta.Name
+		if app.Spec.Node.Meta.Annotations == nil {
+			app.Spec.Node.Meta.Annotations = map[string]string{}
+		}
+	}
+}
+
 func checkAndUpdateChannels(app *meta.App) (bool, string) {
 	channels := app.Spec.Channels
 	chTypes := app.Spec.ChannelTypes
@@ -241,38 +246,24 @@ func nodeIsEmpty(node meta.Node) bool {
 }
 
 func validAndUpdateBoundaries(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
-	boundaryErrors := ""
 	if len(parentChannels) == 0 {
-		boundaryErrors = boundaryErrors + "parent doesn't have Channels;"
-	} else {
-		if len(bound.Input) > 0 {
-			for _, input := range bound.Input {
-				if parentChannels[input] == nil {
-					boundaryErrors = boundaryErrors + "invalid input boundary;"
-					break
-				}
+		return "parent doesn't have Channels;"
+	}
 
-				if !utils.Includes(parentChannels[input].ConnectedApps, appName) {
-					parentChannels[input].ConnectedApps = append(parentChannels[input].ConnectedApps, appName)
-				}
-			}
+	appBoundary := utils.StringSliceUnion(bound.Input, bound.Output)
+
+	for _, chName := range appBoundary {
+		if parentChannels[chName] == nil {
+			return "invalid app boundary;"
 		}
-
-		if len(bound.Output) > 0 {
-			for _, output := range bound.Output {
-				if parentChannels[output] == nil {
-					boundaryErrors = boundaryErrors + "invalid output boundary;"
-					break
-				}
-
-				if !utils.Includes(parentChannels[output].ConnectedApps, appName) {
-					parentChannels[output].ConnectedApps = append(parentChannels[output].ConnectedApps, appName)
-				}
-			}
+	}
+	for _, chName := range appBoundary {
+		if !utils.Includes(parentChannels[chName].ConnectedApps, appName) {
+			parentChannels[chName].ConnectedApps = append(parentChannels[chName].ConnectedApps, appName)
 		}
 	}
 
-	return boundaryErrors
+	return ""
 }
 
 func getParentApp(sonQuery string) (*meta.App, error) {
