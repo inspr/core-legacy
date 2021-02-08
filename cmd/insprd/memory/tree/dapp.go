@@ -154,14 +154,14 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 		return ierrors.NewError().InvalidApp().Message("dApp mustn't have a Node and other dApps at the same time").Build()
 	}
 
-	structureError := validUpdateChanges(*currentApp, *app, query)
-	if structureError != nil {
-		return structureError
-	}
-
 	parent, errParent := getParentApp(query)
 	if errParent != nil {
 		return errParent
+	}
+
+	structureError := amm.recursiveApps(app, parent)
+	if structureError != "" {
+		return ierrors.NewError().InvalidApp().Message(structureError).Build()
 	}
 
 	appBoundary := utils.StringSliceUnion(currentApp.Spec.Boundary.Input, currentApp.Spec.Boundary.Output)
@@ -175,7 +175,10 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 
 	sonRef := strings.Split(query, ".")
 	parentQuery := strings.Join(sonRef[:len(sonRef)-1], ".")
-	amm.CreateApp(app, parentQuery)
+	erro := amm.CreateApp(app, parentQuery)
+	if erro != nil {
+		return erro
+	}
 
 	return nil
 }

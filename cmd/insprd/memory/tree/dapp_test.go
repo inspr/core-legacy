@@ -1505,8 +1505,26 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
 						Apps: map[string]*meta.App{
-							"appUpdate1": {},
-							"appUpdate2": {},
+							"appUpdate1": {
+								Meta: meta.Metadata{
+									Name:        "appUpdate1",
+									Reference:   "app1.appUpdate1",
+									Annotations: map[string]string{},
+									Parent:      "",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{},
+							},
+							"appUpdate2": {
+								Meta: meta.Metadata{
+									Name:        "appUpdate2",
+									Reference:   "app1.appUpdate2",
+									Annotations: map[string]string{},
+									Parent:      "",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{},
+							},
 						},
 						Channels: map[string]*meta.Channel{
 							"ch1app1": {
@@ -1556,8 +1574,26 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 				Spec: meta.AppSpec{
 					Node: meta.Node{},
 					Apps: map[string]*meta.App{
-						"appUpdate1": {},
-						"appUpdate2": {},
+						"appUpdate1": {
+							Meta: meta.Metadata{
+								Name:        "appUpdate1",
+								Reference:   "app1.appUpdate1",
+								Annotations: map[string]string{},
+								Parent:      "",
+								SHA256:      "",
+							},
+							Spec: meta.AppSpec{},
+						},
+						"appUpdate2": {
+							Meta: meta.Metadata{
+								Name:        "appUpdate2",
+								Reference:   "app1.appUpdate2",
+								Annotations: map[string]string{},
+								Parent:      "",
+								SHA256:      "",
+							},
+							Spec: meta.AppSpec{},
+						},
 					},
 					Channels: map[string]*meta.Channel{
 						"ch1app1": {
