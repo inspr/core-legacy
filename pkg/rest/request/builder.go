@@ -1,6 +1,9 @@
 package request
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+)
 
 // ClientBuilder builds a client with the given specifications
 type ClientBuilder struct {
@@ -41,4 +44,9 @@ func NewClient() *ClientBuilder {
 // Build returns the client built by the builder
 func (cb *ClientBuilder) Build() *Client {
 	return cb.c
+}
+
+// NewJSONClient returns a client for the given url with json encoding and decoding
+func NewJSONClient(baseURL string) *Client {
+	return NewClient().BaseURL(baseURL).Encoder(json.Marshal).Decoder(JSONDecoderGenerator).Build()
 }
