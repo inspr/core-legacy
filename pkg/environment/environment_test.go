@@ -1,11 +1,15 @@
 package environment
 
 import (
+<<<<<<< HEAD
 	"os"
+=======
+>>>>>>> story/core-42
 	"reflect"
 	"testing"
 )
 
+<<<<<<< HEAD
 func mockInsprEnvironment() *InsprEnvironment {
 	return &InsprEnvironment{
 		InputChannels:  "inp1;inp2;inp3",
@@ -14,11 +18,14 @@ func mockInsprEnvironment() *InsprEnvironment {
 	}
 }
 
+=======
+>>>>>>> story/core-42
 func TestGetEnvironment(t *testing.T) {
 	tests := []struct {
 		name string
 		want *InsprEnvironment
 	}{
+<<<<<<< HEAD
 		{
 			name: "Get all environment variables",
 			want: mockInsprEnvironment(),
@@ -34,6 +41,12 @@ func TestGetEnvironment(t *testing.T) {
 				recover()
 			}()
 
+=======
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+>>>>>>> story/core-42
 			if got := GetEnvironment(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetEnvironment() = %v, want %v", got, tt.want)
 			}
@@ -50,6 +63,7 @@ func Test_getEnv(t *testing.T) {
 		args args
 		want string
 	}{
+<<<<<<< HEAD
 		{
 			name: "Get input channel enviroment variable",
 			args: args{
@@ -89,6 +103,12 @@ func Test_getEnv(t *testing.T) {
 				recover()
 			}()
 
+=======
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+>>>>>>> story/core-42
 			if got := getEnv(tt.args.name); got != tt.want {
 				t.Errorf("getEnv() = %v, want %v", got, tt.want)
 			}

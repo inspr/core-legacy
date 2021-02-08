@@ -1,15 +1,22 @@
 package models
 
-// Message represents a Inspr message
-type Message struct {
-	Commit  bool        `json:"commit,omitempty"`
-	Channel string      `json:"channel,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
-	Error   error       `json:"error,omitempty"`
+// RECEIVED BY BROKER's INTERFACE METHODS
+
+// BrokerResponse - is the struct that represents
+// the return of the interface methods
+type BrokerResponse struct {
+	Data interface{} `json:"data,omitempty"`
+}
+
+// RECEIVED BY DAPP CLIENT
+
+// BodyMessage - data to be put in the message
+type BodyMessage struct {
+	Data interface{} `json:"data,omitempty"`
 }
 
 // RequestBody represents a an http request structure
 type RequestBody struct {
-	Message Message `json:"message"`
-	Channel string  `json:"channel"`
+	Message BodyMessage `json:"message"`
+	Channel string      `json:"channel"`
 }

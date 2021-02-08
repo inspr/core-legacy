@@ -2,7 +2,6 @@ package sidecarserv
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -37,29 +36,27 @@ func (s *Server) Init(r models.Reader, w models.Writer) {
 
 // InitRoutes establishes the routes of the server
 func (s *Server) InitRoutes() {
-	s.Mux.HandleFunc("/writeMessage", s.writeMessageHandler)
+	handler := newCustomHandlers(&s.Mutex, s.Reader, s.Writer)
 
-	s.Mux.HandleFunc("/readMessage", s.readMessageHandler)
-	s.Mux.HandleFunc("/commit", s.commitMessageHandler)
+	s.Mux.HandleFunc("/writeMessage", handler.writeMessageHandler)
 
+	s.Mux.HandleFunc("/readMessage", handler.readMessageHandler)
+	s.Mux.HandleFunc("/commit", handler.commitMessageHandler)
 }
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(ctx context.Context) {
 	server := &http.Server{
-		Handler: s.Mux,
+		ReadTimeout:       1 * time.Second,
+		WriteTimeout:      1 * time.Second,
+		IdleTimeout:       30 * time.Second,
+		ReadHeaderTimeout: 2 * time.Second,
+		Handler:           s.Mux,
 	}
-	// todo: check if it can listen to the unix socket, os -> folder exists
-	// logrus.Infoln("running write")
-	// if _, err := os.Stat(WriteAddress); !os.IsNotExist(err) {
-	// 	os.RemoveAll(WriteAddress)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	listenerAddr := environment.GetEnvironment().UnixSocketAddr
 
-	// todo: replace this with a interface that returns a listener
+	listenerAddr := environment.GetEnvironment().UnixSocketAddr
+	os.Remove(listenerAddr)
+
 	listener, err := net.Listen("unix", listenerAddr)
 	if err != nil {
 		log.Println("couldn't listen to address: " + listenerAddr)
@@ -72,27 +69,27 @@ func (s *Server) Run(ctx context.Context) {
 		}
 	}()
 
-	fmt.Printf("SideCar listener is up...")
-	<-ctx.Done()
-	log.Printf("Gracefully shutting down...")
+	log.Printf("sideCar listener is up...")
+	select {
+	case <-ctx.Done():
+		log.Println("gracefully shutting down...")
 
-	ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
-	defer func() {
-		cancel()
-	}()
+		ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
+		defer cancel()
 
-	if err = server.Shutdown(ctxShutdown); err != nil {
-		log.Fatal("error shutting down server")
+		if err = server.Shutdown(ctxShutdown); err != nil {
+			log.Fatal("error shutting down server")
+		}
+
+		err = os.RemoveAll(listenerAddr)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("server shutdown complete")
+		if err == http.ErrServerClosed {
+			err = nil
+		}
+		return
 	}
-
-	err = os.RemoveAll(listenerAddr)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("server shutdown complete")
-	if err == http.ErrServerClosed {
-		err = nil
-	}
-	return
 }
