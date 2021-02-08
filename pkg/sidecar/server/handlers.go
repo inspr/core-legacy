@@ -33,14 +33,12 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 	ch.Lock()
 	defer ch.Unlock()
 
-	decoder := json.NewDecoder(r.Body)
 	body := models.RequestBody{}
-
-	if err := decoder.Decode(&body); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
 		// TODO See if it's apropriatte to change rest.Error parameters to insprErrors
 		// that implies in changing the code for the master's api
-		rest.ERROR(w, http.StatusBadRequest, insprError.Build().Err)
+		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
 
@@ -61,10 +59,9 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 	ch.Lock()
 	defer ch.Unlock()
 
-	decoder := json.NewDecoder(r.Body)
 	body := models.RequestBody{}
 
-	if err := decoder.Decode(&body); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		rest.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
@@ -76,13 +73,13 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	msg, err := ch.Reader.ReadMessage(body.Channel)
-	if err != nil {
-		rest.ERROR(w, http.StatusInternalServerError, err)
+	brokerResp := ch.Reader.ReadMessage(body.Channel)
+	if brokerResp.Error != nil {
+		rest.ERROR(w, http.StatusInternalServerError, brokerResp.Error)
 		return
 	}
 
-	rest.JSON(w, http.StatusOK, msg)
+	rest.JSON(w, http.StatusOK, brokerResp)
 }
 
 // handles the /commit route in the server

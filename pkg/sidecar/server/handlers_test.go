@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"testing"
 
+	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
@@ -45,11 +46,11 @@ type testCaseStruct struct {
 func generateTestCases() []testCaseStruct {
 	// default values used in the test cases
 	parsedBody, _ := json.Marshal(models.RequestBody{
-		Message: models.Message{},
+		Message: models.BodyMessage{Data: "data"},
 		Channel: "chan",
 	})
 	noChanBody, _ := json.Marshal(models.RequestBody{
-		Message: models.Message{},
+		Message: models.BodyMessage{Data: "data"},
 		Channel: "donExist",
 	})
 	badBody := []byte{0}
@@ -107,6 +108,7 @@ func deleteMockEnvVars() {
 }
 
 func Test_newCustomHandlers(t *testing.T) {
+	createMockEnvVars()
 	type args struct {
 		server *Server
 	}
@@ -118,7 +120,10 @@ func Test_newCustomHandlers(t *testing.T) {
 		{
 			name: "successfully_created_custom_handlers",
 			args: args{MockServer(nil)},
-			want: &customHandlers{Server: MockServer(nil)},
+			want: &customHandlers{
+				Server:    MockServer(nil),
+				insprVars: environment.GetEnvironment(),
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -128,6 +133,7 @@ func Test_newCustomHandlers(t *testing.T) {
 			}
 		})
 	}
+	deleteMockEnvVars()
 }
 
 func Test_customHandlers_writeMessageHandler(t *testing.T) {
@@ -187,7 +193,7 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 			} else { //reading message
 
 				// reads response and checks for the default mock values
-				msg := models.Message{}
+				msg := models.BrokerResponse{}
 				err := json.NewDecoder(res.Body).Decode(&msg)
 
 				// if it failed to parse body
@@ -196,14 +202,10 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 					t.Errorf("readMessageHandler.Body error = %v, want %v", err, nil)
 				}
 
-				// if it commit field isn't 'true'
-				if !msg.Commit {
-					t.Errorf("readMessageHandler.Body error, field 'commit' = %v, want 'true'", msg.Commit)
-				}
-
 				// if channel isn't 'chan'
-				if msg.Channel != "chan" {
-					t.Errorf("readMessageHandler.Body error, field 'channel' = %v, want 'chan'", msg.Commit)
+				expectedData := MockServer(nil).Reader.ReadMessage("").Data
+				if msg.Data != expectedData {
+					t.Errorf("readMessageHandler.Body error, field 'data' = %v, want %v", msg.Data, expectedData)
 				}
 			}
 		})
