@@ -22,9 +22,6 @@ func (tmm *MemoryManager) Apps() memory.AppMemory {
 	}
 }
 
-// Set defines a set structure
-type Set map[string]bool
-
 // GetApp recieves a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the dApp which name is equal to the last query element.
 // The root app is returned if the query string is an empty string.
@@ -294,39 +291,3 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 
 	return parentApp, err
 }
-
-/*
-ESTRUTURAS PARA CHECAGEM DE DIFFS VÁLIDOS:
-dAPP:
-	diff:"appmeta":
-		METADATA
-	diff:"appspec":
-		diff:"node":
-			diff:"nodemeta":
-				METADATA
-			diff:"nodespec":
-				diff:"image"
-		diff:"boundary":
-			diff:"input"
-			diff:"output"
-		diff:"apps"
-		diff:"channels"
-		diff:"channeltypes"
-
-CHANNEL:
-	diff:"channelmeta":
-		METADATA
-	diff:"channelspec":
-		diff:"type"
-
-CHANNELTYPES:
-	diff:"ctypemeta":
-		METADATA
-	diff:"schema"
-
-METADATA:
-	diff:"name"
-	diff:"reference"
-	diff:"annotations"
-	diff:"parent"
-*/
