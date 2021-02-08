@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -917,7 +918,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			},
 		},
 		{
-			name: "It should update the parent channel's connectedApps",
+			name: "It should update the channel's connectedApps list",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -929,17 +930,54 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				context: "app2",
 				app: &meta.App{
 					Meta: meta.Metadata{
-						Name:        "app2",
+						Name:        "app7",
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
 						SHA256:      "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{
+							"app8": {
+								Meta: meta.Metadata{
+									Name:        "app8",
+									Reference:   "",
+									Annotations: map[string]string{},
+									Parent:      "",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node:         meta.Node{},
+									Apps:         map[string]*meta.App{},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"channel1"},
+										Output: []string{},
+									},
+								},
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{
+									Name: "channel1",
+								},
+								ConnectedApps: []string{},
+								Spec: meta.ChannelSpec{
+									Type: "ct1",
+								},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{
+							"ct1": {
+								Meta: meta.Metadata{
+									Name: "ct1",
+								},
+								ConnectedChannels: []string{},
+							},
+						},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2"},
 							Output: []string{"ch2app2"},
@@ -950,21 +988,13 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
 				am := GetTreeMemory().Channels()
-
-				ch, err := am.GetChannel("app2", "ch1app2")
+				ch, err := am.GetChannel("app2.app7", "channel1")
 				if err != nil {
-					t.Errorf("cant get channel ch1app2")
+					t.Errorf("cant get channel channel1")
 				}
-				if !utils.Includes(ch.ConnectedApps, "app2") {
-					t.Errorf("connectedApps of ch1app2 dont have app2")
-				}
-
-				ch2, err2 := am.GetChannel("app2", "ch2app2")
-				if err2 != nil {
-					t.Errorf("cant get channel ch2app2")
-				}
-				if !utils.Includes(ch2.ConnectedApps, "app2") {
-					t.Errorf("connectedApps of chapp2 dont have app2")
+				if !utils.Includes(ch.ConnectedApps, "app8") {
+					fmt.Println(ch.ConnectedApps)
+					t.Errorf("connectedApps of channel1 dont have app8")
 				}
 			},
 		},
@@ -1807,7 +1837,7 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "invalid dApp name;",
+			want: "this app already exists in parentApp",
 		},
 		{
 			name: "invalidapp substructure",
@@ -1888,7 +1918,7 @@ func Test_validAppStructure(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := validAppStructure(tt.args.app, tt.args.parentApp); got != tt.want {
+			if got := validAppStructure(&tt.args.app, &tt.args.parentApp); got != tt.want {
 				t.Errorf("validAppStructure() = %v, want %v", got, tt.want)
 			}
 		})

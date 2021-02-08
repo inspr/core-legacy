@@ -36,7 +36,7 @@ func (amm *AppMemoryManager) GetApp(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query").Build()
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query " + query).Build()
 
 	nxtApp := amm.root
 	if nxtApp != nil {
@@ -65,7 +65,11 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 		return err
 	}
 
-	structureErrors := validAppStructure(*app, *parentApp)
+	if _, ok := parentApp.Spec.Apps[app.Meta.Name]; ok {
+		return ierrors.NewError().InvalidApp().Message("this app already exists in parentApp").Build()
+	}
+
+	structureErrors := amm.recursiveApps(app, parentApp)
 	if structureErrors == "" {
 		if app.Spec.Apps == nil {
 			app.Spec.Apps = map[string]*meta.App{}
@@ -92,6 +96,14 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 	}
 
 	return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
+}
+
+func (amm *AppMemoryManager) recursiveApps(app *meta.App, parentApp *meta.App) string {
+	structureErrors := validAppStructure(app, parentApp)
+	for _, childApp := range app.Spec.Apps {
+		return amm.recursiveApps(childApp, app)
+	}
+	return structureErrors
 }
 
 // DeleteApp receives a query and searches for the specified dApp through the tree.
@@ -169,16 +181,14 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 }
 
 // Auxiliar unexported functions
-func validAppStructure(app, parentApp meta.App) string {
+func validAppStructure(app, parentApp *meta.App) string {
 	errDescription := ""
 	var validName, validSubstructure, parentWithoutNode bool
 
-	_, inParentRef := parentApp.Spec.Apps[app.Meta.Name]
-
-	validName = (app.Meta.Name != "") && !inParentRef
+	validName = (app.Meta.Name != "")
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
-	validChannels, msg := checkAndUpdateChannels(&app)
+	validChannels, msg := checkAndUpdateChannels(app)
 
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
 	if boundariesExist {
@@ -326,7 +336,7 @@ func validUpdateChanges(currentApp, newApp meta.App, query string) error {
 				}
 			} else {
 				delete(newApp.Spec.Apps, modifiedApp.Meta.Name)
-				childAppErr := validAppStructure(*modifiedApp, newApp)
+				childAppErr := validAppStructure(modifiedApp, &newApp)
 				if childAppErr != "" {
 					return ierrors.NewError().InvalidApp().Message("invalid child dApp: " + childAppErr).Build()
 				}
