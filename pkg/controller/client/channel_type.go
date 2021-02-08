@@ -8,7 +8,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
-// ChannelTypeClient interacts with channels on the Insprd
+// ChannelTypeClient interacts with channeltypes on the Insprd
 type ChannelTypeClient struct {
 	c *request.Client
 }
@@ -19,9 +19,9 @@ type ChannelTypeClient struct {
 // such as app1.app2
 //
 // The name is the name of the channel type. So to search for a channel type inside app1 with the name channel1 you
-// would call cc.Get(context.Background(), "app1", "channel1")
-func (cc *ChannelTypeClient) Get(ctx context.Context, context string, name string) (*meta.ChannelType, error) {
-	cdi := models.ChannelTypeQueryDI{
+// would call ctc.Get(context.Background(), "app1", "channel1")
+func (ctc *ChannelTypeClient) Get(ctx context.Context, context string, name string) (*meta.ChannelType, error) {
+	ctdi := models.ChannelTypeQueryDI{
 		Ctx:    context,
 		CtName: name,
 		Valid:  true,
@@ -29,7 +29,7 @@ func (cc *ChannelTypeClient) Get(ctx context.Context, context string, name strin
 
 	var resp meta.ChannelType
 
-	err := cc.c.Send(ctx, "/channels", "GET", cdi, &resp)
+	err := ctc.c.Send(ctx, "/channeltypes", "GET", ctdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -45,16 +45,16 @@ func (cc *ChannelTypeClient) Get(ctx context.Context, context string, name strin
 // The channel type information such as name and etc will be inferred from the given channel type's metadata.
 //
 // So to create a channel type inside app1 with the name channel1 you
-// would call cc.Create(context.Background(), "app1", &meta.{...})
-func (cc *ChannelTypeClient) Create(ctx context.Context, context string, ch *meta.ChannelType) error {
-	cdi := models.ChannelTypeDI{
+// would call ctc.Create(context.Background(), "app1", &meta.{...})
+func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *meta.ChannelType) error {
+	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
 		ChannelType: *ch,
 		Valid:       true,
 	}
 
 	var resp interface{}
-	err := cc.c.Send(ctx, "/channels", "POST", cdi, &resp)
+	err := ctc.c.Send(ctx, "/channeltypes", "POST", ctdi, &resp)
 	if err != nil {
 		return err
 	}
@@ -70,16 +70,16 @@ func (cc *ChannelTypeClient) Create(ctx context.Context, context string, ch *met
 // The name is the name of the channel type to be deleted.
 //
 // So to delete a channel type inside app1 with the name channel1 you
-// would call cc.Delete(context.Background(), "app1", "channel1")
-func (cc *ChannelTypeClient) Delete(ctx context.Context, context string, name string) error {
-	cdi := models.ChannelTypeQueryDI{
+// would call ctc.Delete(context.Background(), "app1", "channel1")
+func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name string) error {
+	ctdi := models.ChannelTypeQueryDI{
 		Ctx:    context,
 		CtName: name,
 		Valid:  true,
 	}
 
 	var resp interface{}
-	err := cc.c.Send(ctx, "/channels", "DELETE", cdi, &resp)
+	err := ctc.c.Send(ctx, "/channeltypes", "DELETE", ctdi, &resp)
 	if err != nil {
 		return err
 	}
@@ -95,16 +95,16 @@ func (cc *ChannelTypeClient) Delete(ctx context.Context, context string, name st
 // The channel type information such as name and etc will be inferred from the given channel type's metadata.
 //
 // So to update a channel type inside app1 with the name channel1 you
-// would call cc.Create(context.Background(), "app1", &meta.{...})
-func (cc *ChannelTypeClient) Update(ctx context.Context, context string, ch *meta.ChannelType) error {
-	cdi := models.ChannelTypeDI{
+// would call ctc.Create(context.Background(), "app1", &meta.{...})
+func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *meta.ChannelType) error {
+	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
 		ChannelType: *ch,
 		Valid:       true,
 	}
 
 	var resp interface{}
-	err := cc.c.Send(ctx, "/channels", "PUT", cdi, &resp)
+	err := ctc.c.Send(ctx, "/channeltypes", "PUT", ctdi, &resp)
 	if err != nil {
 		return err
 	}

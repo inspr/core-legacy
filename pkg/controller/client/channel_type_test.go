@@ -53,8 +53,8 @@ func TestChannelTypeClient_Delete(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/channels" {
-					t.Errorf("path is not channels")
+				if r.URL.Path != "/channeltypes" {
+					t.Errorf("path is not channeltypes")
 				}
 
 				if r.Method != "DELETE" {
@@ -140,8 +140,8 @@ func TestChannelTypeClient_Get(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/channels" {
-					t.Errorf("path is not channels")
+				if r.URL.Path != "/channeltypes" {
+					t.Errorf("path is not channeltypes")
 				}
 
 				if r.Method != "GET" {
@@ -228,8 +228,8 @@ func TestChannelTypeClient_Create(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/channels" {
-					t.Errorf("path is not channels")
+				if r.URL.Path != "/channeltypes" {
+					t.Errorf("path is not channeltypes")
 				}
 
 				if r.Method != "POST" {
@@ -311,8 +311,8 @@ func TestChannelTypeClient_Update(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/channels" {
-					t.Errorf("path is not channels")
+				if r.URL.Path != "/channeltypes" {
+					t.Errorf("path is not channeltypes")
 				}
 
 				if r.Method != "PUT" {
