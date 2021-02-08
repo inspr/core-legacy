@@ -69,10 +69,10 @@ func (s *Server) Run(ctx context.Context) {
 		}
 	}()
 
-	log.Printf("SideCar listener is up...")
+	log.Printf("sideCar listener is up...")
 	select {
 	case <-ctx.Done():
-		log.Println("Gracefully shutting down...")
+		log.Println("gracefully shutting down...")
 
 		ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
 		defer cancel()

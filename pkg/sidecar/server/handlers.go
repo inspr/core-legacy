@@ -3,7 +3,6 @@ package sidecarserv
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 	"sync"
 
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
@@ -44,10 +43,8 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	existingChannels := strings.Split(ch.insprVars.OutputChannels, ";")
-
-	if !existsInSlice(body.Channel, existingChannels) {
-		insprError := ierrors.NewError().BadRequest().Message("channel doesn't exist")
+	if !ch.insprVars.IsInOutputChannel(body.Channel, ";") {
+		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
@@ -71,10 +68,8 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	existingChannels := strings.Split(ch.insprVars.InputChannels, ";")
-
-	if !existsInSlice(body.Channel, existingChannels) {
-		insprError := ierrors.NewError().BadRequest().Message("channel doesn't exist")
+	if !ch.insprVars.IsInInputChannel(body.Channel, ";") {
+		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
@@ -101,10 +96,8 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	existingChannels := strings.Split(ch.insprVars.OutputChannels, ";")
-
-	if !existsInSlice(body.Channel, existingChannels) {
-		insprError := ierrors.NewError().BadRequest().Message("channel doesn't exist")
+	if !ch.insprVars.IsInOutputChannel(body.Channel, ";") {
+		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
 	}
@@ -114,16 +107,4 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
 	}
 
-}
-
-// existsInSlice checks if a channel belongs to a slice of channel
-func existsInSlice(channel string, channelList []string) bool {
-	exists := false
-	for _, c := range channelList {
-		if channel == c {
-			exists = true
-			break
-		}
-	}
-	return exists
 }

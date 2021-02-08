@@ -151,7 +151,6 @@ func Test_customHandlers_writeMessageHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// tt.ch.writeMessageHandler(tt.args.w, tt.args.r)
 			handlerFunc := http.HandlerFunc(tt.ch.writeMessageHandler)
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
@@ -246,39 +245,4 @@ func Test_customHandlers_commitMessageHandler(t *testing.T) {
 		})
 	}
 	deleteMockEnvVars()
-}
-
-func Test_handlers_existsInSlice(t *testing.T) {
-	tests := []struct {
-		testName    string
-		channel     string
-		channelList []string
-		want        bool
-	}{
-		{
-			testName:    "found_channel",
-			channel:     "a",
-			channelList: []string{"a", "b", "c", "d"},
-			want:        true,
-		},
-		{
-			testName:    "no_channel_found",
-			channel:     "non-existant",
-			channelList: []string{"a", "b", "c", "d"},
-			want:        false,
-		},
-		{
-			testName:    "empty_channelList",
-			channel:     "empty",
-			channelList: []string{},
-			want:        false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.testName, func(t *testing.T) {
-			if got := existsInSlice(tt.channel, tt.channelList); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newCustomHandlers() = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }
