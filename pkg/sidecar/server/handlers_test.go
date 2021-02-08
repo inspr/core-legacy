@@ -46,11 +46,11 @@ type testCaseStruct struct {
 func generateTestCases() []testCaseStruct {
 	// default values used in the test cases
 	parsedBody, _ := json.Marshal(models.RequestBody{
-		Message: models.BodyMessage{Data: "data"},
+		Message: models.Message{Data: "data"},
 		Channel: "chan",
 	})
 	noChanBody, _ := json.Marshal(models.RequestBody{
-		Message: models.BodyMessage{Data: "data"},
+		Message: models.Message{Data: "data"},
 		Channel: "donExist",
 	})
 	badBody := []byte{0}
