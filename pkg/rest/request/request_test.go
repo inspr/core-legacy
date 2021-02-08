@@ -105,18 +105,18 @@ func TestClient_Send(t *testing.T) {
 				decoder := json.NewDecoder(r.Body)
 				encoder := json.NewEncoder(w)
 				if r.Method != tt.args.method {
-					w.WriteHeader(400)
+					w.WriteHeader(http.StatusBadRequest)
 					encoder.Encode(ierrors.NewError().BadRequest().Message("methods are not equal").Build())
 					return
 				}
 				if r.URL.Path != tt.args.route {
-					w.WriteHeader(404)
+					w.WriteHeader(http.StatusNotFound)
 					encoder.Encode(ierrors.NewError().BadRequest().Message("paths are not equal").Build())
 					return
 				}
 
 				if tt.wantErr {
-					w.WriteHeader(400)
+					w.WriteHeader(http.StatusBadRequest)
 					encoder.Encode(ierrors.NewError().BadRequest().Message("wants error").Build())
 					return
 				}
@@ -125,7 +125,7 @@ func TestClient_Send(t *testing.T) {
 
 				decoder.Decode(&body)
 				if !reflect.DeepEqual(tt.args.body, body) {
-					w.WriteHeader(400)
+					w.WriteHeader(http.StatusBadRequest)
 					encoder.Encode(ierrors.NewError().BadRequest().Build())
 					return
 				}
@@ -175,7 +175,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 			},
 			args: args{
 				&http.Response{
-					StatusCode: 400,
+					StatusCode: http.StatusBadRequest,
 					Body: func() io.ReadCloser {
 						b, _ := json.Marshal(ierrors.NewError().Message("this is an error").Build())
 						return ioutil.NopCloser(bytes.NewReader(b))
@@ -191,7 +191,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 			},
 			args: args{
 				&http.Response{
-					StatusCode: 401,
+					StatusCode: http.StatusBadRequest,
 					Body: func() io.ReadCloser {
 						b, _ := json.Marshal(ierrors.NewError().Message("this is an error").Build())
 						return ioutil.NopCloser(bytes.NewReader(b))
@@ -207,7 +207,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 			},
 			args: args{
 				&http.Response{
-					StatusCode: 200,
+					StatusCode: http.StatusOK,
 					Body: func() io.ReadCloser {
 						b, _ := json.Marshal("hello")
 						return ioutil.NopCloser(bytes.NewReader(b))

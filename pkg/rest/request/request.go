@@ -72,7 +72,7 @@ func (c *Client) handleResponseErr(resp *http.Response) error {
 	decoder := c.decoderGenerator(resp.Body)
 	var err *ierrors.InsprError
 	switch resp.StatusCode {
-	case 200:
+	case http.StatusOK:
 		return nil
 	default:
 		decoder.Decode(&err)
