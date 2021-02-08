@@ -3,7 +3,6 @@ package tree
 import (
 	"strings"
 
-	"github.com/r3labs/diff/v2"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -98,14 +97,6 @@ func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
 	return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
 }
 
-func (amm *AppMemoryManager) recursiveApps(app *meta.App, parentApp *meta.App) string {
-	structureErrors := validAppStructure(app, parentApp)
-	for _, childApp := range app.Spec.Apps {
-		return amm.recursiveApps(childApp, app)
-	}
-	return structureErrors
-}
-
 // DeleteApp receives a query and searches for the specified dApp through the tree.
 // If the dApp is found and it doesn't have any dApps insite of it, it's deleted.
 // If it has other dApps inside of itself, those dApps are deleted recursively.
@@ -184,6 +175,14 @@ func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
 }
 
 // Auxiliar unexported functions
+func (amm *AppMemoryManager) recursiveApps(app *meta.App, parentApp *meta.App) string {
+	structureErrors := validAppStructure(app, parentApp)
+	for _, childApp := range app.Spec.Apps {
+		return amm.recursiveApps(childApp, app)
+	}
+	return structureErrors
+}
+
 func validAppStructure(app, parentApp *meta.App) string {
 	errDescription := ""
 	var validName, validSubstructure, parentWithoutNode bool
@@ -217,7 +216,7 @@ func validAppStructure(app, parentApp *meta.App) string {
 func checkAndUpdateChannels(app *meta.App) (bool, string) {
 	channels := app.Spec.Channels
 	chTypes := app.Spec.ChannelTypes
-	for _, channel := range channels {
+	for channelName, channel := range channels {
 		if channel.Spec.Type != "" {
 			if _, ok := chTypes[channel.Spec.Type]; !ok {
 				return false, "invalid channel: using non-existent channel type;"
@@ -225,17 +224,17 @@ func checkAndUpdateChannels(app *meta.App) (bool, string) {
 
 			for _, appName := range channel.ConnectedApps {
 				if _, ok := app.Spec.Apps[appName]; !ok {
-					app.Spec.Channels[channel.Meta.Name].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
+					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
 				}
 				appBoundary := utils.StringSliceUnion(app.Spec.Apps[appName].Spec.Boundary.Input, app.Spec.Apps[appName].Spec.Boundary.Output)
-				if !utils.Includes(appBoundary, channel.Meta.Name) {
-					app.Spec.Channels[channel.Meta.Name].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
+				if !utils.Includes(appBoundary, channelName) {
+					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
 				}
 			}
 
 			connectedChannels := chTypes[channel.Spec.Type].ConnectedChannels
-			if !utils.Includes(connectedChannels, channel.Meta.Name) {
-				chTypes[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channel.Meta.Name)
+			if !utils.Includes(connectedChannels, channelName) {
+				chTypes[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
 			}
 
 		}
@@ -294,135 +293,6 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 	parentApp, err := GetTreeMemory().Apps().GetApp(parentQuery)
 
 	return parentApp, err
-}
-
-func validUpdateChanges(currentApp, newApp meta.App, query string) error {
-	boundChangelog, err := diff.Diff(currentApp.Spec.Boundary, newApp.Spec.Boundary)
-	if err != nil {
-		return diffError(err)
-	}
-
-	if len(boundChangelog) != 0 {
-		parent, errParent := getParentApp(query)
-		if errParent != nil {
-			return errParent
-		}
-
-		boundError := validAndUpdateBoundaries(newApp.Meta.Name, newApp.Spec.Boundary, parent.Spec.Channels)
-		if boundError != "" {
-			return ierrors.NewError().InvalidApp().Message(boundError).Build()
-		}
-	}
-
-	structuresChangelog, err := checkForChildStructureChanges(currentApp.Spec, newApp.Spec)
-	if err != nil {
-		return diffError(err)
-	}
-
-	if len(structuresChangelog["channel"]) > 0 && invalidChannelChanges(structuresChangelog["channel"], &newApp) {
-		return ierrors.NewError().InvalidChannel().Message("channel's parent dApp doesn't contain specified channel type").Build()
-	}
-
-	if valid, msg := checkAndUpdateChannels(&newApp); !valid {
-		return ierrors.NewError().InvalidChannel().Message(msg).Build()
-	}
-
-	if len(structuresChangelog["app"]) > 0 {
-		for changedApp := range structuresChangelog["app"] {
-			currApp := currentApp.Spec.Apps[changedApp]
-			modifiedApp := newApp.Spec.Apps[changedApp]
-			if currApp != nil {
-				newQuery := query + "." + changedApp
-				structureError := validUpdateChanges(*currApp, *modifiedApp, newQuery)
-				if structureError != nil {
-					return structureError
-				}
-			} else {
-				delete(newApp.Spec.Apps, modifiedApp.Meta.Name)
-				childAppErr := validAppStructure(modifiedApp, &newApp)
-				if childAppErr != "" {
-					return ierrors.NewError().InvalidApp().Message("invalid child dApp: " + childAppErr).Build()
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-func checkForChildStructureChanges(currentStruct, newStruct meta.AppSpec) (map[string]Set, error) {
-	changedStructures := map[string]Set{
-		"app":     {},
-		"channel": {},
-		"ctype":   {},
-	}
-
-	appChangelog, err := diff.Diff(currentStruct.Apps, newStruct.Apps)
-	if err != nil {
-		return nil, diffError(err)
-	}
-	if len(appChangelog) != 0 {
-		for _, change := range appChangelog {
-			if change.Type != "delete" && !changedStructures["app"][change.Path[0]] {
-				changedStructures["app"][change.Path[0]] = true
-			}
-		}
-	}
-
-	channelChangelog, err := diff.Diff(currentStruct.Channels, newStruct.Channels)
-	if err != nil {
-		return nil, diffError(err)
-	}
-	if len(channelChangelog) != 0 {
-		for _, change := range channelChangelog {
-			if change.Type != "delete" && !changedStructures["channel"][change.Path[0]] {
-				changedStructures["channel"][change.Path[0]] = true
-			}
-		}
-	}
-
-	ctypeChangelog, err := diff.Diff(currentStruct.ChannelTypes, newStruct.ChannelTypes)
-	if err != nil {
-		return nil, diffError(err)
-	}
-	if len(ctypeChangelog) != 0 {
-		for _, change := range ctypeChangelog {
-			if change.Type != "delete" && !changedStructures["ctype"][change.Path[0]] {
-				changedStructures["ctype"][change.Path[0]] = true
-			}
-		}
-	}
-
-	return changedStructures, nil
-}
-
-func diffError(err error) error {
-	return ierrors.NewError().InnerError(err).InternalServer().Message("couldn't create diff to update dApp").Build()
-}
-
-// invalidChannelChanges checks if the channels to be updated have the app as their parent. If so,
-// the app must contain the channel types used by the channels, or the channel's Type fiel must be empty.
-// Returns true if these conditions are not met. Returns false otherwise
-func invalidChannelChanges(changedChannels Set, newApp *meta.App) bool {
-	channels := newApp.Spec.Channels
-	ctypes := newApp.Spec.ChannelTypes
-
-	if len(ctypes) > 0 {
-		for change := range changedChannels {
-			ct, ctypeExists := ctypes[channels[change].Spec.Type]
-			if channels[change].Meta.Parent == newApp.Meta.Name && channels[change].Spec.Type != "" {
-				if !ctypeExists {
-					return true
-				}
-				if !utils.Includes(ct.ConnectedChannels, change) {
-					ct.ConnectedChannels = append(ct.ConnectedChannels, change)
-				}
-			}
-
-		}
-		return false
-	}
-	return true
 }
 
 /*
