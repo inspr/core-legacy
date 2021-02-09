@@ -17,7 +17,7 @@ type customHandlers struct {
 	sync.Locker
 	r         models.Reader
 	w         models.Writer
-	insprVars *environment.InsprEnvironment
+	insprVars *environment.InsprEnvironmentVariables
 }
 
 // newCustomHandlers returns a struct composed of the
