@@ -92,7 +92,7 @@ func TestDiff(t *testing.T) {
 				t.Errorf("Diff() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !equalChangelogs(got, tt.want) {
 				t.Errorf("Diff() = \n%v, want \n%v", got, tt.want)
 			}
 		})
@@ -175,7 +175,7 @@ func TestChange_diffAppSpec(t *testing.T) {
 			if err := change.diffAppSpec(tt.args.specOrig, tt.args.specCurr); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffAppSpec() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !reflect.DeepEqual(*change, tt.want) {
+			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
 			}
 		})
@@ -257,7 +257,7 @@ func TestChange_diffNodes(t *testing.T) {
 			if err := change.diffNodes(tt.args.nodeOrig, tt.args.nodeCurr); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffNodes() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !reflect.DeepEqual(*change, tt.want) {
+			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
 			}
 		})
@@ -371,7 +371,7 @@ func TestChange_diffBoudaries(t *testing.T) {
 				Diff:    tt.fields.Diff,
 			}
 			change.diffBoudaries(tt.args.boundOrig, tt.args.boundCurr)
-			if !reflect.DeepEqual(*change, tt.want) {
+			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
 			}
 		})
@@ -465,7 +465,7 @@ func TestChange_diffApps(t *testing.T) {
 				Diff:    tt.fields.Diff,
 			}
 			change.diffApps(tt.args.appsOrig, tt.args.appsCurr)
-			if !reflect.DeepEqual(*change, tt.want) {
+			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
 			}
 		})
@@ -554,7 +554,7 @@ func TestChange_diffChannels(t *testing.T) {
 			if err := change.diffChannels(tt.args.chOrig, tt.args.chCurr); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffChannels() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !reflect.DeepEqual(*change, tt.want) {
+			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
 			}
 		})
@@ -647,7 +647,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			if err := change.diffChannelTypes(tt.args.chtOrig, tt.args.chtCurr); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffChannelTypes() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !reflect.DeepEqual(*change, tt.want) {
+			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
 			}
 		})
@@ -810,7 +810,7 @@ func TestChange_diffMetadata(t *testing.T) {
 			if err := change.diffMetadata(tt.args.metaOrig, tt.args.metaCurr, tt.args.ctx); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffMetadata() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !reflect.DeepEqual(*change, tt.want) {
+			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
 			}
 		})
@@ -1087,4 +1087,56 @@ func getMockRootApp2() *meta.App {
 		},
 	}
 	return &root
+}
+
+func equalChanges(change1 Change, change2 Change) bool {
+	if change1.Context != change2.Context {
+		return false
+	}
+	map1 := make(map[Difference]int)
+	map2 := make(map[Difference]int)
+	for _, diff := range change1.Diff {
+		map1[diff]++
+	}
+
+	for _, diff := range change2.Diff {
+		map2[diff]++
+	}
+
+	for key, val := range map1 {
+		if map2[key] != val {
+			return false
+		}
+	}
+	return true
+}
+
+func equalChangelogs(changelog1 Changelog, changelog2 Changelog) bool {
+	if len(changelog1) != len(changelog2) {
+		return false
+	}
+	map1 := make(map[string]map[Difference]int)
+	map2 := make(map[string]map[Difference]int)
+	for _, change := range changelog1 {
+		map1[change.Context] = make(map[Difference]int)
+		for _, diff := range change.Diff {
+			map1[change.Context][diff]++
+		}
+	}
+
+	for _, change := range changelog2 {
+		map2[change.Context] = make(map[Difference]int)
+		for _, diff := range change.Diff {
+			map2[change.Context][diff]++
+		}
+	}
+
+	for key, val := range map1 {
+		for key2, val2 := range val {
+			if map2[key][key2] != val2 {
+				return false
+			}
+		}
+	}
+	return true
 }
