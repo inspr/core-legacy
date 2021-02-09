@@ -1,8 +1,6 @@
 package operators
 
-import (
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-)
+import "gitlab.inspr.dev/inspr/core/pkg/meta"
 
 // NodeOperatorInterface is the interface that allows to obtain or change
 // node information inside a deployment
