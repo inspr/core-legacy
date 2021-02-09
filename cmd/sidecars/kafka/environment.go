@@ -2,17 +2,17 @@ package kafka
 
 import "os"
 
-// KafkaEnvironment represents the current inspr environment
-type KafkaEnvironment struct {
+// Environment represents the current inspr environment
+type Environment struct {
 	KafkaBootstrapServers string
 }
 
-var env *KafkaEnvironment
+var env *Environment
 
 // GetEnvironment returns the current inspr environment
-func GetEnvironment() *KafkaEnvironment {
+func GetEnvironment() *Environment {
 	if env == nil {
-		env = &KafkaEnvironment{
+		env = &Environment{
 			KafkaBootstrapServers: getEnv("KAFKA_BOOTSTRAP_SERVERS"),
 		}
 	}
