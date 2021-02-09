@@ -17,7 +17,7 @@ the value of that field on the original app and the value of that field on the c
 type Difference struct {
 	Field string `json:"field"`
 	From  string `json:"from"`
-	To    string `json:"curr"`
+	To    string `json:"to"`
 }
 
 /*
@@ -282,7 +282,7 @@ func (change *Change) diffChannelTypes(chtOrig utils.Types, chtCurr utils.Types)
 			})
 		}
 
-		err := change.diffMetadata(origCht.Meta, currCht.Meta, "Spec.ChannelTypes["+k+"].")
+		err := change.diffMetadata(origCht.Meta, currCht.Meta, fmt.Sprintf("Spec.ChannelTypes[%s]", k))
 		if err != nil {
 			return err
 		}
