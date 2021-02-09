@@ -110,10 +110,6 @@ func nodeIsEmpty(node meta.Node) bool {
 }
 
 func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
-	if len(parentChannels) == 0 {
-		return "parent doesn't have Channels;"
-	}
-
 	appBoundary := utils.StringSliceUnion(bound.Input, bound.Output)
 
 	for _, chName := range appBoundary {
