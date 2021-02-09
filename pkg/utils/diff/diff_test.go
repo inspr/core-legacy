@@ -310,7 +310,7 @@ func TestChange_diffBoudaries(t *testing.T) {
 			want: Change{},
 		},
 		{
-			name:   "Unchanged Boundaries",
+			name:   "Valid changes on Boundaries",
 			fields: fields{},
 			args: args{
 				boundOrig: meta.AppBoundary{
