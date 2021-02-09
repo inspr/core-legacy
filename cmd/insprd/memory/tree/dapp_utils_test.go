@@ -250,19 +250,19 @@ func Test_validBoundaries(t *testing.T) {
 				appName: "",
 				bound: meta.AppBoundary{
 					Input:  []string{"ch1app2"},
-					Output: []string{"ch2app2"},
+					Output: []string{},
 				},
 				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Apps["app3"].Spec.Channels,
 			},
 			want: "invalid app boundary - channel 'ch1app2' doesnt exist in parent app;",
 		},
 		{
-			name: "invalid input and output boundary",
+			name: "invalid input boundary",
 			args: args{
 				appName: "app3",
 				bound: meta.AppBoundary{
 					Input:  []string{"ch1app1"},
-					Output: []string{"ch2app1"},
+					Output: []string{},
 				},
 				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Channels,
 			},
