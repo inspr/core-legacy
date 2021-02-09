@@ -35,6 +35,12 @@ func NewReader() (Reader, error) {
 		return nil, ierrors.NewError().Build()
 	}
 	reader.consumer = newConsumer
+
+	channelsList := globalEnv.InputChannels
+	if len(channelsList) == 0 {
+		return nil, ierrors.NewError().Build()
+	}
+
 }
 
 // Commit
