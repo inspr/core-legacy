@@ -98,9 +98,14 @@ func (cl Changelog) diff(appOrig *meta.App, appCurr *meta.App, ctx string) (Chan
 }
 
 func (change *Change) diffAppSpec(specOrig meta.AppSpec, specCurr meta.AppSpec) error {
+	err := change.diffNodes(specOrig.Node, specCurr.Node)
+	if err != nil {
+		return err
+	}
+
 	change.diffApps(specOrig.Apps, specCurr.Apps)
 
-	err := change.diffChannels(specOrig.Channels, specCurr.Channels)
+	err = change.diffChannels(specOrig.Channels, specCurr.Channels)
 	if err != nil {
 		return err
 	}
@@ -112,6 +117,22 @@ func (change *Change) diffAppSpec(specOrig meta.AppSpec, specCurr meta.AppSpec) 
 
 	change.diffBoudaries(specOrig.Boundary, specCurr.Boundary)
 
+	return nil
+}
+
+func (change *Change) diffNodes(nodeOrig meta.Node, nodeCurr meta.Node) error {
+	err := change.diffMetadata(nodeOrig.Meta, nodeCurr.Meta, "Spec.Node.")
+	if err != nil {
+		return err
+	}
+
+	if nodeOrig.Spec.Image != nodeCurr.Spec.Image {
+		change.Diff = append(change.Diff, Difference{
+			Field: "Spec.Node.Spec.Image",
+			From:  nodeOrig.Spec.Image,
+			To:    nodeCurr.Spec.Image,
+		})
+	}
 	return nil
 }
 
