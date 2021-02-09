@@ -103,6 +103,8 @@ func createMockEnvVars() {
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_UNIX_SOCKET", unixSocketAddr)
+	os.Setenv("INSPR_APP_CTX", "random.ctx")
+	os.Setenv("INSPR_ENV", "test")
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
@@ -110,6 +112,8 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
 	os.Unsetenv("INSPR_INPUT_CHANNELS")
 	os.Unsetenv("INSPR_UNIX_SOCKET")
+	os.Unsetenv("INSPR_APP_CTX")
+	os.Unsetenv("INSPR_ENV")
 }
 
 func Test_newCustomHandlers(t *testing.T) {

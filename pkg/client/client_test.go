@@ -65,7 +65,27 @@ func mockHandlerFuncTimeout() http.HandlerFunc {
 	})
 }
 
+// createMockEnvVars - sets up the env values to be used in the tests functions
+func createMockEnvVars() {
+	os.Setenv("INSPR_INPUT_CHANNELS", "inp1;inp2;inp3")
+	os.Setenv("INSPR_OUTPUT_CHANNELS", "inp1;inp2;inp3")
+	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
+	os.Setenv("INSPR_APP_CTX", "random.ctx")
+	os.Setenv("INSPR_ENV", "test")
+}
+
+// deleteMockEnvVars - deletes the env values used in the tests functions
+func deleteMockEnvVars() {
+	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
+	os.Unsetenv("INSPR_INPUT_CHANNELS")
+	os.Unsetenv("INSPR_UNIX_SOCKET")
+	os.Unsetenv("INSPR_APP_CTX")
+	os.Unsetenv("INSPR_ENV")
+}
+
 func TestNewAppClient(t *testing.T) {
+	createMockEnvVars()
+	defer deleteMockEnvVars()
 	tests := []struct {
 		name string
 		want *Client
@@ -80,9 +100,6 @@ func TestNewAppClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Setenv("INSPR_INPUT_CHANNELS", "inp1;inp2;inp3")
-			os.Setenv("INSPR_OUTPUT_CHANNELS", "out1;out2;out3")
-			os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
 			got := NewAppClient()
 			if got.addr != tt.want.addr {
 				t.Errorf("NewClient().addr = %v, want %v", got.addr, tt.want.addr)
