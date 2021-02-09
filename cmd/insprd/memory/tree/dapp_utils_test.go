@@ -363,7 +363,7 @@ func Test_getParentApp(t *testing.T) {
 	}
 }
 
-func Test_checkChannels(t *testing.T) {
+func Test_checkAndUpdateChannels(t *testing.T) {
 	type args struct {
 		app *meta.App
 	}
@@ -518,6 +518,152 @@ func Test_checkChannels(t *testing.T) {
 			},
 			want:  false,
 			want1: "invalid channel: using non-existent channel type;",
+		},
+		{
+			name: "invalid channel structure - it should return a name channel error",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app1",
+						Reference:   "app1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{
+							"thenewapp": {
+								Meta: meta.Metadata{
+									Name:        "thenewapp",
+									Reference:   "app1.thenewapp",
+									Annotations: map[string]string{},
+									Parent:      "app1",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Apps:         map[string]*meta.App{},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"ch1app1"},
+										Output: []string{},
+									},
+								},
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"invalid.channel.name": {
+								Meta: meta.Metadata{
+									Name:   "ch1app1",
+									Parent: "",
+								},
+								ConnectedApps: []string{"thenewapp"},
+								Spec: meta.ChannelSpec{
+									Type: "newChannelType",
+								},
+							},
+							"ch2app1": {
+								Meta: meta.Metadata{
+									Name:   "ch2app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{
+							"newChannelType": {
+								Meta: meta.Metadata{
+									Name:        "newChannelType",
+									Reference:   "app1.newChannelType",
+									Annotations: map[string]string{},
+									Parent:      "app1",
+									SHA256:      "",
+								},
+							},
+						},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+					},
+				},
+			},
+			want:  false,
+			want1: "invalid channel name: invalid.channel.name",
+		},
+		{
+			name: "valid channel structure - it shouldn't return a error",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app1",
+						Reference:   "app1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{
+							"thenewapp": {
+								Meta: meta.Metadata{
+									Name:        "thenewapp",
+									Reference:   "app1.thenewapp",
+									Annotations: map[string]string{},
+									Parent:      "app1",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Apps:         map[string]*meta.App{},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"ch1app1"},
+										Output: []string{},
+									},
+								},
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"ch1app1": {
+								Meta: meta.Metadata{
+									Name:   "ch1app1",
+									Parent: "",
+								},
+								ConnectedApps: []string{"thenewapp"},
+								Spec: meta.ChannelSpec{
+									Type: "newChannelType",
+								},
+							},
+							"ch2app1": {
+								Meta: meta.Metadata{
+									Name:   "ch2app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{
+							"invalid.channel.type": {
+								Meta: meta.Metadata{
+									Name:        "newChannelType",
+									Reference:   "app1.newChannelType",
+									Annotations: map[string]string{},
+									Parent:      "app1",
+									SHA256:      "",
+								},
+							},
+						},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+					},
+				},
+			},
+			want:  false,
+			want1: "invalid channelType name: invalid.channel.type",
 		},
 	}
 	for _, tt := range tests {

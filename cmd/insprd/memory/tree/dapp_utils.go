@@ -74,7 +74,17 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 func checkAndUpdateChannels(app *meta.App) (bool, string) {
 	channels := app.Spec.Channels
 	chTypes := app.Spec.ChannelTypes
+	for ctName := range chTypes {
+		nameErr := utils.StructureNameIsValid(ctName)
+		if nameErr != nil {
+			return false, "invalid channelType name: " + ctName
+		}
+	}
 	for channelName, channel := range channels {
+		nameErr := utils.StructureNameIsValid(channelName)
+		if nameErr != nil {
+			return false, "invalid channel name: " + channelName
+		}
 		if channel.Spec.Type != "" {
 			if _, ok := chTypes[channel.Spec.Type]; !ok {
 				return false, "invalid channel: using non-existent channel type;"
