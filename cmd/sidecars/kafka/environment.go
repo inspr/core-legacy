@@ -23,5 +23,5 @@ func getEnv(name string) string {
 	if value, exists := os.LookupEnv(name); exists {
 		return value
 	}
-	panic("[ENV VAR] " + name + " not found.")
+	panic("[ENV VAR] " + name + " not found")
 }
