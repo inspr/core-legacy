@@ -41,36 +41,36 @@ func NewAppClient() *Client {
 }
 
 // WriteMessage receives a channel and a message and sends it in a request to the sidecar server
-func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Message) error {
+func (client *Client) WriteMessage(ctx context.Context, channel string, msg models.Message) error {
 	data := clientMessage{
 		Channel: channel,
 		Message: msg,
 	}
-	_, err := c.sendRequest(ctx, http.MethodPost, "/writeMessage", data)
+	_, err := client.sendRequest(ctx, http.MethodPost, "/writeMessage", data)
 	return err
 }
 
 // ReadMessage receives a channel and sends it in a request to the sidecar server
-func (c *Client) ReadMessage(ctx context.Context, channel string) (models.Message, error) {
+func (client *Client) ReadMessage(ctx context.Context, channel string) (models.Message, error) {
 	data := clientMessage{
 		Channel: channel,
 	}
-	msg, err := c.sendRequest(ctx, http.MethodPost, "/readMessage", data)
+	msg, err := client.sendRequest(ctx, http.MethodPost, "/readMessage", data)
 	return msg, err
 }
 
 // CommitMessage receives a channel and sends it in a request to the sidecar server
-func (c *Client) CommitMessage(ctx context.Context, channel string) error {
+func (client *Client) CommitMessage(ctx context.Context, channel string) error {
 	data := clientMessage{
 		Channel: channel,
 	}
-	_, err := c.sendRequest(ctx, http.MethodPost, "/commit", data)
+	_, err := client.sendRequest(ctx, http.MethodPost, "/commit", data)
 	return err
 }
 
-func (c *Client) sendRequest(ctx context.Context, method, route string, reqData clientMessage) (models.Message, error) {
+func (client *Client) sendRequest(ctx context.Context, method, route string, reqData clientMessage) (models.Message, error) {
 	ret := make(chan requestReturn)
-	addr := c.addr + route
+	addr := client.addr + route
 
 	go func() {
 		reqBytes, err := json.Marshal(reqData)
@@ -86,7 +86,7 @@ func (c *Client) sendRequest(ctx context.Context, method, route string, reqData 
 		}
 
 		newRequest.WithContext(ctx)
-		resp, err := c.httpc.Do(newRequest)
+		resp, err := client.httpc.Do(newRequest)
 		if err != nil {
 			ret <- requestReturn{err, models.Message{}}
 			return
