@@ -254,7 +254,7 @@ func Test_validBoundaries(t *testing.T) {
 				},
 				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Apps["app3"].Spec.Channels,
 			},
-			want: "parent doesn't have Channels;",
+			want: "invalid app boundary - channel 'ch1app2' doesnt exist in parent app;",
 		},
 		{
 			name: "invalid input and output boundary",
