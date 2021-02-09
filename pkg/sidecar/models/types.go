@@ -10,13 +10,13 @@ type BrokerResponse struct {
 
 // RECEIVED BY DAPP CLIENT
 
-// BodyMessage - data to be put in the message
-type BodyMessage struct {
+// Message - data to be put in the message
+type Message struct {
 	Data interface{} `json:"data,omitempty"`
 }
 
 // RequestBody represents a an http request structure
 type RequestBody struct {
-	Message BodyMessage `json:"message"`
-	Channel string      `json:"channel"`
+	Message Message `json:"message"`
+	Channel string  `json:"channel"`
 }
