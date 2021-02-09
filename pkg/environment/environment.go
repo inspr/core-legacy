@@ -7,6 +7,7 @@ type InsprEnvironment struct {
 	InputChannels  string
 	OutputChannels string
 	UnixSocketAddr string
+	InsprNodeID    string
 }
 
 var env *InsprEnvironment
@@ -18,6 +19,7 @@ func GetEnvironment() *InsprEnvironment {
 			InputChannels:  getEnv("INSPR_INPUT_CHANNELS"),
 			OutputChannels: getEnv("INSPR_OUTPUT_CHANNELS"),
 			UnixSocketAddr: getEnv("INSPR_UNIX_SOCKET"),
+			InsprNodeID:    getEnv("INSPR_NODE_ID"),
 		}
 	}
 	return env

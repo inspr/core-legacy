@@ -3,6 +3,7 @@ module gitlab.inspr.dev/inspr/core
 go 1.13
 
 require (
+	github.com/confluentinc/confluent-kafka-go v1.5.2
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
