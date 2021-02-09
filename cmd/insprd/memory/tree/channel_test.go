@@ -293,6 +293,30 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 				return true, ""
 			},
 		},
+		{
+			name: "Invalid channel name - doesn't create channel",
+			fields: fields{
+				root:   getMockChannels(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  false,
+				mockCT: true,
+			},
+			args: args{
+				context: "",
+				ch: &meta.Channel{
+					Meta: meta.Metadata{
+						Name:   "channel3/",
+						Parent: "",
+					},
+					Spec: meta.ChannelSpec{
+						Type: "channelType1",
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
