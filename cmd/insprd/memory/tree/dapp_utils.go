@@ -19,9 +19,9 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app *meta.App, parentApp
 
 func validAppStructure(app, parentApp *meta.App) string {
 	errDescription := ""
-	var validName, validSubstructure, parentWithoutNode bool
+	var validSubstructure, parentWithoutNode bool
 
-	validName = (app.Meta.Name != "")
+	nameErr := utils.StructureNameIsValid(app.Meta.Name)
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
 	validChannels, msg := checkAndUpdateChannels(app)
@@ -31,7 +31,7 @@ func validAppStructure(app, parentApp *meta.App) string {
 		errDescription = errDescription + validBoundaries(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
 	}
 
-	if !validName {
+	if nameErr != nil {
 		errDescription = errDescription + "invalid dApp name;"
 	}
 	if !validSubstructure {
