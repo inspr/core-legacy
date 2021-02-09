@@ -2,7 +2,13 @@ package operators
 
 import "gitlab.inspr.dev/inspr/core/pkg/meta"
 
-// ChannelOperatorInterface is an interface that handles channel creation, updating and getting in Inspr.
+// ChannelOperatorInterface is responsible for handling the following methods
+//
+// 	- `Get`: returns a channel from the DApp of the given context
+//	- `GetAll`: return all channels from the DApp of the given context
+// 	- `Create`: creates a channel in the DApp of the given context
+// 	- `Update`: updates a channel in the DApp of the given context
+// 	- `Delete`: deletes a channel of the specified name in DApp of the given context
 type ChannelOperatorInterface interface {
 	Get(ctx string, name string) (*meta.Channel, error)
 	GetAll(ctx string) ([]*meta.Channel, error)
