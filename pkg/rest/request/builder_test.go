@@ -174,3 +174,36 @@ func TestNewClient(t *testing.T) {
 		})
 	}
 }
+
+func TestClientBuilder_Build(t *testing.T) {
+	c := &Client{
+		c:       *http.DefaultClient,
+		baseURL: "this is an url",
+	}
+	type fields struct {
+		c *Client
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *Client
+	}{
+		{
+			name: "test client creation",
+			fields: fields{
+				c: c,
+			},
+			want: c,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cb := &ClientBuilder{
+				c: tt.fields.c,
+			}
+			if got := cb.Build(); !reflect.DeepEqual(*got, *tt.want) {
+				t.Errorf("ClientBuilder.Build() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
+}

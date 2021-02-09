@@ -242,7 +242,16 @@ func TestClient_routeToURL(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "basic testing",
+			c: &Client{
+				baseURL: "http://test",
+			},
+			args: args{
+				route: "/route",
+			},
+			want: "http://test/route",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -255,19 +264,33 @@ func TestClient_routeToURL(t *testing.T) {
 
 func TestJSONDecoderGenerator(t *testing.T) {
 	type args struct {
-		r io.Reader
+		value interface{}
 	}
 	tests := []struct {
 		name string
 		args args
-		want Decoder
+		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "decoder creation",
+			args: args{
+				value: "hello",
+			},
+			want: "hello",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := JSONDecoderGenerator(tt.args.r); !reflect.DeepEqual(got, tt.want) {
+			encoded, _ := json.Marshal(tt.args.value)
+			gotDecoder := JSONDecoderGenerator(bytes.NewBuffer(encoded))
+			var got string
+			err := gotDecoder.Decode(&got)
+
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("JSONDecoderGenerator() = %v, want %v", got, tt.want)
+			}
+			if err != nil {
+				t.Error("error in decoding")
 			}
 		})
 	}
