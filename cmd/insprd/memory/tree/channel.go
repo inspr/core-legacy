@@ -4,6 +4,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 /*
@@ -48,7 +49,7 @@ CreateChannel receives a context that defines a path to the App
 in which to add a pointer to the channel passed as an argument
 */
 func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel) error {
-	nameErr := meta.StructureNameIsValid(ch.Meta.Name)
+	nameErr := utils.StructureNameIsValid(ch.Meta.Name)
 	if nameErr != nil {
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
@@ -68,6 +69,12 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
 	}
 
+	connectedChannels := parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels
+	if !utils.Includes(connectedChannels, ch.Meta.Name) {
+		connectedChannels = append(connectedChannels, ch.Meta.Name)
+		parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels = connectedChannels
+	}
+
 	if parentApp.Spec.Channels == nil {
 		parentApp.Spec.Channels = map[string]*meta.Channel{}
 	}
@@ -83,10 +90,17 @@ has a pointer to a channel that has the same name as the name passed
 as an argument, that pointer is removed from the list of App channels
 */
 func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) error {
-	_, err := chh.GetChannel(context, chName)
+	channel, err := chh.GetChannel(context, chName)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
 		return newError
+	}
+
+	if len(channel.ConnectedApps) > 0 {
+		return ierrors.NewError().
+			BadRequest().
+			Message("channel cannot be deleted as it is being used by other apps").
+			Build()
 	}
 
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)
@@ -103,11 +117,13 @@ a channel pointer that has the same name as that passed as an argument,
 this pointer will be replaced by the new one
 */
 func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel) error {
-	_, err := chh.GetChannel(context, ch.Meta.Name)
+	oldCh, err := chh.GetChannel(context, ch.Meta.Name)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
 		return newError
 	}
+
+	ch.ConnectedApps = oldCh.ConnectedApps
 
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)
 
