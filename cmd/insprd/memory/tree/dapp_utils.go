@@ -118,7 +118,7 @@ func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[
 
 	for _, chName := range appBoundary {
 		if parentChannels[chName] == nil {
-			return "invalid app boundary;"
+			return "invalid app boundary - channel '" + chName + "' doesnt exist in parent app;"
 		}
 	}
 

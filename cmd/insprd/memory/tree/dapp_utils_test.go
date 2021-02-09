@@ -266,7 +266,7 @@ func Test_validBoundaries(t *testing.T) {
 				},
 				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Channels,
 			},
-			want: "invalid app boundary;",
+			want: "invalid app boundary - channel 'ch1app1' doesnt exist in parent app;",
 		},
 	}
 	for _, tt := range tests {
