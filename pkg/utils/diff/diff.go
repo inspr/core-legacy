@@ -282,7 +282,7 @@ func (change *Change) diffChannelTypes(chtOrig utils.Types, chtCurr utils.Types)
 			})
 		}
 
-		err := change.diffMetadata(origCht.Meta, currCht.Meta, fmt.Sprintf("Spec.ChannelTypes[%s]", k))
+		err := change.diffMetadata(origCht.Meta, currCht.Meta, fmt.Sprintf("Spec.ChannelTypes[%s].", k))
 		if err != nil {
 			return err
 		}
