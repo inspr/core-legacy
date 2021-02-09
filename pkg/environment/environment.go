@@ -17,7 +17,7 @@ func GetEnvironment() *InsprEnvironment {
 		env = &InsprEnvironment{
 			InputChannels:  getEnv("INSPR_INPUT_CHANNELS"),
 			OutputChannels: getEnv("INSPR_OUTPUT_CHANNELS"),
-			UnixSocketAddr: getEnv("UNIX_SOCKET_ADDRESS"),
+			UnixSocketAddr: getEnv("INSPR_UNIX_SOCKET"),
 		}
 	}
 	return env
@@ -27,5 +27,5 @@ func getEnv(name string) string {
 	if value, exists := os.LookupEnv(name); exists {
 		return value
 	}
-	panic("[ENV VAR] " + name + " not found.")
+	panic("[ENV VAR] " + name + " not found")
 }

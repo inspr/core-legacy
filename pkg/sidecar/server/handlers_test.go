@@ -46,11 +46,11 @@ type testCaseStruct struct {
 func generateTestCases() []testCaseStruct {
 	// default values used in the test cases
 	parsedBody, _ := json.Marshal(models.RequestBody{
-		Message: models.BodyMessage{Data: "data"},
+		Message: models.Message{Data: "data"},
 		Channel: "chan",
 	})
 	noChanBody, _ := json.Marshal(models.RequestBody{
-		Message: models.BodyMessage{Data: "data"},
+		Message: models.Message{Data: "data"},
 		Channel: "donExist",
 	})
 	badBody := []byte{0}
@@ -102,14 +102,14 @@ func createMockEnvVars() {
 	var unixSocketAddr = "/tmp/insprd.sock"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
-	os.Setenv("UNIX_SOCKET_ADDRESS", unixSocketAddr)
+	os.Setenv("INSPR_UNIX_SOCKET", unixSocketAddr)
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
 func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
 	os.Unsetenv("INSPR_INPUT_CHANNELS")
-	os.Unsetenv("UNIX_SOCKET_ADDRESS")
+	os.Unsetenv("INSPR_UNIX_SOCKET")
 }
 
 func Test_newCustomHandlers(t *testing.T) {
@@ -135,7 +135,6 @@ func Test_newCustomHandlers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			got := newCustomHandlers(&MockServer(nil).Mutex, MockServer(nil).Reader, MockServer(nil).Writer)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("newCustomHandlers() = %v, want %v", got, tt.want)
