@@ -4,6 +4,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 /*
@@ -29,6 +30,11 @@ ct: ChannetType to be created.
 context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) CreateChannelType(ct *meta.ChannelType, context string) error {
+
+	nameErr := utils.StructureNameIsValid(ct.Meta.Name)
+	if nameErr != nil {
+		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
+	}
 
 	_, err := ctm.GetChannelType(context, ct.Meta.Name)
 	if err == nil {
