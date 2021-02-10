@@ -22,7 +22,7 @@ type AppClient struct {
 // would call ac.Get(context.Background(), "app1.app2")
 func (ac *AppClient) Get(ctx context.Context, context string) (*meta.App, error) {
 	adi := models.AppQueryDI{
-		Query: context,
+		Ctx:   context,
 		Valid: true,
 	}
 
@@ -70,7 +70,7 @@ func (ac *AppClient) Create(ctx context.Context, context string, ch *meta.App) e
 // would call ac.Delete(context.Background(), "app1.app2")
 func (ac *AppClient) Delete(ctx context.Context, context string) error {
 	adi := models.AppQueryDI{
-		Query: context,
+		Ctx:   context,
 		Valid: true,
 	}
 	var resp interface{}
