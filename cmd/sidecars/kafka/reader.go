@@ -28,13 +28,13 @@ func NewReader() (*Reader, error) {
 		"enable.auto.commit": false,
 	})
 	if errKafkaConsumer != nil {
-		return nil, ierrors.NewError().Message("[NEW READER] " + errKafkaConsumer.Error()).InternalServer().Build()
+		return nil, ierrors.NewError().Message("failed to create a new kafka consumer").InnerError(errKafkaConsumer).InternalServer().Build()
 	}
 	reader.consumer = newConsumer
 
 	channelsList := globalEnv.InputChannels
 	if len(channelsList) == 0 {
-		return nil, ierrors.NewError().Message("[ENV VAR] KAFKA_INPUT_CHANNELS not specified").InternalServer().Build()
+		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InternalServer().Build()
 	}
 
 	channelList := strings.Split(channelsList, ";")
