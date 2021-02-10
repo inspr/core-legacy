@@ -120,9 +120,10 @@ func TestStringSliceUnion(t *testing.T) {
 		b []string
 	}
 	tests := []struct {
-		name string
-		args args
-		want []string
+		name          string
+		args          args
+		want          []string
+		checkFunction func(t *testing.T, got []string)
 	}{
 		{
 			name: "It should return the union of two slices (without repeated elements)",
@@ -131,13 +132,16 @@ func TestStringSliceUnion(t *testing.T) {
 				b: []string{"a", "b", "d"},
 			},
 			want: []string{"a", "b", "c", "d"},
+			checkFunction: func(t *testing.T, got []string) {
+				if !(Includes(got, "a") && Includes(got, "b") && Includes(got, "c") && Includes(got, "d") && len(got) == 4) {
+					t.Errorf("StringSliceUnion() = %v, want %v", got, "[a b c d]")
+				}
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := StringSliceUnion(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("StringSliceUnion() = %v, want %v", got, tt.want)
-			}
+			tt.checkFunction(t, StringSliceUnion(tt.args.a, tt.args.b))
 		})
 	}
 }
