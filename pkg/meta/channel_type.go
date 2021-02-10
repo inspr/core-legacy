@@ -5,4 +5,5 @@ package meta
 type ChannelType struct {
 	Meta   Metadata `yaml:"meta" json:"meta" diff:"ctypemeta"`
 	Schema []byte   `yaml:"schema" json:"schema" diff:"schema"`
+	ConnectedChannels []string `yaml:"connectedchannels"  json:"connectedchannels" diff:"connectedchannels"`
 }
