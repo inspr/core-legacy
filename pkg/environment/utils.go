@@ -20,12 +20,10 @@ func (insprEnv *InsprEnvironmentVariables) IsInOutputChannel(channel string) boo
 
 // GetInputChannelList returns a string list with the channels in insprEnv.InputChannels
 func (insprEnv *InsprEnvironmentVariables) GetInputChannelList() []string {
-	channelList := strings.Split(insprEnv.InputChannels, ";")
-	return channelList
+	return strings.Split(insprEnv.InputChannels, ";")
 }
 
 // GetOutputChannelList returns a string list with the channels in insprEnv.OutputChannels
 func (insprEnv *InsprEnvironmentVariables) GetOutputChannelList() []string {
-	channelList := strings.Split(insprEnv.OutputChannels, ";")
-	return channelList
+	return strings.Split(insprEnv.OutputChannels, ";")
 }
