@@ -45,7 +45,12 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }
@@ -96,7 +101,12 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }
@@ -124,7 +134,12 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }
