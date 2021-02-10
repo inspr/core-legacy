@@ -1,11 +1,10 @@
 package kafka
 
 import (
-	"strings"
-
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	globalEnv "gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 // Reader reads/commit messages from the channels defined in the env
@@ -32,23 +31,14 @@ func NewReader() (*Reader, error) {
 	}
 	reader.consumer = newConsumer
 
-	channelsList := globalEnv.InputChannels
+	channelsList := globalEnv.GetInputChannelList()
 	if len(channelsList) == 0 {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InternalServer().Build()
 	}
 
-	channelList := strings.Split(channelsList, ";")
-	channelList = channelList[:len(channelList)-1]
-	channelsToConsume := func() []string {
-		ret := []string{}
-		for _, s := range channelList {
-			topic := toTopic(s)
-			ret = append(ret, topic)
-		}
-		return ret
-	}()
+	channelsAsTopics := utils.Map(channelsList, toTopic)
 
-	reader.consumer.SubscribeTopics(channelsToConsume, nil)
+	reader.consumer.SubscribeTopics(channelsAsTopics, nil)
 	return &reader, nil
 }
 
@@ -95,7 +85,8 @@ func (reader *Reader) Commit() error {
 	if errCommit != nil {
 		return ierrors.
 			NewError().
-			Message("[READER_COMMIT] " + errCommit.Error()).
+			InnerError(errCommit).
+			Message("failed to commit last message").
 			InternalServer().
 			Build()
 	}

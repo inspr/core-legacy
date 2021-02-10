@@ -32,7 +32,7 @@ func NewWriter() (WriterInterface, error) {
 
 // WriteMessage receives a message and sends it to the topic defined by the given channel
 func (w *writer) WriteMessage(channel string, message interface{}) error {
-	if !environment.GetEnvironment().IsInOutputChannel(channel, ";") {
+	if !environment.GetEnvironment().IsInOutputChannel(channel) {
 		return kafka.NewError(kafka.ErrInvalidArg, "invalid output channel", false)
 	}
 

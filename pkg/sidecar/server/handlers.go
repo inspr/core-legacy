@@ -43,7 +43,7 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if !ch.insprVars.IsInOutputChannel(body.Channel, ";") {
+	if !ch.insprVars.IsInOutputChannel(body.Channel) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
@@ -68,7 +68,7 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if !ch.insprVars.IsInInputChannel(body.Channel, ";") {
+	if !ch.insprVars.IsInInputChannel(body.Channel) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return
@@ -96,7 +96,7 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if !ch.insprVars.IsInOutputChannel(body.Channel, ";") {
+	if !ch.insprVars.IsInOutputChannel(body.Channel) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
 		return

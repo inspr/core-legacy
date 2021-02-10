@@ -1,6 +1,9 @@
 package environment
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestInsprEnvironment_IsInInputChannel(t *testing.T) {
 	type fields struct {
@@ -9,8 +12,7 @@ func TestInsprEnvironment_IsInInputChannel(t *testing.T) {
 		UnixSocketAddr string
 	}
 	type args struct {
-		word      string
-		separator string
+		channel string
 	}
 	defaultFields := fields{
 		InputChannels:  "a;b;c;d;e",
@@ -28,8 +30,7 @@ func TestInsprEnvironment_IsInInputChannel(t *testing.T) {
 			name:   "channel_found",
 			fields: defaultFields,
 			args: args{
-				word:      "b",
-				separator: ";",
+				channel: "b",
 			},
 			want: true,
 		},
@@ -37,8 +38,7 @@ func TestInsprEnvironment_IsInInputChannel(t *testing.T) {
 			name:   "channel_not_found",
 			fields: defaultFields,
 			args: args{
-				word:      "f",
-				separator: ";",
+				channel: "f",
 			},
 			want: false,
 		},
@@ -50,7 +50,7 @@ func TestInsprEnvironment_IsInInputChannel(t *testing.T) {
 				OutputChannels: tt.fields.OutputChannels,
 				UnixSocketAddr: tt.fields.UnixSocketAddr,
 			}
-			if got := insprEnv.IsInInputChannel(tt.args.word, tt.args.separator); got != tt.want {
+			if got := insprEnv.IsInInputChannel(tt.args.channel); got != tt.want {
 				t.Errorf("InsprEnvironment.IsInInputChannel() = %v, want %v", got, tt.want)
 			}
 		})
@@ -64,13 +64,12 @@ func TestInsprEnvironment_IsInOutputChannel(t *testing.T) {
 		UnixSocketAddr string
 	}
 	type args struct {
-		word      string
-		separator string
+		channel string
 	}
 
 	defaultFields := fields{
 		InputChannels:  "a;b;c;d;e",
-		OutputChannels: "1-2-3-4-5",
+		OutputChannels: "1;2;3;4;5",
 		UnixSocketAddr: "socket",
 	}
 
@@ -84,8 +83,7 @@ func TestInsprEnvironment_IsInOutputChannel(t *testing.T) {
 			name:   "channel_found",
 			fields: defaultFields,
 			args: args{
-				word:      "1",
-				separator: "-",
+				channel: "1",
 			},
 			want: true,
 		},
@@ -93,8 +91,7 @@ func TestInsprEnvironment_IsInOutputChannel(t *testing.T) {
 			name:   "channel_not_found",
 			fields: defaultFields,
 			args: args{
-				word:      "f",
-				separator: "-",
+				channel: "f",
 			},
 			want: false,
 		},
@@ -106,8 +103,90 @@ func TestInsprEnvironment_IsInOutputChannel(t *testing.T) {
 				OutputChannels: tt.fields.OutputChannels,
 				UnixSocketAddr: tt.fields.UnixSocketAddr,
 			}
-			if got := insprEnv.IsInOutputChannel(tt.args.word, tt.args.separator); got != tt.want {
+			if got := insprEnv.IsInOutputChannel(tt.args.channel); got != tt.want {
 				t.Errorf("InsprEnvironment.IsInOutputChannel() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInsprEnvironmentVariables_GetInputChannelList(t *testing.T) {
+	type fields struct {
+		InputChannels    string
+		OutputChannels   string
+		UnixSocketAddr   string
+		InsprAppContext  string
+		InsprEnvironment string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{
+			name: "It should get all the channels in the InputChannels env",
+			fields: fields{
+				InputChannels:    "ch1;ch2;ch3;ch4",
+				OutputChannels:   "",
+				UnixSocketAddr:   "",
+				InsprAppContext:  "",
+				InsprEnvironment: "",
+			},
+			want: []string{"ch1", "ch2", "ch3", "ch4"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			insprEnv := &InsprEnvironmentVariables{
+				InputChannels:    tt.fields.InputChannels,
+				OutputChannels:   tt.fields.OutputChannels,
+				UnixSocketAddr:   tt.fields.UnixSocketAddr,
+				InsprAppContext:  tt.fields.InsprAppContext,
+				InsprEnvironment: tt.fields.InsprEnvironment,
+			}
+			if got := insprEnv.GetInputChannelList(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("InsprEnvironmentVariables.GetInputChannelList() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInsprEnvironmentVariables_GetOutputChannelList(t *testing.T) {
+	type fields struct {
+		InputChannels    string
+		OutputChannels   string
+		UnixSocketAddr   string
+		InsprAppContext  string
+		InsprEnvironment string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{
+			name: "It should get all the channels in the InputChannels env",
+			fields: fields{
+				InputChannels:    "",
+				OutputChannels:   "ch1;ch2;ch3;ch4",
+				UnixSocketAddr:   "",
+				InsprAppContext:  "",
+				InsprEnvironment: "",
+			},
+			want: []string{"ch1", "ch2", "ch3", "ch4"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			insprEnv := &InsprEnvironmentVariables{
+				InputChannels:    tt.fields.InputChannels,
+				OutputChannels:   tt.fields.OutputChannels,
+				UnixSocketAddr:   tt.fields.UnixSocketAddr,
+				InsprAppContext:  tt.fields.InsprAppContext,
+				InsprEnvironment: tt.fields.InsprEnvironment,
+			}
+			if got := insprEnv.GetOutputChannelList(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("InsprEnvironmentVariables.GetOutputChannelList() = %v, want %v", got, tt.want)
 			}
 		})
 	}
