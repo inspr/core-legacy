@@ -5,6 +5,7 @@ import "os"
 // Environment represents the current inspr environment
 type Environment struct {
 	KafkaBootstrapServers string
+	KafkaAutoOffsetReset  string
 }
 
 var env *Environment
@@ -14,6 +15,7 @@ func GetEnvironment() *Environment {
 	if env == nil {
 		env = &Environment{
 			KafkaBootstrapServers: getEnv("KAFKA_BOOTSTRAP_SERVERS"),
+			KafkaAutoOffsetReset:  getEnv("KAFKA_AUTO_OFFSET_RESET"),
 		}
 	}
 	return env
