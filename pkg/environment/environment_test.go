@@ -110,3 +110,38 @@ func Test_getEnv(t *testing.T) {
 		})
 	}
 }
+
+func TestRefreshEnviromentVariables(t *testing.T) {
+	createMockEnvVars()
+	os.Setenv("INSPR_INPUT_CHANNELS", "one")
+	os.Setenv("INSPR_OUTPUT_CHANNELS", "two")
+	os.Setenv("INSPR_UNIX_SOCKET", "three")
+	os.Setenv("INSPR_APP_CTX", "four")
+	os.Setenv("INSPR_ENV", "five")
+	defer deleteMockEnvVars()
+	tests := []struct {
+		name    string
+		refresh bool
+		want    *InsprEnvironmentVariables
+	}{
+		{
+			name:    "Changed and refreshed environment variables",
+			refresh: true,
+			want: &InsprEnvironmentVariables{
+				InputChannels:    "one",
+				OutputChannels:   "two",
+				UnixSocketAddr:   "three",
+				InsprAppContext:  "four",
+				InsprEnvironment: "five",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			if got := RefreshEnviromentVariables(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetEnvironment() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
