@@ -7,17 +7,13 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 )
 
-// WriterInterface defines an interface for writing messages
-type WriterInterface interface {
-	WriteMessage(channel string, message interface{}) error
-}
-
-type writer struct {
+// Writer defines an interface for writing messages
+type Writer struct {
 	producer *kafka.Producer
 }
 
 // NewWriter creates a new writer/kafka producer
-func NewWriter() (WriterInterface, error) {
+func NewWriter() (*Writer, error) {
 	bootstrapServers := GetEnvironment().KafkaBootstrapServers
 
 	kProd, err := kafka.NewProducer(&kafka.ConfigMap{
@@ -27,22 +23,22 @@ func NewWriter() (WriterInterface, error) {
 		return nil, kafka.NewError(kafka.ErrInvalidArg, err.Error(), false)
 	}
 
-	return &writer{kProd}, nil
+	return &Writer{kProd}, nil
 }
 
 // WriteMessage receives a message and sends it to the topic defined by the given channel
-func (w *writer) WriteMessage(channel string, message interface{}) error {
+func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	if !environment.GetEnvironment().IsInOutputChannel(channel) {
 		return kafka.NewError(kafka.ErrInvalidArg, "invalid output channel", false)
 	}
 
-	go deliveryReport(w.producer)
+	go deliveryReport(writer.producer)
 
-	if errProduceMessage := w.produceMessage(message, channel); errProduceMessage != nil {
+	if errProduceMessage := writer.produceMessage(message, channel); errProduceMessage != nil {
 		return errProduceMessage
 	}
 
-	w.producer.Flush(15 * 1000)
+	writer.producer.Flush(15 * 1000)
 
 	return nil
 }
@@ -65,7 +61,7 @@ func deliveryReport(producer *kafka.Producer) {
 }
 
 // creates a Kafka message and sends it through the ProduceChannel
-func (w *writer) produceMessage(message interface{}, channel string) error {
+func (writer *Writer) produceMessage(message interface{}, channel string) error {
 	messageEncoded, errorEncode := encode(message, channel)
 	if errorEncode != nil {
 		return errorEncode
@@ -73,7 +69,7 @@ func (w *writer) produceMessage(message interface{}, channel string) error {
 
 	topic := toTopic(channel)
 
-	w.producer.ProduceChannel() <- &kafka.Message{
+	writer.producer.ProduceChannel() <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic:     &topic,
 			Partition: kafka.PartitionAny,
