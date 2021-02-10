@@ -29,7 +29,7 @@ func NewReader() (Reader, error) {
 
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
-		"group.id":           globalEnv.InsprNodeID,
+		"group.id":           globalEnv.InsprAppContext,
 		"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
 		"enable.auto.commit": false,
 	})
@@ -73,7 +73,7 @@ func (reader *readerObj) ReadMessage() (*string, interface{}, error) {
 				channel := *ev.TopicPartition.Topic
 
 				// Decoding Message
-				message, errDecode := decode(ev.Value, fromTopic(channel))
+				message, errDecode := decode(ev.Value, fromTopic(channel).channel)
 				if errDecode != nil {
 					return nil, nil, errDecode
 				}
