@@ -46,7 +46,12 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }
@@ -94,9 +99,13 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 		err = ah.UpdateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
-		} else {
-			w.WriteHeader(http.StatusOK)
 		}
+		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }
@@ -124,7 +133,12 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }

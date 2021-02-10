@@ -2,7 +2,10 @@
 // in memory management of the cluster.
 package memory
 
-import "gitlab.inspr.dev/inspr/core/pkg/meta"
+import (
+	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
+)
 
 // ChannelMemory is the interface that allows to obtain
 // or change information related to the stored state of
@@ -43,5 +46,6 @@ type Manager interface {
 	Channels() ChannelMemory
 	ChannelTypes() ChannelTypeMemory
 	Commit()
+	GetTransactionChanges() (diff.Changelog, error)
 	InitTransaction()
 }

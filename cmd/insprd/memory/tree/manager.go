@@ -6,6 +6,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 // MemoryManager defines a memory manager interface
@@ -61,4 +62,10 @@ func (mm *MemoryManager) Commit() {
 func (mm *MemoryManager) Cancel() {
 	defer mm.Unlock()
 	mm.root = nil
+}
+
+//GetTransactionChanges returns the changelog resulting from the current transaction.
+func (mm *MemoryManager) GetTransactionChanges() (diff.Changelog, error) {
+	cl, err := diff.Diff(mm.tree, mm.root)
+	return cl, err
 }
