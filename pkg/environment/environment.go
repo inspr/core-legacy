@@ -2,24 +2,26 @@ package environment
 
 import "os"
 
-// InsprEnvironment represents the current inspr environment
-type InsprEnvironment struct {
-	InputChannels  string
-	OutputChannels string
-	UnixSocketAddr string
-	InsprNodeID    string
+// InsprEnvironmentVariables represents the current inspr environment
+type InsprEnvironmentVariables struct {
+	InputChannels    string
+	OutputChannels   string
+	UnixSocketAddr   string
+	InsprAppContext  string
+	InsprEnvironment string
 }
 
-var env *InsprEnvironment
+var env *InsprEnvironmentVariables
 
 // GetEnvironment returns the current inspr environment
-func GetEnvironment() *InsprEnvironment {
+func GetEnvironment() *InsprEnvironmentVariables {
 	if env == nil {
-		env = &InsprEnvironment{
-			InputChannels:  getEnv("INSPR_INPUT_CHANNELS"),
-			OutputChannels: getEnv("INSPR_OUTPUT_CHANNELS"),
-			UnixSocketAddr: getEnv("INSPR_UNIX_SOCKET"),
-			InsprNodeID:    getEnv("INSPR_NODE_ID"),
+		env = &InsprEnvironmentVariables{
+			InputChannels:    getEnv("INSPR_INPUT_CHANNELS"),
+			OutputChannels:   getEnv("INSPR_OUTPUT_CHANNELS"),
+			UnixSocketAddr:   getEnv("INSPR_UNIX_SOCKET"),
+			InsprAppContext:  getEnv("INSPR_APP_CTX"),
+			InsprEnvironment: getEnv("INSPR_ENV"),
 		}
 	}
 	return env
