@@ -64,36 +64,33 @@ the message and an error if any occured.
 */
 func (reader *readerObj) ReadMessage() (*string, interface{}, error) {
 	for {
-		select {
-		default:
-			event := reader.consumer.Poll(100)
-			switch ev := event.(type) {
-			case *kafka.Message:
+		event := reader.consumer.Poll(100)
+		switch ev := event.(type) {
+		case *kafka.Message:
 
-				channel := *ev.TopicPartition.Topic
+			channel := *ev.TopicPartition.Topic
 
-				// Decoding Message
-				message, errDecode := decode(ev.Value, fromTopic(channel).channel)
-				if errDecode != nil {
-					return nil, nil, errDecode
-				}
-
-				reader.lastMessage = ev
-				channelName := fromTopic(channel).channel
-				return &channelName, message, nil
-
-			case kafka.Error:
-				if ev.Code() == kafka.ErrAllBrokersDown {
-					return nil, nil, ierrors.
-						NewError().
-						Message("[FATAL_ERROR]\n===== All brokers are down! =====\n" + ev.Error()).
-						InternalServer().
-						Build()
-				}
-
-			default:
-				continue
+			// Decoding Message
+			message, errDecode := decode(ev.Value, fromTopic(channel).channel)
+			if errDecode != nil {
+				return nil, nil, errDecode
 			}
+
+			reader.lastMessage = ev
+			channelName := fromTopic(channel).channel
+			return &channelName, message, nil
+
+		case kafka.Error:
+			if ev.Code() == kafka.ErrAllBrokersDown {
+				return nil, nil, ierrors.
+					NewError().
+					Message("[FATAL_ERROR]\n===== All brokers are down! =====\n" + ev.Error()).
+					InternalServer().
+					Build()
+			}
+
+		default:
+			continue
 		}
 	}
 }
