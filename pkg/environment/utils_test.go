@@ -45,7 +45,7 @@ func TestInsprEnvironment_IsInInputChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvironment{
+			insprEnv := &InsprEnvironmentVariables{
 				InputChannels:  tt.fields.InputChannels,
 				OutputChannels: tt.fields.OutputChannels,
 				UnixSocketAddr: tt.fields.UnixSocketAddr,
@@ -101,7 +101,7 @@ func TestInsprEnvironment_IsInOutputChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvironment{
+			insprEnv := &InsprEnvironmentVariables{
 				InputChannels:  tt.fields.InputChannels,
 				OutputChannels: tt.fields.OutputChannels,
 				UnixSocketAddr: tt.fields.UnixSocketAddr,
