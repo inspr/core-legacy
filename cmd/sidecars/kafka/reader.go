@@ -8,24 +8,18 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
-type readerObj struct {
+// Reader reads/commit messages from the channels defined in the env
+type Reader struct {
 	consumer    *kafka.Consumer
 	lastMessage *kafka.Message
 }
 
-// Reader reads messages from the channels defined in the env
-type Reader interface {
-	Commit() error
-	ReadMessage() (string, interface{}, error)
-	Close()
-}
-
-// NewReader return a new reader
-func NewReader() (Reader, error) {
+// NewReader return a new Reader
+func NewReader() (*Reader, error) {
 	kafkaEnv := GetEnvironment()
 	globalEnv := globalEnv.GetEnvironment()
 
-	var reader readerObj
+	var reader Reader
 
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
@@ -62,7 +56,7 @@ func NewReader() (Reader, error) {
 ReadMessage reads message by message. Returns channel the message belongs to,
 the message and an error if any occured.
 */
-func (reader *readerObj) ReadMessage() (string, interface{}, error) {
+func (reader *Reader) ReadMessage() (string, interface{}, error) {
 	for {
 		event := reader.consumer.Poll(100)
 		switch ev := event.(type) {
@@ -96,7 +90,7 @@ func (reader *readerObj) ReadMessage() (string, interface{}, error) {
 }
 
 // Commit commits the last message read by Reader
-func (reader *readerObj) Commit() error {
+func (reader *Reader) Commit() error {
 	_, errCommit := reader.consumer.CommitMessage(reader.lastMessage)
 	if errCommit != nil {
 		return ierrors.
@@ -109,6 +103,6 @@ func (reader *readerObj) Commit() error {
 }
 
 // Close close the reader consumer
-func (reader *readerObj) Close() {
+func (reader *Reader) Close() {
 	reader.consumer.Close()
 }
