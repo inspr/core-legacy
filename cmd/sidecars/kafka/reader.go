@@ -16,7 +16,7 @@ type readerObj struct {
 // Reader reads messages from the channels defined in the env
 type Reader interface {
 	Commit() error
-	ReadMessage() (*string, interface{}, error)
+	ReadMessage() (string, interface{}, error)
 	Close()
 }
 
@@ -62,7 +62,7 @@ func NewReader() (Reader, error) {
 ReadMessage reads message by message. Returns channel the message belongs to,
 the message and an error if any occured.
 */
-func (reader *readerObj) ReadMessage() (*string, interface{}, error) {
+func (reader *readerObj) ReadMessage() (string, interface{}, error) {
 	for {
 		event := reader.consumer.Poll(100)
 		switch ev := event.(type) {
@@ -73,16 +73,16 @@ func (reader *readerObj) ReadMessage() (*string, interface{}, error) {
 			// Decoding Message
 			message, errDecode := decode(ev.Value, fromTopic(channel).channel)
 			if errDecode != nil {
-				return nil, nil, errDecode
+				return "", nil, errDecode
 			}
 
 			reader.lastMessage = ev
 			channelName := fromTopic(channel).channel
-			return &channelName, message, nil
+			return channelName, message, nil
 
 		case kafka.Error:
 			if ev.Code() == kafka.ErrAllBrokersDown {
-				return nil, nil, ierrors.
+				return "", nil, ierrors.
 					NewError().
 					Message("[FATAL_ERROR]\n===== All brokers are down! =====\n" + ev.Error()).
 					InternalServer().
