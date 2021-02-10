@@ -1,6 +1,9 @@
 package operator
 
 import (
+	"fmt"
+	"strings"
+
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 
@@ -20,49 +23,45 @@ func InsprDAppToK8sDeployment(app *meta.App) *kubeApp.Deployment {
 		outputChannels += c + ";"
 	}
 
-	envAppLabel := toDeployment(app)
+	// pod env variables
+	insprEnv := environment.GetEnvironment()
+	// label name to be used in the service
+	appDeployName := toDeploymentName(insprEnv.InsprAppContext, app)
 
 	sidecarEnvironment := map[string]string{
-		"INSPR_INPUT_CHANNELS": inputChannels,
-		// "INSPR_DOMAIN":          insprEnv.Domain,
-		// "INSPR_SUBDOMAIN":       insprEnv.Subdomain,
-		// "INSPR_APPS_SUBDOMAIN":  insprEnv.AppsSubdomain,
-		// "INSPR_CHANNEL_SIDECAR": insprEnv.ChannelSidecarImage,
-		// "INSPR_APPS_TLS":        "true",
+		"INSPR_INPUT_CHANNELS":  inputChannels,
+		"INSPR_CHANNEL_SIDECAR": insprEnv.SidecarImage,
+		"INSPR_APPS_TLS":        "true",
 
 		"INSPR_OUTPUT_CHANNELS": outputChannels,
-		"INSPR_app_ID":          app.Meta.Name, // TODO REVIEW
-		// "INSPR_REGISTRY_URL":    insprEnv.RegistryURL,
-		// "INSPR_LOG_CHANNEL":     insprEnv.LogChannel,
-		// "INSPR_ENVIRONMENT":     insprEnv.Environment,
+		"INSPR_APP_ID":          appDeployName,
 	}
 
 	return &kubeApp.Deployment{
 		ObjectMeta: kubeMeta.ObjectMeta{
-			Name:   envAppLabel,
-			Labels: map[string]string{"app": envAppLabel},
+			Name:   appDeployName,
+			Labels: map[string]string{"app": appDeployName},
 		},
 		Spec: kubeApp.DeploymentSpec{
-			// Replicas: &app.Replicas, // TODO REVIEW HOW TO ADD THIS
+			Replicas: intToint32(app.Spec.Node.Spec.Replicas),
 			Selector: &kubeMeta.LabelSelector{
 				MatchLabels: map[string]string{
-					"app": envAppLabel,
+					"app": appDeployName,
 				},
 			},
 			Strategy: kubeApp.DeploymentStrategy{
 				Type: kubeApp.RollingUpdateDeploymentStrategyType,
 			},
 			Template: kubeCore.PodTemplateSpec{
-
 				ObjectMeta: kubeMeta.ObjectMeta{
 					Labels: map[string]string{
-						"app": envAppLabel,
+						"app": appDeployName,
 					},
 				},
 				Spec: kubeCore.PodSpec{
 					Volumes: []kubeCore.Volume{
 						{
-							Name: envAppLabel + "-volume",
+							Name: appDeployName + "-volume",
 							VolumeSource: kubeCore.VolumeSource{
 								EmptyDir: &kubeCore.EmptyDirVolumeSource{
 									Medium: kubeCore.StorageMediumMemory,
@@ -72,25 +71,17 @@ func InsprDAppToK8sDeployment(app *meta.App) *kubeApp.Deployment {
 					},
 					Containers: []kubeCore.Container{
 						{
-							Name: envAppLabel,
+							Name: app.Spec.Node.Meta.Name,
 							Ports: func() []kubeCore.ContainerPort {
-								if !app.Exposed {
-									return nil
-								}
-								return []kubeCore.ContainerPort{{
-									ContainerPort: func() int32 {
-										return app.Port
-									}(),
-								},
-								}
+								return nil
 							}(),
 
-							Image: app.Image,
+							Image: app.Spec.Node.Spec.Image,
 							// parse from master env var to kube env vars
 							ImagePullPolicy: kubeCore.PullAlways,
 							VolumeMounts: []kubeCore.VolumeMount{
 								{
-									Name:      envAppLabel + "-volume",
+									Name:      app.Spec.Node.Meta.Name + "-volume",
 									MountPath: "/inspr",
 								},
 							},
@@ -103,15 +94,15 @@ func InsprDAppToK8sDeployment(app *meta.App) *kubeApp.Deployment {
 										},
 									},
 								},
-							}, parseToK8sArrEnv(app.Environment)...),
+							}, parseToK8sArrEnv(app.Spec.Node.Spec.Environment)...),
 						},
 						{
-							Name:            envAppLabel + "-sidecar",
-							Image:           environment.GetEnvironment().KafkaSidecarImage,
+							Name:            appDeployName + "-sidecar",
+							Image:           insprEnv.SidecarImage,
 							ImagePullPolicy: kubeCore.PullIfNotPresent,
 							VolumeMounts: []kubeCore.VolumeMount{
 								{
-									Name:      envAppLabel + "-volume",
+									Name:      app.Spec.Node.Meta.Name + "-sidecar-volume",
 									MountPath: "/inspr",
 								},
 							},
@@ -140,4 +131,17 @@ func parseToK8sArrEnv(arrappEnv map[string]string) []kubeCore.EnvVar {
 		})
 	}
 	return arrEnv
+}
+
+// toDeployment - receives the context of an app and it's context
+// creates a unique deployment name to be used in the k8s deploy
+func toDeploymentName(envPath string, app *meta.App) string {
+	s := envPath + "." + fmt.Sprintf("%v", app.Meta.Name)
+	return strings.ToLower(s)
+}
+
+// intToint32 - converts an integer to a *int32
+func intToint32(v int) *int32 {
+	t := int32(v)
+	return &t
 }
