@@ -7,6 +7,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 )
 
+const flushTimeout = 15 * 1000
+
 // Writer defines an interface for writing messages
 type Writer struct {
 	producer *kafka.Producer
@@ -38,7 +40,7 @@ func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 		return errProduceMessage
 	}
 
-	writer.producer.Flush(15 * 1000)
+	writer.producer.Flush(flushTimeout)
 
 	return nil
 }

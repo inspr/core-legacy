@@ -7,6 +7,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
+const pollTimeout = 100
+
 // Reader reads/commit messages from the channels defined in the env
 type Reader struct {
 	consumer    *kafka.Consumer
@@ -33,7 +35,7 @@ func NewReader() (*Reader, error) {
 
 	channelsList := globalEnv.GetInputChannelList()
 	if len(channelsList) == 0 {
-		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InternalServer().Build()
+		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
 
 	channelsAsTopics := utils.Map(channelsList, toTopic)
@@ -48,7 +50,7 @@ the message and an error if any occured.
 */
 func (reader *Reader) ReadMessage() (string, interface{}, error) {
 	for {
-		event := reader.consumer.Poll(100)
+		event := reader.consumer.Poll(pollTimeout)
 		switch ev := event.(type) {
 		case *kafka.Message:
 
@@ -68,7 +70,8 @@ func (reader *Reader) ReadMessage() (string, interface{}, error) {
 			if ev.Code() == kafka.ErrAllBrokersDown {
 				return "", nil, ierrors.
 					NewError().
-					Message("[FATAL_ERROR]\n===== All brokers are down! =====\n" + ev.Error()).
+					InnerError(ev).
+					Message("kafka error = all brokers are down" + ev.Error()).
 					InternalServer().
 					Build()
 			}
