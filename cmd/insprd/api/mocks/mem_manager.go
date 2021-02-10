@@ -1,6 +1,8 @@
 package mocks
 
 import (
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
+
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 )
 
@@ -50,3 +52,8 @@ func (mm *MemManager) Commit() {}
 
 //Cancel mock interface structure
 func (mm *MemManager) Cancel() {}
+
+//GetTransactionChanges mock interface structure
+func (mm *MemManager) GetTransactionChanges() (diff.Changelog, error) {
+	return diff.Changelog{}, nil
+}

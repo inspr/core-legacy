@@ -3,6 +3,7 @@ package tree
 import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 // MockManager mocks a tree structure for testing
@@ -60,3 +61,8 @@ func (tmm *MockManager) Commit() {}
 
 //Cancel mock interface structure
 func (tmm *MockManager) Cancel() {}
+
+//GetTransactionChanges mock structure
+func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
+	return diff.Changelog{}, nil
+}
