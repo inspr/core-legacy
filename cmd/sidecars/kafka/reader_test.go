@@ -117,7 +117,7 @@ func TestReader_ReadMessage(t *testing.T) {
 			want1:   "Hello World!",
 		},
 		{
-			name: "It should return a error",
+			name: "It should return a message poll error",
 			fields: fields{
 				consumer: &MockConsumer{
 					err:           true,
@@ -125,6 +125,20 @@ func TestReader_ReadMessage(t *testing.T) {
 					topic:         toTopic("ch1"),
 					errCode:       0,
 					senderChannel: "ch1",
+				},
+				lastMessage: nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "It should return a decode error (sender channel invalid)",
+			fields: fields{
+				consumer: &MockConsumer{
+					err:           false,
+					pollMsg:       "Hello World!",
+					topic:         toTopic("ch1"),
+					errCode:       0,
+					senderChannel: "ch2",
 				},
 				lastMessage: nil,
 			},
@@ -201,14 +215,32 @@ func TestReader_Commit(t *testing.T) {
 
 func TestReader_Close(t *testing.T) {
 	type fields struct {
-		consumer    *kafka.Consumer
+		consumer    Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
-		name   string
-		fields fields
+		name    string
+		fields  fields
+		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Close the consumer",
+			fields: fields{
+				consumer:    &MockConsumer{},
+				lastMessage: nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Error when trying to close the consumer",
+			fields: fields{
+				consumer: &MockConsumer{
+					err: true,
+				},
+				lastMessage: nil,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -216,7 +248,9 @@ func TestReader_Close(t *testing.T) {
 				consumer:    tt.fields.consumer,
 				lastMessage: tt.fields.lastMessage,
 			}
-			reader.Close()
+			if err := reader.Close(); (err != nil) != tt.wantErr {
+				t.Errorf("Reader.Close() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 }

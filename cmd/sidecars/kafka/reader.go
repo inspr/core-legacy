@@ -31,11 +31,10 @@ func NewReader() (*Reader, error) {
 	var reader Reader
 
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":     kafkaEnv.KafkaBootstrapServers,
-		"group.id":              globalEnv.InsprAppContext,
-		"auto.offset.reset":     kafkaEnv.KafkaAutoOffsetReset,
-		"enable.auto.commit":    false,
-		"test.mock.num.brokers": 1,
+		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
+		"group.id":           globalEnv.InsprAppContext,
+		"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
+		"enable.auto.commit": false,
 	})
 
 	if errKafkaConsumer != nil {
@@ -107,6 +106,10 @@ func (reader *Reader) Commit() error {
 }
 
 // Close close the reader consumer
-func (reader *Reader) Close() {
-	reader.consumer.Close()
+func (reader *Reader) Close() error {
+	err := reader.consumer.Close()
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -45,12 +45,15 @@ func (mc *MockConsumer) SubscribeTopics(topics []string, rebalanceCb kafka.Rebal
 //CommitMessage mock
 func (mc *MockConsumer) CommitMessage(m *kafka.Message) ([]kafka.TopicPartition, error) {
 	if mc.err {
-		return nil, kafka.NewError(kafka.ErrAllBrokersDown, "", false)
+		return nil, kafka.NewError(kafka.ErrApplication, "", false)
 	}
 	return nil, nil
 }
 
 //Close mock
 func (mc *MockConsumer) Close() (err error) {
+	if mc.err {
+		return kafka.NewError(kafka.ErrApplication, "", false)
+	}
 	return nil
 }
