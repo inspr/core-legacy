@@ -157,7 +157,7 @@ func TestReader_ReadMessage(t *testing.T) {
 
 func TestReader_Commit(t *testing.T) {
 	type fields struct {
-		consumer    *kafka.Consumer
+		consumer    Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
@@ -165,7 +165,26 @@ func TestReader_Commit(t *testing.T) {
 		fields  fields
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should not return a error since the message was commited",
+			fields: fields{
+				consumer: &MockConsumer{
+					err: false,
+				},
+				lastMessage: nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "It should return a error since the message was not commited",
+			fields: fields{
+				consumer: &MockConsumer{
+					err: true,
+				},
+				lastMessage: nil,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -44,6 +44,9 @@ func (mc *MockConsumer) SubscribeTopics(topics []string, rebalanceCb kafka.Rebal
 
 //CommitMessage mock
 func (mc *MockConsumer) CommitMessage(m *kafka.Message) ([]kafka.TopicPartition, error) {
+	if mc.err {
+		return nil, kafka.NewError(kafka.ErrAllBrokersDown, "", false)
+	}
 	return nil, nil
 }
 
