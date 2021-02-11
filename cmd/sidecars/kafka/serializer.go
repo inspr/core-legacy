@@ -27,6 +27,7 @@ func getSchema(channel, context string) (string, error) {
 	}
 
 	memChanType, err := tree.GetTreeMemory().ChannelTypes().GetChannelType(context, memChan.Spec.Type)
+	// this error shouldn't occur given that a channel cannot be created without a valid channel type
 	if err != nil {
 		return "", ierrors.NewError().InvalidChannelType().Message(err.Error()).Build()
 	}
