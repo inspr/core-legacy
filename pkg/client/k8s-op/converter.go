@@ -26,7 +26,7 @@ func InsprDAppToK8sDeployment(app *meta.App) *kubeApp.Deployment {
 	// pod env variables
 	insprEnv := environment.GetEnvironment()
 	// label name to be used in the service
-	appDeployName := toDeploymentName(insprEnv.InsprAppContext, app)
+	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app.Meta.Parent, app.Spec.Node.Meta.Name)
 
 	sidecarEnvironment := map[string]string{
 		"INSPR_INPUT_CHANNELS":  inputChannels,
@@ -135,8 +135,8 @@ func parseToK8sArrEnv(arrappEnv map[string]string) []kubeCore.EnvVar {
 
 // toDeployment - receives the context of an app and it's context
 // creates a unique deployment name to be used in the k8s deploy
-func toDeploymentName(envPath string, app *meta.App) string {
-	s := envPath + "." + fmt.Sprintf("%v", app.Meta.Name)
+func toDeploymentName(insprEnv string, context string, name string) string {
+	s := fmt.Sprintf("%s.%s.%s", insprEnv, context, name)
 	if s[0] == '.' {
 		s = s[1:]
 	}

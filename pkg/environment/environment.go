@@ -8,7 +8,6 @@ type InsprEnvVars struct {
 	OutputChannels   string
 	UnixSocketAddr   string
 	SidecarImage     string
-	InsprAppContext  string
 	InsprEnvironment string
 }
 
@@ -22,7 +21,6 @@ func GetEnvironment() *InsprEnvVars {
 			OutputChannels:   getEnv("INSPR_OUTPUT_CHANNELS"),
 			UnixSocketAddr:   getEnv("INSPR_UNIX_SOCKET"),
 			SidecarImage:     getEnv("INSPR_SIDECAR_IMAGE"),
-			InsprAppContext:  getEnv("INSPR_APP_CTX"),
 			InsprEnvironment: getEnv("INSPR_ENV"),
 		}
 	}

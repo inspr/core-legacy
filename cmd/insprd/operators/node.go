@@ -9,9 +9,9 @@ import (
 // NodeOperatorInterface is the interface that allows to obtain or change
 // node information inside a deployment
 type NodeOperatorInterface interface {
-	CreateNode(ctx context.Context, context string, node *meta.Node) error
-	GetNode(ctx context.Context) (*meta.Node, error)
-	UpdateNode(ctx context.Context, context string, node *meta.Node) error
-	DeleteNode(ctx context.Context, context, nodeName string) error
+	CreateNode(ctx context.Context, app *meta.App) error
+	GetNode(ctx context.Context, app *meta.App) (*meta.Node, error)
+	UpdateNode(ctx context.Context, app *meta.App) error
+	DeleteNode(ctx context.Context, nodeContext string, nodeName string) error
 	GetAllNodes() []*meta.Node
 }

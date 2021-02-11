@@ -3,12 +3,14 @@ package nodes
 import (
 	"context"
 	"fmt"
+	"strings"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
+	"gitlab.inspr.dev/inspr/core/pkg/enviroment"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 
+	kubeApp "k8s.io/api/apps/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	v1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 )
@@ -22,44 +24,56 @@ func (nop *NodeOperator) retrieveKube() v1.DeploymentInterface {
 	return nop.clientSet.AppsV1().Deployments(appsNamespace)
 }
 
-// GetNodes returns the node with the given name, if it exists.
+// GetNode returns the node with the given name, if it exists.
 // Otherwise, returns an error
-func (nop *NodeOperator) GetNodes(ctx context.Context, node *meta.node) (*meta.Node, error) {
+func (nop *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	kube := nop.retrieveKube()
-	nodeName := 
-	dep, err := kube.Get(nodeName, metav1.GetOptions{})
-
+	insprEnv := enviroment.GetEnvironment().InsprEnvironment
+	nodeName := parseNodeName(insprEnv, app.Meta.Parent, app.Spec.Node.Meta.Name)
+	_, err := kube.Get(nodeName, metav1.GetOptions{})
+	//
+	return &app.Spec.Node, err
 }
 
 // Nodes is a NodeOperatorInterface that provides methods for node manipulation
-func (no *NodeOperator) Nodes() NodeOperatorInterface {
+func (nop *NodeOperator) Nodes() operators.NodeOperatorInterface {
 	return &NodeOperator{}
 }
 
 // CreateNode deploys a new node structure, if it's information is valid.
 // Otherwise, returns an error
-func (no *NodeOperator) CreateNode(ctx context.Context, context string, node *meta.Node) error {
+func (nop *NodeOperator) CreateNode(ctx context.Context, app *meta.App) error {
 	return nil
 }
 
 // UpdateNode updates a node that already exists, if the new structure is valid.
 // Otherwise, returns an error.
-func (no *NodeOperator) UpdateNode(ctx context.Context, node *meta.node) error {
-	//generate dep from node
-	//update deb so that it matches node
+func (nop *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) error {
+	var deploy *kubeApp.Deployment
+	kube := nop.retrieveKube()
+	// deploy = translatenodetodeploy
+	_, err := kube.Update(deploy)
+
+	return err
 }
 
 // DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
-func (no *NodeOperator) DeleteNode(ctx context.Context, context string, nodeName string) error {
+func (nop *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
 	return nil
 }
 
 // GetAllNodes returns a list of all the active nodes in the deployment, if there are any
-func (no *NodeOperator) GetAllNodes() []*meta.Node {
+func (nop *NodeOperator) GetAllNodes() []*meta.Node {
 	kube := nop.retrieveKube()
-	
+	kube.List(metav1.ListOptions{})
+	return nil
+
 }
 
-func parseNodeName(node *meta.Node) string{
-	return "placeholder" //TODO
+func parseNodeName(insprEnv string, context string, name string) string {
+	s := fmt.Sprintf("%s.%s.%s", insprEnv, context, name)
+	if s[0] == '.' {
+		s = s[1:]
+	}
+	return strings.ToLower(s)
 }
