@@ -9,8 +9,8 @@ const (
 	AlreadyExists
 	InternalServer
 	InvalidName
-	InvalidChannel
 	InvalidApp
+	InvalidChannel
 	InvalidChannelType
 	BadRequest
 )

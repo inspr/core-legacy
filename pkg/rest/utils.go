@@ -25,18 +25,23 @@ func ERROR(w http.ResponseWriter, err error) {
 		case ierrors.NotFound:
 			JSON(w, http.StatusNotFound, e)
 		case ierrors.AlreadyExists:
-
+			JSON(w, http.StatusConflict, e)
 		case ierrors.InternalServer:
-
+			JSON(w, http.StatusInternalServerError, e)
 		case ierrors.InvalidName:
-
+			JSON(w, http.StatusForbidden, e)
+		case ierrors.InvalidApp:
+			JSON(w, http.StatusForbidden, e)
 		case ierrors.InvalidChannel:
-
+			JSON(w, http.StatusForbidden, e)
 		case ierrors.InvalidChannelType:
-
+			JSON(w, http.StatusForbidden, e)
 		case ierrors.BadRequest:
-
+			JSON(w, http.StatusBadRequest, e)
+		default:
+			JSON(w, http.StatusInternalServerError, e)
 		}
+
 	default:
 		JSON(w, http.StatusInternalServerError, struct {
 			Error string `json:"error"`
