@@ -51,7 +51,7 @@ func (amm *AppMemoryManager) GetApp(query string) (*meta.App, error) {
 // CreateApp instantiates a new dApp in the given context.
 // If the dApp's information is invalid, returns an error. The same goes for an invalid context.
 // In case of context being an empty string, the dApp is created inside the root dApp.
-func (amm *AppMemoryManager) CreateApp(app *meta.App, context string) error {
+func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
 	parentApp, err := amm.GetApp(context)
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 // UpdateApp receives a pointer to a dApp and the path to where this dApp is inside the memory tree.
 // If the current dApp is found and the new structure is valid, it's updated.
 // Otherwise, returns an error.
-func (amm *AppMemoryManager) UpdateApp(app *meta.App, query string) error {
+func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
 	currentApp, err := amm.GetApp(query)
 	if err != nil {
 		return err
