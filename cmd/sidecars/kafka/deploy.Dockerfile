@@ -1,5 +1,10 @@
-# copies builded kafka sidecar to deploy folder
 FROM gcr.io/red-inspr/inspr AS build-env
-WORKDIR /deploy
-COPY --from=build-env /inspr/cmd/sidecars/kafka kafka
-ENTRYPOINT ./kafka
+
+WORKDIR /app
+COPY go.mod go.mod
+RUN go mod download
+COPY . .
+
+FROM alpine AS deploy
+WORKDIR /app
+COPY --from=build-env /inspr/cmd/sidecars/kafka /app/kafka

@@ -1,4 +1,4 @@
-# librdkafka base image
+# install librdkafka base image, which is necessary for kafka to run
 FROM golang:alpine AS kafka-build 
 
 RUN apk update && \
