@@ -8,25 +8,6 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 )
 
-// createMockEnvVars - sets up the env values to be used in the tests functions
-// createMockEnvVars - sets up the env values to be used in the tests functions
-func createMockEnvVars() {
-	os.Setenv("INSPR_INPUT_CHANNELS", "inp1;inp2;inp3")
-	os.Setenv("INSPR_OUTPUT_CHANNELS", "out1;out2;out3")
-	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
-	os.Setenv("INSPR_APP_CTX", "random.app1")
-	os.Setenv("INSPR_ENV", "random")
-}
-
-// deleteMockEnvVars - deletes the env values used in the tests functions
-func deleteMockEnvVars() {
-	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
-	os.Unsetenv("INSPR_INPUT_CHANNELS")
-	os.Unsetenv("INSPR_UNIX_SOCKET")
-	os.Unsetenv("INSPR_APP_CTX")
-	os.Unsetenv("INSPR_ENV")
-}
-
 func Test_fromTopicNonPRD(t *testing.T) {
 	createMockEnvVars()
 	os.Setenv("INSPR_ENV", "test")

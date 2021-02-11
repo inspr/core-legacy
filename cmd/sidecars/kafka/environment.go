@@ -27,3 +27,13 @@ func getEnv(name string) string {
 	}
 	panic("[ENV VAR] " + name + " not found")
 }
+
+// RefreshEnviromentVariables "refreshes" the value of kafka environment variables.
+// This was develop for testing and probably sholdn't be used in other cases.
+func RefreshEnviromentVariables() *Environment {
+	env = &Environment{
+		KafkaBootstrapServers: getEnv("KAFKA_BOOTSTRAP_SERVERS"),
+		KafkaAutoOffsetReset:  getEnv("KAFKA_AUTO_OFFSET_RESET"),
+	}
+	return env
+}
