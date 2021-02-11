@@ -13,8 +13,7 @@ import (
 
 func TestServer_Run(t *testing.T) {
 	routes := []string{"commit", "writeMessage", "readMessage"}
-	// ENV variables
-	createMockEnvVars()
+	env.SetMockEnv()
 
 	for _, r := range routes {
 		t.Run("run_test/"+r, func(t *testing.T) {
@@ -34,7 +33,7 @@ func TestServer_Run(t *testing.T) {
 				defer wg.Done()
 				time.Sleep(500 * time.Microsecond)
 
-				c := transports.NewUnixSocketClient(env.GetEnvironment().UnixSocketAddr)
+				c := transports.NewUnixSocketClient("socket_addr") // env mock socket addr
 
 				resp, err := c.Post("http://unix/"+r, "", nil)
 				if err != nil {
@@ -46,12 +45,11 @@ func TestServer_Run(t *testing.T) {
 			}()
 		})
 	}
-	deleteMockEnvVars()
+	env.UnsetMockEnv()
 }
 
 func TestServer_Cancel(t *testing.T) {
-	// ENV variables
-	createMockEnvVars()
+	env.SetMockEnv()
 
 	t.Run("run_test/timeout", func(t *testing.T) {
 		// SERVER
@@ -81,5 +79,5 @@ func TestServer_Cancel(t *testing.T) {
 			}
 		}()
 	})
-	deleteMockEnvVars()
+	env.UnsetMockEnv()
 }

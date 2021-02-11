@@ -4,7 +4,7 @@ import "os"
 
 // SetMockEnv - sets the environment variables to specific values
 func SetMockEnv() {
-	channelsValues := "chan1;chan2;chan3"
+	channelsValues := "chan;chan1;chan2;chan3"
 	os.Setenv("INSPR_INPUT_CHANNELS", channelsValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", channelsValues)
 	os.Setenv("INSPR_UNIX_SOCKET", "socket_addr")
