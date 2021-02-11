@@ -6,29 +6,6 @@ import (
 	"testing"
 )
 
-// createMockEnvVars - sets up the env values to be used in the tests functions
-// createMockEnvVars - sets up the env values to be used in the tests functions
-func createMockEnvVars() {
-	os.Setenv("INSPR_INPUT_CHANNELS", "inp1;inp2;inp3;")
-	os.Setenv("INSPR_OUTPUT_CHANNELS", "out1;out2;out3;ch1;")
-	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
-	os.Setenv("INSPR_APP_CTX", "random.app1")
-	os.Setenv("INSPR_ENV", "random")
-	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "localhost")
-	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "101019")
-}
-
-// deleteMockEnvVars - deletes the env values used in the tests functions
-func deleteMockEnvVars() {
-	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
-	os.Unsetenv("INSPR_INPUT_CHANNELS")
-	os.Unsetenv("INSPR_UNIX_SOCKET")
-	os.Unsetenv("INSPR_APP_CTX")
-	os.Unsetenv("INSPR_ENV")
-	os.Unsetenv("KAFKA_BOOTSTRAP_SERVERS")
-	os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
-}
-
 func mockKafkaEnvironment() *Environment {
 	return &Environment{
 		KafkaBootstrapServers: "localhost",
@@ -39,7 +16,7 @@ func mockKafkaEnvironment() *Environment {
 func TestGetEnvironment(t *testing.T) {
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "localhost")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "101019")
-	defer deleteMockEnvVars()
+	defer deleteMockReaderEnv()
 	tests := []struct {
 		name string
 		want *Environment
@@ -104,10 +81,10 @@ func Test_getEnv(t *testing.T) {
 }
 
 func TestRefreshEnviromentVariables(t *testing.T) {
-	createMockEnvVars()
+	createMockReaderEnv()
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "one")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "two")
-	defer deleteMockEnvVars()
+	defer deleteMockReaderEnv()
 	tests := []struct {
 		name    string
 		refresh bool

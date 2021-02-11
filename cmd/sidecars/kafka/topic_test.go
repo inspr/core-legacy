@@ -9,9 +9,10 @@ import (
 )
 
 func Test_fromTopicNonPRD(t *testing.T) {
-	createMockEnvVars()
+	createMockReaderEnv()
+	defer deleteMockReaderEnv()
 	os.Setenv("INSPR_ENV", "test")
-	defer deleteMockEnvVars()
+	os.Setenv("INSPR_APP_CTX", "random.app1")
 	environment.RefreshEnviromentVariables()
 	type args struct {
 		topic string
@@ -43,9 +44,10 @@ func Test_fromTopicNonPRD(t *testing.T) {
 }
 
 func Test_fromTopicPRD(t *testing.T) {
-	createMockEnvVars()
+	createMockReaderEnv()
 	os.Setenv("INSPR_ENV", "")
-	defer deleteMockEnvVars()
+	os.Setenv("INSPR_APP_CTX", "random.app1")
+	defer deleteMockReaderEnv()
 	environment.RefreshEnviromentVariables()
 	type args struct {
 		topic string
@@ -77,9 +79,10 @@ func Test_fromTopicPRD(t *testing.T) {
 }
 
 func Test_toTopicNonPRD(t *testing.T) {
-	createMockEnvVars()
+	createMockReaderEnv()
 	os.Setenv("INSPR_ENV", "test")
-	defer deleteMockEnvVars()
+	os.Setenv("INSPR_APP_CTX", "random.app1")
+	defer deleteMockReaderEnv()
 	environment.RefreshEnviromentVariables()
 	type args struct {
 		channel string
@@ -113,9 +116,10 @@ func Test_toTopicNonPRD(t *testing.T) {
 }
 
 func Test_toTopicPRD(t *testing.T) {
-	createMockEnvVars()
+	createMockReaderEnv()
 	os.Setenv("INSPR_ENV", "")
-	defer deleteMockEnvVars()
+	os.Setenv("INSPR_APP_CTX", "random.app1")
+	defer deleteMockReaderEnv()
 	environment.RefreshEnviromentVariables()
 	type args struct {
 		channel string

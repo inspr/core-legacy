@@ -8,24 +8,9 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 )
 
-func mockMessageSender(writer *kafka.Producer, topic *string) {
-	// Valid message
-	writer.ProduceChannel() <- &kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     topic,
-			Partition: kafka.PartitionAny,
-		},
-		Value: []byte("msgTest"),
-	}
-	// Invalid message
-	writer.ProduceChannel() <- &kafka.Message{
-		TopicPartition: kafka.TopicPartition{},
-		Value:          []byte("msgTest"),
-	}
-}
 func TestNewWriter(t *testing.T) {
-	createMockEnvVars()
-	defer deleteMockEnvVars()
+	createMockReaderEnv()
+	defer deleteMockReaderEnv()
 	type args struct {
 		mock bool
 	}
@@ -70,10 +55,10 @@ func TestNewWriter(t *testing.T) {
 func TestWriter_WriteMessage(t *testing.T) {
 	mProd, _ := NewWriter(true)
 	defer mProd.Close()
-	createMockEnvVars()
+	createMockReaderEnv()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
-	defer deleteMockEnvVars()
+	defer deleteMockReaderEnv()
 	type fields struct {
 		producer *kafka.Producer
 	}
@@ -155,10 +140,10 @@ func Test_deliveryReport(t *testing.T) {
 func TestWriter_produceMessage(t *testing.T) {
 	mProd, _ := NewWriter(true)
 	defer mProd.Close()
-	createMockEnvVars()
+	createMockReaderEnv()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
-	defer deleteMockEnvVars()
+	defer deleteMockReaderEnv()
 	type fields struct {
 		producer *kafka.Producer
 	}

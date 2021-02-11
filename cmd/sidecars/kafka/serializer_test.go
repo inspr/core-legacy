@@ -6,9 +6,7 @@ import (
 	"testing"
 
 	"github.com/linkedin/goavro"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
 var mockSchema = `{"type":"string"}`
@@ -16,59 +14,6 @@ var mockSchema = `{"type":"string"}`
 func mockNewCodec() *goavro.Codec {
 	codec, _ := goavro.NewCodec(mockSchema)
 	return codec
-}
-
-func getMockApp() tree.MemoryManager {
-	ctype := &meta.ChannelType{
-		Meta: meta.Metadata{
-			Name:        "ct1",
-			Reference:   "root.ct1",
-			Annotations: map[string]string{},
-			Parent:      "root",
-			SHA256:      "",
-		},
-		Schema: []byte{123, 34, 116, 121, 112, 101, 34, 58, 34, 115, 116, 114, 105, 110, 103, 34, 125},
-	}
-	ctype1 := &meta.ChannelType{
-		Meta: meta.Metadata{
-			Name:        "ct2",
-			Reference:   "root.ct2",
-			Annotations: map[string]string{},
-			Parent:      "root",
-			SHA256:      "",
-		},
-		Schema: []byte{104, 101, 108, 108, 111, 116, 101, 115, 116},
-	}
-	chann := &meta.Channel{
-		Meta: meta.Metadata{
-			Name:        "ch1",
-			Reference:   "root.ch1",
-			Annotations: map[string]string{},
-			Parent:      "root",
-			SHA256:      "",
-		},
-		Spec: meta.ChannelSpec{
-			Type: "ct1",
-		},
-	}
-	chann1 := &meta.Channel{
-		Meta: meta.Metadata{
-			Name:        "ch2",
-			Reference:   "root.ch2",
-			Annotations: map[string]string{},
-			Parent:      "root",
-			SHA256:      "",
-		},
-		Spec: meta.ChannelSpec{
-			Type: "ct2",
-		},
-	}
-	tree.GetTreeMemory()
-	tree.GetTreeMemory().ChannelTypes().CreateChannelType(ctype, "")
-	tree.GetTreeMemory().ChannelTypes().CreateChannelType(ctype1, "")
-	tree.GetTreeMemory().Channels().CreateChannel("", chann)
-	tree.GetTreeMemory().Channels().CreateChannel("", chann1)
-	return tree.MemoryManager{}
 }
 
 func returnEncodedMessage(msg string) []byte {
@@ -156,10 +101,10 @@ func Test_getSchema(t *testing.T) {
 }
 
 func Test_decode(t *testing.T) {
-	createMockEnvVars()
+	createMockReaderEnv()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
-	defer deleteMockEnvVars()
+	defer deleteMockReaderEnv()
 	type args struct {
 		messageEncoded []byte
 		channel        string
@@ -214,10 +159,10 @@ func Test_decode(t *testing.T) {
 }
 
 func Test_encode(t *testing.T) {
-	createMockEnvVars()
+	createMockReaderEnv()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
-	defer deleteMockEnvVars()
+	defer deleteMockReaderEnv()
 	type args struct {
 		message interface{}
 		channel string
