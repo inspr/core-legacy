@@ -1,7 +1,6 @@
 package diff
 
 import (
-	"reflect"
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -94,35 +93,6 @@ func TestDiff(t *testing.T) {
 			}
 			if !equalChangelogs(got, tt.want) {
 				t.Errorf("Diff() = \n%v, want \n%v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestChangelog_diff(t *testing.T) {
-	type args struct {
-		appOrig *meta.App
-		appCurr *meta.App
-		ctx     string
-	}
-	tests := []struct {
-		name    string
-		cl      Changelog
-		args    args
-		want    Changelog
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.cl.diff(tt.args.appOrig, tt.args.appCurr, tt.args.ctx)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Changelog.diff() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Changelog.diff() = %v, want %v", got, tt.want)
 			}
 		})
 	}
