@@ -7,9 +7,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-// GetMapCmpOpts - returns opts for cmd.Equal
+// GetMapCompareOptions - returns opts for cmd.Equal
 // ignores all slices and compares maps
-func GetMapCmpOpts() cmp.Options {
+func GetMapCompareOptions() cmp.Options {
 	evaluatesMap := cmp.Comparer(func(l, r interface{}) bool {
 		mapLeft := reflect.ValueOf(l)
 		mapRight := reflect.ValueOf(r)

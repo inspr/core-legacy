@@ -163,7 +163,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := InsprDAppToK8sDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCmpOpts()) {
+			if got := InsprDAppToK8sDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
 				t.Errorf("InsprDAppToK8sDeployment() = %v, want %v", got, tt.want)
 			}
 		})
@@ -210,7 +210,7 @@ func Test_parseToK8sArrEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := parseToK8sArrEnv(tt.args.arrappEnv)
 
-			if !cmp.Equal(got, tt.want, test.GetMapCmpOpts()) {
+			if !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
 				t.Errorf("parseToK8sArrEnv() = %v, want %v", got, tt.want)
 			}
 		})
