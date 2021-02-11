@@ -68,8 +68,8 @@ func TestAppClient_Delete(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Query != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Query, tt.args.context)
+				if di.Ctx != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
 				}
 
 				encoder.Encode("OK")
@@ -162,8 +162,8 @@ func TestAppClient_Get(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Query != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Query, tt.args.context)
+				if di.Ctx != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
 				}
 
 				encoder.Encode(tt.want)
