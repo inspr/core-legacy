@@ -38,7 +38,7 @@ func NewReader() (*Reader, error) {
 	})
 
 	if errKafkaConsumer != nil {
-		return nil, ierrors.NewError().Message("failed to create a new kafka consumer").InnerError(errKafkaConsumer).InternalServer().Build()
+		return nil, ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
 	}
 	reader.consumer = newConsumer
 

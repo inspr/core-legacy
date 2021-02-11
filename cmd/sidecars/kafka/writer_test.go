@@ -55,6 +55,7 @@ func TestNewWriter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewWriter(tt.args.mock)
+			defer got.Close()
 			if tt.wantErr && (got.producer.GetFatalError() != nil) {
 				t.Errorf("NewWriter() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -68,6 +69,7 @@ func TestNewWriter(t *testing.T) {
 
 func TestWriter_WriteMessage(t *testing.T) {
 	mProd, _ := NewWriter(true)
+	defer mProd.Close()
 	createMockEnvVars()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
@@ -123,6 +125,7 @@ func TestWriter_WriteMessage(t *testing.T) {
 
 func Test_deliveryReport(t *testing.T) {
 	mProd, _ := NewWriter(true)
+	defer mProd.Close()
 	type args struct {
 		producer *kafka.Producer
 	}
@@ -151,6 +154,7 @@ func Test_deliveryReport(t *testing.T) {
 
 func TestWriter_produceMessage(t *testing.T) {
 	mProd, _ := NewWriter(true)
+	defer mProd.Close()
 	createMockEnvVars()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()

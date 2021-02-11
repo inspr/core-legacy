@@ -88,3 +88,8 @@ func (writer *Writer) produceMessage(message interface{}, channel string) error 
 
 	return nil
 }
+
+// Close closes the kafka producer
+func (writer *Writer) Close() {
+	writer.producer.Close()
+}

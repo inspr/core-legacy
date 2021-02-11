@@ -36,6 +36,7 @@ func TestNewReader(t *testing.T) {
 	createMockReaderEnv()
 	defer deleteMockReaderEnv()
 	environment.RefreshEnviromentVariables()
+	RefreshEnviromentVariables()
 
 	tests := []struct {
 		name          string
