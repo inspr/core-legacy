@@ -240,6 +240,14 @@ func Test_toDeploymentName(t *testing.T) {
 			},
 			want: "root.app1.app2.mock-app",
 		},
+		{
+			name: "removing_first_character_when_dot",
+			args: args{
+				filePath: ".root.app1.app2",
+				app:      &testApp,
+			},
+			want: "root.app1.app2.mock-app",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

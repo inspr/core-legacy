@@ -137,6 +137,9 @@ func parseToK8sArrEnv(arrappEnv map[string]string) []kubeCore.EnvVar {
 // creates a unique deployment name to be used in the k8s deploy
 func toDeploymentName(envPath string, app *meta.App) string {
 	s := envPath + "." + fmt.Sprintf("%v", app.Meta.Name)
+	if s[0] == '.' {
+		s = s[1:]
+	}
 	return strings.ToLower(s)
 }
 
