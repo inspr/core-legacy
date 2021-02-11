@@ -12,10 +12,10 @@ import (
 // createMockEnvVars - sets up the env values to be used in the tests functions
 // createMockEnvVars - sets up the env values to be used in the tests functions
 func createMockReaderEnv() {
-	os.Setenv("INSPR_INPUT_CHANNELS", "inp1;inp2;inp3")
-	os.Setenv("INSPR_OUTPUT_CHANNELS", "out1;out2;out3")
+	os.Setenv("INSPR_INPUT_CHANNELS", "ch1;ch2")
+	os.Setenv("INSPR_OUTPUT_CHANNELS", "ch1;ch2")
 	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
-	os.Setenv("INSPR_APP_CTX", "random.app1")
+	os.Setenv("INSPR_APP_CTX", "")
 	os.Setenv("INSPR_ENV", "random")
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "latest")
@@ -83,26 +83,50 @@ func TestNewReader(t *testing.T) {
 }
 
 func TestReader_ReadMessage(t *testing.T) {
+	createMockReaderEnv()
+	defer deleteMockReaderEnv()
+	environment.RefreshEnviromentVariables()
+	RefreshEnviromentVariables()
+
 	type fields struct {
-		consumer    *kafka.Consumer
+		consumer    Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
 		name    string
 		fields  fields
+		before  func()
 		want    string
 		want1   interface{}
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should read a message",
+			fields: fields{
+				consumer: &MockConsumer{
+					err:           nil,
+					pollMsg:       "Hello World!",
+					topic:         toTopic("ch1"),
+					errCode:       0,
+					senderChannel: "ch1",
+				},
+				lastMessage: nil,
+			},
+			wantErr: false,
+			want:    "ch1",
+			want1:   "Hello World!",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			getMockApp()
 			reader := &Reader{
 				consumer:    tt.fields.consumer,
 				lastMessage: tt.fields.lastMessage,
 			}
+
 			got, got1, err := reader.ReadMessage()
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Reader.ReadMessage() error = %v, wantErr %v", err, tt.wantErr)
 				return

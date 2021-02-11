@@ -9,9 +9,17 @@ import (
 
 const pollTimeout = 100
 
+// Consumer interface
+type Consumer interface {
+	Poll(timeout int) (event kafka.Event)
+	SubscribeTopics(topics []string, rebalanceCb kafka.RebalanceCb) (err error)
+	CommitMessage(m *kafka.Message) ([]kafka.TopicPartition, error)
+	Close() (err error)
+}
+
 // Reader reads/commit messages from the channels defined in the env
 type Reader struct {
-	consumer    *kafka.Consumer
+	consumer    Consumer
 	lastMessage *kafka.Message
 }
 
@@ -23,11 +31,13 @@ func NewReader() (*Reader, error) {
 	var reader Reader
 
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
-		"group.id":           globalEnv.InsprAppContext,
-		"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
-		"enable.auto.commit": false,
+		"bootstrap.servers":     kafkaEnv.KafkaBootstrapServers,
+		"group.id":              globalEnv.InsprAppContext,
+		"auto.offset.reset":     kafkaEnv.KafkaAutoOffsetReset,
+		"enable.auto.commit":    false,
+		"test.mock.num.brokers": 1,
 	})
+
 	if errKafkaConsumer != nil {
 		return nil, ierrors.NewError().Message("failed to create a new kafka consumer").InnerError(errKafkaConsumer).InternalServer().Build()
 	}
