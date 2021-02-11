@@ -104,7 +104,7 @@ func TestReader_ReadMessage(t *testing.T) {
 			name: "It should read a message",
 			fields: fields{
 				consumer: &MockConsumer{
-					err:           nil,
+					err:           false,
 					pollMsg:       "Hello World!",
 					topic:         toTopic("ch1"),
 					errCode:       0,
@@ -115,6 +115,20 @@ func TestReader_ReadMessage(t *testing.T) {
 			wantErr: false,
 			want:    "ch1",
 			want1:   "Hello World!",
+		},
+		{
+			name: "It should return a error",
+			fields: fields{
+				consumer: &MockConsumer{
+					err:           true,
+					pollMsg:       "Hello World!",
+					topic:         toTopic("ch1"),
+					errCode:       0,
+					senderChannel: "ch1",
+				},
+				lastMessage: nil,
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

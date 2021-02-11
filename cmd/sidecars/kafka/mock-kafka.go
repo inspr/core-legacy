@@ -4,7 +4,7 @@ import "github.com/confluentinc/confluent-kafka-go/kafka"
 
 //MockConsumer mock
 type MockConsumer struct {
-	err           error
+	err           bool
 	errCode       int
 	pollMsg       string
 	topic         string
@@ -22,6 +22,10 @@ func (me *MockEvent) String() string {
 
 //Poll mock
 func (mc *MockConsumer) Poll(timeout int) (event kafka.Event) {
+
+	if mc.err {
+		return kafka.NewError(kafka.ErrAllBrokersDown, "", false)
+	}
 
 	msg, _ := encode(mc.pollMsg, mc.senderChannel)
 	return &kafka.Message{
