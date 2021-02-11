@@ -35,7 +35,7 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			return
 		}
 
-		err = ah.CreateApp(&data.App, data.Ctx)
+		err = ah.CreateApp(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -80,7 +80,7 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 			return
 		}
 
-		err = ah.UpdateApp(&data.App, data.Ctx)
+		err = ah.UpdateApp(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 		} else {

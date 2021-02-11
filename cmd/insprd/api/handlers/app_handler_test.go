@@ -9,9 +9,9 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/mocks"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -43,19 +43,19 @@ func appDICases(funcName string) []appAPITest {
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			ah:   NewAppHandler(fake.MockMemoryManager(nil)),
 			send: sendInRequest{body: parsedAppDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			ah:   NewAppHandler(fake.MockMemoryManager(errors.New("test_error"))),
 			send: sendInRequest{body: parsedAppDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			ah:   NewAppHandler(fake.MockMemoryManager(nil)),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -74,19 +74,19 @@ func appQueryDICases(funcName string) []appAPITest {
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			ah:   NewAppHandler(fake.MockMemoryManager(nil)),
 			send: sendInRequest{body: parsedAppQueryDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			ah:   NewAppHandler(fake.MockMemoryManager(errors.New("test_error"))),
 			send: sendInRequest{body: parsedAppQueryDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			ah:   NewAppHandler(fake.MockMemoryManager(nil)),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -105,10 +105,10 @@ func TestNewAppHandler(t *testing.T) {
 		{
 			name: "success_TestNewAppHandler",
 			args: args{
-				memManager: mocks.MockMemoryManager(nil),
+				memManager: fake.MockMemoryManager(nil),
 			},
 			want: &AppHandler{
-				AppMemory: mocks.MockMemoryManager(nil).Apps(),
+				AppMemory: fake.MockMemoryManager(nil).Apps(),
 			},
 		},
 	}

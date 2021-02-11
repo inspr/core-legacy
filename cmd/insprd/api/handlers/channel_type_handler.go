@@ -36,7 +36,7 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 			return
 		}
 
-		err = cth.CreateChannelType(&data.ChannelType, data.Ctx)
+		err = cth.CreateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -82,7 +82,7 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			return
 		}
 
-		err = cth.UpdateChannelType(&data.ChannelType, data.Ctx)
+		err = cth.UpdateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
