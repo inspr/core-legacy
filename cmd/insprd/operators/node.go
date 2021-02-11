@@ -26,24 +26,24 @@ func (no *NodeOperator) Nodes() NodeOperatorInterface {
 
 // CreateNode deploys a new node structure, if it's information is valid.
 // Otherwise, returns an error
-func (no *NodeOperator) CreateNode(context string, node *meta.Node) error {
+func (no *NodeOperator) CreateNode(ctx context.context, context string, node *meta.Node) error {
 	return nil
 }
 
 // GetNode returns the node with the given name, if it exists.
 // Otherwise, returns an error
-func (no *NodeOperator) GetNode(context string, nodeName string) (*meta.Node, error) {
+func (no *NodeOperator) GetNode(ctx context.context, context string, nodeName string) (*meta.Node, error) {
 	return &meta.Node{}, nil
 }
 
 // UpdateNode updates a node that already exists, if the new structure is valid.
 // Otherwise, returns an error.
-func (no *NodeOperator) UpdateNode(context string, node *meta.Node) error {
+func (no *NodeOperator) UpdateNode(ctx context.context, context string, node *meta.Node) error {
 	return nil
 }
 
 // DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
-func (no *NodeOperator) DeleteNode(context, nodeName string) error {
+func (no *NodeOperator) DeleteNode(ctx context.context, context string, nodeName string) error {
 	return nil
 }
 
