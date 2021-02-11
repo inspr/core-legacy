@@ -18,29 +18,6 @@ func mockNewCodec() *goavro.Codec {
 	return codec
 }
 
-func mockEncodedMessage() []byte {
-	codec, _ := goavro.NewCodec(`
-        {
-          "type": "record",
-          "name": "LongList",
-          "fields" : [
-            {"name": "next", "type": ["null", "LongList"], "default": null}
-          ]
-        }`)
-
-	// Convert native Go form to binary Avro data
-	binary, _ := codec.BinaryFromNative(nil, map[string]interface{}{
-		"next": map[string]interface{}{
-			"LongList": map[string]interface{}{
-				"next": map[string]interface{}{
-					"LongList": map[string]interface{}{},
-				},
-			},
-		},
-	})
-	return binary
-}
-
 func getMockApp() tree.MemoryManager {
 	ctype := &meta.ChannelType{
 		Meta: meta.Metadata{

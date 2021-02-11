@@ -15,14 +15,21 @@ type Writer struct {
 }
 
 // NewWriter creates a new writer/kafka producer
-func NewWriter() (*Writer, error) {
-	bootstrapServers := GetEnvironment().KafkaBootstrapServers
-
-	kProd, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.server": bootstrapServers,
-	})
-	if err != nil {
-		return nil, kafka.NewError(kafka.ErrInvalidArg, err.Error(), false)
+func NewWriter(mock bool) (*Writer, error) {
+	var kProd *kafka.Producer
+	var err error
+	if mock {
+		kProd, _ = kafka.NewProducer(&kafka.ConfigMap{
+			"test.mock.num.brokers": 3,
+		})
+	} else {
+		bootstrapServers := GetEnvironment().KafkaBootstrapServers
+		kProd, err = kafka.NewProducer(&kafka.ConfigMap{
+			"bootstrap.servers": bootstrapServers,
+		})
+		if err != nil {
+			return nil, kafka.NewError(kafka.ErrInvalidArg, err.Error(), false)
+		}
 	}
 
 	return &Writer{kProd}, nil
