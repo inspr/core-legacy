@@ -9,8 +9,8 @@ import (
 
 // Apps - mocks the implementation of the AppMemory interface methods
 type Apps struct {
-	fail     error
-	channels map[string]*meta.App
+	fail error
+	apps map[string]*meta.App
 }
 
 // GetApp - simple mock
@@ -18,9 +18,9 @@ func (ch *Apps) GetApp(query string) (*meta.App, error) {
 	if ch.fail != nil {
 		return nil, ch.fail
 	}
-	ct, ok := ch.channels[query]
+	ct, ok := ch.apps[query]
 	if !ok {
-		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", query)).Build()
+		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("dapp %s not found", query)).Build()
 	}
 	return ct, nil
 }
@@ -31,11 +31,11 @@ func (ch *Apps) CreateApp(context string, ct *meta.App) error {
 		return ch.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
-	_, ok := ch.channels[query]
+	_, ok := ch.apps[query]
 	if ok {
-		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("channel type %s already exists", query)).Build()
+		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("dapp %s already exists", query)).Build()
 	}
-	ch.channels[query] = ct
+	ch.apps[query] = ct
 	return nil
 }
 
@@ -44,12 +44,12 @@ func (ch *Apps) DeleteApp(query string) error {
 	if ch.fail != nil {
 		return ch.fail
 	}
-	_, ok := ch.channels[query]
+	_, ok := ch.apps[query]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", query)).Build()
+		return ierrors.NewError().NotFound().Message(fmt.Sprintf("dapp %s not found", query)).Build()
 	}
 
-	delete(ch.channels, query)
+	delete(ch.apps, query)
 	return nil
 }
 
@@ -59,10 +59,10 @@ func (ch *Apps) UpdateApp(context string, ct *meta.App) error {
 		return ch.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
-	_, ok := ch.channels[query]
+	_, ok := ch.apps[query]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", query)).Build()
+		return ierrors.NewError().NotFound().Message(fmt.Sprintf("dapp %s not found", query)).Build()
 	}
-	ch.channels[query] = ct
+	ch.apps[query] = ct
 	return nil
 }

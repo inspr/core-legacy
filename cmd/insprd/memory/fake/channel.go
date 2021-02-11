@@ -21,7 +21,7 @@ func (ch *Channels) GetChannel(context string, name string) (*meta.Channel, erro
 	query := fmt.Sprintf("%s.%s", context, name)
 	ct, ok := ch.channels[query]
 	if !ok {
-		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", query)).Build()
+		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("channel %s not found", query)).Build()
 	}
 	return ct, nil
 }
@@ -34,7 +34,7 @@ func (ch *Channels) CreateChannel(context string, ct *meta.Channel) error {
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
 	_, ok := ch.channels[query]
 	if ok {
-		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("channel type %s already exists", query)).Build()
+		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("channel %s already exists", query)).Build()
 	}
 	ch.channels[query] = ct
 	return nil
@@ -48,7 +48,7 @@ func (ch *Channels) DeleteChannel(context string, name string) error {
 	query := fmt.Sprintf("%s.%s", context, name)
 	_, ok := ch.channels[query]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", query)).Build()
+		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel %s not found", query)).Build()
 	}
 
 	delete(ch.channels, query)
@@ -63,7 +63,7 @@ func (ch *Channels) UpdateChannel(context string, ct *meta.Channel) error {
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
 	_, ok := ch.channels[query]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", query)).Build()
+		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel %s not found", query)).Build()
 	}
 	ch.channels[query] = ct
 	return nil
