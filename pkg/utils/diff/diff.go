@@ -179,7 +179,7 @@ func (change *Change) diffBoudaries(boundOrig meta.AppBoundary, boundCurr meta.A
 
 }
 
-func (change *Change) diffApps(appsOrig utils.Apps, appsCurr utils.Apps) {
+func (change *Change) diffApps(appsOrig utils.MApps, appsCurr utils.MApps) {
 	set := utils.AppDisjuncSet(appsOrig, appsCurr)
 
 	for k := range set {
@@ -203,7 +203,7 @@ func (change *Change) diffApps(appsOrig utils.Apps, appsCurr utils.Apps) {
 	}
 }
 
-func (change *Change) diffChannels(chOrig utils.Channels, chCurr utils.Channels) error {
+func (change *Change) diffChannels(chOrig utils.MChannels, chCurr utils.MChannels) error {
 	disjunction := utils.ChsDisjuncSet(chOrig, chCurr)
 
 	for k := range disjunction {
@@ -246,7 +246,7 @@ func (change *Change) diffChannels(chOrig utils.Channels, chCurr utils.Channels)
 	return nil
 }
 
-func (change *Change) diffChannelTypes(chtOrig utils.Types, chtCurr utils.Types) error {
+func (change *Change) diffChannelTypes(chtOrig utils.MTypes, chtCurr utils.MTypes) error {
 	disjunction := utils.TypesDisjuncSet(chtOrig, chtCurr)
 
 	for k := range disjunction {

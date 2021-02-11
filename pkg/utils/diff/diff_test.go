@@ -99,18 +99,6 @@ func TestDiff(t *testing.T) {
 	}
 }
 
-func TestChangelog_Print(t *testing.T) {
-	tests := []struct {
-		name string
-		cl   Changelog
-	}{}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.cl.Print()
-		})
-	}
-}
-
 func TestChangelog_diff(t *testing.T) {
 	type args struct {
 		appOrig *meta.App
@@ -384,8 +372,8 @@ func TestChange_diffApps(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		appsOrig utils.Apps
-		appsCurr utils.Apps
+		appsOrig utils.MApps
+		appsCurr utils.MApps
 	}
 	tests := []struct {
 		name   string
@@ -397,7 +385,7 @@ func TestChange_diffApps(t *testing.T) {
 			name:   "Unchanged Apps",
 			fields: fields{},
 			args: args{
-				appsOrig: utils.Apps{
+				appsOrig: utils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{
@@ -410,7 +398,7 @@ func TestChange_diffApps(t *testing.T) {
 						},
 					},
 				},
-				appsCurr: utils.Apps{
+				appsCurr: utils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{
@@ -430,13 +418,13 @@ func TestChange_diffApps(t *testing.T) {
 			name:   "Valid changes on Apps",
 			fields: fields{},
 			args: args{
-				appsOrig: utils.Apps{
+				appsOrig: utils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{},
 					},
 				},
-				appsCurr: utils.Apps{
+				appsCurr: utils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{},
@@ -478,8 +466,8 @@ func TestChange_diffChannels(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		chOrig utils.Channels
-		chCurr utils.Channels
+		chOrig utils.MChannels
+		chCurr utils.MChannels
 	}
 	tests := []struct {
 		name    string
@@ -492,7 +480,7 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Unchanged Channel Types",
 			fields: fields{},
 			args: args{
-				chOrig: utils.Channels{
+				chOrig: utils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -500,7 +488,7 @@ func TestChange_diffChannels(t *testing.T) {
 						},
 					},
 				},
-				chCurr: utils.Channels{
+				chCurr: utils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -516,7 +504,7 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Valid changes on Channel Types",
 			fields: fields{},
 			args: args{
-				chOrig: utils.Channels{
+				chOrig: utils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -524,7 +512,7 @@ func TestChange_diffChannels(t *testing.T) {
 						},
 					},
 				},
-				chCurr: utils.Channels{
+				chCurr: utils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -567,8 +555,8 @@ func TestChange_diffChannelTypes(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		chtOrig utils.Types
-		chtCurr utils.Types
+		chtOrig utils.MTypes
+		chtCurr utils.MTypes
 	}
 	tests := []struct {
 		name    string
@@ -581,13 +569,13 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "Unchanged Channel Types",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.Types{
+				chtOrig: utils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta:   meta.Metadata{},
 						Schema: []byte{},
 					},
 				},
-				chtCurr: utils.Types{
+				chtCurr: utils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta:   meta.Metadata{},
 						Schema: []byte{},
@@ -601,7 +589,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "Valid changes on Channel Types",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.Types{
+				chtOrig: utils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -613,7 +601,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 						Schema: []byte{0, 1, 0, 1, 0, 0, 1, 1, 1, 0},
 					},
 				},
-				chtCurr: utils.Types{
+				chtCurr: utils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -1093,6 +1081,9 @@ func equalChanges(change1 Change, change2 Change) bool {
 	if change1.Context != change2.Context {
 		return false
 	}
+	if len(change1.Diff) != len(change2.Diff) {
+		return false
+	}
 	map1 := make(map[Difference]int)
 	map2 := make(map[Difference]int)
 	for _, diff := range change1.Diff {
@@ -1132,6 +1123,10 @@ func equalChangelogs(changelog1 Changelog, changelog2 Changelog) bool {
 	}
 
 	for key, val := range map1 {
+		if len(map1[key]) != len(map2[key]) {
+			return false
+		}
+
 		for key2, val2 := range val {
 			if map2[key][key2] != val2 {
 				return false

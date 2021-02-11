@@ -4,17 +4,17 @@ import "gitlab.inspr.dev/inspr/core/pkg/meta"
 
 var exists = true
 
-//Apps is a string->App map
-type Apps map[string]*meta.App
+//MApps is a string->App map
+type MApps map[string]*meta.App
 
-//Channels is a string->channel map
-type Channels map[string]*meta.Channel
+//MChannels is a string->channel map
+type MChannels map[string]*meta.Channel
 
-//Types is a string->ChannelType map
-type Types map[string]*meta.ChannelType
+//MTypes is a string->ChannelType map
+type MTypes map[string]*meta.ChannelType
 
-//Str is a string->string map
-type Str map[string]string
+//MStr is a string->string map
+type MStr map[string]string
 
 //StrSet implements a set of strings.
 type StrSet map[string]bool
@@ -55,7 +55,7 @@ func ArrDisjuncSet(arr1 []string, arr2 []string) StrSet {
 }
 
 //AppMakeSet creates a StrSet from a Apps map.
-func AppMakeSet(apps Apps) StrSet {
+func AppMakeSet(apps MApps) StrSet {
 	set := make(StrSet)
 
 	for k := range apps {
@@ -66,14 +66,14 @@ func AppMakeSet(apps Apps) StrSet {
 }
 
 //AppAppendSet extends a StrSet with a Apps map.
-func (set *StrSet) AppAppendSet(apps Apps) {
+func (set *StrSet) AppAppendSet(apps MApps) {
 	for k := range apps {
 		(*set)[k] = exists
 	}
 }
 
 //AppDisjuncSet returns the disjunction set between two Apps maps.
-func AppDisjuncSet(apps1 Apps, apps2 Apps) StrSet {
+func AppDisjuncSet(apps1 MApps, apps2 MApps) StrSet {
 	set := make(StrSet)
 
 	setTemp := AppMakeSet(apps1)
@@ -91,7 +91,7 @@ func AppDisjuncSet(apps1 Apps, apps2 Apps) StrSet {
 }
 
 //AppIntersecSet returns the intersection set between two Apps maps.
-func AppIntersecSet(apps1 Apps, apps2 Apps) StrSet {
+func AppIntersecSet(apps1 MApps, apps2 MApps) StrSet {
 	set := make(StrSet)
 
 	setTemp := AppMakeSet(apps1)
@@ -109,7 +109,7 @@ func AppIntersecSet(apps1 Apps, apps2 Apps) StrSet {
 }
 
 //ChsMakeSet creates a StrSet from a Channels map.
-func ChsMakeSet(apps Channels) StrSet {
+func ChsMakeSet(apps MChannels) StrSet {
 	set := make(StrSet)
 
 	for k := range apps {
@@ -120,14 +120,14 @@ func ChsMakeSet(apps Channels) StrSet {
 }
 
 //ChsAppendSet extends a StrSet with a Channels map.
-func (set *StrSet) ChsAppendSet(apps Channels) {
+func (set *StrSet) ChsAppendSet(apps MChannels) {
 	for k := range apps {
 		(*set)[k] = exists
 	}
 }
 
 //ChsDisjuncSet returns the disjunction set between two Channels maps.
-func ChsDisjuncSet(apps1 Channels, apps2 Channels) StrSet {
+func ChsDisjuncSet(apps1 MChannels, apps2 MChannels) StrSet {
 	set := make(StrSet)
 
 	setTemp := ChsMakeSet(apps1)
@@ -145,7 +145,7 @@ func ChsDisjuncSet(apps1 Channels, apps2 Channels) StrSet {
 }
 
 //ChsIntersecSet returns the intersection set between two Channels maps.
-func ChsIntersecSet(apps1 Channels, apps2 Channels) StrSet {
+func ChsIntersecSet(apps1 MChannels, apps2 MChannels) StrSet {
 	set := make(StrSet)
 
 	setTemp := ChsMakeSet(apps1)
@@ -163,7 +163,7 @@ func ChsIntersecSet(apps1 Channels, apps2 Channels) StrSet {
 }
 
 //TypesMakeSet creates a StrSet from a Types map.
-func TypesMakeSet(types Types) StrSet {
+func TypesMakeSet(types MTypes) StrSet {
 	set := make(StrSet)
 
 	for k := range types {
@@ -174,14 +174,14 @@ func TypesMakeSet(types Types) StrSet {
 }
 
 //TypesAppendSet extends a StrSet with a Types map.
-func (set *StrSet) TypesAppendSet(types Types) {
+func (set *StrSet) TypesAppendSet(types MTypes) {
 	for k := range types {
 		(*set)[k] = exists
 	}
 }
 
 //TypesDisjuncSet returns the disjunction set between two Types maps.
-func TypesDisjuncSet(types1 Types, types2 Types) StrSet {
+func TypesDisjuncSet(types1 MTypes, types2 MTypes) StrSet {
 	set := make(StrSet)
 
 	setTemp := TypesMakeSet(types1)
@@ -199,7 +199,7 @@ func TypesDisjuncSet(types1 Types, types2 Types) StrSet {
 }
 
 //TypesIntersecSet returns the intersection set between two Types maps.
-func TypesIntersecSet(types1 Types, types2 Types) StrSet {
+func TypesIntersecSet(types1 MTypes, types2 MTypes) StrSet {
 	set := make(StrSet)
 
 	setTemp := TypesMakeSet(types1)
@@ -217,7 +217,7 @@ func TypesIntersecSet(types1 Types, types2 Types) StrSet {
 }
 
 //StrMakeSet creates a StrSet from a Str map.
-func StrMakeSet(strings Str) StrSet {
+func StrMakeSet(strings MStr) StrSet {
 	set := make(StrSet)
 
 	for k := range strings {
@@ -228,14 +228,14 @@ func StrMakeSet(strings Str) StrSet {
 }
 
 //StrAppendSet extends a StrSet with a Str map.
-func (set *StrSet) StrAppendSet(strings Str) {
+func (set *StrSet) StrAppendSet(strings MStr) {
 	for k := range strings {
 		(*set)[k] = exists
 	}
 }
 
 //StrDisjuncSet returns the disjunction set between two Str maps.
-func StrDisjuncSet(strings1 Str, strigns2 Str) StrSet {
+func StrDisjuncSet(strings1 MStr, strigns2 MStr) StrSet {
 	set := make(StrSet)
 
 	setTemp := StrMakeSet(strings1)
