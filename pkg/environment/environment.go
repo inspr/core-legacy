@@ -2,8 +2,8 @@ package environment
 
 import "os"
 
-// InsprEnvironment represents the current inspr environment
-type InsprEnvironment struct {
+// InsprEnvVars represents the current inspr environment
+type InsprEnvVars struct {
 	InputChannels    string
 	OutputChannels   string
 	UnixSocketAddr   string
@@ -12,12 +12,12 @@ type InsprEnvironment struct {
 	InsprEnvironment string
 }
 
-var env *InsprEnvironment
+var env *InsprEnvVars
 
 // GetEnvironment returns the current inspr environment
-func GetEnvironment() *InsprEnvironment {
+func GetEnvironment() *InsprEnvVars {
 	if env == nil {
-		env = &InsprEnvironment{
+		env = &InsprEnvVars{
 			InputChannels:    getEnv("INSPR_INPUT_CHANNELS"),
 			OutputChannels:   getEnv("INSPR_OUTPUT_CHANNELS"),
 			UnixSocketAddr:   getEnv("INSPR_UNIX_SOCKET"),

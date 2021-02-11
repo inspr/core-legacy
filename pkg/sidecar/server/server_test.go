@@ -33,7 +33,8 @@ func TestServer_Run(t *testing.T) {
 				defer wg.Done()
 				time.Sleep(500 * time.Microsecond)
 
-				c := transports.NewUnixSocketClient("socket_addr") // env mock socket addr
+				// env mock socket addr
+				c := transports.NewUnixSocketClient("socket_addr")
 
 				resp, err := c.Post("http://unix/"+r, "", nil)
 				if err != nil {

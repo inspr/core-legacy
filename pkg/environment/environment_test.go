@@ -26,8 +26,8 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_ENV")
 }
 
-func mockInsprEnvironment() *InsprEnvironment {
-	return &InsprEnvironment{
+func mockInsprEnvironment() *InsprEnvVars {
+	return &InsprEnvVars{
 		InputChannels:    "inp1;inp2;inp3",
 		OutputChannels:   "out1;out2;out3",
 		UnixSocketAddr:   "/addr/to/socket",
@@ -42,7 +42,7 @@ func TestGetEnvironment(t *testing.T) {
 	defer deleteMockEnvVars()
 	tests := []struct {
 		name string
-		want *InsprEnvironment
+		want *InsprEnvVars
 	}{
 		{
 			name: "Get all environment variables",
