@@ -12,8 +12,9 @@ func createMockEnvVars() {
 	os.Setenv("INSPR_INPUT_CHANNELS", "inp1;inp2;inp3")
 	os.Setenv("INSPR_OUTPUT_CHANNELS", "out1;out2;out3")
 	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
-	os.Setenv("INSPR_APP_CTX", "random.ctx")
-	os.Setenv("INSPR_ENV", "test")
+	os.Setenv("INSPR_SIDECAR_IMAGE", "teste")
+	os.Setenv("INSPR_APP_CTX", "teste")
+	os.Setenv("INSPR_ENV", "teste")
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
@@ -21,17 +22,19 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
 	os.Unsetenv("INSPR_INPUT_CHANNELS")
 	os.Unsetenv("INSPR_UNIX_SOCKET")
+	os.Unsetenv("INSPR_SIDECAR_IMAGE")
 	os.Unsetenv("INSPR_APP_CTX")
 	os.Unsetenv("INSPR_ENV")
 }
 
-func mockInsprEnvironment() *InsprEnvironmentVariables {
-	return &InsprEnvironmentVariables{
+func mockInsprEnvironment() *InsprEnvVars {
+	return &InsprEnvVars{
 		InputChannels:    "inp1;inp2;inp3",
 		OutputChannels:   "out1;out2;out3",
 		UnixSocketAddr:   "/addr/to/socket",
-		InsprAppContext:  "random.ctx",
-		InsprEnvironment: "test",
+		SidecarImage:     "teste",
+		InsprAppContext:  "teste",
+		InsprEnvironment: "teste",
 	}
 }
 
@@ -40,7 +43,7 @@ func TestGetEnvironment(t *testing.T) {
 	defer deleteMockEnvVars()
 	tests := []struct {
 		name string
-		want *InsprEnvironmentVariables
+		want *InsprEnvVars
 	}{
 		{
 			name: "Get all environment variables",

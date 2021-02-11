@@ -6,11 +6,11 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"reflect"
 	"testing"
 	"time"
 
+	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
@@ -93,11 +93,12 @@ func TestNewAppClient(t *testing.T) {
 		{
 			name: "Valid App Client - with address",
 			want: &Client{
-				addr:  "/addr/to/socket",
-				httpc: *mockHTTPClient("/addr/to/socket"),
+				addr:  "socket_addr",
+				httpc: *mockHTTPClient("socket_addr"),
 			},
 		},
 	}
+	environment.SetMockEnv()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewAppClient()
