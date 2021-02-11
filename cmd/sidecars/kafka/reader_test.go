@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"gitlab.inspr.dev/inspr/core/pkg/environment"
 )
 
 // createMockEnvVars - sets up the env values to be used in the tests functions
@@ -31,55 +32,55 @@ func deleteMockReaderEnv() {
 	os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
 }
 
-// func TestNewReader(t *testing.T) {
-// 	createMockReaderEnv()
-// 	defer deleteMockReaderEnv()
-// 	environment.RefreshEnviromentVariables()
+func TestNewReader(t *testing.T) {
+	createMockReaderEnv()
+	defer deleteMockReaderEnv()
+	environment.RefreshEnviromentVariables()
 
-// 	tests := []struct {
-// 		name          string
-// 		want          *Reader
-// 		wantErr       bool
-// 		checkFunction func(t *testing.T, reader *Reader)
-// 		before        func()
-// 	}{
-// 		{
-// 			name:    "It should return a new Reader",
-// 			wantErr: false,
-// 			checkFunction: func(t *testing.T, reader *Reader) {
-// 				if !(reader.consumer != nil && reader.lastMessage == nil) {
-// 					t.Errorf("check function error = Reader not created sucesfully")
-// 				}
-// 			},
-// 		},
-// 		{
-// 			name:    "Input channel list is empty - it should return a error",
-// 			wantErr: true,
-// 			before: func() {
-// 				environment.RefreshEnviromentVariables()
-// 				deleteMockReaderEnv()
-// 				createMockReaderEnv()
-// 				os.Setenv("INSPR_INPUT_CHANNELS", "")
-// 				environment.RefreshEnviromentVariables()
-// 			},
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if tt.before != nil {
-// 				tt.before()
-// 			}
-// 			got, err := NewReader()
-// 			if (err != nil) != tt.wantErr {
-// 				t.Errorf("NewReader() error = %v, wantErr %v", err, tt.wantErr)
-// 				return
-// 			}
-// 			if tt.checkFunction != nil {
-// 				tt.checkFunction(t, got)
-// 			}
-// 		})
-// 	}
-// }
+	tests := []struct {
+		name          string
+		want          *Reader
+		wantErr       bool
+		checkFunction func(t *testing.T, reader *Reader)
+		before        func()
+	}{
+		{
+			name:    "It should return a new Reader",
+			wantErr: false,
+			checkFunction: func(t *testing.T, reader *Reader) {
+				if !(reader.consumer != nil && reader.lastMessage == nil) {
+					t.Errorf("check function error = Reader not created sucesfully")
+				}
+			},
+		},
+		{
+			name:    "Input channel list is empty - it should return a error",
+			wantErr: true,
+			before: func() {
+				environment.RefreshEnviromentVariables()
+				deleteMockReaderEnv()
+				createMockReaderEnv()
+				os.Setenv("INSPR_INPUT_CHANNELS", "")
+				environment.RefreshEnviromentVariables()
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.before != nil {
+				tt.before()
+			}
+			got, err := NewReader()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewReader() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if tt.checkFunction != nil {
+				tt.checkFunction(t, got)
+			}
+		})
+	}
+}
 
 func TestReader_ReadMessage(t *testing.T) {
 	createMockReaderEnv()
