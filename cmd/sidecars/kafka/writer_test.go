@@ -9,8 +9,8 @@ import (
 )
 
 func TestNewWriter(t *testing.T) {
-	createMockReaderEnv()
-	defer deleteMockReaderEnv()
+	createMockEnv()
+	defer deleteMockEnv()
 	type args struct {
 		mock bool
 	}
@@ -55,10 +55,10 @@ func TestNewWriter(t *testing.T) {
 func TestWriter_WriteMessage(t *testing.T) {
 	mProd, _ := NewWriter(true)
 	defer mProd.Close()
-	createMockReaderEnv()
+	createMockEnv()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
-	defer deleteMockReaderEnv()
+	defer deleteMockEnv()
 	type fields struct {
 		producer *kafka.Producer
 	}
@@ -140,10 +140,10 @@ func Test_deliveryReport(t *testing.T) {
 func TestWriter_produceMessage(t *testing.T) {
 	mProd, _ := NewWriter(true)
 	defer mProd.Close()
-	createMockReaderEnv()
+	createMockEnv()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
-	defer deleteMockReaderEnv()
+	defer deleteMockEnv()
 	type fields struct {
 		producer *kafka.Producer
 	}

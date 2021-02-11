@@ -66,7 +66,7 @@ func (mc *MockConsumer) Close() (err error) {
 
 // createMockEnvVars - sets up the env values to be used in the tests functions
 // createMockEnvVars - sets up the env values to be used in the tests functions
-func createMockReaderEnv() {
+func createMockEnv() {
 	os.Setenv("INSPR_INPUT_CHANNELS", "ch1;ch2")
 	os.Setenv("INSPR_OUTPUT_CHANNELS", "ch1;ch2")
 	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
@@ -77,7 +77,7 @@ func createMockReaderEnv() {
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
-func deleteMockReaderEnv() {
+func deleteMockEnv() {
 	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
 	os.Unsetenv("INSPR_INPUT_CHANNELS")
 	os.Unsetenv("INSPR_UNIX_SOCKET")

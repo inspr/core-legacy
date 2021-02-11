@@ -101,10 +101,10 @@ func Test_getSchema(t *testing.T) {
 }
 
 func Test_decode(t *testing.T) {
-	createMockReaderEnv()
+	createMockEnv()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
-	defer deleteMockReaderEnv()
+	defer deleteMockEnv()
 	type args struct {
 		messageEncoded []byte
 		channel        string
@@ -159,10 +159,10 @@ func Test_decode(t *testing.T) {
 }
 
 func Test_encode(t *testing.T) {
-	createMockReaderEnv()
+	createMockEnv()
 	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
-	defer deleteMockReaderEnv()
+	defer deleteMockEnv()
 	type args struct {
 		message interface{}
 		channel string

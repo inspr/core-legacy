@@ -10,8 +10,8 @@ import (
 )
 
 func TestNewReader(t *testing.T) {
-	createMockReaderEnv()
-	defer deleteMockReaderEnv()
+	createMockEnv()
+	defer deleteMockEnv()
 	environment.RefreshEnviromentVariables()
 	RefreshEnviromentVariables()
 
@@ -36,8 +36,8 @@ func TestNewReader(t *testing.T) {
 			wantErr: true,
 			before: func() {
 				environment.RefreshEnviromentVariables()
-				deleteMockReaderEnv()
-				createMockReaderEnv()
+				deleteMockEnv()
+				createMockEnv()
 				os.Setenv("INSPR_INPUT_CHANNELS", "")
 				environment.RefreshEnviromentVariables()
 			},
@@ -61,8 +61,8 @@ func TestNewReader(t *testing.T) {
 }
 
 func TestReader_ReadMessage(t *testing.T) {
-	createMockReaderEnv()
-	defer deleteMockReaderEnv()
+	createMockEnv()
+	defer deleteMockEnv()
 	environment.RefreshEnviromentVariables()
 	RefreshEnviromentVariables()
 

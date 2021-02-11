@@ -16,7 +16,7 @@ func mockKafkaEnvironment() *Environment {
 func TestGetEnvironment(t *testing.T) {
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "localhost")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "101019")
-	defer deleteMockReaderEnv()
+	defer deleteMockEnv()
 	tests := []struct {
 		name string
 		want *Environment
@@ -81,10 +81,10 @@ func Test_getEnv(t *testing.T) {
 }
 
 func TestRefreshEnviromentVariables(t *testing.T) {
-	createMockReaderEnv()
+	createMockEnv()
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "one")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "two")
-	defer deleteMockReaderEnv()
+	defer deleteMockEnv()
 	tests := []struct {
 		name    string
 		refresh bool
