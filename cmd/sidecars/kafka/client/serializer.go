@@ -21,6 +21,11 @@ func getCodec(schema string) (*goavro.Codec, error) {
 
 // returns the channel's channel type schema
 func getSchema(channel, context string) (string, error) {
+	// checa output channels. Se existir, checa nova variável de ambiente que tem channel_schema
+	// mudar schema para string ao invés de array de BAITES
+	if environment.GetEnvironment().IsInOutputChannel(channel) {
+
+	}
 	memChan, err := tree.GetTreeMemory().Channels().GetChannel(context, channel)
 	if err != nil {
 		return "", ierrors.NewError().InvalidChannel().Message(err.Error()).Build()

@@ -114,7 +114,7 @@ func getMockApp() tree.MemoryManager {
 			Parent:      "root",
 			SHA256:      "",
 		},
-		Schema: []byte{123, 34, 116, 121, 112, 101, 34, 58, 34, 115, 116, 114, 105, 110, 103, 34, 125},
+		Schema: string([]byte{123, 34, 116, 121, 112, 101, 34, 58, 34, 115, 116, 114, 105, 110, 103, 34, 125}),
 	}
 	ctype1 := &meta.ChannelType{
 		Meta: meta.Metadata{
@@ -124,7 +124,7 @@ func getMockApp() tree.MemoryManager {
 			Parent:      "root",
 			SHA256:      "",
 		},
-		Schema: []byte{104, 101, 108, 108, 111, 116, 101, 115, 116},
+		Schema: string([]byte{104, 101, 108, 108, 111, 116, 101, 115, 116}),
 	}
 	chann := &meta.Channel{
 		Meta: meta.Metadata{

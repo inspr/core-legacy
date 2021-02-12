@@ -45,7 +45,7 @@ func TestInsprEnvironment_IsInInputChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvironmentVariables{
+			insprEnv := &InsprEnvVars{
 				InputChannels:  tt.fields.InputChannels,
 				OutputChannels: tt.fields.OutputChannels,
 				UnixSocketAddr: tt.fields.UnixSocketAddr,
@@ -98,7 +98,7 @@ func TestInsprEnvironment_IsInOutputChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvironmentVariables{
+			insprEnv := &InsprEnvVars{
 				InputChannels:  tt.fields.InputChannels,
 				OutputChannels: tt.fields.OutputChannels,
 				UnixSocketAddr: tt.fields.UnixSocketAddr,
@@ -110,7 +110,7 @@ func TestInsprEnvironment_IsInOutputChannel(t *testing.T) {
 	}
 }
 
-func TestInsprEnvironmentVariables_GetInputChannelList(t *testing.T) {
+func TestInsprEnvVars_GetInputChannelList(t *testing.T) {
 	type fields struct {
 		InputChannels    string
 		OutputChannels   string
@@ -137,7 +137,7 @@ func TestInsprEnvironmentVariables_GetInputChannelList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvironmentVariables{
+			insprEnv := &InsprEnvVars{
 				InputChannels:    tt.fields.InputChannels,
 				OutputChannels:   tt.fields.OutputChannels,
 				UnixSocketAddr:   tt.fields.UnixSocketAddr,
@@ -145,13 +145,13 @@ func TestInsprEnvironmentVariables_GetInputChannelList(t *testing.T) {
 				InsprEnvironment: tt.fields.InsprEnvironment,
 			}
 			if got := insprEnv.GetInputChannelList(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("InsprEnvironmentVariables.GetInputChannelList() = %v, want %v", got, tt.want)
+				t.Errorf("InsprEnvVars.GetInputChannelList() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestInsprEnvironmentVariables_GetOutputChannelList(t *testing.T) {
+func TestInsprEnvVars_GetOutputChannelList(t *testing.T) {
 	type fields struct {
 		InputChannels    string
 		OutputChannels   string
@@ -178,7 +178,7 @@ func TestInsprEnvironmentVariables_GetOutputChannelList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvironmentVariables{
+			insprEnv := &InsprEnvVars{
 				InputChannels:    tt.fields.InputChannels,
 				OutputChannels:   tt.fields.OutputChannels,
 				UnixSocketAddr:   tt.fields.UnixSocketAddr,
@@ -186,7 +186,7 @@ func TestInsprEnvironmentVariables_GetOutputChannelList(t *testing.T) {
 				InsprEnvironment: tt.fields.InsprEnvironment,
 			}
 			if got := insprEnv.GetOutputChannelList(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("InsprEnvironmentVariables.GetOutputChannelList() = %v, want %v", got, tt.want)
+				t.Errorf("InsprEnvVars.GetOutputChannelList() = %v, want %v", got, tt.want)
 			}
 		})
 	}

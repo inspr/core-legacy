@@ -7,19 +7,19 @@ import (
 )
 
 // IsInInputChannel - checks if a channel exists in the insprEnv.InputChannels
-func (insprEnv *InsprEnvironmentVariables) IsInInputChannel(channel string) bool {
+func (insprEnv *InsprEnvVars) IsInInputChannel(channel string) bool {
 	channelsList := insprEnv.GetInputChannelList()
 	return utils.Includes(channelsList, channel)
 }
 
 // IsInOutputChannel - checks if a channel exists in the insprEnv.OutputChannels
-func (insprEnv *InsprEnvironmentVariables) IsInOutputChannel(channel string) bool {
+func (insprEnv *InsprEnvVars) IsInOutputChannel(channel string) bool {
 	channelsList := insprEnv.GetOutputChannelList()
 	return utils.Includes(channelsList, channel)
 }
 
 // GetInputChannelList returns a string list with the channels in insprEnv.InputChannels
-func (insprEnv *InsprEnvironmentVariables) GetInputChannelList() []string {
+func (insprEnv *InsprEnvVars) GetInputChannelList() []string {
 	if insprEnv.InputChannels == "" {
 		return []string{}
 	}
@@ -27,7 +27,7 @@ func (insprEnv *InsprEnvironmentVariables) GetInputChannelList() []string {
 }
 
 // GetOutputChannelList returns a string list with the channels in insprEnv.OutputChannels
-func (insprEnv *InsprEnvironmentVariables) GetOutputChannelList() []string {
+func (insprEnv *InsprEnvVars) GetOutputChannelList() []string {
 	if insprEnv.OutputChannels == "" {
 		return []string{}
 	}
