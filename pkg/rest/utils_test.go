@@ -2,12 +2,13 @@ package rest
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
 func TestJSON(t *testing.T) {
@@ -63,7 +64,7 @@ func TestERROR(t *testing.T) {
 			args: args{
 				w:          rr,
 				statusCode: http.StatusBadRequest,
-				err:        errors.New("My testing error"),
+				err:        ierrors.NewError().Message("my testing error").Build(),
 			},
 		},
 	}
@@ -74,17 +75,15 @@ func TestERROR(t *testing.T) {
 				t.Errorf("JSON(w,code,data)=%v, want %v", status, tt.args.statusCode)
 			}
 
-			var errorMessage struct {
-				Error string `json:"error"`
-			}
+			var errorMessage *ierrors.InsprError
 
 			err := json.Unmarshal(rr.Body.Bytes(), &errorMessage)
 			if err != nil {
 				t.Fatal("Failed to parse the body bytes from the request")
 			}
 
-			if !reflect.DeepEqual(errorMessage.Error, tt.args.err.Error()) {
-				t.Errorf("JSON(w,code,data)=%v, want %v", errorMessage.Error, tt.args.err.Error())
+			if !reflect.DeepEqual(errorMessage.Error(), tt.args.err.Error()) {
+				t.Errorf("JSON(w,code,data)=%v, want %v", errorMessage.Error(), tt.args.err.Error())
 			}
 		})
 	}

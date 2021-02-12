@@ -12,6 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 func TestAppClient_Delete(t *testing.T) {
@@ -72,7 +73,7 @@ func TestAppClient_Delete(t *testing.T) {
 					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
 				}
 
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
@@ -264,7 +265,7 @@ func TestAppClient_Create(t *testing.T) {
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.App, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
@@ -357,7 +358,7 @@ func TestAppClient_Update(t *testing.T) {
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.App, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()

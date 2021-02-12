@@ -12,6 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 func TestChannelTypeClient_Delete(t *testing.T) {
@@ -76,7 +77,7 @@ func TestChannelTypeClient_Delete(t *testing.T) {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.CtName, tt.args.name)
 				}
 
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
@@ -251,7 +252,7 @@ func TestChannelTypeClient_Create(t *testing.T) {
 				if !reflect.DeepEqual(di.ChannelType, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.ChannelType, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
@@ -334,7 +335,7 @@ func TestChannelTypeClient_Update(t *testing.T) {
 				if !reflect.DeepEqual(di.ChannelType, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.ChannelType, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
