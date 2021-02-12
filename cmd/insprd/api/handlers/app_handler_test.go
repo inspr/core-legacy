@@ -12,6 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -35,11 +36,15 @@ type appAPITest struct {
 // For example, HandleCreateApp and HandleUpdateApp use these test cases
 func appDICases(funcName string) []appAPITest {
 	parsedAppDI, _ := json.Marshal(models.AppDI{
-		App:   meta.App{},
+		App: meta.App{
+			Meta: meta.Metadata{
+				Name: "mock_app",
+			},
+		},
 		Ctx:   "",
 		Valid: true,
 	})
-	wrongFormatData, _ := json.Marshal(struct{}{})
+	wrongFormatData, _ := json.Marshal([]byte{1})
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
@@ -54,9 +59,57 @@ func appDICases(funcName string) []appAPITest {
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
-			name: "bad_request_" + funcName,
+			name: "failed_parsing_request_" + funcName,
 			ah:   NewAppHandler(fake.MockMemoryManager(nil)),
 			send: sendInRequest{body: wrongFormatData},
+			want: expectedResponse{status: http.StatusInternalServerError},
+		},
+		{
+			name: "not_found_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().NotFound().Build())),
+			send: sendInRequest{body: parsedAppDI},
+			want: expectedResponse{status: http.StatusNotFound},
+		},
+		{
+			name: "already_exists_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().AlreadyExists().Build())),
+			send: sendInRequest{body: parsedAppDI},
+			want: expectedResponse{status: http.StatusConflict},
+		},
+		{
+			name: "internal_server_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InternalServer().Build())),
+			send: sendInRequest{body: parsedAppDI},
+			want: expectedResponse{status: http.StatusInternalServerError},
+		},
+		{
+			name: "invalid_name_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InvalidName().Build())),
+			send: sendInRequest{body: parsedAppDI},
+			want: expectedResponse{status: http.StatusForbidden},
+		},
+		{
+			name: "invalid_app_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InvalidApp().Build())),
+			send: sendInRequest{body: parsedAppDI},
+			want: expectedResponse{status: http.StatusForbidden},
+		},
+		{
+			name: "invalid_channel_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannel().Build())),
+			send: sendInRequest{body: parsedAppDI},
+			want: expectedResponse{status: http.StatusForbidden},
+		},
+		{
+			name: "invalid_channel_type_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build())),
+			send: sendInRequest{body: parsedAppDI},
+			want: expectedResponse{status: http.StatusForbidden},
+		},
+		{
+			name: "bad_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().BadRequest().Build())),
+			send: sendInRequest{body: parsedAppDI},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
 	}
@@ -66,28 +119,76 @@ func appDICases(funcName string) []appAPITest {
 // handle the use the appQueryDI struct of the models package.
 // For example, HandleGetAppByRef and HandleDeleteApp use these test cases
 func appQueryDICases(funcName string) []appAPITest {
-	parsedAppQueryDI, _ := json.Marshal(models.AppQueryDI{
-		Query: "",
+	parsedQueryAppDI, _ := json.Marshal(models.AppQueryDI{
+		Query: ".mock_app",
 		Valid: true,
 	})
-	wrongFormatData, _ := json.Marshal(struct{}{})
+	wrongFormatData, _ := json.Marshal([]byte{1})
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
 			ah:   NewAppHandler(fake.MockMemoryManager(nil)),
-			send: sendInRequest{body: parsedAppQueryDI},
+			send: sendInRequest{body: parsedQueryAppDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
 			ah:   NewAppHandler(fake.MockMemoryManager(errors.New("test_error"))),
-			send: sendInRequest{body: parsedAppQueryDI},
+			send: sendInRequest{body: parsedQueryAppDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
-			name: "bad_request_" + funcName,
+			name: "failed_parsing_request_" + funcName,
 			ah:   NewAppHandler(fake.MockMemoryManager(nil)),
 			send: sendInRequest{body: wrongFormatData},
+			want: expectedResponse{status: http.StatusInternalServerError},
+		},
+		{
+			name: "not_found_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().NotFound().Build())),
+			send: sendInRequest{body: parsedQueryAppDI},
+			want: expectedResponse{status: http.StatusNotFound},
+		},
+		{
+			name: "already_exists_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().AlreadyExists().Build())),
+			send: sendInRequest{body: parsedQueryAppDI},
+			want: expectedResponse{status: http.StatusConflict},
+		},
+		{
+			name: "internal_server_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InternalServer().Build())),
+			send: sendInRequest{body: parsedQueryAppDI},
+			want: expectedResponse{status: http.StatusInternalServerError},
+		},
+		{
+			name: "invalid_name_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InvalidName().Build())),
+			send: sendInRequest{body: parsedQueryAppDI},
+			want: expectedResponse{status: http.StatusForbidden},
+		},
+		{
+			name: "invalid_app_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InvalidApp().Build())),
+			send: sendInRequest{body: parsedQueryAppDI},
+			want: expectedResponse{status: http.StatusForbidden},
+		},
+		{
+			name: "invalid_channel_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannel().Build())),
+			send: sendInRequest{body: parsedQueryAppDI},
+			want: expectedResponse{status: http.StatusForbidden},
+		},
+		{
+			name: "invalid_channel_type_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build())),
+			send: sendInRequest{body: parsedQueryAppDI},
+			want: expectedResponse{status: http.StatusForbidden},
+		},
+		{
+			name: "bad_request_" + funcName,
+			ah:   NewAppHandler(fake.MockMemoryManager(ierrors.NewError().BadRequest().Build())),
+			send: sendInRequest{body: parsedQueryAppDI},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
 	}
@@ -152,6 +253,8 @@ func TestAppHandler_HandleGetAppByRef(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
+			tt.ah.CreateApp("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
+
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
 			if err != nil {
@@ -169,11 +272,14 @@ func TestAppHandler_HandleGetAppByRef(t *testing.T) {
 
 func TestAppHandler_HandleUpdateApp(t *testing.T) {
 	tests := appDICases("HandleUpdateApp")
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			handlerFunc := tt.ah.HandleUpdateApp().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
+			tt.ah.CreateApp("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -197,6 +303,8 @@ func TestAppHandler_HandleDeleteApp(t *testing.T) {
 			handlerFunc := tt.ah.HandleDeleteApp().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
+
+			tt.ah.CreateApp("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))

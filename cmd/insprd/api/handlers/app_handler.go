@@ -31,13 +31,13 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
 		err = ah.CreateApp(data.Ctx, &data.App)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -54,12 +54,12 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 		app, err := ah.GetApp(data.Query)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, app)
@@ -76,13 +76,13 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
 		err = ah.UpdateApp(data.Ctx, &data.App)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
@@ -99,13 +99,13 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
 		err = ah.DeleteApp(data.Query)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)

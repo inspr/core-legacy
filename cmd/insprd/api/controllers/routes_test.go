@@ -34,31 +34,41 @@ func TestServer_initRoutes(t *testing.T) {
 		{
 			name: "apps",
 			want: [...]int{
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channels",
 			want: [...]int{
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channeltypes",
 			want: [...]int{
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
+			},
+		},
+		{
+			name: "wrong_route",
+			want: [...]int{
+				http.StatusNotFound,
+				http.StatusNotFound,
+				http.StatusNotFound,
+				http.StatusNotFound,
+				http.StatusNotFound,
 			},
 		},
 	}
