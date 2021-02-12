@@ -303,7 +303,9 @@ func TestMemoryManager_Apps(t *testing.T) {
 				root: getMockApp(),
 			},
 			want: &AppMemoryManager{
-				root: getMockApp(),
+				&MemoryManager{
+					root: getMockApp(),
+				},
 			},
 		},
 	}
@@ -401,7 +403,9 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -1146,7 +1150,9 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -1294,7 +1300,9 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -1763,7 +1771,9 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,

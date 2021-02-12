@@ -24,7 +24,9 @@ func TestMemoryManager_ChannelTypes(t *testing.T) {
 				root: getMockChannelTypes(),
 			},
 			want: &ChannelTypeMemoryManager{
-				root: getMockChannelTypes(),
+				&MemoryManager{
+					root: getMockChannelTypes(),
+				},
 			},
 		},
 	}
@@ -120,7 +122,9 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -281,7 +285,9 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -400,7 +406,9 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -526,7 +534,9 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,

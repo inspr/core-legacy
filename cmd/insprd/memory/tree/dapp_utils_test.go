@@ -345,7 +345,9 @@ func Test_getParentApp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
