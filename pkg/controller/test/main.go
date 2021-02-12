@@ -39,6 +39,26 @@ func main() {
 	updateNewAppAddBoundary(&client)
 	fmt.Printf("\n\n")
 
+	fmt.Println("[Update ChannelOne adding a annotaion to it...]")
+	updateChannelOneAddAnnotationToIt(&client)
+	fmt.Printf("\n\n")
+
+	fmt.Println("[Update ChannelTypeHello adding a note to it...]")
+	updateChannelTypeHelloAddAnnotation(&client)
+	fmt.Printf("\n\n")
+
+	fmt.Println("[Delete NewApp inside HelloWorld...]")
+	deleteNewAppInsideHelloWorld(&client)
+	fmt.Printf("\n\n")
+
+	fmt.Println("[Delete ChannelOne inside HelloWorld...]")
+	deleteChannelOneInsideHelloWorld(&client)
+	fmt.Printf("\n\n")
+
+	fmt.Println("[Delete ChannelTypeHello inside HelloWorld]")
+	deleteChannelTypeHelloInsideHelloWorld(&client)
+	fmt.Printf("\n\n")
+
 }
 
 func createHelloWorldApp(client *client.Client) {
@@ -105,6 +125,63 @@ func updateNewAppAddBoundary(client *client.Client) {
 			},
 		},
 	})
+	if err != nil {
+		fmt.Printf("%#v", err)
+	}
+	resp.Print()
+}
+
+func updateChannelOneAddAnnotationToIt(client *client.Client) {
+	resp, err := client.Channels().Update(context.Background(), "HelloWorld", &meta.Channel{
+		Meta: meta.Metadata{
+			Name: "ChannelOne",
+			Annotations: map[string]string{
+				"NoteOne": "A brand new note!",
+			},
+		},
+		Spec: meta.ChannelSpec{
+			Type: "ChannelTypeHello",
+		},
+	})
+	if err != nil {
+		fmt.Printf("%#v", err)
+	}
+	resp.Print()
+}
+
+func updateChannelTypeHelloAddAnnotation(client *client.Client) {
+	resp, err := client.ChannelTypes().Update(context.Background(), "HelloWorld", &meta.ChannelType{
+		Meta: meta.Metadata{
+			Name: "ChannelTypeHello",
+			Annotations: map[string]string{
+				"What's this?": "This is a note inside ChannelTypeHello",
+			},
+		},
+	})
+	if err != nil {
+		fmt.Printf("%#v", err)
+	}
+	resp.Print()
+}
+
+func deleteNewAppInsideHelloWorld(client *client.Client) {
+	resp, err := client.Apps().Delete(context.Background(), "HelloWorld.NewApp")
+	if err != nil {
+		fmt.Printf("%#v", err)
+	}
+	resp.Print()
+}
+
+func deleteChannelOneInsideHelloWorld(client *client.Client) {
+	resp, err := client.Channels().Delete(context.Background(), "HelloWorld", "ChannelOne")
+	if err != nil {
+		fmt.Printf("%#v", err)
+	}
+	resp.Print()
+}
+
+func deleteChannelTypeHelloInsideHelloWorld(client *client.Client) {
+	resp, err := client.ChannelTypes().Delete(context.Background(), "HelloWorld", "ChannelTypeHello")
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
