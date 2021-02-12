@@ -47,7 +47,7 @@ func (ctc *ChannelTypeClient) Get(ctx context.Context, context string, name stri
 //
 // So to create a channel type inside app1 with the name channel1 you
 // would call ctc.Create(context.Background(), "app1", &meta.{...})
-func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *meta.ChannelType) (diff.Changelog, error) {
+func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
 		ChannelType: *ch,
@@ -72,7 +72,7 @@ func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *me
 //
 // So to delete a channel type inside app1 with the name channel1 you
 // would call ctc.Delete(context.Background(), "app1", "channel1")
-func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name string) (diff.Changelog, error) {
+func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name string, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeQueryDI{
 		Ctx:    context,
 		CtName: name,
@@ -97,7 +97,7 @@ func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name s
 //
 // So to update a channel type inside app1 with the name channel1 you
 // would call ctc.Create(context.Background(), "app1", &meta.{...})
-func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *meta.ChannelType) (diff.Changelog, error) {
+func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
 		ChannelType: *ch,

@@ -12,9 +12,9 @@ import (
 // the Channels in the cluster
 type ChannelInterface interface {
 	Get(ctx context.Context, context string, chName string) (*meta.Channel, error)
-	Create(ctx context.Context, context string, ch *meta.Channel) (diff.Changelog, error)
-	Delete(ctx context.Context, context string, chName string) (diff.Changelog, error)
-	Update(ctx context.Context, context string, ch *meta.Channel) (diff.Changelog, error)
+	Create(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error)
+	Delete(ctx context.Context, context string, chName string, dryRun bool) (diff.Changelog, error)
+	Update(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error)
 }
 
 // AppInterface is the interface that allows to obtain or
@@ -22,9 +22,9 @@ type ChannelInterface interface {
 // the DApps in the cluster
 type AppInterface interface {
 	Get(ctx context.Context, query string) (*meta.App, error)
-	Create(ctx context.Context, context string, app *meta.App) (diff.Changelog, error)
-	Delete(ctx context.Context, query string) (diff.Changelog, error)
-	Update(ctx context.Context, query string, app *meta.App) (diff.Changelog, error)
+	Create(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error)
+	Delete(ctx context.Context, query string, dryRun bool) (diff.Changelog, error)
+	Update(ctx context.Context, query string, app *meta.App, dryRun bool) (diff.Changelog, error)
 }
 
 // ChannelTypeInterface is the interface that allows to
@@ -32,9 +32,9 @@ type AppInterface interface {
 // state of the ChannelTypes in the cluster
 type ChannelTypeInterface interface {
 	Get(ctx context.Context, context string, ctName string) (*meta.ChannelType, error)
-	Create(ctx context.Context, context string, ct *meta.ChannelType) (diff.Changelog, error)
-	Delete(ctx context.Context, context string, ctName string) (diff.Changelog, error)
-	Update(ctx context.Context, context string, ct *meta.ChannelType) (diff.Changelog, error)
+	Create(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error)
+	Delete(ctx context.Context, context string, ctName string, dryRun bool) (diff.Changelog, error)
+	Update(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error)
 }
 
 // Interface is the interface that allows the management

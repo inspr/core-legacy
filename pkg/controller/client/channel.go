@@ -47,11 +47,12 @@ func (cc *ChannelClient) Get(ctx context.Context, context string, name string) (
 //
 // So to create a channel inside app1 with the name channel1 you
 // would call cc.Create(context.Background(), "app1", &meta.Channel{...})
-func (cc *ChannelClient) Create(ctx context.Context, context string, ch *meta.Channel) (diff.Changelog, error) {
+func (cc *ChannelClient) Create(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
 	cdi := models.ChannelDI{
 		Ctx:     context,
 		Channel: *ch,
 		Valid:   true,
+		DryRun:  dryRun,
 	}
 
 	var resp diff.Changelog
@@ -72,11 +73,12 @@ func (cc *ChannelClient) Create(ctx context.Context, context string, ch *meta.Ch
 //
 // So to delete a channel inside app1 with the name channel1 you
 // would call cc.Delete(context.Background(), "app1", "channel1")
-func (cc *ChannelClient) Delete(ctx context.Context, context string, name string) (diff.Changelog, error) {
+func (cc *ChannelClient) Delete(ctx context.Context, context string, name string, dryRun bool) (diff.Changelog, error) {
 	cdi := models.ChannelQueryDI{
 		Ctx:    context,
 		ChName: name,
 		Valid:  true,
+		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
@@ -97,11 +99,12 @@ func (cc *ChannelClient) Delete(ctx context.Context, context string, name string
 //
 // So to update a channel inside app1 with the name channel1 you
 // would call cc.Update(context.Background(), "app1", &meta.Channel{...})
-func (cc *ChannelClient) Update(ctx context.Context, context string, ch *meta.Channel) (diff.Changelog, error) {
+func (cc *ChannelClient) Update(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
 	cdi := models.ChannelDI{
 		Ctx:     context,
 		Channel: *ch,
 		Valid:   true,
+		DryRun:  dryRun,
 	}
 
 	var resp diff.Changelog

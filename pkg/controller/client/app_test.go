@@ -80,7 +80,7 @@ func TestAppClient_Delete(t *testing.T) {
 			ac := &AppClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if _, err := ac.Delete(tt.args.ctx, tt.args.context); (err != nil) != tt.wantErr {
+			if _, err := ac.Delete(tt.args.ctx, tt.args.context, false); (err != nil) != tt.wantErr {
 				t.Errorf("AppClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -272,7 +272,7 @@ func TestAppClient_Create(t *testing.T) {
 			ac := &AppClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AppClient.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -365,7 +365,7 @@ func TestAppClient_Update(t *testing.T) {
 			ac := &AppClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AppClient.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -47,11 +47,12 @@ func (ac *AppClient) Get(ctx context.Context, context string) (*meta.App, error)
 //
 // So to create an app inside app1 with the name app2 you
 // would call ac.Create(context.Background(), "app1", &meta.App{...})
-func (ac *AppClient) Create(ctx context.Context, context string, ch *meta.App) (diff.Changelog, error) {
+func (ac *AppClient) Create(ctx context.Context, context string, ch *meta.App, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppDI{
-		Ctx:   context,
-		App:   *ch,
-		Valid: true,
+		Ctx:    context,
+		App:    *ch,
+		Valid:  true,
+		DryRun: dryRun,
 	}
 	var resp diff.Changelog
 	err := ac.c.Send(ctx, "/apps", "POST", adi, &resp)
@@ -69,10 +70,11 @@ func (ac *AppClient) Create(ctx context.Context, context string, ch *meta.App) (
 //
 // So to delete an app inside app1 with the name app2 you
 // would call ac.Delete(context.Background(), "app1.app2")
-func (ac *AppClient) Delete(ctx context.Context, context string) (diff.Changelog, error) {
+func (ac *AppClient) Delete(ctx context.Context, context string, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppQueryDI{
-		Ctx:   context,
-		Valid: true,
+		Ctx:    context,
+		Valid:  true,
+		DryRun: dryRun,
 	}
 	var resp diff.Changelog
 	err := ac.c.Send(ctx, "/apps", "DELETE", adi, &resp)
@@ -93,11 +95,12 @@ func (ac *AppClient) Delete(ctx context.Context, context string) (diff.Changelog
 //
 // So to update an app inside app1 with the name app2 you
 // would call ac.Update(context.Background(), "app1", &meta.App{...})
-func (ac *AppClient) Update(ctx context.Context, context string, ch *meta.App) (diff.Changelog, error) {
+func (ac *AppClient) Update(ctx context.Context, context string, ch *meta.App, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppDI{
-		Ctx:   context,
-		App:   *ch,
-		Valid: true,
+		Ctx:    context,
+		App:    *ch,
+		Valid:  true,
+		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
