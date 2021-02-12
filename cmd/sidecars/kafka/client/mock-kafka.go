@@ -74,6 +74,8 @@ func createMockEnv() {
 	os.Setenv("INSPR_ENV", "random")
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "latest")
+	os.Setenv("ch1_SCHEMA", `{"type":"string"}`)
+	os.Setenv("ch2_SCHEMA", "hellotest")
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions

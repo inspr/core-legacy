@@ -56,6 +56,9 @@ func Test_getCodec(t *testing.T) {
 }
 
 func Test_getSchema(t *testing.T) {
+	createMockEnv()
+	defer deleteMockEnv()
+	environment.RefreshEnviromentVariables()
 	type args struct {
 		channel string
 		context string
