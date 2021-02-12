@@ -6,7 +6,6 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
@@ -37,18 +36,18 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 			return
 		}
 
-		tree.GetTreeMemory().InitTransaction()
+		cth.InitTransaction()
 		if !data.DryRun {
-			defer tree.GetTreeMemory().Commit()
+			defer cth.Commit()
 		} else {
-			defer tree.GetTreeMemory().Cancel()
+			defer cth.Cancel()
 		}
 		err = cth.CreateChannelType(&data.ChannelType, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		diff, err := cth.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -94,18 +93,18 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			return
 		}
 
-		tree.GetTreeMemory().InitTransaction()
+		cth.InitTransaction()
 		if !data.DryRun {
-			defer tree.GetTreeMemory().Commit()
+			defer cth.Commit()
 		} else {
-			defer tree.GetTreeMemory().Cancel()
+			defer cth.Cancel()
 		}
 		err = cth.UpdateChannelType(&data.ChannelType, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		diff, err := cth.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -128,18 +127,18 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 			return
 		}
 
-		tree.GetTreeMemory().InitTransaction()
+		cth.InitTransaction()
 		if !data.DryRun {
-			defer tree.GetTreeMemory().Commit()
+			defer cth.Commit()
 		} else {
-			defer tree.GetTreeMemory().Cancel()
+			defer cth.Cancel()
 		}
 		err = cth.DeleteChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		diff, err := cth.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
