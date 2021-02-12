@@ -2,14 +2,12 @@ package tree
 
 import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 // MockManager mocks a tree structure for testing
 type MockManager struct {
-	root   *meta.App
-	tree   *meta.App
+	*MemoryManager
 	appErr error
 	mockC  bool
 	mockCT bool
@@ -24,7 +22,7 @@ func (tmm *MockManager) Channels() memory.ChannelMemory {
 		}
 	}
 	return &ChannelMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm.MemoryManager,
 	}
 }
 
@@ -36,7 +34,7 @@ func (tmm *MockManager) ChannelTypes() memory.ChannelTypeMemory {
 		}
 	}
 	return &ChannelTypeMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm.MemoryManager,
 	}
 }
 
@@ -49,7 +47,7 @@ func (tmm *MockManager) Apps() memory.AppMemory {
 		}
 	}
 	return &AppMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm.MemoryManager,
 	}
 }
 

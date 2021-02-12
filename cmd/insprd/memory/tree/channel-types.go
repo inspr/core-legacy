@@ -12,7 +12,7 @@ ChannelTypeMemoryManager implements the ChannelType interface
 and provides methos for operating on ChannelTypes
 */
 type ChannelTypeMemoryManager struct {
-	root *meta.App
+	*MemoryManager
 }
 
 /*
@@ -20,7 +20,7 @@ ChannelTypes is a MemoryManager method that provides an access point for Channel
 */
 func (tmm *MemoryManager) ChannelTypes() memory.ChannelTypeMemory {
 	return &ChannelTypeMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm,
 	}
 }
 

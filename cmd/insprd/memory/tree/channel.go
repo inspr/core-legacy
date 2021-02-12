@@ -12,13 +12,13 @@ ChannelMemoryManager implements the channel interface and
 provides methods for operating on Channels
 */
 type ChannelMemoryManager struct {
-	root *meta.App
+	*MemoryManager
 }
 
 // Channels return a pointer to ChannelMemoryManager
 func (tmm *MemoryManager) Channels() memory.ChannelMemory {
 	return &ChannelMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm,
 	}
 }
 
