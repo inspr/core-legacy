@@ -50,113 +50,74 @@ func TestJSON(t *testing.T) {
 }
 
 func TestERROR(t *testing.T) {
-	rr := httptest.NewRecorder()
-	type args struct {
-		w   http.ResponseWriter
-		err error
-	}
 	tests := []struct {
 		name string
-		args args
+		err  error
 		want int
 	}{
 		{
 			name: "non_InsprErrors",
-			args: args{
-				w:   rr,
-				err: errors.New("server crashed"),
-			},
+			err:  errors.New("server crashed"),
 			want: http.StatusInternalServerError,
 		},
 		{
 			name: "InsprErrors_NotFound",
-			args: args{
-				w:   rr,
-				err: ierrors.NewError().NotFound().Build(),
-			},
+			err:  ierrors.NewError().NotFound().Build(),
 			want: http.StatusNotFound,
 		},
 		{
 			name: "InsprErrors_AlreadyExists",
-			args: args{
-				w:   rr,
-				err: ierrors.NewError().AlreadyExists().Build(),
-			},
+			err:  ierrors.NewError().AlreadyExists().Build(),
 			want: http.StatusConflict,
 		},
 		{
 			name: "InsprErrors_InternalServer",
-			args: args{
-				w:   rr,
-				err: ierrors.NewError().InternalServer().Build(),
-			},
+			err:  ierrors.NewError().InternalServer().Build(),
 			want: http.StatusInternalServerError,
 		},
 		{
 			name: "InsprErrors_InvalidName",
-			args: args{
-				w:   rr,
-				err: ierrors.NewError().InvalidName().Build(),
-			},
+			err:  ierrors.NewError().InvalidName().Build(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_InvalidApp",
-			args: args{
-				w:   rr,
-				err: ierrors.NewError().InvalidApp().Build(),
-			},
+			err:  ierrors.NewError().InvalidApp().Build(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_InvalidChannel",
-			args: args{
-				w:   rr,
-				err: ierrors.NewError().InvalidChannel().Build(),
-			},
+			err:  ierrors.NewError().InvalidChannel().Build(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_InvalidChannelType",
-			args: args{
-				w:   rr,
-				err: ierrors.NewError().InvalidChannelType().Build(),
-			},
+			err:  ierrors.NewError().InvalidChannelType().Build(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_BadRequest",
-			args: args{
-				w:   rr,
-				err: ierrors.NewError().BadRequest().Build(),
-			},
+			err:  ierrors.NewError().BadRequest().Build(),
 			want: http.StatusBadRequest,
 		},
 		{
 			name: "InsprErrors_Unknown_ErrCode",
-			args: args{
-				w:   rr,
-				err: &ierrors.InsprError{Code: 9999},
-			},
-			want: http.StatusForbidden,
+			err:  &ierrors.InsprError{Code: 9999},
+			want: http.StatusInternalServerError,
 		},
 	}
 	for _, tt := range tests {
+		rr := httptest.NewRecorder()
 		t.Run(tt.name, func(t *testing.T) {
-			ERROR(tt.args.w, tt.args.err)
+			ERROR(rr, tt.err)
 			if status := rr.Result().StatusCode; status != tt.want {
 				t.Errorf("JSON(w,code,data)=%v, want %v", status, tt.want)
 			}
+			var errorMessage ierrors.InsprError
+			json.Unmarshal(rr.Body.Bytes(), &errorMessage)
 
-			errorMessage := ierrors.InsprError{}
-
-			err := json.Unmarshal(rr.Body.Bytes(), &errorMessage)
-			if err != nil {
-				t.Fatal("Failed to parse the body bytes from the request")
-			}
-
-			if !reflect.DeepEqual(errorMessage.Error, tt.args.err.Error()) {
-				t.Errorf("JSON(w,code,data)=%v, want %v", errorMessage.Error, tt.args.err.Error())
+			if !reflect.DeepEqual(errorMessage.Message, tt.err.Error()) {
+				t.Errorf("JSON(w,code,data)=%v, want %v", errorMessage.Message, tt.err.Error())
 			}
 		})
 	}

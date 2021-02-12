@@ -42,11 +42,12 @@ func ERROR(w http.ResponseWriter, err error) {
 			JSON(w, http.StatusInternalServerError, e)
 		}
 
-	default:
-		JSON(w, http.StatusInternalServerError, struct {
-			Error string `json:"error"`
-		}{
-			Error: err.Error(),
-		})
+	// default case
+	case error:
+		defaultInsprErr := ierrors.InsprError{
+			Message: e.Error(),
+			Code:    http.StatusInternalServerError,
+		}
+		JSON(w, http.StatusInternalServerError, defaultInsprErr)
 	}
 }

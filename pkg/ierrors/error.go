@@ -3,7 +3,7 @@ package ierrors
 // InsprError is an error that happened inside inspr
 type InsprError struct {
 	Message string         `yaml:"message"  json:"message"`
-	Err     error          `yaml:"err"  json:"err"`
+	Err     error          // no reason to tag a interface
 	Code    InsprErrorCode `yaml:"code"  json:"code"`
 }
 
