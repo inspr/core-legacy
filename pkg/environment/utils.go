@@ -1,8 +1,10 @@
 package environment
 
 import (
+	"os"
 	"strings"
 
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -32,4 +34,15 @@ func (insprEnv *InsprEnvVars) GetOutputChannelList() []string {
 		return []string{}
 	}
 	return strings.Split(insprEnv.OutputChannels, ";")
+}
+
+// GetSchema returns a channel's schema, if the channel exists
+func (insprEnv *InsprEnvVars) GetSchema(channel string) (string, error) {
+	if insprEnv.IsInInputChannel(channel) || insprEnv.IsInOutputChannel(channel) {
+		return os.Getenv(channel + "_SCHEMA"), nil
+	}
+	return "", ierrors.NewError().
+		InvalidChannel().
+		Message("channel " + channel + " not listed as an input or output").
+		Build()
 }
