@@ -61,6 +61,16 @@ func TestServer_initRoutes(t *testing.T) {
 				http.StatusMethodNotAllowed,
 			},
 		},
+		{
+			name: "wrong_route",
+			want: [...]int{
+				http.StatusNotFound,
+				http.StatusNotFound,
+				http.StatusNotFound,
+				http.StatusNotFound,
+				http.StatusNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -253,10 +253,7 @@ func TestAppHandler_HandleGetAppByRef(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			// inserts in mock an app of name 'mock_app'
-			tt.ah.CreateApp("", &meta.App{
-				Meta: meta.Metadata{Name: "mock_app"},
-			})
+			tt.ah.CreateApp("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -282,9 +279,7 @@ func TestAppHandler_HandleUpdateApp(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.CreateApp("", &meta.App{
-				Meta: meta.Metadata{Name: "mock_app"},
-			})
+			tt.ah.CreateApp("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -309,9 +304,7 @@ func TestAppHandler_HandleDeleteApp(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.CreateApp("", &meta.App{
-				Meta: meta.Metadata{Name: "mock_app"},
-			})
+			tt.ah.CreateApp("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
