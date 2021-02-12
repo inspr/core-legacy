@@ -1,10 +1,12 @@
-FROM gcr.io/red-inspr/inspr AS build-env
+# install librdkafka base image, which is necessary for kafka to run
+FROM alpine AS kafka-deploy
 
-WORKDIR /app
-COPY go.mod go.mod
-RUN go mod download
-COPY . .
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache git gcc g++ make bash pkgconfig
 
-FROM alpine AS deploy
-WORKDIR /app
-COPY --from=build-env /inspr/cmd/sidecars/kafka /app/kafka
+RUN git clone https://github.com/edenhill/librdkafka.git && \
+    cd librdkafka && \
+    ./configure --prefix /usr && \
+    make && \
+    make install
