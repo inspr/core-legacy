@@ -83,7 +83,9 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 					Parent: "",
 				},
 				ConnectedApps: []string{"app1"},
-				Spec:          meta.ChannelSpec{},
+				Spec: meta.ChannelSpec{
+					Type: "channelType1",
+				},
 			},
 		},
 		{
@@ -441,7 +443,9 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 					Parent: "",
 				},
 				ConnectedApps: []string{"app1"},
-				Spec:          meta.ChannelSpec{},
+				Spec: meta.ChannelSpec{
+					Type: "channelType1",
+				},
 			},
 		},
 	}
@@ -637,7 +641,9 @@ func getMockChannels() *meta.App {
 									Name:   "ch1app1",
 									Parent: "",
 								},
-								Spec: meta.ChannelSpec{},
+								Spec: meta.ChannelSpec{
+									Type: "ctUpdate1",
+								},
 							},
 							"ch2app1Update": {
 								Meta: meta.Metadata{
@@ -658,7 +664,7 @@ func getMockChannels() *meta.App {
 									Parent:      "app1",
 									SHA256:      "",
 								},
-								ConnectedChannels: []string{"ch2app1Update"},
+								ConnectedChannels: []string{"ch2app1Update", "ch1app1"},
 							},
 						},
 						Boundary: meta.AppBoundary{
@@ -676,14 +682,18 @@ func getMockChannels() *meta.App {
 						Parent: "",
 					},
 					ConnectedApps: []string{"app1"},
-					Spec:          meta.ChannelSpec{},
+					Spec: meta.ChannelSpec{
+						Type: "channelType1",
+					},
 				},
 				"channel2": {
 					Meta: meta.Metadata{
 						Name:   "channel2",
 						Parent: "",
 					},
-					Spec: meta.ChannelSpec{},
+					Spec: meta.ChannelSpec{
+						Type: "channelType1",
+					},
 				},
 			},
 			ChannelTypes: map[string]*meta.ChannelType{
