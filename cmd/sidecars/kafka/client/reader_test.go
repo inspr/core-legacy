@@ -131,7 +131,9 @@ func TestReader_ReadMessage(t *testing.T) {
 				lastMessage: tt.fields.lastMessage,
 			}
 
-			got, got1, err := reader.ReadMessage()
+			bData, err := reader.ReadMessage()
+			got := bData.Channel
+			got1 := bData.Message.Data
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Reader.ReadMessage() error = %v, wantErr %v", err, tt.wantErr)

@@ -204,7 +204,7 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 			} else { //reading message
 
 				// reads response and checks for the default mock values
-				msg := models.BrokerResponse{}
+				msg := models.BrokerData{}
 				err := json.NewDecoder(res.Body).Decode(&msg)
 
 				// if it failed to parse body
@@ -215,8 +215,8 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 
 				// if channel isn't 'chan'
 				expectedData, _ := MockServer(nil).Reader.ReadMessage()
-				if msg.Data != expectedData.Data {
-					t.Errorf("readMessageHandler.Body error, field 'data' = %v, want %v", msg.Data, expectedData)
+				if msg.Message.Data != expectedData.Message.Data {
+					t.Errorf("readMessageHandler.Body error, field 'data' = %v, want %v", msg.Message.Data, expectedData)
 				}
 			}
 		})

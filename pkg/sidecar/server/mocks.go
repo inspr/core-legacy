@@ -24,9 +24,9 @@ type mockWriter struct {
 
 func (mr *mockReader) ReadMessage() (models.BrokerData, error) {
 	if mr.err != nil {
-		return models.BrokerResponse{Data: "mock_data"}, mr.err
+		return models.BrokerData{Message: models.Message{Data: "mock_data"}, Channel: ""}, mr.err
 	}
-	return models.BrokerResponse{Data: "mock_data"}, nil
+	return models.BrokerData{Message: models.Message{Data: "mock_data"}, Channel: ""}, nil
 }
 
 func (mr *mockReader) CommitMessage() error {
