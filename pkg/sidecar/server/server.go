@@ -22,6 +22,11 @@ type Server struct {
 	Writer models.Writer
 }
 
+// NewServer returns a new sidecar server
+func NewServer() *Server {
+	return &Server{}
+}
+
 // Init - configures the server
 func (s *Server) Init(r models.Reader, w models.Writer) {
 	// server requests related

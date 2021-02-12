@@ -41,15 +41,15 @@ type testCaseStruct struct {
 
 // generateTestCases returns the tests cases values to be used in each
 // handle test, the reason for them to share tests cases is because of
-// the models.RequestBody that sets a standard struct to be sent in each
+// the models.BrokerData that sets a standard struct to be sent in each
 // request made in the handler func.
 func generateTestCases() []testCaseStruct {
 	// default values used in the test cases
-	parsedBody, _ := json.Marshal(models.RequestBody{
+	parsedBody, _ := json.Marshal(models.BrokerData{
 		Message: models.Message{Data: "data"},
 		Channel: "chan",
 	})
-	noChanBody, _ := json.Marshal(models.RequestBody{
+	noChanBody, _ := json.Marshal(models.BrokerData{
 		Message: models.Message{Data: "data"},
 		Channel: "donExist",
 	})
@@ -214,7 +214,7 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 				}
 
 				// if channel isn't 'chan'
-				expectedData, _ := MockServer(nil).Reader.ReadMessage("")
+				expectedData, _ := MockServer(nil).Reader.ReadMessage()
 				if msg.Data != expectedData.Data {
 					t.Errorf("readMessageHandler.Body error, field 'data' = %v, want %v", msg.Data, expectedData)
 				}

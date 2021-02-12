@@ -15,8 +15,8 @@ type Message struct {
 	Data interface{} `json:"data,omitempty"`
 }
 
-// RequestBody represents a an http request structure
-type RequestBody struct {
+// BrokerData represents a an http request structure
+type BrokerData struct {
 	Message Message `json:"message"`
 	Channel string  `json:"channel"`
 }

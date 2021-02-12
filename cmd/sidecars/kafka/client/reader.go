@@ -1,9 +1,10 @@
-package kafka
+package kafkasc
 
 import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	globalEnv "gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -57,7 +58,8 @@ func NewReader() (*Reader, error) {
 ReadMessage reads message by message. Returns channel the message belongs to,
 the message and an error if any occured.
 */
-func (reader *Reader) ReadMessage() (string, interface{}, error) {
+func (reader *Reader) ReadMessage() (models.BrokerData, error) {
+	// brokerMsg := models.BrokerData{}
 	for {
 		event := reader.consumer.Poll(pollTimeout)
 		switch ev := event.(type) {
@@ -68,16 +70,17 @@ func (reader *Reader) ReadMessage() (string, interface{}, error) {
 			// Decoding Message
 			message, errDecode := decode(ev.Value, fromTopic(channel).channel)
 			if errDecode != nil {
-				return "", nil, errDecode
+				return models.BrokerData{}, errDecode
 			}
 
 			reader.lastMessage = ev
 			channelName := fromTopic(channel).channel
-			return channelName, message, nil
+
+			return models.BrokerData{Message: models.Message{Data: message}, Channel: channelName}, nil
 
 		case kafka.Error:
 			if ev.Code() == kafka.ErrAllBrokersDown {
-				return "", nil, ierrors.
+				return models.BrokerData{}, ierrors.
 					NewError().
 					InnerError(ev).
 					Message("kafka error = all brokers are down" + ev.Error()).
@@ -91,8 +94,8 @@ func (reader *Reader) ReadMessage() (string, interface{}, error) {
 	}
 }
 
-// Commit commits the last message read by Reader
-func (reader *Reader) Commit() error {
+// CommitMessage commits the last message read by Reader
+func (reader *Reader) CommitMessage() error {
 	_, errCommit := reader.consumer.CommitMessage(reader.lastMessage)
 	if errCommit != nil {
 		return ierrors.

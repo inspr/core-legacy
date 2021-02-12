@@ -1,4 +1,4 @@
-package kafka
+package kafkasc
 
 import (
 	"os"
@@ -184,7 +184,7 @@ func TestReader_Commit(t *testing.T) {
 				consumer:    tt.fields.consumer,
 				lastMessage: tt.fields.lastMessage,
 			}
-			if err := reader.Commit(); (err != nil) != tt.wantErr {
+			if err := reader.CommitMessage(); (err != nil) != tt.wantErr {
 				t.Errorf("Reader.Commit() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
