@@ -60,7 +60,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 		"INSPR_app_ID":          environment.GetEnvironment().InsprAppContext + "." + testApp.Meta.Name,
 	}
 
-	appDeployName := toDeploymentName(environment.GetEnvironment().InsprAppContext, &testApp)
+	appDeployName := toDeploymentName(environment.GetEnvironment().InsprAppContext, testApp.Meta.Parent, testApp.Meta.Name)
 
 	type args struct {
 		app *meta.App
@@ -251,7 +251,7 @@ func Test_toDeploymentName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := toDeploymentName(tt.args.filePath, tt.args.app); got != tt.want {
+			if got := toDeploymentName(tt.args.filePath, tt.args.app.Meta.Parent, tt.args.app.Meta.Name); got != tt.want {
 				t.Errorf("toDeploymentName() = %v, want %v", got, tt.want)
 			}
 		})

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 
 	kubeApp "k8s.io/api/apps/v1"
@@ -133,6 +134,14 @@ func parseToK8sArrEnv(arrappEnv map[string]string) []kubeCore.EnvVar {
 	return arrEnv
 }
 
+func parseToNodeEnviroment(envs []kubeCore.EnvVar) map[string]string {
+	nodeEnv := make(map[string]string)
+	for _, env := range envs {
+		nodeEnv[env.Name] = env.Value
+	}
+	return nodeEnv
+}
+
 // toDeployment - receives the context of an app and it's context
 // creates a unique deployment name to be used in the k8s deploy
 func toDeploymentName(insprEnv string, context string, name string) string {
@@ -147,4 +156,25 @@ func toDeploymentName(insprEnv string, context string, name string) string {
 func intToint32(v int) *int32 {
 	t := int32(v)
 	return &t
+}
+
+func ToNode(kdep *kubeApp.Deployment) (*meta.Node, error) {
+	var err error
+	node := &meta.Node{}
+	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
+	if err != nil {
+		return &meta.Node{}, err
+	}
+	node.Spec.Replicas = int(*kdep.Spec.Replicas)
+	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
+	node.Spec.Environment = parseToNodeEnviroment(kdep.Spec.Template.Spec.Containers[0].Env)
+	return node, nil
+}
+
+func toNodeName(deployName string) (string, error) {
+	strs := strings.Split(deployName, ".")
+	if len(strs) < 3 {
+		return "", ierrors.NewError().Message("invalid deployment name").Build()
+	}
+	return strs[2], nil
 }
