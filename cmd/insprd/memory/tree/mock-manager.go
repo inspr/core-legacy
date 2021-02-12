@@ -18,7 +18,7 @@ type MockManager struct {
 func (tmm *MockManager) Channels() memory.ChannelMemory {
 	if tmm.mockC {
 		return &ChannelMockManager{
-			root: tmm.root,
+			MockManager: tmm,
 		}
 	}
 	return &ChannelMemoryManager{
@@ -30,7 +30,7 @@ func (tmm *MockManager) Channels() memory.ChannelMemory {
 func (tmm *MockManager) ChannelTypes() memory.ChannelTypeMemory {
 	if tmm.mockCT {
 		return &ChannelTypeMockManager{
-			root: tmm.root,
+			MockManager: tmm,
 		}
 	}
 	return &ChannelTypeMemoryManager{
@@ -42,8 +42,8 @@ func (tmm *MockManager) ChannelTypes() memory.ChannelTypeMemory {
 func (tmm *MockManager) Apps() memory.AppMemory {
 	if tmm.mockA {
 		return &MockAppManager{
-			root: tmm.root,
-			err:  tmm.appErr,
+			MockManager: tmm,
+			err:         tmm.appErr,
 		}
 	}
 	return &AppMemoryManager{
