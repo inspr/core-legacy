@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
@@ -52,7 +51,7 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		fmt.Println(json.Marshal(diff))
+
 		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)

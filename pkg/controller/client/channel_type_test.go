@@ -83,7 +83,7 @@ func TestChannelTypeClient_Delete(t *testing.T) {
 			ac := &ChannelTypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name); (err != nil) != tt.wantErr {
+			if _, err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelTypeClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -258,7 +258,7 @@ func TestChannelTypeClient_Create(t *testing.T) {
 			ac := &ChannelTypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelTypeClient.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -341,7 +341,7 @@ func TestChannelTypeClient_Update(t *testing.T) {
 			ac := &ChannelTypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelTypeClient.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -6,6 +6,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 // ChannelClient interacts with channels on the Insprd
@@ -46,20 +47,20 @@ func (cc *ChannelClient) Get(ctx context.Context, context string, name string) (
 //
 // So to create a channel inside app1 with the name channel1 you
 // would call cc.Create(context.Background(), "app1", &meta.Channel{...})
-func (cc *ChannelClient) Create(ctx context.Context, context string, ch *meta.Channel) error {
+func (cc *ChannelClient) Create(ctx context.Context, context string, ch *meta.Channel) (diff.Changelog, error) {
 	cdi := models.ChannelDI{
 		Ctx:     context,
 		Channel: *ch,
 		Valid:   true,
 	}
 
-	var resp interface{}
+	var resp diff.Changelog
 	err := cc.c.Send(ctx, "/channels", "POST", cdi, &resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resp, nil
 }
 
 // Delete deletes a channel inside the Insprd
@@ -71,20 +72,20 @@ func (cc *ChannelClient) Create(ctx context.Context, context string, ch *meta.Ch
 //
 // So to delete a channel inside app1 with the name channel1 you
 // would call cc.Delete(context.Background(), "app1", "channel1")
-func (cc *ChannelClient) Delete(ctx context.Context, context string, name string) error {
+func (cc *ChannelClient) Delete(ctx context.Context, context string, name string) (diff.Changelog, error) {
 	cdi := models.ChannelQueryDI{
 		Ctx:    context,
 		ChName: name,
 		Valid:  true,
 	}
 
-	var resp interface{}
+	var resp diff.Changelog
 	err := cc.c.Send(ctx, "/channels", "DELETE", cdi, &resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resp, nil
 }
 
 // Update creates a channel inside the Insprd
@@ -96,18 +97,18 @@ func (cc *ChannelClient) Delete(ctx context.Context, context string, name string
 //
 // So to update a channel inside app1 with the name channel1 you
 // would call cc.Update(context.Background(), "app1", &meta.Channel{...})
-func (cc *ChannelClient) Update(ctx context.Context, context string, ch *meta.Channel) error {
+func (cc *ChannelClient) Update(ctx context.Context, context string, ch *meta.Channel) (diff.Changelog, error) {
 	cdi := models.ChannelDI{
 		Ctx:     context,
 		Channel: *ch,
 		Valid:   true,
 	}
 
-	var resp interface{}
+	var resp diff.Changelog
 	err := cc.c.Send(ctx, "/channels", "PUT", cdi, &resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resp, nil
 }
