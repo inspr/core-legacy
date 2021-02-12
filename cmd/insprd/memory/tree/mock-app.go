@@ -4,8 +4,8 @@ import "gitlab.inspr.dev/inspr/core/pkg/meta"
 
 // MockAppManager to Mock App Manager
 type MockAppManager struct {
-	root *meta.App
-	err  error
+	*MockManager
+	err error
 }
 
 // GetApp Mock

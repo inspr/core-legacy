@@ -6,7 +6,6 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
@@ -35,23 +34,22 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		tree.GetTreeMemory().InitTransaction()
+		ah.InitTransaction()
 		if !data.DryRun {
-			defer tree.GetTreeMemory().Commit()
+			defer ah.Commit()
 		} else {
-			defer tree.GetTreeMemory().Cancel()
+			defer ah.Cancel()
 		}
 		err = ah.CreateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		diff, err := ah.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-
 		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
@@ -91,17 +89,17 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		tree.GetTreeMemory().InitTransaction()
+		ah.InitTransaction()
 		if !data.DryRun {
-			defer tree.GetTreeMemory().Commit()
+			defer ah.Commit()
 		} else {
-			defer tree.GetTreeMemory().Cancel()
+			defer ah.Cancel()
 		}
 		err = ah.UpdateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 		}
-		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		diff, err := ah.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -123,18 +121,18 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		tree.GetTreeMemory().InitTransaction()
+		ah.InitTransaction()
 		if !data.DryRun {
-			defer tree.GetTreeMemory().Commit()
+			defer ah.Commit()
 		} else {
-			defer tree.GetTreeMemory().Cancel()
+			defer ah.Cancel()
 		}
 		err = ah.DeleteApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := tree.GetTreeMemory().GetTransactionChanges()
+		diff, err := ah.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
