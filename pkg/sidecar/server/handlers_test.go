@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
+	env "gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
@@ -117,7 +117,7 @@ func deleteMockEnvVars() {
 }
 
 func Test_newCustomHandlers(t *testing.T) {
-	createMockEnvVars()
+	env.SetMockEnv()
 	type args struct {
 		server *Server
 	}
@@ -133,7 +133,7 @@ func Test_newCustomHandlers(t *testing.T) {
 				Locker:    &MockServer(nil).Mutex,
 				r:         MockServer(nil).Reader,
 				w:         MockServer(nil).Writer,
-				insprVars: environment.GetEnvironment(),
+				insprVars: env.GetEnvironment(),
 			},
 		},
 	}
@@ -145,11 +145,11 @@ func Test_newCustomHandlers(t *testing.T) {
 			}
 		})
 	}
-	deleteMockEnvVars()
+	env.UnsetMockEnv()
 }
 
 func Test_customHandlers_writeMessageHandler(t *testing.T) {
-	createMockEnvVars()
+	env.SetMockEnv()
 	tests := generateTestCases()
 
 	for _, tt := range tests {
@@ -171,11 +171,11 @@ func Test_customHandlers_writeMessageHandler(t *testing.T) {
 
 		})
 	}
-	deleteMockEnvVars()
+	env.UnsetMockEnv()
 }
 
 func Test_customHandlers_readMessageHandler(t *testing.T) {
-	createMockEnvVars()
+	env.SetMockEnv()
 	tests := generateTestCases()
 
 	for _, tt := range tests {
@@ -221,11 +221,11 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 			}
 		})
 	}
-	deleteMockEnvVars()
+	env.UnsetMockEnv()
 }
 
 func Test_customHandlers_commitMessageHandler(t *testing.T) {
-	createMockEnvVars()
+	env.SetMockEnv()
 
 	tests := generateTestCases()
 	for _, tt := range tests {
@@ -247,5 +247,5 @@ func Test_customHandlers_commitMessageHandler(t *testing.T) {
 
 		})
 	}
-	deleteMockEnvVars()
+	env.UnsetMockEnv()
 }

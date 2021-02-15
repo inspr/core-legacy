@@ -8,7 +8,9 @@ type Node struct {
 
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.
 type NodeSpec struct {
-	Image string `yaml:"image"  json:"image" diff:"image"`
+	Image       string            `yaml:"image"  json:"image" diff:"image"`
+	Replicas    int               `yaml:"replicas" json:"replicas" diff:"replicas"`
+	Environment map[string]string `yaml:"envioronment" json:"envioronment" diff:"envioronment"`
 }
 
 // App is an inspr component that represents an App. An App can contain other apps, channels and other components.
