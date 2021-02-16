@@ -1,4 +1,4 @@
-package operator
+package nodes
 
 import (
 	"fmt"
@@ -168,7 +168,7 @@ func intToint32(v int) *int32 {
 	return &t
 }
 
-func ToNode(kdep *kubeApp.Deployment) (*meta.Node, error) {
+func toNode(kdep *kubeApp.Deployment) (*meta.Node, error) {
 	var err error
 	node := &meta.Node{}
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)

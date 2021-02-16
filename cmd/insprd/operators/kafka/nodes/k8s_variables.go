@@ -2,15 +2,15 @@ package nodes
 
 import "os"
 
-type K8SVariables struct {
+type k8sVariables struct {
 	AppsNamespace string
 }
 
-var variables *K8SVariables
+var variables *k8sVariables
 
-func GetK8SVariables() *K8SVariables {
+func getK8SVariables() *k8sVariables {
 	if variables == nil {
-		variables = &K8SVariables{
+		variables = &k8sVariables{
 			AppsNamespace: getFromEnv("NODES_APPS_NAMESPACE"),
 		}
 	}
