@@ -6,6 +6,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 // ChannelTypeClient interacts with channeltypes on the Insprd
@@ -46,20 +47,20 @@ func (ctc *ChannelTypeClient) Get(ctx context.Context, context string, name stri
 //
 // So to create a channel type inside app1 with the name channel1 you
 // would call ctc.Create(context.Background(), "app1", &meta.{...})
-func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *meta.ChannelType) error {
+func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
 		ChannelType: *ch,
 		Valid:       true,
 	}
 
-	var resp interface{}
+	var resp diff.Changelog
 	err := ctc.c.Send(ctx, "/channeltypes", "POST", ctdi, &resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resp, nil
 }
 
 // Delete deletes a channel type inside the Insprd
@@ -71,20 +72,20 @@ func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *me
 //
 // So to delete a channel type inside app1 with the name channel1 you
 // would call ctc.Delete(context.Background(), "app1", "channel1")
-func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name string) error {
+func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name string, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeQueryDI{
 		Ctx:    context,
 		CtName: name,
 		Valid:  true,
 	}
 
-	var resp interface{}
+	var resp diff.Changelog
 	err := ctc.c.Send(ctx, "/channeltypes", "DELETE", ctdi, &resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resp, nil
 }
 
 // Update creates a channel type inside the Insprd
@@ -96,18 +97,18 @@ func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name s
 //
 // So to update a channel type inside app1 with the name channel1 you
 // would call ctc.Create(context.Background(), "app1", &meta.{...})
-func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *meta.ChannelType) error {
+func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
 		ChannelType: *ch,
 		Valid:       true,
 	}
 
-	var resp interface{}
+	var resp diff.Changelog
 	err := ctc.c.Send(ctx, "/channeltypes", "PUT", ctdi, &resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resp, nil
 }

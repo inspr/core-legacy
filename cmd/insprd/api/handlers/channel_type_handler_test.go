@@ -32,6 +32,7 @@ func channelTypeDICases(funcName string) []channelTypeAPITest {
 		ChannelType: meta.ChannelType{Meta: meta.Metadata{Name: "mock_channelType"}},
 		Ctx:         "",
 		Valid:       true,
+		DryRun:      false,
 	})
 	wrongFormatData := []byte{1}
 	return []channelTypeAPITest{
@@ -113,6 +114,7 @@ func channelTypeQueryDICases(funcName string) []channelTypeAPITest {
 		Ctx:    "",
 		CtName: "mock_channelType",
 		Valid:  true,
+		DryRun: false,
 	})
 	wrongFormatData := []byte{1}
 	return []channelTypeAPITest{

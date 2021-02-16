@@ -12,6 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 func TestChannelClient_Delete(t *testing.T) {
@@ -76,14 +77,14 @@ func TestChannelClient_Delete(t *testing.T) {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.ChName, tt.args.name)
 				}
 
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name); (err != nil) != tt.wantErr {
+			if _, err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -255,14 +256,14 @@ func TestChannelClient_Create(t *testing.T) {
 				if !reflect.DeepEqual(di.Channel, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.Channel, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelClient.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -340,14 +341,14 @@ func TestChannelClient_Update(t *testing.T) {
 				if !reflect.DeepEqual(di.Channel, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.Channel, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelClient.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

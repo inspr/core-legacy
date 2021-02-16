@@ -2,12 +2,12 @@ package tree
 
 import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 // MockManager mocks a tree structure for testing
 type MockManager struct {
-	root   *meta.App
+	*MemoryManager
 	appErr error
 	mockC  bool
 	mockCT bool
@@ -18,11 +18,11 @@ type MockManager struct {
 func (tmm *MockManager) Channels() memory.ChannelMemory {
 	if tmm.mockC {
 		return &ChannelMockManager{
-			root: tmm.root,
+			MockManager: tmm,
 		}
 	}
 	return &ChannelMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm.MemoryManager,
 	}
 }
 
@@ -30,11 +30,11 @@ func (tmm *MockManager) Channels() memory.ChannelMemory {
 func (tmm *MockManager) ChannelTypes() memory.ChannelTypeMemory {
 	if tmm.mockCT {
 		return &ChannelTypeMockManager{
-			root: tmm.root,
+			MockManager: tmm,
 		}
 	}
 	return &ChannelTypeMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm.MemoryManager,
 	}
 }
 
@@ -42,11 +42,25 @@ func (tmm *MockManager) ChannelTypes() memory.ChannelTypeMemory {
 func (tmm *MockManager) Apps() memory.AppMemory {
 	if tmm.mockA {
 		return &MockAppManager{
-			root: tmm.root,
-			err:  tmm.appErr,
+			MockManager: tmm,
+			err:         tmm.appErr,
 		}
 	}
 	return &AppMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm.MemoryManager,
 	}
+}
+
+//InitTransaction mock interface structure
+func (tmm *MockManager) InitTransaction() {}
+
+//Commit mock interface structure
+func (tmm *MockManager) Commit() {}
+
+//Cancel mock interface structure
+func (tmm *MockManager) Cancel() {}
+
+//GetTransactionChanges mock structure
+func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
+	return diff.Changelog{}, nil
 }

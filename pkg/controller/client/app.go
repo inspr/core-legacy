@@ -6,6 +6,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 // AppClient is a client for getting and setting app information on Insprd
@@ -22,7 +23,7 @@ type AppClient struct {
 // would call ac.Get(context.Background(), "app1.app2")
 func (ac *AppClient) Get(ctx context.Context, context string) (*meta.App, error) {
 	adi := models.AppQueryDI{
-		Query: context,
+		Ctx:   context,
 		Valid: true,
 	}
 
@@ -46,19 +47,20 @@ func (ac *AppClient) Get(ctx context.Context, context string) (*meta.App, error)
 //
 // So to create an app inside app1 with the name app2 you
 // would call ac.Create(context.Background(), "app1", &meta.App{...})
-func (ac *AppClient) Create(ctx context.Context, context string, ch *meta.App) error {
+func (ac *AppClient) Create(ctx context.Context, context string, ch *meta.App, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppDI{
-		Ctx:   context,
-		App:   *ch,
-		Valid: true,
+		Ctx:    context,
+		App:    *ch,
+		Valid:  true,
+		DryRun: dryRun,
 	}
-	var resp interface{}
+	var resp diff.Changelog
 	err := ac.c.Send(ctx, "/apps", "POST", adi, &resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resp, nil
 }
 
 // Delete deletes an app inside the Insprd.
@@ -68,18 +70,19 @@ func (ac *AppClient) Create(ctx context.Context, context string, ch *meta.App) e
 //
 // So to delete an app inside app1 with the name app2 you
 // would call ac.Delete(context.Background(), "app1.app2")
-func (ac *AppClient) Delete(ctx context.Context, context string) error {
+func (ac *AppClient) Delete(ctx context.Context, context string, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppQueryDI{
-		Query: context,
-		Valid: true,
+		Ctx:    context,
+		Valid:  true,
+		DryRun: dryRun,
 	}
-	var resp interface{}
+	var resp diff.Changelog
 	err := ac.c.Send(ctx, "/apps", "DELETE", adi, &resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resp, nil
 }
 
 // Update updates an app inside the Insprd.
@@ -92,18 +95,19 @@ func (ac *AppClient) Delete(ctx context.Context, context string) error {
 //
 // So to update an app inside app1 with the name app2 you
 // would call ac.Update(context.Background(), "app1", &meta.App{...})
-func (ac *AppClient) Update(ctx context.Context, context string, ch *meta.App) error {
+func (ac *AppClient) Update(ctx context.Context, context string, ch *meta.App, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppDI{
-		Ctx:   context,
-		App:   *ch,
-		Valid: true,
+		Ctx:    context,
+		App:    *ch,
+		Valid:  true,
+		DryRun: dryRun,
 	}
 
-	var resp interface{}
+	var resp diff.Changelog
 	err := ac.c.Send(ctx, "/apps", "PUT", adi, &resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resp, nil
 }

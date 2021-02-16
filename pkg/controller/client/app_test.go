@@ -12,6 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 func TestAppClient_Delete(t *testing.T) {
@@ -68,18 +69,18 @@ func TestAppClient_Delete(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Query != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Query, tt.args.context)
+				if di.Ctx != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
 				}
 
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AppClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Delete(tt.args.ctx, tt.args.context); (err != nil) != tt.wantErr {
+			if _, err := ac.Delete(tt.args.ctx, tt.args.context, false); (err != nil) != tt.wantErr {
 				t.Errorf("AppClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -162,8 +163,8 @@ func TestAppClient_Get(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Query != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Query, tt.args.context)
+				if di.Ctx != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
 				}
 
 				encoder.Encode(tt.want)
@@ -264,14 +265,14 @@ func TestAppClient_Create(t *testing.T) {
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.App, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AppClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AppClient.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -357,14 +358,14 @@ func TestAppClient_Update(t *testing.T) {
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.App, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AppClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AppClient.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

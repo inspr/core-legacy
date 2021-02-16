@@ -6,9 +6,9 @@ package meta
 // The parent field represents the parent app of the object.
 // The full reference for this component will be {it's parent's reference}.Name
 type Metadata struct {
-	Name        string            `yaml:"name" json:"name" diff:"name"`
-	Reference   string            `yaml:"reference" json:"reference" diff:"reference"`
-	Annotations map[string]string `yaml:"annotations" json:"annotations" diff:"annotations"`
-	Parent      string            `yaml:"parent" json:"parent" diff:"parent"`
+	Name        string            `yaml:"name" json:"name"`
+	Reference   string            `yaml:"reference" json:"reference"`
+	Annotations map[string]string `yaml:"annotations" json:"annotations"`
+	Parent      string            `yaml:"parent" json:"parent"`
 	SHA256      string
 }

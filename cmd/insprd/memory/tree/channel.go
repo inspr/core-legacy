@@ -12,13 +12,13 @@ ChannelMemoryManager implements the channel interface and
 provides methods for operating on Channels
 */
 type ChannelMemoryManager struct {
-	root *meta.App
+	*MemoryManager
 }
 
 // Channels return a pointer to ChannelMemoryManager
 func (tmm *MemoryManager) Channels() memory.ChannelMemory {
 	return &ChannelMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm,
 	}
 }
 
@@ -104,6 +104,9 @@ func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) er
 	}
 
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)
+
+	channelType := parentApp.Spec.ChannelTypes[channel.Spec.Type]
+	channelType.ConnectedChannels = utils.Remove(channelType.ConnectedChannels, channel.Meta.Name)
 
 	delete(parentApp.Spec.Channels, chName)
 

@@ -12,13 +12,13 @@ import (
 // AppMemoryManager implements the App interface
 // and provides methos for operating on dApps
 type AppMemoryManager struct {
-	root *meta.App
+	*MemoryManager
 }
 
 // Apps is a MemoryManager method that provides an access point for Apps
 func (tmm *MemoryManager) Apps() memory.AppMemory {
 	return &AppMemoryManager{
-		root: tmm.root,
+		MemoryManager: tmm,
 	}
 }
 

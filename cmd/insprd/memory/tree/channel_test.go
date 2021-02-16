@@ -26,7 +26,9 @@ func TestMemoryManager_Channels(t *testing.T) {
 				root: getMockChannels(),
 			},
 			want: &ChannelMemoryManager{
-				root: getMockChannels(),
+				&MemoryManager{
+					root: getMockChannels(),
+				},
 			},
 		},
 	}
@@ -81,7 +83,9 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 					Parent: "",
 				},
 				ConnectedApps: []string{"app1"},
-				Spec:          meta.ChannelSpec{},
+				Spec: meta.ChannelSpec{
+					Type: "channelType1",
+				},
 			},
 		},
 		{
@@ -118,7 +122,9 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -321,7 +327,9 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -435,14 +443,18 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 					Parent: "",
 				},
 				ConnectedApps: []string{"app1"},
-				Spec:          meta.ChannelSpec{},
+				Spec: meta.ChannelSpec{
+					Type: "channelType1",
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -574,7 +586,9 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -627,7 +641,9 @@ func getMockChannels() *meta.App {
 									Name:   "ch1app1",
 									Parent: "",
 								},
-								Spec: meta.ChannelSpec{},
+								Spec: meta.ChannelSpec{
+									Type: "ctUpdate1",
+								},
 							},
 							"ch2app1Update": {
 								Meta: meta.Metadata{
@@ -648,7 +664,7 @@ func getMockChannels() *meta.App {
 									Parent:      "app1",
 									SHA256:      "",
 								},
-								ConnectedChannels: []string{"ch2app1Update"},
+								ConnectedChannels: []string{"ch2app1Update", "ch1app1"},
 							},
 						},
 						Boundary: meta.AppBoundary{
@@ -666,14 +682,18 @@ func getMockChannels() *meta.App {
 						Parent: "",
 					},
 					ConnectedApps: []string{"app1"},
-					Spec:          meta.ChannelSpec{},
+					Spec: meta.ChannelSpec{
+						Type: "channelType1",
+					},
 				},
 				"channel2": {
 					Meta: meta.Metadata{
 						Name:   "channel2",
 						Parent: "",
 					},
-					Spec: meta.ChannelSpec{},
+					Spec: meta.ChannelSpec{
+						Type: "channelType1",
+					},
 				},
 			},
 			ChannelTypes: map[string]*meta.ChannelType{

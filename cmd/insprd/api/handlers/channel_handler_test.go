@@ -113,6 +113,7 @@ func channelQueryDICases(funcName string) []channelAPITest {
 		Ctx:    "",
 		ChName: "mock_channel",
 		Valid:  true,
+		DryRun: false,
 	})
 	wrongFormatData := []byte{1}
 	return []channelAPITest{
