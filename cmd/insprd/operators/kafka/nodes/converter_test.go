@@ -1,4 +1,4 @@
-package operator
+package nodes
 
 import (
 	"os"
@@ -152,7 +152,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := InsprDAppToK8sDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
+			if got := dAppToDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
 				t.Errorf("InsprDAppToK8sDeployment() = \n%v, \nwant \n%v", got, tt.want)
 			}
 		})

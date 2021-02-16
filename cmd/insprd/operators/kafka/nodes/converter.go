@@ -1,4 +1,4 @@
-package operator
+package nodes
 
 import (
 	"fmt"
@@ -46,8 +46,8 @@ func baseEnvironment(app *meta.App) meta.EnvironmentMap {
 	return env
 }
 
-// InsprDAppToK8sDeployment translates the DApp
-func InsprDAppToK8sDeployment(app *meta.App) *kubeApp.Deployment {
+// dAppToDeployment translates the DApp
+func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	insprEnv := environment.GetEnvironment()
 
 	sidecarEnvironment := baseEnvironment(app)
@@ -168,7 +168,7 @@ func intToint32(v int) *int32 {
 	return &t
 }
 
-func ToNode(kdep *kubeApp.Deployment) (*meta.Node, error) {
+func toNode(kdep *kubeApp.Deployment) (*meta.Node, error) {
 	var err error
 	node := &meta.Node{}
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)

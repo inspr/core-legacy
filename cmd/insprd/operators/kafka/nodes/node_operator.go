@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	operator "gitlab.inspr.dev/inspr/core/pkg/client/k8s-op"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -23,7 +22,7 @@ type NodeOperator struct {
 }
 
 func (nop *NodeOperator) retrieveKube() v1.DeploymentInterface {
-	appsNamespace := GetK8SVariables().AppsNamespace
+	appsNamespace := getK8SVariables().AppsNamespace
 	return nop.clientSet.AppsV1().Deployments(appsNamespace)
 }
 
@@ -37,7 +36,7 @@ func (nop *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message("could't get deployment from kubernetes").InnerError(err).Build()
 	}
-	node, err := operator.ToNode(dep)
+	node, err := toNode(dep)
 	if err != nil {
 		return &meta.Node{}, err
 	}
@@ -54,12 +53,12 @@ func (nop *NodeOperator) Nodes() operators.NodeOperatorInterface {
 func (nop *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	var deploy *kubeApp.Deployment
 	kube := nop.retrieveKube()
-	deploy = operator.InsprDAppToK8sDeployment(app)
+	deploy = dAppToDeployment(app)
 	dep, err := kube.Create(deploy)
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message("could't create deployment from kubernetes").InnerError(err).Build()
 	}
-	node, err := operator.ToNode(dep)
+	node, err := toNode(dep)
 	if err != nil {
 		return &meta.Node{}, err
 	}
@@ -71,12 +70,12 @@ func (nop *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.N
 func (nop *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	var deploy *kubeApp.Deployment
 	kube := nop.retrieveKube()
-	deploy = operator.InsprDAppToK8sDeployment(app)
+	deploy = dAppToDeployment(app)
 	dep, err := kube.Update(deploy)
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message("could't update deployment from kubernetes").InnerError(err).Build()
 	}
-	node, err := operator.ToNode(dep)
+	node, err := toNode(dep)
 	if err != nil {
 		return &meta.Node{}, err
 	}
@@ -87,7 +86,7 @@ func (nop *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.N
 func (nop *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
 	var deploy string
 	kube := nop.retrieveKube()
-	deploy = parseNodeName(GetK8SVariables().AppsNamespace, nodeContext, nodeName)
+	deploy = parseNodeName(getK8SVariables().AppsNamespace, nodeContext, nodeName)
 	err := kube.Delete(deploy, &metav1.DeleteOptions{})
 
 	return ierrors.NewError().Message("could't delete deployment from kubernetes").InnerError(err).Build()
@@ -99,7 +98,7 @@ func (nop *NodeOperator) GetAllNodes() []*meta.Node {
 	kube := nop.retrieveKube()
 	list, _ := kube.List(metav1.ListOptions{})
 	for _, item := range list.Items {
-		node, _ := operator.ToNode(&item)
+		node, _ := toNode(&item)
 		nodes = append(nodes, node)
 	}
 	return nodes
