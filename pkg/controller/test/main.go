@@ -70,6 +70,13 @@ func main() {
 	createNewAppInsideHelloWorld(&client, false)
 	fmt.Printf("\n\n")
 
+	resp, err := client.Apps().Get(context.Background(), "HelloWorld")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(resp.Spec.Apps)
+
 }
 
 func createHelloWorldApp(client *client.Client, dryRun bool) {
