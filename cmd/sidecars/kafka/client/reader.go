@@ -33,7 +33,7 @@ func NewReader() (*Reader, error) {
 
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
-		"group.id":           globalEnv.InsprAppContext,
+		"group.id":           globalEnv.InsprAppID,
 		"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
 		"enable.auto.commit": false,
 	})
@@ -50,7 +50,9 @@ func NewReader() (*Reader, error) {
 
 	channelsAsTopics := utils.Map(channelsList, toTopic)
 
-	reader.consumer.SubscribeTopics(channelsAsTopics, nil)
+	if err := reader.consumer.SubscribeTopics(channelsAsTopics, nil); err != nil {
+		return nil, err
+	}
 	return &reader, nil
 }
 
@@ -59,7 +61,6 @@ ReadMessage reads message by message. Returns channel the message belongs to,
 the message and an error if any occured.
 */
 func (reader *Reader) ReadMessage() (models.BrokerData, error) {
-	// brokerMsg := models.BrokerData{}
 	for {
 		event := reader.consumer.Poll(pollTimeout)
 		switch ev := event.(type) {

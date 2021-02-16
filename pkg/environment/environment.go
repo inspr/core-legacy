@@ -10,6 +10,7 @@ type InsprEnvVars struct {
 	SidecarImage     string
 	InsprAppContext  string
 	InsprEnvironment string
+	InsprAppID       string
 }
 
 var env *InsprEnvVars
@@ -24,6 +25,7 @@ func GetEnvironment() *InsprEnvVars {
 			SidecarImage:     getEnv("INSPR_SIDECAR_IMAGE"),
 			InsprAppContext:  getEnv("INSPR_APP_CTX"),
 			InsprEnvironment: getEnv("INSPR_ENV"),
+			InsprAppID:       getEnv("INSPR_APP_ID"),
 		}
 	}
 	return env
@@ -43,8 +45,10 @@ func RefreshEnviromentVariables() *InsprEnvVars {
 		InputChannels:    getEnv("INSPR_INPUT_CHANNELS"),
 		OutputChannels:   getEnv("INSPR_OUTPUT_CHANNELS"),
 		UnixSocketAddr:   getEnv("INSPR_UNIX_SOCKET"),
+		SidecarImage:     getEnv("INSPR_SIDECAR_IMAGE"),
 		InsprAppContext:  getEnv("INSPR_APP_CTX"),
 		InsprEnvironment: getEnv("INSPR_ENV"),
+		InsprAppID:       getEnv("INSPR_APP_ID"),
 	}
 	return env
 }

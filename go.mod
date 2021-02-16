@@ -10,6 +10,7 @@ require (
 	github.com/linkedin/goavro v2.1.0+incompatible
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/r3labs/diff/v2 v2.9.1
+	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/linkedin/goavro.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

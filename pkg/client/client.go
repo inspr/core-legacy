@@ -35,7 +35,7 @@ type requestReturn struct {
 func NewAppClient() *Client {
 	envAddr := environment.GetEnvironment().UnixSocketAddr
 	return &Client{
-		addr:  envAddr,
+		addr:  "http://unix",
 		httpc: transports.NewUnixSocketClient(envAddr),
 	}
 }

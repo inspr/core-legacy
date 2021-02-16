@@ -2,6 +2,7 @@ package sidecarserv
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -49,8 +50,9 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if err := ch.w.WriteMessage(body.Channel, body.Message); err != nil {
+	if err := ch.w.WriteMessage(body.Channel, body.Message.Data); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's writeMessage failed")
+		fmt.Println(err)
 		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
 	}
 }

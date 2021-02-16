@@ -59,7 +59,7 @@ func (s *Server) Run(ctx context.Context) {
 		Handler:           s.Mux,
 	}
 
-	listenerAddr := environment.GetEnvironment().UnixSocketAddr
+	listenerAddr := "/inspr/" + environment.GetEnvironment().UnixSocketAddr + ".sock"
 	os.Remove(listenerAddr)
 
 	listener, err := net.Listen("unix", listenerAddr)

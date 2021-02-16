@@ -15,6 +15,7 @@ func createMockEnvVars() {
 	os.Setenv("INSPR_SIDECAR_IMAGE", "teste")
 	os.Setenv("INSPR_APP_CTX", "teste")
 	os.Setenv("INSPR_ENV", "teste")
+	os.Setenv("INSPR_APP_ID", "testappid1")
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
@@ -25,6 +26,7 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_SIDECAR_IMAGE")
 	os.Unsetenv("INSPR_APP_CTX")
 	os.Unsetenv("INSPR_ENV")
+	os.Unsetenv("INSPR_APP_ID")
 }
 
 func mockInsprEnvironment() *InsprEnvVars {
@@ -35,6 +37,7 @@ func mockInsprEnvironment() *InsprEnvVars {
 		SidecarImage:     "teste",
 		InsprAppContext:  "teste",
 		InsprEnvironment: "teste",
+		InsprAppID:       "testappid1",
 	}
 }
 
@@ -76,14 +79,14 @@ func Test_getEnv(t *testing.T) {
 			args: args{
 				name: "INSPR_INPUT_CHANNELS",
 			},
-			want: "inp1;inp2;inp3",
+			want: "inp1;inp2;inp3;",
 		},
 		{
 			name: "Get output channel enviroment variable",
 			args: args{
 				name: "INSPR_OUTPUT_CHANNELS",
 			},
-			want: "out1;out2;out3",
+			want: "out1;out2;out3;",
 		},
 		{
 			name: "Get unix socket enviroment variable",
@@ -121,6 +124,8 @@ func TestRefreshEnviromentVariables(t *testing.T) {
 	os.Setenv("INSPR_UNIX_SOCKET", "three")
 	os.Setenv("INSPR_APP_CTX", "four")
 	os.Setenv("INSPR_ENV", "five")
+	os.Setenv("INSPR_APP_ID", "six")
+	os.Setenv("INSPR_SIDECAR_IMAGE", "seven")
 	defer deleteMockEnvVars()
 	tests := []struct {
 		name    string
@@ -136,6 +141,8 @@ func TestRefreshEnviromentVariables(t *testing.T) {
 				UnixSocketAddr:   "three",
 				InsprAppContext:  "four",
 				InsprEnvironment: "five",
+				SidecarImage:     "seven",
+				InsprAppID:       "six",
 			},
 		},
 	}
