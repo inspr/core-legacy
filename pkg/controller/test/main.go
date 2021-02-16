@@ -111,6 +111,10 @@ func main() {
 	}
 	utils.PrintAppTree(resp)
 
+	fmt.Println("[Deleting HelloWorld App...]")
+	deleteHelloWorldApp(&client, false)
+	fmt.Printf("\n\n")
+
 }
 
 func createHelloWorldApp(client *client.Client, dryRun bool) {
@@ -234,6 +238,14 @@ func deleteChannelOneInsideHelloWorld(client *client.Client, dryRun bool) {
 
 func deleteChannelTypeHelloInsideHelloWorld(client *client.Client, dryRun bool) {
 	resp, err := client.ChannelTypes().Delete(context.Background(), "HelloWorld", "ChannelTypeHello", dryRun)
+	if err != nil {
+		fmt.Printf("%#v", err)
+	}
+	resp.Print()
+}
+
+func deleteHelloWorldApp(client *client.Client, dryRun bool) {
+	resp, err := client.Apps().Delete(context.Background(), "HelloWorld", dryRun)
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
