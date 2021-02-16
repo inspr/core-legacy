@@ -7,8 +7,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-// PrintAppBeautiful prints the app tree
-func PrintAppBeautiful(app *meta.App) {
+// PrintAppTree prints the app tree
+func PrintAppTree(app *meta.App) {
 	tree := gotree.New(app.Meta.Name)
 	meta := tree.Add("Meta")
 
@@ -47,8 +47,8 @@ func PrintAppBeautiful(app *meta.App) {
 
 }
 
-// PrintChannelBeatiful prints the channel structure
-func PrintChannelBeatiful(ch *meta.Channel) {
+// PrintChannelTree prints the channel structure
+func PrintChannelTree(ch *meta.Channel) {
 	channel := gotree.New(ch.Meta.Name)
 	meta := channel.Add("Meta")
 
@@ -65,8 +65,8 @@ func PrintChannelBeatiful(ch *meta.Channel) {
 	fmt.Println(channel.Print())
 }
 
-// PrintChannelTypeBeatiful prints the channel structure
-func PrintChannelTypeBeatiful(ct *meta.ChannelType) {
+// PrintChannelTypeTree prints the channel structure
+func PrintChannelTypeTree(ct *meta.ChannelType) {
 	channelType := gotree.New(ct.Meta.Name)
 	meta := channelType.Add("Meta")
 
