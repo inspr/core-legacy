@@ -79,14 +79,14 @@ func Test_getEnv(t *testing.T) {
 			args: args{
 				name: "INSPR_INPUT_CHANNELS",
 			},
-			want: "inp1;inp2;inp3;",
+			want: "inp1;inp2;inp3",
 		},
 		{
 			name: "Get output channel enviroment variable",
 			args: args{
 				name: "INSPR_OUTPUT_CHANNELS",
 			},
-			want: "out1;out2;out3;",
+			want: "out1;out2;out3",
 		},
 		{
 			name: "Get unix socket enviroment variable",

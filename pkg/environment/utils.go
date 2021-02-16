@@ -26,7 +26,7 @@ func (insprEnv *InsprEnvVars) GetInputChannelList() []string {
 		return []string{}
 	}
 	arr := strings.Split(insprEnv.InputChannels, ";")
-	return arr[:len(arr)-1]
+	return arr
 }
 
 // GetOutputChannelList returns a string list with the channels in insprEnv.OutputChannels
@@ -35,7 +35,7 @@ func (insprEnv *InsprEnvVars) GetOutputChannelList() []string {
 		return []string{}
 	}
 	arr := strings.Split(insprEnv.OutputChannels, ";")
-	return arr[:len(arr)-1]
+	return arr
 }
 
 // GetSchema returns a channel's schema, if the channel exists
