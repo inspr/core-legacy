@@ -8,9 +8,9 @@ type Node struct {
 
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.
 type NodeSpec struct {
-	Image       string            `yaml:"image"  json:"image" diff:"image"`
-	Replicas    int               `yaml:"replicas" json:"replicas" diff:"replicas"`
-	Environment map[string]string `yaml:"envioronment" json:"envioronment" diff:"envioronment"`
+	Image       string         `yaml:"image"  json:"image" diff:"image"`
+	Replicas    int            `yaml:"replicas" json:"replicas" diff:"replicas"`
+	Environment EnvironmentMap `yaml:"envioronment" json:"envioronment" diff:"envioronment"`
 }
 
 // App is an inspr component that represents an App. An App can contain other apps, channels and other components.
@@ -22,8 +22,8 @@ type App struct {
 // AppBoundary represents the connections this app can make to other apps. These are the fields that can be overriten
 // by the ChannelAliases when instantiating the app.
 type AppBoundary struct {
-	Input  []string `yaml:"input" json:"input" diff:"input"`
-	Output []string `yaml:"output" json:"output" diff:"output"`
+	Input  StringArray `yaml:"input" json:"input"`
+	Output StringArray `yaml:"output" json:"output"`
 }
 
 // AppSpec represents the configuration of an App.

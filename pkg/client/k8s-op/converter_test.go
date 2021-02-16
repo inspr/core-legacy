@@ -1,7 +1,9 @@
 package operator
 
 import (
+	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -15,6 +17,9 @@ import (
 
 func TestInsprDAppToK8sDeployment(t *testing.T) {
 	environment.SetMockEnv()
+
+	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
+	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
 	testApp := meta.App{
 		Meta: meta.Metadata{
 			Name:      "mock_app",
@@ -43,14 +48,8 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 		},
 	}
 
-	inputChannels := ""
-	for _, c := range testApp.Spec.Boundary.Input {
-		inputChannels += c + ";"
-	}
-	outputChannels := ""
-	for _, c := range testApp.Spec.Boundary.Output {
-		outputChannels += c + ";"
-	}
+	outputChannels := strings.Join(testApp.Spec.Boundary.Output, ";")
+	inputChannels := strings.Join(testApp.Spec.Boundary.Input, ";")
 	testEnv := map[string]string{
 		"INSPR_INPUT_CHANNELS":  inputChannels,
 		"INSPR_CHANNEL_SIDECAR": environment.GetEnvironment().SidecarImage,
@@ -86,9 +85,6 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 							"app": appDeployName,
 						},
 					},
-					Strategy: kubeApp.DeploymentStrategy{
-						Type: kubeApp.RollingUpdateDeploymentStrategyType,
-					},
 					Template: kubeCore.PodTemplateSpec{
 
 						ObjectMeta: kubeMeta.ObjectMeta{
@@ -109,42 +105,35 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 							},
 							Containers: []kubeCore.Container{
 								{
-									Name: testApp.Spec.Node.Meta.Name,
-									Ports: func() []kubeCore.ContainerPort {
-										return nil
-									}(),
-
+									Name:  testApp.Spec.Node.Meta.Name,
 									Image: testApp.Spec.Node.Spec.Image,
 									// parse from master env var to kube env vars
-									ImagePullPolicy: kubeCore.PullAlways,
 									VolumeMounts: []kubeCore.VolumeMount{
 										{
 											Name:      testApp.Spec.Node.Meta.Name + "-volume",
 											MountPath: "/inspr",
 										},
 									},
-									Env: append([]kubeCore.EnvVar{
-										{
+									Env: append(meta.EnvironmentMap(testApp.Spec.Node.Spec.Environment).ParseToK8sArrEnv(),
+										kubeCore.EnvVar{
 											Name: "UUID",
 											ValueFrom: &kubeCore.EnvVarSource{
 												FieldRef: &kubeCore.ObjectFieldSelector{
 													FieldPath: "metadata.name",
 												},
 											},
-										},
-									}, parseToK8sArrEnv(testApp.Spec.Node.Spec.Environment)...), // TODO WHAT OT PUT HERE
+										}),
 								},
 								{
-									Name:            appDeployName + "-sidecar",
-									Image:           environment.GetEnvironment().SidecarImage,
-									ImagePullPolicy: kubeCore.PullIfNotPresent,
+									Name:  appDeployName + "-sidecar",
+									Image: environment.GetEnvironment().SidecarImage,
 									VolumeMounts: []kubeCore.VolumeMount{
 										{
-											Name:      testApp.Spec.Node.Meta.Name + "-sidecar-volume",
+											Name:      testApp.Spec.Node.Meta.Name + "-volume",
 											MountPath: "/inspr",
 										},
 									},
-									Env: append(parseToK8sArrEnv(testEnv), kubeCore.EnvVar{
+									Env: append(meta.EnvironmentMap(testEnv).ParseToK8sArrEnv(), kubeCore.EnvVar{
 										Name: "UUID",
 										ValueFrom: &kubeCore.EnvVarSource{
 											FieldRef: &kubeCore.ObjectFieldSelector{
@@ -164,57 +153,11 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := InsprDAppToK8sDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
-				t.Errorf("InsprDAppToK8sDeployment() = %v, want %v", got, tt.want)
+				t.Errorf("InsprDAppToK8sDeployment() = \n%v, \nwant \n%v", got, tt.want)
 			}
 		})
 	}
 	environment.UnsetMockEnv()
-}
-
-func Test_parseToK8sArrEnv(t *testing.T) {
-	type args struct {
-		arrappEnv map[string]string
-	}
-	tests := []struct {
-		name string
-		args args
-		want []kubeCore.EnvVar
-	}{
-		{
-			name: "successful_test",
-			args: args{
-				arrappEnv: map[string]string{
-					"key_1": "value_1",
-					"key_2": "value_2",
-					"key_3": "value_3",
-				},
-			},
-			want: []kubeCore.EnvVar{
-				{
-					Name:  "key_1",
-					Value: "value_1",
-				},
-				{
-					Name:  "key_2",
-					Value: "value_2",
-				},
-				{
-					Name:  "key_3",
-					Value: "value_3",
-				},
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := parseToK8sArrEnv(tt.args.arrappEnv)
-
-			if !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
-				t.Errorf("parseToK8sArrEnv() = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }
 
 func Test_toDeploymentName(t *testing.T) {

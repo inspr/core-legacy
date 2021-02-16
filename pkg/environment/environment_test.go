@@ -15,6 +15,7 @@ func createMockEnvVars() {
 	os.Setenv("INSPR_SIDECAR_IMAGE", "teste")
 	os.Setenv("INSPR_APP_CTX", "teste")
 	os.Setenv("INSPR_ENV", "teste")
+	os.Setenv("INSPR_APP_ID", "testappid1")
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
@@ -25,6 +26,7 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_SIDECAR_IMAGE")
 	os.Unsetenv("INSPR_APP_CTX")
 	os.Unsetenv("INSPR_ENV")
+	os.Unsetenv("INSPR_APP_ID")
 }
 
 func mockInsprEnvironment() *InsprEnvVars {
@@ -35,6 +37,7 @@ func mockInsprEnvironment() *InsprEnvVars {
 		SidecarImage:     "teste",
 		InsprAppContext:  "teste",
 		InsprEnvironment: "teste",
+		InsprAppID:       "testappid1",
 	}
 }
 
@@ -109,6 +112,45 @@ func Test_getEnv(t *testing.T) {
 
 			if got := getEnv(tt.args.name); got != tt.want {
 				t.Errorf("getEnv() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRefreshEnviromentVariables(t *testing.T) {
+	createMockEnvVars()
+	os.Setenv("INSPR_INPUT_CHANNELS", "one")
+	os.Setenv("INSPR_OUTPUT_CHANNELS", "two")
+	os.Setenv("INSPR_UNIX_SOCKET", "three")
+	os.Setenv("INSPR_APP_CTX", "four")
+	os.Setenv("INSPR_ENV", "five")
+	os.Setenv("INSPR_APP_ID", "six")
+	os.Setenv("INSPR_SIDECAR_IMAGE", "seven")
+	defer deleteMockEnvVars()
+	tests := []struct {
+		name    string
+		refresh bool
+		want    *InsprEnvVars
+	}{
+		{
+			name:    "Changed and refreshed environment variables",
+			refresh: true,
+			want: &InsprEnvVars{
+				InputChannels:    "one",
+				OutputChannels:   "two",
+				UnixSocketAddr:   "three",
+				InsprAppContext:  "four",
+				InsprEnvironment: "five",
+				SidecarImage:     "seven",
+				InsprAppID:       "six",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			if got := RefreshEnviromentVariables(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetEnvironment() = %v, want %v", got, tt.want)
 			}
 		})
 	}

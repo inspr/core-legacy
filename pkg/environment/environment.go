@@ -10,6 +10,7 @@ type InsprEnvVars struct {
 	SidecarImage     string
 	InsprAppContext  string
 	InsprEnvironment string
+	InsprAppID       string
 }
 
 var env *InsprEnvVars
@@ -22,8 +23,9 @@ func GetEnvironment() *InsprEnvVars {
 			OutputChannels:   getEnv("INSPR_OUTPUT_CHANNELS"),
 			UnixSocketAddr:   getEnv("INSPR_UNIX_SOCKET"),
 			SidecarImage:     getEnv("INSPR_SIDECAR_IMAGE"),
-			InsprAppContext:  getEnv("INSPER_APP_CTX"),
+			InsprAppContext:  getEnv("INSPR_APP_CTX"),
 			InsprEnvironment: getEnv("INSPR_ENV"),
+			InsprAppID:       getEnv("INSPR_APP_ID"),
 		}
 	}
 	return env
@@ -34,4 +36,19 @@ func getEnv(name string) string {
 		return value
 	}
 	panic("[ENV VAR] " + name + " not found")
+}
+
+// RefreshEnviromentVariables "refreshes" the value of inspr environment variables.
+// This was develop for testing and probably sholdn't be used in other cases.
+func RefreshEnviromentVariables() *InsprEnvVars {
+	env = &InsprEnvVars{
+		InputChannels:    getEnv("INSPR_INPUT_CHANNELS"),
+		OutputChannels:   getEnv("INSPR_OUTPUT_CHANNELS"),
+		UnixSocketAddr:   getEnv("INSPR_UNIX_SOCKET"),
+		SidecarImage:     getEnv("INSPR_SIDECAR_IMAGE"),
+		InsprAppContext:  getEnv("INSPR_APP_CTX"),
+		InsprEnvironment: getEnv("INSPR_ENV"),
+		InsprAppID:       getEnv("INSPR_APP_ID"),
+	}
+	return env
 }

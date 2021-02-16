@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
+	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -13,109 +15,117 @@ import (
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// InsprDAppToK8sDeployment translates the DApp
-func InsprDAppToK8sDeployment(app *meta.App) *kubeApp.Deployment {
-	inputChannels := ""
-	for _, c := range app.Spec.Boundary.Input {
-		inputChannels += c + ";"
-	}
-	outputChannels := ""
-	for _, c := range app.Spec.Boundary.Output {
-		outputChannels += c + ";"
-	}
+func baseEnvironment(app *meta.App) meta.EnvironmentMap {
+	input := app.Spec.Boundary.Input
+	output := app.Spec.Boundary.Output
+	channels := input.Union(output)
 
 	// pod env variables
 	insprEnv := environment.GetEnvironment()
 	// label name to be used in the service
 	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app.Meta.Parent, app.Spec.Node.Meta.Name)
 
-	sidecarEnvironment := map[string]string{
-		"INSPR_INPUT_CHANNELS":  inputChannels,
-		"INSPR_CHANNEL_SIDECAR": insprEnv.SidecarImage,
-		"INSPR_APPS_TLS":        "true",
-
-		"INSPR_OUTPUT_CHANNELS": outputChannels,
-		"INSPR_APP_ID":          appDeployName,
+	inputEnv := input.Join(";")
+	outputEnv := output.Join(";")
+	env := meta.EnvironmentMap{
+		"INSPR_INPUT_CHANNELS":    inputEnv,
+		"INSPR_OUTPUT_CHANNELS":   outputEnv,
+		"INSPR_SIDECAR_IMAGE":     insprEnv.SidecarImage,
+		"INSPR_APP_ID":            appDeployName,
+		"INSPR_APP_CTX":           app.Meta.Parent,
+		"INSPR_ENV":               insprEnv.InsprEnvironment,
+		"KAFKA_BOOSTRAP_SERVERS":  kafkasc.GetEnvironment().KafkaBootstrapServers,
+		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
 	}
+	channels.Map(func(s string) string {
+		ch, _ := tree.GetTreeMemory().Channels().GetChannel(app.Meta.Parent, s)
+		ct, _ := tree.GetTreeMemory().ChannelTypes().GetChannelType(app.Meta.Parent, ch.Spec.Type)
+		env[s+"_SCHEMA"] = ct.Schema
+		return s
+	})
+	return env
+}
+
+// InsprDAppToK8sDeployment translates the DApp
+func InsprDAppToK8sDeployment(app *meta.App) *kubeApp.Deployment {
+	insprEnv := environment.GetEnvironment()
+
+	sidecarEnvironment := baseEnvironment(app)
+
+	nodeKubeEnv := append(app.Spec.Node.Spec.Environment.ParseToK8sArrEnv(), kubeCore.EnvVar{
+		Name: "INSPR_UNIX_SOCKET",
+		ValueFrom: &kubeCore.EnvVarSource{
+			FieldRef: &kubeCore.ObjectFieldSelector{
+				FieldPath: "metadata.name",
+			},
+		},
+	})
+
+	nodeContainer := kubeCore.Container{
+		Name:  app.Spec.Node.Meta.Name,
+		Image: app.Spec.Node.Spec.Image,
+		// parse from master env var to kube env vars
+		VolumeMounts: []kubeCore.VolumeMount{
+			{
+				Name:      app.Spec.Node.Meta.Name + "-volume",
+				MountPath: "/inspr",
+			},
+		},
+		Env: nodeKubeEnv,
+	}
+
+	sidecarKubeEnv := append(sidecarEnvironment.ParseToK8sArrEnv(), kubeCore.EnvVar{
+		Name: "INSPR_UNIX_SOCKET",
+		ValueFrom: &kubeCore.EnvVarSource{
+			FieldRef: &kubeCore.ObjectFieldSelector{
+				FieldPath: "metadata.name",
+			},
+		},
+	})
+
+	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app.Meta.Parent, app.Meta.Name)
+	sidecarContainer := kubeCore.Container{
+		Name:  appDeployName + "-sidecar",
+		Image: insprEnv.SidecarImage,
+		VolumeMounts: []kubeCore.VolumeMount{
+			{
+				Name:      app.Spec.Node.Meta.Name + "-volume",
+				MountPath: "/inspr",
+			},
+		},
+		Env: sidecarKubeEnv,
+	}
+
+	volume := kubeCore.Volume{
+		Name: appDeployName + "-volume",
+		VolumeSource: kubeCore.VolumeSource{
+			EmptyDir: &kubeCore.EmptyDirVolumeSource{
+				Medium: kubeCore.StorageMediumMemory,
+			},
+		},
+	}
+
+	appLabels := map[string]string{"app": appDeployName}
 
 	return &kubeApp.Deployment{
 		ObjectMeta: kubeMeta.ObjectMeta{
 			Name:   appDeployName,
-			Labels: map[string]string{"app": appDeployName},
+			Labels: appLabels,
 		},
 		Spec: kubeApp.DeploymentSpec{
 			Replicas: intToint32(app.Spec.Node.Spec.Replicas),
 			Selector: &kubeMeta.LabelSelector{
-				MatchLabels: map[string]string{
-					"app": appDeployName,
-				},
-			},
-			Strategy: kubeApp.DeploymentStrategy{
-				Type: kubeApp.RollingUpdateDeploymentStrategyType,
+				MatchLabels: appLabels,
 			},
 			Template: kubeCore.PodTemplateSpec{
 				ObjectMeta: kubeMeta.ObjectMeta{
-					Labels: map[string]string{
-						"app": appDeployName,
-					},
+					Labels: appLabels,
 				},
 				Spec: kubeCore.PodSpec{
-					Volumes: []kubeCore.Volume{
-						{
-							Name: appDeployName + "-volume",
-							VolumeSource: kubeCore.VolumeSource{
-								EmptyDir: &kubeCore.EmptyDirVolumeSource{
-									Medium: kubeCore.StorageMediumMemory,
-								},
-							},
-						},
-					},
+					Volumes: []kubeCore.Volume{volume},
 					Containers: []kubeCore.Container{
-						{
-							Name: app.Spec.Node.Meta.Name,
-							Ports: func() []kubeCore.ContainerPort {
-								return nil
-							}(),
-
-							Image: app.Spec.Node.Spec.Image,
-							// parse from master env var to kube env vars
-							ImagePullPolicy: kubeCore.PullAlways,
-							VolumeMounts: []kubeCore.VolumeMount{
-								{
-									Name:      app.Spec.Node.Meta.Name + "-volume",
-									MountPath: "/inspr",
-								},
-							},
-							Env: append([]kubeCore.EnvVar{
-								{
-									Name: "UUID",
-									ValueFrom: &kubeCore.EnvVarSource{
-										FieldRef: &kubeCore.ObjectFieldSelector{
-											FieldPath: "metadata.name",
-										},
-									},
-								},
-							}, parseToK8sArrEnv(app.Spec.Node.Spec.Environment)...),
-						},
-						{
-							Name:            appDeployName + "-sidecar",
-							Image:           insprEnv.SidecarImage,
-							ImagePullPolicy: kubeCore.PullIfNotPresent,
-							VolumeMounts: []kubeCore.VolumeMount{
-								{
-									Name:      app.Spec.Node.Meta.Name + "-sidecar-volume",
-									MountPath: "/inspr",
-								},
-							},
-							Env: append(parseToK8sArrEnv(sidecarEnvironment), kubeCore.EnvVar{
-								Name: "UUID",
-								ValueFrom: &kubeCore.EnvVarSource{
-									FieldRef: &kubeCore.ObjectFieldSelector{
-										FieldPath: "metadata.name",
-									},
-								},
-							}),
-						},
+						sidecarContainer,
+						nodeContainer,
 					},
 				},
 			},

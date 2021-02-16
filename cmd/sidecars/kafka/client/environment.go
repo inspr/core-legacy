@@ -1,10 +1,11 @@
-package kafka
+package kafkasc
 
 import "os"
 
 // Environment represents the current inspr environment
 type Environment struct {
 	KafkaBootstrapServers string
+	KafkaAutoOffsetReset  string
 }
 
 var env *Environment
@@ -14,6 +15,7 @@ func GetEnvironment() *Environment {
 	if env == nil {
 		env = &Environment{
 			KafkaBootstrapServers: getEnv("KAFKA_BOOTSTRAP_SERVERS"),
+			KafkaAutoOffsetReset:  getEnv("KAFKA_AUTO_OFFSET_RESET"),
 		}
 	}
 	return env
@@ -24,4 +26,14 @@ func getEnv(name string) string {
 		return value
 	}
 	panic("[ENV VAR] " + name + " not found")
+}
+
+// RefreshEnviromentVariables "refreshes" the value of kafka environment variables.
+// This was develop for testing and probably sholdn't be used in other cases.
+func RefreshEnviromentVariables() *Environment {
+	env = &Environment{
+		KafkaBootstrapServers: getEnv("KAFKA_BOOTSTRAP_SERVERS"),
+		KafkaAutoOffsetReset:  getEnv("KAFKA_AUTO_OFFSET_RESET"),
+	}
+	return env
 }

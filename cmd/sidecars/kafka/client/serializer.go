@@ -1,10 +1,9 @@
-package kafka
+package kafkasc
 
 import (
 	"errors"
 
 	"github.com/linkedin/goavro"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
@@ -21,17 +20,12 @@ func getCodec(schema string) (*goavro.Codec, error) {
 
 // returns the channel's channel type schema
 func getSchema(channel, context string) (string, error) {
-	memChan, err := tree.GetTreeMemory().Channels().GetChannel(context, channel)
+	schema, err := environment.GetEnvironment().GetSchema(channel)
 	if err != nil {
-		return "", ierrors.NewError().InvalidChannel().Message(err.Error()).Build()
+		return "", ierrors.NewError().InnerError(err).Message(err.Error()).Build()
 	}
 
-	memChanType, err := tree.GetTreeMemory().ChannelTypes().GetChannelType(context, memChan.Spec.Type)
-	if err != nil {
-		return "", ierrors.NewError().InvalidChannelType().Message(err.Error()).Build()
-	}
-
-	return string(memChanType.Schema), nil
+	return schema, nil
 }
 
 func decode(messageEncoded []byte, channel string) (interface{}, error) {
