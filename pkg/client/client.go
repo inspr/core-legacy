@@ -33,7 +33,7 @@ type requestReturn struct {
 
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
-	envAddr := environment.GetEnvironment().UnixSocketAddr
+	envAddr := "/inspr/" + environment.GetEnvironment().UnixSocketAddr + ".sock"
 	return &Client{
 		addr:  "http://unix",
 		httpc: transports.NewUnixSocketClient(envAddr),
