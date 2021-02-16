@@ -20,6 +20,7 @@ type Server struct {
 	sync.Mutex
 	Reader models.Reader
 	Writer models.Writer
+	addr   string
 }
 
 // NewServer returns a new sidecar server
@@ -31,6 +32,7 @@ func NewServer() *Server {
 func (s *Server) Init(r models.Reader, w models.Writer) {
 	// server requests related
 	s.Mux = http.NewServeMux()
+	s.addr = "/inspr/" + environment.GetEnvironment().UnixSocketAddr + ".sock"
 
 	// implementations of write and read for a specific sidecar
 	s.Reader = r
@@ -59,12 +61,11 @@ func (s *Server) Run(ctx context.Context) {
 		Handler:           s.Mux,
 	}
 
-	listenerAddr := "/inspr/" + environment.GetEnvironment().UnixSocketAddr + ".sock"
-	os.Remove(listenerAddr)
+	os.Remove(s.addr)
 
-	listener, err := net.Listen("unix", listenerAddr)
+	listener, err := net.Listen("unix", s.addr)
 	if err != nil {
-		log.Println("couldn't listen to address: " + listenerAddr)
+		log.Println("couldn't listen to address: " + s.addr)
 		return
 	}
 
@@ -86,7 +87,7 @@ func (s *Server) Run(ctx context.Context) {
 			log.Fatal("error shutting down server")
 		}
 
-		err = os.RemoveAll(listenerAddr)
+		err = os.RemoveAll(s.addr)
 		if err != nil {
 			log.Fatal(err)
 		}
