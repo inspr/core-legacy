@@ -70,6 +70,9 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 			return
 		}
 
+		cth.InitTransaction()
+		defer cth.Cancel()
+
 		channelType, err := cth.GetChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)

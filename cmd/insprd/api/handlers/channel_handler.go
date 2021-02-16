@@ -67,6 +67,9 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 			return
 		}
 
+		ch.InitTransaction()
+		defer ch.Cancel()
+
 		channel, err := ch.GetChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)

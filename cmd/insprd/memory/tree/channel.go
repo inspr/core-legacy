@@ -105,6 +105,9 @@ func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) er
 
 	parentApp, _ := GetTreeMemory().Apps().GetApp(context)
 
+	channelType := parentApp.Spec.ChannelTypes[channel.Spec.Type]
+	channelType.ConnectedChannels = utils.Remove(channelType.ConnectedChannels, channel.Meta.Name)
+
 	delete(parentApp.Spec.Channels, chName)
 
 	return nil
