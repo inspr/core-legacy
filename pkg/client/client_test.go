@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -65,7 +66,27 @@ func mockHandlerFuncTimeout() http.HandlerFunc {
 	})
 }
 
+// createMockEnvVars - sets up the env values to be used in the tests functions
+func createMockEnvVars() {
+	os.Setenv("INSPR_INPUT_CHANNELS", "inp1;inp2;inp3")
+	os.Setenv("INSPR_OUTPUT_CHANNELS", "inp1;inp2;inp3")
+	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
+	os.Setenv("INSPR_APP_CTX", "random.ctx")
+	os.Setenv("INSPR_ENV", "test")
+}
+
+// deleteMockEnvVars - deletes the env values used in the tests functions
+func deleteMockEnvVars() {
+	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
+	os.Unsetenv("INSPR_INPUT_CHANNELS")
+	os.Unsetenv("INSPR_UNIX_SOCKET")
+	os.Unsetenv("INSPR_APP_CTX")
+	os.Unsetenv("INSPR_ENV")
+}
+
 func TestNewAppClient(t *testing.T) {
+	createMockEnvVars()
+	defer deleteMockEnvVars()
 	tests := []struct {
 		name string
 		want *Client

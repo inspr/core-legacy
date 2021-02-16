@@ -7,6 +7,7 @@ import (
 )
 
 // createMockEnvVars - sets up the env values to be used in the tests functions
+// createMockEnvVars - sets up the env values to be used in the tests functions
 func createMockEnvVars() {
 	os.Setenv("INSPR_INPUT_CHANNELS", "inp1;inp2;inp3")
 	os.Setenv("INSPR_OUTPUT_CHANNELS", "out1;out2;out3")
@@ -108,6 +109,41 @@ func Test_getEnv(t *testing.T) {
 
 			if got := getEnv(tt.args.name); got != tt.want {
 				t.Errorf("getEnv() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRefreshEnviromentVariables(t *testing.T) {
+	createMockEnvVars()
+	os.Setenv("INSPR_INPUT_CHANNELS", "one")
+	os.Setenv("INSPR_OUTPUT_CHANNELS", "two")
+	os.Setenv("INSPR_UNIX_SOCKET", "three")
+	os.Setenv("INSPR_APP_CTX", "four")
+	os.Setenv("INSPR_ENV", "five")
+	defer deleteMockEnvVars()
+	tests := []struct {
+		name    string
+		refresh bool
+		want    *InsprEnvVars
+	}{
+		{
+			name:    "Changed and refreshed environment variables",
+			refresh: true,
+			want: &InsprEnvVars{
+				InputChannels:    "one",
+				OutputChannels:   "two",
+				UnixSocketAddr:   "three",
+				InsprAppContext:  "four",
+				InsprEnvironment: "five",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			if got := RefreshEnviromentVariables(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetEnvironment() = %v, want %v", got, tt.want)
 			}
 		})
 	}

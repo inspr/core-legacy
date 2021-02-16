@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"testing"
 
@@ -40,15 +41,15 @@ type testCaseStruct struct {
 
 // generateTestCases returns the tests cases values to be used in each
 // handle test, the reason for them to share tests cases is because of
-// the models.RequestBody that sets a standard struct to be sent in each
+// the models.BrokerData that sets a standard struct to be sent in each
 // request made in the handler func.
 func generateTestCases() []testCaseStruct {
 	// default values used in the test cases
-	parsedBody, _ := json.Marshal(models.RequestBody{
+	parsedBody, _ := json.Marshal(models.BrokerData{
 		Message: models.Message{Data: "data"},
 		Channel: "chan",
 	})
-	noChanBody, _ := json.Marshal(models.RequestBody{
+	noChanBody, _ := json.Marshal(models.BrokerData{
 		Message: models.Message{Data: "data"},
 		Channel: "donExist",
 	})
@@ -93,6 +94,26 @@ func generateTestCases() []testCaseStruct {
 			},
 		},
 	}
+}
+
+// createMockEnvVars - sets up the env values to be used in the tests functions
+func createMockEnvVars() {
+	customEnvValues := "chan;testing;banana"
+	var unixSocketAddr = "/tmp/insprd.sock"
+	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
+	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
+	os.Setenv("INSPR_UNIX_SOCKET", unixSocketAddr)
+	os.Setenv("INSPR_APP_CTX", "random.ctx")
+	os.Setenv("INSPR_ENV", "test")
+}
+
+// deleteMockEnvVars - deletes the env values used in the tests functions
+func deleteMockEnvVars() {
+	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
+	os.Unsetenv("INSPR_INPUT_CHANNELS")
+	os.Unsetenv("INSPR_UNIX_SOCKET")
+	os.Unsetenv("INSPR_APP_CTX")
+	os.Unsetenv("INSPR_ENV")
 }
 
 func Test_newCustomHandlers(t *testing.T) {
@@ -183,7 +204,7 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 			} else { //reading message
 
 				// reads response and checks for the default mock values
-				msg := models.BrokerResponse{}
+				msg := models.BrokerData{}
 				err := json.NewDecoder(res.Body).Decode(&msg)
 
 				// if it failed to parse body
@@ -193,9 +214,9 @@ func Test_customHandlers_readMessageHandler(t *testing.T) {
 				}
 
 				// if channel isn't 'chan'
-				expectedData, _ := MockServer(nil).Reader.ReadMessage("")
-				if msg.Data != expectedData.Data {
-					t.Errorf("readMessageHandler.Body error, field 'data' = %v, want %v", msg.Data, expectedData)
+				expectedData, _ := MockServer(nil).Reader.ReadMessage()
+				if msg.Message.Data != expectedData.Message.Data {
+					t.Errorf("readMessageHandler.Body error, field 'data' = %v, want %v", msg.Message.Data, expectedData)
 				}
 			}
 		})
