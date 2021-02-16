@@ -46,3 +46,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
+kafkaBootstrap: default.kafka.svc:9092
+kafkaAutoOffsetReset: earliest
