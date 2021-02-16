@@ -8,6 +8,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func main() {
@@ -27,9 +28,33 @@ func main() {
 	createChannelTypeInsideHelloWorld(&client, false)
 	fmt.Printf("\n\n")
 
+	fmt.Println("[Getting ChannelTypeHello...]")
+	cType, err := client.ChannelTypes().Get(context.Background(), "HelloWorld", "ChannelTypeHello")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	utils.PrintChannelTypeBeatiful(cType)
+
 	fmt.Println("[Creating ChannelOne inside HelloWorld app...]")
 	createChannelInsideHelloWorld(&client, false)
 	fmt.Printf("\n\n")
+
+	fmt.Println("[Getting ChannelOne...]")
+	ch, err := client.Channels().Get(context.Background(), "HelloWorld", "ChannelOne")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	utils.PrintChannelBeatiful(ch)
+
+	fmt.Println("[Getting ChannelTypeHello...]")
+	cType, err = client.ChannelTypes().Get(context.Background(), "HelloWorld", "ChannelTypeHello")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	utils.PrintChannelTypeBeatiful(cType)
 
 	fmt.Println("[Creating NewApp inside HelloWorld app...]")
 	createNewAppInsideHelloWorld(&client, false)
@@ -66,16 +91,25 @@ func main() {
 	createNewAppInsideHelloWorld(&client, true)
 	fmt.Printf("\n\n")
 
-	fmt.Println("[Creating NewApp inside HelloWorld app NOT USING DRY RUN...]")
-	createNewAppInsideHelloWorld(&client, false)
-	fmt.Printf("\n\n")
-
+	fmt.Println("[Getting App HelloWorld...]")
 	resp, err := client.Apps().Get(context.Background(), "HelloWorld")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(resp.Spec.Apps)
+	utils.PrintAppBeautiful(resp)
+
+	fmt.Println("[Creating NewApp inside HelloWorld app NOT USING DRY RUN...]")
+	createNewAppInsideHelloWorld(&client, false)
+	fmt.Printf("\n\n")
+
+	fmt.Println("[Getting App HelloWorld...]")
+	resp, err = client.Apps().Get(context.Background(), "HelloWorld")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	utils.PrintAppBeautiful(resp)
 
 }
 
