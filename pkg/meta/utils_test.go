@@ -1,6 +1,12 @@
 package meta
 
-import "testing"
+import (
+	"testing"
+
+	test "gitlab.inspr.dev/inspr/core/pkg/testutils"
+	"gotest.tools/v3/assert/cmp"
+	kubeCore "k8s.io/api/core/v1"
+)
 
 func TestStructureNameIsValid(t *testing.T) {
 	type args struct {
@@ -123,6 +129,52 @@ func TestStructureNameIsValid(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("StructureNameIsValid() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			}
+		})
+	}
+}
+func Test_parseToK8sArrEnv(t *testing.T) {
+	type args struct {
+		arrappEnv EnvironmentMap
+	}
+	tests := []struct {
+		name string
+		args args
+		want []kubeCore.EnvVar
+	}{
+		{
+			name: "successful_test",
+			args: args{
+				arrappEnv: map[string]string{
+					"key_1": "value_1",
+					"key_2": "value_2",
+					"key_3": "value_3",
+				},
+			},
+			want: []kubeCore.EnvVar{
+				{
+					Name:  "key_1",
+					Value: "value_1",
+				},
+				{
+					Name:  "key_2",
+					Value: "value_2",
+				},
+				{
+					Name:  "key_3",
+					Value: "value_3",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.args.arrappEnv.ParseToK8sArrEnv()
+
+			var comp cmp.Comparison = cmp.DeepEqual(got, tt.want, test.GetMapCompareOptions())
+			if !comp().Success() {
+				t.Errorf("parseToK8sArrEnv() = %v, want %v", got, tt.want)
 			}
 		})
 	}
