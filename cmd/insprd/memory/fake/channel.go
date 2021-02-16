@@ -9,6 +9,7 @@ import (
 
 // Channels - mocks the implementation of the ChannelMemory interface methods
 type Channels struct {
+	*MemManager
 	fail     error
 	channels map[string]*meta.Channel
 }

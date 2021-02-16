@@ -46,7 +46,7 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 		}
 		diff, err := ch.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)
@@ -105,7 +105,7 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 		}
 		diff, err := ch.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)
@@ -137,7 +137,7 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 		}
 		diff, err := ch.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)
