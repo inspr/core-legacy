@@ -19,7 +19,7 @@ func getCodec(schema string) (*goavro.Codec, error) {
 }
 
 // returns the channel's channel type schema
-func getSchema(channel, context string) (string, error) {
+func getSchema(channel string) (string, error) {
 	schema, err := environment.GetEnvironment().GetSchema(channel)
 	if err != nil {
 		return "", ierrors.NewError().InnerError(err).Message(err.Error()).Build()
@@ -29,7 +29,7 @@ func getSchema(channel, context string) (string, error) {
 }
 
 func decode(messageEncoded []byte, channel string) (interface{}, error) {
-	schema, errGetSchema := getSchema(channel, environment.GetEnvironment().InsprAppContext)
+	schema, errGetSchema := getSchema(channel)
 	if errGetSchema != nil {
 		return nil, errGetSchema
 	}
@@ -48,7 +48,7 @@ func decode(messageEncoded []byte, channel string) (interface{}, error) {
 }
 
 func encode(message interface{}, channel string) ([]byte, error) {
-	schema, errGetSchema := getSchema(channel, environment.GetEnvironment().InsprAppContext)
+	schema, errGetSchema := getSchema(channel)
 	if errGetSchema != nil {
 		return nil, errGetSchema
 	}
