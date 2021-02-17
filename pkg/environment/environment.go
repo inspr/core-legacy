@@ -1,6 +1,10 @@
 package environment
 
-import "os"
+import (
+	"os"
+
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+)
 
 // InsprEnvVars represents the current inspr environment
 type InsprEnvVars struct {
@@ -51,4 +55,16 @@ func RefreshEnviromentVariables() *InsprEnvVars {
 		InsprAppID:       getEnv("INSPR_APP_ID"),
 	}
 	return env
+}
+
+// RecoverEnvironmentErrors recovers environment errors when instantiating the environment. It sends any recovered
+// errors to the channel in the parameter of the function.
+//
+// The channel that is passed through to the parameter must have at least one buffer spot, so that the error can be easily consumed.
+func RecoverEnvironmentErrors(errch chan<- error) {
+	err := recover()
+	if err != nil {
+		errch <- ierrors.NewError().Message(err.(string)).Build()
+	}
+	errch <- nil
 }
