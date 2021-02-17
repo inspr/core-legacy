@@ -6,7 +6,7 @@ import (
 
 // ChannelMockManager mocks a channel interface for testing
 type ChannelMockManager struct {
-	root *meta.App
+	*MockManager
 }
 
 // GetChannel mocks a channel method for testing

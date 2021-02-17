@@ -2,12 +2,16 @@
 // in memory management of the cluster.
 package memory
 
-import "gitlab.inspr.dev/inspr/core/pkg/meta"
+import (
+	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
+)
 
 // ChannelMemory is the interface that allows to obtain
 // or change information related to the stored state of
 // the Channels in the cluster
 type ChannelMemory interface {
+	TransactionInterface
 	GetChannel(context string, chName string) (*meta.Channel, error)
 	CreateChannel(context string, ch *meta.Channel) error
 	DeleteChannel(context string, chName string) error
@@ -18,6 +22,7 @@ type ChannelMemory interface {
 // change information related to the current state of
 // the DApps in the cluster
 type AppMemory interface {
+	TransactionInterface
 	GetApp(query string) (*meta.App, error)
 	CreateApp(app *meta.App, context string) error
 	DeleteApp(query string) error
@@ -28,6 +33,7 @@ type AppMemory interface {
 // obtain or change information related to the current
 // state of the ChannelTypes in the cluster
 type ChannelTypeMemory interface {
+	TransactionInterface
 	GetChannelType(context string, ctName string) (*meta.ChannelType, error)
 	CreateChannelType(ct *meta.ChannelType, context string) error
 	DeleteChannelType(context string, ctName string) error
@@ -38,7 +44,16 @@ type ChannelTypeMemory interface {
 // of the current state of the cluster. Permiting the
 // modification of Channels, DApps and ChannelTypes
 type Manager interface {
-	Channels() ChannelMemory
+	TransactionInterface
 	Apps() AppMemory
+	Channels() ChannelMemory
 	ChannelTypes() ChannelTypeMemory
+}
+
+// TransactionInterface makes transactions on a Memory manager
+type TransactionInterface interface {
+	Commit()
+	GetTransactionChanges() (diff.Changelog, error)
+	InitTransaction()
+	Cancel()
 }
