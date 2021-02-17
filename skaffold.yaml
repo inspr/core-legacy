@@ -8,10 +8,15 @@ build:
     context: .
     docker:
       dockerfile: cmd/insprd/Dockerfile
+  - image: gcr.io/red-inspr/inspr/sidecar/kafka
+    context: .
+    docker:
+      dockerfile: cmd/sidecars/kafka/sidecar.Dockerfile
 deploy:
   helm:
     releases:
     - name: insprd
       artifactOverrides:
         insprdRepository: gcr.io/red-inspr/insprd
+        kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
       chartPath: build/helm

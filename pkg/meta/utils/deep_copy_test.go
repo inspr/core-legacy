@@ -61,7 +61,7 @@ func getMockedTree() *meta.App {
 						Parent:      "",
 						SHA256:      "",
 					},
-					Schema: []byte{},
+					Schema: "",
 				},
 			},
 			Boundary: meta.AppBoundary{
