@@ -36,12 +36,23 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 			return
 		}
 
+		cth.InitTransaction()
+		if !data.DryRun {
+			defer cth.Commit()
+		} else {
+			defer cth.Cancel()
+		}
 		err = cth.CreateChannelType(&data.ChannelType, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := cth.GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }
@@ -58,6 +69,9 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
+
+		cth.InitTransaction()
+		defer cth.Cancel()
 
 		channelType, err := cth.GetChannelType(data.Ctx, data.CtName)
 		if err != nil {
@@ -82,12 +96,23 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			return
 		}
 
+		cth.InitTransaction()
+		if !data.DryRun {
+			defer cth.Commit()
+		} else {
+			defer cth.Cancel()
+		}
 		err = cth.UpdateChannelType(&data.ChannelType, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := cth.GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }
@@ -105,12 +130,23 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 			return
 		}
 
+		cth.InitTransaction()
+		if !data.DryRun {
+			defer cth.Commit()
+		} else {
+			defer cth.Cancel()
+		}
 		err = cth.DeleteChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := cth.GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }

@@ -1,4 +1,4 @@
-package operator
+package nodes
 
 import (
 	"os"
@@ -10,6 +10,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	test "gitlab.inspr.dev/inspr/core/pkg/testutils"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -114,7 +115,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 											MountPath: "/inspr",
 										},
 									},
-									Env: append(meta.EnvironmentMap(testApp.Spec.Node.Spec.Environment).ParseToK8sArrEnv(),
+									Env: append(utils.EnvironmentMap(testApp.Spec.Node.Spec.Environment).ParseToK8sArrEnv(),
 										kubeCore.EnvVar{
 											Name: "UUID",
 											ValueFrom: &kubeCore.EnvVarSource{
@@ -133,7 +134,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 											MountPath: "/inspr",
 										},
 									},
-									Env: append(meta.EnvironmentMap(testEnv).ParseToK8sArrEnv(), kubeCore.EnvVar{
+									Env: append(utils.EnvironmentMap(testEnv).ParseToK8sArrEnv(), kubeCore.EnvVar{
 										Name: "UUID",
 										ValueFrom: &kubeCore.EnvVarSource{
 											FieldRef: &kubeCore.ObjectFieldSelector{
@@ -152,7 +153,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := InsprDAppToK8sDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
+			if got := dAppToDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
 				t.Errorf("InsprDAppToK8sDeployment() = \n%v, \nwant \n%v", got, tt.want)
 			}
 		})

@@ -7,6 +7,7 @@ import (
 // Apps - mocks the implementation of the AppMemory interface methods
 type Apps struct {
 	fail error
+	*MemManager
 }
 
 // GetApp - simple mock
