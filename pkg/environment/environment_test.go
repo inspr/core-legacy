@@ -6,34 +6,10 @@ import (
 	"testing"
 )
 
-// func SetMockEnv() {
-// 	channelsValues := "chan;chan1;chan2;chan3;"
-// 	os.Setenv("INSPR_INPUT_CHANNELS", channelsValues)
-// 	os.Setenv("INSPR_OUTPUT_CHANNELS", channelsValues)
-// 	os.Setenv("INSPR_UNIX_SOCKET", "socket_addr")
-// 	os.Setenv("INSPR_SIDECAR_IMAGE", "mock_sidecar_image")
-// 	os.Setenv("INSPR_APP_CTX", "mock.dapp.context")
-// 	os.Setenv("INSPR_ENV", "mock_env")
-// 	os.Setenv("INSPR_APP_ID", "testappid1")
-// 	os.Setenv("INSPR_SIDECAR_IMAGE", "random-sidecar-image")
-// }
-
-// // UnsetMockEnv - removes the values of the environment variables
-// func UnsetMockEnv() {
-// 	os.Unsetenv("INSPR_INPUT_CHANNELS")
-// 	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
-// 	os.Unsetenv("INSPR_UNIX_SOCKET")
-// 	os.Unsetenv("INSPR_SIDECAR_IMAGE")
-// 	os.Unsetenv("INSPR_APP_CTX")
-// 	os.Unsetenv("INSPR_ENV")
-// 	os.Unsetenv("INSPR_APP_ID")
-// 	os.Unsetenv("INSPR_SIDECAR_IMAGE")
-// }
-
 func mockInsprEnvironment() *InsprEnvVars {
 	return &InsprEnvVars{
-		InputChannels:    "chan;chan1;chan2;chan3;",
-		OutputChannels:   "chan;chan1;chan2;chan3;",
+		InputChannels:    "chan;chan1;chan2;chan3",
+		OutputChannels:   "chan;chan1;chan2;chan3",
 		UnixSocketAddr:   "socket_addr",
 		SidecarImage:     "mock_sidecar_image",
 		InsprAppContext:  "mock.dapp.context",
@@ -80,14 +56,14 @@ func Test_getEnv(t *testing.T) {
 			args: args{
 				name: "INSPR_INPUT_CHANNELS",
 			},
-			want: "chan;chan1;chan2;chan3;",
+			want: "chan;chan1;chan2;chan3",
 		},
 		{
 			name: "Get output channel enviroment variable",
 			args: args{
 				name: "INSPR_OUTPUT_CHANNELS",
 			},
-			want: "chan;chan1;chan2;chan3;",
+			want: "chan;chan1;chan2;chan3",
 		},
 		{
 			name: "Get unix socket enviroment variable",

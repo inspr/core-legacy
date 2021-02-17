@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// NewUnixSocketClient returna um client que conecta via unix socket
+// NewUnixSocketClient returns a client that conects via unix socket
 func NewUnixSocketClient(addr string) http.Client {
 	return http.Client{
 		Transport: &http.Transport{
