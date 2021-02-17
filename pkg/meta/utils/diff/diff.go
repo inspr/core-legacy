@@ -6,7 +6,7 @@ import (
 	"text/tabwriter"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
 /*

@@ -7,8 +7,8 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func main() {

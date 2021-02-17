@@ -5,8 +5,8 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
-	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 // AppClient is a client for getting and setting app information on Insprd
