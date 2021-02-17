@@ -8,13 +8,14 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func baseEnvironment(app *meta.App) meta.EnvironmentMap {
+func baseEnvironment(app *meta.App) utils.EnvironmentMap {
 	input := app.Spec.Boundary.Input
 	output := app.Spec.Boundary.Output
 	channels := input.Union(output)
@@ -26,7 +27,7 @@ func baseEnvironment(app *meta.App) meta.EnvironmentMap {
 
 	inputEnv := input.Join(";")
 	outputEnv := output.Join(";")
-	env := meta.EnvironmentMap{
+	env := utils.EnvironmentMap{
 		"INSPR_INPUT_CHANNELS":    inputEnv,
 		"INSPR_OUTPUT_CHANNELS":   outputEnv,
 		"INSPR_SIDECAR_IMAGE":     insprEnv.SidecarImage,
@@ -154,17 +155,17 @@ func parseToNodeEnviroment(envs []kubeCore.EnvVar) map[string]string {
 // toDeployment - receives the context of an app and it's context
 // creates a unique deployment name to be used in the k8s deploy
 func toDeploymentName(envPath string, app *meta.App) string {
-	var arr meta.StringArray
+	var arr utils.StringArray
 	if envPath != "" {
 
-		arr = meta.StringArray{
+		arr = utils.StringArray{
 			"inspr",
 			envPath,
 			app.Meta.Parent,
 			app.Meta.Name,
 		}
 	} else {
-		arr = meta.StringArray{
+		arr = utils.StringArray{
 			"inspr",
 			app.Meta.Parent,
 			app.Meta.Name,

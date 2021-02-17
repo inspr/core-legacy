@@ -7,6 +7,7 @@ import (
 // ChannelTypes - mocks the implementation of the ChannelTypeMemory interface methods
 type ChannelTypes struct {
 	fail error
+	*MemManager
 }
 
 // GetChannelType - simple mock

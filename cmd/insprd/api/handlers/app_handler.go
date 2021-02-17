@@ -34,13 +34,23 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
+		ah.InitTransaction()
+		if !data.DryRun {
+			defer ah.Commit()
+		} else {
+			defer ah.Cancel()
+		}
 		err = ah.CreateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := ah.GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }
@@ -57,7 +67,11 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		app, err := ah.GetApp(data.Query)
+
+		ah.InitTransaction()
+		defer ah.Cancel()
+
+		app, err := ah.GetApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -79,13 +93,22 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
+		ah.InitTransaction()
+		if !data.DryRun {
+			defer ah.Commit()
+		} else {
+			defer ah.Cancel()
+		}
 		err = ah.UpdateApp(&data.App, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
-		} else {
-			w.WriteHeader(http.StatusOK)
 		}
+		diff, err := ah.GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }
@@ -102,13 +125,23 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
-		err = ah.DeleteApp(data.Query)
+		ah.InitTransaction()
+		if !data.DryRun {
+			defer ah.Commit()
+		} else {
+			defer ah.Cancel()
+		}
+		err = ah.DeleteApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		diff, err := ah.GetTransactionChanges()
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
 }

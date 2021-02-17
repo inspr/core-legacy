@@ -24,7 +24,9 @@ func TestMemoryManager_ChannelTypes(t *testing.T) {
 				root: getMockChannelTypes(),
 			},
 			want: &ChannelTypeMemoryManager{
-				root: getMockChannelTypes(),
+				&MemoryManager{
+					root: getMockChannelTypes(),
+				},
 			},
 		},
 	}
@@ -95,7 +97,7 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 			},
 			args: args{
 				context: "",
-				ctName:  "ct3",
+				ctName:  "ct4",
 			},
 			wantErr: true,
 			want:    nil,
@@ -120,7 +122,9 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -170,7 +174,7 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 			args: args{
 				ct: &meta.ChannelType{
 					Meta: meta.Metadata{
-						Name:        "ct3",
+						Name:        "ct4",
 						Reference:   "ct1",
 						Annotations: map[string]string{},
 						Parent:      "",
@@ -183,7 +187,7 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 			wantErr: false,
 			want: &meta.ChannelType{
 				Meta: meta.Metadata{
-					Name:        "ct3",
+					Name:        "ct4",
 					Reference:   "ct1",
 					Annotations: map[string]string{},
 					Parent:      "",
@@ -281,7 +285,9 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -348,7 +354,7 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 				mockCT: false,
 			},
 			args: args{
-				ctName:  "ct3",
+				ctName:  "ct4",
 				context: "",
 			},
 			wantErr: true,
@@ -370,11 +376,39 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 			wantErr: true,
 			want:    nil,
 		},
+		{
+			name: "It should not delete the channelType because it's been used by a channel",
+			fields: fields{
+				root:   getMockChannelTypes(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				context: "",
+				ctName:  "ct3",
+			},
+			wantErr: true,
+			want: &meta.ChannelType{
+				Meta: meta.Metadata{
+					Name:        "ct3",
+					Reference:   "ct3",
+					Annotations: map[string]string{},
+					Parent:      "",
+					SHA256:      "",
+				},
+				ConnectedChannels: []string{"channel1"},
+				Schema:            "",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -500,7 +534,9 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				root:   tt.fields.root,
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
@@ -536,7 +572,17 @@ func getMockChannelTypes() *meta.App {
 				"app1": {},
 				"app2": {},
 			},
-			Channels: map[string]*meta.Channel{},
+			Channels: map[string]*meta.Channel{
+				"channel1": {
+					Meta: meta.Metadata{
+						Name:   "channel1",
+						Parent: "",
+					},
+					Spec: meta.ChannelSpec{
+						Type: "ct3",
+					},
+				},
+			},
 			ChannelTypes: map[string]*meta.ChannelType{
 				"ct1": {
 					Meta: meta.Metadata{
@@ -557,6 +603,17 @@ func getMockChannelTypes() *meta.App {
 						SHA256:      "",
 					},
 					Schema: "",
+				},
+				"ct3": {
+					Meta: meta.Metadata{
+						Name:        "ct3",
+						Reference:   "ct3",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					ConnectedChannels: []string{"channel1"},
+					Schema:            "",
 				},
 			},
 			Boundary: meta.AppBoundary{
