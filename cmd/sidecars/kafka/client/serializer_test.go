@@ -42,7 +42,6 @@ func Test_getCodec(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			getMockApp()
 			got, err := getCodec(tt.args.schema)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getCodec() error = %v, wantErr %v", err, tt.wantErr)
@@ -90,7 +89,6 @@ func Test_getSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			getMockApp()
 			got, err := getSchema(tt.args.channel, tt.args.context)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getSchema() error = %v, wantErr %v", err, tt.wantErr)
@@ -148,7 +146,6 @@ func Test_decode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			getMockApp()
 			got, err := decode(tt.args.messageEncoded, tt.args.channel)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("decode() error = %v, wantErr %v", err, tt.wantErr)
@@ -206,7 +203,6 @@ func Test_encode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			getMockApp()
 			got, err := encode(tt.args.message, tt.args.channel)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("encode() error = %v, wantErr %v", err, tt.wantErr)

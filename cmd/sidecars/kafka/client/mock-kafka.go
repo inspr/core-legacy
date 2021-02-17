@@ -4,8 +4,6 @@ import (
 	"os"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
 //MockConsumer mock
@@ -67,8 +65,8 @@ func (mc *MockConsumer) Close() (err error) {
 // createMockEnvVars - sets up the env values to be used in the tests functions
 // createMockEnvVars - sets up the env values to be used in the tests functions
 func createMockEnv() {
-	os.Setenv("INSPR_INPUT_CHANNELS", "ch1;ch2;")
-	os.Setenv("INSPR_OUTPUT_CHANNELS", "ch1;ch2;")
+	os.Setenv("INSPR_INPUT_CHANNELS", "ch1;ch2")
+	os.Setenv("INSPR_OUTPUT_CHANNELS", "ch1;ch2")
 	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
 	os.Setenv("INSPR_APP_CTX", "")
 	os.Setenv("INSPR_ENV", "random")
@@ -108,58 +106,4 @@ func mockMessageSender(writer *kafka.Producer, topic *string) {
 		TopicPartition: kafka.TopicPartition{},
 		Value:          []byte("msgTest"),
 	}
-}
-
-// getMockApp returns a mocked dApp
-func getMockApp() tree.MemoryManager {
-	ctype := &meta.ChannelType{
-		Meta: meta.Metadata{
-			Name:        "ct1",
-			Reference:   "root.ct1",
-			Annotations: map[string]string{},
-			Parent:      "root",
-			SHA256:      "",
-		},
-		Schema: string([]byte{123, 34, 116, 121, 112, 101, 34, 58, 34, 115, 116, 114, 105, 110, 103, 34, 125}),
-	}
-	ctype1 := &meta.ChannelType{
-		Meta: meta.Metadata{
-			Name:        "ct2",
-			Reference:   "root.ct2",
-			Annotations: map[string]string{},
-			Parent:      "root",
-			SHA256:      "",
-		},
-		Schema: string([]byte{104, 101, 108, 108, 111, 116, 101, 115, 116}),
-	}
-	chann := &meta.Channel{
-		Meta: meta.Metadata{
-			Name:        "ch1",
-			Reference:   "root.ch1",
-			Annotations: map[string]string{},
-			Parent:      "root",
-			SHA256:      "",
-		},
-		Spec: meta.ChannelSpec{
-			Type: "ct1",
-		},
-	}
-	chann1 := &meta.Channel{
-		Meta: meta.Metadata{
-			Name:        "ch2",
-			Reference:   "root.ch2",
-			Annotations: map[string]string{},
-			Parent:      "root",
-			SHA256:      "",
-		},
-		Spec: meta.ChannelSpec{
-			Type: "ct2",
-		},
-	}
-	tree.GetTreeMemory()
-	tree.GetTreeMemory().ChannelTypes().CreateChannelType(ctype, "")
-	tree.GetTreeMemory().ChannelTypes().CreateChannelType(ctype1, "")
-	tree.GetTreeMemory().Channels().CreateChannel("", chann)
-	tree.GetTreeMemory().Channels().CreateChannel("", chann1)
-	return tree.MemoryManager{}
 }

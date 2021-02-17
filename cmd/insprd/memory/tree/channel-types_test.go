@@ -399,7 +399,7 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 					SHA256:      "",
 				},
 				ConnectedChannels: []string{"channel1"},
-				Schema:            []byte{},
+				Schema:            "",
 			},
 		},
 	}
@@ -613,7 +613,7 @@ func getMockChannelTypes() *meta.App {
 						SHA256:      "",
 					},
 					ConnectedChannels: []string{"channel1"},
-					Schema:            []byte{},
+					Schema:            "",
 				},
 			},
 			Boundary: meta.AppBoundary{

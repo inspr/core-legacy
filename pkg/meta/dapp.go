@@ -1,5 +1,7 @@
 package meta
 
+import "gitlab.inspr.dev/inspr/core/pkg/utils"
+
 // Node represents an inspr component that is a node.
 type Node struct {
 	Meta Metadata `yaml:"meta"  json:"meta"`
@@ -8,9 +10,9 @@ type Node struct {
 
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.
 type NodeSpec struct {
-	Image       string         `yaml:"image"  json:"image" diff:"image"`
-	Replicas    int            `yaml:"replicas" json:"replicas" diff:"replicas"`
-	Environment EnvironmentMap `yaml:"envioronment" json:"envioronment" diff:"envioronment"`
+	Image       string               `yaml:"image"  json:"image" diff:"image"`
+	Replicas    int                  `yaml:"replicas" json:"replicas" diff:"replicas"`
+	Environment utils.EnvironmentMap `yaml:"envioronment" json:"envioronment" diff:"envioronment"`
 }
 
 // App is an inspr component that represents an App. An App can contain other apps, channels and other components.
@@ -22,8 +24,8 @@ type App struct {
 // AppBoundary represents the connections this app can make to other apps. These are the fields that can be overriten
 // by the ChannelAliases when instantiating the app.
 type AppBoundary struct {
-	Input  StringArray `yaml:"input" json:"input"`
-	Output StringArray `yaml:"output" json:"output"`
+	Input  utils.StringArray `yaml:"input" json:"input"`
+	Output utils.StringArray `yaml:"output" json:"output"`
 }
 
 // AppSpec represents the configuration of an App.

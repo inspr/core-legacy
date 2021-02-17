@@ -4,6 +4,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -49,7 +50,7 @@ CreateChannel receives a context that defines a path to the App
 in which to add a pointer to the channel passed as an argument
 */
 func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel) error {
-	nameErr := utils.StructureNameIsValid(ch.Meta.Name)
+	nameErr := metautils.StructureNameIsValid(ch.Meta.Name)
 	if nameErr != nil {
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}

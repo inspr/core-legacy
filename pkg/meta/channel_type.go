@@ -4,6 +4,6 @@ package meta
 // type will be defined via the workspace and instantiated as a string on the cluster
 type ChannelType struct {
 	Meta              Metadata `yaml:"meta" json:"meta"`
-	Schema            []byte   `yaml:"schema" json:"schema"`
+	Schema            string   `yaml:"schema" json:"schema"`
 	ConnectedChannels []string `yaml:"connectedchannels"  json:"connectedchannels"`
 }

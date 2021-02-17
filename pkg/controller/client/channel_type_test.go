@@ -11,8 +11,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
-	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 )
 
 func TestChannelTypeClient_Delete(t *testing.T) {
@@ -119,7 +119,7 @@ func TestChannelTypeClient_Get(t *testing.T) {
 					Name:      "app2",
 					Reference: "app1",
 				},
-				Schema: []byte("schemma"),
+				Schema: "schemma",
 			},
 		},
 		{
@@ -204,7 +204,7 @@ func TestChannelTypeClient_Create(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "app3",
 					},
-					Schema: []byte("schema"),
+					Schema: "schema",
 				},
 			},
 			wantErr: false,
@@ -287,7 +287,7 @@ func TestChannelTypeClient_Update(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "app3",
 					},
-					Schema: []byte("schema"),
+					Schema: "schema",
 				},
 			},
 			wantErr: false,
