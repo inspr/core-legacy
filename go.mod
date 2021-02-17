@@ -14,6 +14,7 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/linkedin/goavro.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gotest.tools/v3 v3.0.3
 	k8s.io/api v0.20.2
 	k8s.io/apimachinery v0.20.2
 )
