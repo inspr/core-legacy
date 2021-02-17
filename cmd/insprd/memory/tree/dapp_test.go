@@ -266,7 +266,7 @@ func getMockApp() *meta.App {
 						Parent:      "root",
 						SHA256:      "",
 					},
-					Schema: []byte{},
+					Schema: "",
 				},
 				"ct2": {
 					Meta: meta.Metadata{
@@ -276,7 +276,7 @@ func getMockApp() *meta.App {
 						Parent:      "root",
 						SHA256:      "",
 					},
-					Schema: []byte{},
+					Schema: "",
 				},
 			},
 			Boundary: meta.AppBoundary{

@@ -35,6 +35,13 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: "KAFKA_SIDECAR_IMAGE"
+              value: {{ .Values.kafkaSidecarImage}}
+            - name: "KAFKA_BOOTSTRAP_SERVERS"
+              value: {{ .Values.kafkaBootstrap}}
+            - name: "KAFKA_AUTO_OFFSET_RESET"
+              value: {{ .Values.kafkaAutoOffsetReset}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

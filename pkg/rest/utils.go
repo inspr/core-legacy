@@ -2,7 +2,9 @@ package rest
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -17,13 +19,17 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 
 // ERROR reports the error back to the user withing a JSON format
 func ERROR(w http.ResponseWriter, statusCode int, err error) {
-	if err != nil {
-		JSON(w, statusCode, struct {
-			Error string `json:"error"`
-		}{
-			Error: err.Error(),
-		})
-	} else {
-		JSON(w, statusCode, err)
-	}
+	JSON(w, statusCode, err)
+}
+
+// UnmarshalERROR generates a golang erro with the
+// response body created by the ERROR function
+func UnmarshalERROR(r io.Reader) error {
+	errBody := struct {
+		Error string `json:"error"`
+	}{}
+	decoder := json.NewDecoder(r)
+	decoder.Decode(&errBody)
+	return errors.New(errBody.Error)
+
 }
