@@ -701,7 +701,7 @@ func getMockChannels() *meta.App {
 					Meta: meta.Metadata{
 						Name: "channelType1",
 					},
-					Schema: sha256.New().Sum([]byte("hello")),
+					Schema: string(sha256.New().Sum([]byte("hello"))),
 				},
 			},
 			Boundary: meta.AppBoundary{
