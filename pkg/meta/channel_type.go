@@ -1,8 +1,8 @@
 package meta
 
 // ChannelType is the type of the channel. It can be a reference to an outsourced type or can be a local type. This local
-// type will be defined via the workspace and instantiated as a []byte on the cluster
+// type will be defined via the workspace and instantiated as a string on the cluster
 type ChannelType struct {
 	Meta   Metadata `yaml:"meta" json:"meta" diff:"ctypemeta"`
-	Schema []byte   `yaml:"schema" json:"schema,omitempty"  json:"schema" diff:"schema"`
+	Schema string   `yaml:"schema" json:"schema,omitempty"  json:"schema" diff:"schema"`
 }

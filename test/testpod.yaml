@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sidecar-testpod
+spec:
+  volumes: 
+    - name: inspr-volume
+      emptyDir:
+        medium: Memory
+  containers:
+    - name: sidecar-kafka
+      image: gcr.io/red-inspr/inspr/sidecar/kafka:b16856d-dirty
+      imagePullPolicy: Always
+      volumeMounts:
+      - name: inspr-volume
+        mountPath: /inspr
+      env:
+        - name: INSPR_UNIX_SOCKET
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: INSPR_INPUT_CHANNELS
+          value: "ch1;"
+        - name: INSPR_OUTPUT_CHANNELS
+          value: "ch1;"
+        - name: INSPR_APP_CTX
+          value: ""
+        - name: INSPR_ENV
+          value: "test"
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka.default.svc:9092"
+        - name: KAFKA_AUTO_OFFSET_RESET
+          value: "earliest"
+        - name: ch1_SCHEMA
+          value: '{"type":"string"}'
+        - name: INSPR_SIDECAR_IMAGE
+          value: ""
+        - name: INSPR_APP_ID
+          value: "abcdef"
+    - name: app
+      image: gcr.io/red-inspr/inspr/sidecar/test:latest
+      imagePullPolicy: Always
+      volumeMounts:
+      - name: inspr-volume
+        mountPath: /inspr
+      env:
+      - name: INSPR_UNIX_SOCKET
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.name
+      - name: INSPR_INPUT_CHANNELS
+        value: "ch1;"
+      - name: INSPR_OUTPUT_CHANNELS
+        value: "ch1;"
+      - name: INSPR_APP_CTX
+        value: ""
+      - name: INSPR_ENV
+        value: "test"
+      - name: KAFKA_BOOTSTRAP_SERVERS
+        value: "default.kafka.svc:9092"
+      - name: KAFKA_AUTO_OFFSET_RESET
+        value: "earliest"
+      - name: ch1_SCHEMA
+        value: '{"type":"string"}'
+      - name: INSPR_SIDECAR_IMAGE
+        value: ""
+      - name: INSPR_APP_ID
+        value: "abcdef"
