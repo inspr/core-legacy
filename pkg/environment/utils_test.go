@@ -1,6 +1,7 @@
 package environment
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
@@ -134,6 +135,17 @@ func TestInsprEnvVars_GetInputChannelList(t *testing.T) {
 			},
 			want: []string{"ch1", "ch2", "ch3", "ch4"},
 		},
+		{
+			name: "Returns empty string slice",
+			fields: fields{
+				InputChannels:    "",
+				OutputChannels:   "",
+				UnixSocketAddr:   "",
+				InsprAppContext:  "",
+				InsprEnvironment: "",
+			},
+			want: []string{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -175,6 +187,17 @@ func TestInsprEnvVars_GetOutputChannelList(t *testing.T) {
 			},
 			want: []string{"ch1", "ch2", "ch3", "ch4"},
 		},
+		{
+			name: "Returns empty string slice",
+			fields: fields{
+				InputChannels:    "",
+				OutputChannels:   "",
+				UnixSocketAddr:   "",
+				InsprAppContext:  "",
+				InsprEnvironment: "",
+			},
+			want: []string{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -187,6 +210,69 @@ func TestInsprEnvVars_GetOutputChannelList(t *testing.T) {
 			}
 			if got := insprEnv.GetOutputChannelList(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("InsprEnvVars.GetOutputChannelList() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInsprEnvVars_GetSchema(t *testing.T) {
+	os.Setenv("ch1_SCHEMA", "this_is_a_schema")
+	type fields struct {
+		InputChannels    string
+		OutputChannels   string
+		UnixSocketAddr   string
+		InsprAppContext  string
+		InsprEnvironment string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		channel string
+		wantErr bool
+		want    string
+	}{
+		{
+			name: "Get valid env var with schema",
+			fields: fields{
+				InputChannels:    "",
+				OutputChannels:   "ch1;ch2;ch3;ch4",
+				UnixSocketAddr:   "",
+				InsprAppContext:  "",
+				InsprEnvironment: "",
+			},
+			channel: "ch1",
+			wantErr: false,
+			want:    "this_is_a_schema",
+		},
+		{
+			name: "Get invalid env var with schema",
+			fields: fields{
+				InputChannels:    "",
+				OutputChannels:   "ch1;ch2;ch3;ch4",
+				UnixSocketAddr:   "",
+				InsprAppContext:  "",
+				InsprEnvironment: "",
+			},
+			channel: "ch5",
+			wantErr: true,
+			want:    "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			insprEnv := &InsprEnvVars{
+				InputChannels:    tt.fields.InputChannels,
+				OutputChannels:   tt.fields.OutputChannels,
+				UnixSocketAddr:   tt.fields.UnixSocketAddr,
+				InsprAppContext:  tt.fields.InsprAppContext,
+				InsprEnvironment: tt.fields.InsprEnvironment,
+			}
+			got, err := insprEnv.GetSchema(tt.channel)
+			if tt.wantErr && err == nil {
+				t.Errorf("InsprEnvVars.GetSchema() = %v, want %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("InsprEnvVars.GetSchema() = %v, want %v", got, tt.want)
 			}
 		})
 	}
