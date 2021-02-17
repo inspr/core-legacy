@@ -10,10 +10,11 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/linkedin/goavro v2.1.0+incompatible
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
-	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/linkedin/goavro.v1 v1.0.5 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.16.8
 	k8s.io/apimachinery v0.16.8

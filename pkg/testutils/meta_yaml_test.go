@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	"gopkg.in/yaml.v2"
 )
 
