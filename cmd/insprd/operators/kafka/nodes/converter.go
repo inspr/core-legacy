@@ -168,12 +168,12 @@ func intToint32(v int) *int32 {
 	return &t
 }
 
-func toNode(kdep *kubeApp.Deployment) (*meta.Node, error) {
+func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 	var err error
-	node := &meta.Node{}
+	node := meta.Node{}
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
 	if err != nil {
-		return &meta.Node{}, err
+		return meta.Node{}, err
 	}
 	node.Spec.Replicas = int(*kdep.Spec.Replicas)
 	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image

@@ -21,15 +21,15 @@ type NodeOperator struct {
 	clientSet kubernetes.Interface
 }
 
-func (nop *NodeOperator) retrieveKube() v1.DeploymentInterface {
+func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
 	appsNamespace := getK8SVariables().AppsNamespace
-	return nop.clientSet.AppsV1().Deployments(appsNamespace)
+	return no.clientSet.AppsV1().Deployments(appsNamespace)
 }
 
 // GetNode returns the node with the given name, if it exists.
 // Otherwise, returns an error
-func (nop *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
-	kube := nop.retrieveKube()
+func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+	kube := no.retrieveKube()
 	insprEnv := environment.GetEnvironment().InsprEnvironment
 	nodeName := parseNodeName(insprEnv, app.Meta.Parent, app.Spec.Node.Meta.Name)
 	dep, err := kube.Get(nodeName, metav1.GetOptions{})
@@ -40,19 +40,19 @@ func (nop *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node
 	if err != nil {
 		return &meta.Node{}, err
 	}
-	return node, nil
+	return &node, nil
 }
 
 // Nodes is a NodeOperatorInterface that provides methods for node manipulation
-func (nop *NodeOperator) Nodes() operators.NodeOperatorInterface {
+func (no *NodeOperator) Nodes() operators.NodeOperatorInterface {
 	return &NodeOperator{}
 }
 
 // CreateNode deploys a new node structure, if it's information is valid.
 // Otherwise, returns an error
-func (nop *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	var deploy *kubeApp.Deployment
-	kube := nop.retrieveKube()
+	kube := no.retrieveKube()
 	deploy = dAppToDeployment(app)
 	dep, err := kube.Create(deploy)
 	if err != nil {
@@ -62,14 +62,14 @@ func (nop *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.N
 	if err != nil {
 		return &meta.Node{}, err
 	}
-	return node, nil
+	return &node, nil
 }
 
 // UpdateNode updates a node that already exists, if the new structure is valid.
 // Otherwise, returns an error.
-func (nop *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	var deploy *kubeApp.Deployment
-	kube := nop.retrieveKube()
+	kube := no.retrieveKube()
 	deploy = dAppToDeployment(app)
 	dep, err := kube.Update(deploy)
 	if err != nil {
@@ -79,23 +79,26 @@ func (nop *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.N
 	if err != nil {
 		return &meta.Node{}, err
 	}
-	return node, nil
+	return &node, nil
 }
 
 // DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
-func (nop *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
+func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
 	var deploy string
-	kube := nop.retrieveKube()
+	kube := no.retrieveKube()
 	deploy = parseNodeName(getK8SVariables().AppsNamespace, nodeContext, nodeName)
 	err := kube.Delete(deploy, &metav1.DeleteOptions{})
 
-	return ierrors.NewError().Message("could't delete deployment from kubernetes").InnerError(err).Build()
+	if err != nil {
+		return ierrors.NewError().Message("could't delete deployment from kubernetes").InnerError(err).Build()
+	}
+	return nil
 }
 
 // GetAllNodes returns a list of all the active nodes in the deployment, if there are any
-func (nop *NodeOperator) GetAllNodes() []*meta.Node {
-	var nodes []*meta.Node
-	kube := nop.retrieveKube()
+func (no *NodeOperator) GetAllNodes() []meta.Node {
+	var nodes []meta.Node
+	kube := no.retrieveKube()
 	list, _ := kube.List(metav1.ListOptions{})
 	for _, item := range list.Items {
 		node, _ := toNode(&item)
