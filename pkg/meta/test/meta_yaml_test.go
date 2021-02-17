@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
 	"gopkg.in/yaml.v2"
 )
 
-func main() {
+func TestYAMLTagsInMeta(t *testing.T) {
 	appTest := &meta.App{
 		Meta: meta.Metadata{
 			Name: "App1",
@@ -126,14 +127,8 @@ func main() {
 
 	yaml.Unmarshal(data, &app)
 
-	utils.PrintAppTree(&app)
+	if changelog, _ := diff.Diff(appTest, &app); len(changelog) != 0 {
+		t.Errorf("TestServer_Init() = %v, want %v", app, appTest)
+	}
 
-	app2 := app.Spec.Apps["app2"]
-	utils.PrintAppTree(app2)
-
-	channel2 := app2.Spec.Channels["channel2"]
-	utils.PrintChannelTree(channel2)
-
-	ct1 := app2.Spec.ChannelTypes["ct1"]
-	utils.PrintChannelTypeTree(ct1)
 }
