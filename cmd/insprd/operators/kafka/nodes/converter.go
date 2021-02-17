@@ -1,7 +1,6 @@
 package nodes
 
 import (
-	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
@@ -23,7 +22,7 @@ func baseEnvironment(app *meta.App) meta.EnvironmentMap {
 	// pod env variables
 	insprEnv := environment.GetEnvironment()
 	// label name to be used in the service
-	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app.Meta.Parent, app.Spec.Node.Meta.Name)
+	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app)
 
 	inputEnv := input.Join(";")
 	outputEnv := output.Join(";")
@@ -83,7 +82,7 @@ func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	})
 
-	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app.Meta.Parent, app.Meta.Name)
+	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app)
 	sidecarContainer := kubeCore.Container{
 		Name:  appDeployName + "-sidecar",
 		Image: insprEnv.SidecarImage,
@@ -154,12 +153,24 @@ func parseToNodeEnviroment(envs []kubeCore.EnvVar) map[string]string {
 
 // toDeployment - receives the context of an app and it's context
 // creates a unique deployment name to be used in the k8s deploy
-func toDeploymentName(insprEnv string, context string, name string) string {
-	s := fmt.Sprintf("%s.%s.%s", insprEnv, context, name)
-	if s[0] == '.' {
-		s = s[1:]
+func toDeploymentName(envPath string, app *meta.App) string {
+	var arr meta.StringArray
+	if envPath != "" {
+
+		arr = meta.StringArray{
+			"inspr",
+			envPath,
+			app.Meta.Parent,
+			app.Meta.Name,
+		}
+	} else {
+		arr = meta.StringArray{
+			"inspr",
+			app.Meta.Parent,
+			app.Meta.Name,
+		}
 	}
-	return strings.ToLower(s)
+	return arr.Join("-")
 }
 
 // intToint32 - converts an integer to a *int32

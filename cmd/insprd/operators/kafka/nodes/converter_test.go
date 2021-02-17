@@ -56,10 +56,10 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 		"INSPR_APPS_TLS":        "true",
 
 		"INSPR_OUTPUT_CHANNELS": outputChannels,
-		"INSPR_app_ID":          environment.GetEnvironment().InsprAppContext + "." + testApp.Meta.Name,
+		"INSPR_APP_ID":          environment.GetEnvironment().InsprAppContext + "." + testApp.Meta.Name,
 	}
 
-	appDeployName := toDeploymentName(environment.GetEnvironment().InsprAppContext, testApp.Meta.Parent, testApp.Meta.Name)
+	appDeployName := toDeploymentName(environment.GetEnvironment().InsprEnvironment, &testApp)
 
 	type args struct {
 		app *meta.App
@@ -163,7 +163,8 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 func Test_toDeploymentName(t *testing.T) {
 	testApp := meta.App{
 		Meta: meta.Metadata{
-			Name: "Mock-app",
+			Name:   "app1",
+			Parent: "parent",
 		},
 	}
 	type args struct {
@@ -178,23 +179,23 @@ func Test_toDeploymentName(t *testing.T) {
 		{
 			name: "successful_need_replacement",
 			args: args{
-				filePath: "root.app1.app2",
+				filePath: "test",
 				app:      &testApp,
 			},
-			want: "root.app1.app2.mock-app",
+			want: "inspr-test-parent-app1",
 		},
 		{
 			name: "removing_first_character_when_dot",
 			args: args{
-				filePath: ".root.app1.app2",
+				filePath: "",
 				app:      &testApp,
 			},
-			want: "root.app1.app2.mock-app",
+			want: "inspr-parent-app1",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := toDeploymentName(tt.args.filePath, tt.args.app.Meta.Parent, tt.args.app.Meta.Name); got != tt.want {
+			if got := toDeploymentName(tt.args.filePath, tt.args.app); got != tt.want {
 				t.Errorf("toDeploymentName() = %v, want %v", got, tt.want)
 			}
 		})
