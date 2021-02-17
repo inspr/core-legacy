@@ -14,10 +14,22 @@ func NewHiddenCmd() *cobra.Command {
 		WithDescription("hidden subcommand").
 		Hidden().
 		WithCommonFlags().
-		NoArgs(doHidden)
+		WithFlags([]*Flag{
+			{
+				Name:          "randomNewTag",
+				Usage:         "blablabla",
+				Shorthand:     "n",
+				Value:         &InsprOptions.sampleFlagValue,
+				DefValue:      "",
+				FlagAddMethod: "",
+				DefinedOn:     []string{"hidden"},
+			},
+		}).
+		ExactArgs(2, doHidden)
+
 }
 
-func doHidden(_ context.Context, out io.Writer) error {
+func doHidden(_ context.Context, out io.Writer, strs []string) error {
 	fmt.Fprint(out, "hidden hello\n")
 	return nil
 }

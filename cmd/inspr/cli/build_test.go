@@ -78,7 +78,7 @@ func Test_builder_WithLongDescription(t *testing.T) {
 		want Builder
 	}{
 		{
-			name: "cobra_cmd_description",
+			name: "cobra_cmd_long_description",
 			b:    &builder{cmd: cobra.Command{}},
 			args: args{long: "mock_long_description"},
 			want: &builder{cmd: cobra.Command{
@@ -107,14 +107,14 @@ func Test_builder_WithExample(t *testing.T) {
 		want Builder
 	}{
 		{
-			name: "cobra_cmd_description",
+			name: "cobra_example",
 			b:    &builder{cmd: cobra.Command{}},
 			args: args{
 				comment: "mock_comment",
 				command: "mock_command",
 			},
 			want: &builder{cmd: cobra.Command{
-				Example: fmt.Sprintf("  # %s\n  inspr %s\n", "mock_comment", "mock_command"),
+				Example: "\n" + fmt.Sprintf("  # %s\n  inspr %s\n", "mock_comment", "mock_command"),
 			}},
 		},
 	}
@@ -156,7 +156,7 @@ func Test_builder_WithFlagAdder(t *testing.T) {
 		want Builder
 	}{
 		{
-			name: "cobra_cmd_description",
+			name: "cobra_flagAdder",
 			b:    &builder{cmd: cobra.Command{}},
 			args: args{
 				adder: func(fl *pflag.FlagSet) {
@@ -205,7 +205,7 @@ func Test_builder_Hidden(t *testing.T) {
 		want Builder
 	}{
 		{
-			name: "cobra_cmd_description",
+			name: "cobra_hidden",
 			b:    &builder{cmd: cobra.Command{}},
 			want: &builder{cmd: cobra.Command{
 				Hidden: true,
