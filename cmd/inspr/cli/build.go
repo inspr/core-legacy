@@ -102,8 +102,7 @@ func handleWellKnownErrors(err error) error {
 	if err == nil {
 		return err
 	}
-	// TODO error handler of the cli in the ierrors pkg
-	// maybe do a cli errors in the ierrors package
+
 	return iErrors.NewError().
 		Message("error with the cli").
 		Build()

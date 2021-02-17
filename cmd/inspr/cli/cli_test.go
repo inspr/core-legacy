@@ -14,9 +14,7 @@ func TestNewInsprCommand(t *testing.T) {
 		want    *cobra.Command
 		wantOut string
 		wantErr string
-	}{
-		// TODO: Add test cases.
-	}
+	}{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			out := &bytes.Buffer{}
