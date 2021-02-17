@@ -1,9 +1,6 @@
 package operator
 
 import (
-	"fmt"
-	"strings"
-
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
@@ -135,11 +132,23 @@ func InsprDAppToK8sDeployment(app *meta.App) *kubeApp.Deployment {
 // toDeployment - receives the context of an app and it's context
 // creates a unique deployment name to be used in the k8s deploy
 func toDeploymentName(envPath string, app *meta.App) string {
-	s := envPath + "." + fmt.Sprintf("%v", app.Meta.Name)
-	if s[0] == '.' {
-		s = s[1:]
+	var arr meta.StringArray
+	if envPath != "" {
+
+		arr = meta.StringArray{
+			"inspr",
+			envPath,
+			app.Meta.Parent,
+			app.Meta.Name,
+		}
+	} else {
+		arr = meta.StringArray{
+			"inspr",
+			app.Meta.Parent,
+			app.Meta.Name,
+		}
 	}
-	return strings.ToLower(s)
+	return arr.Join("-")
 }
 
 // intToint32 - converts an integer to a *int32
