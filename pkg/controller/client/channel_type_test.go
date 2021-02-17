@@ -11,6 +11,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
@@ -76,14 +77,14 @@ func TestChannelTypeClient_Delete(t *testing.T) {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.CtName, tt.args.name)
 				}
 
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelTypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name); (err != nil) != tt.wantErr {
+			if _, err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelTypeClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -118,7 +119,7 @@ func TestChannelTypeClient_Get(t *testing.T) {
 					Name:      "app2",
 					Reference: "app1",
 				},
-				Schema: []byte("schemma"),
+				Schema: "schemma",
 			},
 		},
 		{
@@ -203,7 +204,7 @@ func TestChannelTypeClient_Create(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "app3",
 					},
-					Schema: []byte("schema"),
+					Schema: "schema",
 				},
 			},
 			wantErr: false,
@@ -251,14 +252,14 @@ func TestChannelTypeClient_Create(t *testing.T) {
 				if !reflect.DeepEqual(di.ChannelType, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.ChannelType, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelTypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelTypeClient.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -286,7 +287,7 @@ func TestChannelTypeClient_Update(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "app3",
 					},
-					Schema: []byte("schema"),
+					Schema: "schema",
 				},
 			},
 			wantErr: false,
@@ -334,14 +335,14 @@ func TestChannelTypeClient_Update(t *testing.T) {
 				if !reflect.DeepEqual(di.ChannelType, *tt.args.ch) {
 					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.ChannelType, tt.args.ch)
 				}
-				encoder.Encode("OK")
+				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelTypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
-			if err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelTypeClient.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

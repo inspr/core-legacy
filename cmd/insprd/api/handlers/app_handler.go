@@ -67,6 +67,10 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
+
+		ah.InitTransaction()
+		defer ah.Cancel()
+
 		app, err := ah.GetApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)

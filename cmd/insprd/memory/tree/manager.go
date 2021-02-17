@@ -5,8 +5,8 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/utils/diff"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 )
 
 // MemoryManager defines a memory manager interface

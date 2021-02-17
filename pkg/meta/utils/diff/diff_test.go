@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
 func TestDiff(t *testing.T) {
@@ -542,13 +542,13 @@ func TestChange_diffChannelTypes(t *testing.T) {
 				chtOrig: utils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta:   meta.Metadata{},
-						Schema: []byte{},
+						Schema: "",
 					},
 				},
 				chtCurr: utils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta:   meta.Metadata{},
-						Schema: []byte{},
+						Schema: "",
 					},
 				},
 			},
@@ -568,7 +568,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 							Parent:      "root",
 							SHA256:      "",
 						},
-						Schema: []byte{0, 1, 0, 1, 0, 0, 1, 1, 1, 0},
+						Schema: string([]byte{0, 1, 0, 1, 0, 0, 1, 1, 1, 0}),
 					},
 				},
 				chtCurr: utils.MTypes{
@@ -580,7 +580,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 							Parent:      "root",
 							SHA256:      "",
 						},
-						Schema: []byte{0, 1, 0, 1, 0, 1, 1, 1, 1, 1},
+						Schema: string([]byte{0, 1, 0, 1, 0, 1, 1, 1, 1, 1}),
 					},
 				},
 			},
@@ -912,7 +912,7 @@ func getMockRootApp() *meta.App {
 						Parent:      "root",
 						SHA256:      "",
 					},
-					Schema: []byte{},
+					Schema: "",
 				},
 				"ct2": {
 					Meta: meta.Metadata{
@@ -922,7 +922,7 @@ func getMockRootApp() *meta.App {
 						Parent:      "root",
 						SHA256:      "",
 					},
-					Schema: []byte{},
+					Schema: "",
 				},
 			},
 			Boundary: meta.AppBoundary{
@@ -1035,7 +1035,7 @@ func getMockRootApp2() *meta.App {
 						Parent:      "root",
 						SHA256:      "",
 					},
-					Schema: []byte{},
+					Schema: "",
 				},
 			},
 			Boundary: meta.AppBoundary{

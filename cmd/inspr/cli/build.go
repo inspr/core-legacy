@@ -51,7 +51,7 @@ func (b *builder) WithExample(comment, command string) Builder {
 	if b.cmd.Example != "" {
 		b.cmd.Example += "\n"
 	}
-	b.cmd.Example += fmt.Sprintf("  # %s\n  inspr %s\n", comment, command)
+	b.cmd.Example += fmt.Sprintf("  # %s\n inspr %s\n", comment, command)
 	return b
 }
 
@@ -73,7 +73,6 @@ func (b *builder) WithFlags(flags []*Flag) Builder {
 	b.cmd.PreRun = func(cmd *cobra.Command, args []string) {
 		ParseFlags(cmd, flags)
 	}
-
 	return b
 }
 
@@ -104,5 +103,8 @@ func handleWellKnownErrors(err error) error {
 		return err
 	}
 	// TODO error handler of the cli in the ierrors pkg
-	return iErrors.NewError().Message("error with the cli").Build()
+	// maybe do a cli errors in the ierrors package
+	return iErrors.NewError().
+		Message("error with the cli").
+		Build()
 }

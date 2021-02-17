@@ -5,6 +5,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -21,7 +22,7 @@ func validAppStructure(app, parentApp *meta.App) string {
 	errDescription := ""
 	var validSubstructure, parentWithoutNode bool
 
-	nameErr := utils.StructureNameIsValid(app.Meta.Name)
+	nameErr := metautils.StructureNameIsValid(app.Meta.Name)
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
 	validChannels, msg := checkAndUpdateChannels(app)
@@ -75,13 +76,13 @@ func checkAndUpdateChannels(app *meta.App) (bool, string) {
 	channels := app.Spec.Channels
 	chTypes := app.Spec.ChannelTypes
 	for ctName := range chTypes {
-		nameErr := utils.StructureNameIsValid(ctName)
+		nameErr := metautils.StructureNameIsValid(ctName)
 		if nameErr != nil {
 			return false, "invalid channelType name: " + ctName
 		}
 	}
 	for channelName, channel := range channels {
-		nameErr := utils.StructureNameIsValid(channelName)
+		nameErr := metautils.StructureNameIsValid(channelName)
 		if nameErr != nil {
 			return false, "invalid channel name: " + channelName
 		}
