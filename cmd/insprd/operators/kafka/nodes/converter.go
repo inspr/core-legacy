@@ -1,9 +1,12 @@
-package operator
+package nodes
 
 import (
+	"strings"
+
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 
@@ -20,7 +23,7 @@ func baseEnvironment(app *meta.App) utils.EnvironmentMap {
 	// pod env variables
 	insprEnv := environment.GetEnvironment()
 	// label name to be used in the service
-	appDeployName := toDeploymentName(insprEnv.InsprAppContext, app)
+	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app)
 
 	inputEnv := input.Join(";")
 	outputEnv := output.Join(";")
@@ -43,8 +46,8 @@ func baseEnvironment(app *meta.App) utils.EnvironmentMap {
 	return env
 }
 
-// InsprDAppToK8sDeployment translates the DApp
-func InsprDAppToK8sDeployment(app *meta.App) *kubeApp.Deployment {
+// dAppToDeployment translates the DApp
+func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	insprEnv := environment.GetEnvironment()
 
 	sidecarEnvironment := baseEnvironment(app)
@@ -156,4 +159,25 @@ func toDeploymentName(envPath string, app *meta.App) string {
 func intToint32(v int) *int32 {
 	t := int32(v)
 	return &t
+}
+
+func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
+	var err error
+	node := meta.Node{}
+	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
+	if err != nil {
+		return meta.Node{}, err
+	}
+	node.Spec.Replicas = int(*kdep.Spec.Replicas)
+	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
+	node.Spec.Environment = utils.ParseFromK8sEnviroment(kdep.Spec.Template.Spec.Containers[0].Env)
+	return node, nil
+}
+
+func toNodeName(deployName string) (string, error) {
+	strs := strings.Split(deployName, ".")
+	if len(strs) < 3 {
+		return "", ierrors.NewError().Message("invalid deployment name").Build()
+	}
+	return strs[2], nil
 }
