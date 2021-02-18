@@ -29,7 +29,7 @@ CreateChannelType creates, if it doesn't already exist, a new ChannellType for a
 ct: ChannetType to be created.
 context: Path to reference app (x.y.z...)
 */
-func (ctm *ChannelTypeMemoryManager) CreateChannelType(ct *meta.ChannelType, context string) error {
+func (ctm *ChannelTypeMemoryManager) CreateChannelType(context string, ct *meta.ChannelType) error {
 	nameErr := utils.StructureNameIsValid(ct.Meta.Name)
 	if nameErr != nil {
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
@@ -117,7 +117,7 @@ UpdateChannelType updates, if it exists, a ChannellType of a given app.
 ct: Updated ChannetType to be updated on app
 context: Path to reference app (x.y.z...)
 */
-func (ctm *ChannelTypeMemoryManager) UpdateChannelType(ct *meta.ChannelType, context string) error {
+func (ctm *ChannelTypeMemoryManager) UpdateChannelType(context string, ct *meta.ChannelType) error {
 
 	oldChType, err := ctm.GetChannelType(context, ct.Meta.Name)
 	if err != nil {

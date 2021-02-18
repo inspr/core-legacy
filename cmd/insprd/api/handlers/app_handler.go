@@ -31,7 +31,7 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 		ah.InitTransaction()
@@ -40,14 +40,14 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 		} else {
 			defer ah.Cancel()
 		}
-		err = ah.CreateApp(&data.App, data.Ctx)
+		err = ah.CreateApp(data.Ctx, &data.App)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		diff, err := ah.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)
@@ -64,7 +64,7 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -73,7 +73,7 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 
 		app, err := ah.GetApp(data.Ctx)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, app)
@@ -90,7 +90,7 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 		ah.InitTransaction()
@@ -99,13 +99,13 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 		} else {
 			defer ah.Cancel()
 		}
-		err = ah.UpdateApp(&data.App, data.Ctx)
+		err = ah.UpdateApp(data.Ctx, &data.App)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 		}
 		diff, err := ah.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)
@@ -122,7 +122,7 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 		ah.InitTransaction()
@@ -133,12 +133,12 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 		}
 		err = ah.DeleteApp(data.Ctx)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		diff, err := ah.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)
