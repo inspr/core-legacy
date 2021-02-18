@@ -17,7 +17,7 @@ func (mock *MockAppManager) GetApp(query string) (*meta.App, error) {
 }
 
 // CreateApp Mock
-func (mock *MockAppManager) CreateApp(app *meta.App, context string) error {
+func (mock *MockAppManager) CreateApp(context string, app *meta.App) error {
 	return nil
 }
 
@@ -27,6 +27,6 @@ func (mock *MockAppManager) DeleteApp(query string) error {
 }
 
 // UpdateApp Mock
-func (mock *MockAppManager) UpdateApp(app *meta.App, query string) error {
+func (mock *MockAppManager) UpdateApp(query string, app *meta.App) error {
 	return nil
 }

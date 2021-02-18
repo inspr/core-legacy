@@ -7,8 +7,8 @@ package meta
 // The full reference for this component will be {it's parent's reference}.Name
 type Metadata struct {
 	Name        string            `yaml:"name" json:"name"`
-	Reference   string            `yaml:"reference" json:"reference"`
-	Annotations map[string]string `yaml:"annotations" json:"annotations"`
-	Parent      string            `yaml:"parent" json:"parent"`
-	SHA256      string
+	Reference   string            `yaml:"reference,omitempty" json:"reference"`
+	Annotations map[string]string `yaml:"annotations,omitempty" json:"annotations"`
+	Parent      string            `yaml:"parent,omitempty" json:"parent"`
+	SHA256      string            `yaml:"sha256,omitempty"`
 }

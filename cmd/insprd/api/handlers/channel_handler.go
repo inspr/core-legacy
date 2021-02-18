@@ -30,7 +30,7 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 		ch.InitTransaction()
@@ -41,12 +41,12 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 		}
 		err = ch.CreateChannel(data.Ctx, &data.Channel)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		diff, err := ch.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)
@@ -63,7 +63,7 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -72,7 +72,7 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 
 		channel, err := ch.GetChannel(data.Ctx, data.ChName)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, channel)
@@ -89,7 +89,7 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 		ch.InitTransaction()
@@ -100,12 +100,12 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 		}
 		err = ch.UpdateChannel(data.Ctx, &data.Channel)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		diff, err := ch.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)
@@ -118,11 +118,10 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
-		decoder := json.NewDecoder(r.Body)
 
-		err := decoder.Decode(&data)
+		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 		ch.InitTransaction()
@@ -133,12 +132,12 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 		}
 		err = ch.DeleteChannel(data.Ctx, data.ChName)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		diff, err := ch.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)

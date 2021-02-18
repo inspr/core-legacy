@@ -1159,7 +1159,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			am := GetTreeMemory().Apps()
-			err := am.CreateApp(tt.args.app, tt.args.context)
+			err := am.CreateApp(tt.args.context, tt.args.app)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -1780,7 +1780,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			am := GetTreeMemory().Apps()
-			err := am.UpdateApp(tt.args.app, tt.args.query)
+			err := am.UpdateApp(tt.args.query, tt.args.app)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
