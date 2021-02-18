@@ -133,25 +133,6 @@ func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	}
 }
 
-func parseToK8sArrEnv(arrappEnv map[string]string) []kubeCore.EnvVar {
-	var arrEnv []kubeCore.EnvVar
-	for key, val := range arrappEnv {
-		arrEnv = append(arrEnv, kubeCore.EnvVar{
-			Name:  key,
-			Value: val,
-		})
-	}
-	return arrEnv
-}
-
-func parseToNodeEnviroment(envs []kubeCore.EnvVar) map[string]string {
-	nodeEnv := make(map[string]string)
-	for _, env := range envs {
-		nodeEnv[env.Name] = env.Value
-	}
-	return nodeEnv
-}
-
 // toDeployment - receives the context of an app and it's context
 // creates a unique deployment name to be used in the k8s deploy
 func toDeploymentName(envPath string, app *meta.App) string {
@@ -189,7 +170,7 @@ func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 	}
 	node.Spec.Replicas = int(*kdep.Spec.Replicas)
 	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
-	node.Spec.Environment = parseToNodeEnviroment(kdep.Spec.Template.Spec.Containers[0].Env)
+	node.Spec.Environment = utils.ParseFromK8sEnviroment(kdep.Spec.Template.Spec.Containers[0].Env)
 	return node, nil
 }
 
