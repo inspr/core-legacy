@@ -107,6 +107,7 @@ func (m EnvironmentMap) ParseToK8sArrEnv() []kubeCore.EnvVar {
 	return arrEnv
 }
 
+//ParseFromK8sEnviroment is the oposing function to ParseToK8sArrEnv.
 func ParseFromK8sEnviroment(envs []kubeCore.EnvVar) EnvironmentMap {
 	nodeEnv := make(map[string]string)
 	for _, env := range envs {
