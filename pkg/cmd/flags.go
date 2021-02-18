@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// Flag defines a Skaffold CLI flag which contains a list of
+// Flag defines a INSPR CLI flag which contains a list of
 // subcommands the flag belongs to in `DefinedOn` field.
 type Flag struct {
 	Name               string
@@ -42,7 +42,7 @@ var flagRegistry = []Flag{
 		DefinedOn:     []string{"all"},
 	},
 	{
-		Name:          "especificTag",
+		Name:          "specificTag",
 		Usage:         "tag used only by hidden subcommand",
 		Value:         &InsprOptions.SampleFlagValue,
 		DefValue:      "",
