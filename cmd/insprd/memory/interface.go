@@ -24,9 +24,9 @@ type ChannelMemory interface {
 type AppMemory interface {
 	TransactionInterface
 	GetApp(query string) (*meta.App, error)
-	CreateApp(app *meta.App, context string) error
+	CreateApp(context string, app *meta.App) error
 	DeleteApp(query string) error
-	UpdateApp(app *meta.App, query string) error
+	UpdateApp(query string, app *meta.App) error
 }
 
 // ChannelTypeMemory is the interface that allows to
@@ -35,9 +35,9 @@ type AppMemory interface {
 type ChannelTypeMemory interface {
 	TransactionInterface
 	GetChannelType(context string, ctName string) (*meta.ChannelType, error)
-	CreateChannelType(ct *meta.ChannelType, context string) error
+	CreateChannelType(context string, ct *meta.ChannelType) error
 	DeleteChannelType(context string, ctName string) error
-	UpdateChannelType(ct *meta.ChannelType, context string) error
+	UpdateChannelType(context string, ct *meta.ChannelType) error
 }
 
 // Manager is the interface that allows the management

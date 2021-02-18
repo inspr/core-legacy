@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/mocks"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
 )
 
 // TestServer_initRoutes - this test is a bit different than the one automatically
@@ -17,7 +17,7 @@ import (
 func TestServer_initRoutes(t *testing.T) {
 	testServer := &Server{
 		Mux:           http.NewServeMux(),
-		MemoryManager: mocks.MockMemoryManager(nil),
+		MemoryManager: fake.MockMemoryManager(nil),
 	}
 	testServer.initRoutes()
 	defaultMethods := [...]string{
@@ -34,31 +34,41 @@ func TestServer_initRoutes(t *testing.T) {
 		{
 			name: "apps",
 			want: [...]int{
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channels",
 			want: [...]int{
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channeltypes",
 			want: [...]int{
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
-				http.StatusBadRequest,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
+			},
+		},
+		{
+			name: "wrong_route",
+			want: [...]int{
+				http.StatusNotFound,
+				http.StatusNotFound,
+				http.StatusNotFound,
+				http.StatusNotFound,
+				http.StatusNotFound,
 			},
 		},
 	}

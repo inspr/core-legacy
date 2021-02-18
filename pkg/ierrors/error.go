@@ -2,9 +2,9 @@ package ierrors
 
 // InsprError is an error that happened inside inspr
 type InsprError struct {
-	Message string
-	Err     error
-	Code    InsprErrorCode
+	Message string         `yaml:"message"  json:"message"`
+	Err     error          `yaml:"_" json:"_"`
+	Code    InsprErrorCode `yaml:"code"  json:"code"`
 }
 
 // ErrBuilder is an Inspr Error Creator

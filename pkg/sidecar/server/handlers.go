@@ -40,20 +40,20 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 	body := models.BrokerData{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
-		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
+		rest.ERROR(w, insprError.Build())
 		return
 	}
 
 	if !ch.insprVars.IsInOutputChannel(body.Channel) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
-		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
+		rest.ERROR(w, insprError.Build())
 		return
 	}
 
 	if err := ch.w.WriteMessage(body.Channel, body.Message.Data); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's writeMessage failed")
 		fmt.Println(err)
-		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
+		rest.ERROR(w, insprError.Build())
 	}
 }
 
@@ -66,20 +66,20 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
-		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
+		rest.ERROR(w, insprError.Build())
 		return
 	}
 
 	if !ch.insprVars.IsInInputChannel(body.Channel) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
-		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
+		rest.ERROR(w, insprError.Build())
 		return
 	}
 
 	brokerResp, err := ch.r.ReadMessage()
 	if err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's ReadMessage returned an error")
-		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
+		rest.ERROR(w, insprError.Build())
 		return
 	}
 
@@ -94,19 +94,19 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 	body := models.BrokerData{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
-		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
+		rest.ERROR(w, insprError.Build())
 		return
 	}
 
 	if !ch.insprVars.IsInOutputChannel(body.Channel) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
-		rest.ERROR(w, http.StatusBadRequest, insprError.Build())
+		rest.ERROR(w, insprError.Build())
 		return
 	}
 
 	if err := ch.r.CommitMessage(); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's commitMessage failed")
-		rest.ERROR(w, http.StatusInternalServerError, insprError.Build())
+		rest.ERROR(w, insprError.Build())
 	}
 
 }
