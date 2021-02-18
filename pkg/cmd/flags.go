@@ -1,4 +1,4 @@
-package cli
+package cmd
 
 import (
 	"fmt"
@@ -36,7 +36,7 @@ var flagRegistry = []Flag{
 		Name:          "sampleFlag",
 		Shorthand:     "s",
 		Usage:         "sample of usage of such flag",
-		Value:         &InsprOptions.sampleFlagValue,
+		Value:         &InsprOptions.SampleFlagValue,
 		DefValue:      "",
 		FlagAddMethod: "",
 		DefinedOn:     []string{"all"},
@@ -44,7 +44,7 @@ var flagRegistry = []Flag{
 	{
 		Name:          "especificTag",
 		Usage:         "tag used only by hidden subcommand",
-		Value:         &InsprOptions.sampleFlagValue,
+		Value:         &InsprOptions.SampleFlagValue,
 		DefValue:      "",
 		FlagAddMethod: "",
 		DefinedOn:     []string{"hidden"},
@@ -68,7 +68,8 @@ func methodNameByType(v reflect.Value) string {
 	return ""
 }
 
-func (fl *Flag) flag() *pflag.Flag {
+// Flag return a pflag.Flag from the insprCMD-flag
+func (fl *Flag) Flag() *pflag.Flag {
 	if fl.pflag != nil {
 		return fl.pflag
 	}
@@ -127,7 +128,7 @@ func AddFlags(cmd *cobra.Command) {
 			continue
 		}
 
-		cmd.Flags().AddFlag(fl.flag())
+		cmd.Flags().AddFlag(fl.Flag())
 
 		flagsForCommand = append(flagsForCommand, fl)
 	}

@@ -6,20 +6,21 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
+	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 )
 
 // NewHiddenCmd - hidden subcommand
 func NewHiddenCmd() *cobra.Command {
-	return NewCmd("hidden").
+	return cmd.NewCmd("hidden").
 		WithDescription("hidden subcommand").
 		Hidden().
 		WithCommonFlags().
-		WithFlags([]*Flag{
+		WithFlags([]*cmd.Flag{
 			{
 				Name:          "randomNewTag",
 				Usage:         "blablabla",
 				Shorthand:     "n",
-				Value:         &InsprOptions.sampleFlagValue,
+				Value:         &cmd.InsprOptions.SampleFlagValue,
 				DefValue:      "",
 				FlagAddMethod: "",
 				DefinedOn:     []string{"hidden"},

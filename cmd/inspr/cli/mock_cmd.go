@@ -6,11 +6,12 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
+	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 )
 
 // NewMockCmd - mock subcommand
 func NewMockCmd() *cobra.Command {
-	return NewCmd("mock").
+	return cmd.NewCmd("mock").
 		WithDescription("mocks the usage of a subcommand").
 		WithCommonFlags().
 		NoArgs(doMock)

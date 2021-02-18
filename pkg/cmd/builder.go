@@ -1,4 +1,4 @@
-package cli
+package cmd
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	icmd "gitlab.inspr.dev/inspr/core/pkg/cmd"
 	iErrors "gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
@@ -18,7 +17,7 @@ type Builder interface {
 	WithLongDescription(long string) Builder
 	WithExample(comment, command string) Builder
 	WithFlagAdder(adder func(*pflag.FlagSet)) Builder
-	WithFlags([]*icmd.Flag) Builder
+	WithFlags([]*Flag) Builder
 	WithCommonFlags() Builder
 	Hidden() Builder
 	ExactArgs(argCount int, action func(context.Context, io.Writer, []string) error) *cobra.Command
@@ -57,7 +56,7 @@ func (b *builder) WithExample(comment, command string) Builder {
 }
 
 func (b *builder) WithCommonFlags() Builder {
-	icmd.AddFlags(&b.cmd)
+	AddFlags(&b.cmd)
 	return b
 }
 
@@ -66,13 +65,13 @@ func (b *builder) WithFlagAdder(adder func(*pflag.FlagSet)) Builder {
 	return b
 }
 
-func (b *builder) WithFlags(flags []*icmd.Flag) Builder {
+func (b *builder) WithFlags(flags []*Flag) Builder {
 	for _, f := range flags {
 		fl := f.Flag()
 		b.cmd.Flags().AddFlag(fl)
 	}
 	b.cmd.PreRun = func(cmd *cobra.Command, args []string) {
-		icmd.ParseFlags(cmd, flags)
+		ParseFlags(cmd, flags)
 	}
 	return b
 }
