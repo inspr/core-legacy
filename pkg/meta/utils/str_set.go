@@ -109,10 +109,10 @@ func AppIntersecSet(apps1 MApps, apps2 MApps) StrSet {
 }
 
 //ChsMakeSet creates a StrSet from a Channels map.
-func ChsMakeSet(apps MChannels) StrSet {
+func ChsMakeSet(chans MChannels) StrSet {
 	set := make(StrSet)
 
-	for k := range apps {
+	for k := range chans {
 		set[k] = exists
 	}
 
@@ -120,22 +120,22 @@ func ChsMakeSet(apps MChannels) StrSet {
 }
 
 //ChsAppendSet extends a StrSet with a Channels map.
-func (set *StrSet) ChsAppendSet(apps MChannels) {
-	for k := range apps {
+func (set *StrSet) ChsAppendSet(chans MChannels) {
+	for k := range chans {
 		(*set)[k] = exists
 	}
 }
 
 //ChsDisjuncSet returns the disjunction set between two Channels maps.
-func ChsDisjuncSet(apps1 MChannels, apps2 MChannels) StrSet {
+func ChsDisjuncSet(chans1 MChannels, chans2 MChannels) StrSet {
 	set := make(StrSet)
 
-	setTemp := ChsMakeSet(apps1)
-	setTemp.ChsAppendSet(apps2)
+	setTemp := ChsMakeSet(chans1)
+	setTemp.ChsAppendSet(chans2)
 
 	for k := range setTemp {
-		_, first := apps1[k]
-		_, second := apps2[k]
+		_, first := chans1[k]
+		_, second := chans2[k]
 		if first != second {
 			set[k] = exists
 		}
@@ -145,15 +145,15 @@ func ChsDisjuncSet(apps1 MChannels, apps2 MChannels) StrSet {
 }
 
 //ChsIntersecSet returns the intersection set between two Channels maps.
-func ChsIntersecSet(apps1 MChannels, apps2 MChannels) StrSet {
+func ChsIntersecSet(chans1 MChannels, chans2 MChannels) StrSet {
 	set := make(StrSet)
 
-	setTemp := ChsMakeSet(apps1)
-	setTemp.ChsAppendSet(apps2)
+	setTemp := ChsMakeSet(chans1)
+	setTemp.ChsAppendSet(chans2)
 
 	for k := range setTemp {
-		_, first := apps1[k]
-		_, second := apps2[k]
+		_, first := chans1[k]
+		_, second := chans2[k]
 		if first && second {
 			set[k] = exists
 		}
@@ -235,15 +235,15 @@ func (set *StrSet) StrAppendSet(strings MStr) {
 }
 
 //StrDisjuncSet returns the disjunction set between two Str maps.
-func StrDisjuncSet(strings1 MStr, strigns2 MStr) StrSet {
+func StrDisjuncSet(strings1 MStr, strings2 MStr) StrSet {
 	set := make(StrSet)
 
 	setTemp := StrMakeSet(strings1)
-	setTemp.StrAppendSet(strigns2)
+	setTemp.StrAppendSet(strings2)
 
 	for k := range setTemp {
 		_, first := strings1[k]
-		_, second := strigns2[k]
+		_, second := strings2[k]
 		if first != second {
 			set[k] = exists
 		}
