@@ -12,6 +12,7 @@ import (
 // NewHiddenCmd - hidden subcommand
 func NewHiddenCmd() *cobra.Command {
 	return cmd.NewCmd("hidden").
+		WithExample("should have two arguments", "hidden X Y").
 		WithDescription("hidden subcommand").
 		Hidden().
 		WithCommonFlags().

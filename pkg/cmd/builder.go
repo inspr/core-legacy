@@ -7,8 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-
-	iErrors "gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
 // Builder is used to build cobra commands.
@@ -103,7 +102,7 @@ func handleWellKnownErrors(err error) error {
 		return err
 	}
 
-	return iErrors.NewError().
+	return ierrors.NewError().
 		Message("error with the cli").
 		Build()
 }
