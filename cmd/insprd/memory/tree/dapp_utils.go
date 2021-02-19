@@ -14,7 +14,7 @@ import (
 func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app *meta.App, parentApp *meta.App) string {
 	structureErrors := validAppStructure(app, parentApp)
 	for _, childApp := range app.Spec.Apps {
-		return amm.recursiveCheckAndRefineApp(childApp, app)
+		structureErrors += amm.recursiveCheckAndRefineApp(childApp, app)
 	}
 	return structureErrors
 }
@@ -23,9 +23,15 @@ func validAppStructure(app, parentApp *meta.App) string {
 	errDescription := ""
 	var validSubstructure, parentWithoutNode bool
 
+	parentStr := getParentString(app, parentApp)
+	app.Meta.Parent = parentStr
 	nameErr := metautils.StructureNameIsValid(app.Meta.Name)
+	appWithoutNode := nodeIsEmpty(app.Spec.Node)
+	if !appWithoutNode {
+		app.Spec.Node.Meta.Parent = parentStr
+	}
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
-	validSubstructure = nodeIsEmpty(app.Spec.Node) || (len(app.Spec.Apps) == 0)
+	validSubstructure = appWithoutNode || (len(app.Spec.Apps) == 0)
 	validChannels, msg := checkAndUpdateChannels(app)
 
 	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
@@ -63,13 +69,7 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 		app.Spec.Apps = map[string]*meta.App{}
 	}
 
-	parentStr := ""
-	if parentApp.Meta.Parent != "" {
-		parentStr = fmt.Sprintf("%s.", parentApp.Meta.Parent)
-	}
-	if parentApp.Meta.Name != "" {
-		parentStr = fmt.Sprintf("%s%s", parentStr, parentApp.Meta.Name)
-	}
+	parentStr := getParentString(app, parentApp)
 
 	app.Meta.Parent = parentStr
 	parentApp.Spec.Apps[app.Meta.Name] = app
@@ -165,4 +165,15 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 	parentApp, err := GetTreeMemory().Apps().GetApp(parentQuery)
 
 	return parentApp, err
+}
+
+func getParentString(app, parentApp *meta.App) string {
+	parentStr := ""
+	if parentApp.Meta.Parent != "" {
+		parentStr = fmt.Sprintf("%s.", parentApp.Meta.Parent)
+	}
+	if parentApp.Meta.Name != "" {
+		parentStr = fmt.Sprintf("%s%s", parentStr, parentApp.Meta.Name)
+	}
+	return parentStr
 }
