@@ -114,3 +114,8 @@ func parseNodeName(insprEnv string, context string, name string) string {
 	}
 	return strings.ToLower(s)
 }
+
+// NewOperator TODO
+func NewOperator() operators.NodeOperatorInterface {
+	return &NodeOperator{}
+}
