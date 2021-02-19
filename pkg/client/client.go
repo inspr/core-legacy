@@ -42,7 +42,7 @@ func NewAppClient() *Client {
 }
 
 // WriteMessage receives a channel and a message and sends it in a request to the sidecar server
-func (client *Client) WriteMessage(ctx context.Context, channel string, msg models.Message) error {
+func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Message) error {
 	data := clientMessage{
 		Channel: channel,
 		Message: msg,
@@ -50,31 +50,31 @@ func (client *Client) WriteMessage(ctx context.Context, channel string, msg mode
 
 	var resp interface{}
 
-	err := client.client.Send(ctx, "/writeMessage", http.MethodPost, data, &resp)
+	err := c.client.Send(ctx, "/writeMessage", http.MethodPost, data, &resp)
 	return err
 }
 
 // ReadMessage receives a channel and sends it in a request to the sidecar server
-func (client *Client) ReadMessage(ctx context.Context, channel string) (models.Message, error) {
+func (c *Client) ReadMessage(ctx context.Context, channel string) (models.Message, error) {
 	data := clientMessage{
 		Channel: channel,
 	}
 
 	var msg models.BrokerData
 
-	err := client.client.Send(ctx, "/readMessage", http.MethodPost, data, &msg)
+	err := c.client.Send(ctx, "/readMessage", http.MethodPost, data, &msg)
 	return msg.Message, err
 }
 
 // CommitMessage receives a channel and sends it in a request to the sidecar server
-func (client *Client) CommitMessage(ctx context.Context, channel string) error {
+func (c *Client) CommitMessage(ctx context.Context, channel string) error {
 	data := clientMessage{
 		Channel: channel,
 	}
 
 	var resp interface{}
 
-	err := client.client.Send(ctx, "/commit", http.MethodPost, data, &resp)
+	err := c.client.Send(ctx, "/commit", http.MethodPost, data, &resp)
 
 	return err
 }
