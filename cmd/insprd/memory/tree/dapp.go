@@ -65,7 +65,7 @@ func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
 	if appErr != nil {
 		return appErr
 	}
-	amm.addAppInTree(app, parentApp)
+	amm.addAppInTree(context, app, parentApp)
 	return nil
 }
 
@@ -136,7 +136,7 @@ func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
 
 	delete(parent.Spec.Apps, currentApp.Meta.Name)
 
-	amm.addAppInTree(app, parent)
+	amm.addAppInTree(app.Meta.Parent, app, parent)
 
 	return nil
 }

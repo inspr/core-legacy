@@ -56,16 +56,16 @@ func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
 	return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
 }
 
-func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
+func (amm *AppMemoryManager) addAppInTree(ctx string, app, parentApp *meta.App) {
 	updateAppBoundary(app, parentApp)
 	if app.Spec.Apps == nil {
 		app.Spec.Apps = map[string]*meta.App{}
 	}
-	app.Meta.Parent = parentApp.Meta.Name
+	app.Meta.Parent = ctx
 	parentApp.Spec.Apps[app.Meta.Name] = app
 
 	if !nodeIsEmpty(app.Spec.Node) {
-		app.Spec.Node.Meta.Parent = app.Meta.Name
+		app.Spec.Node.Meta.Parent = ctx
 		if app.Spec.Node.Meta.Annotations == nil {
 			app.Spec.Node.Meta.Annotations = map[string]string{}
 		}
