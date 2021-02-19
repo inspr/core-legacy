@@ -19,5 +19,7 @@ func NewMockCmd() *cobra.Command {
 
 func doMock(_ context.Context, out io.Writer) error {
 	fmt.Fprint(out, "mock hello\n")
+
+	fmt.Fprintf(out, "something %v\n", cmd.InsprOptions.SampleFlagValue)
 	return nil
 }
