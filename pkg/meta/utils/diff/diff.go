@@ -9,6 +9,20 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
+// Kind represents a kind of difference between two structures
+type Kind int
+
+// Kinds of diff
+const (
+	AppKind Kind = 1 << iota
+	NodeKind
+	MetaKind
+	ChannelKind
+	ChannelTypeKind
+	BoundaryKind
+	FieldKind
+)
+
 /*
 Difference is the most basic diff structure, it represents a difference between two apps.
 The object carries information abaout what field differs from one app to another,
@@ -18,6 +32,8 @@ type Difference struct {
 	Field string `json:"field"`
 	From  string `json:"from"`
 	To    string `json:"to"`
+	Kind  Kind
+	Name  string
 }
 
 /*
@@ -27,6 +43,7 @@ information about the context those apps exist in the app tree.
 type Change struct {
 	Context string       `json:"context"`
 	Diff    []Difference `json:"diff"`
+	Kind    Kind
 }
 
 //Changelog log of all changes between two app trees.
@@ -131,7 +148,9 @@ func (change *Change) diffNodes(nodeOrig meta.Node, nodeCurr meta.Node) error {
 			Field: "Spec.Node.Spec.Image",
 			From:  nodeOrig.Spec.Image,
 			To:    nodeCurr.Spec.Image,
+			Kind:  NodeKind,
 		})
+		change.Kind |= NodeKind
 	}
 	return nil
 }
@@ -155,7 +174,9 @@ func (change *Change) diffBoudaries(boundOrig meta.AppBoundary, boundCurr meta.A
 			Field: "Spec.Boundary.Input",
 			From:  orig,
 			To:    curr,
+			Kind:  BoundaryKind,
 		})
+		change.Kind |= BoundaryKind
 	}
 
 	outputSet := utils.ArrDisjuncSet(boundOrig.Output, boundCurr.Output)
@@ -174,7 +195,9 @@ func (change *Change) diffBoudaries(boundOrig meta.AppBoundary, boundCurr meta.A
 			Field: "Spec.Boundary.Output",
 			From:  orig,
 			To:    curr,
+			Kind:  BoundaryKind,
 		})
+		change.Kind |= BoundaryKind
 	}
 
 }
@@ -199,7 +222,9 @@ func (change *Change) diffApps(appsOrig utils.MApps, appsCurr utils.MApps) {
 			Field: fmt.Sprintf("Spec.Apps[%s]", k),
 			From:  origAppStatus,
 			To:    currAppStatus,
+			Kind:  AppKind,
 		})
+		change.Kind |= AppKind
 	}
 }
 
@@ -221,7 +246,9 @@ func (change *Change) diffChannels(chOrig utils.MChannels, chCurr utils.MChannel
 			Field: fmt.Sprintf("Spec.Channels[%s]", k),
 			From:  origChStatus,
 			To:    currChStatus,
+			Kind:  ChannelKind,
 		})
+		change.Kind |= ChannelKind
 	}
 
 	intersection := utils.ChsIntersecSet(chOrig, chCurr)
@@ -234,7 +261,9 @@ func (change *Change) diffChannels(chOrig utils.MChannels, chCurr utils.MChannel
 				Field: fmt.Sprintf("Spec.Channels[%s].Spec.Type", k),
 				From:  origCh.Spec.Type,
 				To:    currCh.Spec.Type,
+				Kind:  ChannelKind,
 			})
+			change.Kind |= MetaKind
 		}
 
 		err := change.diffMetadata(origCh.Meta, currCh.Meta, "Spec.Channels["+k+"].")
@@ -265,7 +294,9 @@ func (change *Change) diffChannelTypes(chtOrig utils.MTypes, chtCurr utils.MType
 			Field: fmt.Sprintf("Spec.ChannelTypes[%s]", k),
 			From:  origChtStatus,
 			To:    currChtStatus,
+			Kind:  ChannelTypeKind,
 		})
+		change.Kind |= ChannelTypeKind
 	}
 
 	intersection := utils.TypesIntersecSet(chtOrig, chtCurr)
@@ -279,6 +310,7 @@ func (change *Change) diffChannelTypes(chtOrig utils.MTypes, chtCurr utils.MType
 				Field: fmt.Sprintf("Spec.ChannelTypes[%s].Spec.Schema", k),
 				From:  string(origCht.Schema),
 				To:    string(currCht.Schema),
+				Kind:  ChannelTypeKind,
 			})
 		}
 
@@ -286,6 +318,7 @@ func (change *Change) diffChannelTypes(chtOrig utils.MTypes, chtCurr utils.MType
 		if err != nil {
 			return err
 		}
+		change.Kind |= ChannelTypeKind
 	}
 
 	return nil
@@ -301,6 +334,7 @@ func (change *Change) diffMetadata(metaOrig meta.Metadata, metaCurr meta.Metadat
 			Field: ctx + "Meta.Name",
 			From:  metaOrig.Name,
 			To:    metaCurr.Name,
+			Kind:  MetaKind,
 		})
 	}
 
@@ -309,7 +343,9 @@ func (change *Change) diffMetadata(metaOrig meta.Metadata, metaCurr meta.Metadat
 			Field: ctx + "Meta.Reference",
 			From:  metaOrig.Reference,
 			To:    metaCurr.Reference,
+			Kind:  MetaKind,
 		})
+		change.Kind |= MetaKind
 	}
 
 	if metaOrig.Parent != metaCurr.Parent {
@@ -318,7 +354,9 @@ func (change *Change) diffMetadata(metaOrig meta.Metadata, metaCurr meta.Metadat
 			Field: ctx + "Meta.Parent",
 			From:  metaOrig.Parent,
 			To:    metaCurr.Parent,
+			Kind:  MetaKind,
 		})
+		change.Kind |= MetaKind
 	}
 
 	if metaOrig.SHA256 != metaCurr.SHA256 {
@@ -326,6 +364,7 @@ func (change *Change) diffMetadata(metaOrig meta.Metadata, metaCurr meta.Metadat
 			Field: ctx + "Meta.SHA256",
 			From:  metaOrig.SHA256,
 			To:    metaCurr.SHA256,
+			Kind:  MetaKind,
 		})
 	}
 
@@ -347,7 +386,9 @@ func (change *Change) diffMetadata(metaOrig meta.Metadata, metaCurr meta.Metadat
 			Field: fmt.Sprintf("Meta.Annotations[%s]", k),
 			From:  origVal,
 			To:    currVal,
+			Kind:  MetaKind,
 		})
+		change.Kind |= MetaKind
 	}
 
 	return err
