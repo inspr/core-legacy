@@ -110,8 +110,6 @@ func getValidFiles(folder []os.FileInfo, path, specificFile string) ([]io.Reader
 			if isYaml(file, "") {
 				validFile, err := getFile(path + "/" + file.Name())
 				if err != nil {
-					fmt.Println("Sabia que ia dar erro1")
-					fmt.Println(err)
 					ignoredFiles = append(ignoredFiles, file.Name())
 				} else {
 					validFiles = append(validFiles, validFile)
