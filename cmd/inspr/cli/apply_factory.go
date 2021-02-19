@@ -2,6 +2,7 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -37,10 +38,17 @@ func GetFactory() *ApplyFactory {
 
 /*
 GetRunMethod returns the runMethod registered for the
-given component
+given component. If the component is not found in the
+dictionary, it returns a ierror
 */
-func (af *ApplyFactory) GetRunMethod(component meta.Component) RunMethod {
-	return af.applyDict[component]
+func (af *ApplyFactory) GetRunMethod(component meta.Component) (RunMethod, error) {
+	if method, ok := af.applyDict[component]; ok {
+		return method, nil
+	}
+	return nil, ierrors.NewError().
+		InvalidName().
+		Message("Component not subscribed in the ApplyFactory dictionary").
+		Build()
 }
 
 /*
