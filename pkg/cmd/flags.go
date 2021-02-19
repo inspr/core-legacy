@@ -33,10 +33,10 @@ type Flag struct {
 // name, default value, and usage string. e.g. `StringVar`, `BoolVar`
 var flagRegistry = []Flag{
 	{
-		Name:          "sampleFlag",
+		Name:          "scope",
 		Shorthand:     "s",
-		Usage:         "sample of usage of such flag",
-		Value:         &InsprOptions.SampleFlagValue,
+		Usage:         "inspr [command] --scope app1.app2",
+		Value:         &InsprOptions.Scope,
 		DefValue:      "",
 		FlagAddMethod: "",
 		DefinedOn:     []string{"all"},

@@ -1,8 +1,12 @@
 package cmd
 
 // InsprOptions values for the cli
-var InsprOptions = struct {
+var InsprOptions struct {
 	SampleFlagValue string
-}{
-	SampleFlagValue: "sample_default_value",
+	// Scope recieves the dApp scope/context from the cli
+	Scope string
+	// AppliedFileStructure recieves the folder/file to be applied
+	AppliedFileStructure string
+	// AppliedFolderStructure recieves the folder/file to be applied
+	AppliedFolderStructure string
 }
