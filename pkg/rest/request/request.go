@@ -19,7 +19,7 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 		return ierrors.NewError().BadRequest().Message("error encoding body to json").InnerError(err).Build()
 	}
 
-	req, err := http.NewRequest(method, c.routeToURL(route), bytes.NewBuffer(buf))
+	req, err := http.NewRequestWithContext(ctx, method, c.routeToURL(route), bytes.NewBuffer(buf))
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message("error creating request").InnerError(err).Build()
 	}
