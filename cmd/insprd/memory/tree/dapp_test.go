@@ -7,6 +7,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -1621,7 +1622,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 								Name:        "appUpdate1",
 								Reference:   "app1.appUpdate1",
 								Annotations: map[string]string{},
-								Parent:      "",
+								Parent:      "app1",
 								SHA256:      "",
 							},
 							Spec: meta.AppSpec{},
@@ -1631,7 +1632,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 								Name:        "appUpdate2",
 								Reference:   "app1.appUpdate2",
 								Annotations: map[string]string{},
-								Parent:      "",
+								Parent:      "app1",
 								SHA256:      "",
 							},
 							Spec: meta.AppSpec{},
@@ -1787,6 +1788,11 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 			}
 			if tt.want != nil {
 				got, err := am.GetApp(tt.args.query)
+				cl, derr := diff.Diff(got, tt.want)
+				if derr != nil {
+					fmt.Println(derr.Error())
+				}
+				cl.Print()
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
