@@ -29,7 +29,7 @@ func (s *Server) initRoutes() {
 		}
 	})
 
-	ahandler := handler.NewAppHandler(s.MemoryManager)
+	ahandler := handler.NewAppHandler(s.MemoryManager, s.NodeOperator, s.ChannelOperator)
 	s.Mux.HandleFunc("/apps", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 
