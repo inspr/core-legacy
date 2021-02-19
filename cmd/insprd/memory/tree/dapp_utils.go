@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -56,16 +57,25 @@ func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
 	return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
 }
 
-func (amm *AppMemoryManager) addAppInTree(ctx string, app, parentApp *meta.App) {
+func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 	updateAppBoundary(app, parentApp)
 	if app.Spec.Apps == nil {
 		app.Spec.Apps = map[string]*meta.App{}
 	}
-	app.Meta.Parent = ctx
+
+	parentStr := ""
+	if parentApp.Meta.Parent != "" {
+		parentStr = fmt.Sprintf("%s.", parentApp.Meta.Parent)
+	}
+	if parentApp.Meta.Name != "" {
+		parentStr = fmt.Sprintf("%s%s", parentStr, parentApp.Meta.Name)
+	}
+
+	app.Meta.Parent = parentStr
 	parentApp.Spec.Apps[app.Meta.Name] = app
 
 	if !nodeIsEmpty(app.Spec.Node) {
-		app.Spec.Node.Meta.Parent = ctx
+		app.Spec.Node.Meta.Parent = parentStr
 		if app.Spec.Node.Meta.Annotations == nil {
 			app.Spec.Node.Meta.Annotations = map[string]string{}
 		}
