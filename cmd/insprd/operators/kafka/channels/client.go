@@ -2,15 +2,40 @@ package kafka
 
 import (
 	"context"
+	"os"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
 // Client is a client for channel operations on kafka
 type Client struct {
-	k kafka.AdminClient
+	k *kafka.AdminClient
+}
+
+type kafkaEnv struct {
+	kafkaBootstrapServers string
+}
+
+func getEnv() (env kafkaEnv) {
+	boot := os.Getenv("KAFKA_BOOTSTRAP_SERVERS")
+	env.kafkaBootstrapServers = boot
+	return
+}
+
+// NewOperator returns an initialized operator from the environment variables
+func NewOperator() (operators.ChannelOperatorInterface, error) {
+	adminClient, err := kafka.NewAdminClient(&kafka.ConfigMap{
+		"bootstrap.servers": getEnv().kafkaBootstrapServers,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &Client{
+		k: adminClient,
+	}, err
 }
 
 // Get gets a channel from kafka
