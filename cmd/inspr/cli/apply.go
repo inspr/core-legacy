@@ -133,28 +133,18 @@ func applyValidFiles(path string, files []string) []applied {
 				continue
 			}
 
+			apply, err := GetFactory().GetRunMethod(comp)
+			if err != nil {
+				continue
+			}
+			err = apply(f)
+			if err != nil {
+				continue
+			}
 			appliedFiles = append(appliedFiles, applied{file: file, component: comp})
-			funcs[comp](f)
 
 		}
 	}
 
 	return appliedFiles
-}
-
-// THE FUNCTION BELOW IS A MOCKED IMPLEMENTATION OF THE FACTORY METHODS
-// AND IT WILL BE REMOVED WHEN MERGED WITH BRANCH story/core-164
-var funcs = map[meta.Component]func([]byte){
-	{APIVersion: "v1", Kind: "channel"}: func(s []byte) {
-		ch := meta.Channel{}
-
-		yaml.Unmarshal(s, &ch)
-		fmt.Println(ch)
-	},
-	{APIVersion: "v1", Kind: "app"}: func(s []byte) {
-		ch := meta.App{}
-
-		yaml.Unmarshal(s, &ch)
-		fmt.Println(ch)
-	},
 }
