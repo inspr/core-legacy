@@ -1,5 +1,3 @@
-// TODO -> Change to Walk, and add yaml unmarshall before doSomething
-
 package cli
 
 import (
@@ -53,6 +51,11 @@ func NewApplyCmd() *cobra.Command {
 	return applyCmd
 }
 
+type applied struct {
+	file      string
+	component meta.Component
+}
+
 func doApply(_ context.Context, out io.Writer) error {
 	var files []string
 	var path string
@@ -75,15 +78,17 @@ func doApply(_ context.Context, out io.Writer) error {
 		path = cmd.InsprOptions.AppliedFolderStructure
 		err := getFilesFromFolder(cmd.InsprOptions.AppliedFolderStructure, &files)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Fprint(out, err.Error())
 			return err
 		}
 	}
 
-	ignoredFiles := applyValidFiles(path, files)
+	appliedFiles := applyValidFiles(path, files)
 
-	if len(ignoredFiles) > 0 {
-		printIgnoredFiles(ignoredFiles)
+	if len(appliedFiles) > 0 {
+		printAppliedFiles(appliedFiles, out)
+	} else {
+		fmt.Fprint(out, "No files were applied\n")
 	}
 
 	return nil
@@ -94,10 +99,10 @@ func isYaml(file string) bool {
 	return tempStr[len(tempStr)-1] == "yaml" || tempStr[len(tempStr)-1] == "yml"
 }
 
-func printIgnoredFiles(ignoredFiles []string) {
-	fmt.Println("The following files were ignored: ")
-	for _, file := range ignoredFiles {
-		fmt.Println(file)
+func printAppliedFiles(appliedFiles []applied, out io.Writer) {
+	fmt.Fprint(out, "Applying: \n")
+	for _, file := range appliedFiles {
+		fmt.Fprint(out, file.file+" | "+file.component.Kind+" | "+file.component.APIVersion+"\n")
 	}
 }
 
@@ -113,31 +118,32 @@ func getFilesFromFolder(path string, files *[]string) error {
 	return nil
 }
 
-func applyValidFiles(path string, files []string) []string {
-	var ignoredFiles []string
+func applyValidFiles(path string, files []string) []applied {
+	var appliedFiles []applied
 
 	for _, file := range files {
 		if isYaml(file) {
 			comp := meta.Component{}
 			f, err := ioutil.ReadFile(path + file)
 			if err != nil {
-				ignoredFiles = append(ignoredFiles, file)
 				continue
 			}
 			err = yaml.Unmarshal(f, &comp)
 			if err != nil || comp.APIVersion == "" || comp.Kind == "" {
-				ignoredFiles = append(ignoredFiles, file)
 				continue
 			}
+
+			appliedFiles = append(appliedFiles, applied{file: file, component: comp})
 			funcs[comp](f)
-		} else {
-			ignoredFiles = append(ignoredFiles, file)
+
 		}
 	}
 
-	return ignoredFiles
+	return appliedFiles
 }
 
+// THE FUNCTION BELOW IS A MOCKED IMPLEMENTATION OF THE FACTORY METHODS
+// AND IT WILL BE REMOVED WHEN MERGED WITH BRANCH story/core-164
 var funcs = map[meta.Component]func([]byte){
 	{APIVersion: "v1", Kind: "channel"}: func(s []byte) {
 		ch := meta.Channel{}
