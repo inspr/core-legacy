@@ -55,6 +55,13 @@ Subscribe adds to the apply factory dictonary the
 given component with the value equals to the given
 runMethod
 */
-func (af *ApplyFactory) Subscribe(component meta.Component, method RunMethod) {
+func (af *ApplyFactory) Subscribe(component meta.Component, method RunMethod) error {
+	if component.Kind == "" || component.APIVersion == "" {
+		return ierrors.NewError().
+			InvalidName().
+			Message("Component must have a not empty kind and apiVersion").
+			Build()
+	}
 	af.applyDict[component] = method
+	return nil
 }

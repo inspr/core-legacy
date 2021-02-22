@@ -118,18 +118,46 @@ func TestApplyFactory_Subscribe(t *testing.T) {
 		method    RunMethod
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should not return a error - subscribe correctly",
+			fields: fields{
+				map[meta.Component]RunMethod{},
+			},
+			args: args{
+				component: meta.Component{
+					Kind:       "app",
+					APIVersion: "v1",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "It should return a error - component has invalid field",
+			fields: fields{
+				map[meta.Component]RunMethod{},
+			},
+			args: args{
+				component: meta.Component{
+					Kind:       "",
+					APIVersion: "v1",
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			af := &ApplyFactory{
 				applyDict: tt.fields.applyDict,
 			}
-			af.Subscribe(tt.args.component, tt.args.method)
+			if err := af.Subscribe(tt.args.component, tt.args.method); (err != nil) != tt.wantErr {
+				t.Errorf("ApplyFactory.Subscribe() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 }
