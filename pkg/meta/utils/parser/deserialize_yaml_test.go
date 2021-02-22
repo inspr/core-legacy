@@ -56,28 +56,24 @@ func TestYamlToChannel(t *testing.T) {
 	os.Remove(fileName)
 }
 
-func TestYamlWithoutValidFields(t *testing.T) {
-	// creates mock
-	mockStr, mockChannel := createYaml()
-	mockStr += `extra_field: mock_value`
-	// creates a file with the expected syntax
-	ioutil.WriteFile(
-		fileName,
-		[]byte(mockStr),
-		os.ModePerm,
-	)
-
+func TestIncorrectYaml(t *testing.T) {
 	t.Run("", func(t *testing.T) {
-		bytes, _ := ioutil.ReadFile("mock_extra_fields.yaml")
+		bytes, _ := ioutil.ReadFile("mock_incorrect.yaml")
 		ch, err := YamlToChannel(bytes)
 		if err != nil {
 			t.Errorf("expected 'nil', received %v\n", err)
 		}
 
+		mockCh := meta.Channel{
+			Meta: meta.Metadata{
+				Annotations: map[string]string{},
+			},
+		}
+
 		// uses cmp Equal to not evaluate comparison between maps
 		if cmp.Equal(
 			ch,
-			mockChannel,
+			mockCh,
 			cmp.Options{
 				cmp.FilterValues(func(x, y interface{}) bool {
 					vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
@@ -91,9 +87,8 @@ func TestYamlWithoutValidFields(t *testing.T) {
 					}),
 				),
 			}) {
-			t.Errorf("unexpected error -> got %v, expected %v", ch, mockChannel)
+			t.Errorf("unexpected error -> got %v, expected %v", ch, mockCh)
 		}
-		os.Remove(fileName)
 	})
 }
 
