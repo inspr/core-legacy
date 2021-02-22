@@ -46,7 +46,7 @@ func (af *ApplyFactory) GetRunMethod(component meta.Component) (RunMethod, error
 	}
 	return nil, ierrors.NewError().
 		InvalidName().
-		Message("Component not subscribed in the ApplyFactory dictionary").
+		Message("component not subscribed in the ApplyFactory dictionary").
 		Build()
 }
 
@@ -59,7 +59,7 @@ func (af *ApplyFactory) Subscribe(component meta.Component, method RunMethod) er
 	if component.Kind == "" || component.APIVersion == "" {
 		return ierrors.NewError().
 			InvalidName().
-			Message("Component must have a not empty kind and apiVersion").
+			Message("component must have a not empty kind and apiVersion").
 			Build()
 	}
 	af.applyDict[component] = method
