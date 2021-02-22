@@ -1,3 +1,5 @@
+// TODO -> Change to Walk, and add yaml unmarshall before doSomething
+
 package cli
 
 import (
@@ -5,13 +7,13 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gopkg.in/yaml.v2"
 )
 
 // NewApplyCmd - mock subcommand
@@ -52,6 +54,7 @@ func NewApplyCmd() *cobra.Command {
 }
 
 func doApply(_ context.Context, out io.Writer) error {
+	var files []string
 	var path string
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")
 	hasFolderFlag := (cmd.InsprOptions.AppliedFolderStructure != "")
@@ -60,32 +63,24 @@ func doApply(_ context.Context, out io.Writer) error {
 		return ierrors.NewError().Message("invalid flag arguments").Build()
 	}
 
-	specificFile := ""
 	if hasFileFlag {
 		filePath := strings.Split(cmd.InsprOptions.AppliedFileStructure, "/")
 		if len(filePath) == 1 {
-			path = ""
-			specificFile = filePath[0]
+			files = append(files, filePath[0])
 		} else {
-			specificFile = filePath[len(filePath)-1]
-			filePath = filePath[1 : len(filePath)-1]
-			path = strings.Join(filePath, "/")
+			path = strings.Join(filePath[:len(filePath)-1], "/") + "/"
+			files = append(files, filePath[len(filePath)-1])
 		}
 	} else {
-		filePath := strings.Split(cmd.InsprOptions.AppliedFolderStructure, "/")
-		filePath = filePath[1:]
-		path = strings.Join(filePath, "/")
+		path = cmd.InsprOptions.AppliedFolderStructure
+		err := getFilesFromFolder(cmd.InsprOptions.AppliedFolderStructure, &files)
+		if err != nil {
+			fmt.Println(err.Error())
+			return err
+		}
 	}
 
-	folder, err := getFilesFromFolder("/" + path)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-
-	validFiles, ignoredFiles := getValidFiles(folder, path, specificFile)
-
-	doSomething(validFiles)
+	ignoredFiles := applyValidFiles(path, files)
 
 	if len(ignoredFiles) > 0 {
 		printIgnoredFiles(ignoredFiles)
@@ -94,52 +89,9 @@ func doApply(_ context.Context, out io.Writer) error {
 	return nil
 }
 
-func getFile(name string) (io.Reader, error) {
-	if name == "-" {
-		return os.Stdin, nil
-	}
-	return os.Open(name)
-}
-
-func getValidFiles(folder []os.FileInfo, path, specificFile string) ([]io.Reader, []string) {
-	var validFiles []io.Reader
-	var ignoredFiles []string
-
-	if specificFile == "" {
-		for _, file := range folder {
-			if isYaml(file, "") {
-				validFile, err := getFile(path + "/" + file.Name())
-				if err != nil {
-					ignoredFiles = append(ignoredFiles, file.Name())
-				} else {
-					validFiles = append(validFiles, validFile)
-				}
-			} else {
-				ignoredFiles = append(ignoredFiles, file.Name())
-			}
-		}
-	} else {
-		if isYaml(nil, specificFile) {
-			validFile, err := getFile(path + "/" + specificFile)
-			if err != nil {
-				fmt.Println(err)
-				return nil, nil
-			}
-			return []io.Reader{validFile}, nil
-		}
-
-		fmt.Println("given file should be .yaml or .yml")
-		return nil, nil
-	}
-	return validFiles, ignoredFiles
-}
-
-func isYaml(file os.FileInfo, fileStr string) bool {
-	if fileStr != "" {
-		tempStr := strings.Split(fileStr, ".")
-		return tempStr[len(tempStr)-1] == "yaml" || tempStr[len(tempStr)-1] == "yml"
-	}
-	return filepath.Ext(file.Name()) == ".yaml" || filepath.Ext(file.Name()) == ".yml"
+func isYaml(file string) bool {
+	tempStr := strings.Split(file, ".")
+	return tempStr[len(tempStr)-1] == "yaml" || tempStr[len(tempStr)-1] == "yml"
 }
 
 func printIgnoredFiles(ignoredFiles []string) {
@@ -149,30 +101,54 @@ func printIgnoredFiles(ignoredFiles []string) {
 	}
 }
 
-func getFilesFromFolder(path string) ([]os.FileInfo, error) {
-	if path == "/" {
-		path = ""
-	}
-	dir, err := os.Getwd()
+func getFilesFromFolder(path string, files *[]string) error {
+	folder, err := ioutil.ReadDir(path)
 	if err != nil {
-		return nil, ierrors.NewError().InnerError(err).Message("couldn't find current directory: " + dir).Build()
+		return err
 	}
 
-	folder, err := ioutil.ReadDir(dir + path)
-	if err != nil {
-		return nil, ierrors.NewError().InnerError(err).Message("couldn't open folder: " + dir + path).Build()
-	}
-
-	return folder, nil
-}
-
-func doSomething(files []io.Reader) error {
-	if files == nil {
-		fmt.Println("No changes were applied")
-		return nil
-	}
-	for _, file := range files {
-		fmt.Println(file)
+	for _, file := range folder {
+		*files = append(*files, file.Name())
 	}
 	return nil
+}
+
+func applyValidFiles(path string, files []string) []string {
+	var ignoredFiles []string
+
+	for _, file := range files {
+		if isYaml(file) {
+			comp := meta.Component{}
+			f, err := ioutil.ReadFile(path + file)
+			if err != nil {
+				ignoredFiles = append(ignoredFiles, file)
+				continue
+			}
+			err = yaml.Unmarshal(f, &comp)
+			if err != nil || comp.APIVersion == "" || comp.Kind == "" {
+				ignoredFiles = append(ignoredFiles, file)
+				continue
+			}
+			funcs[comp](f)
+		} else {
+			ignoredFiles = append(ignoredFiles, file)
+		}
+	}
+
+	return ignoredFiles
+}
+
+var funcs = map[meta.Component]func([]byte){
+	{APIVersion: "v1", Kind: "channel"}: func(s []byte) {
+		ch := meta.Channel{}
+
+		yaml.Unmarshal(s, &ch)
+		fmt.Println(ch)
+	},
+	{APIVersion: "v1", Kind: "app"}: func(s []byte) {
+		ch := meta.App{}
+
+		yaml.Unmarshal(s, &ch)
+		fmt.Println(ch)
+	},
 }

@@ -1,5 +1,15 @@
-guess: true
-strip: price
-skill: 196850992.03550625
-lunch: 1702752291
-soap: false
+apiVersion: v1
+kind: channel
+meta:
+  name: mock_name2
+  reference: mock_reference2
+  annotations:
+    mock_map2: mock_value2
+  parent: mock_parent2
+  sha256: mock_sha2562
+spec:
+  type: mock_type2
+connectedapps:
+- a2
+- b2
+- c2

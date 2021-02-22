@@ -44,7 +44,7 @@ var flagRegistry = []Flag{
 	{
 		Name:          "specificTag",
 		Usage:         "tag used only by hidden subcommand",
-		Value:         &InsprOptions.SpecificTag,
+		Value:         &InsprOptions.SampleFlagValue,
 		DefValue:      "",
 		FlagAddMethod: "",
 		DefinedOn:     []string{"hidden"},
