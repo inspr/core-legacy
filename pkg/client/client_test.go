@@ -14,6 +14,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
+	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
 
@@ -104,8 +105,12 @@ func TestNewAppClient(t *testing.T) {
 		{
 			name: "Valid App Client - with address",
 			want: &Client{
-				addr:  "http://unix",
-				httpc: *mockHTTPClient("http://unix"),
+				client: request.NewClient().
+					BaseURL("http://unix").
+					HTTPClient(*mockHTTPClient("http://unix")).
+					Encoder(json.Marshal).
+					Decoder(request.JSONDecoderGenerator).
+					Build(),
 			},
 		},
 	}
@@ -113,11 +118,8 @@ func TestNewAppClient(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewAppClient()
-			if got.addr != tt.want.addr {
-				t.Errorf("NewClient().addr = %v, want %v", got.addr, tt.want.addr)
-			}
-			if got.httpc.Transport == tt.want.httpc.Transport {
-				t.Errorf("NewClient().httpc.Transport = %v, want %v", got.httpc.Transport, tt.want.httpc.Transport)
+			if got.client == nil {
+				t.Errorf("NewClient().client = %v, want %v", got.client, tt.want.client)
 			}
 		})
 	}
@@ -176,8 +178,12 @@ func TestClient_WriteMessage(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			c := Client{
-				addr:  s.URL,
-				httpc: *http.DefaultClient,
+				client: request.NewClient().
+					BaseURL(s.URL).
+					HTTPClient(*http.DefaultClient).
+					Encoder(json.Marshal).
+					Decoder(request.JSONDecoderGenerator).
+					Build(),
 			}
 
 			if tt.interruptServer {
@@ -238,8 +244,12 @@ func TestClient_ReadMessage(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			c := Client{
-				addr:  s.URL,
-				httpc: *http.DefaultClient,
+				client: request.NewClient().
+					BaseURL(s.URL).
+					HTTPClient(*http.DefaultClient).
+					Encoder(json.Marshal).
+					Decoder(request.JSONDecoderGenerator).
+					Build(),
 			}
 
 			if tt.interruptServer {
@@ -295,8 +305,12 @@ func TestClient_CommitMessage(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			c := Client{
-				addr:  s.URL,
-				httpc: *http.DefaultClient,
+				client: request.NewClient().
+					BaseURL(s.URL).
+					HTTPClient(*http.DefaultClient).
+					Encoder(json.Marshal).
+					Decoder(request.JSONDecoderGenerator).
+					Build(),
 			}
 
 			if tt.interruptServer {
@@ -306,92 +320,6 @@ func TestClient_CommitMessage(t *testing.T) {
 			err := c.CommitMessage(context.Background(), "chan1")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.CommitMessage() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestClient_sendRequest(t *testing.T) {
-	type args struct {
-		ctx     context.Context
-		method  string
-		reqData clientMessage
-		route   string
-	}
-	tests := []struct {
-		name            string
-		args            args
-		want            models.Message
-		interruptServer bool
-		wantErr         bool
-	}{
-		{
-			name: "Valid request",
-			args: args{
-				route:  "/commit",
-				ctx:    context.Background(),
-				method: http.MethodPost,
-				reqData: clientMessage{
-					Message: models.Message{},
-					Channel: "",
-				},
-			},
-			wantErr:         false,
-			want:            models.Message{},
-			interruptServer: false,
-		},
-		{
-			name: "Invalid request - invalid route",
-			args: args{
-				route:  "",
-				ctx:    context.Background(),
-				method: http.MethodPost,
-				reqData: clientMessage{
-					Message: models.Message{},
-					Channel: "",
-				},
-			},
-			wantErr:         true,
-			want:            models.Message{},
-			interruptServer: false,
-		},
-		{
-			name: "Invalid request - server killed",
-			args: args{
-				route:  "/",
-				ctx:    context.Background(),
-				method: http.MethodPost,
-				reqData: clientMessage{
-					Message: models.Message{},
-					Channel: "",
-				},
-			},
-			wantErr:         true,
-			want:            models.Message{},
-			interruptServer: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			handler := mockHandlerFunc(tt.args.route, tt.args)
-			s := httptest.NewServer(http.HandlerFunc(handler))
-			defer s.Close()
-			c := Client{
-				addr:  s.URL,
-				httpc: *http.DefaultClient,
-			}
-
-			if tt.interruptServer {
-				s.Close()
-			}
-
-			got, err := c.sendRequest(tt.args.ctx, tt.args.method, tt.args.route, tt.args.reqData)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.sendRequest() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.sendRequest() = %v, want %v", got, tt.want)
 			}
 		})
 	}
