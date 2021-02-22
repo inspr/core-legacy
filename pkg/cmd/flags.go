@@ -132,24 +132,6 @@ func AddFlags(cmd *cobra.Command) {
 
 		flagsForCommand = append(flagsForCommand, fl)
 	}
-
-	// Apply command-specific default values to flags.
-	cmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
-		ParseFlags(cmd, flagsForCommand)
-		// Since PersistentPreRunE replaces the parent's PersistentPreRunE,
-		// make sure we call it, if it is set.
-		if parent := cmd.Parent(); parent != nil {
-			if preRun := parent.PersistentPreRunE; preRun != nil {
-				if err := preRun(cmd, args); err != nil {
-					return err
-				}
-			} else if preRun := parent.PersistentPreRun; preRun != nil {
-				preRun(cmd, args)
-			}
-		}
-
-		return nil
-	}
 }
 
 func hasCmdAnnotation(cmdName string, annotations []string) bool {
