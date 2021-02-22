@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -59,35 +60,10 @@ func TestYamlToChannel(t *testing.T) {
 func TestIncorrectYaml(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		bytes, _ := ioutil.ReadFile("mock_incorrect.yaml")
-		ch, err := YamlToChannel(bytes)
-		if err != nil {
-			t.Errorf("expected 'nil', received %v\n", err)
-		}
 
-		mockCh := meta.Channel{
-			Meta: meta.Metadata{
-				Annotations: map[string]string{},
-			},
-		}
-
-		// uses cmp Equal to not evaluate comparison between maps
-		if cmp.Equal(
-			ch,
-			mockCh,
-			cmp.Options{
-				cmp.FilterValues(func(x, y interface{}) bool {
-					vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
-					flag := (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) && (vx.Kind() == reflect.Map)
-					return flag
-				}, cmp.Comparer(func(_, _ interface{}) bool { return true })),
-
-				cmp.FilterValues(func(x, y interface{}) bool { return true },
-					cmp.Comparer(func(x, y interface{}) bool {
-						return reflect.DeepEqual(x, y)
-					}),
-				),
-			}) {
-			t.Errorf("unexpected error -> got %v, expected %v", ch, mockCh)
+		_, err := YamlToChannel(bytes)
+		if err == nil {
+			t.Errorf("expected %v, received %v\n", errors.New("channel without name"), err)
 		}
 	})
 }
@@ -97,7 +73,7 @@ func TestNonExistantFile(t *testing.T) {
 	bytes := []byte{1}
 	_, err := YamlToChannel(bytes)
 	if err == nil {
-		t.Errorf("unexpected error -> got %v, expected %v", err, "error")
+		t.Errorf("expected -> %v, expected %v", err, "error")
 	}
 }
 

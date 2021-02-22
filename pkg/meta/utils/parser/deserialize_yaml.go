@@ -14,5 +14,10 @@ func YamlToChannel(bytes []byte) (meta.Channel, error) {
 	if err := yaml.Unmarshal(bytes, &channel); err != nil {
 		return channel, errors.New("Error parsing the file")
 	}
+
+	if channel.Meta.Name == "" {
+		return meta.Channel{}, errors.New("channel without name")
+	}
+
 	return channel, nil
 }
