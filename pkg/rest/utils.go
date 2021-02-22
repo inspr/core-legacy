@@ -17,7 +17,7 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 	}
 }
 
-// ERROR reports the error back to the user withing a JSON format
+// ERROR reports the error back to the user within a JSON format
 func ERROR(w http.ResponseWriter, statusCode int, err error) {
 	JSON(w, statusCode, err)
 }

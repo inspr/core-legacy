@@ -12,7 +12,7 @@ import (
 // Handler is an alias of the api router function.
 // It acts as the function that handles the routes but at
 // the same time it contains certain methods attached to it
-// that allows for more utility. For an example check the JSON funciton.
+// that allows for more utility. For an example check the JSON function.
 type Handler func(w http.ResponseWriter, r *http.Request)
 
 // HTTPHandlerFunc transforms the rest.handler to a http.handlerFunc type

@@ -14,7 +14,7 @@ type MemManager struct {
 	app         Apps
 }
 
-// MockMemoryManager mock exported with propagated error throught the functions
+// MockMemoryManager mock exported with propagated error through the functions
 func MockMemoryManager(failErr error) memory.Manager {
 	return &MemManager{
 		channelType: ChannelTypes{

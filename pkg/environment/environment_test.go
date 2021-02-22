@@ -52,28 +52,28 @@ func Test_getEnv(t *testing.T) {
 		want string
 	}{
 		{
-			name: "Get input channel enviroment variable",
+			name: "Get input channel environment variable",
 			args: args{
 				name: "INSPR_INPUT_CHANNELS",
 			},
 			want: "chan;chan1;chan2;chan3",
 		},
 		{
-			name: "Get output channel enviroment variable",
+			name: "Get output channel environment variable",
 			args: args{
 				name: "INSPR_OUTPUT_CHANNELS",
 			},
 			want: "chan;chan1;chan2;chan3",
 		},
 		{
-			name: "Get unix socket enviroment variable",
+			name: "Get unix socket environment variable",
 			args: args{
 				name: "INSPR_UNIX_SOCKET",
 			},
 			want: "socket_addr",
 		},
 		{
-			name: "Invalid - Get invalid enviroment variable",
+			name: "Invalid - Get invalid environment variable",
 			args: args{
 				name: "INSPR_INVALID_ENV_VAR",
 			},

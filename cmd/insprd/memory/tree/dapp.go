@@ -22,7 +22,7 @@ func (tmm *MemoryManager) Apps() memory.AppMemory {
 	}
 }
 
-// GetApp recieves a query string (format = 'x.y.z') and iterates through the
+// GetApp receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the dApp which name is equal to the last query element.
 // The root app is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
