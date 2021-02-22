@@ -13,7 +13,6 @@ import (
 func NewHelloCmd() *cobra.Command {
 	return cmd.NewCmd("hello").
 		WithDescription("HELLO WORLD").
-		WithCommonFlags().
 		NoArgs(doHello)
 }
 
