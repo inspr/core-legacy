@@ -10,8 +10,8 @@ type Client struct {
 	HTTPClient *request.Client
 }
 
-// NewClient return a new Client
-func NewClient(rc *request.Client) *Client {
+// NewControllerClient return a new Client
+func NewControllerClient(rc *request.Client) *Client {
 	return &Client{
 		HTTPClient: rc,
 	}
