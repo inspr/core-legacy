@@ -126,7 +126,7 @@ func TestApplyFactory_Subscribe(t *testing.T) {
 		{
 			name: "It should not return a error - subscribe correctly",
 			fields: fields{
-				map[meta.Component]RunMethod{},
+				applyDict: map[meta.Component]RunMethod{},
 			},
 			args: args{
 				component: meta.Component{
@@ -139,11 +139,31 @@ func TestApplyFactory_Subscribe(t *testing.T) {
 		{
 			name: "It should return a error - component has invalid field",
 			fields: fields{
-				map[meta.Component]RunMethod{},
+				applyDict: map[meta.Component]RunMethod{},
 			},
 			args: args{
 				component: meta.Component{
 					Kind:       "",
+					APIVersion: "v1",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "It should return a error - component already subscribed",
+			fields: fields{
+				applyDict: map[meta.Component]RunMethod{
+					{
+						Kind:       "app",
+						APIVersion: "v1",
+					}: func([]byte) error {
+						return errors.New("Just a example to test the function return")
+					},
+				},
+			},
+			args: args{
+				component: meta.Component{
+					Kind:       "app",
 					APIVersion: "v1",
 				},
 			},

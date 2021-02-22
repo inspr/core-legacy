@@ -62,6 +62,14 @@ func (af *ApplyFactory) Subscribe(component meta.Component, method RunMethod) er
 			Message("component must have a not empty kind and apiVersion").
 			Build()
 	}
+
+	if _, ok := af.applyDict[component]; ok {
+		return ierrors.NewError().
+			InvalidName().
+			Message("component already subscribed").
+			Build()
+	}
+
 	af.applyDict[component] = method
 	return nil
 }
