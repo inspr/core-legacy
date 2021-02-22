@@ -36,7 +36,7 @@ func TestYamlToChannel(t *testing.T) {
 	}
 
 	// uses cmp Equal to not evaluate comparison between maps
-	if cmp.Equal(
+	if !cmp.Equal(
 		channel,
 		mockChannel,
 		cmp.Options{
@@ -46,6 +46,7 @@ func TestYamlToChannel(t *testing.T) {
 				return flag
 			}, cmp.Comparer(func(_, _ interface{}) bool { return true })),
 
+			// everything besides maps
 			cmp.FilterValues(func(x, y interface{}) bool { return true },
 				cmp.Comparer(func(x, y interface{}) bool {
 					return reflect.DeepEqual(x, y)
@@ -63,7 +64,7 @@ func TestIncorrectYaml(t *testing.T) {
 
 		_, err := YamlToChannel(bytes)
 		if err == nil {
-			t.Errorf("expected %v, received %v\n", errors.New("channel without name"), err)
+			t.Errorf("expected %v, received %v\n", errors.New("channel without name").Error(), err)
 		}
 	})
 }
