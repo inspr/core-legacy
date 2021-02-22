@@ -1,11 +1,10 @@
 package cli
 
 import (
-	"fmt"
+	"errors"
 	"reflect"
 	"testing"
 
-	"github.com/spf13/cobra"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -38,11 +37,11 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 		component meta.Component
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    RunMethod
-		wantErr bool
+		name          string
+		fields        fields
+		args          args
+		checkFunction func(t *testing.T, runMethod RunMethod)
+		wantErr       bool
 	}{
 		{
 			name: "It should get the method for the given component",
@@ -51,8 +50,8 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 					{
 						Kind:       "app",
 						APIVersion: "v1",
-					}: func(c *cobra.Command, s []string) {
-						fmt.Println("It runs the function")
+					}: func([]byte) error {
+						return errors.New("Just a example to test the function return")
 					},
 				},
 			},
@@ -62,10 +61,34 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			want: func(c *cobra.Command, s []string) {
-				fmt.Println("It runs the function")
+			checkFunction: func(t *testing.T, runMethod RunMethod) {
+				foo := []byte("foo")
+				got := runMethod(foo).Error()
+				if got != "Just a example to test the function return" {
+					t.Errorf("ApplyFactory.GetRunMethod() = %v, want %v", got, "Just a example to test the function return")
+				}
 			},
 			wantErr: false,
+		},
+		{
+			name: "It should return a error - component not registered",
+			fields: fields{
+				applyDict: map[meta.Component]RunMethod{
+					{
+						Kind:       "app",
+						APIVersion: "v1",
+					}: func([]byte) error {
+						return errors.New("Just a example to test the function return")
+					},
+				},
+			},
+			args: args{
+				meta.Component{
+					Kind:       "invalid",
+					APIVersion: "v1",
+				},
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -78,8 +101,9 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 				t.Errorf("ApplyFactory.GetRunMethod() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ApplyFactory.GetRunMethod() = %v, want %v", got, tt.want)
+
+			if tt.checkFunction != nil {
+				tt.checkFunction(t, got)
 			}
 		})
 	}
