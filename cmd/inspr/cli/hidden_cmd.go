@@ -9,6 +9,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 )
 
+var randomNewTag string
+
 // NewHiddenCmd - hidden subcommand
 func NewHiddenCmd() *cobra.Command {
 	return cmd.NewCmd("hidden").
@@ -21,7 +23,7 @@ func NewHiddenCmd() *cobra.Command {
 				Name:          "randomNewTag",
 				Usage:         "blablabla",
 				Shorthand:     "n",
-				Value:         &cmd.InsprOptions.SampleFlagValue,
+				Value:         &randomNewTag,
 				DefValue:      "",
 				FlagAddMethod: "",
 				DefinedOn:     []string{"hidden"},
@@ -32,6 +34,6 @@ func NewHiddenCmd() *cobra.Command {
 }
 
 func doHidden(_ context.Context, out io.Writer, strs []string) error {
-	fmt.Fprint(out, "hidden hello\n")
+	fmt.Fprintf(out, "hidden hello -> %v\n", randomNewTag)
 	return nil
 }
