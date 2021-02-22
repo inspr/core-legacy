@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -127,7 +128,7 @@ func createHelloWorldApp(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func createChannelInsideHelloWorld(client *client.Client, dryRun bool) {
@@ -142,7 +143,7 @@ func createChannelInsideHelloWorld(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func createChannelTypeInsideHelloWorld(client *client.Client, dryRun bool) {
@@ -154,7 +155,7 @@ func createChannelTypeInsideHelloWorld(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func createNewAppInsideHelloWorld(client *client.Client, dryRun bool) {
@@ -167,7 +168,7 @@ func createNewAppInsideHelloWorld(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func updateNewAppAddBoundary(client *client.Client, dryRun bool) {
@@ -184,7 +185,7 @@ func updateNewAppAddBoundary(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func updateChannelOneAddAnnotationToIt(client *client.Client, dryRun bool) {
@@ -202,7 +203,7 @@ func updateChannelOneAddAnnotationToIt(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func updateChannelTypeHelloAddAnnotation(client *client.Client, dryRun bool) {
@@ -217,7 +218,7 @@ func updateChannelTypeHelloAddAnnotation(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func deleteNewAppInsideHelloWorld(client *client.Client, dryRun bool) {
@@ -225,7 +226,7 @@ func deleteNewAppInsideHelloWorld(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func deleteChannelOneInsideHelloWorld(client *client.Client, dryRun bool) {
@@ -233,7 +234,7 @@ func deleteChannelOneInsideHelloWorld(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func deleteChannelTypeHelloInsideHelloWorld(client *client.Client, dryRun bool) {
@@ -241,7 +242,7 @@ func deleteChannelTypeHelloInsideHelloWorld(client *client.Client, dryRun bool) 
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
 
 func deleteHelloWorldApp(client *client.Client, dryRun bool) {
@@ -249,5 +250,5 @@ func deleteHelloWorldApp(client *client.Client, dryRun bool) {
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}
-	resp.Print()
+	resp.Print(os.Stdout)
 }
