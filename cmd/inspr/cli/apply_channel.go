@@ -27,43 +27,43 @@ this is a list of things to do  related to this package
 type RunMethod func(data []byte, out io.Writer) error
 
 // ApplyChannel is of the type RunMethod, it calls the pkg/controller/client functions.
-func ApplyChannel() RunMethod {
-	return func(data []byte, out io.Writer) error {
-		url := viper.GetString("reqUrl")
-		rc := request.NewClient().
-			BaseURL(url).
-			Encoder(json.Marshal).
-			Decoder(request.JSONDecoderGenerator).
-			Build()
+var ApplyChannel RunMethod = func(data []byte, out io.Writer) error {
+	url := viper.GetString("reqUrl")
 
-		// create controller client
-		c := client.NewControllerClient(rc)
+	rc := request.NewClient().
+		BaseURL(url).
+		Encoder(json.Marshal).
+		Decoder(request.JSONDecoderGenerator).
+		Build()
 
-		// unmarshal into a channel
-		channel, err := utils.YamlToChannel(data)
-		if err != nil {
-			return err
-		}
+	// create controller client
+	c := client.NewControllerClient(rc)
 
-		// todo use the flags from the apply cmd
-		flagDryRun := false
-		flagIsUpdate := false
-
-		var clog diff.Changelog
-		// creates or updates it
-		if flagIsUpdate {
-			clog, err = c.Channels().Update(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
-		} else {
-			clog, err = c.Channels().Create(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
-		}
-
-		if err != nil {
-			return err
-		}
-
-		// prints differences
-		clog.Print(out)
-
-		return nil
+	// unmarshal into a channel
+	channel, err := utils.YamlToChannel(data)
+	if err != nil {
+		return err
 	}
+
+	// INTEGRATION: REMOVE, flags from other story
+	// todo use the flags from the apply cmd
+	flagDryRun := false
+	flagIsUpdate := false
+
+	var clog diff.Changelog
+	// creates or updates it
+	if flagIsUpdate {
+		clog, err = c.Channels().Update(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+	} else {
+		clog, err = c.Channels().Create(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	// prints differences
+	clog.Print(out)
+
+	return nil
 }

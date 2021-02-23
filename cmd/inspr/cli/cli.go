@@ -4,10 +4,7 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 )
-
-var builder cmd.Builder
 
 // NewInsprCommand - returns a root command associated with inspr cli
 func NewInsprCommand(out, err io.Writer) *cobra.Command {
