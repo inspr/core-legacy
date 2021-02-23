@@ -10,6 +10,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -173,11 +174,5 @@ func printTab() {
 }
 
 func getUrl() string {
-	return ""
+	return viper.GetString("reqUrl")
 }
-
-// getChannel()
-
-// getNode()
-
-// getChannelType()
