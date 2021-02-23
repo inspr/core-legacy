@@ -75,7 +75,7 @@ func doApply(_ context.Context, out io.Writer) error {
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")
 	hasFolderFlag := (cmd.InsprOptions.AppliedFolderStructure != "")
 	if hasFileFlag == hasFolderFlag {
-		fmt.Fprint(out, "Specified file/folder path is invalid\n")
+		fmt.Fprint(out, "Given flags are invalid\n")
 		return ierrors.NewError().Message("invalid flag arguments").Build()
 	}
 

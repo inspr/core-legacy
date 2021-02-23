@@ -35,7 +35,7 @@ var flagRegistry = []Flag{
 	{
 		Name:          "scope",
 		Shorthand:     "s",
-		Usage:         "inspr [command] --scope app1.app2",
+		Usage:         "inspr <command> --scope app1.app2",
 		Value:         &InsprOptions.Scope,
 		DefValue:      "",
 		FlagAddMethod: "",
@@ -44,7 +44,7 @@ var flagRegistry = []Flag{
 	{
 		Name:          "dry-run",
 		Shorthand:     "d",
-		Usage:         "inspr [command] --dry-run",
+		Usage:         "inspr <command> --dry-run",
 		Value:         &InsprOptions.DryRun,
 		DefValue:      false,
 		FlagAddMethod: "BoolVar",
