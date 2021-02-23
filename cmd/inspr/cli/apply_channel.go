@@ -3,9 +3,7 @@ package cli
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
-	"text/tabwriter"
 
 	"github.com/spf13/viper"
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
@@ -29,46 +27,43 @@ this is a list of things to do  related to this package
 type RunMethod func(data []byte, out io.Writer) error
 
 // ApplyChannel is of the type RunMethod, it calls the pkg/controller/client functions.
-var ApplyChannel RunMethod = func(data []byte, out io.Writer) error {
-	url := viper.GetString("reqUrl")
-	rc := request.NewClient().
-		BaseURL(url).
-		Encoder(json.Marshal).
-		Decoder(request.JSONDecoderGenerator).
-		Build()
+func ApplyChannel() RunMethod {
+	return func(data []byte, out io.Writer) error {
+		url := viper.GetString("reqUrl")
+		rc := request.NewClient().
+			BaseURL(url).
+			Encoder(json.Marshal).
+			Decoder(request.JSONDecoderGenerator).
+			Build()
 
-	// create controller client
-	c := client.NewControllerClient(rc)
+		// create controller client
+		c := client.NewControllerClient(rc)
 
-	// unmarshal into a channel
-	channel, err := utils.YamlToChannel(data)
-	if err != nil {
-		return err
-	}
-
-	// todo use the flags from the apply cmd
-	flagDryRun := false
-	flagIsUpdate := false
-
-	var clog diff.Changelog
-	// creates or updates it
-	if flagIsUpdate {
-		clog, err = c.Channels().Update(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
-	} else {
-		clog, err = c.Channels().Create(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
-	}
-
-	// TODO review how to isolate this, maybe refactor the diff out?
-	var w *tabwriter.Writer
-	for _, change := range clog {
-		fmt.Println("On: ", change.Context)
-		w = tabwriter.NewWriter(out, 12, 0, 3, ' ', tabwriter.Debug)
-		fmt.Fprintf(w, "Field\t From\t To\n")
-		for _, diff := range change.Diff {
-			fmt.Fprintf(w, "%s\t %s\t %s\n",
-				diff.Field, diff.From, diff.To)
+		// unmarshal into a channel
+		channel, err := utils.YamlToChannel(data)
+		if err != nil {
+			return err
 		}
-		w.Flush()
+
+		// todo use the flags from the apply cmd
+		flagDryRun := false
+		flagIsUpdate := false
+
+		var clog diff.Changelog
+		// creates or updates it
+		if flagIsUpdate {
+			clog, err = c.Channels().Update(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+		} else {
+			clog, err = c.Channels().Create(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+		}
+
+		if err != nil {
+			return err
+		}
+
+		// prints differences
+		clog.Print(out)
+
+		return nil
 	}
-	return nil
 }
