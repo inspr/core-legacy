@@ -33,15 +33,6 @@ type Flag struct {
 // name, default value, and usage string. e.g. `StringVar`, `BoolVar`
 var flagRegistry = []Flag{
 	{
-		Name:          "sampleFlag",
-		Shorthand:     "s",
-		Usage:         "sample of usage of such flag",
-		Value:         &InsprOptions.SampleFlagValue,
-		DefValue:      "",
-		FlagAddMethod: "",
-		DefinedOn:     []string{"all"},
-	},
-	{
 		Name:          "specificTag",
 		Usage:         "tag used only by hidden subcommand",
 		Value:         &InsprOptions.SpecificTag,

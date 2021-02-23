@@ -13,6 +13,7 @@ import (
 // Builder is used to build cobra commands.
 // it contains all the methods to manipulate a command
 type Builder interface {
+	WithAliases([]string) Builder
 	WithDescription(description string) Builder
 	WithLongDescription(long string) Builder
 	WithExample(comment, command string) Builder
@@ -23,6 +24,7 @@ type Builder interface {
 	ExactArgs(argCount int, action func(context.Context, io.Writer, []string) error) *cobra.Command
 	NoArgs(action func(context.Context, io.Writer) error) *cobra.Command
 	AddSubCommand(cmds ...*cobra.Command) Builder
+	Super() *cobra.Command
 }
 
 // internal builder of the package, implements all the Builder interface methods
@@ -135,6 +137,15 @@ func (b *builder) NoArgs(action func(context.Context, io.Writer) error) *cobra.C
 	return &b.cmd
 }
 
+// Super - guarantees that a command can't be executed on it's own,
+// requires the use of its subcommands.
+func (b *builder) Super() *cobra.Command {
+	b.cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		return cmd.Help()
+	}
+	return &b.cmd
+}
+
 // handleWellKnownErrors - responsible for handling the cli common errors and
 // returning them in a proper manner to the user
 func handleWellKnownErrors(err error) error {
@@ -145,4 +156,10 @@ func handleWellKnownErrors(err error) error {
 	return ierrors.NewError().
 		Message("error with the cli").
 		Build()
+}
+
+// WithAliases adds command aliases
+func (b *builder) WithAliases(alias []string) Builder {
+	b.cmd.Aliases = alias
+	return b
 }
