@@ -59,6 +59,7 @@ func TestYamlToChannelType(t *testing.T) {
 	}
 	os.Remove(channelTypeFile)
 }
+
 func TestIncorrectYaml(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		bytes, _ := ioutil.ReadFile("mock_incorrect.yaml")
