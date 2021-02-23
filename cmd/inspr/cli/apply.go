@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
@@ -80,13 +79,7 @@ func doApply(_ context.Context, out io.Writer) error {
 	}
 
 	if hasFileFlag {
-		filePath := strings.Split(cmd.InsprOptions.AppliedFileStructure, "/")
-		if len(filePath) == 1 {
-			files = append(files, filePath[0])
-		} else {
-			path = strings.Join(filePath[:len(filePath)-1], "/") + "/"
-			files = append(files, filePath[len(filePath)-1])
-		}
+		files = append(files, cmd.InsprOptions.AppliedFileStructure)
 	} else {
 		path = cmd.InsprOptions.AppliedFolderStructure
 		files, err = getFilesFromFolder(cmd.InsprOptions.AppliedFolderStructure)
