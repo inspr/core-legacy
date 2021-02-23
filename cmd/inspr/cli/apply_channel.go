@@ -17,10 +17,9 @@ Given the current state of the tasks some things will change when integrating ev
 this is a list of things to do  related to this package
 
 	- remove the RunMethod and use the one defined in the method Factory
-	- Establisha a prerun in the apply cmd where the factory.Subscribe is done for this method
-	- how to determine
+	- Establish a prerun in the apply cmd where the factory.Subscribe is done for this method
 	- in the channels().create -> the false parameter is the cmd.InsprOptions.DryRunFlag variable
-	- replace the mock_flags with the ones in the apply cmd
+		- replace the mock_flags with the ones in the apply cmd
 */
 
 // RunMethod defines the method that will run for the component
