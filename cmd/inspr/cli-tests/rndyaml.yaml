@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: channel
+meta:
+  name: mock_name
+  reference: mock_reference
+  annotations:
+    mock_map: mock_value
+  parent: mock_parent
+  sha256: mock_sha256
+spec:
+  type: mock_type
+connectedapps:
+- a
+- b
+- c
