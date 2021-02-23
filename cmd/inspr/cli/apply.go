@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -68,8 +69,6 @@ type applied struct {
 }
 
 func doApply(_ context.Context, out io.Writer) error {
-	fmt.Println(cmd.InsprOptions.DryRun)
-	fmt.Println(cmd.InsprOptions.Update)
 	var files []string
 	var path string
 	var err error
@@ -109,8 +108,8 @@ func doApply(_ context.Context, out io.Writer) error {
 }
 
 func isYaml(file string) bool {
-	tempStr := strings.Split(file, ".")
-	return tempStr[len(tempStr)-1] == "yaml" || tempStr[len(tempStr)-1] == "yml"
+	tempStr := filepath.Ext(file)
+	return tempStr == ".yaml" || tempStr == ".yml"
 }
 
 func printAppliedFiles(appliedFiles []applied, out io.Writer) {
@@ -138,6 +137,7 @@ func applyValidFiles(path string, files []string) []applied {
 
 	for _, file := range files {
 		if isYaml(file) {
+			fmt.Println(file)
 			comp := meta.Component{}
 			f, err := ioutil.ReadFile(path + file)
 			if err != nil {
