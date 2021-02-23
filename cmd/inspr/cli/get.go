@@ -19,9 +19,6 @@ import (
 var tabWriter *tabwriter.Writer
 var ctx string
 
-// TODO get app tree, deploy custom printer methods
-// get
-
 // NewGetCmd - mock subcommand
 func NewGetCmd() *cobra.Command {
 	getApps := cmd.NewCmd("apps").
@@ -105,7 +102,7 @@ func getObj(printObj func(*meta.App)) {
 		fmt.Println(err.Error())
 		return
 	}
-	req, err := http.NewRequest(http.MethodGet, getUrl(), bytes.NewBuffer(body))
+	req, err := http.NewRequest(http.MethodGet, getURL(), bytes.NewBuffer(body))
 	defer req.Body.Close()
 	if err != nil {
 		fmt.Println(err.Error())
@@ -173,6 +170,6 @@ func printTab() {
 	tabWriter.Flush()
 }
 
-func getUrl() string {
+func getURL() string {
 	return viper.GetString("reqUrl")
 }
