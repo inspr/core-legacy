@@ -96,7 +96,7 @@ func doApply(_ context.Context, out io.Writer) error {
 		}
 	}
 
-	appliedFiles := applyValidFiles(path, files)
+	appliedFiles := applyValidFiles(path, files, out)
 
 	if len(appliedFiles) > 0 {
 		printAppliedFiles(appliedFiles, out)
@@ -132,7 +132,7 @@ func getFilesFromFolder(path string) ([]string, error) {
 	return files, nil
 }
 
-func applyValidFiles(path string, files []string) []applied {
+func applyValidFiles(path string, files []string, out io.Writer) []applied {
 	var appliedFiles []applied
 
 	for _, file := range files {
@@ -154,6 +154,7 @@ func applyValidFiles(path string, files []string) []applied {
 			}
 			err = apply(f)
 			if err != nil {
+				fmt.Fprintf(out, "Error while applying file '%v' :\n %v", file, err.Error())
 				continue
 			}
 			appliedFiles = append(appliedFiles, applied{file: file, component: comp})

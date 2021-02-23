@@ -224,6 +224,7 @@ func Test_applyValidFiles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			out := &bytes.Buffer{}
 			GetFactory().Subscribe(meta.Component{
 				APIVersion: "v1",
 				Kind:       "app",
@@ -236,7 +237,7 @@ func Test_applyValidFiles(t *testing.T) {
 
 					return nil
 				})
-			if got := applyValidFiles(tt.args.path, tt.args.files); !reflect.DeepEqual(got, tt.want) {
+			if got := applyValidFiles(tt.args.path, tt.args.files, out); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("applyValidFiles() = %v, want %v", got, tt.want)
 			}
 		})
