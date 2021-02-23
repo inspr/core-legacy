@@ -17,8 +17,10 @@ import (
 // NewApplyCmd - mock subcommand
 func NewApplyCmd() *cobra.Command {
 	applyCmd := cmd.NewCmd("apply").
-		WithDescription("applies changes to the connected cluster").
-		WithLongDescription("apply takes a file or a directory and applies the defined components on the connected cluster").
+		WithDescription("Applies changes to the connected cluster").
+		WithLongDescription("Apply takes a file or a directory and applies the defined components on the connected cluster.\n"+
+			"It can be called with the flag --update for updating instead of creating a new dApp.\n"+
+			"It can be called with the flag --dry-run so the changes that would be made are shown, but not applied on the cluster").
 		WithExample("Applies a structure component defined in a file", "apply -f app.yaml").
 		WithExample("Applies components defined in a specific folder", "apply -k randfolder/").
 		WithExample("Applies a structure component defined in a specific scope", "apply -f app.yaml --scope app1.app2").
@@ -26,8 +28,8 @@ func NewApplyCmd() *cobra.Command {
 		WithFlags([]*cmd.Flag{
 			{
 				Name:          "file",
-				Usage:         "inspr apply -f ctype.yaml",
 				Shorthand:     "f",
+				Usage:         "inspr apply -f ctype.yaml",
 				Value:         &cmd.InsprOptions.AppliedFileStructure,
 				DefValue:      "",
 				FlagAddMethod: "",
@@ -35,11 +37,20 @@ func NewApplyCmd() *cobra.Command {
 			},
 			{
 				Name:          "folder",
-				Usage:         "inspr apply -k randfolder/",
 				Shorthand:     "k",
+				Usage:         "inspr apply -k randfolder/",
 				Value:         &cmd.InsprOptions.AppliedFolderStructure,
 				DefValue:      "",
 				FlagAddMethod: "",
+				DefinedOn:     []string{"apply"},
+			},
+			{
+				Name:          "update",
+				Shorthand:     "u",
+				Usage:         "inspr apply [path] --update",
+				Value:         &cmd.InsprOptions.Update,
+				DefValue:      false,
+				FlagAddMethod: "BoolVar",
 				DefinedOn:     []string{"apply"},
 			},
 		}).
@@ -57,6 +68,8 @@ type applied struct {
 }
 
 func doApply(_ context.Context, out io.Writer) error {
+	fmt.Println(cmd.InsprOptions.DryRun)
+	fmt.Println(cmd.InsprOptions.Update)
 	var files []string
 	var path string
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")

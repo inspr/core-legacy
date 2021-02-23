@@ -42,6 +42,15 @@ var flagRegistry = []Flag{
 		DefinedOn:     []string{"all"},
 	},
 	{
+		Name:          "dry-run",
+		Shorthand:     "d",
+		Usage:         "inspr [command] --dry-run",
+		Value:         &InsprOptions.DryRun,
+		DefValue:      false,
+		FlagAddMethod: "BoolVar",
+		DefinedOn:     []string{"apply"},
+	},
+	{
 		Name:          "specificTag",
 		Usage:         "tag used only by hidden subcommand",
 		Value:         &InsprOptions.SampleFlagValue,
