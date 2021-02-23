@@ -47,7 +47,7 @@ func NewApplyCmd() *cobra.Command {
 			{
 				Name:          "update",
 				Shorthand:     "u",
-				Usage:         "inspr apply [path] --update",
+				Usage:         "inspr apply (-f FILENAME | -k DIRECTORY) --update",
 				Value:         &cmd.InsprOptions.Update,
 				DefValue:      false,
 				FlagAddMethod: "BoolVar",
@@ -72,6 +72,7 @@ func doApply(_ context.Context, out io.Writer) error {
 	fmt.Println(cmd.InsprOptions.Update)
 	var files []string
 	var path string
+	var err error
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")
 	hasFolderFlag := (cmd.InsprOptions.AppliedFolderStructure != "")
 	if hasFileFlag == hasFolderFlag {
@@ -89,7 +90,7 @@ func doApply(_ context.Context, out io.Writer) error {
 		}
 	} else {
 		path = cmd.InsprOptions.AppliedFolderStructure
-		err := getFilesFromFolder(cmd.InsprOptions.AppliedFolderStructure, &files)
+		files, err = getFilesFromFolder(cmd.InsprOptions.AppliedFolderStructure)
 		if err != nil {
 			fmt.Fprint(out, err.Error())
 			return err
@@ -119,16 +120,17 @@ func printAppliedFiles(appliedFiles []applied, out io.Writer) {
 	}
 }
 
-func getFilesFromFolder(path string, files *[]string) error {
+func getFilesFromFolder(path string) ([]string, error) {
+	var files []string
 	folder, err := ioutil.ReadDir(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, file := range folder {
-		*files = append(*files, file.Name())
+		files = append(files, file.Name())
 	}
-	return nil
+	return files, nil
 }
 
 func applyValidFiles(path string, files []string) []applied {

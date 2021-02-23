@@ -147,49 +147,45 @@ func Test_doApply(t *testing.T) {
 }
 
 func Test_getFilesFromFolder(t *testing.T) {
-	tempFiles := []string{}
-	yamlString := createYaml()
-	// creates a file with the expected syntax
-	ioutil.WriteFile(
-		filePath,
-		[]byte(yamlString),
-		os.ModePerm,
-	)
-
 	type args struct {
-		path  string
-		files *[]string
+		path string
 	}
 	tests := []struct {
 		name    string
 		args    args
 		wantErr bool
+		want    []string
 	}{
 		{
 			name: "Get file from current folder",
 			args: args{
-				path:  ".",
-				files: &tempFiles,
+				path: ".",
 			},
 			wantErr: false,
+			want: []string{"apply.go", "apply_factory.go", "apply_factory_test.go",
+				"apply_test.go", "cli.go", "cli_test.go", "hidden_cmd.go", "mock_cmd.go"},
 		},
 		{
 			name: "Invalid - path doesn't exist",
 			args: args{
-				path:  "invalid/",
-				files: &tempFiles,
+				path: "invalid/",
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := getFilesFromFolder(tt.args.path, tt.args.files); (err != nil) != tt.wantErr {
+			got, err := getFilesFromFolder(tt.args.path)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("getFilesFromFolder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getFilesFromFolder() = %v, want %v", got, tt.want)
+				return
 			}
 		})
 	}
-	os.Remove(filePath)
 }
 
 func Test_applyValidFiles(t *testing.T) {
