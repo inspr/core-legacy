@@ -22,6 +22,7 @@ type Builder interface {
 	Hidden() Builder
 	ExactArgs(argCount int, action func(context.Context, io.Writer, []string) error) *cobra.Command
 	NoArgs(action func(context.Context, io.Writer) error) *cobra.Command
+	AddSubCommand(cmds ...*cobra.Command) Builder
 }
 
 // internal builder of the package, implements all the Builder interface methods
@@ -101,6 +102,13 @@ func (b *builder) WithFlags(flags []*Flag) Builder {
 // Hidden - Sets the command to be hidden, to not show in the --help description
 func (b *builder) Hidden() Builder {
 	b.cmd.Hidden = true
+	return b
+}
+
+func (b *builder) AddSubCommand(cmds ...*cobra.Command) Builder {
+	for _, cmd := range cmds {
+		b.cmd.AddCommand(cmd)
+	}
 	return b
 }
 
