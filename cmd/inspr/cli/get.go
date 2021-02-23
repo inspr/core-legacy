@@ -43,6 +43,7 @@ func NewGetCmd() *cobra.Command {
 		NoArgs(getNodes)
 	return cmd.NewCmd("get").
 		WithDescription("Get by object type").
+		WithAliases([]string{"list"}).
 		WithCommonFlags().
 		WithFlags([]*cmd.Flag{
 			{
