@@ -92,29 +92,9 @@ func displayChannelState(_ context.Context, out io.Writer, args []string) error 
 		return err
 	}
 
-	path := scope
-	var chName string
-
-	if err := utils.StructureNameIsValid(args[0]); err != nil {
-		if !utils.IsValidScope(args[0]) {
-			return ierrors.NewError().Build()
-		}
-
-		newScope, lastName, err := utils.RemoveLastPartInScope(args[0])
-		if err != nil {
-			return ierrors.NewError().Build()
-		}
-
-		separator := ""
-		if scope != "" {
-			separator = "."
-		}
-
-		path = path + separator + newScope
-		chName = lastName
-
-	} else {
-		chName = args[0]
+	path, chName, err := processArg(args[0], scope)
+	if err != nil {
+		return err
 	}
 
 	channel, err := client.Channels().Get(context.Background(), path, chName)
@@ -134,29 +114,9 @@ func displayChannelTypeState(_ context.Context, out io.Writer, args []string) er
 		return err
 	}
 
-	path := scope
-	var ctName string
-
-	if err := utils.StructureNameIsValid(args[0]); err != nil {
-		if !utils.IsValidScope(args[0]) {
-			return ierrors.NewError().Build()
-		}
-
-		newScope, lastName, err := utils.RemoveLastPartInScope(args[0])
-		if err != nil {
-			return ierrors.NewError().Build()
-		}
-
-		separator := ""
-		if scope != "" {
-			separator = "."
-		}
-
-		path = path + separator + newScope
-		ctName = lastName
-
-	} else {
-		ctName = args[0]
+	path, ctName, err := processArg(args[0], scope)
+	if err != nil {
+		return err
 	}
 
 	channelType, err := client.ChannelTypes().Get(context.Background(), path, ctName)
@@ -170,7 +130,7 @@ func displayChannelTypeState(_ context.Context, out io.Writer, args []string) er
 }
 
 func getClient() *client.Client {
-	url := "http://127.0.0.1:8080" // Here it will get from viper
+	url := "http://127.0.0.1:8080" // Here it will take from viper
 
 	client := client.Client{
 		HTTPClient: request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build(),
@@ -179,7 +139,7 @@ func getClient() *client.Client {
 }
 
 func getScope() (string, error) {
-	defaultScope := "" // Here it will get from viper
+	defaultScope := "" // Here it will take from viper
 	scope := defaultScope
 
 	if cmd.InsprOptions.Scope != "" {
@@ -192,4 +152,32 @@ func getScope() (string, error) {
 	}
 
 	return scope, nil
+}
+
+func processArg(arg, scope string) (string, string, error) {
+	path := scope
+	var component string
+
+	if err := utils.StructureNameIsValid(arg); err != nil {
+		if !utils.IsValidScope(arg) {
+			return "", "", ierrors.NewError().Build()
+		}
+
+		newScope, lastName, err := utils.RemoveLastPartInScope(arg)
+		if err != nil {
+			return "", "", ierrors.NewError().Build()
+		}
+
+		separator := ""
+		if scope != "" {
+			separator = "."
+		}
+
+		path = path + separator + newScope
+		component = lastName
+
+	} else {
+		component = arg
+	}
+	return path, component, nil
 }
