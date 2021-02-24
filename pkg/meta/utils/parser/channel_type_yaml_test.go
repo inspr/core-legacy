@@ -27,7 +27,7 @@ func TestYamlToChannelType(t *testing.T) {
 	)
 
 	// reads file created
-	bytes, err := os.ReadFile(channelTypeFile)
+	bytes, err := ioutil.ReadFile(channelTypeFile)
 	if err != nil {
 		t.Errorf("couldn't read file")
 	}
