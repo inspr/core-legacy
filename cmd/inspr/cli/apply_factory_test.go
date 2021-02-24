@@ -2,6 +2,8 @@ package cli
 
 import (
 	"errors"
+	"io"
+	"os"
 	"reflect"
 	"testing"
 
@@ -50,7 +52,7 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 					{
 						Kind:       "app",
 						APIVersion: "v1",
-					}: func([]byte) error {
+					}: func(b []byte, out io.Writer) error {
 						return errors.New("Just a example to test the function return")
 					},
 				},
@@ -63,7 +65,7 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 			},
 			checkFunction: func(t *testing.T, runMethod RunMethod) {
 				foo := []byte("foo")
-				got := runMethod(foo).Error()
+				got := runMethod(foo, os.Stdout).Error()
 				if got != "Just a example to test the function return" {
 					t.Errorf("ApplyFactory.GetRunMethod() = %v, want %v", got, "Just a example to test the function return")
 				}
@@ -77,7 +79,7 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 					{
 						Kind:       "app",
 						APIVersion: "v1",
-					}: func([]byte) error {
+					}: func(b []byte, out io.Writer) error {
 						return errors.New("Just a example to test the function return")
 					},
 				},
@@ -156,7 +158,7 @@ func TestApplyFactory_Subscribe(t *testing.T) {
 					{
 						Kind:       "app",
 						APIVersion: "v1",
-					}: func([]byte) error {
+					}: func(b []byte, out io.Writer) error {
 						return errors.New("Just a example to test the function return")
 					},
 				},
