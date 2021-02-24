@@ -103,7 +103,7 @@ func getObj(printObj func(*meta.App)) {
 		fmt.Println(err.Error())
 		return
 	}
-	req, err := http.NewRequest(http.MethodGet, getURL(), bytes.NewBuffer(body))
+	req, err := http.NewRequest(http.MethodGet, getAppsURL(), bytes.NewBuffer(body))
 	defer req.Body.Close()
 	if err != nil {
 		fmt.Println(err.Error())
@@ -171,6 +171,6 @@ func printTab() {
 	tabWriter.Flush()
 }
 
-func getURL() string {
-	return viper.GetString("reqUrl")
+func getAppsURL() string {
+	return fmt.Sprintf(viper.GetString("reqUrl"), "/apps")
 }
