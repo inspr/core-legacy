@@ -67,7 +67,7 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 				foo := []byte("foo")
 				got := runMethod(foo, os.Stdout).Error()
 				if got != "just a example to test the function return" {
-					t.Errorf("ApplyFactory.GetRunMethod() = %v, want %v", got, "Just a example to test the function return")
+					t.Errorf("ApplyFactory.GetRunMethod() = %v, want %v", got, "just a example to test the function return")
 				}
 			},
 			wantErr: false,
