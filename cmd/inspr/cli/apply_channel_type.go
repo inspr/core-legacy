@@ -14,8 +14,8 @@ import (
 // depending on the flags values
 func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 	return func(data []byte, out io.Writer) error {
-		// unmarshal into a channel
-		channel, err := utils.YamlToChannelType(data)
+		// unmarshal into a channelType
+		channelType, err := utils.YamlToChannelType(data)
 		if err != nil {
 			return err
 		}
@@ -26,9 +26,9 @@ func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 		var log diff.Changelog
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+			log, err = c.Update(context.Background(), channelType.Meta.Parent, &channelType, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+			log, err = c.Create(context.Background(), channelType.Meta.Parent, &channelType, flagDryRun)
 		}
 
 		if err != nil {

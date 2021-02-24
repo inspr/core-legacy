@@ -147,7 +147,7 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 			}
 			err = apply(f, out)
 			if err != nil {
-				fmt.Fprintf(out, "Error while applying file '%v' :\n %v", file, err.Error())
+				fmt.Fprintf(out, "Error while applying file '%v' :\n %v\n", file, err.Error())
 				continue
 			}
 			appliedFiles = append(appliedFiles, applied{file: file, component: comp})
