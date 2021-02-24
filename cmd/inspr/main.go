@@ -23,5 +23,10 @@ func main() {
 		Kind:       "channel",
 	}, cli.NewApplyChannel(client.Channels()))
 
+	cli.GetFactory().Subscribe(meta.Component{
+		APIVersion: "v1",
+		Kind:       "channeltype",
+	}, cli.NewApplyChannelType(client.ChannelTypes()))
+
 	cli.NewInsprCommand(os.Stdout, os.Stderr).Execute()
 }

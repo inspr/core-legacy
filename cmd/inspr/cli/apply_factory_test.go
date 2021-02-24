@@ -25,7 +25,7 @@ func TestGetFactory(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetFactory(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetFactory() = %v, want %v", got, tt.want)
+				t.Errorf("getFactory() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -178,7 +178,7 @@ func TestApplyFactory_Subscribe(t *testing.T) {
 				applyDict: tt.fields.applyDict,
 			}
 			if err := af.Subscribe(tt.args.component, tt.args.method); (err != nil) != tt.wantErr {
-				t.Errorf("ApplyFactory.Subscribe() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("applyFactory.Subscribe() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

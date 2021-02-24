@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -146,8 +145,7 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 			if err != nil {
 				continue
 			}
-
-			err = apply(f, os.Stdout)
+			err = apply(f, out)
 			if err != nil {
 				fmt.Fprintf(out, "error while applying file '%v' :\n %v\n", file, err.Error())
 				continue

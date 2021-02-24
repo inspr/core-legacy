@@ -58,7 +58,7 @@ func TestYamlToChannel(t *testing.T) {
 	os.Remove(fileName)
 }
 
-func TestIncorrectYaml(t *testing.T) {
+func TestIncorrectChannelYaml(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		bytes, _ := ioutil.ReadFile("mock_incorrect.yaml")
 
@@ -69,7 +69,7 @@ func TestIncorrectYaml(t *testing.T) {
 	})
 }
 
-func TestNonExistantFile(t *testing.T) {
+func TestNonExistantChannelFile(t *testing.T) {
 	// reads file created
 	bytes := []byte{1}
 	_, err := YamlToChannel(bytes)
