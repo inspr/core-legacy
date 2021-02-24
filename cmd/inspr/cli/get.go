@@ -25,37 +25,70 @@ func NewGetCmd() *cobra.Command {
 		WithDescription("Get apps").
 		WithAliases([]string{"a"}).
 		WithCommonFlags().
+		WithFlags([]*cmd.Flag{
+			{
+				Name:          "scope",
+				Usage:         "inspr get <subcommand> --scope/-s <apppath>",
+				Shorthand:     "s",
+				Value:         &ctx,
+				DefValue:      "",
+				FlagAddMethod: "",
+				DefinedOn:     []string{"apps"},
+			},
+		}).
 		NoArgs(getApps)
 	getChannels := cmd.NewCmd("channels").
 		WithDescription("Get channels").
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
+		WithFlags([]*cmd.Flag{
+			{
+				Name:          "define search scope",
+				Usage:         "inspr get <subcommand> --scope/-s <apppath>",
+				Shorthand:     "s",
+				Value:         &ctx,
+				DefValue:      "",
+				FlagAddMethod: "",
+				DefinedOn:     []string{"channels"},
+			},
+		}).
 		NoArgs(getChannels)
 	getTypes := cmd.NewCmd("types").
 		WithDescription("Get types").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
+		WithFlags([]*cmd.Flag{
+			{
+				Name:          "scope",
+				Usage:         "inspr get <subcommand> --scope/-s <apppath>",
+				Shorthand:     "s",
+				Value:         &ctx,
+				DefValue:      "",
+				FlagAddMethod: "",
+				DefinedOn:     []string{"types"},
+			},
+		}).
 		NoArgs(getCTypes)
 	getNodes := cmd.NewCmd("nodes").
 		WithDescription("Get nodes").
 		WithAliases([]string{"n"}).
 		WithCommonFlags().
+		WithFlags([]*cmd.Flag{
+			{
+				Name:          "scope",
+				Usage:         "inspr get <subcommand> --scope/-s <apppath>",
+				Shorthand:     "s",
+				Value:         &ctx,
+				DefValue:      "",
+				FlagAddMethod: "",
+				DefinedOn:     []string{"nodes"},
+			},
+		}).
 		NoArgs(getNodes)
 	return cmd.NewCmd("get").
 		WithDescription("Get by object type").
 		WithAliases([]string{"list"}).
 		WithCommonFlags().
-		WithFlags([]*cmd.Flag{
-			{
-				Name:          "inspr get <subcommand> --scope/-s <apppath>",
-				Usage:         "define search scope",
-				Shorthand:     "s",
-				Value:         &ctx,
-				DefValue:      "",
-				FlagAddMethod: "",
-				DefinedOn:     []string{"get"},
-			},
-		}).
 		AddSubCommand(getApps).
 		AddSubCommand(getChannels).
 		AddSubCommand(getTypes).
@@ -65,9 +98,10 @@ func NewGetCmd() *cobra.Command {
 }
 
 func getApps(_ context.Context, out io.Writer) error {
-	initTab(out)
-	getObj(printApps)
-	printTab()
+	// initTab(out)
+	// getObj(printApps)
+	// printTab()
+	fmt.Println(ctx)
 	return nil
 }
 
