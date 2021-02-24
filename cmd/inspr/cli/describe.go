@@ -32,10 +32,11 @@ func NewDescribeCmd() *cobra.Command {
 
 	describeChannel := cmd.NewCmd("channels").
 		WithDescription("retrieves the full state of the channel from a given namespace").
-		WithExample("Display the state of the given channel on the default scope", "describe channel hello_world").
-		WithExample("Display the state of the given channel on a custom scope", "describe channel --scope app1.app2 hello_world").
-		WithExample("Display the state of the given channel by the path", "describe channel app1.app2.hello_world").
+		WithExample("Display the state of the given channel on the default scope", "describe channels hello_world").
+		WithExample("Display the state of the given channel on a custom scope", "describe channels --scope app1.app2 hello_world").
+		WithExample("Display the state of the given channel by the path", "describe channels app1.app2.hello_world").
 		WithAliases([]string{"ch"}).
+		WithCommonFlags().
 		ExactArgs(1, displayChannelState)
 
 	describeChannelType := cmd.NewCmd("channeltypes").
@@ -63,21 +64,11 @@ func NewDescribeCmd() *cobra.Command {
 }
 
 func displayAppState(_ context.Context, out io.Writer, args []string) error {
+	client := getClient()
 
-	client := client.Client{
-		HTTPClient: request.NewClient().BaseURL("http://127.0.0.1:8080").Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build(),
-	}
-
-	defaultScope := "" // Here it will get from viper
-	scope := defaultScope
-
-	if cmd.InsprOptions.Scope != "" {
-		if utils.IsValidScope(cmd.InsprOptions.Scope) {
-			scope = cmd.InsprOptions.Scope
-		} else {
-			fmt.Println("invalid scope")
-			return ierrors.NewError().Build()
-		}
+	scope, err := getScope()
+	if err != nil {
+		return err
 	}
 
 	if !utils.IsValidScope(args[0]) {
@@ -103,6 +94,44 @@ func displayAppState(_ context.Context, out io.Writer, args []string) error {
 }
 
 func displayChannelState(_ context.Context, out io.Writer, args []string) error {
+	client := getClient()
+	scope, err := getScope()
+	if err != nil {
+		return err
+	}
+
+	path := scope
+	var chName string
+
+	if err := utils.StructureNameIsValid(args[0]); err != nil {
+		if !utils.IsValidScope(args[0]) {
+			return ierrors.NewError().Build()
+		}
+
+		newScope, lastName, err := utils.RemoveLastPartInScope(args[0])
+		if err != nil {
+			return ierrors.NewError().Build()
+		}
+
+		separator := ""
+		if scope != "" {
+			separator = "."
+		}
+
+		path = path + separator + newScope
+		chName = lastName
+
+	} else {
+		chName = args[0]
+	}
+
+	channel, err := client.Channels().Get(context.Background(), path, chName)
+	if err != nil {
+		fmt.Println(err)
+		return ierrors.NewError().Build()
+	}
+	utils.PrintChannelTree(channel)
+
 	return nil
 }
 
@@ -112,4 +141,29 @@ func displayChannelTypeState(_ context.Context, out io.Writer, args []string) er
 
 func displayNodeState(_ context.Context, out io.Writer, args []string) error {
 	return nil
+}
+
+func getClient() *client.Client {
+	url := "http://127.0.0.1:8080" // Here it will get from viper
+
+	client := client.Client{
+		HTTPClient: request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build(),
+	}
+	return &client
+}
+
+func getScope() (string, error) {
+	defaultScope := "" // Here it will get from viper
+	scope := defaultScope
+
+	if cmd.InsprOptions.Scope != "" {
+		if utils.IsValidScope(cmd.InsprOptions.Scope) {
+			scope = cmd.InsprOptions.Scope
+		} else {
+			fmt.Println("invalid scope")
+			return "", ierrors.NewError().Build()
+		}
+	}
+
+	return scope, nil
 }

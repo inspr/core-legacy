@@ -3,6 +3,7 @@ package utils
 import (
 	"strings"
 
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -27,4 +28,28 @@ func IsValidScope(scope string) bool {
 	}
 
 	return true
+}
+
+/*
+RemoveLastPartInScope removes the last name defined in the scope
+and returns the new scope and the element that was removed
+*/
+func RemoveLastPartInScope(scope string) (string, string, error) {
+	if !IsValidScope(scope) {
+		return "", "", ierrors.NewError().Build()
+	}
+
+	names := strings.Split(scope, ".")
+	lastName := names[len(names)-1]
+	names = names[:len(names)-1]
+
+	newScope := ""
+	separator := ""
+	for _, name := range names {
+		newScope = newScope + separator + name
+		separator = "."
+	}
+
+	return newScope, lastName, nil
+
 }
