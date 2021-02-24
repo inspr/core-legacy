@@ -1,0 +1,13 @@
+incorrect_tag_meta:
+  name: mock_name
+  reference: mock_reference
+  annotations:
+    mock_map: mock_value
+  parent: mock_parent
+  sha256: mock_sha256
+incorrect_tag_spec:
+  type: mock_type
+incorrect_tag_connectedapps:
+- a
+- b
+- c
