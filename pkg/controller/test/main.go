@@ -72,48 +72,48 @@ func main() {
 	updateChannelTypeHelloAddAnnotation(&client, false)
 	fmt.Printf("\n\n")
 
-	// fmt.Println("[Delete NewApp inside HelloWorld...]")
-	// deleteNewAppInsideHelloWorld(&client, false)
-	// fmt.Printf("\n\n")
+	fmt.Println("[Delete NewApp inside HelloWorld...]")
+	deleteNewAppInsideHelloWorld(&client, false)
+	fmt.Printf("\n\n")
 
-	// fmt.Println("[Delete ChannelOne inside HelloWorld...]")
-	// deleteChannelOneInsideHelloWorld(&client, false)
-	// fmt.Printf("\n\n")
+	fmt.Println("[Delete ChannelOne inside HelloWorld...]")
+	deleteChannelOneInsideHelloWorld(&client, false)
+	fmt.Printf("\n\n")
 
-	// fmt.Println("[Delete ChannelTypeHello inside HelloWorld]")
-	// deleteChannelTypeHelloInsideHelloWorld(&client, false)
-	// fmt.Printf("\n\n")
+	fmt.Println("[Delete ChannelTypeHello inside HelloWorld]")
+	deleteChannelTypeHelloInsideHelloWorld(&client, false)
+	fmt.Printf("\n\n")
 
-	// fmt.Println("[TESTING DRY RUN...]")
-	// fmt.Printf("\n\n")
+	fmt.Println("[TESTING DRY RUN...]")
+	fmt.Printf("\n\n")
 
-	// fmt.Println("[Creating NewApp inside HelloWorld app USING DRY RUN...]")
-	// createNewAppInsideHelloWorld(&client, true)
-	// fmt.Printf("\n\n")
+	fmt.Println("[Creating NewApp inside HelloWorld app USING DRY RUN...]")
+	createNewAppInsideHelloWorld(&client, true)
+	fmt.Printf("\n\n")
 
-	// fmt.Println("[Getting App HelloWorld...]")
-	// resp, err := client.Apps().Get(context.Background(), "HelloWorld")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// utils.PrintAppTree(resp)
+	fmt.Println("[Getting App HelloWorld...]")
+	resp, err := client.Apps().Get(context.Background(), "HelloWorld")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	utils.PrintAppTree(resp)
 
-	// fmt.Println("[Creating NewApp inside HelloWorld app NOT USING DRY RUN...]")
-	// createNewAppInsideHelloWorld(&client, false)
-	// fmt.Printf("\n\n")
+	fmt.Println("[Creating NewApp inside HelloWorld app NOT USING DRY RUN...]")
+	createNewAppInsideHelloWorld(&client, false)
+	fmt.Printf("\n\n")
 
-	// fmt.Println("[Getting App HelloWorld...]")
-	// resp, err = client.Apps().Get(context.Background(), "HelloWorld")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// utils.PrintAppTree(resp)
+	fmt.Println("[Getting App HelloWorld...]")
+	resp, err = client.Apps().Get(context.Background(), "HelloWorld")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	utils.PrintAppTree(resp)
 
-	// fmt.Println("[Deleting HelloWorld App...]")
-	// deleteHelloWorldApp(&client, false)
-	// fmt.Printf("\n\n")
+	fmt.Println("[Deleting HelloWorld App...]")
+	deleteHelloWorldApp(&client, false)
+	fmt.Printf("\n\n")
 
 }
 
