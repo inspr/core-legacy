@@ -41,10 +41,11 @@ func NewDescribeCmd() *cobra.Command {
 
 	describeChannelType := cmd.NewCmd("channeltypes").
 		WithDescription("retrieves the full state of the channelType from a given namespace").
-		WithExample("Display the state of the given channelType on the default scope", "describe channelType hello_world").
-		WithExample("Display the state of the given channelType on a custom scope", "describe channelType --scope app1.app2 hello_world").
-		WithExample("Display the state of the given channelType by the path", "describe channelType app1.app2.hello_world").
+		WithExample("Display the state of the given channelType on the default scope", "describe channeltypes hello_world").
+		WithExample("Display the state of the given channelType on a custom scope", "describe channeltypes --scope app1.app2 hello_world").
+		WithExample("Display the state of the given channelType by the path", "describe channeltypes app1.app2.hello_world").
 		WithAliases([]string{"ct"}).
+		WithCommonFlags().
 		ExactArgs(1, displayChannelTypeState)
 
 	describeNode := cmd.NewCmd("nodes").
@@ -136,6 +137,45 @@ func displayChannelState(_ context.Context, out io.Writer, args []string) error 
 }
 
 func displayChannelTypeState(_ context.Context, out io.Writer, args []string) error {
+
+	client := getClient()
+	scope, err := getScope()
+	if err != nil {
+		return err
+	}
+
+	path := scope
+	var ctName string
+
+	if err := utils.StructureNameIsValid(args[0]); err != nil {
+		if !utils.IsValidScope(args[0]) {
+			return ierrors.NewError().Build()
+		}
+
+		newScope, lastName, err := utils.RemoveLastPartInScope(args[0])
+		if err != nil {
+			return ierrors.NewError().Build()
+		}
+
+		separator := ""
+		if scope != "" {
+			separator = "."
+		}
+
+		path = path + separator + newScope
+		ctName = lastName
+
+	} else {
+		ctName = args[0]
+	}
+
+	channelType, err := client.ChannelTypes().Get(context.Background(), path, ctName)
+	if err != nil {
+		fmt.Println(err)
+		return ierrors.NewError().Build()
+	}
+	utils.PrintChannelTypeTree(channelType)
+
 	return nil
 }
 
