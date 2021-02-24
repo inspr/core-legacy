@@ -32,7 +32,7 @@ func TestNewApplyChannelType(t *testing.T) {
 			want: nil,
 		},
 		{
-			name: "channel_without_name",
+			name: "channeltype_without_name",
 			args: args{
 				c: mocks.NewChannelTypeMock(nil),
 				b: chanTypeWithoutNameBytes,
@@ -56,11 +56,11 @@ func TestNewApplyChannelType(t *testing.T) {
 
 			if r != nil && tt.want != nil {
 				if r.Error() != tt.want.Error() {
-					t.Errorf("NewApplyChannel() = %v, want %v", r.Error(), tt.want.Error())
+					t.Errorf("NewApplyChannelType() = %v, want %v", r.Error(), tt.want.Error())
 				}
 			} else {
 				if r != tt.want {
-					t.Errorf("NewApplyChannel() = %v, want %v", r, tt.want)
+					t.Errorf("NewApplyChannelType() = %v, want %v", r, tt.want)
 				}
 			}
 		})

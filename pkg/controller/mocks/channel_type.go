@@ -7,7 +7,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 )
 
-// ChannelTypeMock mock structure for the operations of the controller.Channels()
+// ChannelTypeMock mock structure for the operations of the controller.ChannelTypes()
 type ChannelTypeMock struct {
 	err error
 }
