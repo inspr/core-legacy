@@ -7,34 +7,41 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 )
 
-type channelMock struct {
+type ChannelMock struct {
 	err error
 }
 
 // NewChannelMock exports a mock of the channel.interface
-func NewChannelMock(err error) *channelMock {
-	return &channelMock{err: err}
+func NewChannelMock(err error) *ChannelMock {
+	return &ChannelMock{err: err}
 }
 
-func (cm *channelMock) Get(ctx context.Context, context string, chName string) (*meta.Channel, error) {
+// Get is the channelmock Get
+func (cm *ChannelMock) Get(ctx context.Context, context string, chName string) (*meta.Channel, error) {
 	if cm.err != nil {
 		return &meta.Channel{}, cm.err
 	}
 	return &meta.Channel{}, nil
 }
-func (cm *channelMock) Create(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
+
+// Create is the channelmock Create
+func (cm *ChannelMock) Create(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
 	if cm.err != nil {
 		return diff.Changelog{}, cm.err
 	}
 	return diff.Changelog{}, nil
 }
-func (cm *channelMock) Delete(ctx context.Context, context string, chName string, dryRun bool) (diff.Changelog, error) {
+
+// Delete is the channelmock Delete
+func (cm *ChannelMock) Delete(ctx context.Context, context string, chName string, dryRun bool) (diff.Changelog, error) {
 	if cm.err != nil {
 		return diff.Changelog{}, cm.err
 	}
 	return diff.Changelog{}, nil
 }
-func (cm *channelMock) Update(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
+
+// Update is the channelmock Update
+func (cm *ChannelMock) Update(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
 	if cm.err != nil {
 		return diff.Changelog{}, cm.err
 	}
