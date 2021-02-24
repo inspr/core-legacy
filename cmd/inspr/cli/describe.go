@@ -48,18 +48,9 @@ func NewDescribeCmd() *cobra.Command {
 		WithCommonFlags().
 		ExactArgs(1, displayChannelTypeState)
 
-	describeNode := cmd.NewCmd("nodes").
-		WithDescription("retrieves the full state of the node from a given namespace").
-		WithExample("Display the state of the given node on the default scope", "describe node hello_world").
-		WithExample("Display the state of the given node on a custom scope", "describe node --scope app1.app2 hello_world").
-		WithExample("Display the state of the given node by the path", "describe node app1.app2.hello_world").
-		WithAliases([]string{"n"}).
-		ExactArgs(1, displayNodeState)
-
 	describeCmd.AddCommand(describeApp)
 	describeCmd.AddCommand(describeChannel)
 	describeCmd.AddCommand(describeChannelType)
-	describeCmd.AddCommand(describeNode)
 
 	return describeCmd
 }
@@ -137,7 +128,6 @@ func displayChannelState(_ context.Context, out io.Writer, args []string) error 
 }
 
 func displayChannelTypeState(_ context.Context, out io.Writer, args []string) error {
-
 	client := getClient()
 	scope, err := getScope()
 	if err != nil {
@@ -176,10 +166,6 @@ func displayChannelTypeState(_ context.Context, out io.Writer, args []string) er
 	}
 	utils.PrintChannelTypeTree(channelType)
 
-	return nil
-}
-
-func displayNodeState(_ context.Context, out io.Writer, args []string) error {
 	return nil
 }
 
