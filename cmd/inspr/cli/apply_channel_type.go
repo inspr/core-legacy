@@ -10,12 +10,9 @@ import (
 	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
 )
 
-// ApplyChannelType is of the type RunMethod, it calls the pkg/controller/client functions.
-type ApplyChannelType RunMethod
-
 // NewApplyChannelType receives a controller ChannelTypeInterface and calls it's methods
 // depending on the flags values
-func NewApplyChannelType(c controller.ChannelTypeInterface) ApplyChannelType {
+func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 	return func(data []byte, out io.Writer) error {
 		// unmarshal into a channel
 		channel, err := utils.YamlToChannelType(data)
