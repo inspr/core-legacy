@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 
+	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
@@ -14,7 +15,7 @@ type ApplyChannelType RunMethod
 
 // NewApplyChannelType receives a controller ChannelTypeInterface and calls it's methods
 // depending on the flags values
-func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
+func NewApplyChannelType(c controller.ChannelTypeInterface) ApplyChannelType {
 	return func(data []byte, out io.Writer) error {
 		// unmarshal into a channel
 		channel, err := utils.YamlToChannelType(data)
@@ -22,8 +23,8 @@ func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 			return err
 		}
 
-		flagDryRun := false
-		flagIsUpdate := false
+		flagDryRun := cmd.InsprOptions.DryRun
+		flagIsUpdate := cmd.InsprOptions.Update
 
 		var log diff.Changelog
 		// creates or updates it
