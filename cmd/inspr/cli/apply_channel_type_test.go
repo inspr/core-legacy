@@ -56,11 +56,11 @@ func TestNewApplyChannelType(t *testing.T) {
 
 			if r != nil && tt.want != nil {
 				if r.Error() != tt.want.Error() {
-					t.Errorf("NewApplyChannelType() = %v, want %v", r.Error(), tt.want.Error())
+					t.Errorf("newApplyChannelType() = %v, want %v", r.Error(), tt.want.Error())
 				}
 			} else {
 				if r != tt.want {
-					t.Errorf("NewApplyChannelType() = %v, want %v", r, tt.want)
+					t.Errorf("newApplyChannelType() = %v, want %v", r, tt.want)
 				}
 			}
 		})

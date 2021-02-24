@@ -25,7 +25,7 @@ func TestGetFactory(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetFactory(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetFactory() = %v, want %v", got, tt.want)
+				t.Errorf("getFactory() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -53,7 +53,7 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 						Kind:       "app",
 						APIVersion: "v1",
 					}: func(b []byte, out io.Writer) error {
-						return errors.New("Just a example to test the function return")
+						return errors.New("just a example to test the function return")
 					},
 				},
 			},
@@ -66,7 +66,7 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 			checkFunction: func(t *testing.T, runMethod RunMethod) {
 				foo := []byte("foo")
 				got := runMethod(foo, os.Stdout).Error()
-				if got != "Just a example to test the function return" {
+				if got != "just a example to test the function return" {
 					t.Errorf("ApplyFactory.GetRunMethod() = %v, want %v", got, "Just a example to test the function return")
 				}
 			},
@@ -80,7 +80,7 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 						Kind:       "app",
 						APIVersion: "v1",
 					}: func(b []byte, out io.Writer) error {
-						return errors.New("Just a example to test the function return")
+						return errors.New("just a example to test the function return")
 					},
 				},
 			},
@@ -159,7 +159,7 @@ func TestApplyFactory_Subscribe(t *testing.T) {
 						Kind:       "app",
 						APIVersion: "v1",
 					}: func(b []byte, out io.Writer) error {
-						return errors.New("Just a example to test the function return")
+						return errors.New("just a example to test the function return")
 					},
 				},
 			},
@@ -178,7 +178,7 @@ func TestApplyFactory_Subscribe(t *testing.T) {
 				applyDict: tt.fields.applyDict,
 			}
 			if err := af.Subscribe(tt.args.component, tt.args.method); (err != nil) != tt.wantErr {
-				t.Errorf("ApplyFactory.Subscribe() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("applyFactory.Subscribe() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
