@@ -26,6 +26,16 @@ func createYaml() string {
 	return string(data)
 }
 
+func getCurrentFilesInFolder() []string {
+	var files []string
+	folder, _ := ioutil.ReadDir(".")
+
+	for _, file := range folder {
+		files = append(files, file.Name())
+	}
+	return files
+}
+
 // TestNewApplyCmd is mainly for improving test coverage,
 // it was really tested by instantiating Inspr's CLI
 func TestNewApplyCmd(t *testing.T) {
@@ -162,8 +172,7 @@ func Test_getFilesFromFolder(t *testing.T) {
 				path: ".",
 			},
 			wantErr: false,
-			want: []string{"apply.go", "apply_factory.go", "apply_factory_test.go",
-				"apply_test.go", "cli.go", "cli_test.go", "hidden_cmd.go", "mock_cmd.go"},
+			want:    getCurrentFilesInFolder(),
 		},
 		{
 			name: "Invalid - path doesn't exist",
