@@ -2,6 +2,7 @@ package tree
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"testing"
 
@@ -1792,7 +1793,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 				if derr != nil {
 					fmt.Println(derr.Error())
 				}
-				cl.Print()
+				cl.Print(os.Stdout)
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}

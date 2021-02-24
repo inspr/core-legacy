@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"io"
+
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
@@ -9,7 +11,7 @@ import (
 RunMethod defines the method that will run for the
 component
 */
-type RunMethod func([]byte) error
+type RunMethod func(b []byte, out io.Writer) error
 
 /*
 ApplyFactory holds a dictionary that maps all the pairs
