@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	cli "gitlab.inspr.dev/inspr/core/cmd/inspr/cli"
@@ -14,7 +15,7 @@ func main() {
 		APIVersion: "v1",
 		Kind:       "channel",
 	},
-		func(b []byte) error {
+		func(b []byte, out io.Writer) error {
 			ch := meta.Channel{}
 
 			yaml.Unmarshal(b, &ch)

@@ -145,7 +145,7 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 			if err != nil {
 				continue
 			}
-			err = apply(f)
+			err = apply(f, out)
 			if err != nil {
 				fmt.Fprintf(out, "Error while applying file '%v' :\n %v", file, err.Error())
 				continue
