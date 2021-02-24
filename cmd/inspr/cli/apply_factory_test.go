@@ -53,7 +53,7 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 						Kind:       "app",
 						APIVersion: "v1",
 					}: func(b []byte, out io.Writer) error {
-						return errors.New("Just a example to test the function return")
+						return errors.New("just a example to test the function return")
 					},
 				},
 			},
@@ -66,8 +66,8 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 			checkFunction: func(t *testing.T, runMethod RunMethod) {
 				foo := []byte("foo")
 				got := runMethod(foo, os.Stdout).Error()
-				if got != "Just a example to test the function return" {
-					t.Errorf("ApplyFactory.GetRunMethod() = %v, want %v", got, "Just a example to test the function return")
+				if got != "just a example to test the function return" {
+					t.Errorf("ApplyFactory.GetRunMethod() = %v, want %v", got, "just a example to test the function return")
 				}
 			},
 			wantErr: false,
@@ -80,7 +80,7 @@ func TestApplyFactory_GetRunMethod(t *testing.T) {
 						Kind:       "app",
 						APIVersion: "v1",
 					}: func(b []byte, out io.Writer) error {
-						return errors.New("Just a example to test the function return")
+						return errors.New("just a example to test the function return")
 					},
 				},
 			},
@@ -159,7 +159,7 @@ func TestApplyFactory_Subscribe(t *testing.T) {
 						Kind:       "app",
 						APIVersion: "v1",
 					}: func(b []byte, out io.Writer) error {
-						return errors.New("Just a example to test the function return")
+						return errors.New("just a example to test the function return")
 					},
 				},
 			},
