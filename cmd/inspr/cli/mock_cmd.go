@@ -14,6 +14,7 @@ func NewMockCmd() *cobra.Command {
 	return cmd.NewCmd("mock").
 		WithDescription("mocks the usage of a subcommand").
 		WithCommonFlags().
+		AddSubCommand(NewHelloCmd()).
 		NoArgs(doMock)
 }
 
