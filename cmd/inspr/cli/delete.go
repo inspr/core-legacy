@@ -7,20 +7,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"text/tabwriter"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-var tabWriter *tabwriter.Writer
-var getScope string
+var deleteScope string
 
 // NewGetCmd - mock subcommand
-func NewGetCmd() *cobra.Command {
+func NewDeleteCmd() *cobra.Command {
 	getApps := cmd.NewCmd("apps").
 		WithDescription("Get apps").
 		WithAliases([]string{"a"}).
@@ -64,35 +61,35 @@ func NewGetCmd() *cobra.Command {
 
 }
 
-func getApps(_ context.Context, out io.Writer) error {
+func deleteApps(_ context.Context, out io.Writer) error {
 	initTab(out)
 	getObj(printApps)
 	printTab()
 	return nil
 }
 
-func getChannels(_ context.Context, out io.Writer) error {
+func deleteChannels(_ context.Context, out io.Writer) error {
 	initTab(out)
 	getObj(printChannels)
 	printTab()
 	return nil
 }
 
-func getCTypes(_ context.Context, out io.Writer) error {
+func deleteCTypes(_ context.Context, out io.Writer) error {
 	initTab(out)
 	getObj(printCTypes)
 	printTab()
 	return nil
 }
 
-func getNodes(_ context.Context, out io.Writer) error {
+func deleteNodes(_ context.Context, out io.Writer) error {
 	initTab(out)
 	getObj(printNodes)
 	printTab()
 	return nil
 }
 
-func getObj(printObj func(*meta.App)) {
+func deleteObj(printObj func(*meta.App)) {
 	getDO := models.AppQueryDI{
 		Ctx:    getScope,
 		Valid:  true,
@@ -120,57 +117,4 @@ func getObj(printObj func(*meta.App)) {
 	json.NewDecoder(resp.Body).Decode(apps)
 	printObj(&apps.App)
 
-}
-
-func printApps(app *meta.App) {
-	if app.Meta.Name != "" {
-		printLine(app.Meta.Name)
-	}
-	for _, child := range app.Spec.Apps {
-		printApps(child)
-	}
-}
-
-func printChannels(app *meta.App) {
-	for ch := range app.Spec.Channels {
-		printLine(ch)
-	}
-	for _, child := range app.Spec.Apps {
-		printChannels(child)
-	}
-}
-
-func printCTypes(app *meta.App) {
-	for ct := range app.Spec.ChannelTypes {
-		printLine(ct)
-	}
-	for _, child := range app.Spec.Apps {
-		printChannels(child)
-	}
-}
-
-func printNodes(app *meta.App) {
-	if app.Spec.Node.Meta.Name != "" {
-		printLine(app.Spec.Node.Meta.Name)
-	}
-	for _, child := range app.Spec.Apps {
-		printApps(child)
-	}
-}
-
-func printLine(name string) {
-	fmt.Fprintf(tabWriter, "%s", name)
-}
-
-func initTab(out io.Writer) {
-	tabWriter = tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.Debug)
-	fmt.Fprintf(tabWriter, "NAME")
-}
-
-func printTab() {
-	tabWriter.Flush()
-}
-
-func getURL() string {
-	return viper.GetString("reqUrl")
 }
