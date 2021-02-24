@@ -7,5 +7,5 @@ the cluster
 */
 type Component struct {
 	Kind       string `yaml:"kind"`
-	APIVersion string `yaml:"apiversion"`
+	APIVersion string `yaml:"apiVersion"`
 }
