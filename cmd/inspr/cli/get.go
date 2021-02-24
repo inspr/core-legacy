@@ -98,10 +98,9 @@ func NewGetCmd() *cobra.Command {
 }
 
 func getApps(_ context.Context, out io.Writer) error {
-	// initTab(out)
-	// getObj(printApps)
-	// printTab()
-	fmt.Println(ctx)
+	initTab(out)
+	getObj(printApps)
+	printTab()
 	return nil
 }
 
