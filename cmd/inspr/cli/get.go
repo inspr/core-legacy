@@ -35,7 +35,7 @@ func NewGetCmd() *cobra.Command {
 		WithDescription("Get types").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
-		NoArgs(getTypes)
+		NoArgs(getCTypes)
 	getNodes := cmd.NewCmd("nodes").
 		WithDescription("Get nodes").
 		WithAliases([]string{"n"}).
@@ -47,7 +47,7 @@ func NewGetCmd() *cobra.Command {
 		WithCommonFlags().
 		WithFlags([]*cmd.Flag{
 			{
-				Name:          "scope",
+				Name:          "inspr get <subcommand> --scope/-s <apppath>",
 				Usage:         "define search scope",
 				Shorthand:     "s",
 				Value:         &ctx,
@@ -78,9 +78,9 @@ func getChannels(_ context.Context, out io.Writer) error {
 	return nil
 }
 
-func getTypes(_ context.Context, out io.Writer) error {
+func getCTypes(_ context.Context, out io.Writer) error {
 	initTab(out)
-	getObj(printTypes)
+	getObj(printCTypes)
 	printTab()
 	return nil
 }
@@ -140,7 +140,7 @@ func printChannels(app *meta.App) {
 	}
 }
 
-func printTypes(app *meta.App) {
+func printCTypes(app *meta.App) {
 	for ct := range app.Spec.ChannelTypes {
 		printLine(ct)
 	}
