@@ -28,12 +28,12 @@ func NewApplyChannel(c controller.ChannelInterface) RunMethod {
 		flagDryRun := false
 		flagIsUpdate := false
 
-		var clog diff.Changelog
+		var log diff.Changelog
 		// creates or updates it
 		if flagIsUpdate {
-			clog, err = c.Update(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+			log, err = c.Update(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
 		} else {
-			clog, err = c.Create(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+			log, err = c.Create(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
 		}
 
 		if err != nil {
@@ -41,7 +41,7 @@ func NewApplyChannel(c controller.ChannelInterface) RunMethod {
 		}
 
 		// prints differences
-		clog.Print(out)
+		log.Print(out)
 
 		return nil
 	}
