@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -238,7 +239,7 @@ func Test_applyValidFiles(t *testing.T) {
 				APIVersion: "v1",
 				Kind:       "app",
 			},
-				func(b []byte) error {
+				func(b []byte, out io.Writer) error {
 					ch := meta.Channel{}
 
 					yaml.Unmarshal(b, &ch)

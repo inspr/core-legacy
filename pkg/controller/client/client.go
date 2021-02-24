@@ -10,6 +10,13 @@ type Client struct {
 	HTTPClient *request.Client
 }
 
+// NewControllerClient return a new Client
+func NewControllerClient(rc *request.Client) *Client {
+	return &Client{
+		HTTPClient: rc,
+	}
+}
+
 // Channels interacts with channels on the Insprd
 func (c *Client) Channels() controller.ChannelInterface {
 	return &ChannelClient{
