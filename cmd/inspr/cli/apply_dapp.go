@@ -7,6 +7,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
 )
@@ -39,11 +40,15 @@ func NewApplyApp(c controller.AppInterface) RunMethod {
 		flagIsUpdate := cmd.InsprOptions.Update
 
 		var log diff.Changelog
+		query, err := metautils.JoinScopes(cmd.InsprOptions.Scope, app.Meta.Parent)
+		if err != nil {
+			return err
+		}
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), app.Meta.Parent, &app, flagDryRun)
+			log, err = c.Update(context.Background(), query, &app, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), app.Meta.Parent, &app, flagDryRun)
+			log, err = c.Create(context.Background(), query, &app, flagDryRun)
 		}
 
 		if err != nil {

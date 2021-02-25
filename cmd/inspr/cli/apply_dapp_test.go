@@ -76,7 +76,20 @@ func Test_schemaInjection(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Valid schema injection",
+			args: args{
+				ctypes: map[string]*meta.ChannelType{
+					"ct1": {
+						Meta: meta.Metadata{
+							Name: "ct1",
+						},
+						Schema: "test/schema_example.schema",
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -96,7 +109,13 @@ func Test_recursiveSchemaInjection(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Valid schema injection",
+			args: args{
+				apps: getAppMap(),
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -104,5 +123,48 @@ func Test_recursiveSchemaInjection(t *testing.T) {
 				t.Errorf("recursiveSchemaInjection() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+func getAppMap() map[string]*meta.App {
+	return map[string]*meta.App{
+		"app1": {
+			Spec: meta.AppSpec{
+				ChannelTypes: map[string]*meta.ChannelType{
+					"ct1": {
+						Meta: meta.Metadata{
+							Name: "ct1",
+						},
+						Schema: "test/schema_example.schema",
+					},
+				},
+			},
+		},
+		"app2": {
+			Spec: meta.AppSpec{
+				ChannelTypes: map[string]*meta.ChannelType{
+					"ct2": {
+						Meta: meta.Metadata{
+							Name: "ct2",
+						},
+						Schema: "test/schema_example.schema",
+					},
+				},
+				Apps: map[string]*meta.App{
+					"app3": {
+						Spec: meta.AppSpec{
+							ChannelTypes: map[string]*meta.ChannelType{
+								"ct3": {
+									Meta: meta.Metadata{
+										Name: "ct3",
+									},
+									Schema: "test/schema_example.schema",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 }
