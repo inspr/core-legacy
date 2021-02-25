@@ -2,12 +2,17 @@ package cli
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
+	"gopkg.in/yaml.v2"
 )
 
 // NewApplyChannelType receives a controller ChannelTypeInterface and calls it's methods
@@ -18,6 +23,10 @@ func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 		channelType, err := utils.YamlToChannelType(data)
 		if err != nil {
 			return err
+		}
+
+		if schemaNeedsInjection(channelType.Schema) {
+			channelType.Schema, err = injectSchema(channelType.Schema)
 		}
 
 		flagDryRun := cmd.InsprOptions.DryRun
@@ -40,4 +49,28 @@ func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 
 		return nil
 	}
+}
+
+func schemaNeedsInjection(schema string) bool {
+	_, err := os.Stat(schema)
+	if !os.IsNotExist(err) && filepath.Ext(schema) == ".schema" {
+		// file exists and has the right extention
+		return true
+	}
+	return false
+}
+
+func injectSchema(path string) (string, error) {
+	var schema interface{}
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	err = yaml.Unmarshal(file, &schema)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%v", schema), nil
 }
