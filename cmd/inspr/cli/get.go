@@ -21,22 +21,22 @@ var ctx string
 func NewGetCmd() *cobra.Command {
 	ctx = ""
 	getApps := cmd.NewCmd("apps").
-		WithDescription("Get apps").
+		WithDescription("Get apps from context").
 		WithAliases([]string{"a"}).
 		WithCommonFlags().
 		NoArgs(getApps)
 	getChannels := cmd.NewCmd("channels").
-		WithDescription("Get channels").
+		WithDescription("Get channels from context").
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
 		NoArgs(getChannels)
 	getTypes := cmd.NewCmd("ctypes").
-		WithDescription("Get types").
+		WithDescription("Get channel types from context").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		NoArgs(getCTypes)
 	getNodes := cmd.NewCmd("nodes").
-		WithDescription("Get nodes").
+		WithDescription("Get nodes from context").
 		WithAliases([]string{"n"}).
 		WithCommonFlags().
 		NoArgs(getNodes)
