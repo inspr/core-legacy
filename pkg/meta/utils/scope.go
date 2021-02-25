@@ -67,9 +67,5 @@ func JoinScopes(s1, s2 string) (string, error) {
 	}
 	newScope := s1 + separator + s2
 
-	if !IsValidScope(newScope) {
-		return "", ierrors.NewError().Message("invalid result scope. Make sure the second scope is not the root (empty)").InvalidName().Build()
-	}
-
 	return newScope, nil
 }
