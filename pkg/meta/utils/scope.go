@@ -48,3 +48,24 @@ func RemoveLastPartInScope(scope string) (string, string, error) {
 	return newScope, lastName, nil
 
 }
+
+/*
+JoinScopes join two scopes and return the new scope
+*/
+func JoinScopes(s1, s2 string) (string, error) {
+	if !IsValidScope(s1) || !IsValidScope(s2) {
+		return "", ierrors.NewError().Message("invalid scope in args").InvalidName().Build()
+	}
+
+	separator := ""
+	if s1 != "" {
+		separator = "."
+	}
+	newScope := s1 + separator + s2
+
+	if !IsValidScope(newScope) {
+		return "", ierrors.NewError().Message("invalid result scope. Make sure the second scope is not the root (empty)").InvalidName().Build()
+	}
+
+	return newScope, nil
+}

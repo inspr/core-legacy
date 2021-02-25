@@ -109,3 +109,63 @@ func TestRemoveLastPartInScope(t *testing.T) {
 		})
 	}
 }
+
+func TestJoinScopes(t *testing.T) {
+	type args struct {
+		s1 string
+		s2 string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "Valid scopes - it should not return an error",
+			args: args{
+				s1: "app1.app2",
+				s2: "app3",
+			},
+			want:    "app1.app2.app3",
+			wantErr: false,
+		},
+		{
+			name: "Valid scopes - scope one as root",
+			args: args{
+				s1: "",
+				s2: "app3",
+			},
+			want:    "app3",
+			wantErr: false,
+		},
+		{
+			name: "Invalid scope in args",
+			args: args{
+				s1: "app1..app2",
+				s2: "app3",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Invalid result scope - second scope cant be root",
+			args: args{
+				s1: "app1.app2",
+				s2: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := JoinScopes(tt.args.s1, tt.args.s2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("JoinScopes() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("JoinScopes() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
