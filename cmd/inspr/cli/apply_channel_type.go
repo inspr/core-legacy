@@ -26,7 +26,7 @@ func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 		}
 
 		if schemaNeedsInjection(channelType.Schema) {
-			channelType.Schema, err = injectSchema(channelType.Schema)
+			channelType.Schema, err = injectedSchema(channelType.Schema)
 		}
 
 		flagDryRun := cmd.InsprOptions.DryRun
@@ -61,7 +61,7 @@ func schemaNeedsInjection(schema string) bool {
 	return false
 }
 
-func injectSchema(path string) (string, error) {
+func injectedSchema(path string) (string, error) {
 	var schema interface{}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
