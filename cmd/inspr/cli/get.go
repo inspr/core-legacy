@@ -10,9 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
@@ -155,19 +153,4 @@ func printTab() {
 
 func getAppsURL() string {
 	return "http://127.0.0.1:8080"
-}
-
-func getScope() (string, error) {
-	defaultScope := "" // Here it will take from viper
-	scope := defaultScope
-
-	if cmd.InsprOptions.Scope != "" {
-		if utils.IsValidScope(cmd.InsprOptions.Scope) {
-			scope = cmd.InsprOptions.Scope
-		} else {
-			return "", ierrors.NewError().BadRequest().Message("invalid scope").Build()
-		}
-	}
-
-	return scope, nil
 }
