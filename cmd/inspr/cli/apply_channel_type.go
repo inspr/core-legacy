@@ -53,7 +53,8 @@ func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 
 func schemaNeedsInjection(schema string) bool {
 	_, err := os.Stat(schema)
-	if !os.IsNotExist(err) && filepath.Ext(schema) == ".schema" {
+	if !os.IsNotExist(err) &&
+		(filepath.Ext(schema) == ".schema" || filepath.Ext(schema) == ".avsc") {
 		// file exists and has the right extention
 		return true
 	}
