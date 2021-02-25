@@ -116,8 +116,8 @@ func parseNodeName(insprEnv string, context string, name string) string {
 	return strings.ToLower(s)
 }
 
+// NewOperator initializes a k8s based kafka node operator with in cluster configuration
 func NewOperator() (nop *NodeOperator, err error) {
-
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
