@@ -15,6 +15,10 @@ import (
 // that allows for more utility. For an example check the JSON function.
 type Handler func(w http.ResponseWriter, r *http.Request)
 
+func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h(w, r)
+}
+
 // HTTPHandlerFunc transforms the rest.handler to a http.handlerFunc type
 func (h Handler) HTTPHandlerFunc() http.HandlerFunc {
 	return http.HandlerFunc(h)
