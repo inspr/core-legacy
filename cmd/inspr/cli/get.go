@@ -1,61 +1,57 @@
 package cli
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
+	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
 var tabWriter *tabwriter.Writer
-var getScope string
 
 // NewGetCmd - mock subcommand
 func NewGetCmd() *cobra.Command {
 	getApps := cmd.NewCmd("apps").
-		WithDescription("Get apps").
+		WithDescription("Get apps from context ").
 		WithAliases([]string{"a"}).
+		WithExample("Get apps from the default scope", "get apps ").
+		WithExample("Get apps from a custom scope", "get apps --scope app1.app2").
 		WithCommonFlags().
 		NoArgs(getApps)
 	getChannels := cmd.NewCmd("channels").
-		WithDescription("Get channels").
+		WithDescription("Get channels from context").
+		WithExample("Get channels from the default scope", "get channels ").
+		WithExample("Get channels from a custom scope", "get channels --scope app1.app2").
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
 		NoArgs(getChannels)
-	getTypes := cmd.NewCmd("types").
-		WithDescription("Get types").
+	getTypes := cmd.NewCmd("ctypes").
+		WithDescription("Get channel types from context").
+		WithExample("Get channel types from the default scope", "get ctypes ").
+		WithExample("Get channel types from a custom scope", "get ctypes --scope app1.app2").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		NoArgs(getCTypes)
 	getNodes := cmd.NewCmd("nodes").
-		WithDescription("Get nodes").
+		WithDescription("Get nodes from context").
+		WithExample("Get nodes from the default scope", "get nodes ").
+		WithExample("Get nodes from a custom scope", "get nodes --scope app1.app2").
 		WithAliases([]string{"n"}).
 		WithCommonFlags().
 		NoArgs(getNodes)
 	return cmd.NewCmd("get").
 		WithDescription("Get by object type").
+		WithDescription("Retrieves the components from a given namespace").
+		WithLongDescription("get takes a component type (apps | channels | ctypes | nodes) and displays names for those components is a scope)").
 		WithAliases([]string{"list"}).
 		WithCommonFlags().
-		WithFlags([]*cmd.Flag{
-			{
-				Name:          "inspr get <subcommand> --scope/-s <apppath>",
-				Usage:         "define search scope",
-				Shorthand:     "s",
-				Value:         &getScope,
-				DefValue:      "",
-				FlagAddMethod: "",
-				DefinedOn:     []string{"get"},
-			},
-		}).
 		AddSubCommand(getApps).
 		AddSubCommand(getChannels).
 		AddSubCommand(getTypes).
@@ -93,33 +89,19 @@ func getNodes(_ context.Context, out io.Writer) error {
 }
 
 func getObj(printObj func(*meta.App)) {
-	getDO := models.AppQueryDI{
-		Ctx:    getScope,
-		Valid:  true,
-		DryRun: false,
-	}
-	body, err := json.Marshal(getDO)
+	rc := request.NewClient().BaseURL(getAppsURL()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
+	client := client.NewControllerClient(rc)
+	scope, err := getScope()
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	req, err := http.NewRequest(http.MethodGet, getURL(), bytes.NewBuffer(body))
-	defer req.Body.Close()
+	resp, err := client.Apps().Get(context.Background(), scope)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	apps := &models.AppDI{}
-	json.NewDecoder(resp.Body).Decode(apps)
-	printObj(&apps.App)
-
+	printObj(resp)
 }
 
 func printApps(app *meta.App) {
@@ -159,18 +141,18 @@ func printNodes(app *meta.App) {
 }
 
 func printLine(name string) {
-	fmt.Fprintf(tabWriter, "%s", name)
+	fmt.Fprintf(tabWriter, "%s\n", name)
 }
 
 func initTab(out io.Writer) {
 	tabWriter = tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.Debug)
-	fmt.Fprintf(tabWriter, "NAME")
+	fmt.Fprintf(tabWriter, "NAME\n")
 }
 
 func printTab() {
 	tabWriter.Flush()
 }
 
-func getURL() string {
-	return viper.GetString("reqUrl")
+func getAppsURL() string {
+	return "http://127.0.0.1:8080"
 }

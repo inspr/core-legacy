@@ -34,7 +34,7 @@ func baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		"INSPR_APP_ID":            appDeployName,
 		"INSPR_APP_CTX":           app.Meta.Parent,
 		"INSPR_ENV":               insprEnv.InsprEnvironment,
-		"KAFKA_BOOSTRAP_SERVERS":  kafkasc.GetEnvironment().KafkaBootstrapServers,
+		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
 		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
 	}
 	channels.Map(func(s string) string {
@@ -61,13 +61,14 @@ func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	})
 
+	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app)
 	nodeContainer := kubeCore.Container{
-		Name:  app.Spec.Node.Meta.Name,
+		Name:  appDeployName,
 		Image: app.Spec.Node.Spec.Image,
 		// parse from master env var to kube env vars
 		VolumeMounts: []kubeCore.VolumeMount{
 			{
-				Name:      app.Spec.Node.Meta.Name + "-volume",
+				Name:      appDeployName + "-volume",
 				MountPath: "/inspr",
 			},
 		},
@@ -83,13 +84,12 @@ func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	})
 
-	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app)
 	sidecarContainer := kubeCore.Container{
 		Name:  appDeployName + "-sidecar",
 		Image: insprEnv.SidecarImage,
 		VolumeMounts: []kubeCore.VolumeMount{
 			{
-				Name:      app.Spec.Node.Meta.Name + "-volume",
+				Name:      appDeployName + "-volume",
 				MountPath: "/inspr",
 			},
 		},
@@ -113,7 +113,6 @@ func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 			Labels: appLabels,
 		},
 		Spec: kubeApp.DeploymentSpec{
-			Replicas: intToint32(app.Spec.Node.Spec.Replicas),
 			Selector: &kubeMeta.LabelSelector{
 				MatchLabels: appLabels,
 			},

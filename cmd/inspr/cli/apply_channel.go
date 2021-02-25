@@ -1,0 +1,43 @@
+package cli
+
+import (
+	"context"
+	"io"
+
+	"gitlab.inspr.dev/inspr/core/pkg/cmd"
+	"gitlab.inspr.dev/inspr/core/pkg/controller"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
+	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
+)
+
+// NewApplyChannel receives a controller ChannelInterface and calls it's methods
+// depending on the flags values
+func NewApplyChannel(c controller.ChannelInterface) RunMethod {
+	return func(data []byte, out io.Writer) error {
+		// unmarshal into a channel
+		channel, err := utils.YamlToChannel(data)
+		if err != nil {
+			return err
+		}
+
+		flagDryRun := cmd.InsprOptions.DryRun
+		flagIsUpdate := cmd.InsprOptions.Update
+
+		var log diff.Changelog
+		// creates or updates it
+		if flagIsUpdate {
+			log, err = c.Update(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+		} else {
+			log, err = c.Create(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+		}
+
+		if err != nil {
+			return err
+		}
+
+		// prints differences
+		log.Print(out)
+
+		return nil
+	}
+}
