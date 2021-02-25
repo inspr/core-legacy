@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"strings"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
@@ -17,8 +17,10 @@ import (
 // NewApplyCmd - mock subcommand
 func NewApplyCmd() *cobra.Command {
 	applyCmd := cmd.NewCmd("apply").
-		WithDescription("applies changes to the connected cluster").
-		WithLongDescription("apply takes a file or a directory and applies the defined components on the connected cluster").
+		WithDescription("Applies changes to the connected cluster").
+		WithLongDescription("Apply takes a file or a directory and applies the defined components on the connected cluster.\n"+
+			"It can be called with the flag --update for updating instead of creating a new dApp.\n"+
+			"It can be called with the flag --dry-run so the changes that would be made are shown, but not applied on the cluster").
 		WithExample("Applies a structure component defined in a file", "apply -f app.yaml").
 		WithExample("Applies components defined in a specific folder", "apply -k randfolder/").
 		WithExample("Applies a structure component defined in a specific scope", "apply -f app.yaml --scope app1.app2").
@@ -26,8 +28,8 @@ func NewApplyCmd() *cobra.Command {
 		WithFlags([]*cmd.Flag{
 			{
 				Name:          "file",
-				Usage:         "inspr apply -f ctype.yaml",
 				Shorthand:     "f",
+				Usage:         "inspr apply -f ctype.yaml",
 				Value:         &cmd.InsprOptions.AppliedFileStructure,
 				DefValue:      "",
 				FlagAddMethod: "",
@@ -35,11 +37,20 @@ func NewApplyCmd() *cobra.Command {
 			},
 			{
 				Name:          "folder",
-				Usage:         "inspr apply -k randfolder/",
 				Shorthand:     "k",
+				Usage:         "inspr apply -k randfolder/",
 				Value:         &cmd.InsprOptions.AppliedFolderStructure,
 				DefValue:      "",
 				FlagAddMethod: "",
+				DefinedOn:     []string{"apply"},
+			},
+			{
+				Name:          "update",
+				Shorthand:     "u",
+				Usage:         "inspr apply (-f FILENAME | -k DIRECTORY) --update",
+				Value:         &cmd.InsprOptions.Update,
+				DefValue:      false,
+				FlagAddMethod: "BoolVar",
 				DefinedOn:     []string{"apply"},
 			},
 		}).
@@ -59,31 +70,26 @@ type applied struct {
 func doApply(_ context.Context, out io.Writer) error {
 	var files []string
 	var path string
+	var err error
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")
 	hasFolderFlag := (cmd.InsprOptions.AppliedFolderStructure != "")
 	if hasFileFlag == hasFolderFlag {
-		fmt.Fprint(out, "Specified file/folder path is invalid\n")
+		fmt.Fprint(out, "Given flags are invalid\n")
 		return ierrors.NewError().Message("invalid flag arguments").Build()
 	}
 
 	if hasFileFlag {
-		filePath := strings.Split(cmd.InsprOptions.AppliedFileStructure, "/")
-		if len(filePath) == 1 {
-			files = append(files, filePath[0])
-		} else {
-			path = strings.Join(filePath[:len(filePath)-1], "/") + "/"
-			files = append(files, filePath[len(filePath)-1])
-		}
+		files = append(files, cmd.InsprOptions.AppliedFileStructure)
 	} else {
 		path = cmd.InsprOptions.AppliedFolderStructure
-		err := getFilesFromFolder(cmd.InsprOptions.AppliedFolderStructure, &files)
+		files, err = getFilesFromFolder(cmd.InsprOptions.AppliedFolderStructure)
 		if err != nil {
 			fmt.Fprint(out, err.Error())
 			return err
 		}
 	}
 
-	appliedFiles := applyValidFiles(path, files)
+	appliedFiles := applyValidFiles(path, files, out)
 
 	if len(appliedFiles) > 0 {
 		printAppliedFiles(appliedFiles, out)
@@ -95,8 +101,8 @@ func doApply(_ context.Context, out io.Writer) error {
 }
 
 func isYaml(file string) bool {
-	tempStr := strings.Split(file, ".")
-	return tempStr[len(tempStr)-1] == "yaml" || tempStr[len(tempStr)-1] == "yml"
+	tempStr := filepath.Ext(file)
+	return tempStr == ".yaml" || tempStr == ".yml"
 }
 
 func printAppliedFiles(appliedFiles []applied, out io.Writer) {
@@ -106,23 +112,25 @@ func printAppliedFiles(appliedFiles []applied, out io.Writer) {
 	}
 }
 
-func getFilesFromFolder(path string, files *[]string) error {
+func getFilesFromFolder(path string) ([]string, error) {
+	var files []string
 	folder, err := ioutil.ReadDir(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, file := range folder {
-		*files = append(*files, file.Name())
+		files = append(files, file.Name())
 	}
-	return nil
+	return files, nil
 }
 
-func applyValidFiles(path string, files []string) []applied {
+func applyValidFiles(path string, files []string, out io.Writer) []applied {
 	var appliedFiles []applied
 
 	for _, file := range files {
 		if isYaml(file) {
+			fmt.Println(file)
 			comp := meta.Component{}
 			f, err := ioutil.ReadFile(path + file)
 			if err != nil {
@@ -137,8 +145,9 @@ func applyValidFiles(path string, files []string) []applied {
 			if err != nil {
 				continue
 			}
-			err = apply(f)
+			err = apply(f, out)
 			if err != nil {
+				fmt.Fprintf(out, "error while applying file '%v' :\n %v\n", file, err.Error())
 				continue
 			}
 			appliedFiles = append(appliedFiles, applied{file: file, component: comp})

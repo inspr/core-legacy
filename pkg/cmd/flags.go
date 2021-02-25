@@ -35,11 +35,20 @@ var flagRegistry = []Flag{
 	{
 		Name:          "scope",
 		Shorthand:     "s",
-		Usage:         "inspr [command] --scope app1.app2",
+		Usage:         "inspr <command> --scope app1.app2",
 		Value:         &InsprOptions.Scope,
 		DefValue:      "",
 		FlagAddMethod: "",
 		DefinedOn:     []string{"all"},
+	},
+	{
+		Name:          "dry-run",
+		Shorthand:     "d",
+		Usage:         "inspr <command> --dry-run",
+		Value:         &InsprOptions.DryRun,
+		DefValue:      false,
+		FlagAddMethod: "BoolVar",
+		DefinedOn:     []string{"apply"},
 	},
 	{
 		Name:          "specificTag",
@@ -131,24 +140,6 @@ func AddFlags(cmd *cobra.Command) {
 		cmd.Flags().AddFlag(fl.Flag())
 
 		flagsForCommand = append(flagsForCommand, fl)
-	}
-
-	// Apply command-specific default values to flags.
-	cmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
-		ParseFlags(cmd, flagsForCommand)
-		// Since PersistentPreRunE replaces the parent's PersistentPreRunE,
-		// make sure we call it, if it is set.
-		if parent := cmd.Parent(); parent != nil {
-			if preRun := parent.PersistentPreRunE; preRun != nil {
-				if err := preRun(cmd, args); err != nil {
-					return err
-				}
-			} else if preRun := parent.PersistentPreRun; preRun != nil {
-				preRun(cmd, args)
-			}
-		}
-
-		return nil
 	}
 }
 
