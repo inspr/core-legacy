@@ -80,7 +80,6 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 					Labels: map[string]string{"app": appDeployName},
 				},
 				Spec: kubeApp.DeploymentSpec{
-					Replicas: intToint32(testApp.Spec.Node.Spec.Replicas),
 					Selector: &kubeMeta.LabelSelector{
 						MatchLabels: map[string]string{
 							"app": appDeployName,
@@ -106,18 +105,18 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 							},
 							Containers: []kubeCore.Container{
 								{
-									Name:  testApp.Spec.Node.Meta.Name,
+									Name:  appDeployName,
 									Image: testApp.Spec.Node.Spec.Image,
 									// parse from master env var to kube env vars
 									VolumeMounts: []kubeCore.VolumeMount{
 										{
-											Name:      testApp.Spec.Node.Meta.Name + "-volume",
+											Name:      appDeployName + "-volume",
 											MountPath: "/inspr",
 										},
 									},
 									Env: append(utils.EnvironmentMap(testApp.Spec.Node.Spec.Environment).ParseToK8sArrEnv(),
 										kubeCore.EnvVar{
-											Name: "UUID",
+											Name: "INSPR_UNIX_SOCKET",
 											ValueFrom: &kubeCore.EnvVarSource{
 												FieldRef: &kubeCore.ObjectFieldSelector{
 													FieldPath: "metadata.name",
@@ -130,12 +129,12 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 									Image: environment.GetEnvironment().SidecarImage,
 									VolumeMounts: []kubeCore.VolumeMount{
 										{
-											Name:      testApp.Spec.Node.Meta.Name + "-volume",
+											Name:      appDeployName + "-volume",
 											MountPath: "/inspr",
 										},
 									},
 									Env: append(utils.EnvironmentMap(testEnv).ParseToK8sArrEnv(), kubeCore.EnvVar{
-										Name: "UUID",
+										Name: "INSPR_UNIX_SOCKET",
 										ValueFrom: &kubeCore.EnvVarSource{
 											FieldRef: &kubeCore.ObjectFieldSelector{
 												FieldPath: "metadata.name",
