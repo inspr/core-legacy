@@ -1,6 +1,7 @@
 package diff
 
 import (
+	"encoding/json"
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -26,66 +27,86 @@ func TestDiff(t *testing.T) {
 			},
 			want: Changelog{
 				{
-					Context: "*",
+					Context:   "*",
+					Kind:      MetaKind | AnnotationKind | AppKind | ChannelKind | ChannelTypeKind,
+					Operation: Create | Update | Delete,
 					Diff: []Difference{
 						{
-							Field: "Meta.SHA256",
-							From:  "1",
-							To:    "2",
-							Kind:  MetaKind,
+							Field:     "Meta.SHA256",
+							From:      "1",
+							To:        "2",
+							Kind:      MetaKind | AppKind,
+							Operation: Update,
 						},
 						{
-							Field: "Meta.Annotations[an1]",
-							From:  "<nil>",
-							To:    "a",
-							Kind:  MetaKind,
+							Field:     "Meta.Annotations[an1]",
+							From:      "<nil>",
+							To:        "a",
+							Kind:      AnnotationKind | AppKind | MetaKind,
+							Name:      "an1",
+							Operation: Create,
 						},
 						{
-							Field: "Meta.Annotations[an2]",
-							From:  "<nil>",
-							To:    "b",
-							Kind:  MetaKind,
+							Field:     "Meta.Annotations[an2]",
+							From:      "<nil>",
+							To:        "b",
+							Kind:      MetaKind | AppKind | AnnotationKind,
+							Operation: Create,
+							Name:      "an2",
 						},
 						{
-							Field: "Spec.Apps[app1]",
-							From:  "{...}",
-							To:    "<nil>",
-							Kind:  AppKind,
+							Field:     "Spec.Apps[app1]",
+							From:      "{...}",
+							To:        "<nil>",
+							Kind:      AppKind,
+							Operation: Delete,
+							Name:      "app1",
 						},
 						{
-							Field: "Spec.Channels[ch2]",
-							From:  "{...}",
-							To:    "<nil>",
-							Kind:  ChannelKind,
+							Field:     "Spec.Channels[ch2]",
+							From:      "{...}",
+							To:        "<nil>",
+							Kind:      ChannelKind,
+							Operation: Delete,
+							Name:      "ch2",
 						},
 						{
-							Field: "Spec.Channels[ch1].Meta.Reference",
-							From:  "root.ch1",
-							To:    "root.ch1diff",
-							Kind:  MetaKind,
+							Field:     "Spec.Channels[ch1].Meta.Reference",
+							From:      "root.ch1",
+							To:        "root.ch1diff",
+							Kind:      MetaKind | ChannelKind,
+							Operation: Update,
+							Name:      "ch1",
 						},
 						{
-							Field: "Spec.ChannelTypes[ct2]",
-							From:  "{...}",
-							To:    "<nil>",
-							Kind:  ChannelTypeKind,
+							Field:     "Spec.ChannelTypes[ct2]",
+							From:      "{...}",
+							To:        "<nil>",
+							Kind:      ChannelTypeKind,
+							Operation: Delete,
+							Name:      "ct2",
 						},
 						{
-							Field: "Spec.ChannelTypes[ct1].Meta.Reference",
-							From:  "root.ct1",
-							To:    "root.ct1diff",
-							Kind:  MetaKind,
+							Field:     "Spec.ChannelTypes[ct1].Meta.Reference",
+							From:      "root.ct1",
+							To:        "root.ct1diff",
+							Kind:      MetaKind | ChannelTypeKind,
+							Operation: Update,
+							Name:      "ct1",
 						},
 					},
 				},
 				{
-					Context: "*.Spec.Apps.app2.Spec.Apps.app3",
+					Context:   "*.Spec.Apps.app2.Spec.Apps.app3",
+					Kind:      NodeKind,
+					Operation: Update,
 					Diff: []Difference{
 						{
-							Field: "Spec.Node.Spec.Image",
-							From:  "imageNodeApp3",
-							To:    "imageNodeApp3diff",
-							Kind:  NodeKind,
+							Field:     "Spec.Node.Spec.Image",
+							From:      "imageNodeApp3",
+							To:        "imageNodeApp3diff",
+							Kind:      NodeKind,
+							Operation: Update,
 						},
 					},
 				},
@@ -101,7 +122,9 @@ func TestDiff(t *testing.T) {
 				return
 			}
 			if !equalChangelogs(got, tt.want) {
-				t.Errorf("Diff() = \n%v, want \n%v", got, tt.want)
+				gots, _ := json.MarshalIndent(got, "", "    ")
+				wants, _ := json.MarshalIndent(tt.want, "", "    ")
+				t.Errorf("Diff() = \n%s, want \n%s", gots, wants)
 			}
 		})
 	}
@@ -204,12 +227,15 @@ func TestChange_diffNodes(t *testing.T) {
 			},
 			wantErr: false,
 			want: Change{
+				Kind:      NodeKind,
+				Operation: Update,
 				Diff: []Difference{
 					{
-						Field: "Spec.Node.Spec.Image",
-						From:  "image",
-						To:    "imagediff",
-						Kind:  NodeKind,
+						Field:     "Spec.Node.Spec.Image",
+						From:      "image",
+						To:        "imagediff",
+						Kind:      NodeKind,
+						Operation: Update,
 					},
 				},
 			},
@@ -307,30 +333,40 @@ func TestChange_diffBoudaries(t *testing.T) {
 				},
 			},
 			want: Change{
+				Kind:      BoundaryKind,
+				Operation: Create | Delete,
 				Diff: []Difference{
 					{
-						Field: "Spec.Boundary.Input",
-						From:  "c",
-						To:    "<nil>",
-						Kind:  BoundaryKind,
+						Field:     "Spec.Boundary.Input",
+						From:      "c",
+						To:        "<nil>",
+						Kind:      BoundaryKind,
+						Operation: Delete,
+						Name:      "c",
 					},
 					{
-						Field: "Spec.Boundary.Input",
-						From:  "<nil>",
-						To:    "d",
-						Kind:  BoundaryKind,
+						Field:     "Spec.Boundary.Input",
+						From:      "<nil>",
+						To:        "d",
+						Kind:      BoundaryKind,
+						Operation: Create,
+						Name:      "d",
 					},
 					{
-						Field: "Spec.Boundary.Output",
-						From:  "c",
-						To:    "<nil>",
-						Kind:  BoundaryKind,
+						Field:     "Spec.Boundary.Output",
+						From:      "c",
+						To:        "<nil>",
+						Kind:      BoundaryKind,
+						Operation: Delete,
+						Name:      "c",
 					},
 					{
-						Field: "Spec.Boundary.Output",
-						From:  "<nil>",
-						To:    "d",
-						Kind:  BoundaryKind,
+						Field:     "Spec.Boundary.Output",
+						From:      "<nil>",
+						To:        "d",
+						Kind:      BoundaryKind,
+						Operation: Create,
+						Name:      "d",
 					},
 				},
 			},
@@ -407,6 +443,10 @@ func TestChange_diffApps(t *testing.T) {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{},
 					},
+					"app3": {
+						Meta: meta.Metadata{},
+						Spec: meta.AppSpec{},
+					},
 				},
 				appsCurr: utils.MApps{
 					"app1": {
@@ -420,12 +460,24 @@ func TestChange_diffApps(t *testing.T) {
 				},
 			},
 			want: Change{
+				Kind:      AppKind,
+				Operation: Create | Delete,
 				Diff: []Difference{
 					{
-						Field: "Spec.Apps[app2]",
-						From:  "<nil>",
-						To:    "{...}",
-						Kind:  AppKind,
+						Field:     "Spec.Apps[app2]",
+						From:      "<nil>",
+						To:        "{...}",
+						Kind:      AppKind,
+						Operation: Create,
+						Name:      "app2",
+					},
+					{
+						Field:     "Spec.Apps[app3]",
+						From:      "{...}",
+						To:        "<nil>",
+						Kind:      AppKind,
+						Operation: Delete,
+						Name:      "app3",
 					},
 				},
 			},
@@ -508,12 +560,76 @@ func TestChange_diffChannels(t *testing.T) {
 			},
 			wantErr: false,
 			want: Change{
+				Kind:      ChannelKind,
+				Operation: Update,
 				Diff: []Difference{
 					{
-						Field: "Spec.Channels[ch1].Spec.Type",
-						From:  "type",
-						To:    "typediff",
-						Kind:  ChannelKind,
+						Field:     "Spec.Channels[ch1].Spec.Type",
+						From:      "type",
+						To:        "typediff",
+						Kind:      ChannelKind,
+						Operation: Update,
+						Name:      "ch1",
+					},
+				},
+			},
+		},
+		{
+			name:   "Channel deleted",
+			fields: fields{},
+			args: args{
+				chOrig: utils.MChannels{
+					"ch1": &meta.Channel{
+						Meta: meta.Metadata{},
+						Spec: meta.ChannelSpec{
+							Type: "type",
+						},
+					},
+				},
+				chCurr: utils.MChannels{},
+			},
+			wantErr: false,
+			want: Change{
+				Kind:      ChannelKind,
+				Operation: Delete,
+				Diff: []Difference{
+					{
+						Field:     "Spec.Channels[ch1]",
+						From:      "{...}",
+						To:        "<nil>",
+						Kind:      ChannelKind,
+						Operation: Delete,
+						Name:      "ch1",
+					},
+				},
+			},
+		},
+		{
+			name:   "Channel created",
+			fields: fields{},
+			args: args{
+				chOrig: utils.MChannels{},
+				chCurr: utils.MChannels{
+					"ch1": &meta.Channel{
+						Meta: meta.Metadata{},
+						Spec: meta.ChannelSpec{
+							Type: "type",
+						},
+					},
+				},
+			},
+			wantErr: false,
+			want: Change{
+				Kind:      ChannelKind,
+				Operation: Create,
+				Diff: []Difference{
+					{
+						Field:     "Spec.Channels[ch1]",
+						From:      "<nil>",
+						To:        "{...}",
+						Kind:      ChannelKind,
+						Operation: Create,
+						Name:      "ch1",
 					},
 				},
 			},
@@ -602,12 +718,84 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			},
 			wantErr: false,
 			want: Change{
+				Kind:      ChannelTypeKind,
+				Operation: Update,
 				Diff: []Difference{
 					{
-						Field: "Spec.ChannelTypes[ct1].Spec.Schema",
-						From:  string([]byte{0, 1, 0, 1, 0, 0, 1, 1, 1, 0}),
-						To:    string([]byte{0, 1, 0, 1, 0, 1, 1, 1, 1, 1}),
-						Kind:  ChannelTypeKind,
+						Field:     "Spec.ChannelTypes[ct1].Spec.Schema",
+						From:      string([]byte{0, 1, 0, 1, 0, 0, 1, 1, 1, 0}),
+						To:        string([]byte{0, 1, 0, 1, 0, 1, 1, 1, 1, 1}),
+						Kind:      ChannelTypeKind,
+						Operation: Update,
+						Name:      "ct1",
+					},
+				},
+			},
+		},
+		{
+			name:   "create channel type",
+			fields: fields{},
+			args: args{
+				chtOrig: utils.MTypes{},
+				chtCurr: utils.MTypes{
+					"ct1": &meta.ChannelType{
+						Meta: meta.Metadata{
+							Name:        "ct1",
+							Reference:   "root.ct1",
+							Annotations: map[string]string{},
+							Parent:      "root",
+							SHA256:      "",
+						},
+						Schema: string([]byte{0, 1, 0, 1, 0, 1, 1, 1, 1, 1}),
+					},
+				},
+			},
+			wantErr: false,
+			want: Change{
+				Kind:      ChannelTypeKind,
+				Operation: Create,
+				Diff: []Difference{
+					{
+						Field:     "Spec.ChannelTypes[ct1]",
+						From:      "<nil>",
+						To:        "{...}",
+						Kind:      ChannelTypeKind,
+						Operation: Create,
+						Name:      "ct1",
+					},
+				},
+			},
+		},
+		{
+			name:   "delete channel type",
+			fields: fields{},
+			args: args{
+				chtOrig: utils.MTypes{
+					"ct1": &meta.ChannelType{
+						Meta: meta.Metadata{
+							Name:        "ct1",
+							Reference:   "root.ct1",
+							Annotations: map[string]string{},
+							Parent:      "root",
+							SHA256:      "",
+						},
+						Schema: string([]byte{0, 1, 0, 1, 0, 1, 1, 1, 1, 1}),
+					},
+				},
+				chtCurr: utils.MTypes{},
+			},
+			wantErr: false,
+			want: Change{
+				Kind:      ChannelTypeKind,
+				Operation: Delete,
+				Diff: []Difference{
+					{
+						Field:     "Spec.ChannelTypes[ct1]",
+						From:      "{...}",
+						To:        "<nil>",
+						Kind:      ChannelTypeKind,
+						Operation: Delete,
+						Name:      "ct1",
 					},
 				},
 			},
@@ -635,9 +823,11 @@ func TestChange_diffMetadata(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		metaOrig meta.Metadata
-		metaCurr meta.Metadata
-		ctx      string
+		parentKind    Kind
+		metaOrig      meta.Metadata
+		metaCurr      meta.Metadata
+		ctx           string
+		parentElement string
 	}
 	tests := []struct {
 		name    string
@@ -664,7 +854,8 @@ func TestChange_diffMetadata(t *testing.T) {
 					Parent:    "",
 					SHA256:    "1234567890",
 				},
-				ctx: "",
+				ctx:        "",
+				parentKind: AppKind,
 			},
 			wantErr: false,
 			want:    Change{},
@@ -690,28 +881,35 @@ func TestChange_diffMetadata(t *testing.T) {
 						"1": "1",
 					},
 				},
-				ctx: "",
+				ctx:        "",
+				parentKind: NodeKind,
 			},
 			wantErr: false,
 			want: Change{
+				Kind:      MetaKind | NodeKind | AnnotationKind,
+				Operation: Create | Update,
 				Diff: []Difference{
 					{
-						Field: "Meta.Reference",
-						From:  "reference",
-						To:    "referenceDiff",
-						Kind:  MetaKind,
+						Field:     "Meta.Reference",
+						From:      "reference",
+						To:        "referenceDiff",
+						Kind:      MetaKind | NodeKind,
+						Operation: Update,
 					},
 					{
-						Field: "Meta.SHA256",
-						From:  "1234567890",
-						To:    "1234567890Diff",
-						Kind:  MetaKind,
+						Field:     "Meta.SHA256",
+						From:      "1234567890",
+						To:        "1234567890Diff",
+						Kind:      MetaKind | NodeKind,
+						Operation: Update,
 					},
 					{
-						Field: "Meta.Annotations[1]",
-						From:  "<nil>",
-						To:    "1",
-						Kind:  MetaKind,
+						Field:     "Meta.Annotations[1]",
+						From:      "<nil>",
+						To:        "1",
+						Kind:      MetaKind | NodeKind | AnnotationKind,
+						Operation: Create,
+						Name:      "1",
 					},
 				},
 			},
@@ -734,16 +932,20 @@ func TestChange_diffMetadata(t *testing.T) {
 					Parent:    "Err",
 					SHA256:    "1234567890",
 				},
-				ctx: "",
+				ctx:        "",
+				parentKind: AppKind,
 			},
 			wantErr: true,
 			want: Change{
+				Kind:      MetaKind | AppKind,
+				Operation: Update,
 				Diff: []Difference{
 					{
-						Field: "Meta.Parent",
-						From:  "",
-						To:    "Err",
-						Kind:  MetaKind,
+						Field:     "Meta.Parent",
+						From:      "",
+						To:        "Err",
+						Kind:      MetaKind | AppKind,
+						Operation: Update,
 					},
 				},
 			},
@@ -766,16 +968,64 @@ func TestChange_diffMetadata(t *testing.T) {
 					Parent:    "",
 					SHA256:    "1234567890",
 				},
-				ctx: "",
+				ctx:        "",
+				parentKind: ChannelKind,
 			},
 			wantErr: true,
 			want: Change{
+				Kind:      MetaKind | ChannelKind,
+				Operation: Update,
 				Diff: []Difference{
 					{
-						Field: "Meta.Name",
-						From:  "name",
-						To:    "Err",
-						Kind:  MetaKind,
+						Field:     "Meta.Name",
+						From:      "name",
+						To:        "Err",
+						Kind:      MetaKind | ChannelKind,
+						Operation: Update,
+					},
+				},
+			},
+		},
+		{
+			name: "delete annotation update",
+			fields: fields{
+				Context: "",
+			},
+			args: args{
+				metaOrig: meta.Metadata{
+					Name:      "name",
+					Reference: "reference",
+					Parent:    "",
+					SHA256:    "1234567890",
+					Annotations: map[string]string{
+						"1": "1",
+						"2": "1",
+					},
+				},
+				metaCurr: meta.Metadata{
+					Name:      "name",
+					Reference: "reference",
+					Parent:    "",
+					SHA256:    "1234567890",
+					Annotations: map[string]string{
+						"1": "1",
+					},
+				},
+				ctx:        "",
+				parentKind: NodeKind,
+			},
+			wantErr: false,
+			want: Change{
+				Operation: Delete,
+				Kind:      MetaKind | NodeKind | AnnotationKind,
+				Diff: []Difference{
+					{
+						Field:     "Meta.Annotations[2]",
+						From:      "1",
+						To:        "<nil>",
+						Kind:      MetaKind | NodeKind | AnnotationKind,
+						Operation: Delete,
+						Name:      "2",
 					},
 				},
 			},
@@ -787,7 +1037,7 @@ func TestChange_diffMetadata(t *testing.T) {
 				Context: tt.fields.Context,
 				Diff:    tt.fields.Diff,
 			}
-			if err := change.diffMetadata(tt.args.metaOrig, tt.args.metaCurr, tt.args.ctx); (err != nil) != tt.wantErr {
+			if err := change.diffMetadata(tt.args.parentElement, tt.args.parentKind, tt.args.metaOrig, tt.args.metaCurr, tt.args.ctx); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffMetadata() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !equalChanges(*change, tt.want) {
@@ -1071,6 +1321,12 @@ func getMockRootApp2() *meta.App {
 
 func equalChanges(change1 Change, change2 Change) bool {
 	if change1.Context != change2.Context {
+		return false
+	}
+	if change1.Kind != change2.Kind {
+		return false
+	}
+	if change1.Operation != change2.Operation {
 		return false
 	}
 	if len(change1.Diff) != len(change2.Diff) {
