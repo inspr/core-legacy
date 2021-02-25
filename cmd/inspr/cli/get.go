@@ -93,8 +93,12 @@ func getNodes(_ context.Context, out io.Writer) error {
 func getObj(printObj func(*meta.App)) {
 	rc := request.NewClient().BaseURL(getAppsURL()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
 	client := client.NewControllerClient(rc)
-	resp, err := client.Apps().Get(context.Background(), cmd.InsprOptions.Scope)
-
+	scope, err := getScope()
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	resp, err := client.Apps().Get(context.Background(), scope)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
