@@ -18,33 +18,33 @@ func NewAppMock(err error) *AppMock {
 }
 
 // Get is the AppMock Get
-func (cm *AppMock) Get(ctx context.Context, context string) (*meta.App, error) {
-	if cm.err != nil {
-		return &meta.App{}, cm.err
+func (am *AppMock) Get(ctx context.Context, context string) (*meta.App, error) {
+	if am.err != nil {
+		return &meta.App{}, am.err
 	}
 	return &meta.App{}, nil
 }
 
 // Create is the AppMock Create
-func (cm *AppMock) Create(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
+func (am *AppMock) Create(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+	if am.err != nil {
+		return diff.Changelog{}, am.err
 	}
 	return diff.Changelog{}, nil
 }
 
 // Delete is the AppMock Delete
-func (cm *AppMock) Delete(ctx context.Context, context string, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
+func (am *AppMock) Delete(ctx context.Context, context string, dryRun bool) (diff.Changelog, error) {
+	if am.err != nil {
+		return diff.Changelog{}, am.err
 	}
 	return diff.Changelog{}, nil
 }
 
 // Update is the AppMock Update
-func (cm *AppMock) Update(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
+func (am *AppMock) Update(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+	if am.err != nil {
+		return diff.Changelog{}, am.err
 	}
 	return diff.Changelog{}, nil
 }
