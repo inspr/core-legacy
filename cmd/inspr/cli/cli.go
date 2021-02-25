@@ -21,19 +21,28 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.Root().SilenceUsage = true
 
-			// vypers boys
+			// viper defaults values or reads from the config location
 			initViper()
+
 			if err := viper.ReadInConfig(); err != nil {
 				if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-					fmt.Fprintln(out, "need to create config file")
-					viper.WriteConfig()
+					if createErr := createConfig(); createErr != nil {
+						err = createErr
+						fmt.Fprintln(out, err.Error())
+					} else {
+						err = nil
+					}
 				} else {
-					fmt.Fprintln(out, "misterious error")
 					fmt.Fprintln(out, err.Error())
 				}
+				return err
 			}
-			viper.WatchConfig()
 
+			err := viper.Unmarshal(&conf)
+			if err != nil {
+				fmt.Fprintln(out, "Error unmarshaling the config file")
+				fmt.Fprintln(out, err.Error())
+			}
 			return nil
 		},
 	}
