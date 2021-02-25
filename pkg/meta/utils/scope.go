@@ -43,12 +43,7 @@ func RemoveLastPartInScope(scope string) (string, string, error) {
 	lastName := names[len(names)-1]
 	names = names[:len(names)-1]
 
-	newScope := ""
-	separator := ""
-	for _, name := range names {
-		newScope = newScope + separator + name
-		separator = "."
-	}
+	newScope := strings.Join(names, ".")
 
 	return newScope, lastName, nil
 
