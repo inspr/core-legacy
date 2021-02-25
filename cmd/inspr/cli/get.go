@@ -10,7 +10,9 @@ import (
 	"github.com/spf13/cobra"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
@@ -21,27 +23,37 @@ var ctx string
 func NewGetCmd() *cobra.Command {
 	ctx = ""
 	getApps := cmd.NewCmd("apps").
-		WithDescription("Get apps from context").
+		WithDescription("Get apps from context ").
 		WithAliases([]string{"a"}).
+		WithExample("Get apps from the default scope", "get apps ").
+		WithExample("Get apps from a custom scope", "get apps --scope app1.app2").
 		WithCommonFlags().
 		NoArgs(getApps)
 	getChannels := cmd.NewCmd("channels").
 		WithDescription("Get channels from context").
+		WithExample("Get channels from the default scope", "get channels ").
+		WithExample("Get channels from a custom scope", "get channels --scope app1.app2").
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
 		NoArgs(getChannels)
 	getTypes := cmd.NewCmd("ctypes").
 		WithDescription("Get channel types from context").
+		WithExample("Get channel types from the default scope", "get ctypes ").
+		WithExample("Get channel types from a custom scope", "get ctypes --scope app1.app2").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		NoArgs(getCTypes)
 	getNodes := cmd.NewCmd("nodes").
 		WithDescription("Get nodes from context").
+		WithExample("Get nodes from the default scope", "get nodes ").
+		WithExample("Get nodes from a custom scope", "get nodes --scope app1.app2").
 		WithAliases([]string{"n"}).
 		WithCommonFlags().
 		NoArgs(getNodes)
 	return cmd.NewCmd("get").
 		WithDescription("Get by object type").
+		WithDescription("Retrieves the components from a given namespace").
+		WithLongDescription("get takes a component type (apps | channels | ctypes | nodes) and displays names for those components is a scope)").
 		WithAliases([]string{"list"}).
 		WithCommonFlags().
 		AddSubCommand(getApps).
@@ -143,4 +155,19 @@ func printTab() {
 
 func getAppsURL() string {
 	return "http://127.0.0.1:8080"
+}
+
+func getScope() (string, error) {
+	defaultScope := "" // Here it will take from viper
+	scope := defaultScope
+
+	if cmd.InsprOptions.Scope != "" {
+		if utils.IsValidScope(cmd.InsprOptions.Scope) {
+			scope = cmd.InsprOptions.Scope
+		} else {
+			return "", ierrors.NewError().BadRequest().Message("invalid scope").Build()
+		}
+	}
+
+	return scope, nil
 }
