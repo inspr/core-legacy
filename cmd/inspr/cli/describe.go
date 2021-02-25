@@ -131,10 +131,8 @@ func displayChannelTypeState(_ context.Context, out io.Writer, args []string) er
 func getClient() *client.Client {
 	url := "http://127.0.0.1:8080" // Here it will take from viper
 
-	client := client.Client{
-		HTTPClient: request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build(),
-	}
-	return &client
+	rc := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
+	return client.NewControllerClient(rc)
 }
 
 func getScope() (string, error) {
