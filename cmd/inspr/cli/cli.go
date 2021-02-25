@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // NewInsprCommand - returns a root command associated with inspr cli
@@ -18,6 +20,20 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 		},
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.Root().SilenceUsage = true
+
+			// vypers boys
+			initViper()
+			if err := viper.ReadInConfig(); err != nil {
+				if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+					fmt.Fprintln(out, "need to create config file")
+					viper.WriteConfig()
+				} else {
+					fmt.Fprintln(out, "misterious error")
+					fmt.Fprintln(out, err.Error())
+				}
+			}
+			viper.WatchConfig()
+
 			return nil
 		},
 	}
