@@ -24,8 +24,8 @@ var defaultValues map[string]string = map[string]string{
 func initViper() {
 	// specifies the path in which the config file present
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("$HOME")
-	viper.SetConfigName(".inspr-env")
+	viper.AddConfigPath("$HOME/.inspr/")
+	viper.SetConfigName("env")
 
 	for k, v := range defaultValues {
 		viper.SetDefault(k, v)
@@ -34,14 +34,19 @@ func initViper() {
 }
 
 func createConfig() error {
-	homeDir := os.Getenv("$HOME")
+	homeDir := os.Getenv("HOME")
+	insprDir := homeDir + "/" + ".inspr"
+
+	if _, err := os.Stat(insprDir); os.IsNotExist(err) {
+		os.Mkdir(insprDir, os.ModePerm)
+	}
 
 	bytes, err := yaml.Marshal(defaultValues)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(homeDir+".inspr-env.yaml", bytes, 0777)
+	err = ioutil.WriteFile(insprDir+"/env.yaml", bytes, 0777)
 	if err != nil {
 		return err
 	}
