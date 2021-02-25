@@ -1,18 +1,17 @@
 package cli
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
+	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
 var tabWriter *tabwriter.Writer
@@ -126,32 +125,16 @@ func getNodes(_ context.Context, out io.Writer) error {
 }
 
 func getObj(printObj func(*meta.App)) {
-	getDO := models.AppQueryDI{
-		Ctx:    ctx,
-		Valid:  true,
-		DryRun: true,
-	}
-	body, err := json.Marshal(getDO)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	req, err := http.NewRequest(http.MethodGet, getAppsURL(), bytes.NewBuffer(body))
-	defer req.Body.Close()
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
+	rc := request.NewClient().BaseURL(getAppsURL()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
+	client := client.NewControllerClient(rc)
+	resp, err := client.Apps().Get(context.Background(), ctx)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	fmt.Println(resp)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	apps := &meta.App{}
-	json.NewDecoder(resp.Body).Decode(apps)
-	printObj(apps)
+	printObj(resp)
 }
 
 func printApps(app *meta.App) {
@@ -204,5 +187,5 @@ func printTab() {
 }
 
 func getAppsURL() string {
-	return "http://127.0.0.1:8080/apps"
+	return "http://127.0.0.1:8080"
 }
