@@ -16,11 +16,6 @@ import (
 
 // NewDescribeCmd DOC TODO
 func NewDescribeCmd() *cobra.Command {
-	describeCmd := cmd.NewCmd("describe").
-		WithDescription("retrieves the full state of a component from a given namespace").
-		WithLongDescription("describe takes a component type (app | channel | channelType | node) plus the name of the component, and displays the state tree)").
-		Super()
-
 	describeApp := cmd.NewCmd("apps <app_name | app_path>").
 		WithDescription("retrieves the full state of the app from a given namespace").
 		WithExample("Display the state of the given app on the default scope", "describe apps hello_world").
@@ -48,9 +43,13 @@ func NewDescribeCmd() *cobra.Command {
 		WithCommonFlags().
 		ExactArgs(1, displayChannelTypeState)
 
-	describeCmd.AddCommand(describeApp)
-	describeCmd.AddCommand(describeChannel)
-	describeCmd.AddCommand(describeChannelType)
+	describeCmd := cmd.NewCmd("describe").
+		WithDescription("retrieves the full state of a component from a given namespace").
+		WithLongDescription("describe takes a component type (app | channel | channelType | node) plus the name of the component, and displays the state tree)").
+		AddSubCommand(describeApp).
+		AddSubCommand(describeChannel).
+		AddSubCommand(describeChannelType).
+		Super()
 
 	return describeCmd
 }
