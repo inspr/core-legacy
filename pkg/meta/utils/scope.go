@@ -57,6 +57,10 @@ func JoinScopes(s1, s2 string) (string, error) {
 		return "", ierrors.NewError().Message("invalid scope in args").InvalidName().Build()
 	}
 
+	if s2 == "" {
+		return s1, nil
+	}
+
 	separator := ""
 	if s1 != "" {
 		separator = "."

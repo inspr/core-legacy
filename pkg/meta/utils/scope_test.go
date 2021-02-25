@@ -147,14 +147,6 @@ func TestJoinScopes(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		{
-			name: "Invalid result scope - second scope cant be root",
-			args: args{
-				s1: "app1.app2",
-				s2: "",
-			},
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
