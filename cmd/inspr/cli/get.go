@@ -24,65 +24,21 @@ func NewGetCmd() *cobra.Command {
 		WithDescription("Get apps").
 		WithAliases([]string{"a"}).
 		WithCommonFlags().
-		WithFlags([]*cmd.Flag{
-			{
-				Name:          "scope",
-				Usage:         "inspr get <subcommand> --scope/-s <apppath>",
-				Shorthand:     "s",
-				Value:         &ctx,
-				DefValue:      "",
-				FlagAddMethod: "",
-				DefinedOn:     []string{"apps"},
-			},
-		}).
 		NoArgs(getApps)
 	getChannels := cmd.NewCmd("channels").
 		WithDescription("Get channels").
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
-		WithFlags([]*cmd.Flag{
-			{
-				Name:          "define search scope",
-				Usage:         "inspr get <subcommand> --scope/-s <apppath>",
-				Shorthand:     "s",
-				Value:         &ctx,
-				DefValue:      "",
-				FlagAddMethod: "",
-				DefinedOn:     []string{"channels"},
-			},
-		}).
 		NoArgs(getChannels)
 	getTypes := cmd.NewCmd("ctypes").
 		WithDescription("Get types").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
-		WithFlags([]*cmd.Flag{
-			{
-				Name:          "scope",
-				Usage:         "inspr get <subcommand> --scope/-s <apppath>",
-				Shorthand:     "s",
-				Value:         &ctx,
-				DefValue:      "",
-				FlagAddMethod: "",
-				DefinedOn:     []string{"types"},
-			},
-		}).
 		NoArgs(getCTypes)
 	getNodes := cmd.NewCmd("nodes").
 		WithDescription("Get nodes").
 		WithAliases([]string{"n"}).
 		WithCommonFlags().
-		WithFlags([]*cmd.Flag{
-			{
-				Name:          "scope",
-				Usage:         "inspr get <subcommand> [(-s|--scope)=...] [flags]",
-				Shorthand:     "s",
-				Value:         &ctx,
-				DefValue:      "",
-				FlagAddMethod: "",
-				DefinedOn:     []string{"nodes"},
-			},
-		}).
 		NoArgs(getNodes)
 	return cmd.NewCmd("get").
 		WithDescription("Get by object type").
@@ -127,9 +83,8 @@ func getNodes(_ context.Context, out io.Writer) error {
 func getObj(printObj func(*meta.App)) {
 	rc := request.NewClient().BaseURL(getAppsURL()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
 	client := client.NewControllerClient(rc)
-	resp, err := client.Apps().Get(context.Background(), ctx)
+	resp, err := client.Apps().Get(context.Background(), cmd.InsprOptions.Scope)
 
-	fmt.Println(resp)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
