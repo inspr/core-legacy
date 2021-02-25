@@ -64,8 +64,8 @@ func displayAppState(_ context.Context, out io.Writer, args []string) error {
 	}
 
 	if !utils.IsValidScope(args[0]) {
-		fmt.Println("invalid args")
-		return ierrors.NewError().Build()
+		fmt.Fprint(out, "invalid args\n")
+		return ierrors.NewError().Message("Invalid args").BadRequest().Build()
 	}
 
 	separator := ""
@@ -76,7 +76,7 @@ func displayAppState(_ context.Context, out io.Writer, args []string) error {
 
 	app, err := client.Apps().Get(context.Background(), path)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprint(out, err.Error()+"\n")
 		return err
 	}
 
@@ -99,8 +99,8 @@ func displayChannelState(_ context.Context, out io.Writer, args []string) error 
 
 	channel, err := client.Channels().Get(context.Background(), path, chName)
 	if err != nil {
-		fmt.Println(err)
-		return ierrors.NewError().Build()
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
 	}
 	utils.PrintChannelTree(channel)
 
@@ -121,8 +121,8 @@ func displayChannelTypeState(_ context.Context, out io.Writer, args []string) er
 
 	channelType, err := client.ChannelTypes().Get(context.Background(), path, ctName)
 	if err != nil {
-		fmt.Println(err)
-		return ierrors.NewError().Build()
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
 	}
 	utils.PrintChannelTypeTree(channelType)
 
@@ -146,8 +146,7 @@ func getScope() (string, error) {
 		if utils.IsValidScope(cmd.InsprOptions.Scope) {
 			scope = cmd.InsprOptions.Scope
 		} else {
-			fmt.Println("invalid scope")
-			return "", ierrors.NewError().Build()
+			return "", ierrors.NewError().BadRequest().Message("invalid scope").Build()
 		}
 	}
 
@@ -160,12 +159,12 @@ func processArg(arg, scope string) (string, string, error) {
 
 	if err := utils.StructureNameIsValid(arg); err != nil {
 		if !utils.IsValidScope(arg) {
-			return "", "", ierrors.NewError().Build()
+			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
 		}
 
 		newScope, lastName, err := utils.RemoveLastPartInScope(arg)
 		if err != nil {
-			return "", "", ierrors.NewError().Build()
+			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
 		}
 
 		separator := ""

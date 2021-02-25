@@ -36,7 +36,7 @@ and returns the new scope and the element that was removed
 */
 func RemoveLastPartInScope(scope string) (string, string, error) {
 	if !IsValidScope(scope) {
-		return "", "", ierrors.NewError().Build()
+		return "", "", ierrors.NewError().Message("invalid scope: " + scope).InvalidName().Build()
 	}
 
 	names := strings.Split(scope, ".")
