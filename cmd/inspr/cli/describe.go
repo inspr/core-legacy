@@ -45,7 +45,7 @@ func NewDescribeCmd() *cobra.Command {
 
 	describeCmd := cmd.NewCmd("describe").
 		WithDescription("Retrieves the full state of a component from a given namespace").
-		WithLongDescription("describe takes a component type (app | channel | channelType | node) plus the name of the component, and displays the state tree)").
+		WithLongDescription("describe takes a component type (apps | channels | ctypes) plus the name of the component, and displays the state tree)").
 		AddSubCommand(describeApp).
 		AddSubCommand(describeChannel).
 		AddSubCommand(describeChannelType).
