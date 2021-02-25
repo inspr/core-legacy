@@ -10,7 +10,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -21,6 +20,7 @@ var ctx string
 
 // NewGetCmd - mock subcommand
 func NewGetCmd() *cobra.Command {
+	ctx = ""
 	getApps := cmd.NewCmd("apps").
 		WithDescription("Get apps").
 		WithAliases([]string{"a"}).
@@ -53,7 +53,7 @@ func NewGetCmd() *cobra.Command {
 			},
 		}).
 		NoArgs(getChannels)
-	getTypes := cmd.NewCmd("types").
+	getTypes := cmd.NewCmd("ctypes").
 		WithDescription("Get types").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
@@ -76,7 +76,7 @@ func NewGetCmd() *cobra.Command {
 		WithFlags([]*cmd.Flag{
 			{
 				Name:          "scope",
-				Usage:         "inspr get <subcommand> --scope/-s <apppath>",
+				Usage:         "inspr get <subcommand> [(-s|--scope)=...] [flags]",
 				Shorthand:     "s",
 				Value:         &ctx,
 				DefValue:      "",
@@ -129,7 +129,7 @@ func getObj(printObj func(*meta.App)) {
 	getDO := models.AppQueryDI{
 		Ctx:    ctx,
 		Valid:  true,
-		DryRun: false,
+		DryRun: true,
 	}
 	body, err := json.Marshal(getDO)
 	if err != nil {
@@ -149,10 +149,9 @@ func getObj(printObj func(*meta.App)) {
 		fmt.Println(err.Error())
 		return
 	}
-	apps := &models.AppDI{}
+	apps := &meta.App{}
 	json.NewDecoder(resp.Body).Decode(apps)
-	printObj(&apps.App)
-
+	printObj(apps)
 }
 
 func printApps(app *meta.App) {
@@ -192,12 +191,12 @@ func printNodes(app *meta.App) {
 }
 
 func printLine(name string) {
-	fmt.Fprintf(tabWriter, "%s", name)
+	fmt.Fprintf(tabWriter, "%s\n", name)
 }
 
 func initTab(out io.Writer) {
 	tabWriter = tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.Debug)
-	fmt.Fprintf(tabWriter, "NAME")
+	fmt.Fprintf(tabWriter, "NAME\n")
 }
 
 func printTab() {
@@ -205,5 +204,5 @@ func printTab() {
 }
 
 func getAppsURL() string {
-	return fmt.Sprintf(viper.GetString("reqUrl"), "/apps")
+	return "http://127.0.0.1:8080/apps"
 }
