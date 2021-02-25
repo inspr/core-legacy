@@ -26,6 +26,7 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 	rootCmd.AddCommand(NewMockCmd())
 	rootCmd.AddCommand(NewHiddenCmd())
 	rootCmd.AddCommand(NewApplyCmd())
+	rootCmd.AddCommand(NewDescribeCmd())
 	// root persistentFlags
 	return rootCmd
 }
