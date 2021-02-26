@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 )
 
@@ -19,8 +20,11 @@ func NewMockCmd() *cobra.Command {
 }
 
 func doMock(_ context.Context, out io.Writer) error {
-	fmt.Fprint(out, "mock hello\n")
+	value := viper.Get(configScope)
+	fmt.Fprintln(out, value)
 
-	fmt.Fprintf(out, "something %v\n", cmd.InsprOptions.SampleFlagValue)
+	port := viper.Get(configServerIP)
+	fmt.Fprintln(out, port)
+
 	return nil
 }
