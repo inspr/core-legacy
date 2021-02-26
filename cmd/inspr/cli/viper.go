@@ -62,8 +62,9 @@ func createViperConfig() error {
 // readConfig - reads the inspr's viper config, in case it didn't
 // found any, it creates one with the defaults values
 func readViperConfig() error {
-
-	if _, err := os.Stat(viper.ConfigFileUsed()); os.IsNotExist(err) {
+	homeDir, _ := os.UserHomeDir()
+	configDir := filepath.Join(homeDir, ".inspr", "config")
+	if _, err := os.Stat(configDir); os.IsNotExist(err) {
 		if createErr := createViperConfig(); createErr != nil {
 			return createErr
 		}
