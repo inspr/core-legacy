@@ -5,19 +5,25 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-type FakeOperator struct {
+// Operator mock
+type Operator struct {
 	nodes    NodeOperator
 	channels ChannelOperator
 }
 
-func (f *FakeOperator) Channels() operators.ChannelOperatorInterface {
+// Channels mock
+func (f *Operator) Channels() operators.ChannelOperatorInterface {
 	return f.channels
 }
-func (f *FakeOperator) Nodes() operators.NodeOperatorInterface {
+
+// Nodes mock
+func (f *Operator) Nodes() operators.NodeOperatorInterface {
 	return f.nodes
 }
+
+// NewFakeOperator creates a simple operator that only acts in memory
 func NewFakeOperator() operators.OperatorInterface {
-	return &FakeOperator{
+	return &Operator{
 		nodes: NodeOperator{
 			nodes: make(map[string]*meta.App),
 		},

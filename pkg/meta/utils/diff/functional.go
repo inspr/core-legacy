@@ -84,17 +84,26 @@ func (c Changelog) ForEachDiffFiltered(operations ...DifferenceOperation) {
 	}
 }
 
+// ChangeOperation is a struct that holds a filter and an operation to be applied on
+// a Changelog. The filter determines which changess will be applied to and the operation defines
+// what will be applied to each change.
 type ChangeOperation struct {
 	filter func(c Change) bool
 	apply  func(c Change)
 }
 
+// NewChangeOperation creates a ChangeOperation for the given filter and apply function
+//
+// See ChangeOperation
 func NewChangeOperation(filter func(c Change) bool, apply func(c Change)) ChangeOperation {
 	return ChangeOperation{
 		filter, apply,
 	}
 }
 
+// NewChangeKindOperation creates a ChangeOperation that filters per type.
+//
+// See ChangeOperation
 func NewChangeKindOperation(kind Kind, apply func(c Change)) ChangeOperation {
 	return ChangeOperation{
 		filter: func(c Change) bool {
@@ -104,6 +113,7 @@ func NewChangeKindOperation(kind Kind, apply func(c Change)) ChangeOperation {
 	}
 }
 
+// Filter filters the differences of the Change with the return value of the given function
 func (c Change) Filter(f func(d Difference) bool) (ret Change) {
 	ret.Context = c.Context
 	ret.Kind = c.Kind
@@ -117,12 +127,17 @@ func (c Change) Filter(f func(d Difference) bool) (ret Change) {
 	return
 }
 
+// FilterKind filters the diffs of the change by its kind.
 func (c Change) FilterKind(kind Kind) Change {
 	return c.Filter(func(d Difference) bool {
 		return d.Kind&kind > 0
 	})
 }
 
+// ForEachFiltered applies each operation on the changes contained in the changelog.
+//
+// The operations are applied only if the filters defined on them return true, and every filter
+// is applied on each change in the changelog.
 func (c Changelog) ForEachFiltered(operations ...ChangeOperation) {
 	for _, change := range c {
 		for _, op := range operations {
@@ -133,6 +148,7 @@ func (c Changelog) ForEachFiltered(operations ...ChangeOperation) {
 	}
 }
 
+// ForEach applies the function for each change in the changelog
 func (c Change) ForEach(f func(d Difference)) {
 	for _, d := range c.Diff {
 		f(d)

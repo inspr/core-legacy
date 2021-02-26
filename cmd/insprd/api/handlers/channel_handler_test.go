@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -276,6 +277,7 @@ func TestChannelHandler_HandleUpdateChannel(t *testing.T) {
 			defer ts.Close()
 
 			tt.ch.mem.Channels().CreateChannel("", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}})
+			tt.ch.op.Channels().Create(context.Background(), "", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -301,6 +303,7 @@ func TestChannelHandler_HandleDeleteChannel(t *testing.T) {
 			defer ts.Close()
 
 			tt.ch.mem.Channels().CreateChannel("", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}})
+			tt.ch.op.Channels().Create(context.Background(), "", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))

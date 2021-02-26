@@ -17,6 +17,8 @@ type ChannelMemory interface {
 	DeleteChannel(context string, chName string) error
 	UpdateChannel(context string, ch *meta.Channel) error
 }
+
+// ChannelGetInterface is an interface to get channels from memory
 type ChannelGetInterface interface {
 	Get(context string, ctName string) (*meta.Channel, error)
 }
@@ -31,6 +33,8 @@ type AppMemory interface {
 	DeleteApp(query string) error
 	UpdateApp(query string, app *meta.App) error
 }
+
+// AppGetInterface is an interface to get apps from memory
 type AppGetInterface interface {
 	Get(query string) (*meta.App, error)
 }
@@ -45,6 +49,8 @@ type ChannelTypeMemory interface {
 	DeleteChannelType(context string, ctName string) error
 	UpdateChannelType(context string, ct *meta.ChannelType) error
 }
+
+// ChannelTypeGetInterface is an interface to get channel types from memory
 type ChannelTypeGetInterface interface {
 	Get(context string, ctName string) (*meta.ChannelType, error)
 }
@@ -59,6 +65,7 @@ type Manager interface {
 	ChannelTypes() ChannelTypeMemory
 }
 
+// GetInterface is an interface to get components from memory
 type GetInterface interface {
 	Apps() AppGetInterface
 	Channels() ChannelGetInterface
