@@ -26,6 +26,7 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 	rootCmd.AddCommand(NewMockCmd())
 	rootCmd.AddCommand(NewHiddenCmd())
 	rootCmd.AddCommand(NewGetCmd())
+	rootCmd.AddCommand(NewDeleteCmd())
 
 	rootCmd.AddCommand(NewApplyCmd())
 	rootCmd.AddCommand(NewDescribeCmd())

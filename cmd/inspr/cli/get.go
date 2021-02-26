@@ -15,11 +15,10 @@ import (
 )
 
 var tabWriter *tabwriter.Writer
-var ctx string
+var lines []string
 
 // NewGetCmd - mock subcommand
 func NewGetCmd() *cobra.Command {
-	ctx = ""
 	getApps := cmd.NewCmd("apps").
 		WithDescription("Get apps from context ").
 		WithAliases([]string{"a"}).
@@ -53,7 +52,6 @@ func NewGetCmd() *cobra.Command {
 		WithDescription("Retrieves the components from a given namespace").
 		WithLongDescription("get takes a component type (apps | channels | ctypes | nodes) and displays names for those components is a scope)").
 		WithAliases([]string{"list"}).
-		WithCommonFlags().
 		AddSubCommand(getApps).
 		AddSubCommand(getChannels).
 		AddSubCommand(getTypes).
@@ -64,46 +62,59 @@ func NewGetCmd() *cobra.Command {
 
 func getApps(_ context.Context, out io.Writer) error {
 	initTab(out)
-	getObj(printApps)
+	err := getObj(printApps, out)
+	if err != nil {
+		return err
+	}
 	printTab()
 	return nil
 }
 
 func getChannels(_ context.Context, out io.Writer) error {
 	initTab(out)
-	getObj(printChannels)
+	err := getObj(printChannels, out)
+	if err != nil {
+		return err
+	}
 	printTab()
 	return nil
 }
 
 func getCTypes(_ context.Context, out io.Writer) error {
 	initTab(out)
-	getObj(printCTypes)
+	err := getObj(printCTypes, out)
+	if err != nil {
+		return err
+	}
 	printTab()
 	return nil
 }
 
 func getNodes(_ context.Context, out io.Writer) error {
 	initTab(out)
-	getObj(printNodes)
+	err := getObj(printNodes, out)
+	if err != nil {
+		return err
+	}
 	printTab()
 	return nil
 }
 
-func getObj(printObj func(*meta.App)) {
+func getObj(printObj func(*meta.App), out io.Writer) error {
 	rc := request.NewClient().BaseURL(getAppsURL()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
 	client := client.NewControllerClient(rc)
 	scope, err := getScope()
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
 	}
 	resp, err := client.Apps().Get(context.Background(), scope)
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
 	}
 	printObj(resp)
+	return nil
 }
 
 func printApps(app *meta.App) {
@@ -143,15 +154,18 @@ func printNodes(app *meta.App) {
 }
 
 func printLine(name string) {
-	fmt.Fprintf(tabWriter, "%s\n", name)
+	lines = append(lines, fmt.Sprintf("%s\n", name))
 }
 
 func initTab(out io.Writer) {
-	tabWriter = tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.Debug)
-	fmt.Fprintf(tabWriter, "NAME\n")
+	tabWriter = tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	lines = append(lines, "NAME\n")
 }
 
 func printTab() {
+	for _, line := range lines {
+		fmt.Fprint(tabWriter, line)
+	}
 	tabWriter.Flush()
 }
 
