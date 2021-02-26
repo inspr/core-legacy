@@ -10,8 +10,8 @@ type Apps struct {
 	*MemManager
 }
 
-// GetApp - simple mock
-func (apps *Apps) GetApp(query string) (*meta.App, error) {
+// Get - simple mock
+func (apps *Apps) Get(query string) (*meta.App, error) {
 	if apps.fail != nil {
 		return &meta.App{}, apps.fail
 	}

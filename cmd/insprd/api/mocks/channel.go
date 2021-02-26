@@ -10,8 +10,8 @@ type Channels struct {
 	*MemManager
 }
 
-// GetChannel - simple mock
-func (chs *Channels) GetChannel(context string, chName string) (*meta.Channel, error) {
+// Get - simple mock
+func (chs *Channels) Get(context string, chName string) (*meta.Channel, error) {
 	if chs.fail != nil {
 		return &meta.Channel{}, chs.fail
 	}
