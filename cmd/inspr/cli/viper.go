@@ -64,6 +64,7 @@ func createViperConfig() error {
 func readViperConfig() error {
 	homeDir, _ := os.UserHomeDir()
 	configDir := filepath.Join(homeDir, ".inspr", "config")
+
 	if _, err := os.Stat(configDir); os.IsNotExist(err) {
 		if createErr := createViperConfig(); createErr != nil {
 			return createErr
@@ -97,4 +98,12 @@ func existsKey(key string) bool {
 		}
 	}
 	return false
+}
+
+func existingKeys() []string {
+	arr := make([]string, 0)
+	for k, _ := range defaultValues {
+		arr = append(arr, k)
+	}
+	return arr
 }

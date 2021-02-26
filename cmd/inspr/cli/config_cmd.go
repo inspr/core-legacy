@@ -26,6 +26,8 @@ func doConfigChange(_ context.Context, out io.Writer, args []string) error {
 	if !existsKey(key) {
 		errMsg := "key inserted does not exist in the inspr config"
 		fmt.Fprintln(out, errMsg)
+		fmt.Fprintln(out, "existing keys")
+		fmt.Fprintln(out, existingKeys())
 		return ierrors.NewError().Message(errMsg).Build()
 	}
 
