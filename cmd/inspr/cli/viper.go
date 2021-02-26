@@ -76,3 +76,15 @@ func readViperConfig() error {
 	}
 	return nil
 }
+
+// changeViperValues - changes the values of the viper configuration
+// and saves it in the config file of inspr, if the file is not created
+// it will return an error.
+func changeViperValues(key string, value interface{}) error {
+	viper.Set(key, value)
+	if err := viper.WriteConfig(); err != nil {
+		return err
+	}
+
+	return nil
+}
