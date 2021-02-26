@@ -1,120 +1,119 @@
 package cli
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 
 	"github.com/spf13/cobra"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
-var deleteScope string
-
-// NewGetCmd - mock subcommand
+// NewDeleteCmd - mock subcommand
 func NewDeleteCmd() *cobra.Command {
-	getApps := cmd.NewCmd("apps").
-		WithDescription("Get apps").
+	deleteApps := cmd.NewCmd("apps").
+		WithDescription("delete apps from context ").
 		WithAliases([]string{"a"}).
+		WithExample("delete apps from the default scope", "delete apps ").
+		WithExample("delete apps from a custom scope", "delete apps --scope app1.app2").
 		WithCommonFlags().
-		NoArgs(getApps)
-	getChannels := cmd.NewCmd("channels").
-		WithDescription("Get channels").
+		ExactArgs(1, deleteApps)
+	deleteChannels := cmd.NewCmd("channels").
+		WithDescription("delete channels from context").
+		WithExample("delete channels from the default scope", "delete channels ").
+		WithExample("delete channels from a custom scope", "delete channels --scope app1.app2").
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
-		NoArgs(getChannels)
-	getTypes := cmd.NewCmd("types").
-		WithDescription("Get types").
+		ExactArgs(1, deleteChannels)
+	deleteTypes := cmd.NewCmd("ctypes").
+		WithDescription("delete channel types from context").
+		WithExample("delete channel types from the default scope", "delete ctypes ").
+		WithExample("delete channel types from a custom scope", "delete ctypes --scope app1.app2").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
-		NoArgs(getCTypes)
-	getNodes := cmd.NewCmd("nodes").
-		WithDescription("Get nodes").
-		WithAliases([]string{"n"}).
-		WithCommonFlags().
-		NoArgs(getNodes)
-	return cmd.NewCmd("get").
-		WithDescription("Get by object type").
+		ExactArgs(1, deleteCTypes)
+	return cmd.NewCmd("delete").
+		WithDescription("delete by object type").
+		WithDescription("Retrieves the components from a given namespace").
+		WithLongDescription("delete takes a component type (apps | channels | ctypes | nodes) and displays names for those components is a scope)").
 		WithAliases([]string{"list"}).
-		WithCommonFlags().
-		WithFlags([]*cmd.Flag{
-			{
-				Name:          "inspr get <subcommand> --scope/-s <apppath>",
-				Usage:         "define search scope",
-				Shorthand:     "s",
-				Value:         &getScope,
-				DefValue:      "",
-				FlagAddMethod: "",
-				DefinedOn:     []string{"get"},
-			},
-		}).
-		AddSubCommand(getApps).
-		AddSubCommand(getChannels).
-		AddSubCommand(getTypes).
-		AddSubCommand(getNodes).
+		AddSubCommand(deleteApps).
+		AddSubCommand(deleteChannels).
+		AddSubCommand(deleteTypes).
 		Super()
 
 }
 
-func deleteApps(_ context.Context, out io.Writer) error {
-	initTab(out)
-	getObj(printApps)
-	printTab()
-	return nil
-}
+func deleteApps(_ context.Context, out io.Writer, args []string) error {
+	client := getClient()
 
-func deleteChannels(_ context.Context, out io.Writer) error {
-	initTab(out)
-	getObj(printChannels)
-	printTab()
-	return nil
-}
-
-func deleteCTypes(_ context.Context, out io.Writer) error {
-	initTab(out)
-	getObj(printCTypes)
-	printTab()
-	return nil
-}
-
-func deleteNodes(_ context.Context, out io.Writer) error {
-	initTab(out)
-	getObj(printNodes)
-	printTab()
-	return nil
-}
-
-func deleteObj(printObj func(*meta.App)) {
-	getDO := models.AppQueryDI{
-		Ctx:    getScope,
-		Valid:  true,
-		DryRun: false,
-	}
-	body, err := json.Marshal(getDO)
+	scope, err := getScope()
 	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	req, err := http.NewRequest(http.MethodGet, getURL(), bytes.NewBuffer(body))
-	defer req.Body.Close()
-	if err != nil {
-		fmt.Println(err.Error())
-		return
+		return err
 	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
+	if !utils.IsValidScope(args[0]) {
+		fmt.Fprint(out, "invalid args\n")
+		return ierrors.NewError().Message("Invalid args").BadRequest().Build()
 	}
-	apps := &models.AppDI{}
-	json.NewDecoder(resp.Body).Decode(apps)
-	printObj(&apps.App)
 
+	separator := ""
+	if scope != "" {
+		separator = "."
+	}
+	path := scope + separator + args[0]
+
+	cl, err := client.Apps().Delete(context.Background(), path, cmd.InsprOptions.DryRun)
+	if err != nil {
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
+	}
+	cl.Print(out)
+	return nil
+}
+
+func deleteChannels(_ context.Context, out io.Writer, args []string) error {
+	client := getClient()
+	scope, err := getScope()
+	if err != nil {
+		return err
+	}
+
+	path, chName, err := processArg(args[0], scope)
+	if err != nil {
+		return err
+	}
+
+	cl, err := client.Channels().Delete(context.Background(), path, chName, cmd.InsprOptions.DryRun)
+	if err != nil {
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
+	}
+	cl.Print(out)
+
+	return nil
+}
+
+func deleteCTypes(_ context.Context, out io.Writer, args []string) error {
+	client := getClient()
+	scope, err := getScope()
+	if err != nil {
+		return err
+	}
+
+	path, ctName, err := processArg(args[0], scope)
+	if err != nil {
+		return err
+	}
+
+	cl, err := client.ChannelTypes().Delete(context.Background(), path, ctName, cmd.InsprOptions.DryRun)
+	if err != nil {
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
+	}
+	cl.Print(out)
+
+	return nil
 }
