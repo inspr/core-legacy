@@ -9,6 +9,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
 )
@@ -31,11 +32,22 @@ func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 		flagIsUpdate := cmd.InsprOptions.Update
 
 		var log diff.Changelog
+
+		scope, err := getScope()
+		if err != nil {
+			return err
+		}
+
+		parentPath, err := metautils.JoinScopes(scope, channelType.Meta.Parent)
+		if err != nil {
+			return err
+		}
+
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), channelType.Meta.Parent, &channelType, flagDryRun)
+			log, err = c.Update(context.Background(), parentPath, &channelType, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), channelType.Meta.Parent, &channelType, flagDryRun)
+			log, err = c.Create(context.Background(), parentPath, &channelType, flagDryRun)
 		}
 
 		if err != nil {
