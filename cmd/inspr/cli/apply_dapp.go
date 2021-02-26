@@ -28,6 +28,10 @@ func NewApplyApp(c controller.AppInterface) RunMethod {
 			}
 		}
 
+		for chName, channel := range app.Spec.Channels {
+			channel.Meta.Name = chName
+		}
+
 		if len(app.Spec.Apps) > 0 {
 			err = recursiveSchemaInjection(app.Spec.Apps)
 			if err != nil {
