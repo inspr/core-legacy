@@ -12,6 +12,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/mocks"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/fake"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -37,19 +39,19 @@ func channelTypeDICases(funcName string) []channelTypeAPITest {
 	return []channelTypeAPITest{
 		{
 			name: "successful_request_" + funcName,
-			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
+			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(errors.New("test_error")), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
+			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -71,19 +73,19 @@ func channelTypeQueryDICases(funcName string) []channelTypeAPITest {
 	return []channelTypeAPITest{
 		{
 			name: "successful_request_" + funcName,
-			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
+			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(errors.New("test_error")), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil)),
+			cth:  NewChannelTypeHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -93,6 +95,7 @@ func channelTypeQueryDICases(funcName string) []channelTypeAPITest {
 func TestNewChannelTypeHandler(t *testing.T) {
 	type args struct {
 		memManager memory.Manager
+		op         operators.OperatorInterface
 	}
 	tests := []struct {
 		name string
@@ -103,15 +106,17 @@ func TestNewChannelTypeHandler(t *testing.T) {
 			name: "success_CreateChannelHandler",
 			args: args{
 				memManager: mocks.MockMemoryManager(nil),
+				op:         fake.NewFakeOperator(),
 			},
 			want: &ChannelTypeHandler{
-				ChannelTypeMemory: mocks.MockMemoryManager(nil).ChannelTypes(),
+				mem: mocks.MockMemoryManager(nil),
+				op:  fake.NewFakeOperator(),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewChannelTypeHandler(tt.args.memManager); !reflect.DeepEqual(got, tt.want) {
+			if got := NewChannelTypeHandler(tt.args.memManager, tt.args.op); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewChannelTypeHandler() = %v, want %v", got, tt.want)
 			}
 		})

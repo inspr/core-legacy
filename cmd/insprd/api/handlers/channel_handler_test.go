@@ -12,6 +12,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/mocks"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/fake"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -36,19 +38,19 @@ func channelDICases(funcName string) []channelAPITest {
 	return []channelAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ch:   NewChannelHandler(mocks.MockMemoryManager(nil)),
+			ch:   NewChannelHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedChannelDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ch:   NewChannelHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			ch:   NewChannelHandler(mocks.MockMemoryManager(errors.New("test_error")), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedChannelDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ch:   NewChannelHandler(mocks.MockMemoryManager(nil)),
+			ch:   NewChannelHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -69,19 +71,19 @@ func channelQueryDICases(funcName string) []channelAPITest {
 	return []channelAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ch:   NewChannelHandler(mocks.MockMemoryManager(nil)),
+			ch:   NewChannelHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedChannelQueryDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ch:   NewChannelHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			ch:   NewChannelHandler(mocks.MockMemoryManager(errors.New("test_error")), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedChannelQueryDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ch:   NewChannelHandler(mocks.MockMemoryManager(nil)),
+			ch:   NewChannelHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -91,6 +93,7 @@ func channelQueryDICases(funcName string) []channelAPITest {
 func TestNewChannelHandler(t *testing.T) {
 	type args struct {
 		memManager memory.Manager
+		op         operators.OperatorInterface
 	}
 	tests := []struct {
 		name string
@@ -101,15 +104,17 @@ func TestNewChannelHandler(t *testing.T) {
 			name: "success_CreateChannelHandler",
 			args: args{
 				memManager: mocks.MockMemoryManager(nil),
+				op:         fake.NewFakeOperator(),
 			},
 			want: &ChannelHandler{
-				ChannelMemory: mocks.MockMemoryManager(nil).Channels(),
+				mem: mocks.MockMemoryManager(nil),
+				op:  fake.NewFakeOperator(),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewChannelHandler(tt.args.memManager); !reflect.DeepEqual(got, tt.want) {
+			if got := NewChannelHandler(tt.args.memManager, tt.args.op); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewChannelHandler() = %v, want %v", got, tt.want)
 			}
 		})
@@ -188,7 +193,7 @@ func TestChannelHandler_HandleDeleteChannel(t *testing.T) {
 	tests := channelQueryDICases("HandleDeleteChannel")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ch.HandleDeleteChannel().HTTPHandlerFunc()
+			handlerFunc := tt.ch.HandleDeleteChannel()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 

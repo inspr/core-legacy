@@ -1,23 +1,28 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 // ChannelHandler - contains handlers that uses the ChannelMemory interface methods
 type ChannelHandler struct {
-	memory.ChannelMemory
+	mem memory.Manager
+	op  operators.OperatorInterface
 }
 
 // NewChannelHandler exports
-func NewChannelHandler(memManager memory.Manager) *ChannelHandler {
+func NewChannelHandler(memManager memory.Manager, op operators.OperatorInterface) *ChannelHandler {
 	return &ChannelHandler{
-		ChannelMemory: memManager.Channels(),
+		mem: memManager,
+		op:  op,
 	}
 }
 
@@ -33,23 +38,34 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		ch.InitTransaction()
+		ch.mem.InitTransaction()
 		if !data.DryRun {
-			defer ch.Commit()
+			defer ch.mem.Commit()
 		} else {
-			defer ch.Cancel()
+			defer ch.mem.Cancel()
 		}
-		err = ch.CreateChannel(data.Ctx, &data.Channel)
+
+		err = ch.mem.Channels().CreateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := ch.GetTransactionChanges()
+
+		changes, err := ch.mem.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, diff)
+
+		channel, _ := ch.mem.Channels().Get(data.Ctx, data.Channel.Meta.Name)
+		err = ch.op.Channels().Create(context.Background(), data.Ctx, channel)
+
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().InternalServer().InnerError(err).Message("unable to create channel in cluster").Build())
+			return
+		}
+
+		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
 }
@@ -67,10 +83,10 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 			return
 		}
 
-		ch.InitTransaction()
-		defer ch.Cancel()
+		ch.mem.InitTransaction()
+		defer ch.mem.Cancel()
 
-		channel, err := ch.GetChannel(data.Ctx, data.ChName)
+		channel, err := ch.mem.Channels().Get(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -92,23 +108,45 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		ch.InitTransaction()
+		ch.mem.InitTransaction()
 		if !data.DryRun {
-			defer ch.Commit()
+			defer ch.mem.Commit()
 		} else {
-			defer ch.Cancel()
+			defer ch.mem.Cancel()
 		}
-		err = ch.UpdateChannel(data.Ctx, &data.Channel)
+		err = ch.mem.Channels().UpdateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := ch.GetTransactionChanges()
+		changes, err := ch.mem.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, diff)
+
+		channel, _ := ch.mem.Channels().Get(data.Ctx, data.Channel.Meta.Name)
+		err = ch.op.Channels().Update(context.Background(), data.Ctx, channel)
+
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().InternalServer().InnerError(err).Message("unable to update channel in cluster").Build())
+			return
+		}
+
+		var errs string
+		for _, appName := range channel.ConnectedApps {
+			app, _ := ch.mem.Apps().Get(data.Ctx + "." + appName)
+			_, err = ch.op.Nodes().UpdateNode(context.Background(), app)
+			if err != nil {
+				errs += err.Error() + "\n"
+			}
+		}
+		if errs != "" {
+			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().Message(errs).InternalServer().Build())
+			return
+		}
+
+		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
 }
@@ -125,23 +163,33 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 			rest.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-		ch.InitTransaction()
+
+		ch.mem.InitTransaction()
 		if !data.DryRun {
-			defer ch.Commit()
+			defer ch.mem.Commit()
 		} else {
-			defer ch.Cancel()
+			defer ch.mem.Cancel()
 		}
-		err = ch.DeleteChannel(data.Ctx, data.ChName)
+
+		err = ch.mem.Channels().DeleteChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := ch.GetTransactionChanges()
+
+		changes, err := ch.mem.Channels().GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, diff)
+
+		err = ch.op.Channels().Delete(context.Background(), data.Ctx, data.ChName)
+
+		if err != nil {
+			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().InternalServer().InnerError(err).Message("unable to delete channel from cluster").Build())
+			return
+		}
+		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
 }

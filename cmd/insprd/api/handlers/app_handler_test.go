@@ -12,6 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/mocks"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/fake"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
@@ -44,19 +45,19 @@ func appDICases(funcName string) []appAPITest {
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			ah:   NewAppHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedAppDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error")), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedAppDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			ah:   NewAppHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -76,19 +77,19 @@ func appQueryDICases(funcName string) []appAPITest {
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			ah:   NewAppHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedAppQueryDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error"))),
+			ah:   NewAppHandler(mocks.MockMemoryManager(errors.New("test_error")), fake.NewFakeOperator()),
 			send: sendInRequest{body: parsedAppQueryDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewAppHandler(mocks.MockMemoryManager(nil)),
+			ah:   NewAppHandler(mocks.MockMemoryManager(nil), fake.NewFakeOperator()),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -111,12 +112,13 @@ func TestNewAppHandler(t *testing.T) {
 			},
 			want: &AppHandler{
 				AppMemory: mocks.MockMemoryManager(nil).Apps(),
+				op:        fake.NewFakeOperator(),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewAppHandler(tt.args.memManager); !reflect.DeepEqual(got, tt.want) {
+			if got := NewAppHandler(tt.args.memManager, fake.NewFakeOperator()); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewAppHandler() = %v, want %v", got, tt.want)
 			}
 		})
@@ -196,7 +198,7 @@ func TestAppHandler_HandleDeleteApp(t *testing.T) {
 	tests := appQueryDICases("HandleDeleteApp")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleDeleteApp().HTTPHandlerFunc()
+			handlerFunc := tt.ah.HandleDeleteApp()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 

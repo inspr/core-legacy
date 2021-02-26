@@ -1,25 +1,30 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 // ChannelTypeHandler - contains handlers that uses the
 // ChannelTypeMemory interface methods
 type ChannelTypeHandler struct {
-	memory.ChannelTypeMemory
+	mem memory.Manager
+	op  operators.OperatorInterface
 }
 
 // NewChannelTypeHandler - returns the handle function that
 // manages the creation of a channelType
-func NewChannelTypeHandler(memManager memory.Manager) *ChannelTypeHandler {
+func NewChannelTypeHandler(memManager memory.Manager, op operators.OperatorInterface) *ChannelTypeHandler {
 	return &ChannelTypeHandler{
-		ChannelTypeMemory: memManager.ChannelTypes(),
+		mem: memManager,
+		op:  op,
 	}
 }
 
@@ -36,18 +41,18 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 			return
 		}
 
-		cth.InitTransaction()
+		cth.mem.InitTransaction()
 		if !data.DryRun {
-			defer cth.Commit()
+			defer cth.mem.Commit()
 		} else {
-			defer cth.Cancel()
+			defer cth.mem.Cancel()
 		}
-		err = cth.CreateChannelType(&data.ChannelType, data.Ctx)
+		err = cth.mem.ChannelTypes().CreateChannelType(&data.ChannelType, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := cth.GetTransactionChanges()
+		diff, err := cth.mem.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -70,10 +75,10 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 			return
 		}
 
-		cth.InitTransaction()
-		defer cth.Cancel()
+		cth.mem.InitTransaction()
+		defer cth.mem.Cancel()
 
-		channelType, err := cth.GetChannelType(data.Ctx, data.CtName)
+		channelType, err := cth.mem.ChannelTypes().Get(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
@@ -96,22 +101,49 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			return
 		}
 
-		cth.InitTransaction()
+		cth.mem.InitTransaction()
 		if !data.DryRun {
-			defer cth.Commit()
+			defer cth.mem.Commit()
 		} else {
-			defer cth.Cancel()
+			defer cth.mem.Cancel()
 		}
-		err = cth.UpdateChannelType(&data.ChannelType, data.Ctx)
+
+		err = cth.mem.ChannelTypes().UpdateChannelType(&data.ChannelType, data.Ctx)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := cth.GetTransactionChanges()
+
+		diff, err := cth.mem.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
+
+		var errs string
+		ct, _ := cth.mem.ChannelTypes().Get(data.Ctx, data.ChannelType.Meta.Name)
+		for _, chName := range ct.ConnectedChannels {
+			ch, _ := cth.mem.Channels().Get(data.Ctx, chName)
+			err = cth.op.Channels().Update(context.Background(), data.Ctx, ch)
+			if err != nil {
+				errs += err.Error() + "\n"
+				continue
+			}
+
+			for _, appName := range ch.ConnectedApps {
+				app, _ := cth.mem.Apps().Get(ch.Meta.Parent + "." + appName)
+				_, err = cth.op.Nodes().UpdateNode(context.Background(), app)
+				if err != nil {
+					errs += err.Error() + "\n"
+				}
+			}
+		}
+
+		if errs != "" {
+			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().Message(errs).InternalServer().Build())
+			return
+		}
+
 		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
@@ -130,18 +162,18 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 			return
 		}
 
-		cth.InitTransaction()
+		cth.mem.InitTransaction()
 		if !data.DryRun {
-			defer cth.Commit()
+			defer cth.mem.Commit()
 		} else {
-			defer cth.Cancel()
+			defer cth.mem.Cancel()
 		}
-		err = cth.DeleteChannelType(data.Ctx, data.CtName)
+		err = cth.mem.ChannelTypes().DeleteChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
 		}
-		diff, err := cth.GetTransactionChanges()
+		diff, err := cth.mem.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, http.StatusInternalServerError, err)
 			return
