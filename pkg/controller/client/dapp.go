@@ -47,10 +47,10 @@ func (ac *AppClient) Get(ctx context.Context, context string) (*meta.App, error)
 //
 // So to create an app inside app1 with the name app2 you
 // would call ac.Create(context.Background(), "app1", &meta.App{...})
-func (ac *AppClient) Create(ctx context.Context, context string, ch *meta.App, dryRun bool) (diff.Changelog, error) {
+func (ac *AppClient) Create(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppDI{
 		Ctx:    context,
-		App:    *ch,
+		App:    *app,
 		Valid:  true,
 		DryRun: dryRun,
 	}
@@ -95,10 +95,10 @@ func (ac *AppClient) Delete(ctx context.Context, context string, dryRun bool) (d
 //
 // So to update an app inside app1 with the name app2 you
 // would call ac.Update(context.Background(), "app1", &meta.App{...})
-func (ac *AppClient) Update(ctx context.Context, context string, ch *meta.App, dryRun bool) (diff.Changelog, error) {
+func (ac *AppClient) Update(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppDI{
 		Ctx:    context,
-		App:    *ch,
+		App:    *app,
 		Valid:  true,
 		DryRun: dryRun,
 	}
