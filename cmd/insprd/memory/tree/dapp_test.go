@@ -405,6 +405,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 			setTree(&MockManager{
 				MemoryManager: &MemoryManager{
 					root: tt.fields.root,
+					tree: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -412,13 +413,13 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			amm := GetTreeMemory().Apps()
-			got, err := amm.GetApp(tt.args.query)
+			got, err := amm.Get(tt.args.query)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.GetApp() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AppMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AppMemoryManager.GetApp() = %v, want %v", got, tt.want)
+				t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -991,7 +992,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
 				am := GetTreeMemory().Channels()
-				ch, err := am.GetChannel("app2.app7", "channel1")
+				ch, err := am.Get("app2.app7", "channel1")
 				if err != nil {
 					t.Errorf("cant get channel channel1")
 				}
@@ -1102,7 +1103,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
 				am := GetTreeMemory().ChannelTypes()
-				ct, err := am.GetChannelType("app2.app2", "ct1")
+				ct, err := am.Get("app2.app2", "ct1")
 				if err != nil {
 					t.Errorf("cant get channelType ct1")
 				}
@@ -1152,6 +1153,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			setTree(&MockManager{
 				MemoryManager: &MemoryManager{
 					root: tt.fields.root,
+					tree: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -1165,7 +1167,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				return
 			}
 			if tt.want != nil {
-				got, err := am.GetApp(tt.args.searchQuery)
+				got, err := am.Get(tt.args.searchQuery)
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
@@ -1287,7 +1289,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
 				am := GetTreeMemory().Channels()
-				ch, err := am.GetChannel("app1", "ch1app1")
+				ch, err := am.Get("app1", "ch1app1")
 				if err != nil {
 					t.Errorf("cant get channel ch1app1")
 				}
@@ -1302,6 +1304,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 			setTree(&MockManager{
 				MemoryManager: &MemoryManager{
 					root: tt.fields.root,
+					tree: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -1315,7 +1318,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 				return
 			}
 			if !tt.wantErr {
-				got, err := am.GetApp(tt.args.query)
+				got, err := am.Get(tt.args.query)
 				if err == nil {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
@@ -1757,7 +1760,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 			checkFunction: func(t *testing.T) {
 				am := GetTreeMemory().Channels()
 
-				ch, err := am.GetChannel("app1", "ch1app1")
+				ch, err := am.Get("app1", "ch1app1")
 				if err != nil {
 					t.Errorf("cant get channel ch1app1")
 				}
@@ -1773,6 +1776,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 			setTree(&MockManager{
 				MemoryManager: &MemoryManager{
 					root: tt.fields.root,
+					tree: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
@@ -1786,7 +1790,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 				return
 			}
 			if tt.want != nil {
-				got, err := am.GetApp(tt.args.query)
+				got, err := am.Get(tt.args.query)
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}

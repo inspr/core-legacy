@@ -8,8 +8,8 @@ type MockAppManager struct {
 	err error
 }
 
-// GetApp Mock
-func (mock *MockAppManager) GetApp(query string) (*meta.App, error) {
+// Get Mock
+func (mock *MockAppManager) Get(query string) (*meta.App, error) {
 	if mock.err != nil {
 		return nil, mock.err
 	}

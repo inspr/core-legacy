@@ -131,13 +131,13 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			ctm := GetTreeMemory().ChannelTypes()
-			got, err := ctm.GetChannelType(tt.args.context, tt.args.ctName)
+			got, err := ctm.Get(tt.args.context, tt.args.ctName)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.GetChannelType() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ChannelTypeMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ChannelTypeMemoryManager.GetChannelType() = %v, want %v", got, tt.want)
+				t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -300,9 +300,9 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 				return
 			}
 			if tt.want != nil {
-				got, err := ctm.GetChannelType(tt.args.context, tt.want.Meta.Name)
+				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("ChannelTypeMemoryManager.GetChannelType() = %v, want %v", got, tt.want)
+					t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
 		})
@@ -419,9 +419,9 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 				t.Errorf("ChannelTypeMemoryManager.DeleteChannelType() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			got, _ := ctm.GetChannelType(tt.args.context, tt.args.ctName)
+			got, _ := ctm.Get(tt.args.context, tt.args.ctName)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ChannelTypeMemoryManager.GetChannelType() = %v, want %v", got, tt.want)
+				t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -548,9 +548,9 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 				return
 			}
 			if tt.want != nil {
-				got, err := ctm.GetChannelType(tt.args.context, tt.want.Meta.Name)
+				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("ChannelTypeMemoryManager.GetChannelType() = %v, want %v", got, tt.want)
+					t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
 		})

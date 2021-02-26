@@ -347,6 +347,7 @@ func Test_getParentApp(t *testing.T) {
 			setTree(&MockManager{
 				MemoryManager: &MemoryManager{
 					root: tt.fields.root,
+					tree: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
