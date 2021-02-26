@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
@@ -142,7 +144,7 @@ func Test_injectSchema(t *testing.T) {
 				path: "test.schema",
 			},
 			wantErr: false,
-			want:    `{"type":"string"}`,
+			want:    "'{\"type\":\"string\"}'",
 		},
 		{
 			name: "Invalid file path",
@@ -155,13 +157,18 @@ func Test_injectSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := injectSchema(tt.args.path)
+			got, err := injectedSchema(tt.args.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("injectSchema() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != tt.want {
-				t.Errorf("injectSchema() = %v, want %v", got, tt.want)
+			var gotJSON interface{}
+			var wantJSON interface{}
+			json.Unmarshal([]byte(got), &gotJSON)
+			json.Unmarshal([]byte(tt.want), &wantJSON)
+
+			if !reflect.DeepEqual(gotJSON, wantJSON) {
+				t.Errorf("injectSchema() = %v, want %v", gotJSON, wantJSON)
 			}
 		})
 	}
