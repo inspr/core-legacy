@@ -21,7 +21,6 @@ func NewApplyApp(c controller.AppInterface) RunMethod {
 		if err != nil {
 			return err
 		}
-
 		if len(app.Spec.ChannelTypes) > 0 {
 			err = schemaInjection(app.Spec.ChannelTypes)
 			if err != nil {
@@ -46,7 +45,11 @@ func NewApplyApp(c controller.AppInterface) RunMethod {
 		}
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), query, &app, flagDryRun)
+			updateQuery, err := metautils.JoinScopes(query, app.Meta.Name)
+			if err != nil {
+				return err
+			}
+			log, err = c.Update(context.Background(), updateQuery, &app, flagDryRun)
 		} else {
 			log, err = c.Create(context.Background(), query, &app, flagDryRun)
 		}
