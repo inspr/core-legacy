@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"bytes"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -19,8 +18,8 @@ func Test_initConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			initConfig()
 			scope := viper.Get(configCurrentScope)
-			if scope != "./app1/app2" {
-				t.Errorf("viper's default scope, expected %v, got %v", "./app1/app2", scope)
+			if scope != "" {
+				t.Errorf("viper's default scope, expected %v, got %v", "", scope)
 			}
 		})
 	}
@@ -36,6 +35,7 @@ func Test_createConfig(t *testing.T) {
 			wantErr: false,
 		},
 	}
+	initConfig()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := createConfig(); (err != nil) != tt.wantErr {
@@ -46,27 +46,26 @@ func Test_createConfig(t *testing.T) {
 }
 
 func Test_readConfig(t *testing.T) {
-	tests := []struct {
-		name    string
-		wantOut string
-		wantErr bool
-	}{
-		{
-			name:    "basic_read",
-			wantOut: "",
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			out := &bytes.Buffer{}
-			if err := readConfig(out); (err != nil) != tt.wantErr {
-				t.Errorf("readConfig() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if gotOut := out.String(); gotOut != tt.wantOut {
-				t.Errorf("readConfig() = %v, want %v", gotOut, tt.wantOut)
-			}
-		})
-	}
+	name := "basic_read_test"
+	wantErr := false
+	initConfig()   // inits viper
+	createConfig() // creates the config in the system in case it doesn't exists
+
+	// tests
+	t.Run(name, func(t *testing.T) {
+
+		if err := readConfig(); (err != nil) != wantErr {
+			t.Errorf("readConfig() error = %v, wantErr %v", err, wantErr)
+		}
+		scope := viper.Get(configCurrentScope)
+		if scope != defaultValues[configCurrentScope] {
+			t.Errorf("readConfig() -> scope, error = %v, wantErr %v", scope, defaultValues[configCurrentScope])
+		}
+
+		ip := viper.Get(configServerIP)
+		if ip != defaultValues[configServerIP] {
+			t.Errorf("readConfig() -> scope, error = %v, wantErr %v", scope, defaultValues[configServerIP])
+		}
+	})
+
 }

@@ -22,7 +22,7 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 			// viper defaults values or reads from the config location
 			initConfig()
 
-			if err := readConfig(out); err != nil {
+			if err := readConfig(); err != nil {
 				return err
 			}
 
