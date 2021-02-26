@@ -6,6 +6,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
 )
@@ -24,11 +25,22 @@ func NewApplyChannel(c controller.ChannelInterface) RunMethod {
 		flagIsUpdate := cmd.InsprOptions.Update
 
 		var log diff.Changelog
+
+		scope, err := getScope()
+		if err != nil {
+			return err
+		}
+
+		parentPath, err := metautils.JoinScopes(scope, channel.Meta.Parent)
+		if err != nil {
+			return err
+		}
+
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+			log, err = c.Update(context.Background(), parentPath, &channel, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), channel.Meta.Parent, &channel, flagDryRun)
+			log, err = c.Create(context.Background(), parentPath, &channel, flagDryRun)
 		}
 
 		if err != nil {

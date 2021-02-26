@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -10,9 +9,9 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
-	"gopkg.in/yaml.v2"
 )
 
 // NewApplyChannelType receives a controller ChannelTypeInterface and calls it's methods
@@ -26,18 +25,29 @@ func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 		}
 
 		if schemaNeedsInjection(channelType.Schema) {
-			channelType.Schema, err = injectSchema(channelType.Schema)
+			channelType.Schema, err = injectedSchema(channelType.Schema)
 		}
 
 		flagDryRun := cmd.InsprOptions.DryRun
 		flagIsUpdate := cmd.InsprOptions.Update
 
 		var log diff.Changelog
+
+		scope, err := getScope()
+		if err != nil {
+			return err
+		}
+
+		parentPath, err := metautils.JoinScopes(scope, channelType.Meta.Parent)
+		if err != nil {
+			return err
+		}
+
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), channelType.Meta.Parent, &channelType, flagDryRun)
+			log, err = c.Update(context.Background(), parentPath, &channelType, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), channelType.Meta.Parent, &channelType, flagDryRun)
+			log, err = c.Create(context.Background(), parentPath, &channelType, flagDryRun)
 		}
 
 		if err != nil {
@@ -61,17 +71,13 @@ func schemaNeedsInjection(schema string) bool {
 	return false
 }
 
-func injectSchema(path string) (string, error) {
-	var schema interface{}
+func injectedSchema(path string) (string, error) {
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
 
-	err = yaml.Unmarshal(file, &schema)
-	if err != nil {
-		return "", err
-	}
+	schema := string(file)
 
-	return fmt.Sprintf("%v", schema), nil
+	return schema, nil
 }

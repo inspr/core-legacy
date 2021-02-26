@@ -1,0 +1,20 @@
+apiVersion: "v1"
+kind: "dapp"
+meta:
+  name: "app1"
+spec:
+  channeltypes:
+    ct1:
+      schema: '{"type":"string"}'
+    ct2:
+      schema: "cli/test/schema_example.schema"
+  channels:
+    ch1:
+      spec:
+        type: "ct1"
+  apps:
+    app4:
+      spec:
+        boundary:
+          input:
+          - "ch1"
