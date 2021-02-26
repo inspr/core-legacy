@@ -8,6 +8,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -156,5 +157,5 @@ func printTab() {
 }
 
 func getAppsURL() string {
-	return "http://127.0.0.1:8080"
+	return viper.GetString(configServerIP)
 }

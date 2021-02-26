@@ -14,7 +14,7 @@ const (
 
 var defaultValues map[string]string = map[string]string{
 	configScope:    "",
-	configServerIP: "127.0.0.1",
+	configServerIP: "http://127.0.0.1:8080",
 }
 
 // initConfig - sets defaults values and where is the file in which new values can be read
