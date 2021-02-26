@@ -92,7 +92,7 @@ func changeViperValues(key string, value interface{}) error {
 // existsKey - informs to the user if the key passed exists in the
 // default keys that are saved in the inspr config file
 func existsKey(key string) bool {
-	for k, _ := range defaultValues {
+	for k := range defaultValues {
 		if k == key {
 			return true
 		}
@@ -102,7 +102,7 @@ func existsKey(key string) bool {
 
 func existingKeys() []string {
 	arr := make([]string, 0)
-	for k, _ := range defaultValues {
+	for k := range defaultValues {
 		arr = append(arr, k)
 	}
 	return arr
