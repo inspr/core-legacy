@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -12,7 +11,6 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
-	"gopkg.in/yaml.v2"
 )
 
 // NewApplyChannelType receives a controller ChannelTypeInterface and calls it's methods
@@ -62,16 +60,12 @@ func schemaNeedsInjection(schema string) bool {
 }
 
 func injectedSchema(path string) (string, error) {
-	var schema interface{}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
 
-	err = yaml.Unmarshal(file, &schema)
-	if err != nil {
-		return "", err
-	}
+	schema := string(file)
 
-	return fmt.Sprintf("%v", schema), nil
+	return schema, nil
 }
