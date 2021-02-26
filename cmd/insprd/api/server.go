@@ -9,8 +9,8 @@ import (
 var server ctrl.Server
 
 // Run is the server start up function
-func Run(mm memory.Manager, nOp operators.NodeOperatorInterface, cOp operators.ChannelOperatorInterface) {
+func Run(mm memory.Manager, op operators.OperatorInterface) {
 	// server.Init(mocks.MockMemoryManager(nil))
-	server.Init(mm, nOp, cOp)
+	server.Init(mm, op)
 	server.Run(":8080")
 }
