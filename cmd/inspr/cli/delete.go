@@ -35,8 +35,7 @@ func NewDeleteCmd() *cobra.Command {
 		WithCommonFlags().
 		ExactArgs(1, deleteCTypes)
 	return cmd.NewCmd("delete").
-		WithDescription("Delete by object type").
-		WithDescription("Retrieves the components from a given namespace").
+		WithDescription("Delete component of object type").
 		WithLongDescription("Delete takes a component type (apps | channels | ctypes) its scope and name, and deletes it from the cluster").
 		AddSubCommand(deleteApps).
 		AddSubCommand(deleteChannels).
