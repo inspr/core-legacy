@@ -2,11 +2,13 @@ package tree
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -1161,7 +1163,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			am := GetTreeMemory().Apps()
-			err := am.CreateApp(tt.args.app, tt.args.context)
+			err := am.CreateApp(tt.args.context, tt.args.app)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -1624,7 +1626,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 								Name:        "appUpdate1",
 								Reference:   "app1.appUpdate1",
 								Annotations: map[string]string{},
-								Parent:      "",
+								Parent:      "app1",
 								SHA256:      "",
 							},
 							Spec: meta.AppSpec{},
@@ -1634,7 +1636,7 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 								Name:        "appUpdate2",
 								Reference:   "app1.appUpdate2",
 								Annotations: map[string]string{},
-								Parent:      "",
+								Parent:      "app1",
 								SHA256:      "",
 							},
 							Spec: meta.AppSpec{},
@@ -1784,13 +1786,18 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			am := GetTreeMemory().Apps()
-			err := am.UpdateApp(tt.args.app, tt.args.query)
+			err := am.UpdateApp(tt.args.query, tt.args.app)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {
 				got, err := am.Get(tt.args.query)
+				cl, derr := diff.Diff(got, tt.want)
+				if derr != nil {
+					fmt.Println(derr.Error())
+				}
+				cl.Print(os.Stdout)
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}

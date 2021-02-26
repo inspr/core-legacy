@@ -89,7 +89,7 @@ func Test_getSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getSchema(tt.args.channel, tt.args.context)
+			got, err := getSchema(tt.args.channel)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getSchema() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -37,7 +37,7 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -47,14 +47,14 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 		} else {
 			defer cth.mem.Cancel()
 		}
-		err = cth.mem.ChannelTypes().CreateChannelType(&data.ChannelType, data.Ctx)
+		err = cth.mem.ChannelTypes().CreateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		diff, err := cth.mem.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)
@@ -71,7 +71,7 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -80,7 +80,7 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 
 		channelType, err := cth.mem.ChannelTypes().Get(data.Ctx, data.CtName)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, channelType)
@@ -97,7 +97,7 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -108,15 +108,15 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			defer cth.mem.Cancel()
 		}
 
-		err = cth.mem.ChannelTypes().UpdateChannelType(&data.ChannelType, data.Ctx)
+		err = cth.mem.ChannelTypes().UpdateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 
 		diff, err := cth.mem.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -140,7 +140,7 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 		}
 
 		if errs != "" {
-			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().Message(errs).InternalServer().Build())
+			rest.ERROR(w, ierrors.NewError().Message(errs).InternalServer().Build())
 			return
 		}
 
@@ -158,7 +158,7 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -170,12 +170,12 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 		}
 		err = cth.mem.ChannelTypes().DeleteChannelType(data.Ctx, data.CtName)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		diff, err := cth.mem.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, diff)

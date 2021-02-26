@@ -9,7 +9,7 @@ spec:
         medium: Memory
   containers:
     - name: sidecar-kafka
-      image: gcr.io/red-inspr/inspr/sidecar/kafka:b16856d-dirty
+      image: gcr.io/red-inspr/inspr/sidecar/kafka:0b6a876-dirty
       imagePullPolicy: Always
       volumeMounts:
       - name: inspr-volume

@@ -18,7 +18,6 @@ import (
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 	k8stesting "k8s.io/client-go/testing"
 )
 
@@ -53,29 +52,6 @@ func mockK8sList(verb string, deps kubeApp.DeploymentList, erro error) kubernete
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
 	return client
-}
-
-func TestNodeOperator_retrieveKube(t *testing.T) {
-	type fields struct {
-		clientSet kubernetes.Interface
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   v1.DeploymentInterface
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			nop := &NodeOperator{
-				clientSet: tt.fields.clientSet,
-			}
-			if got := nop.retrieveKube(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NodeOperator.retrieveKube() = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }
 
 func TestNodeOperator_GetNode(t *testing.T) {

@@ -2,7 +2,7 @@ package diff
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"text/tabwriter"
 
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -72,12 +72,12 @@ func Diff(appOrig *meta.App, appCurr *meta.App) (Changelog, error) {
 }
 
 //Print is an auxiliar method used for displaying a Changelog
-func (cl Changelog) Print() {
+func (cl Changelog) Print(out io.Writer) {
 	var w *tabwriter.Writer
 
 	for _, change := range cl {
 		fmt.Println("On: ", change.Context)
-		w = tabwriter.NewWriter(os.Stdout, 12, 0, 3, ' ', tabwriter.Debug)
+		w = tabwriter.NewWriter(out, 12, 0, 3, ' ', tabwriter.Debug)
 		fmt.Fprintf(w, "Field\t From\t To\n")
 		for _, diff := range change.Diff {
 			fmt.Fprintf(w, "%s\t %s\t %s\n",

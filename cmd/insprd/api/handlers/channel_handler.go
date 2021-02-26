@@ -35,7 +35,7 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 		ch.mem.InitTransaction()
@@ -47,13 +47,13 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 
 		err = ch.mem.Channels().CreateChannel(data.Ctx, &data.Channel)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 
 		changes, err := ch.mem.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -61,7 +61,7 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 		err = ch.op.Channels().Create(context.Background(), data.Ctx, channel)
 
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().InternalServer().InnerError(err).Message("unable to create channel in cluster").Build())
+			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Message("unable to create channel in cluster").Build())
 			return
 		}
 
@@ -79,7 +79,7 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -88,7 +88,7 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 
 		channel, err := ch.mem.Channels().Get(data.Ctx, data.ChName)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, http.StatusOK, channel)
@@ -105,7 +105,7 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 		ch.mem.InitTransaction()
@@ -116,12 +116,12 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 		}
 		err = ch.mem.Channels().UpdateChannel(data.Ctx, &data.Channel)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 		changes, err := ch.mem.GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -129,7 +129,7 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 		err = ch.op.Channels().Update(context.Background(), data.Ctx, channel)
 
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().InternalServer().InnerError(err).Message("unable to update channel in cluster").Build())
+			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Message("unable to update channel in cluster").Build())
 			return
 		}
 
@@ -142,7 +142,7 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			}
 		}
 		if errs != "" {
-			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().Message(errs).InternalServer().Build())
+			rest.ERROR(w, ierrors.NewError().Message(errs).InternalServer().Build())
 			return
 		}
 
@@ -156,11 +156,10 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
-		decoder := json.NewDecoder(r.Body)
 
-		err := decoder.Decode(&data)
+		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil || !data.Valid {
-			rest.ERROR(w, http.StatusBadRequest, err)
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -173,20 +172,20 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 
 		err = ch.mem.Channels().DeleteChannel(data.Ctx, data.ChName)
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 
 		changes, err := ch.mem.Channels().GetTransactionChanges()
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, err)
+			rest.ERROR(w, err)
 			return
 		}
 
 		err = ch.op.Channels().Delete(context.Background(), data.Ctx, data.ChName)
 
 		if err != nil {
-			rest.ERROR(w, http.StatusInternalServerError, ierrors.NewError().InternalServer().InnerError(err).Message("unable to delete channel from cluster").Build())
+			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Message("unable to delete channel from cluster").Build())
 			return
 		}
 		rest.JSON(w, http.StatusOK, changes)

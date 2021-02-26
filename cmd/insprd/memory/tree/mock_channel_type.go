@@ -10,7 +10,7 @@ type ChannelTypeMockManager struct {
 }
 
 // CreateChannelType mocks a channelType method for testing
-func (ctm *ChannelTypeMockManager) CreateChannelType(ct *meta.ChannelType, context string) error {
+func (ctm *ChannelTypeMockManager) CreateChannelType(context string, ct *meta.ChannelType) error {
 	return nil
 }
 
@@ -25,6 +25,6 @@ func (ctm *ChannelTypeMockManager) DeleteChannelType(context string, ctName stri
 }
 
 // UpdateChannelType mocks a channelType method for testing
-func (ctm *ChannelTypeMockManager) UpdateChannelType(ct *meta.ChannelType, query string) error {
+func (ctm *ChannelTypeMockManager) UpdateChannelType(query string, ct *meta.ChannelType) error {
 	return nil
 }

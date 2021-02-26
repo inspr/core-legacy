@@ -132,3 +132,47 @@ func TestRefreshEnviromentVariables(t *testing.T) {
 		})
 	}
 }
+
+func TestRecoverEnvironmentErrors(t *testing.T) {
+	tests := []struct {
+		name    string
+		wantErr bool
+		before  func()
+	}{
+		{
+			name:    "no environment errors",
+			wantErr: false,
+			before: func() {
+				SetMockEnv()
+			},
+		},
+		{
+			name:    "environment errors",
+			wantErr: true,
+			before: func() {
+				UnsetMockEnv()
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.before != nil {
+				tt.before()
+			}
+			// creating the error channel to hold recovered errors
+			cherr := make(chan error, 10)
+
+			var err error
+			func() {
+				defer RecoverEnvironmentErrors(cherr)
+				RefreshEnviromentVariables()
+			}()
+
+			err = <-cherr
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RecoverEnvironmentErrors() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

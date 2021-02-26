@@ -42,6 +42,8 @@ spec:
               value: {{ .Values.kafkaBootstrap}}
             - name: "KAFKA_AUTO_OFFSET_RESET"
               value: {{ .Values.kafkaAutoOffsetReset}}
+            - name: "INSPR_APPS_NAMESPACE"
+              value: {{ .Values.insprAppsNamespace}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

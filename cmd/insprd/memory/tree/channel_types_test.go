@@ -294,7 +294,7 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			ctm := GetTreeMemory().ChannelTypes()
-			err := ctm.CreateChannelType(tt.args.ct, tt.args.context)
+			err := ctm.CreateChannelType(tt.args.context, tt.args.ct)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ChannelTypeMemoryManager.CreateChannelType() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -543,7 +543,7 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			ctm := GetTreeMemory().ChannelTypes()
-			if err := ctm.UpdateChannelType(tt.args.ct, tt.args.context); (err != nil) != tt.wantErr {
+			if err := ctm.UpdateChannelType(tt.args.context, tt.args.ct); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelTypeMemoryManager.UpdateChannelType() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

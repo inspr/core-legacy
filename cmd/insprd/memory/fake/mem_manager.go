@@ -1,9 +1,10 @@
-package mocks
+package fake
 
 import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
 // MemManager is the api struct with the necessary implementations
@@ -18,13 +19,16 @@ type MemManager struct {
 func MockMemoryManager(failErr error) memory.Manager {
 	return &MemManager{
 		channelType: ChannelTypes{
-			fail: failErr,
+			fail:         failErr,
+			channelTypes: make(map[string]*meta.ChannelType),
 		},
 		channel: Channels{
-			fail: failErr,
+			fail:     failErr,
+			channels: make(map[string]*meta.Channel),
 		},
 		app: Apps{
 			fail: failErr,
+			apps: make(map[string]*meta.App),
 		},
 	}
 }

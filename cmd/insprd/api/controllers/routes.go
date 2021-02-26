@@ -7,27 +7,6 @@ import (
 )
 
 func (s *Server) initRoutes() {
-	chandler := handler.NewChannelHandler(s.MemoryManager, s.op)
-	s.Mux.HandleFunc("/channels", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-
-		case http.MethodGet:
-			chandler.HandleGetChannelByRef().JSON()(w, r)
-
-		case http.MethodPost:
-			chandler.HandleCreateChannel().JSON()(w, r)
-
-		case http.MethodPut:
-			chandler.HandleUpdateChannel().JSON()(w, r)
-
-		case http.MethodDelete:
-			chandler.HandleDeleteChannel().JSON()(w, r)
-
-		default:
-			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-	})
 
 	ahandler := handler.NewAppHandler(s.MemoryManager, s.op)
 	s.Mux.HandleFunc("/apps", func(w http.ResponseWriter, r *http.Request) {
@@ -44,6 +23,28 @@ func (s *Server) initRoutes() {
 
 		case http.MethodDelete:
 			ahandler.HandleDeleteApp().JSON()(w, r)
+
+		default:
+			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+	})
+
+	chandler := handler.NewChannelHandler(s.MemoryManager, s.op)
+	s.Mux.HandleFunc("/channels", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+
+		case http.MethodGet:
+			chandler.HandleGetChannelByRef().JSON()(w, r)
+
+		case http.MethodPost:
+			chandler.HandleCreateChannel().JSON()(w, r)
+
+		case http.MethodPut:
+			chandler.HandleUpdateChannel().JSON()(w, r)
+
+		case http.MethodDelete:
+			chandler.HandleDeleteChannel().JSON()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)

@@ -9,6 +9,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"k8s.io/client-go/rest"
 
 	kubeApp "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -115,7 +116,18 @@ func parseNodeName(insprEnv string, context string, name string) string {
 	return strings.ToLower(s)
 }
 
-// NewOperator TODO
-func NewOperator() (*NodeOperator, error) {
-	return &NodeOperator{}, nil
+// NewOperator initializes a k8s based kafka node operator with in cluster configuration
+func NewOperator() (nop *NodeOperator, err error) {
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	nop = &NodeOperator{}
+
+	nop.clientSet, err = kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	return nop, nil
 }

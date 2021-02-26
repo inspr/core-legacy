@@ -1,4 +1,6 @@
-# install librdkafka base image, which is necessary for kafka to run
+# Install librdkafka base image, which is necessary for kafka to run
+# Tag used to build this image:
+# gcr.io/red-inspr/inspr/sidecar/kafka:deploy
 FROM alpine AS kafka-deploy
 
 RUN apk update && \

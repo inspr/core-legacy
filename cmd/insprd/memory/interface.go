@@ -27,9 +27,9 @@ type ChannelGetInterface interface {
 type AppMemory interface {
 	TransactionInterface
 	AppGetInterface
-	CreateApp(app *meta.App, context string) error
+	CreateApp(context string, app *meta.App) error
 	DeleteApp(query string) error
-	UpdateApp(app *meta.App, query string) error
+	UpdateApp(query string, app *meta.App) error
 }
 type AppGetInterface interface {
 	Get(query string) (*meta.App, error)
@@ -41,9 +41,9 @@ type AppGetInterface interface {
 type ChannelTypeMemory interface {
 	TransactionInterface
 	ChannelTypeGetInterface
-	CreateChannelType(ct *meta.ChannelType, context string) error
+	CreateChannelType(context string, ct *meta.ChannelType) error
 	DeleteChannelType(context string, ctName string) error
-	UpdateChannelType(ct *meta.ChannelType, context string) error
+	UpdateChannelType(context string, ct *meta.ChannelType) error
 }
 type ChannelTypeGetInterface interface {
 	Get(context string, ctName string) (*meta.ChannelType, error)
