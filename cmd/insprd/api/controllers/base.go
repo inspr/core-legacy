@@ -12,18 +12,16 @@ import (
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
-	Mux             *http.ServeMux
-	MemoryManager   memory.Manager
-	ChannelOperator operators.ChannelOperatorInterface
-	NodeOperator    operators.NodeOperatorInterface
+	Mux           *http.ServeMux
+	MemoryManager memory.Manager
+	op            operators.OperatorInterface
 }
 
 // Init - configures the server
-func (s *Server) Init(mm memory.Manager, nodeOperator operators.NodeOperatorInterface, channelOperator operators.ChannelOperatorInterface) {
+func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface) {
 	s.Mux = http.NewServeMux()
 	s.MemoryManager = mm
-	s.ChannelOperator = channelOperator
-	s.NodeOperator = nodeOperator
+	s.op = op
 	s.initRoutes()
 }
 

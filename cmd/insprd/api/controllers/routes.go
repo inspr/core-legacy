@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Server) initRoutes() {
-	chandler := handler.NewChannelHandler(s.MemoryManager)
+	chandler := handler.NewChannelHandler(s.MemoryManager, s.op)
 	s.Mux.HandleFunc("/channels", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 
@@ -29,7 +29,7 @@ func (s *Server) initRoutes() {
 		}
 	})
 
-	ahandler := handler.NewAppHandler(s.MemoryManager, s.NodeOperator, s.ChannelOperator)
+	ahandler := handler.NewAppHandler(s.MemoryManager, s.op)
 	s.Mux.HandleFunc("/apps", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 
@@ -51,7 +51,7 @@ func (s *Server) initRoutes() {
 		}
 	})
 
-	cthandler := handler.NewChannelTypeHandler(s.MemoryManager)
+	cthandler := handler.NewChannelTypeHandler(s.MemoryManager, s.op)
 	s.Mux.HandleFunc("/channeltypes", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 

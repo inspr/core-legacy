@@ -11,9 +11,8 @@ import (
 
 func TestServer_Init(t *testing.T) {
 	type args struct {
-		mm  memory.Manager
-		cOp operators.ChannelOperatorInterface
-		nOp operators.NodeOperatorInterface
+		mm memory.Manager
+		op operators.OperatorInterface
 	}
 	tests := []struct {
 		name string
@@ -30,7 +29,7 @@ func TestServer_Init(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.s.Init(tt.args.mm, tt.args.nOp, tt.args.cOp)
+			tt.s.Init(tt.args.mm, tt.args.op)
 			if !reflect.DeepEqual(tt.s.MemoryManager, mocks.MockMemoryManager(nil)) {
 				t.Errorf("TestServer_Init() = %v, want %v", tt.s.MemoryManager, nil)
 			}
