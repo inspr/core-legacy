@@ -1,17 +1,16 @@
-package kafka
+package channels
 
 import (
 	"context"
 	"os"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-// Client is a client for channel operations on kafka
-type Client struct {
+// ChannelOperator is a client for channel operations on kafka
+type ChannelOperator struct {
 	k *kafka.AdminClient
 }
 
@@ -26,20 +25,20 @@ func getEnv() (env kafkaEnv) {
 }
 
 // NewOperator returns an initialized operator from the environment variables
-func NewOperator() (operators.ChannelOperatorInterface, error) {
+func NewOperator() (*ChannelOperator, error) {
 	adminClient, err := kafka.NewAdminClient(&kafka.ConfigMap{
 		"bootstrap.servers": getEnv().kafkaBootstrapServers,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return &Client{
+	return &ChannelOperator{
 		k: adminClient,
 	}, err
 }
 
 // Get gets a channel from kafka
-func (c *Client) Get(ctx context.Context, context string, name string) (*meta.Channel, error) {
+func (c *ChannelOperator) Get(ctx context.Context, context string, name string) (*meta.Channel, error) {
 	topic := toTopic(context, name)
 	meta, err := c.k.GetMetadata(&topic, false, 1000)
 	if err != nil {
@@ -51,7 +50,7 @@ func (c *Client) Get(ctx context.Context, context string, name string) (*meta.Ch
 }
 
 // GetAll gets all channels from kafka
-func (c *Client) GetAll(ctx context.Context, context string) (ret []*meta.Channel, err error) {
+func (c *ChannelOperator) GetAll(ctx context.Context, context string) (ret []*meta.Channel, err error) {
 	metas, err := c.k.GetMetadata(nil, true, 1000)
 	if err != nil {
 		return nil, ierrors.NewError().InnerError(err).InternalServer().Message("unable to get topics from kafka").Build()
@@ -64,7 +63,7 @@ func (c *Client) GetAll(ctx context.Context, context string) (ret []*meta.Channe
 }
 
 // Create creates a channel in kafka
-func (c *Client) Create(ctx context.Context, context string, channel *meta.Channel) error {
+func (c *ChannelOperator) Create(ctx context.Context, context string, channel *meta.Channel) error {
 	config, err := configFromChannel(channel)
 	if err != nil {
 		return err
@@ -83,13 +82,13 @@ func (c *Client) Create(ctx context.Context, context string, channel *meta.Chann
 }
 
 // Update updates a channel in kafka
-func (c *Client) Update(ctx context.Context, context string, channel *meta.Channel) error {
+func (c *ChannelOperator) Update(ctx context.Context, context string, channel *meta.Channel) error {
 	// updating and creating a new topic is the same thing on kafka
 	return c.Create(ctx, context, channel)
 }
 
 // Delete deletes a channel from kafka
-func (c *Client) Delete(ctx context.Context, context string, name string) error {
+func (c *ChannelOperator) Delete(ctx context.Context, context string, name string) error {
 	topics := []string{toTopic(context, name)}
 	_, err := c.k.DeleteTopics(ctx, topics)
 	if err != nil {

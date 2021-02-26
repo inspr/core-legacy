@@ -1,4 +1,4 @@
-package kafka
+package channels
 
 import (
 	"fmt"

@@ -38,8 +38,8 @@ func baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
 	}
 	channels.Map(func(s string) string {
-		ch, _ := tree.GetTreeMemory().Channels().GetChannel(app.Meta.Parent, s)
-		ct, _ := tree.GetTreeMemory().ChannelTypes().GetChannelType(app.Meta.Parent, ch.Spec.Type)
+		ch, _ := tree.GetTreeMemory().Channels().Get(app.Meta.Parent, s)
+		ct, _ := tree.GetTreeMemory().ChannelTypes().Get(app.Meta.Parent, ch.Spec.Type)
 		env[s+"_SCHEMA"] = ct.Schema
 		return s
 	})

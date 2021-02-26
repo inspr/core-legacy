@@ -116,6 +116,6 @@ func parseNodeName(insprEnv string, context string, name string) string {
 }
 
 // NewOperator TODO
-func NewOperator() operators.NodeOperatorInterface {
-	return &NodeOperator{}
+func NewOperator() (*NodeOperator, error) {
+	return &NodeOperator{}, nil
 }
