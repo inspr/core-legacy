@@ -18,6 +18,14 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 		},
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.Root().SilenceUsage = true
+
+			// viper defaults values or reads from the config location
+			initViperConfig()
+
+			if err := readViperConfig(); err != nil {
+				return err
+			}
+
 			return nil
 		},
 	}
