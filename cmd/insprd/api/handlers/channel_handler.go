@@ -181,12 +181,13 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
+		if !data.DryRun {
+			err = ch.op.Channels().Delete(context.Background(), data.Ctx, data.ChName)
 
-		err = ch.op.Channels().Delete(context.Background(), data.Ctx, data.ChName)
-
-		if err != nil {
-			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Message("unable to delete channel from cluster").Build())
-			return
+			if err != nil {
+				rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Message("unable to delete channel from cluster").Build())
+				return
+			}
 		}
 		rest.JSON(w, http.StatusOK, changes)
 	}

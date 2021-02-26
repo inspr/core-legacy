@@ -120,28 +120,30 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			return
 		}
 
-		var errs string
-		ct, _ := cth.mem.ChannelTypes().Get(data.Ctx, data.ChannelType.Meta.Name)
-		for _, chName := range ct.ConnectedChannels {
-			ch, _ := cth.mem.Channels().Get(data.Ctx, chName)
-			err = cth.op.Channels().Update(context.Background(), data.Ctx, ch)
-			if err != nil {
-				errs += err.Error() + "\n"
-				continue
-			}
-
-			for _, appName := range ch.ConnectedApps {
-				app, _ := cth.mem.Apps().Get(ch.Meta.Parent + "." + appName)
-				_, err = cth.op.Nodes().UpdateNode(context.Background(), app)
+		if !data.DryRun {
+			var errs string
+			ct, _ := cth.mem.ChannelTypes().Get(data.Ctx, data.ChannelType.Meta.Name)
+			for _, chName := range ct.ConnectedChannels {
+				ch, _ := cth.mem.Channels().Get(data.Ctx, chName)
+				err = cth.op.Channels().Update(context.Background(), data.Ctx, ch)
 				if err != nil {
 					errs += err.Error() + "\n"
+					continue
+				}
+
+				for _, appName := range ch.ConnectedApps {
+					app, _ := cth.mem.Apps().Get(ch.Meta.Parent + "." + appName)
+					_, err = cth.op.Nodes().UpdateNode(context.Background(), app)
+					if err != nil {
+						errs += err.Error() + "\n"
+					}
 				}
 			}
-		}
 
-		if errs != "" {
-			rest.ERROR(w, ierrors.NewError().Message(errs).InternalServer().Build())
-			return
+			if errs != "" {
+				rest.ERROR(w, ierrors.NewError().Message(errs).InternalServer().Build())
+				return
+			}
 		}
 
 		rest.JSON(w, http.StatusOK, diff)
