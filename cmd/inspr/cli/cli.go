@@ -20,9 +20,9 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 			cmd.Root().SilenceUsage = true
 
 			// viper defaults values or reads from the config location
-			initConfig()
+			initViperConfig()
 
-			if err := readConfig(); err != nil {
+			if err := readViperConfig(); err != nil {
 				return err
 			}
 

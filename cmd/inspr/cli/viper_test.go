@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Test_initConfig(t *testing.T) {
+func Test_initViperConfig(t *testing.T) {
 	tests := []struct {
 		name string
 	}{
@@ -16,7 +16,7 @@ func Test_initConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			initConfig()
+			initViperConfig()
 			scope := viper.Get(configCurrentScope)
 			if scope != "" {
 				t.Errorf("viper's default scope, expected %v, got %v", "", scope)
@@ -25,7 +25,7 @@ func Test_initConfig(t *testing.T) {
 	}
 }
 
-func Test_createConfig(t *testing.T) {
+func Test_createViperConfig(t *testing.T) {
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -35,26 +35,26 @@ func Test_createConfig(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	initConfig()
+	initViperConfig()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := createConfig(); (err != nil) != tt.wantErr {
+			if err := createViperConfig(); (err != nil) != tt.wantErr {
 				t.Errorf("createConfig() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func Test_readConfig(t *testing.T) {
+func Test_readViperConfig(t *testing.T) {
 	name := "basic_read_test"
 	wantErr := false
-	initConfig()   // inits viper
-	createConfig() // creates the config in the system in case it doesn't exists
+	initViperConfig()   // inits viper
+	createViperConfig() // creates the config in the system in case it doesn't exists
 
 	// tests
 	t.Run(name, func(t *testing.T) {
 
-		if err := readConfig(); (err != nil) != wantErr {
+		if err := readViperConfig(); (err != nil) != wantErr {
 			t.Errorf("readConfig() error = %v, wantErr %v", err, wantErr)
 		}
 		scope := viper.Get(configCurrentScope)
