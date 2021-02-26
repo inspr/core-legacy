@@ -14,31 +14,30 @@ import (
 // NewDeleteCmd - mock subcommand
 func NewDeleteCmd() *cobra.Command {
 	deleteApps := cmd.NewCmd("apps").
-		WithDescription("delete apps from context ").
+		WithDescription("Delete apps from context ").
 		WithAliases([]string{"a"}).
-		WithExample("delete apps from the default scope", "delete apps ").
-		WithExample("delete apps from a custom scope", "delete apps --scope app1.app2").
+		WithExample("Delete apps from the default scope", "delete apps ").
+		WithExample("Delete apps from a custom scope", "delete apps --scope app1.app2").
 		WithCommonFlags().
 		ExactArgs(1, deleteApps)
 	deleteChannels := cmd.NewCmd("channels").
-		WithDescription("delete channels from context").
-		WithExample("delete channels from the default scope", "delete channels ").
-		WithExample("delete channels from a custom scope", "delete channels --scope app1.app2").
+		WithDescription("Delete channels from context").
+		WithExample("Delete channels from the default scope", "delete channels ").
+		WithExample("Delete channels from a custom scope", "delete channels --scope app1.app2").
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
 		ExactArgs(1, deleteChannels)
 	deleteTypes := cmd.NewCmd("ctypes").
-		WithDescription("delete channel types from context").
-		WithExample("delete channel types from the default scope", "delete ctypes ").
-		WithExample("delete channel types from a custom scope", "delete ctypes --scope app1.app2").
+		WithDescription("Delete channel types from context").
+		WithExample("Delete channel types from the default scope", "delete ctypes ").
+		WithExample("Delete channel types from a custom scope", "delete ctypes --scope app1.app2").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		ExactArgs(1, deleteCTypes)
 	return cmd.NewCmd("delete").
-		WithDescription("delete by object type").
+		WithDescription("Delete by object type").
 		WithDescription("Retrieves the components from a given namespace").
-		WithLongDescription("delete takes a component type (apps | channels | ctypes | nodes) and displays names for those components is a scope)").
-		WithAliases([]string{"list"}).
+		WithLongDescription("Delete takes a component type (apps | channels | ctypes) its scope and name, and deletes it from the cluster").
 		AddSubCommand(deleteApps).
 		AddSubCommand(deleteChannels).
 		AddSubCommand(deleteTypes).
