@@ -8,13 +8,13 @@ import (
 )
 
 const (
-	configCurrentScope = "currentScope"
-	configServerIP     = "serverIP"
+	configScope    = "scope"
+	configServerIP = "serverIP"
 )
 
 var defaultValues map[string]string = map[string]string{
-	configCurrentScope: "",
-	configServerIP:     "127.0.0.1",
+	configScope:    "",
+	configServerIP: "127.0.0.1",
 }
 
 // initConfig - sets defaults values and where is the file in which new values can be read
@@ -86,4 +86,15 @@ func changeViperValues(key string, value interface{}) error {
 	}
 
 	return nil
+}
+
+// existsKey - informs to the user if the key passed exists in the
+// default keys that are saved in the inspr config file
+func existsKey(key string) bool {
+	for k, _ := range defaultValues {
+		if k == key {
+			return true
+		}
+	}
+	return false
 }

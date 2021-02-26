@@ -18,7 +18,7 @@ func Test_initViperConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			initViperConfig()
-			scope := viper.Get(configCurrentScope)
+			scope := viper.Get(configScope)
 			if scope != "" {
 				t.Errorf("viper's default scope, expected %v, got %v", "", scope)
 			}
@@ -72,7 +72,7 @@ func Test_readViperConfig(t *testing.T) {
 				t.Errorf("readViperConfig() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if got := viper.Get(configCurrentScope); !tt.wantErr && !reflect.DeepEqual(got, "") {
+			if got := viper.Get(configScope); !tt.wantErr && !reflect.DeepEqual(got, "") {
 				t.Errorf("readViperConfig() -> want = %v, got %v", "", got)
 			}
 		})
@@ -92,7 +92,7 @@ func Test_changeViperValues(t *testing.T) {
 		{
 			name: "changing_scope",
 			args: args{
-				key:   configCurrentScope,
+				key:   configScope,
 				value: "new_scope",
 			},
 			wantErr: false,
