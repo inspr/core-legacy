@@ -20,7 +20,7 @@ var defaultValues map[string]string = map[string]string{
 	configServerIP:     "127.0.0.1",
 }
 
-// sets defaults values and where is the file in which new values can be read
+// initConfig - sets defaults values and where is the file in which new values can be read
 func initConfig() {
 	// specifies the path in which the config file present
 	viper.AddConfigPath("$HOME/.inspr/")
@@ -30,9 +30,10 @@ func initConfig() {
 	for k, v := range defaultValues {
 		viper.SetDefault(k, v)
 	}
-
 }
 
+// createConfig - creates the folder and or file of the inspr's viper config
+// if they already a file the createConfig will truncate it before writing
 func createConfig() error {
 	homeDir := os.Getenv("HOME")
 	insprDir := homeDir + "/" + ".inspr"
@@ -54,6 +55,8 @@ func createConfig() error {
 	return nil
 }
 
+// readConfig - reads the inspr's viper config, in case it didn't
+// found any, it creates one with the defaults values
 func readConfig(out io.Writer) error {
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
