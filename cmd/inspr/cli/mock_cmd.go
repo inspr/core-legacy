@@ -20,10 +20,10 @@ func NewMockCmd() *cobra.Command {
 }
 
 func doMock(_ context.Context, out io.Writer) error {
-	value := viper.Get("mock")
+	value := viper.Get(configCurrentScope)
 	fmt.Fprintln(out, value)
 
-	port := viper.Get("port")
+	port := viper.Get(configServerIP)
 	fmt.Fprintln(out, port)
 
 	return nil

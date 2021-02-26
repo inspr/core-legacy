@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 
@@ -8,24 +10,22 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type configuration struct {
-	port string
-	mock string
-}
-
-var conf *configuration
+const (
+	configCurrentScope = "currentScope"
+	configServerIP     = "serverIP"
+)
 
 var defaultValues map[string]string = map[string]string{
-	"port": "8080",
-	"mock": "default_mock",
+	configCurrentScope: "./app1/app2",
+	configServerIP:     "127.0.0.1",
 }
 
 // sets defaults values and where is the file in which new values can be read
-func initViper() {
+func initConfig() {
 	// specifies the path in which the config file present
-	viper.SetConfigType("yaml")
 	viper.AddConfigPath("$HOME/.inspr/")
 	viper.SetConfigName("env")
+	viper.SetConfigType("yaml")
 
 	for k, v := range defaultValues {
 		viper.SetDefault(k, v)
@@ -51,5 +51,22 @@ func createConfig() error {
 		return err
 	}
 
+	return nil
+}
+
+func readConfig(out io.Writer) error {
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			if createErr := createConfig(); createErr != nil {
+				err = createErr
+				fmt.Fprintln(out, err.Error())
+			} else {
+				err = nil
+			}
+		} else {
+			fmt.Fprintln(out, err.Error())
+		}
+		return err
+	}
 	return nil
 }

@@ -1,11 +1,9 @@
 package cli
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // NewInsprCommand - returns a root command associated with inspr cli
@@ -22,27 +20,12 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 			cmd.Root().SilenceUsage = true
 
 			// viper defaults values or reads from the config location
-			initViper()
+			initConfig()
 
-			if err := viper.ReadInConfig(); err != nil {
-				if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-					if createErr := createConfig(); createErr != nil {
-						err = createErr
-						fmt.Fprintln(out, err.Error())
-					} else {
-						err = nil
-					}
-				} else {
-					fmt.Fprintln(out, err.Error())
-				}
+			if err := readConfig(out); err != nil {
 				return err
 			}
 
-			err := viper.Unmarshal(&conf)
-			if err != nil {
-				fmt.Fprintln(out, "Error unmarshaling the config file")
-				fmt.Fprintln(out, err.Error())
-			}
 			return nil
 		},
 	}
