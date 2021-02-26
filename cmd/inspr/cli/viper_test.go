@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -46,26 +47,90 @@ func Test_createViperConfig(t *testing.T) {
 }
 
 func Test_readViperConfig(t *testing.T) {
-	name := "basic_read_test"
-	wantErr := false
+	tests := []struct {
+		name    string
+		wantErr bool
+	}{
+		{
+			name:    "basic_read_test",
+			wantErr: false,
+		},
+		{
+			name:    "want_error",
+			wantErr: true,
+		},
+	}
+
 	initViperConfig()   // inits viper
 	createViperConfig() // creates the config in the system in case it doesn't exists
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.wantErr {
+				viper.SetConfigFile("/etc/")
+			}
+			if err := readViperConfig(); (err != nil) != tt.wantErr {
+				t.Errorf("readViperConfig() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
-	// tests
-	t.Run(name, func(t *testing.T) {
+			if got := viper.Get(configCurrentScope); !tt.wantErr && !reflect.DeepEqual(got, "") {
+				t.Errorf("readViperConfig() -> want = %v, got %v", "", got)
+			}
+		})
+	}
+}
 
-		if err := readViperConfig(); (err != nil) != wantErr {
-			t.Errorf("readConfig() error = %v, wantErr %v", err, wantErr)
-		}
-		scope := viper.Get(configCurrentScope)
-		if scope != defaultValues[configCurrentScope] {
-			t.Errorf("readConfig() -> scope, error = %v, wantErr %v", scope, defaultValues[configCurrentScope])
-		}
+func Test_changeViperValues(t *testing.T) {
+	type args struct {
+		key   string
+		value interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "changing_scope",
+			args: args{
+				key:   configCurrentScope,
+				value: "new_scope",
+			},
+			wantErr: false,
+		},
+		{
+			name: "changing_IP",
+			args: args{
+				key:   configServerIP,
+				value: "XXX.YYY.ZZZ.0",
+			},
+			wantErr: false,
+		},
+		{
+			name: "error_writing",
+			args: args{
+				key:   configServerIP,
+				value: nil,
+			},
+			wantErr: true,
+		},
+	}
 
-		ip := viper.Get(configServerIP)
-		if ip != defaultValues[configServerIP] {
-			t.Errorf("readConfig() -> scope, error = %v, wantErr %v", scope, defaultValues[configServerIP])
-		}
-	})
+	initViperConfig() // inits viper
+	readViperConfig() // reads the current values of the viper config
 
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.wantErr {
+				viper.SetConfigFile("/etc/")
+			}
+
+			if err := changeViperValues(tt.args.key, tt.args.value); (err != nil) != tt.wantErr {
+				t.Errorf("changeViperValues() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if got := viper.Get(tt.args.key); !reflect.DeepEqual(got, tt.args.value) && !tt.wantErr {
+				t.Errorf("viper.Get(key) got = %v, want %v", got, tt.args.value)
+			}
+		})
+	}
 }

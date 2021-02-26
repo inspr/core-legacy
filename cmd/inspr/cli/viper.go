@@ -43,7 +43,7 @@ func createViperConfig() error {
 
 	// creates folder
 	if _, err := os.Stat(insprFolderDir); os.IsNotExist(err) {
-		if err := os.Mkdir(insprFolderDir, 0666); err != nil { // perm 0666
+		if err := os.Mkdir(insprFolderDir, 0777); err != nil { // perm 0666
 			return err
 		}
 	}
@@ -62,16 +62,14 @@ func createViperConfig() error {
 // readConfig - reads the inspr's viper config, in case it didn't
 // found any, it creates one with the defaults values
 func readViperConfig() error {
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			if createErr := createViperConfig(); createErr != nil {
-				err = createErr
-			} else {
-				err = nil
-			}
-		} else {
-			return err
+
+	if _, err := os.Stat(viper.ConfigFileUsed()); os.IsNotExist(err) {
+		if createErr := createViperConfig(); createErr != nil {
+			return createErr
 		}
+	}
+
+	if err := viper.ReadInConfig(); err != nil {
 		return err
 	}
 	return nil

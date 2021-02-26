@@ -26,5 +26,7 @@ func doMock(_ context.Context, out io.Writer) error {
 	port := viper.Get(configServerIP)
 	fmt.Fprintln(out, port)
 
+	fmt.Fprintln(out, viper.ConfigFileUsed())
+
 	return nil
 }
