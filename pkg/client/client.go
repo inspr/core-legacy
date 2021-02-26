@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/transports"
@@ -30,7 +30,11 @@ type requestReturn struct {
 
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
-	envAddr := "/inspr/" + environment.GetEnvironment().UnixSocketAddr + ".sock"
+	socket := os.Getenv("INSPR_UNIX_SOCKET")
+	if socket == "" {
+		panic("NO SOCKET ENVIRONMENT VARIABLE")
+	}
+	envAddr := "/inspr/" + socket + ".sock"
 	return &Client{
 		client: request.NewClient().
 			BaseURL("http://unix").
