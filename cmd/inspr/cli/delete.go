@@ -16,27 +16,26 @@ func NewDeleteCmd() *cobra.Command {
 	deleteApps := cmd.NewCmd("apps").
 		WithDescription("Delete apps from context ").
 		WithAliases([]string{"a"}).
-		WithExample("Delete apps from the default scope", "delete apps ").
-		WithExample("Delete apps from a custom scope", "delete apps --scope app1.app2").
+		WithExample("Delete app from the default scope", "delete apps <appname> ").
+		WithExample("Delete app from a custom scope", "delete apps <appname> --scope app1.app2").
 		WithCommonFlags().
 		ExactArgs(1, deleteApps)
 	deleteChannels := cmd.NewCmd("channels").
 		WithDescription("Delete channels from context").
-		WithExample("Delete channels from the default scope", "delete channels ").
-		WithExample("Delete channels from a custom scope", "delete channels --scope app1.app2").
+		WithExample("Delete channel from the default scope", "delete channels <channelname>").
+		WithExample("Delete channels from a custom scope", "delete channels <channelname> --scope app1.app2").
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
 		ExactArgs(1, deleteChannels)
 	deleteTypes := cmd.NewCmd("ctypes").
 		WithDescription("Delete channel types from context").
-		WithExample("Delete channel types from the default scope", "delete ctypes ").
-		WithExample("Delete channel types from a custom scope", "delete ctypes --scope app1.app2").
+		WithExample("Delete channel type from the default scope", "delete ctypes <ctypename>").
+		WithExample("Delete channel type from a custom scope", "delete ctypes <ctypename> --scope app1.app2 ").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		ExactArgs(1, deleteCTypes)
 	return cmd.NewCmd("delete").
-		WithDescription("Delete by object type").
-		WithDescription("Retrieves the components from a given namespace").
+		WithDescription("Delete component of object type").
 		WithLongDescription("Delete takes a component type (apps | channels | ctypes) its scope and name, and deletes it from the cluster").
 		AddSubCommand(deleteApps).
 		AddSubCommand(deleteChannels).
