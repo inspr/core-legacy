@@ -17,7 +17,7 @@ var defaultValues map[string]string = map[string]string{
 	configServerIP: "http://127.0.0.1:8080",
 }
 
-// initConfig - sets defaults values and where is the file in which new values can be read
+// initViperConfig - sets defaults values and where is the file in which new values can be read
 func initViperConfig() {
 	// specifies the path in which the config file present
 	viper.AddConfigPath("$HOME/.inspr/")
@@ -29,45 +29,46 @@ func initViperConfig() {
 	}
 }
 
-// createConfig - creates the folder and or file of the inspr's viper config
+// createViperConfig - creates the folder and or file of the inspr's viper config
+//
 // if they already a file the createConfig will truncate it before writing
-func createViperConfig() error {
-
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-
-	// folder path
-	insprFolderDir := filepath.Join(homeDir, ".inspr")
-
-	// creates folder
-	if _, err := os.Stat(insprFolderDir); os.IsNotExist(err) {
-		if err := os.Mkdir(insprFolderDir, 0777); err != nil { // perm 0666
-			return err
-		}
-	}
-
-	// file path
-	fileDir := filepath.Join(insprFolderDir, "config")
-
+func createViperConfig(configPath string) error {
 	// creates config file
-	err = viper.WriteConfigAs(fileDir)
+	err := viper.WriteConfigAs(configPath)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+// createInsprConfigFolder - creates the folder of the inspr's config, it only
+// creates the folder if already doesn't exists
+func createInsprConfigFolder(folderPath string) error {
+	// creates folder
+	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+		if err := os.Mkdir(folderPath, 0777); err != nil { // perm 0666
+			return err
+		}
+	}
+
+	return nil
+}
+
 // readConfig - reads the inspr's viper config, in case it didn't
 // found any, it creates one with the defaults values
-func readViperConfig() error {
-	homeDir, _ := os.UserHomeDir()
-	configDir := filepath.Join(homeDir, ".inspr", "config")
+func readViperConfig(baseDir string) error {
+	folderDir := filepath.Join(baseDir, ".inspr")
+	configDir := filepath.Join(folderDir, "config")
+
+	if _, err := os.Stat(folderDir); os.IsNotExist(err) {
+		if createErr := createInsprConfigFolder(folderDir); createErr != nil {
+			return createErr
+		}
+	}
 
 	if _, err := os.Stat(configDir); os.IsNotExist(err) {
-		if createErr := createViperConfig(); createErr != nil {
-			return createErr
+		if configErr := createViperConfig(configDir); configErr != nil {
+			return configErr
 		}
 	}
 
@@ -92,7 +93,7 @@ func changeViperValues(key string, value interface{}) error {
 // existsKey - informs to the user if the key passed exists in the
 // default keys that are saved in the inspr config file
 func existsKey(key string) bool {
-	for k := range defaultValues {
+	for _, k := range viper.GetViper().AllKeys() {
 		if k == key {
 			return true
 		}
@@ -101,9 +102,5 @@ func existsKey(key string) bool {
 }
 
 func existingKeys() []string {
-	arr := make([]string, 0)
-	for k := range defaultValues {
-		arr = append(arr, k)
-	}
-	return arr
+	return viper.GetViper().AllKeys()
 }
