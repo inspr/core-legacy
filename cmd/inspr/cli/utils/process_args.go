@@ -5,6 +5,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
+//ProcessArg is responsible for separating a path into an component name and it's parent's path.
+// < path, name, error >
 func ProcessArg(arg, scope string) (string, string, error) {
 	path := scope
 	var component string

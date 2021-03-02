@@ -23,7 +23,7 @@ func doMock(_ context.Context, out io.Writer) error {
 	value := cliutils.GetConfiguredScope()
 	fmt.Fprintln(out, value)
 
-	port := cliutils.GetConfiguredServerIp()
+	port := cliutils.GetConfiguredServerIP()
 	fmt.Fprintln(out, port)
 
 	return nil

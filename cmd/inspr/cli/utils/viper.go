@@ -17,9 +17,9 @@ var defaultValues map[string]string = map[string]string{
 	configServerIP: "http://127.0.0.1:8080",
 }
 
-//GetConfiguredServerIp is responsible for returning config value for serverIp.
+//GetConfiguredServerIP is responsible for returning config value for serverIp.
 //Avoids having to constants public.
-func GetConfiguredServerIp() string {
+func GetConfiguredServerIP() string {
 	return viper.GetString(configServerIP)
 }
 
@@ -29,7 +29,7 @@ func GetConfiguredScope() string {
 	return viper.GetString(configServerIP)
 }
 
-// initConfig - sets defaults values and where is the file in which new values can be read
+//InitViperConfig - sets defaults values and where is the file in which new values can be read
 func InitViperConfig() {
 	// specifies the path in which the config file present
 	viper.AddConfigPath("$HOME/.inspr/")
@@ -71,7 +71,7 @@ func createViperConfig() error {
 	return nil
 }
 
-// readConfig - reads the inspr's viper config, in case it didn't
+// ReadViperConfig - reads the inspr's viper config, in case it didn't
 // found any, it creates one with the defaults values
 func ReadViperConfig() error {
 	homeDir, _ := os.UserHomeDir()
@@ -89,7 +89,7 @@ func ReadViperConfig() error {
 	return nil
 }
 
-// changeViperValues - changes the values of the viper configuration
+// ChangeViperValues - changes the values of the viper configuration
 // and saves it in the config file of inspr, if the file is not created
 // it will return an error.
 func ChangeViperValues(key string, value interface{}) error {
@@ -101,7 +101,7 @@ func ChangeViperValues(key string, value interface{}) error {
 	return nil
 }
 
-// existsKey - informs to the user if the key passed exists in the
+// ExistsKey - informs to the user if the key passed exists in the
 // default keys that are saved in the inspr config file
 func ExistsKey(key string) bool {
 	for k := range defaultValues {
@@ -112,6 +112,7 @@ func ExistsKey(key string) bool {
 	return false
 }
 
+// ExistingKeys - returns to the user all availible keys in viper's configs.
 func ExistingKeys() []string {
 	arr := make([]string, 0)
 	for k := range defaultValues {

@@ -102,7 +102,7 @@ func getNodes(_ context.Context, out io.Writer) error {
 }
 
 func getObj(printObj func(*meta.App), out io.Writer) error {
-	rc := request.NewClient().BaseURL(cliutils.GetConfiguredServerIp()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
+	rc := request.NewClient().BaseURL(cliutils.GetConfiguredServerIP()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
 	client := client.NewControllerClient(rc)
 	scope, err := cliutils.GetScope()
 	if err != nil {
