@@ -215,46 +215,6 @@ func Test_createInsprConfigFolder(t *testing.T) {
 	os.Remove("./test/inspr")
 }
 
-func Test_existsKey(t *testing.T) {
-	tests := []struct {
-		name string
-		key  string
-		want bool
-	}{
-		{
-			name: "query_scope",
-			key:  "scope",
-			want: true,
-		},
-		{
-			name: "query_serverip",
-			key:  "serverip",
-			want: true,
-		},
-		{
-			name: "query_extra",
-			key:  "extra",
-			want: true,
-		},
-		{
-			name: "query_nonExistant",
-			key:  "nonExistant",
-			want: false,
-		},
-	}
-
-	// read mock config values
-	setupViperTest()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := existsKey(tt.key); got != tt.want {
-				t.Errorf("existsKey() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_existingKeys(t *testing.T) {
 	tests := []struct {
 		name string

@@ -43,10 +43,10 @@ func createViperConfig(configPath string) error {
 
 // createInsprConfigFolder - creates the folder of the inspr's config, it only
 // creates the folder if already doesn't exists
-func createInsprConfigFolder(folderPath string) error {
+func createInsprConfigFolder(path string) error {
 	// creates folder
-	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-		if err := os.Mkdir(folderPath, 0777); err != nil { // perm 0666
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.Mkdir(path, 0777); err != nil { // perm 0666
 			return err
 		}
 	}
@@ -88,17 +88,6 @@ func changeViperValues(key string, value interface{}) error {
 	}
 
 	return nil
-}
-
-// existsKey - informs to the user if the key passed exists in the
-// default keys that are saved in the inspr config file
-func existsKey(key string) bool {
-	for _, k := range viper.GetViper().AllKeys() {
-		if k == key {
-			return true
-		}
-	}
-	return false
 }
 
 func existingKeys() []string {
