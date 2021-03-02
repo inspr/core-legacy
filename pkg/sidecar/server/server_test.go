@@ -76,7 +76,7 @@ func TestServer_Cancel(t *testing.T) {
 			cancel()
 			time.Sleep(500 * time.Microsecond)
 
-			c := transports.NewUnixSocketClient(env.GetEnvironment().UnixSocketAddr)
+			c := transports.NewUnixSocketClient(env.GetUnixSocketAddress())
 
 			_, err := c.Post("http://unix/commit", "", nil)
 			if err == nil {
