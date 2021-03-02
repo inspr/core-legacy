@@ -1,4 +1,4 @@
-package cli
+package utils
 
 import (
 	"os"
@@ -17,8 +17,20 @@ var defaultValues map[string]string = map[string]string{
 	configServerIP: "http://127.0.0.1:8080",
 }
 
+//GetConfiguredServerIp is responsible for returning config value for serverIp.
+//Avoids having to constants public.
+func GetConfiguredServerIp() string {
+	return viper.GetString(configServerIP)
+}
+
+//GetConfiguredScope is responsible for returning config value for scope.
+//Avoids having to constants public.
+func GetConfiguredScope() string {
+	return viper.GetString(configServerIP)
+}
+
 // initConfig - sets defaults values and where is the file in which new values can be read
-func initViperConfig() {
+func InitViperConfig() {
 	// specifies the path in which the config file present
 	viper.AddConfigPath("$HOME/.inspr/")
 	viper.SetConfigName("config")
@@ -61,7 +73,7 @@ func createViperConfig() error {
 
 // readConfig - reads the inspr's viper config, in case it didn't
 // found any, it creates one with the defaults values
-func readViperConfig() error {
+func ReadViperConfig() error {
 	homeDir, _ := os.UserHomeDir()
 	configDir := filepath.Join(homeDir, ".inspr", "config")
 
@@ -80,7 +92,7 @@ func readViperConfig() error {
 // changeViperValues - changes the values of the viper configuration
 // and saves it in the config file of inspr, if the file is not created
 // it will return an error.
-func changeViperValues(key string, value interface{}) error {
+func ChangeViperValues(key string, value interface{}) error {
 	viper.Set(key, value)
 	if err := viper.WriteConfig(); err != nil {
 		return err
@@ -91,7 +103,7 @@ func changeViperValues(key string, value interface{}) error {
 
 // existsKey - informs to the user if the key passed exists in the
 // default keys that are saved in the inspr config file
-func existsKey(key string) bool {
+func ExistsKey(key string) bool {
 	for k := range defaultValues {
 		if k == key {
 			return true
@@ -100,7 +112,7 @@ func existsKey(key string) bool {
 	return false
 }
 
-func existingKeys() []string {
+func ExistingKeys() []string {
 	arr := make([]string, 0)
 	for k := range defaultValues {
 		arr = append(arr, k)

@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 )
 
@@ -20,10 +20,10 @@ func NewMockCmd() *cobra.Command {
 }
 
 func doMock(_ context.Context, out io.Writer) error {
-	value := viper.Get(configScope)
+	value := cliutils.GetConfiguredScope()
 	fmt.Fprintln(out, value)
 
-	port := viper.Get(configServerIP)
+	port := cliutils.GetConfiguredServerIp()
 	fmt.Fprintln(out, port)
 
 	return nil

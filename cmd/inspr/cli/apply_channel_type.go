@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
 	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
@@ -33,7 +34,7 @@ func NewApplyChannelType(c controller.ChannelTypeInterface) RunMethod {
 
 		var log diff.Changelog
 
-		scope, err := getScope()
+		scope, err := cliutils.GetScope()
 		if err != nil {
 			return err
 		}

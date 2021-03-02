@@ -3,6 +3,8 @@ package cli
 import (
 	"io"
 
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+
 	"github.com/spf13/cobra"
 )
 
@@ -20,9 +22,9 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 			cmd.Root().SilenceUsage = true
 
 			// viper defaults values or reads from the config location
-			initViperConfig()
+			cliutils.InitViperConfig()
 
-			if err := readViperConfig(); err != nil {
+			if err := cliutils.ReadViperConfig(); err != nil {
 				return err
 			}
 

@@ -1,4 +1,4 @@
-package cli
+package utils
 
 import (
 	"reflect"
@@ -17,7 +17,7 @@ func Test_initViperConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			initViperConfig()
+			InitViperConfig()
 			scope := viper.Get(configScope)
 			if scope != "" {
 				t.Errorf("viper's default scope, expected %v, got %v", "", scope)
@@ -36,7 +36,7 @@ func Test_createViperConfig(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	initViperConfig()
+	InitViperConfig()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := createViperConfig(); (err != nil) != tt.wantErr {
@@ -61,14 +61,14 @@ func Test_readViperConfig(t *testing.T) {
 		},
 	}
 
-	initViperConfig()   // inits viper
+	InitViperConfig()   // inits viper
 	createViperConfig() // creates the config in the system in case it doesn't exists
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.wantErr {
 				viper.SetConfigFile("/etc/")
 			}
-			if err := readViperConfig(); (err != nil) != tt.wantErr {
+			if err := ReadViperConfig(); (err != nil) != tt.wantErr {
 				t.Errorf("readViperConfig() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
@@ -115,8 +115,8 @@ func Test_changeViperValues(t *testing.T) {
 		},
 	}
 
-	initViperConfig() // inits viper
-	readViperConfig() // reads the current values of the viper config
+	InitViperConfig() // inits viper
+	ReadViperConfig() // reads the current values of the viper config
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -124,7 +124,7 @@ func Test_changeViperValues(t *testing.T) {
 				viper.SetConfigFile("/etc/")
 			}
 
-			if err := changeViperValues(tt.args.key, tt.args.value); (err != nil) != tt.wantErr {
+			if err := ChangeViperValues(tt.args.key, tt.args.value); (err != nil) != tt.wantErr {
 				t.Errorf("changeViperValues() error = %v, wantErr %v", err, tt.wantErr)
 			}
 

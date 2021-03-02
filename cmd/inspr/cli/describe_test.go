@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 )
 
@@ -47,7 +48,7 @@ func Test_getClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := getClient()
+			got := cliutils.GetClient()
 			if tt.checkFunction != nil {
 				tt.checkFunction(t, got)
 			}
@@ -68,7 +69,7 @@ func Test_getScope(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getScope()
+			got, err := cliutils.GetScope()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getScope() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -131,7 +132,7 @@ func Test_processArg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, err := processArg(tt.args.arg, tt.args.scope)
+			got, got1, err := cliutils.ProcessArg(tt.args.arg, tt.args.scope)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("processArg() error = %v, wantErr %v", err, tt.wantErr)
 				return

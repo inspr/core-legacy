@@ -112,9 +112,9 @@ func main() {
 	}
 	utils.PrintAppTree(resp)
 
-	fmt.Println("[Deleting HelloWorld App...]")
-	deleteHelloWorldApp(&client, false)
-	fmt.Printf("\n\n")
+	// fmt.Println("[Deleting HelloWorld App...]")
+	// deleteHelloWorldApp(&client, false)
+	// fmt.Printf("\n\n")
 
 }
 
