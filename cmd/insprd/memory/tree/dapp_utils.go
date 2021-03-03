@@ -11,7 +11,7 @@ import (
 )
 
 // Auxiliar dapp unexported functions
-func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app *meta.App, parentApp *meta.App) string {
+func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App) string {
 	structureErrors := validAppStructure(app, parentApp)
 	for _, childApp := range app.Spec.Apps {
 		structureErrors += amm.recursiveCheckAndRefineApp(childApp, app)
@@ -65,9 +65,6 @@ func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
 
 func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 	updateAppBoundary(app, parentApp)
-	if app.Spec.Apps == nil {
-		app.Spec.Apps = map[string]*meta.App{}
-	}
 
 	parentStr := getParentString(app, parentApp)
 
@@ -76,6 +73,7 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 
 	if !nodeIsEmpty(app.Spec.Node) {
 		app.Spec.Node.Meta.Parent = parentStr
+		app.Spec.Node.Meta.Name = app.Meta.Name
 		if app.Spec.Node.Meta.Annotations == nil {
 			app.Spec.Node.Meta.Annotations = map[string]string{}
 		}

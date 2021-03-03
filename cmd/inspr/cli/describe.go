@@ -2,20 +2,17 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
-// NewDescribeCmd DOC TODO
+// NewDescribeCmd creates describe command for Inspr CLI
 func NewDescribeCmd() *cobra.Command {
 	describeApp := cmd.NewCmd("apps <app_name | app_path>").
 		WithDescription("Retrieves the full state of the app from a given namespace").
@@ -59,9 +56,9 @@ func NewDescribeCmd() *cobra.Command {
 }
 
 func displayAppState(_ context.Context, out io.Writer, args []string) error {
-	client := getClient()
+	client := cliutils.GetClient()
 
-	scope, err := getScope()
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
 	}
@@ -89,13 +86,13 @@ func displayAppState(_ context.Context, out io.Writer, args []string) error {
 }
 
 func displayChannelState(_ context.Context, out io.Writer, args []string) error {
-	client := getClient()
-	scope, err := getScope()
+	client := cliutils.GetClient()
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
 	}
 
-	path, chName, err := processArg(args[0], scope)
+	path, chName, err := cliutils.ProcessArg(args[0], scope)
 	if err != nil {
 		return err
 	}
@@ -111,13 +108,13 @@ func displayChannelState(_ context.Context, out io.Writer, args []string) error 
 }
 
 func displayChannelTypeState(_ context.Context, out io.Writer, args []string) error {
-	client := getClient()
-	scope, err := getScope()
+	client := cliutils.GetClient()
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
 	}
 
-	path, ctName, err := processArg(args[0], scope)
+	path, ctName, err := cliutils.ProcessArg(args[0], scope)
 	if err != nil {
 		return err
 	}
@@ -130,54 +127,4 @@ func displayChannelTypeState(_ context.Context, out io.Writer, args []string) er
 	utils.PrintChannelTypeTree(channelType)
 
 	return nil
-}
-
-func getClient() *client.Client {
-	url := viper.GetString(configServerIP)
-
-	rc := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
-	return client.NewControllerClient(rc)
-}
-
-func getScope() (string, error) {
-	defaultScope := viper.GetString(configScope)
-	scope := defaultScope
-
-	if cmd.InsprOptions.Scope != "" {
-		if utils.IsValidScope(cmd.InsprOptions.Scope) {
-			scope = cmd.InsprOptions.Scope
-		} else {
-			return "", ierrors.NewError().BadRequest().Message("invalid scope").Build()
-		}
-	}
-
-	return scope, nil
-}
-
-func processArg(arg, scope string) (string, string, error) {
-	path := scope
-	var component string
-
-	if err := utils.StructureNameIsValid(arg); err != nil {
-		if !utils.IsValidScope(arg) {
-			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
-		}
-
-		newScope, lastName, err := utils.RemoveLastPartInScope(arg)
-		if err != nil {
-			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
-		}
-
-		separator := ""
-		if scope != "" {
-			separator = "."
-		}
-
-		path = path + separator + newScope
-		component = lastName
-
-	} else {
-		component = arg
-	}
-	return path, component, nil
 }

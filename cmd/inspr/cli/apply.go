@@ -78,8 +78,10 @@ func doApply(_ context.Context, out io.Writer) error {
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")
 	hasFolderFlag := (cmd.InsprOptions.AppliedFolderStructure != "")
 	if hasFileFlag == hasFolderFlag {
-		fmt.Fprintln(out, "Given flags are invalid")
-
+		fmt.Fprintln(
+			out,
+			"Invalid command call\nFor help, type 'inspr apply --help'",
+		)
 		return ierrors.NewError().Message("invalid flag arguments").Build()
 	}
 
@@ -99,7 +101,7 @@ func doApply(_ context.Context, out io.Writer) error {
 	if len(appliedFiles) > 0 {
 		printAppliedFiles(appliedFiles, out)
 	} else {
-		fmt.Fprint(out, "No files were applied\n")
+		fmt.Fprint(out, "No files were applied\nFiles to be applied must be .yaml or .yml\n")
 	}
 
 	return nil

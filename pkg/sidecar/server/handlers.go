@@ -16,19 +16,21 @@ import (
 //  to be used to server
 type customHandlers struct {
 	sync.Locker
-	r         models.Reader
-	w         models.Writer
-	insprVars *environment.InsprEnvVars
+	r              models.Reader
+	w              models.Writer
+	InputChannels  string
+	OutputChannels string
 }
 
 // newCustomHandlers returns a struct composed of the
 // Reader and Writer given in the parameters
 func newCustomHandlers(l sync.Locker, r models.Reader, w models.Writer) *customHandlers {
 	return &customHandlers{
-		Locker:    l,
-		r:         r,
-		w:         w,
-		insprVars: environment.GetEnvironment(),
+		Locker:         l,
+		r:              r,
+		w:              w,
+		InputChannels:  environment.GetInputChannels(),
+		OutputChannels: environment.GetOutputChannels(),
 	}
 }
 
@@ -44,7 +46,7 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if !ch.insprVars.IsInOutputChannel(body.Channel) {
+	if !environment.IsInOutputChannel(body.Channel, ch.OutputChannels) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, insprError.Build())
 		return
@@ -70,7 +72,7 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if !ch.insprVars.IsInInputChannel(body.Channel) {
+	if !environment.IsInInputChannel(body.Channel, ch.InputChannels) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, insprError.Build())
 		return
@@ -98,7 +100,7 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if !ch.insprVars.IsInOutputChannel(body.Channel) {
+	if !environment.IsInOutputChannel(body.Channel, ch.OutputChannels) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, insprError.Build())
 		return

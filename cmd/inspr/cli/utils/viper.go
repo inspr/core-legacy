@@ -1,4 +1,4 @@
-package cli
+package utils
 
 import (
 	"os"
@@ -17,8 +17,20 @@ var defaultValues map[string]string = map[string]string{
 	configServerIP: "http://127.0.0.1:8080",
 }
 
-// initViperConfig - sets defaults values and where is the file in which new values can be read
-func initViperConfig() {
+//GetConfiguredServerIP is responsible for returning config value for serverIp.
+//Avoids having to constants public.
+func GetConfiguredServerIP() string {
+	return viper.GetString(configServerIP)
+}
+
+//GetConfiguredScope is responsible for returning config value for scope.
+//Avoids having to constants public.
+func GetConfiguredScope() string {
+	return viper.GetString(configServerIP)
+}
+
+//InitViperConfig - sets defaults values and where is the file in which new values can be read
+func InitViperConfig() {
 	// specifies the path in which the config file present
 	viper.AddConfigPath("$HOME/.inspr/")
 	viper.SetConfigName("config")
@@ -53,9 +65,9 @@ func createInsprConfigFolder(path string) error {
 	return nil
 }
 
-// readConfig - reads the inspr's viper config, in case it didn't
+// ReadViperConfig - reads the inspr's viper config, in case it didn't
 // found any, it creates one with the defaults values
-func readViperConfig(basePath string) error {
+func ReadViperConfig(basePath string) error {
 	folderPath := filepath.Join(basePath, ".inspr")
 	filePath := filepath.Join(folderPath, "config")
 
@@ -77,10 +89,10 @@ func readViperConfig(basePath string) error {
 	return nil
 }
 
-// changeViperValues - changes the values of the viper configuration
+// ChangeViperValues - changes the values of the viper configuration
 // and saves it in the config file of inspr, if the file is not created
 // it will return an error.
-func changeViperValues(key string, value interface{}) error {
+func ChangeViperValues(key string, value interface{}) error {
 	viper.Set(key, value)
 	if err := viper.WriteConfig(); err != nil {
 		return err
@@ -89,6 +101,13 @@ func changeViperValues(key string, value interface{}) error {
 	return nil
 }
 
-func existingKeys() []string {
+// ExistsKey - informs to the user if the key passed exists in the
+// default keys that are saved in the inspr config file
+func ExistsKey(key string) bool {
+	return viper.IsSet(key)
+}
+
+// ExistingKeys - returns to the user all availible keys in viper's configs.
+func ExistingKeys() []string {
 	return viper.GetViper().AllKeys()
 }

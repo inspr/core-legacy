@@ -46,12 +46,7 @@ func TestInsprEnvironment_IsInInputChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvVars{
-				InputChannels:  tt.fields.InputChannels,
-				OutputChannels: tt.fields.OutputChannels,
-				UnixSocketAddr: tt.fields.UnixSocketAddr,
-			}
-			if got := insprEnv.IsInInputChannel(tt.args.channel); got != tt.want {
+			if got := IsInInputChannel(tt.args.channel, tt.fields.InputChannels); got != tt.want {
 				t.Errorf("InsprEnvironment.IsInInputChannel() = %v, want %v", got, tt.want)
 			}
 		})
@@ -99,12 +94,7 @@ func TestInsprEnvironment_IsInOutputChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvVars{
-				InputChannels:  tt.fields.InputChannels,
-				OutputChannels: tt.fields.OutputChannels,
-				UnixSocketAddr: tt.fields.UnixSocketAddr,
-			}
-			if got := insprEnv.IsInOutputChannel(tt.args.channel); got != tt.want {
+			if got := IsInOutputChannel(tt.args.channel, tt.fields.OutputChannels); got != tt.want {
 				t.Errorf("InsprEnvironment.IsInOutputChannel() = %v, want %v", got, tt.want)
 			}
 		})
@@ -149,14 +139,7 @@ func TestInsprEnvVars_GetInputChannelList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvVars{
-				InputChannels:    tt.fields.InputChannels,
-				OutputChannels:   tt.fields.OutputChannels,
-				UnixSocketAddr:   tt.fields.UnixSocketAddr,
-				InsprAppContext:  tt.fields.InsprAppContext,
-				InsprEnvironment: tt.fields.InsprEnvironment,
-			}
-			if got := insprEnv.GetInputChannelList(); !reflect.DeepEqual(got, tt.want) {
+			if got := GetInputChannelList(tt.fields.InputChannels); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("InsprEnvVars.GetInputChannelList() = %v, want %v", got, tt.want)
 			}
 		})
@@ -201,14 +184,7 @@ func TestInsprEnvVars_GetOutputChannelList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvVars{
-				InputChannels:    tt.fields.InputChannels,
-				OutputChannels:   tt.fields.OutputChannels,
-				UnixSocketAddr:   tt.fields.UnixSocketAddr,
-				InsprAppContext:  tt.fields.InsprAppContext,
-				InsprEnvironment: tt.fields.InsprEnvironment,
-			}
-			if got := insprEnv.GetOutputChannelList(); !reflect.DeepEqual(got, tt.want) {
+			if got := GetOutputChannelList(tt.fields.OutputChannels); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("InsprEnvVars.GetOutputChannelList() = %v, want %v", got, tt.want)
 			}
 		})
@@ -260,14 +236,7 @@ func TestInsprEnvVars_GetSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			insprEnv := &InsprEnvVars{
-				InputChannels:    tt.fields.InputChannels,
-				OutputChannels:   tt.fields.OutputChannels,
-				UnixSocketAddr:   tt.fields.UnixSocketAddr,
-				InsprAppContext:  tt.fields.InsprAppContext,
-				InsprEnvironment: tt.fields.InsprEnvironment,
-			}
-			got, err := insprEnv.GetSchema(tt.channel)
+			got, err := GetSchema(tt.channel, tt.fields.InputChannels, tt.fields.OutputChannels)
 			if tt.wantErr && err == nil {
 				t.Errorf("InsprEnvVars.GetSchema() = %v, want %v", err, tt.wantErr)
 			}

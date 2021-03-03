@@ -8,7 +8,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -18,7 +18,7 @@ import (
 var tabWriter *tabwriter.Writer
 var lines []string
 
-// NewGetCmd - mock subcommand
+// NewGetCmd creates get command for Inspr CLI
 func NewGetCmd() *cobra.Command {
 	getApps := cmd.NewCmd("apps").
 		WithDescription("Get apps from context ").
@@ -106,9 +106,9 @@ func getNodes(_ context.Context, out io.Writer) error {
 }
 
 func getObj(printObj func(*meta.App), out io.Writer) error {
-	rc := request.NewClient().BaseURL(getAppsURL()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
+	rc := request.NewClient().BaseURL(cliutils.GetConfiguredServerIP()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
 	client := client.NewControllerClient(rc)
-	scope, err := getScope()
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		fmt.Fprint(out, err.Error()+"\n")
 		return err
@@ -172,8 +172,4 @@ func printTab() {
 		fmt.Fprint(tabWriter, line)
 	}
 	tabWriter.Flush()
-}
-
-func getAppsURL() string {
-	return viper.GetString(configServerIP)
 }

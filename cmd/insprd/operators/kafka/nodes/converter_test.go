@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	test "gitlab.inspr.dev/inspr/core/pkg/testutils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 	kubeApp "k8s.io/api/apps/v1"
@@ -51,16 +52,17 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 
 	outputChannels := strings.Join(testApp.Spec.Boundary.Output, ";")
 	inputChannels := strings.Join(testApp.Spec.Boundary.Input, ";")
+	appID, _ := metautils.JoinScopes(environment.GetInsprAppContext(), testApp.Meta.Name)
 	testEnv := map[string]string{
 		"INSPR_INPUT_CHANNELS":  inputChannels,
-		"INSPR_CHANNEL_SIDECAR": environment.GetEnvironment().SidecarImage,
+		"INSPR_CHANNEL_SIDECAR": environment.GetSidecarImage(),
 		"INSPR_APPS_TLS":        "true",
 
 		"INSPR_OUTPUT_CHANNELS": outputChannels,
-		"INSPR_APP_ID":          environment.GetEnvironment().InsprAppContext + "." + testApp.Meta.Name,
+		"INSPR_APP_ID":          appID,
 	}
 
-	appDeployName := toDeploymentName(environment.GetEnvironment().InsprEnvironment, &testApp)
+	appDeployName := toDeploymentName(environment.GetInsprEnvironment(), &testApp)
 
 	type args struct {
 		app *meta.App
@@ -126,7 +128,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 								},
 								{
 									Name:  appDeployName + "-sidecar",
-									Image: environment.GetEnvironment().SidecarImage,
+									Image: environment.GetSidecarImage(),
 									VolumeMounts: []kubeCore.VolumeMount{
 										{
 											Name:      appDeployName + "-volume",
