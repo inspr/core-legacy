@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
@@ -45,9 +46,9 @@ func NewDeleteCmd() *cobra.Command {
 }
 
 func deleteApps(_ context.Context, out io.Writer, args []string) error {
-	client := getClient()
+	client := cliutils.GetClient()
 
-	scope, err := getScope()
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
 	}
@@ -73,13 +74,13 @@ func deleteApps(_ context.Context, out io.Writer, args []string) error {
 }
 
 func deleteChannels(_ context.Context, out io.Writer, args []string) error {
-	client := getClient()
-	scope, err := getScope()
+	client := cliutils.GetClient()
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
 	}
 
-	path, chName, err := processArg(args[0], scope)
+	path, chName, err := cliutils.ProcessArg(args[0], scope)
 	if err != nil {
 		return err
 	}
@@ -95,13 +96,13 @@ func deleteChannels(_ context.Context, out io.Writer, args []string) error {
 }
 
 func deleteCTypes(_ context.Context, out io.Writer, args []string) error {
-	client := getClient()
-	scope, err := getScope()
+	client := cliutils.GetClient()
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
 	}
 
-	path, ctName, err := processArg(args[0], scope)
+	path, ctName, err := cliutils.ProcessArg(args[0], scope)
 	if err != nil {
 		return err
 	}

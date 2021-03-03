@@ -1,4 +1,4 @@
-package cli
+package utils
 
 import (
 	"os"
@@ -18,8 +18,7 @@ func Test_initViperConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			initViperConfig()
-
+			InitViperConfig()
 			scope := viper.Get(configScope)
 			if scope != defaultValues[configScope] {
 				t.Errorf("viper's scope, expected %v, got %v",
@@ -65,7 +64,7 @@ func Test_readViperConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := readViperConfig(tt.args.baseDir)
+			err := ReadViperConfig(tt.args.baseDir)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("readViperConfig() error = %v, wantErr %v",
 					err,
@@ -123,9 +122,9 @@ func Test_changeViperValues(t *testing.T) {
 			}
 
 			// reads the current values of the viper config
-			readViperConfig("./test")
+			ReadViperConfig("./test")
 
-			err := changeViperValues(tt.args.key, tt.args.value)
+			err := ChangeViperValues(tt.args.key, tt.args.value)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("changeViperValues() error = %v, wantErr %v",
 					err,
@@ -231,7 +230,7 @@ func Test_existingKeys(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := existingKeys()
+			got := ExistingKeys()
 
 			// doesn't return in a specific order, so we use maps to compare
 			receivedValues := make(map[string]bool)
