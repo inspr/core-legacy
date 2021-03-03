@@ -2,6 +2,7 @@ package cli
 
 import (
 	"io"
+	"os"
 
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 
@@ -24,7 +25,9 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 			// viper defaults values or reads from the config location
 			cliutils.InitViperConfig()
 
-			if err := cliutils.ReadViperConfig(); err != nil {
+			homeDir, _ := os.UserHomeDir()
+
+			if err := cliutils.ReadViperConfig(homeDir); err != nil {
 				return err
 			}
 

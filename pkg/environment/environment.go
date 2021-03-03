@@ -23,13 +23,13 @@ var env *InsprEnvVars
 func GetEnvironment() *InsprEnvVars {
 	if env == nil {
 		env = &InsprEnvVars{
-			InputChannels:    getEnv("INSPR_INPUT_CHANNELS"),
-			OutputChannels:   getEnv("INSPR_OUTPUT_CHANNELS"),
-			UnixSocketAddr:   getEnv("INSPR_UNIX_SOCKET"),
-			SidecarImage:     getEnv("INSPR_SIDECAR_IMAGE"),
-			InsprAppContext:  getEnv("INSPR_APP_CTX"),
-			InsprEnvironment: getEnv("INSPR_ENV"),
-			InsprAppID:       getEnv("INSPR_APP_ID"),
+			InputChannels:    GetInputChannels(),
+			OutputChannels:   GetOutputChannels(),
+			UnixSocketAddr:   GetUnixSocketAddress(),
+			SidecarImage:     GetSidecarImage(),
+			InsprAppContext:  GetInsprAppContext(),
+			InsprEnvironment: GetInsprEnvironment(),
+			InsprAppID:       GetInsprAppID(),
 		}
 	}
 	return env
@@ -46,13 +46,13 @@ func getEnv(name string) string {
 // This was develop for testing and probably sholdn't be used in other cases.
 func RefreshEnviromentVariables() *InsprEnvVars {
 	env = &InsprEnvVars{
-		InputChannels:    getEnv("INSPR_INPUT_CHANNELS"),
-		OutputChannels:   getEnv("INSPR_OUTPUT_CHANNELS"),
-		UnixSocketAddr:   getEnv("INSPR_UNIX_SOCKET"),
-		SidecarImage:     getEnv("INSPR_SIDECAR_IMAGE"),
-		InsprAppContext:  getEnv("INSPR_APP_CTX"),
-		InsprEnvironment: getEnv("INSPR_ENV"),
-		InsprAppID:       getEnv("INSPR_APP_ID"),
+		InputChannels:    GetInputChannels(),
+		OutputChannels:   GetOutputChannels(),
+		UnixSocketAddr:   GetUnixSocketAddress(),
+		SidecarImage:     GetSidecarImage(),
+		InsprAppContext:  GetInsprAppContext(),
+		InsprEnvironment: GetInsprEnvironment(),
+		InsprAppID:       GetInsprAppID(),
 	}
 	return env
 }
@@ -67,4 +67,39 @@ func RecoverEnvironmentErrors(errch chan<- error) {
 		errch <- ierrors.NewError().Message(err.(string)).Build()
 	}
 	errch <- nil
+}
+
+// GetInputChannels returns environment variable which contains the input channels
+func GetInputChannels() string {
+	return getEnv("INSPR_INPUT_CHANNELS")
+}
+
+// GetOutputChannels returns environment variable which contains the output channels
+func GetOutputChannels() string {
+	return getEnv("INSPR_OUTPUT_CHANNELS")
+}
+
+// GetUnixSocketAddress returns environment variable which contains the unix socket address
+func GetUnixSocketAddress() string {
+	return getEnv("INSPR_UNIX_SOCKET")
+}
+
+// GetSidecarImage returns environment variable which contains the sidecar image reference
+func GetSidecarImage() string {
+	return getEnv("INSPR_SIDECAR_IMAGE")
+}
+
+// GetInsprAppContext returns environment variable which contains the current dApp context
+func GetInsprAppContext() string {
+	return getEnv("INSPR_APP_CTX")
+}
+
+// GetInsprEnvironment returns Inspr's current environment (test, production, qa, etc.)
+func GetInsprEnvironment() string {
+	return getEnv("INSPR_ENV")
+}
+
+// GetInsprAppID returns environment variable which contains the current dApp's ID
+func GetInsprAppID() string {
+	return getEnv("INSPR_APP_ID")
 }

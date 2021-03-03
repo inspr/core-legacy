@@ -41,45 +41,45 @@ func InitViperConfig() {
 	}
 }
 
-// createConfig - creates the folder and or file of the inspr's viper config
+// createViperConfig - creates the folder and or file of the inspr's viper config
+//
 // if they already a file the createConfig will truncate it before writing
-func createViperConfig() error {
-
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-
-	// folder path
-	insprFolderDir := filepath.Join(homeDir, ".inspr")
-
-	// creates folder
-	if _, err := os.Stat(insprFolderDir); os.IsNotExist(err) {
-		if err := os.Mkdir(insprFolderDir, 0777); err != nil { // perm 0666
-			return err
-		}
-	}
-
-	// file path
-	fileDir := filepath.Join(insprFolderDir, "config")
-
+func createViperConfig(path string) error {
 	// creates config file
-	err = viper.WriteConfigAs(fileDir)
+	err := viper.WriteConfigAs(path)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+// createInsprConfigFolder - creates the folder of the inspr's config, it only
+// creates the folder if already doesn't exists
+func createInsprConfigFolder(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.Mkdir(path, 0777); err != nil { // perm 0666
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ReadViperConfig - reads the inspr's viper config, in case it didn't
 // found any, it creates one with the defaults values
-func ReadViperConfig() error {
-	homeDir, _ := os.UserHomeDir()
-	configDir := filepath.Join(homeDir, ".inspr", "config")
+func ReadViperConfig(basePath string) error {
+	folderPath := filepath.Join(basePath, ".inspr")
+	filePath := filepath.Join(folderPath, "config")
 
-	if _, err := os.Stat(configDir); os.IsNotExist(err) {
-		if createErr := createViperConfig(); createErr != nil {
+	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+		if createErr := createInsprConfigFolder(folderPath); createErr != nil {
 			return createErr
+		}
+	}
+
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		if configErr := createViperConfig(filePath); configErr != nil {
+			return configErr
 		}
 	}
 
@@ -114,9 +114,5 @@ func ExistsKey(key string) bool {
 
 // ExistingKeys - returns to the user all availible keys in viper's configs.
 func ExistingKeys() []string {
-	arr := make([]string, 0)
-	for k := range defaultValues {
-		arr = append(arr, k)
-	}
-	return arr
+	return viper.GetViper().AllKeys()
 }

@@ -30,7 +30,7 @@ func Test_fromTopicNonPRD(t *testing.T) {
 			want: messageChannel{
 				channel: "nonPrdChan",
 				prefix:  "test",
-				appCtx:  os.Getenv("INSPR_APP_CTX"),
+				appCtx:  environment.GetInsprAppContext(),
 			},
 		},
 	}
@@ -65,7 +65,7 @@ func Test_fromTopicPRD(t *testing.T) {
 			want: messageChannel{
 				channel: "prdChan",
 				prefix:  "",
-				appCtx:  os.Getenv("INSPR_APP_CTX"),
+				appCtx:  environment.GetInsprAppContext(),
 			},
 		},
 	}
