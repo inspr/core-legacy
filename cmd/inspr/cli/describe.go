@@ -80,10 +80,6 @@ func displayAppState(_ context.Context, out io.Writer, args []string) error {
 	app, err := client.Apps().Get(context.Background(), path)
 	if err != nil {
 		fmt.Fprintln(out, err.Error())
-		fmt.Fprintln(out, path)
-		fmt.Fprintln(out, scope)
-		fmt.Fprintln(out, separator)
-		fmt.Fprintln(out, args[0])
 		return err
 	}
 
