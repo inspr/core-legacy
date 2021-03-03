@@ -13,16 +13,16 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			ahandler.HandleGetAppByRef().JSON()(w, r)
+			ahandler.HandleGetAppByRef().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			ahandler.HandleCreateApp().JSON()(w, r)
+			ahandler.HandleCreateApp().JSON().Recover()(w, r)
 
 		case http.MethodPut:
-			ahandler.HandleUpdateApp().JSON()(w, r)
+			ahandler.HandleUpdateApp().JSON().Recover()(w, r)
 
 		case http.MethodDelete:
-			ahandler.HandleDeleteApp().JSON()(w, r)
+			ahandler.HandleDeleteApp().JSON().Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
