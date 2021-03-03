@@ -14,11 +14,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var applyCmd *cobra.Command
-
 // NewApplyCmd - mock subcommand
 func NewApplyCmd() *cobra.Command {
-	applyCmd = cmd.NewCmd("apply").
+	applyCmd := cmd.NewCmd("apply").
 		WithDescription("Applies changes to the connected cluster").
 		WithLongDescription(`
 Apply takes a file or a directory and applies the defined components on the connected cluster.
@@ -80,10 +78,8 @@ func doApply(_ context.Context, out io.Writer) error {
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")
 	hasFolderFlag := (cmd.InsprOptions.AppliedFolderStructure != "")
 	if hasFileFlag == hasFolderFlag {
-		fmt.Fprintln(out, "\nGiven flags are invalid")
-		fmt.Fprintln(out, "\nCommand Help")
+		fmt.Fprintln(out, "Given flags are invalid")
 
-		applyCmd.Help()
 		return ierrors.NewError().Message("invalid flag arguments").Build()
 	}
 
