@@ -98,7 +98,7 @@ func ChangeViperValues(key string, value interface{}) error {
 		return err
 	}
 	if key == configServerIP {
-		SetDefaultClient()
+		setGlobalClient()
 	}
 
 	return nil

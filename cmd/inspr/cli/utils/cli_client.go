@@ -9,41 +9,41 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
-type cliDefaults struct {
+type cliGlobalStructure struct {
 	client *client.Client
 	out    io.Writer
 }
 
-var defaults cliDefaults
+var defaults cliGlobalStructure
 
 //GetCliClient returns the default controller client for cli.
 func GetCliClient() *client.Client {
 	if defaults.client == nil {
-		SetDefaultClient()
+		setGlobalClient()
 	}
 	return defaults.client
 }
 
 //GetCliOut returns the default output for cli.
-func GetCliOut() io.Writer {
+func GetCliOutput() io.Writer {
 	if defaults.out == nil {
-		setDefaultOut()
+		setGlobalOutput()
 	}
 	return defaults.out
 }
 
 //SetDefaultClient creates cli's controller client from viper's configured serverIp
-func SetDefaultClient() {
+func setGlobalClient() {
 	url := GetConfiguredServerIP()
 	rc := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
 
-	defaults = cliDefaults{
+	defaults = cliGlobalStructure{
 		client: client.NewControllerClient(rc),
 	}
 }
 
-func setDefaultOut() {
-	defaults = cliDefaults{
+func setGlobalOutput() {
+	defaults = cliGlobalStructure{
 		out: os.Stdout,
 	}
 }
