@@ -43,7 +43,7 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 }
 
 func toTopic(ctx, name string) string {
-	insprEnvironment := environment.GetEnvironment().InsprEnvironment
+	insprEnvironment := environment.GetInsprEnvironment()
 	if insprEnvironment == "" {
 		return fmt.Sprintf("inspr-%s-%s", ctx, name)
 	}

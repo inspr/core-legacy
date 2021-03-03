@@ -20,20 +20,18 @@ func baseEnvironment(app *meta.App) utils.EnvironmentMap {
 	output := app.Spec.Boundary.Output
 	channels := input.Union(output)
 
-	// pod env variables
-	insprEnv := environment.GetEnvironment()
 	// label name to be used in the service
-	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app)
+	appDeployName := toDeploymentName(environment.GetInsprEnvironment(), app)
 
 	inputEnv := input.Join(";")
 	outputEnv := output.Join(";")
 	env := utils.EnvironmentMap{
 		"INSPR_INPUT_CHANNELS":    inputEnv,
 		"INSPR_OUTPUT_CHANNELS":   outputEnv,
-		"INSPR_SIDECAR_IMAGE":     insprEnv.SidecarImage,
+		"INSPR_SIDECAR_IMAGE":     environment.GetSidecarImage(),
 		"INSPR_APP_ID":            appDeployName,
 		"INSPR_APP_CTX":           app.Meta.Parent,
-		"INSPR_ENV":               insprEnv.InsprEnvironment,
+		"INSPR_ENV":               environment.GetInsprEnvironment(),
 		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
 		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
 	}
@@ -48,7 +46,6 @@ func baseEnvironment(app *meta.App) utils.EnvironmentMap {
 
 // dAppToDeployment translates the DApp
 func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
-	insprEnv := environment.GetEnvironment()
 
 	sidecarEnvironment := baseEnvironment(app)
 
@@ -61,7 +58,7 @@ func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	})
 
-	appDeployName := toDeploymentName(insprEnv.InsprEnvironment, app)
+	appDeployName := toDeploymentName(environment.GetInsprEnvironment(), app)
 	nodeContainer := kubeCore.Container{
 		Name:  appDeployName,
 		Image: app.Spec.Node.Spec.Image,
@@ -86,7 +83,7 @@ func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 
 	sidecarContainer := kubeCore.Container{
 		Name:  appDeployName + "-sidecar",
-		Image: insprEnv.SidecarImage,
+		Image: environment.GetSidecarImage(),
 		VolumeMounts: []kubeCore.VolumeMount{
 			{
 				Name:      appDeployName + "-volume",

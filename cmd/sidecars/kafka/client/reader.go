@@ -27,13 +27,12 @@ type Reader struct {
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
 	kafkaEnv := GetEnvironment()
-	globalEnv := globalEnv.GetEnvironment()
 
 	var reader Reader
 
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
-		"group.id":           globalEnv.InsprAppID,
+		"group.id":           globalEnv.GetInsprAppID(),
 		"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
 		"enable.auto.commit": false,
 	})
@@ -43,7 +42,7 @@ func NewReader() (*Reader, error) {
 	}
 	reader.consumer = newConsumer
 
-	channelsList := globalEnv.GetInputChannelList()
+	channelsList := globalEnv.GetInputChannelList(globalEnv.GetInputChannels())
 	if len(channelsList) == 0 {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}

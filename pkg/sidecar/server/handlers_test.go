@@ -130,10 +130,11 @@ func Test_newCustomHandlers(t *testing.T) {
 			name: "successfully_created_custom_handlers",
 			args: args{MockServer(nil)},
 			want: &customHandlers{
-				Locker:    &MockServer(nil).Mutex,
-				r:         MockServer(nil).Reader,
-				w:         MockServer(nil).Writer,
-				insprVars: env.GetEnvironment(),
+				Locker:         &MockServer(nil).Mutex,
+				r:              MockServer(nil).Reader,
+				w:              MockServer(nil).Writer,
+				InputChannels:  env.GetInputChannels(),
+				OutputChannels: env.GetOutputChannels(),
 			},
 		},
 	}

@@ -32,7 +32,7 @@ func NewServer() *Server {
 func (s *Server) Init(r models.Reader, w models.Writer) {
 	// server requests related
 	s.Mux = http.NewServeMux()
-	s.addr = "/inspr/" + environment.GetEnvironment().UnixSocketAddr + ".sock"
+	s.addr = "/inspr/" + environment.GetUnixSocketAddress() + ".sock"
 
 	// implementations of write and read for a specific sidecar
 	s.Reader = r
