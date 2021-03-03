@@ -3,9 +3,10 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/spf13/cobra"
+
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 )
 
@@ -16,7 +17,8 @@ func NewHelloCmd() *cobra.Command {
 		NoArgs(doHello)
 }
 
-func doHello(_ context.Context, out io.Writer) error {
+func doHello(_ context.Context) error {
+	out := cliutils.GetCliOut()
 	fmt.Fprint(out, "sub of a subcommand hello\n")
 	return nil
 }

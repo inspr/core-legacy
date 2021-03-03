@@ -3,9 +3,10 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/spf13/cobra"
+
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 )
 
@@ -33,7 +34,8 @@ func NewHiddenCmd() *cobra.Command {
 
 }
 
-func doHidden(_ context.Context, out io.Writer, strs []string) error {
+func doHidden(_ context.Context, strs []string) error {
+	out := cliutils.GetCliOut()
 	fmt.Fprintf(out, "hidden hello -> %v\n", randomNewTag)
 	return nil
 }

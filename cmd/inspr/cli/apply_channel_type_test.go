@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/controller"
+
 	"gitlab.inspr.dev/inspr/core/pkg/controller/mocks"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"

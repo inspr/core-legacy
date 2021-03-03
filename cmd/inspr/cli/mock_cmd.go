@@ -3,10 +3,11 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/spf13/cobra"
+
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 )
 
@@ -19,7 +20,8 @@ func NewMockCmd() *cobra.Command {
 		NoArgs(doMock)
 }
 
-func doMock(_ context.Context, out io.Writer) error {
+func doMock(_ context.Context) error {
+	out := cliutils.GetCliOut()
 	value := cliutils.GetConfiguredScope()
 	fmt.Fprintln(out, value)
 

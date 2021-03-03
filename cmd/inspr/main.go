@@ -1,22 +1,16 @@
 package main
 
 import (
-	"encoding/json"
 	"os"
 
 	cli "gitlab.inspr.dev/inspr/core/cmd/inspr/cli"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
 func main() {
-	rc := request.NewClient().
-		BaseURL("http://127.0.0.1:8080").
-		Encoder(json.Marshal).
-		Decoder(request.JSONDecoderGenerator).
-		Build()
-	client := client.NewControllerClient(rc)
+	client := cliutils.GetCliClient()
 
 	cli.GetFactory().Subscribe(meta.Component{
 		APIVersion: "v1",
