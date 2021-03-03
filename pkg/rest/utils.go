@@ -15,7 +15,6 @@ func RecoverFromPanic(w http.ResponseWriter) {
 	if recoveryMessage := recover(); recoveryMessage != nil {
 		fmt.Println(recoveryMessage)
 		ERROR(w, ierrors.NewError().InternalServer().Message(recoveryMessage.(string)).Build())
-		return
 	}
 }
 
