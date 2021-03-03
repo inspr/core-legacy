@@ -21,12 +21,10 @@ func ProcessArg(arg, scope string) (string, string, error) {
 			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
 		}
 
-		separator := ""
-		if scope != "" {
-			separator = "."
+		path, err = utils.JoinScopes(path, newScope)
+		if err != nil {
+			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
 		}
-
-		path = path + separator + newScope
 		component = lastName
 
 	} else {
