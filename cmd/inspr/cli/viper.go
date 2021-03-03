@@ -32,9 +32,9 @@ func initViperConfig() {
 // createViperConfig - creates the folder and or file of the inspr's viper config
 //
 // if they already a file the createConfig will truncate it before writing
-func createViperConfig(configPath string) error {
+func createViperConfig(path string) error {
 	// creates config file
-	err := viper.WriteConfigAs(configPath)
+	err := viper.WriteConfigAs(path)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,6 @@ func createViperConfig(configPath string) error {
 // createInsprConfigFolder - creates the folder of the inspr's config, it only
 // creates the folder if already doesn't exists
 func createInsprConfigFolder(path string) error {
-	// creates folder
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if err := os.Mkdir(path, 0777); err != nil { // perm 0666
 			return err
@@ -56,18 +55,18 @@ func createInsprConfigFolder(path string) error {
 
 // readConfig - reads the inspr's viper config, in case it didn't
 // found any, it creates one with the defaults values
-func readViperConfig(baseDir string) error {
-	folderDir := filepath.Join(baseDir, ".inspr")
-	configDir := filepath.Join(folderDir, "config")
+func readViperConfig(basePath string) error {
+	folderPath := filepath.Join(basePath, ".inspr")
+	filePath := filepath.Join(folderPath, "config")
 
-	if _, err := os.Stat(folderDir); os.IsNotExist(err) {
-		if createErr := createInsprConfigFolder(folderDir); createErr != nil {
+	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+		if createErr := createInsprConfigFolder(folderPath); createErr != nil {
 			return createErr
 		}
 	}
 
-	if _, err := os.Stat(configDir); os.IsNotExist(err) {
-		if configErr := createViperConfig(configDir); configErr != nil {
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		if configErr := createViperConfig(filePath); configErr != nil {
 			return configErr
 		}
 	}
