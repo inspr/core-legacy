@@ -33,7 +33,7 @@ func doConfigChange(_ context.Context, out io.Writer, args []string) error {
 	value := args[1]
 
 	// key doesn't exist
-	if cliutils.ExistsKey(key) {
+	if !cliutils.ExistsKey(key) {
 		errMsg := "key inserted does not exist in the inspr config"
 		fmt.Fprintln(out, errMsg)
 		fmt.Fprintln(out, "existing keys")
