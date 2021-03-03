@@ -51,7 +51,7 @@ func NewDeleteCmd() *cobra.Command {
 
 func deleteApps(_ context.Context, args []string) error {
 	client := cliutils.GetCliClient()
-	out := cliutils.GetCliOut()
+	out := cliutils.GetCliOutput()
 
 	scope, err := cliutils.GetScope()
 	if err != nil {
@@ -80,7 +80,7 @@ func deleteApps(_ context.Context, args []string) error {
 
 func deleteChannels(_ context.Context, args []string) error {
 	client := cliutils.GetCliClient()
-	out := cliutils.GetCliOut()
+	out := cliutils.GetCliOutput()
 	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func deleteChannels(_ context.Context, args []string) error {
 
 func deleteCTypes(_ context.Context, args []string) error {
 	client := cliutils.GetCliClient()
-	out := cliutils.GetCliOut()
+	out := cliutils.GetCliOutput()
 
 	scope, err := cliutils.GetScope()
 	if err != nil {

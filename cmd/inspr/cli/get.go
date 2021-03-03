@@ -106,7 +106,7 @@ func getNodes(_ context.Context) error {
 
 func getObj(printObj func(*meta.App)) error {
 	client := cliutils.GetCliClient()
-	out := cliutils.GetCliOut()
+	out := cliutils.GetCliOutput()
 
 	scope, err := cliutils.GetScope()
 	if err != nil {
@@ -163,7 +163,7 @@ func printLine(name string) {
 }
 
 func initTab() {
-	out := cliutils.GetCliOut()
+	out := cliutils.GetCliOutput()
 	tabWriter = tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
 	lines = append(lines, "NAME\n")
 }

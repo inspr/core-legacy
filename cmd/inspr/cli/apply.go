@@ -78,7 +78,7 @@ func doApply(_ context.Context) error {
 	var files []string
 	var path string
 	var err error
-	out := cliutils.GetCliOut()
+	out := cliutils.GetCliOutput()
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")
 	hasFolderFlag := (cmd.InsprOptions.AppliedFolderStructure != "")
 	if hasFileFlag == hasFolderFlag {

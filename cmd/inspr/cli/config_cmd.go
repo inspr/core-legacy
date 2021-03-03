@@ -30,7 +30,7 @@ func NewListConfig() *cobra.Command {
 }
 
 func doConfigChange(_ context.Context, args []string) error {
-	out := cliutils.GetCliOut()
+	out := cliutils.GetCliOutput()
 
 	key := args[0]
 	value := args[1]
@@ -53,7 +53,7 @@ func doConfigChange(_ context.Context, args []string) error {
 }
 
 func doListConfig(_ context.Context) error {
-	out := cliutils.GetCliOut()
+	out := cliutils.GetCliOutput()
 	fmt.Fprintln(out, cliutils.ExistingKeys())
 	return nil
 }
