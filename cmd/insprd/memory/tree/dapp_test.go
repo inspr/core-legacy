@@ -1149,7 +1149,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Creating app with Node",
+			name: "Creating app with Node without name",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
