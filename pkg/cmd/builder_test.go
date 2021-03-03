@@ -185,26 +185,6 @@ func Test_builder_NewCmdError(t *testing.T) {
 	}
 }
 
-// func Test_builder_CmdOutput(t *testing.T) {
-// 	var buf bytes.Buffer
-// 	cmd := NewCmd("").ExactArgs(1, func(ctx context.Context, args []string) error {
-// 		out := buf
-// 		fmt.Fprintf(out, "test output: %v\n", args)
-// 		return nil
-// 	})
-// 	cmd.SetOutput(&buf)
-
-// 	err := cmd.RunE(nil, []string{"arg1"})
-// 	if err != nil {
-// 		t.Errorf("expected nil and received %v\n", err)
-// 	}
-
-// 	expected := "test output: [arg1]\n"
-// 	if !reflect.DeepEqual(buf.String(), expected) {
-// 		t.Errorf("expected %v, received %v", expected, buf.String())
-// 	}
-// }
-
 func Test_builder_NewCmdWithFlags(t *testing.T) {
 	cmd := NewCmd("").WithFlagAdder(func(flagSet *pflag.FlagSet) {
 		flagSet.Bool("test", false, "usage")
