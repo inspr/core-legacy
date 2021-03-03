@@ -21,9 +21,13 @@ import (
 func NewApplyCmd() *cobra.Command {
 	applyCmd := cmd.NewCmd("apply").
 		WithDescription("Applies changes to the connected cluster").
-		WithLongDescription("Apply takes a file or a directory and applies the defined components on the connected cluster.\n"+
-			"It can be called with the flag --update for updating instead of creating a new dApp.\n"+
-			"It can be called with the flag --dry-run so the changes that would be made are shown, but not applied on the cluster").
+		WithLongDescription(`
+Apply takes a file or a directory and applies the defined components on the connected cluster.
+
+It can be called with the flag --update for updating instead of creating a new dApp.
+
+It can be called with the flag --dry-run so the changes that would be made are shown, but not applied on the cluster
+		`).
 		WithExample("Applies a structure component defined in a file", "apply -f app.yaml").
 		WithExample("Applies components defined in a specific folder", "apply -k randfolder/").
 		WithExample("Applies a structure component defined in a specific scope", "apply -f app.yaml --scope app1.app2").
@@ -78,7 +82,10 @@ func doApply(_ context.Context) error {
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")
 	hasFolderFlag := (cmd.InsprOptions.AppliedFolderStructure != "")
 	if hasFileFlag == hasFolderFlag {
-		fmt.Fprint(out, "Given flags are invalid\n")
+		fmt.Fprintln(
+			out,
+			"Invalid command call\nFor help, type 'inspr apply --help'",
+		)
 		return ierrors.NewError().Message("invalid flag arguments").Build()
 	}
 
@@ -98,7 +105,7 @@ func doApply(_ context.Context) error {
 	if len(appliedFiles) > 0 {
 		printAppliedFiles(appliedFiles, out)
 	} else {
-		fmt.Fprint(out, "No files were applied\n")
+		fmt.Fprint(out, "No files were applied\nFiles to be applied must be .yaml or .yml\n")
 	}
 
 	return nil

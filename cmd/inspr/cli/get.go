@@ -16,7 +16,7 @@ import (
 var tabWriter *tabwriter.Writer
 var lines []string
 
-// NewGetCmd - mock subcommand
+// NewGetCmd creates get command for Inspr CLI
 func NewGetCmd() *cobra.Command {
 	getApps := cmd.NewCmd("apps").
 		WithDescription("Get apps from context ").
@@ -49,6 +49,10 @@ func NewGetCmd() *cobra.Command {
 	return cmd.NewCmd("get").
 		WithDescription("Get by object type").
 		WithDescription("Retrieves the components from a given namespace").
+		WithExample("gets apps from cluster", "get apps --scope <scope>").
+		WithExample("gets channels from cluster", "get ch --scope <scope>").
+		WithExample("gets channel_types from cluster", "get ct --scope <scope>").
+		WithExample("gets nodes from cluster", "get nodes --scope <scope>").
 		WithLongDescription("get takes a component type (apps | channels | ctypes | nodes) and displays names for those components is a scope)").
 		WithAliases([]string{"list"}).
 		AddSubCommand(getApps).

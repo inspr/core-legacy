@@ -13,7 +13,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
-// NewDeleteCmd - mock subcommand
+// NewDeleteCmd creates delete command for Inspr CLI
 func NewDeleteCmd() *cobra.Command {
 	deleteApps := cmd.NewCmd("apps").
 		WithDescription("Delete apps from context ").
@@ -39,6 +39,9 @@ func NewDeleteCmd() *cobra.Command {
 	return cmd.NewCmd("delete").
 		WithDescription("Delete component of object type").
 		WithLongDescription("Delete takes a component type (apps | channels | ctypes) its scope and name, and deletes it from the cluster").
+		WithExample("deletes app", "delete apps <app_name>").
+		WithExample("deletes channel", "delete ch <channel_name>").
+		WithExample("deletes channel_type", "delete ct <channel_type_name>").
 		AddSubCommand(deleteApps).
 		AddSubCommand(deleteChannels).
 		AddSubCommand(deleteTypes).

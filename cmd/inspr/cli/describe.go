@@ -12,7 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
-// NewDescribeCmd DOC TODO
+// NewDescribeCmd creates describe command for Inspr CLI
 func NewDescribeCmd() *cobra.Command {
 	describeApp := cmd.NewCmd("apps <app_name | app_path>").
 		WithDescription("Retrieves the full state of the app from a given namespace").
@@ -43,6 +43,9 @@ func NewDescribeCmd() *cobra.Command {
 
 	describeCmd := cmd.NewCmd("describe").
 		WithDescription("Retrieves the full state of a component from a given namespace").
+		WithExample("Describes the app component type", "describe apps <namespace>").
+		WithExample("Describes the channel component type", "describe ch <namespace>").
+		WithExample("Describes the channel_type component type", "describe ct <namespace>").
 		WithLongDescription("describe takes a component type (apps | channels | ctypes) plus the name of the component, and displays the state tree)").
 		AddSubCommand(describeApp).
 		AddSubCommand(describeChannel).
@@ -74,7 +77,7 @@ func displayAppState(_ context.Context, args []string) error {
 
 	app, err := client.Apps().Get(context.Background(), path)
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		fmt.Fprintln(out, err.Error())
 		return err
 	}
 
