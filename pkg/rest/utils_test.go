@@ -147,8 +147,3 @@ func TestRecoverFromPanic(t *testing.T) {
 	}
 
 }
-
-func callRecoverPanic(w http.ResponseWriter) {
-	defer RecoverFromPanic(w)
-	panic("Panic from Test")
-}
