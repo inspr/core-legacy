@@ -15,7 +15,7 @@ import (
 func NewConfigChangeCmd() *cobra.Command {
 	return cmd.NewCmd("config").
 		WithDescription("Can change the values stored in the inspr config").
-		WithExample("how to use", "config <key> <value>").
+		WithExample("How to use", "config <key> <value>").
 		AddSubCommand(NewListConfig()).
 		ExactArgs(2, doConfigChange)
 }
