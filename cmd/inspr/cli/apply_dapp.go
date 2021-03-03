@@ -4,8 +4,8 @@ import (
 	"context"
 	"io"
 
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
-	"gitlab.inspr.dev/inspr/core/pkg/controller"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
@@ -14,7 +14,8 @@ import (
 
 // NewApplyApp receives a controller AppInterface and calls it's methods
 // depending on the flags values
-func NewApplyApp(c controller.AppInterface) RunMethod {
+func NewApplyApp() RunMethod {
+	c := cliutils.GetCliClient().Apps()
 	return func(data []byte, out io.Writer) error {
 		// unmarshal into an app
 		app, err := utils.YamlToApp(data)

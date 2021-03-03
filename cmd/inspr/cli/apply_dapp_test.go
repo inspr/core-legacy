@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/controller"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/mocks"
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gopkg.in/yaml.v2"
@@ -15,7 +15,6 @@ func TestNewApplyApp(t *testing.T) {
 	appWithoutNameBytes, _ := yaml.Marshal(meta.App{})
 	appDefaultBytes, _ := yaml.Marshal(meta.App{Meta: meta.Metadata{Name: "mock"}})
 	type args struct {
-		a controller.AppInterface
 		b []byte
 	}
 	tests := []struct {
@@ -26,7 +25,6 @@ func TestNewApplyApp(t *testing.T) {
 		{
 			name: "default_test",
 			args: args{
-				a: mocks.NewAppMock(nil),
 				b: appDefaultBytes,
 			},
 			want: nil,
@@ -34,7 +32,6 @@ func TestNewApplyApp(t *testing.T) {
 		{
 			name: "app_without_name",
 			args: args{
-				a: mocks.NewAppMock(nil),
 				b: appWithoutNameBytes,
 			},
 			want: ierrors.NewError().Message("dapp without name").Build(),
@@ -42,7 +39,6 @@ func TestNewApplyApp(t *testing.T) {
 		{
 			name: "error_testing",
 			args: args{
-				a: mocks.NewAppMock(errors.New("new error")),
 				b: appDefaultBytes,
 			},
 			want: errors.New("new error"),
@@ -50,7 +46,8 @@ func TestNewApplyApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewApplyApp(tt.args.a)
+			cliutils.SetMockedClient(tt.want)
+			got := NewApplyApp()
 
 			r := got(tt.args.b, nil)
 

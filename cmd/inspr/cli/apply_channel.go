@@ -6,7 +6,6 @@ import (
 
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
-	"gitlab.inspr.dev/inspr/core/pkg/controller"
 	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
@@ -14,7 +13,8 @@ import (
 
 // NewApplyChannel receives a controller ChannelInterface and calls it's methods
 // depending on the flags values
-func NewApplyChannel(c controller.ChannelInterface) RunMethod {
+func NewApplyChannel() RunMethod {
+	c := cliutils.GetCliClient().Channels()
 	return func(data []byte, out io.Writer) error {
 		// unmarshal into a channel
 		channel, err := utils.YamlToChannel(data)

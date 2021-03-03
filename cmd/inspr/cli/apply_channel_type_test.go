@@ -8,9 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/controller"
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 
-	"gitlab.inspr.dev/inspr/core/pkg/controller/mocks"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gopkg.in/yaml.v2"
@@ -26,7 +25,6 @@ func TestNewApplyChannelType(t *testing.T) {
 	chanTypeWithoutNameBytes, _ := yaml.Marshal(meta.ChannelType{})
 	chanTypeDefaultBytes, _ := yaml.Marshal(meta.ChannelType{Meta: meta.Metadata{Name: "mock"}})
 	type args struct {
-		c controller.ChannelTypeInterface
 		b []byte
 	}
 	tests := []struct {
@@ -37,7 +35,6 @@ func TestNewApplyChannelType(t *testing.T) {
 		{
 			name: "default_test",
 			args: args{
-				c: mocks.NewChannelTypeMock(nil),
 				b: chanTypeDefaultBytes,
 			},
 			want: nil,
@@ -45,7 +42,6 @@ func TestNewApplyChannelType(t *testing.T) {
 		{
 			name: "channeltype_without_name",
 			args: args{
-				c: mocks.NewChannelTypeMock(nil),
 				b: chanTypeWithoutNameBytes,
 			},
 			want: ierrors.NewError().Message("channelType without name").Build(),
@@ -53,7 +49,6 @@ func TestNewApplyChannelType(t *testing.T) {
 		{
 			name: "error_testing",
 			args: args{
-				c: mocks.NewChannelTypeMock(errors.New("new error")),
 				b: chanTypeDefaultBytes,
 			},
 			want: errors.New("new error"),
@@ -61,7 +56,8 @@ func TestNewApplyChannelType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewApplyChannelType(tt.args.c)
+			cliutils.SetMockedClient(tt.want)
+			got := NewApplyChannelType()
 
 			r := got(tt.args.b, nil)
 
