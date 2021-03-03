@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -34,7 +33,7 @@ func doConfigChange(_ context.Context, out io.Writer, args []string) error {
 	value := args[1]
 
 	// key doesn't exist
-	if !viper.IsSet(key) {
+	if cliutils.ExistsKey(key) {
 		errMsg := "key inserted does not exist in the inspr config"
 		fmt.Fprintln(out, errMsg)
 		fmt.Fprintln(out, "existing keys")

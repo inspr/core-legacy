@@ -104,12 +104,7 @@ func ChangeViperValues(key string, value interface{}) error {
 // ExistsKey - informs to the user if the key passed exists in the
 // default keys that are saved in the inspr config file
 func ExistsKey(key string) bool {
-	for k := range defaultValues {
-		if k == key {
-			return true
-		}
-	}
-	return false
+	return viper.IsSet(key)
 }
 
 // ExistingKeys - returns to the user all availible keys in viper's configs.
