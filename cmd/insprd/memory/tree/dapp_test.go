@@ -35,7 +35,7 @@ func getMockApp() *meta.App {
 					Spec: meta.AppSpec{
 						Node: meta.Node{
 							Meta: meta.Metadata{
-								Name:        "nodeAppNode",
+								Name:        "appNode",
 								Reference:   "appNode.appNode",
 								Annotations: map[string]string{},
 								Parent:      "appNode",
@@ -146,7 +146,7 @@ func getMockApp() *meta.App {
 								Spec: meta.AppSpec{
 									Node: meta.Node{
 										Meta: meta.Metadata{
-											Name:        "nodeApp3",
+											Name:        "app3",
 											Reference:   "app3.nodeApp2",
 											Annotations: map[string]string{},
 											Parent:      "app3",
@@ -176,7 +176,7 @@ func getMockApp() *meta.App {
 								Spec: meta.AppSpec{
 									Node: meta.Node{
 										Meta: meta.Metadata{
-											Name:        "nodeApp4",
+											Name:        "app4",
 											Reference:   "app4.nodeApp4",
 											Annotations: map[string]string{},
 											Parent:      "app4",
@@ -589,7 +589,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Creating app inside of app with Node",
+			name: "Invalid - Creating app inside of app with Node",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -870,9 +870,9 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 					Spec: meta.AppSpec{
 						Node: meta.Node{
 							Meta: meta.Metadata{
-								Name:        "nodeApp2-2",
+								Name:        "app2",
 								Reference:   "",
-								Annotations: map[string]string{},
+								Annotations: nil,
 								Parent:      "",
 								SHA256:      "",
 							},
@@ -902,7 +902,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				Spec: meta.AppSpec{
 					Node: meta.Node{
 						Meta: meta.Metadata{
-							Name:        "nodeApp2-2",
+							Name:        "app2",
 							Reference:   "",
 							Annotations: map[string]string{},
 							Parent:      "app2",
