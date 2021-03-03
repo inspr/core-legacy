@@ -46,6 +46,7 @@ func setGlobalOutput() {
 	defaults.out = os.Stdout
 }
 
+//SetMockedClient configures singleton's client as a mocked client given a error
 func SetMockedClient(err error) {
 	defaults.client = mocks.NewClientMock(err)
 }
