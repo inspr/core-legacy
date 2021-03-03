@@ -15,8 +15,8 @@ type messageChannel struct {
 // returns specified topic's channel
 func fromTopic(topic string) messageChannel {
 	msgChan := messageChannel{
-		prefix: environment.GetEnvironment().InsprEnvironment,
-		appCtx: environment.GetEnvironment().InsprAppContext,
+		prefix: environment.GetInsprEnvironment(),
+		appCtx: environment.GetInsprAppContext(),
 	}
 
 	if msgChan.prefix == "" {
@@ -31,13 +31,13 @@ func fromTopic(topic string) messageChannel {
 func toTopic(channel string) string {
 	var topic string
 
-	if environment.GetEnvironment().InsprEnvironment == "" {
-		topic = fmt.Sprintf("inspr-%s-%s", environment.GetEnvironment().InsprAppContext, channel)
+	if environment.GetInsprEnvironment() == "" {
+		topic = fmt.Sprintf("inspr-%s-%s", environment.GetInsprAppContext(), channel)
 	} else {
 		topic = fmt.Sprintf(
 			"inspr-%s-%s-%s",
-			environment.GetEnvironment().InsprEnvironment,
-			environment.GetEnvironment().InsprAppContext,
+			environment.GetInsprEnvironment(),
+			environment.GetInsprAppContext(),
 			channel,
 		)
 	}

@@ -20,7 +20,9 @@ func getCodec(schema string) (*goavro.Codec, error) {
 
 // returns the channel's channel type schema
 func getSchema(channel string) (string, error) {
-	schema, err := environment.GetEnvironment().GetSchema(channel)
+	inputChan := environment.GetInputChannels()
+	outputChan := environment.GetOutputChannels()
+	schema, err := environment.GetSchema(channel, inputChan, outputChan)
 	if err != nil {
 		return "", ierrors.NewError().InnerError(err).Message(err.Error()).Build()
 	}

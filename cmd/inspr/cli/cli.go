@@ -2,6 +2,7 @@ package cli
 
 import (
 	"io"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -22,7 +23,9 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 			// viper defaults values or reads from the config location
 			initViperConfig()
 
-			if err := readViperConfig(); err != nil {
+			homeDir, _ := os.UserHomeDir()
+
+			if err := readViperConfig(homeDir); err != nil {
 				return err
 			}
 

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
@@ -18,65 +19,62 @@ func Test_initViperConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			initViperConfig()
-			scope := viper.Get(configScope)
-			if scope != "" {
-				t.Errorf("viper's default scope, expected %v, got %v", "", scope)
-			}
-		})
-	}
-}
 
-func Test_createViperConfig(t *testing.T) {
-	tests := []struct {
-		name    string
-		wantErr bool
-	}{
-		{
-			name:    "check_and_create_folder",
-			wantErr: false,
-		},
-	}
-	initViperConfig()
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := createViperConfig(); (err != nil) != tt.wantErr {
-				t.Errorf("createConfig() error = %v, wantErr %v", err, tt.wantErr)
+			scope := viper.Get(configScope)
+			if scope != defaultValues[configScope] {
+				t.Errorf("viper's scope, expected %v, got %v",
+					scope,
+					defaultValues[configScope])
+			}
+
+			ip := viper.Get(configServerIP)
+			if ip != defaultValues[configServerIP] {
+				t.Errorf("viper's scope, expected %v, got %v",
+					ip,
+					defaultValues[configServerIP])
 			}
 		})
 	}
 }
 
 func Test_readViperConfig(t *testing.T) {
+	type args struct {
+		baseDir string
+	}
 	tests := []struct {
 		name    string
+		args    args
 		wantErr bool
 	}{
 		{
-			name:    "basic_read_test",
+			name:    "working_read",
+			args:    args{baseDir: "./test"},
 			wantErr: false,
 		},
 		{
-			name:    "want_error",
+			name:    "not_working_read",
+			args:    args{baseDir: "1/2/3/"},
 			wantErr: true,
 		},
 	}
 
-	initViperConfig()   // inits viper
-	createViperConfig() // creates the config in the system in case it doesn't exists
+	// sets defaults values in ./test/.inspr/config
+	setupViperTest()
+	// sets the
+	viper.SetConfigFile("./test/.inspr/config")
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.wantErr {
-				viper.SetConfigFile("/etc/")
-			}
-			if err := readViperConfig(); (err != nil) != tt.wantErr {
-				t.Errorf("readViperConfig() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if got := viper.Get(configScope); !tt.wantErr && !reflect.DeepEqual(got, "") {
-				t.Errorf("readViperConfig() -> want = %v, got %v", "", got)
+			err := readViperConfig(tt.args.baseDir)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("readViperConfig() error = %v, wantErr %v",
+					err,
+					tt.wantErr)
 			}
 		})
 	}
+	os.Remove("./test/.inspr/config")
+	os.Remove("./test/.inspr")
 }
 
 func Test_changeViperValues(t *testing.T) {
@@ -115,8 +113,8 @@ func Test_changeViperValues(t *testing.T) {
 		},
 	}
 
-	initViperConfig() // inits viper
-	readViperConfig() // reads the current values of the viper config
+	// read mock config values
+	setupViperTest()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -124,13 +122,142 @@ func Test_changeViperValues(t *testing.T) {
 				viper.SetConfigFile("/etc/")
 			}
 
-			if err := changeViperValues(tt.args.key, tt.args.value); (err != nil) != tt.wantErr {
-				t.Errorf("changeViperValues() error = %v, wantErr %v", err, tt.wantErr)
+			// reads the current values of the viper config
+			readViperConfig("./test")
+
+			err := changeViperValues(tt.args.key, tt.args.value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("changeViperValues() error = %v, wantErr %v",
+					err,
+					tt.wantErr)
 			}
 
-			if got := viper.Get(tt.args.key); !reflect.DeepEqual(got, tt.args.value) && !tt.wantErr {
-				t.Errorf("viper.Get(key) got = %v, want %v", got, tt.args.value)
+			got := viper.Get(tt.args.key)
+			if !reflect.DeepEqual(got, tt.args.value) && !tt.wantErr {
+				t.Errorf("viper.Get(key) got = %v, want %v",
+					got,
+					tt.args.value)
 			}
 		})
 	}
+	os.Remove("./test/.inspr/config")
+	os.Remove("./test/.inspr")
+}
+
+func Test_createViperConfig(t *testing.T) {
+	type args struct {
+		folderPath string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "local_viper_config",
+			args:    args{folderPath: "./test/config"},
+			wantErr: false,
+		},
+		{
+			name:    "error_folder_location",
+			args:    args{folderPath: "/1//2/3/4/5"},
+			wantErr: true,
+		},
+	}
+
+	// read mock config values
+	setupViperTest()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			err := createViperConfig(tt.args.folderPath)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("createViperConfig() error = %v, wantErr %v",
+					err,
+					tt.wantErr)
+			}
+		})
+	}
+	os.Remove("./test/config")
+}
+
+func Test_createInsprConfigFolder(t *testing.T) {
+	type args struct {
+		folderPath string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "create_folder",
+			args:    args{folderPath: "./test/inspr"},
+			wantErr: false,
+		},
+		{
+			name:    "create_folder",
+			args:    args{folderPath: "1/inspr"},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := createInsprConfigFolder(tt.args.folderPath)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("createInsprConfigFolder() error = %v, wantErr %v",
+					err,
+					tt.wantErr)
+			}
+		})
+	}
+	os.Remove("./test/inspr")
+}
+
+func Test_existingKeys(t *testing.T) {
+	tests := []struct {
+		name string
+		want []string
+	}{
+		{
+			name: "all_keys",
+			want: []string{"extra", "scope", "serverip"},
+		},
+	}
+
+	// read mock config values
+	setupViperTest()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := existingKeys()
+
+			// doesn't return in a specific order, so we use maps to compare
+			receivedValues := make(map[string]bool)
+			for _, k := range got {
+				receivedValues[k] = true
+			}
+
+			// checking values
+			for _, k := range tt.want {
+				if receivedValues[k] == false {
+					t.Errorf("existingKeys() => %v doesn't exist but is expected",
+						k)
+				}
+			}
+		})
+	}
+}
+
+/// test utils functions
+
+func setupViperTest() {
+	// specifies the path in which the config file present
+	viper.AddConfigPath("./test/")
+	viper.SetConfigName("viper_config")
+	viper.SetConfigType("yaml")
+
+	// contains defaults values to be used in others functions
+	viper.ReadInConfig()
 }

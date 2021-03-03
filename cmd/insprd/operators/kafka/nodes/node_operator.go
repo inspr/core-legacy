@@ -31,7 +31,7 @@ func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
 // Otherwise, returns an error
 func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	kube := no.retrieveKube()
-	insprEnv := environment.GetEnvironment().InsprEnvironment
+	insprEnv := environment.GetInsprEnvironment()
 	nodeName := parseNodeName(insprEnv, app.Meta.Parent, app.Spec.Node.Meta.Name)
 	dep, err := kube.Get(nodeName, metav1.GetOptions{})
 	if err != nil {
