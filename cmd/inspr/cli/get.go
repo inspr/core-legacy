@@ -18,7 +18,7 @@ import (
 var tabWriter *tabwriter.Writer
 var lines []string
 
-// NewGetCmd - mock subcommand
+// NewGetCmd creates get command for Inspr CLI
 func NewGetCmd() *cobra.Command {
 	getApps := cmd.NewCmd("apps").
 		WithDescription("Get apps from context ").

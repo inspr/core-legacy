@@ -12,7 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
-// NewDeleteCmd - mock subcommand
+// NewDeleteCmd creates delete command for Inspr CLI
 func NewDeleteCmd() *cobra.Command {
 	deleteApps := cmd.NewCmd("apps").
 		WithDescription("Delete apps from context ").

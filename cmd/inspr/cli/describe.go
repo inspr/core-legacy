@@ -12,7 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
-// NewDescribeCmd DOC TODO
+// NewDescribeCmd creates describe command for Inspr CLI
 func NewDescribeCmd() *cobra.Command {
 	describeApp := cmd.NewCmd("apps <app_name | app_path>").
 		WithDescription("Retrieves the full state of the app from a given namespace").
