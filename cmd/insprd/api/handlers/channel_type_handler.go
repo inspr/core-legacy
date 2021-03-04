@@ -27,8 +27,6 @@ func NewChannelTypeHandler(memManager memory.Manager) *ChannelTypeHandler {
 // manages the creation of a channelType
 func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.ChannelTypeDI{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -63,8 +61,6 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 // a channelType by the reference given
 func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.ChannelTypeQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -91,8 +87,6 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 // updates the channelType with the parameters given in the request
 func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.ChannelTypeDI{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -127,8 +121,6 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 // deletes the channelType of the given path
 func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.ChannelTypeQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 
