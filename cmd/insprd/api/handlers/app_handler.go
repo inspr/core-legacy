@@ -32,7 +32,6 @@ func NewAppHandler(memManager memory.Manager, op operators.OperatorInterface) *A
 // HandleCreateApp - handler that generates the rest.Handle
 // func to manage the http request
 func (ah *AppHandler) HandleCreateApp() rest.Handler {
-
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppDI{}
 		decoder := json.NewDecoder(r.Body)

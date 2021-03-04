@@ -71,3 +71,11 @@ func (h Handler) Put() Handler {
 		h(w, r)
 	}
 }
+
+//Recover adds a recover function to the handler
+func (h Handler) Recover() Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer RecoverFromPanic(w)
+		h(w, r)
+	}
+}

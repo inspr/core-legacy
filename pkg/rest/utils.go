@@ -10,6 +10,13 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
+// RecoverFromPanic will handle panic
+func RecoverFromPanic(w http.ResponseWriter) {
+	if recoveryMessage := recover(); recoveryMessage != nil {
+		ERROR(w, ierrors.NewError().InternalServer().Message(recoveryMessage.(string)).Build())
+	}
+}
+
 // JSON writes the data into the response writer with a JSON format
 func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 	w.WriteHeader(statusCode)

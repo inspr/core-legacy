@@ -6,11 +6,14 @@ handler functions
 package rest
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
 func TestHandler_HTTPHandlerFunc(t *testing.T) {
@@ -207,5 +210,37 @@ func TestHandler_Put(t *testing.T) {
 		if status := rr.Result().StatusCode; status != tt.want {
 			t.Errorf("Handler.JSON() = %v, want %v", status, tt.want)
 		}
+	}
+}
+
+func TestHandler_Recover(t *testing.T) {
+	var manipulation = func(h Handler) func(w http.ResponseWriter, r *http.Request) {
+		return func(w http.ResponseWriter, r *http.Request) {
+			h.Recover()(w, r)
+		}
+	}
+
+	var panicHandler Handler = func(w http.ResponseWriter, r *http.Request) {
+		panic("Panic Test")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, "/testing", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+
+	successHandler := http.HandlerFunc(manipulation(panicHandler))
+	successHandler.ServeHTTP(rr, req)
+
+	body := rr.Result().Body
+
+	var got *ierrors.InsprError
+	json.NewDecoder(body).Decode(&got)
+
+	want := ierrors.NewError().InternalServer().Message("Panic Test").Build()
+
+	if !reflect.DeepEqual(want.Message, got.Message) || !reflect.DeepEqual(want.Code, got.Code) {
+		t.Errorf("RecoverFromPanic=%v, want %v", got, want)
 	}
 }

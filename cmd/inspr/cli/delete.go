@@ -3,15 +3,17 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/spf13/cobra"
+
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
-// NewDeleteCmd - mock subcommand
+// NewDeleteCmd creates delete command for Inspr CLI
 func NewDeleteCmd() *cobra.Command {
 	deleteApps := cmd.NewCmd("apps").
 		WithDescription("Delete apps from context ").
@@ -37,6 +39,9 @@ func NewDeleteCmd() *cobra.Command {
 	return cmd.NewCmd("delete").
 		WithDescription("Delete component of object type").
 		WithLongDescription("Delete takes a component type (apps | channels | ctypes) its scope and name, and deletes it from the cluster").
+		WithExample("deletes app", "delete apps <app_name>").
+		WithExample("deletes channel", "delete ch <channel_name>").
+		WithExample("deletes channel_type", "delete ct <channel_type_name>").
 		AddSubCommand(deleteApps).
 		AddSubCommand(deleteChannels).
 		AddSubCommand(deleteTypes).
@@ -44,10 +49,11 @@ func NewDeleteCmd() *cobra.Command {
 
 }
 
-func deleteApps(_ context.Context, out io.Writer, args []string) error {
-	client := getClient()
+func deleteApps(_ context.Context, args []string) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
 
-	scope, err := getScope()
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
 	}
@@ -72,14 +78,15 @@ func deleteApps(_ context.Context, out io.Writer, args []string) error {
 	return nil
 }
 
-func deleteChannels(_ context.Context, out io.Writer, args []string) error {
-	client := getClient()
-	scope, err := getScope()
+func deleteChannels(_ context.Context, args []string) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
 	}
 
-	path, chName, err := processArg(args[0], scope)
+	path, chName, err := cliutils.ProcessArg(args[0], scope)
 	if err != nil {
 		return err
 	}
@@ -94,14 +101,16 @@ func deleteChannels(_ context.Context, out io.Writer, args []string) error {
 	return nil
 }
 
-func deleteCTypes(_ context.Context, out io.Writer, args []string) error {
-	client := getClient()
-	scope, err := getScope()
+func deleteCTypes(_ context.Context, args []string) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+
+	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
 	}
 
-	path, ctName, err := processArg(args[0], scope)
+	path, ctName, err := cliutils.ProcessArg(args[0], scope)
 	if err != nil {
 		return err
 	}

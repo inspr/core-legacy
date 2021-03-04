@@ -75,11 +75,16 @@ type Client struct {
 func (c *Client) handleResponseErr(resp *http.Response) error {
 	decoder := c.decoderGenerator(resp.Body)
 	var err *ierrors.InsprError
+
 	switch resp.StatusCode {
 	case http.StatusOK:
 		return nil
 	default:
 		decoder.Decode(&err)
+		if err == nil {
+			return ierrors.NewError().InternalServer().Message("cannot retrieve error from server").Build()
+		}
+
 		return err
 	}
 }

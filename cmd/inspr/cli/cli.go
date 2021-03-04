@@ -4,6 +4,8 @@ import (
 	"io"
 	"os"
 
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+
 	"github.com/spf13/cobra"
 )
 
@@ -21,11 +23,11 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 			cmd.Root().SilenceUsage = true
 
 			// viper defaults values or reads from the config location
-			initViperConfig()
+			cliutils.InitViperConfig()
 
 			homeDir, _ := os.UserHomeDir()
 
-			if err := readViperConfig(homeDir); err != nil {
+			if err := cliutils.ReadViperConfig(homeDir); err != nil {
 				return err
 			}
 
@@ -34,8 +36,6 @@ func NewInsprCommand(out, err io.Writer) *cobra.Command {
 	}
 
 	// other commmands
-	rootCmd.AddCommand(NewMockCmd())
-	rootCmd.AddCommand(NewHiddenCmd())
 	rootCmd.AddCommand(NewGetCmd())
 	rootCmd.AddCommand(NewDeleteCmd())
 

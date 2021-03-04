@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 )
 
 func TestNewDescribeCmd(t *testing.T) {
@@ -31,30 +31,6 @@ func TestNewDescribeCmd(t *testing.T) {
 	}
 }
 
-func Test_getClient(t *testing.T) {
-	tests := []struct {
-		name          string
-		checkFunction func(t *testing.T, got *client.Client)
-	}{
-		{
-			name: "It should return a controller client",
-			checkFunction: func(t *testing.T, got *client.Client) {
-				if got == nil {
-					t.Errorf("getClient() = nil")
-				}
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := getClient()
-			if tt.checkFunction != nil {
-				tt.checkFunction(t, got)
-			}
-		})
-	}
-}
-
 func Test_getScope(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -68,7 +44,7 @@ func Test_getScope(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getScope()
+			got, err := cliutils.GetScope()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getScope() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -131,7 +107,7 @@ func Test_processArg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, err := processArg(tt.args.arg, tt.args.scope)
+			got, got1, err := cliutils.ProcessArg(tt.args.arg, tt.args.scope)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("processArg() error = %v, wantErr %v", err, tt.wantErr)
 				return

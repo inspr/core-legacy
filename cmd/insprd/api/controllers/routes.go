@@ -13,16 +13,16 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			ahandler.HandleGetAppByRef().JSON()(w, r)
+			ahandler.HandleGetAppByRef().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			ahandler.HandleCreateApp().JSON()(w, r)
+			ahandler.HandleCreateApp().JSON().Recover()(w, r)
 
 		case http.MethodPut:
-			ahandler.HandleUpdateApp().JSON()(w, r)
+			ahandler.HandleUpdateApp().JSON().Recover()(w, r)
 
 		case http.MethodDelete:
-			ahandler.HandleDeleteApp().JSON()(w, r)
+			ahandler.HandleDeleteApp().JSON().Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
@@ -35,16 +35,16 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			chandler.HandleGetChannelByRef().JSON()(w, r)
+			chandler.HandleGetChannelByRef().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			chandler.HandleCreateChannel().JSON()(w, r)
+			chandler.HandleCreateChannel().JSON().Recover()(w, r)
 
 		case http.MethodPut:
-			chandler.HandleUpdateChannel().JSON()(w, r)
+			chandler.HandleUpdateChannel().JSON().Recover()(w, r)
 
 		case http.MethodDelete:
-			chandler.HandleDeleteChannel().JSON()(w, r)
+			chandler.HandleDeleteChannel().JSON().Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
@@ -57,16 +57,16 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			cthandler.HandleGetChannelTypeByRef().JSON()(w, r)
+			cthandler.HandleGetChannelTypeByRef().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			cthandler.HandleCreateChannelType().JSON()(w, r)
+			cthandler.HandleCreateChannelType().JSON().Recover()(w, r)
 
 		case http.MethodPut:
-			cthandler.HandleUpdateChannelType().JSON()(w, r)
+			cthandler.HandleUpdateChannelType().JSON().Recover()(w, r)
 
 		case http.MethodDelete:
-			cthandler.HandleDeleteChannelType().JSON()(w, r)
+			cthandler.HandleDeleteChannelType().JSON().Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)

@@ -1,8 +1,10 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -121,4 +123,27 @@ func TestERROR(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRecoverFromPanic(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer RecoverFromPanic(w)
+		panic("This is a panic error")
+	}))
+	defer ts.Close()
+
+	resp, err := http.Post(ts.URL, "application/json", bytes.NewBuffer([]byte("")))
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var got *ierrors.InsprError
+	json.NewDecoder(resp.Body).Decode(&got)
+
+	want := ierrors.NewError().InternalServer().Message("This is a panic error").Build()
+
+	if !reflect.DeepEqual(want.Message, got.Message) || !reflect.DeepEqual(want.Code, got.Code) {
+		t.Errorf("RecoverFromPanic=%v, want %v", got, want)
+	}
+
 }
