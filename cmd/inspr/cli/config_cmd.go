@@ -3,10 +3,11 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/spf13/cobra"
+
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
@@ -28,7 +29,9 @@ func NewListConfig() *cobra.Command {
 		NoArgs(doListConfig)
 }
 
-func doConfigChange(_ context.Context, out io.Writer, args []string) error {
+func doConfigChange(_ context.Context, args []string) error {
+	out := cliutils.GetCliOutput()
+
 	key := args[0]
 	value := args[1]
 
@@ -49,7 +52,8 @@ func doConfigChange(_ context.Context, out io.Writer, args []string) error {
 	return nil
 }
 
-func doListConfig(_ context.Context, out io.Writer) error {
+func doListConfig(_ context.Context) error {
+	out := cliutils.GetCliOutput()
 	fmt.Fprintln(out, cliutils.ExistingKeys())
 	return nil
 }
