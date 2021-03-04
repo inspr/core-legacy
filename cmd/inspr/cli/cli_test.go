@@ -19,7 +19,7 @@ func TestNewInsprCommand(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			out := &bytes.Buffer{}
 			err := &bytes.Buffer{}
-			got := NewInsprCommand(out, err)
+			got := NewInsprCommand(out, err, "")
 			if got == nil {
 				t.Errorf("NewInsprCommand() = %v", got)
 			}
