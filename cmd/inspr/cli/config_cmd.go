@@ -14,9 +14,9 @@ import (
 
 // NewConfigChangeCmd - responsible for changing the values of the inspr's viper config
 func NewConfigChangeCmd() *cobra.Command {
-	return cmd.NewCmd("config").
+	return cmd.NewCmd("config <key> <value>").
 		WithDescription("Change the values stored in the inspr config").
-		WithExample("How to use", "config <key> <value>").
+		WithExample("Changing IP config", "config serverip http://127.0.0.1:8080").
 		WithExample("Changing scope config", "config scope app1.app2").
 		AddSubCommand(NewListConfig()).
 		ExactArgs(2, doConfigChange)
