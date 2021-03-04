@@ -3,11 +3,11 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
@@ -30,7 +30,9 @@ func NewListConfig() *cobra.Command {
 		NoArgs(doListConfig)
 }
 
-func doConfigChange(_ context.Context, out io.Writer, args []string) error {
+func doConfigChange(_ context.Context, args []string) error {
+	out := cliutils.GetCliOutput()
+
 	key := args[0]
 	value := args[1]
 
@@ -38,7 +40,7 @@ func doConfigChange(_ context.Context, out io.Writer, args []string) error {
 	if !cliutils.ExistsKey(key) {
 		errMsg := "error: key inserted does not exist in the inspr config"
 		fmt.Fprintln(out, errMsg)
-		printExistingKeys(out)
+		printExistingKeys()
 		return ierrors.NewError().Message(errMsg).Build()
 	}
 
@@ -51,12 +53,13 @@ func doConfigChange(_ context.Context, out io.Writer, args []string) error {
 	return nil
 }
 
-func doListConfig(_ context.Context, out io.Writer) error {
-	printExistingKeys(out)
+func doListConfig(_ context.Context) error {
+	printExistingKeys()
 	return nil
 }
 
-func printExistingKeys(out io.Writer) {
+func printExistingKeys() {
+	out := cliutils.GetCliOutput()
 	fmt.Fprintln(out, "Available configurations: ")
 	for _, key := range cliutils.ExistingKeys() {
 		value := viper.GetString(key)

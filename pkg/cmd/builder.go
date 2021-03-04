@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -21,8 +20,8 @@ type Builder interface {
 	WithFlags([]*Flag) Builder
 	WithCommonFlags() Builder
 	Hidden() Builder
-	ExactArgs(argCount int, action func(context.Context, io.Writer, []string) error) *cobra.Command
-	NoArgs(action func(context.Context, io.Writer) error) *cobra.Command
+	ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command
+	NoArgs(action func(context.Context) error) *cobra.Command
 	AddSubCommand(cmds ...*cobra.Command) Builder
 	Super() *cobra.Command
 }
@@ -117,10 +116,10 @@ func (b *builder) AddSubCommand(cmds ...*cobra.Command) Builder {
 // ExactArgs - imposes the condition in which the function will only be executed
 // if the exact amount of arguments are given, if didn't received the proper args
 // it will show the cmd.help() content
-func (b *builder) ExactArgs(argCount int, action func(context.Context, io.Writer, []string) error) *cobra.Command {
+func (b *builder) ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command {
 	b.cmd.Args = cobra.ExactArgs(argCount)
 	b.cmd.RunE = func(_ *cobra.Command, args []string) error {
-		err := handleWellKnownErrors(action(b.cmd.Context(), b.cmd.OutOrStdout(), args))
+		err := handleWellKnownErrors(action(b.cmd.Context(), args))
 		return err
 	}
 	return &b.cmd
@@ -128,10 +127,10 @@ func (b *builder) ExactArgs(argCount int, action func(context.Context, io.Writer
 
 // NoArgs - runs the function if no args are given, in case of the user inserting
 // an argument the cmd.help() content will be shown
-func (b *builder) NoArgs(action func(context.Context, io.Writer) error) *cobra.Command {
+func (b *builder) NoArgs(action func(context.Context) error) *cobra.Command {
 	b.cmd.Args = cobra.NoArgs
 	b.cmd.RunE = func(*cobra.Command, []string) error {
-		err := handleWellKnownErrors(action(b.cmd.Context(), b.cmd.OutOrStdout()))
+		err := handleWellKnownErrors(action(b.cmd.Context()))
 		return err
 	}
 	return &b.cmd
