@@ -59,8 +59,8 @@ func doListConfig(_ context.Context, out io.Writer) error {
 func printExistingKeys(out io.Writer) {
 	fmt.Fprintln(out, "Available configurations: ")
 	for _, key := range cliutils.ExistingKeys() {
-		value := viper.Get(key)
-		value = "\"" + value.(string) + "\""
+		value := viper.GetString(key)
+		value = "\"" + value + "\""
 		fmt.Fprintf(out, "- %v: %v\n", key, value)
 	}
 }
