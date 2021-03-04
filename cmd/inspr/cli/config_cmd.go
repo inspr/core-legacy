@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -14,8 +15,9 @@ import (
 // NewConfigChangeCmd - responsible for changing the values of the inspr's viper config
 func NewConfigChangeCmd() *cobra.Command {
 	return cmd.NewCmd("config").
-		WithDescription("Can change the values stored in the inspr config").
+		WithDescription("Change the values stored in the inspr config").
 		WithExample("How to use", "config <key> <value>").
+		WithExample("Changing scope config", "config scope app1.app2").
 		AddSubCommand(NewListConfig()).
 		ExactArgs(2, doConfigChange)
 }
@@ -23,7 +25,7 @@ func NewConfigChangeCmd() *cobra.Command {
 // NewListConfig - config subcommand that shows all existant variables in the config
 func NewListConfig() *cobra.Command {
 	return cmd.NewCmd("list").
-		WithDescription("To see the list of configuration variables existant").
+		WithDescription("See the list of configuration variables and their current values").
 		WithExample("type", "config list").
 		NoArgs(doListConfig)
 }
@@ -34,10 +36,9 @@ func doConfigChange(_ context.Context, out io.Writer, args []string) error {
 
 	// key doesn't exist
 	if !cliutils.ExistsKey(key) {
-		errMsg := "key inserted does not exist in the inspr config"
+		errMsg := "error: key inserted does not exist in the inspr config"
 		fmt.Fprintln(out, errMsg)
-		fmt.Fprintln(out, "existing keys")
-		fmt.Fprintln(out, cliutils.ExistingKeys())
+		printExistingKeys(out)
 		return ierrors.NewError().Message(errMsg).Build()
 	}
 
@@ -46,10 +47,20 @@ func doConfigChange(_ context.Context, out io.Writer, args []string) error {
 		return err
 	}
 
+	fmt.Fprintf(out, "Success: inspr config [%v] changed to '%v'\n", key, value)
 	return nil
 }
 
 func doListConfig(_ context.Context, out io.Writer) error {
-	fmt.Fprintln(out, cliutils.ExistingKeys())
+	printExistingKeys(out)
 	return nil
+}
+
+func printExistingKeys(out io.Writer) {
+	fmt.Fprintln(out, "Available configurations: ")
+	for _, key := range cliutils.ExistingKeys() {
+		value := viper.Get(key)
+		value = "\"" + value.(string) + "\""
+		fmt.Fprintf(out, "- %v: %v\n", key, value)
+	}
 }
