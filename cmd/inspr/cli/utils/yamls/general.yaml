@@ -6,9 +6,7 @@ spec:
   channeltypes:
     ct1:
       schema: '{"type":"string"}'
-    ct2:
-      schema: '{"type":"string"}'
-  
+
   channels:
     ch1:
       spec:
@@ -18,19 +16,23 @@ spec:
         type: "ct1"
          
   apps:
+    # number generators
     generator:
       meta:
         name: "generator"
       spec:
         node:
-          image: gcr.io/red-inspr/generator
-        replicas: 3
-        env:
-          MODULE: 100
-        boundary:
-          output:
-            - "ch1"
-    filter: # filters primes
+          meta:
+            name: "node-number-generator"
+            parent: "number-generator"
+          spec:
+            image: gcr.io/red-inspr/generator
+            replicas: 3
+            environment:
+              MODULE: 100
+
+    # filters primes
+    filter: 
       meta:
         name: "filter-primes"
       spec:
@@ -43,7 +45,19 @@ spec:
             - "ch1"
           output:
             - "ch2"
-    print: # prints the filtered
+        
+        node:
+          meta:
+            name: "node-number-generator"
+            parent: "number-generator"
+          spec:
+            image: ...
+            replicas: 3
+            environment:
+              teste_env: "test"
+
+    # prints the filtered
+    print: 
       meta:
         name: "printer-primes"
       spec:
