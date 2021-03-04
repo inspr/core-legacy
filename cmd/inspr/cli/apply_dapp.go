@@ -15,8 +15,8 @@ import (
 // NewApplyApp receives a controller AppInterface and calls it's methods
 // depending on the flags values
 func NewApplyApp() RunMethod {
-	c := cliutils.GetCliClient().Apps()
 	return func(data []byte, out io.Writer) error {
+		c := cliutils.GetCliClient().Apps()
 		// unmarshal into an app
 		app, err := utils.YamlToApp(data)
 		if err != nil {

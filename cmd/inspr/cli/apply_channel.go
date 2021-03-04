@@ -14,8 +14,8 @@ import (
 // NewApplyChannel receives a controller ChannelInterface and calls it's methods
 // depending on the flags values
 func NewApplyChannel() RunMethod {
-	c := cliutils.GetCliClient().Channels()
 	return func(data []byte, out io.Writer) error {
+		c := cliutils.GetCliClient().Channels()
 		// unmarshal into a channel
 		channel, err := utils.YamlToChannel(data)
 		if err != nil {
