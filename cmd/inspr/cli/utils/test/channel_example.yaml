@@ -1,7 +1,7 @@
 apiVersion: "v1"
 kind: "channel"
 meta:
-  parent: "HelloWorld"
-  name: "channel"
+  parent: ""
+  name: "ch1"
 spec:
-  type: "ChannelTypeHello"
+  type: "ct1"

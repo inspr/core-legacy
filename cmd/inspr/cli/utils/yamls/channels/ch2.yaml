@@ -1,0 +1,11 @@
+apiVersion: "v1"
+kind: "channel"
+meta:
+  name: "ch2"
+  reference: ""
+  Annotations: 
+    -a: "a"
+  parent: ""
+  sha256: "sha256"
+spec:
+  type: "ct2"

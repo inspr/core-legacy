@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: dapp
+meta:
+  name: "number-generator"
+spec:
+  channels:
+    ch1:
+      meta:
+        name: "num-gen-ch"
+        reference: ""
+        parent: ""
+      spec:
+        type: "ct1"
+
+  node:
+    meta:
+      name: "node-number-generator"
+      parent: "number-generator"
+    spec:
+      image: ...
+      replicas: 3
+      environment:
+        teste_env: "test"
+  
+  boundary:
+    output:
+      - ch1

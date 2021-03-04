@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: dapp
+meta:
+  name: "basic-example"
+spec:
+  channeltypes:
+    ct1:
+      schema: '{"type":"string"}'
+    ct2:
+      schema: '{"type":"string"}'
+  
+  channels:
+    ch1:
+      spec:
+        type: "ct1"
+    ch2:
+      spec:
+        type: "ct1"
+         
+  apps:
+    generator:
+      meta:
+        name: "generator"
+      spec:
+        node:
+          image: gcr.io/red-inspr/generator
+        replicas: 3
+        env:
+          MODULE: 100
+        boundary:
+          output:
+            - "ch1"
+    filter: # filters primes
+      meta:
+        name: "filter-primes"
+      spec:
+        node:                
+          image: gcr.io/red-inspr/primes-fiter
+          replicas: 3 
+
+        boundary:
+          input:
+            - "ch1"
+          output:
+            - "ch2"
+    print: # prints the filtered
+      meta:
+        name: "printer-primes"
+      spec:
+        node:
+          image: gcr.io/red-inspr/primes-printer
+        boundary:
+          input:
+            - "ch2"                
