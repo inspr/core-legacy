@@ -57,7 +57,7 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			return
 		}
 
-		channel, _ := ch.mem.Channels().Get(data.Ctx, data.Channel.Meta.Name)
+		channel, _ := ch.mem.Root().Channels().Get(data.Ctx, data.Channel.Meta.Name)
 		err = ch.op.Channels().Create(context.Background(), data.Ctx, channel)
 
 		if err != nil {
@@ -86,7 +86,7 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 		ch.mem.InitTransaction()
 		defer ch.mem.Cancel()
 
-		channel, err := ch.mem.Channels().Get(data.Ctx, data.ChName)
+		channel, err := ch.mem.Root().Channels().Get(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -125,7 +125,7 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			return
 		}
 
-		channel, _ := ch.mem.Channels().Get(data.Ctx, data.Channel.Meta.Name)
+		channel, _ := ch.mem.Root().Channels().Get(data.Ctx, data.Channel.Meta.Name)
 		err = ch.op.Channels().Update(context.Background(), data.Ctx, channel)
 
 		if err != nil {

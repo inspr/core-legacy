@@ -1,7 +1,10 @@
 package kafka
 
 import (
+	"os"
+
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/fake"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/kafka/channels"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/kafka/nodes"
 )
@@ -14,7 +17,7 @@ import (
 // KAFKA_OFFSET_RESET - tells the operators and sidecars what that configuration should be when creating
 // readers and writers
 type Operator struct {
-	channels *channels.ChannelOperator
+	channels operators.ChannelOperatorInterface
 	nodes    *nodes.NodeOperator
 }
 
@@ -32,11 +35,16 @@ func (op *Operator) Channels() operators.ChannelOperatorInterface {
 //
 // View Operator
 func NewKafkaOperator() (operators.OperatorInterface, error) {
-	chOp, err := channels.NewOperator()
-	if err != nil {
-		return nil, err
+	var err error
+	var chOp operators.ChannelOperatorInterface
+	if _, ok := os.LookupEnv("DEBUG"); !ok {
+		chOp, err = channels.NewOperator()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		chOp = fake.NewFakeOperator().Channels()
 	}
-
 	nOp, err := nodes.NewOperator()
 	if err != nil {
 		return nil, err

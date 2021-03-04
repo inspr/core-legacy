@@ -5,7 +5,6 @@ import (
 	"io"
 	"text/tabwriter"
 
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
@@ -58,6 +57,7 @@ type Change struct {
 	Diff      []Difference `json:"diff"`
 	Kind      Kind
 	Operation Operation
+	changelog *Changelog
 }
 
 //Changelog log of all changes between two app trees.
@@ -87,13 +87,11 @@ func (cl Changelog) Print(out io.Writer) {
 	}
 }
 
-func (cl Changelog) diff(appOrig *meta.App, appCurr *meta.App, ctx string) (Changelog, error) {
-	if ctx == "" {
-		ctx = "*"
-	}
+func (cl *Changelog) diff(appOrig *meta.App, appCurr *meta.App, ctx string) (Changelog, error) {
 
 	change := Change{
-		Context: ctx,
+		Context:   ctx,
+		changelog: cl,
 	}
 
 	err := change.diffMetadata(appOrig.Meta.Name, AppKind, appOrig.Meta, appCurr.Meta, "")
@@ -102,7 +100,7 @@ func (cl Changelog) diff(appOrig *meta.App, appCurr *meta.App, ctx string) (Chan
 	}
 
 	if appCurr.Meta.Name != "" {
-		change.Context = fmt.Sprintf("%s.%s", change.Context, appCurr.Meta.Name)
+		change.Context, _ = utils.JoinScopes(ctx, appOrig.Meta.Name)
 	}
 
 	err = change.diffAppSpec(appOrig.Spec, appCurr.Spec)
@@ -111,21 +109,9 @@ func (cl Changelog) diff(appOrig *meta.App, appCurr *meta.App, ctx string) (Chan
 	}
 
 	if len(change.Diff) > 0 {
-		cl = append(cl, change)
+		*cl = append(*cl, change)
 	}
-
-	set := utils.AppIntersecSet(appOrig.Spec.Apps, appCurr.Spec.Apps)
-	for k := range set {
-		newOrig := appOrig.Spec.Apps[k]
-		newCurr := appCurr.Spec.Apps[k]
-
-		cl, err = cl.diff(newOrig, newCurr, change.Context+".Spec.Apps")
-		if err != nil {
-			return Changelog{}, err
-		}
-	}
-
-	return cl, nil
+	return *cl, nil
 }
 
 func (change *Change) diffAppSpec(specOrig meta.AppSpec, specCurr meta.AppSpec) error {
@@ -228,7 +214,6 @@ func (change *Change) diffBoudaries(boundOrig meta.AppBoundary, boundCurr meta.A
 		change.Kind |= BoundaryKind
 		change.Operation |= op
 	}
-
 }
 
 func (change *Change) diffApps(appsOrig utils.MApps, appsCurr utils.MApps) {
@@ -247,6 +232,8 @@ func (change *Change) diffApps(appsOrig utils.MApps, appsCurr utils.MApps) {
 		} else {
 			to = "{...}"
 			op = Create
+			newScope, _ := utils.JoinScopes(change.Context, k)
+			*change.changelog, _ = change.changelog.diff(&meta.App{}, appsCurr[k], newScope)
 		}
 
 		change.Diff = append(change.Diff, Difference{
@@ -260,6 +247,17 @@ func (change *Change) diffApps(appsOrig utils.MApps, appsCurr utils.MApps) {
 		change.Kind |= AppKind
 		change.Operation |= op
 	}
+
+	intersection := utils.AppIntersecSet(appsOrig, appsCurr)
+
+	for app := range intersection {
+		from := appsOrig[app]
+		to := appsCurr[app]
+
+		newScope, _ := utils.JoinScopes(change.Context, from.Meta.Name)
+		change.changelog.diff(from, to, newScope)
+	}
+
 }
 
 func (change *Change) diffChannels(chOrig utils.MChannels, chCurr utils.MChannels) error {
@@ -380,7 +378,6 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, metaOr
 	var errs string
 
 	if metaOrig.Name != metaCurr.Name {
-		errs += fmt.Sprintf("on %s Metadata: Different name", ctx)
 		change.Diff = append(change.Diff, Difference{
 			Field:     ctx + "Meta.Name",
 			From:      metaOrig.Name,
@@ -462,8 +459,5 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, metaOr
 		change.Operation |= op
 	}
 
-	if errs != "" {
-		return ierrors.NewError().InvalidApp().Message(errs).Build()
-	}
 	return nil
 }

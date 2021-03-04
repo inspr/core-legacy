@@ -1,5 +1,7 @@
 package diff
 
+import "strings"
+
 // FilterDiffsByKind filters the changelog by changes of a spefific kind or combination of kinds.
 // To use a combination, just bitwise or the different kinds, so, if you want the changes on channels and
 // apps, use
@@ -14,6 +16,10 @@ func (c Changelog) FilterDiffsByKind(kind Kind) Changelog {
 // ForEach applies a function on each change of the changelog
 func (c Changelog) ForEach(f func(c Change)) {
 	for _, change := range c {
+		change.Context = strings.Replace(change.Context, "*.", "", 0)
+		if change.Context == "*" {
+			change.Context = ""
+		}
 		f(change)
 	}
 }
@@ -22,6 +28,10 @@ func (c Changelog) ForEach(f func(c Change)) {
 func (c Changelog) FilterDiffs(comp func(c string, d Difference) bool) Changelog {
 	newChangelog := Changelog{}
 	for _, change := range c {
+		change.Context = strings.Replace(change.Context, "*.", "", 0)
+		if change.Context == "*" {
+			change.Context = ""
+		}
 		hasAdded := false
 		for _, d := range change.Diff {
 			if comp(change.Context, d) {
@@ -74,6 +84,10 @@ func NewDifferenceOperation(filter func(scope string, d Difference) bool, apply 
 // is applied on each diff in the changelog.
 func (c Changelog) ForEachDiffFiltered(operations ...DifferenceOperation) {
 	for _, change := range c {
+		change.Context = strings.Replace(change.Context, "*.", "", 0)
+		if change.Context == "*" {
+			change.Context = ""
+		}
 		for _, d := range change.Diff {
 			for _, filter := range operations {
 				if filter.filter(change.Context, d) {
@@ -140,6 +154,10 @@ func (c Change) FilterKind(kind Kind) Change {
 // is applied on each change in the changelog.
 func (c Changelog) ForEachFiltered(operations ...ChangeOperation) {
 	for _, change := range c {
+		change.Context = strings.Replace(change.Context, "*.", "", 0)
+		if change.Context == "*" {
+			change.Context = ""
+		}
 		for _, op := range operations {
 			if op.filter(change) {
 				op.apply(change)

@@ -2,6 +2,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -16,14 +17,16 @@ type NodeOperator struct {
 
 // NewNodeOperator returns a mocked node operator that returns err on every function if err is not nil
 func NewNodeOperator(err error) operators.NodeOperatorInterface {
-	return NodeOperator{
+	return &NodeOperator{
 		nodes: make(map[string]*meta.App),
 		err:   err,
 	}
 }
 
 // CreateNode mock
-func (o NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (o *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+	fmt.Println(app.Meta.Parent, app.Meta.Name)
+
 	if o.err != nil {
 		return nil, o.err
 	}
@@ -35,7 +38,7 @@ func (o NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node
 }
 
 // GetNode mock
-func (o NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (o *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	if o.err != nil {
 		return nil, o.err
 	}
@@ -47,7 +50,7 @@ func (o NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, e
 }
 
 // UpdateNode mock
-func (o NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (o *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	if o.err != nil {
 		return nil, o.err
 	}
@@ -59,20 +62,22 @@ func (o NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node
 }
 
 // DeleteNode mock
-func (o NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
+func (o *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
+	fmt.Println(nodeContext, nodeName)
 	if o.err != nil {
 		return o.err
 	}
 	_, ok := o.nodes[nodeContext+nodeName]
 	if !ok {
-		return ierrors.NewError().NotFound().Message("node not found").Build()
+		fmt.Println(o.nodes)
+		return ierrors.NewError().NotFound().Message(fmt.Sprintf("node %s not found", nodeContext+nodeName)).Build()
 	}
 	delete(o.nodes, nodeContext+nodeName)
 	return nil
 }
 
 // GetAllNodes mock
-func (o NodeOperator) GetAllNodes() (ret []meta.Node) {
+func (o *NodeOperator) GetAllNodes() (ret []meta.Node) {
 
 	for _, app := range o.nodes {
 		ret = append(ret, app.Spec.Node)

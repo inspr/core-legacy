@@ -2,6 +2,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
@@ -25,11 +26,12 @@ func NewChannelOperator(err error) operators.ChannelOperatorInterface {
 
 // Create mock
 func (o ChannelOperator) Create(ctx context.Context, context string, ch *meta.Channel) error {
+	fmt.Println(ch.Meta.Name)
 	if o.err != nil {
 		return o.err
 	}
 	if _, ok := o.channels[context+ch.Meta.Name]; ok {
-		return ierrors.NewError().AlreadyExists().Message("node already exists").Build()
+		return ierrors.NewError().AlreadyExists().Message("channel already exists").Build()
 	}
 	o.channels[context+ch.Meta.Name] = ch
 	return nil
@@ -42,7 +44,7 @@ func (o ChannelOperator) Get(ctx context.Context, context string, name string) (
 	}
 	ch, ok := o.channels[context+name]
 	if !ok {
-		return nil, ierrors.NewError().NotFound().Message("node not found").Build()
+		return nil, ierrors.NewError().NotFound().Message("channel not found").Build()
 	}
 	return ch, nil
 }
@@ -53,7 +55,7 @@ func (o ChannelOperator) Update(ctx context.Context, context string, ch *meta.Ch
 		return o.err
 	}
 	if _, ok := o.channels[context+ch.Meta.Name]; !ok {
-		return ierrors.NewError().NotFound().Message("node not found").Build()
+		return ierrors.NewError().NotFound().Message("channel not found").Build()
 	}
 	o.channels[context+ch.Meta.Name] = ch
 	return nil
@@ -66,7 +68,7 @@ func (o ChannelOperator) Delete(ctx context.Context, context string, name string
 	}
 	_, ok := o.channels[context+name]
 	if !ok {
-		return ierrors.NewError().NotFound().Message("node not found").Build()
+		return ierrors.NewError().NotFound().Message("channel not found").Build()
 	}
 	delete(o.channels, context+name)
 	return nil

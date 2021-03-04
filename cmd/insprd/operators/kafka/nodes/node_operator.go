@@ -3,7 +3,7 @@ package nodes
 import (
 	"context"
 	"fmt"
-	"strings"
+	"os"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
@@ -14,6 +14,7 @@ import (
 	kubeApp "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/fake"
 	v1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 )
 
@@ -32,7 +33,7 @@ func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
 func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	kube := no.retrieveKube()
 	insprEnv := environment.GetInsprEnvironment()
-	nodeName := parseNodeName(insprEnv, app.Meta.Parent, app.Spec.Node.Meta.Name)
+	nodeName := parseNodeName(insprEnv, app.Meta.Parent, app.Meta.Name)
 	dep, err := kube.Get(nodeName, metav1.GetOptions{})
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message("could't get deployment from kubernetes").InnerError(err).Build()
@@ -87,7 +88,8 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
 	var deploy string
 	kube := no.retrieveKube()
-	deploy = parseNodeName(getK8SVariables().AppsNamespace, nodeContext, nodeName)
+	deploy = parseNodeName(environment.GetInsprEnvironment(), nodeContext, nodeName)
+	fmt.Println(deploy)
 	err := kube.Delete(deploy, &metav1.DeleteOptions{})
 
 	if err != nil {
@@ -109,25 +111,30 @@ func (no *NodeOperator) GetAllNodes() []meta.Node {
 }
 
 func parseNodeName(insprEnv string, context string, name string) string {
-	s := fmt.Sprintf("%s.%s.%s", insprEnv, context, name)
-	if s[0] == '.' {
-		s = s[1:]
+	var s string
+	if insprEnv == "" {
+		s = fmt.Sprintf("inspr-%s-%s", context, name)
+	} else {
+		s = fmt.Sprintf("inspr-%s-%s-%s", insprEnv, context, name)
 	}
-	return strings.ToLower(s)
+	return s
 }
 
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration
 func NewOperator() (nop *NodeOperator, err error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, err
-	}
-
 	nop = &NodeOperator{}
+	if _, exists := os.LookupEnv("DEBUG"); exists {
+		nop.clientSet = fake.NewSimpleClientset()
+	} else {
+		config, err := rest.InClusterConfig()
+		if err != nil {
+			return nil, err
+		}
 
-	nop.clientSet, err = kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, err
+		nop.clientSet, err = kubernetes.NewForConfig(config)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return nop, nil
 }

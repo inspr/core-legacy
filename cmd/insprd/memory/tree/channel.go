@@ -139,3 +139,28 @@ func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel)
 
 	return nil
 }
+
+type ChannelRootGetter struct {
+	tree *meta.Channel
+}
+
+// Get receives a query string (format = 'x.y.z') and iterates through the
+// memory tree until it finds the dChannel which name is equal to the last query element.
+// The tree Channel is returned if the query string is an empty string.
+// If the specified dChannel is found, it is returned. Otherwise, returns an error.
+func (amm *ChannelRootGetter) Get(context string, name string) (*meta.Channel, error) {
+	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
+	if err != nil {
+		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel was not found because the app context has an error").Build()
+		return nil, newError
+	}
+
+	if parentApp.Spec.Channels != nil {
+		if ch, ok := parentApp.Spec.Channels[name]; ok {
+			return ch, nil
+		}
+	}
+
+	newError := ierrors.NewError().NotFound().Message("channel not found").Build()
+	return nil, newError
+}

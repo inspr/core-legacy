@@ -210,8 +210,8 @@ func TestNewAppHandler(t *testing.T) {
 				memManager: fake.MockMemoryManager(nil),
 			},
 			want: &AppHandler{
-				AppMemory: fake.MockMemoryManager(nil).Apps(),
-				op:        ofake.NewFakeOperator(),
+				mem: fake.MockMemoryManager(nil),
+				op:  ofake.NewFakeOperator(),
 			},
 		},
 	}

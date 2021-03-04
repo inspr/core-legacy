@@ -78,7 +78,7 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 		cth.mem.InitTransaction()
 		defer cth.mem.Cancel()
 
-		channelType, err := cth.mem.ChannelTypes().Get(data.Ctx, data.CtName)
+		channelType, err := cth.mem.Root().ChannelTypes().Get(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -122,7 +122,7 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 
 		if !data.DryRun {
 			var errs string
-			ct, _ := cth.mem.ChannelTypes().Get(data.Ctx, data.ChannelType.Meta.Name)
+			ct, _ := cth.mem.Root().ChannelTypes().Get(data.Ctx, data.ChannelType.Meta.Name)
 			for _, chName := range ct.ConnectedChannels {
 				ch, _ := cth.mem.Channels().Get(data.Ctx, chName)
 				err = cth.op.Channels().Update(context.Background(), data.Ctx, ch)

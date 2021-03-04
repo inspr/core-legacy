@@ -26,9 +26,18 @@ func getEnv() (env kafkaEnv) {
 
 // NewOperator returns an initialized operator from the environment variables
 func NewOperator() (*ChannelOperator, error) {
-	adminClient, err := kafka.NewAdminClient(&kafka.ConfigMap{
-		"bootstrap.servers": getEnv().kafkaBootstrapServers,
-	})
+	var config *kafka.ConfigMap
+	if _, exists := os.LookupEnv("DEBUG"); exists {
+		config = &kafka.ConfigMap{
+			"bootstrap.servers":       getEnv().kafkaBootstrapServers,
+			"test.mock.num.brokers=3": "true",
+		}
+	} else {
+		config = &kafka.ConfigMap{
+			"bootstrap.servers": getEnv().kafkaBootstrapServers,
+		}
+	}
+	adminClient, err := kafka.NewAdminClient(config)
 	if err != nil {
 		return nil, err
 	}

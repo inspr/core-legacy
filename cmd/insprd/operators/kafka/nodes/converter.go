@@ -1,6 +1,7 @@
 package nodes
 
 import (
+	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
@@ -160,18 +161,18 @@ func intToint32(v int) *int32 {
 func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 	var err error
 	node := meta.Node{}
+	fmt.Println(kdep.ObjectMeta.Name)
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
 	if err != nil {
 		return meta.Node{}, err
 	}
-	node.Spec.Replicas = int(*kdep.Spec.Replicas)
 	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
 	node.Spec.Environment = utils.ParseFromK8sEnviroment(kdep.Spec.Template.Spec.Containers[0].Env)
 	return node, nil
 }
 
 func toNodeName(deployName string) (string, error) {
-	strs := strings.Split(deployName, ".")
+	strs := strings.Split(deployName, "-")
 	if len(strs) < 3 {
 		return "", ierrors.NewError().Message("invalid deployment name").Build()
 	}

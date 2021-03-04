@@ -7,8 +7,8 @@ import (
 
 // Operator mock
 type Operator struct {
-	nodes    NodeOperator
-	channels ChannelOperator
+	nodes    *NodeOperator
+	channels *ChannelOperator
 }
 
 // Channels mock
@@ -24,10 +24,10 @@ func (f *Operator) Nodes() operators.NodeOperatorInterface {
 // NewFakeOperator creates a simple operator that only acts in memory
 func NewFakeOperator() operators.OperatorInterface {
 	return &Operator{
-		nodes: NodeOperator{
+		nodes: &NodeOperator{
 			nodes: make(map[string]*meta.App),
 		},
-		channels: ChannelOperator{
+		channels: &ChannelOperator{
 			channels: make(map[string]*meta.Channel),
 		},
 	}

@@ -6,7 +6,21 @@ variables:
   REPO_NAME: gitlab.inspr.dev/inspr/core
 
 stages:
+  - build
   - test
+  - deploy
+
+build-cli:
+  stage: build
+  script:
+    - bash build-cli.sh
+  only:
+    - develop
+    - tags
+  artifacts:
+    paths:
+      - bin/*
+    expire_in: 30 days
 
 
 unit-tests:
@@ -21,3 +35,11 @@ lint:
   script:
     - go get -u golang.org/x/lint/golint
     - golint --set_exit_status ./...
+
+
+release-cli:
+  stage: deploy
+  script:
+    bash .gitlab/scripts/release-cli.sh # get the built CLI, push it to gcloud or something, create a release on gitlab that contains the build CLIs
+  only:
+    - tags

@@ -63,6 +63,7 @@ type Manager interface {
 	Apps() AppMemory
 	Channels() ChannelMemory
 	ChannelTypes() ChannelTypeMemory
+	Root() GetInterface
 }
 
 // GetInterface is an interface to get components from memory

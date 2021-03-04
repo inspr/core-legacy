@@ -15,6 +15,18 @@ type MemManager struct {
 	app         Apps
 }
 
+type LookupMemManager MemManager
+
+func (l LookupMemManager) Apps() memory.AppGetInterface {
+	return &l.app
+}
+func (l LookupMemManager) Channels() memory.ChannelGetInterface {
+	return &l.channel
+}
+func (l LookupMemManager) ChannelTypes() memory.ChannelTypeGetInterface {
+	return &l.channelType
+}
+
 // MockMemoryManager mock exported with propagated error through the functions
 func MockMemoryManager(failErr error) memory.Manager {
 	return &MemManager{
@@ -31,6 +43,10 @@ func MockMemoryManager(failErr error) memory.Manager {
 			apps: make(map[string]*meta.App),
 		},
 	}
+}
+
+func (mm *MemManager) Root() memory.GetInterface {
+	return (*LookupMemManager)(mm)
 }
 
 // Apps returns manager of DApps

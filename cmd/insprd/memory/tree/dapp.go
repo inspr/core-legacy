@@ -28,13 +28,13 @@ func (tmm *MemoryManager) Apps() memory.AppMemory {
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	if query == "" {
-		return amm.tree, nil
+		return amm.root, nil
 	}
 
 	reference := strings.Split(query, ".")
 	err := ierrors.NewError().NotFound().Message("dApp not found for given query " + query).Build()
 
-	nxtApp := amm.tree
+	nxtApp := amm.root
 	if nxtApp != nil {
 		for _, element := range reference {
 			nxtApp = nxtApp.Spec.Apps[element]
@@ -139,4 +139,34 @@ func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
 	amm.addAppInTree(app, parent)
 
 	return nil
+}
+
+type AppRootGetter struct {
+	tree *meta.App
+}
+
+// Get receives a query string (format = 'x.y.z') and iterates through the
+// memory tree until it finds the dApp which name is equal to the last query element.
+// The tree app is returned if the query string is an empty string.
+// If the specified dApp is found, it is returned. Otherwise, returns an error.
+func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
+	if query == "" {
+		return amm.tree, nil
+	}
+
+	reference := strings.Split(query, ".")
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query " + query).Build()
+
+	nxtApp := amm.tree
+	if nxtApp != nil {
+		for _, element := range reference {
+			nxtApp = nxtApp.Spec.Apps[element]
+			if nxtApp == nil {
+				return nil, err
+			}
+		}
+		return nxtApp, nil
+	}
+
+	return nil, err
 }

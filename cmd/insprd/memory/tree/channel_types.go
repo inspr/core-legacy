@@ -136,3 +136,28 @@ func (ctm *ChannelTypeMemoryManager) UpdateChannelType(context string, ct *meta.
 	parentApp.Spec.ChannelTypes[ct.Meta.Name] = ct
 	return nil
 }
+
+type ChannelTypeRootGetter struct {
+	tree *meta.ChannelType
+}
+
+// Get receives a query string (format = 'x.y.z') and iterates through the
+// memory tree until it finds the dChannelType which name is equal to the last query element.
+// The tree ChannelType is returned if the query string is an empty string.
+// If the specified dChannelType is found, it is returned. Otherwise, returns an error.
+func (amm *ChannelTypeRootGetter) Get(context string, name string) (*meta.ChannelType, error) {
+	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
+	if err != nil {
+		newError := ierrors.NewError().InnerError(err).NotFound().Message("ChannelType was not found because the app context has an error").Build()
+		return nil, newError
+	}
+
+	if parentApp.Spec.ChannelTypes != nil {
+		if ch, ok := parentApp.Spec.ChannelTypes[name]; ok {
+			return ch, nil
+		}
+	}
+
+	newError := ierrors.NewError().NotFound().Message("ChannelType not found").Build()
+	return nil, newError
+}

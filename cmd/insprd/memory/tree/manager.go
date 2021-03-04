@@ -69,3 +69,25 @@ func (mm *MemoryManager) GetTransactionChanges() (diff.Changelog, error) {
 	cl, err := diff.Diff(mm.tree, mm.root)
 	return cl, err
 }
+
+type TreeRootGetter struct {
+	tree *meta.App
+}
+
+func (t *TreeRootGetter) Apps() memory.AppGetInterface {
+	return &AppRootGetter{
+		tree: t.tree,
+	}
+}
+func (t *TreeRootGetter) Channels() memory.ChannelGetInterface {
+	return &ChannelRootGetter{}
+}
+func (t *TreeRootGetter) ChannelTypes() memory.ChannelTypeGetInterface {
+	return &ChannelTypeRootGetter{}
+}
+
+func (mm *MemoryManager) Root() memory.GetInterface {
+	return &TreeRootGetter{
+		tree: mm.tree,
+	}
+}

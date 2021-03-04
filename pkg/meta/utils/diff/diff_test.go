@@ -155,6 +155,25 @@ func TestChange_diffAppSpec(t *testing.T) {
 			},
 			want: Change{},
 		},
+		{
+			name:   "Uchanged Specs",
+			fields: fields{},
+			args: args{
+				specOrig: meta.AppSpec{},
+				specCurr: meta.AppSpec{
+					Apps: map[string]*meta.App{
+						"app1": {
+							Spec: meta.AppSpec{
+								Apps: map[string]*meta.App{
+									"app1": {},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: Change{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
