@@ -3,15 +3,6 @@ kind: dapp
 meta:
   name: "num-printer"
 spec:
-  channels:
-    ch1:
-      meta:
-        name: "printer-ch"
-        reference: ""
-        parent: ""
-      spec:
-        type: "ct1"
-
   node:
     meta:
       name: "node-primes"

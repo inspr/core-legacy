@@ -3,22 +3,6 @@ kind: dapp
 meta:
   name: "primes"
 spec:
-  channels:
-    ch1:
-      meta:
-        name: "primes-ch-in"
-        reference: ""
-        parent: ""
-      spec:
-        type: "ct1"
-    ch2:
-      meta:
-        name: "primes-ch-out"
-        reference: ""
-        parent: ""
-      spec:
-        type: "ct1"
-
   node:
     meta:
       name: "node-primes"

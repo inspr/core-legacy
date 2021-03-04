@@ -2,16 +2,9 @@ apiVersion: v1
 kind: dapp
 meta:
   name: "number-generator"
+  reference: ""
+  parent: ""
 spec:
-  channels:
-    ch1:
-      meta:
-        name: "num-gen-ch"
-        reference: ""
-        parent: ""
-      spec:
-        type: "ct1"
-
   node:
     meta:
       name: "node-number-generator"
