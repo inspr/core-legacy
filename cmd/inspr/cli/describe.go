@@ -3,9 +3,9 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/spf13/cobra"
+
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -58,8 +58,9 @@ func NewDescribeCmd() *cobra.Command {
 	return describeCmd
 }
 
-func displayAppState(_ context.Context, out io.Writer, args []string) error {
-	client := cliutils.GetClient()
+func displayAppState(_ context.Context, args []string) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
 
 	scope, err := cliutils.GetScope()
 	if err != nil {
@@ -88,8 +89,10 @@ func displayAppState(_ context.Context, out io.Writer, args []string) error {
 	return nil
 }
 
-func displayChannelState(_ context.Context, out io.Writer, args []string) error {
-	client := cliutils.GetClient()
+func displayChannelState(_ context.Context, args []string) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+
 	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
@@ -110,8 +113,10 @@ func displayChannelState(_ context.Context, out io.Writer, args []string) error 
 	return nil
 }
 
-func displayChannelTypeState(_ context.Context, out io.Writer, args []string) error {
-	client := cliutils.GetClient()
+func displayChannelTypeState(_ context.Context, args []string) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+
 	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err

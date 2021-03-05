@@ -5,7 +5,6 @@ import (
 
 	"github.com/spf13/cobra"
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 )
 
 func TestNewDescribeCmd(t *testing.T) {
@@ -27,30 +26,6 @@ func TestNewDescribeCmd(t *testing.T) {
 			got := NewDescribeCmd()
 			if tt.checkFunctiom != nil {
 				tt.checkFunctiom(t, got)
-			}
-		})
-	}
-}
-
-func Test_getClient(t *testing.T) {
-	tests := []struct {
-		name          string
-		checkFunction func(t *testing.T, got *client.Client)
-	}{
-		{
-			name: "It should return a controller client",
-			checkFunction: func(t *testing.T, got *client.Client) {
-				if got == nil {
-					t.Errorf("getClient() = nil")
-				}
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := cliutils.GetClient()
-			if tt.checkFunction != nil {
-				tt.checkFunction(t, got)
 			}
 		})
 	}
