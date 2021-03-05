@@ -20,7 +20,7 @@ build-cli:
       - tags
   artifacts:
     paths:
-      - bin/*
+      - bin/
     expire_in: 30 days
 
 unit-tests:
