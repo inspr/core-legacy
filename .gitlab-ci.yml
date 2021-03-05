@@ -40,7 +40,7 @@ release-cli:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - bash .gitlab/scripts/releasecli.sh
+    - sh .gitlab/scripts/releasecli.sh
   only:
     - tags
   after_script:
