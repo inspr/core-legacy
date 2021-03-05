@@ -103,6 +103,13 @@ func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	}
 
 	appLabels := map[string]string{"app": appDeployName}
+	replicas := new(int32)
+
+	if app.Spec.Node.Spec.Replicas == 0 {
+		app.Spec.Node.Spec.Replicas = 1
+	}
+
+	*replicas = int32(app.Spec.Node.Spec.Replicas)
 
 	return &kubeApp.Deployment{
 		ObjectMeta: kubeMeta.ObjectMeta{
@@ -125,6 +132,7 @@ func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 					},
 				},
 			},
+			Replicas: replicas,
 		},
 	}
 }

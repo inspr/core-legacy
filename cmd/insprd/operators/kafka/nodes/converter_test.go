@@ -68,6 +68,8 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 		app *meta.App
 	}
 
+	replicasHelper := int32(testApp.Spec.Node.Spec.Replicas)
+
 	tests := []struct {
 		name string
 		args args
@@ -87,6 +89,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 							"app": appDeployName,
 						},
 					},
+					Replicas: &replicasHelper,
 					Template: kubeCore.PodTemplateSpec{
 
 						ObjectMeta: kubeMeta.ObjectMeta{
