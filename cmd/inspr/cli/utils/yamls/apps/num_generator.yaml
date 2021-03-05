@@ -13,7 +13,7 @@ spec:
       image: gcr.io/red-inspr/generator
       replicas: 3
       environment:
-        teste_env: "test"
+        MODULE: 100
   
   boundary:
     output:
