@@ -30,11 +30,13 @@ func main() {
 
 	// sets up client for sidecar
 	c := dappclient.NewAppClient()
+	// channelName
+	chName := "ch1"
 
 	for {
 		select {
 		case <-ticker.C:
-			c.WriteMessage(context.Background(), "ch1", models.Message{
+			c.WriteMessage(context.Background(), chName, models.Message{
 				Data: (rand.Int() % mod),
 			})
 		}
