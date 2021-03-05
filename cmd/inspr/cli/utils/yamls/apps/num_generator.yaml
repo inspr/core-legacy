@@ -10,7 +10,7 @@ spec:
       name: "node-number-generator"
       parent: "number-generator"
     spec:
-      image: ...
+      image: gcr.io/red-inspr/generator
       replicas: 3
       environment:
         teste_env: "test"
