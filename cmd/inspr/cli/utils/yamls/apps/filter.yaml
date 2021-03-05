@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: dapp
 meta:
-  name: "primes"
+  name: "filter"
 spec:
   node:
     meta:
-      name: "node-primes"
+      name: "node-filter"
       parent: ""
     spec:
-      image: gcr.io/red-inspr/primes-filter
+      image: gcr.io/red-inspr/examples/primes/filter
       replicas: 3
       environment:
         teste_env: "test"

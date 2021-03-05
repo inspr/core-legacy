@@ -4,9 +4,8 @@ meta:
   name: "ch2"
   reference: ""
   Annotations: 
-    -a: "a"
-  parent: ""
-  sha256: "sha256"
+    mock: "mock"
+  parent: ""  
 spec:
   type: "ct2"
   

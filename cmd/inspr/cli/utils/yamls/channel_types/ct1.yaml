@@ -3,6 +3,5 @@ kind: "channeltype"
 meta:
   name: "ct1"
   reference: ""
-  parent: ""
-  sha256: "sha256"
+  parent: ""  
 schema: '{"type":"int"}'
