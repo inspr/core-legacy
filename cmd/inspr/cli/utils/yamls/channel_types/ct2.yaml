@@ -5,4 +5,4 @@ meta:
   reference: ""
   parent: ""
   sha256: "sha256"
-schema: '{"type":"string"}'
+schema: '{"type":"int"}'

@@ -5,7 +5,7 @@ meta:
 spec:
   channeltypes:
     ct1:
-      schema: '{"type":"string"}'
+      schema: '{"type":"int"}'
 
   channels:
     ch1:
