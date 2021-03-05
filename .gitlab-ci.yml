@@ -8,7 +8,7 @@ variables:
 stages:
   - build
   - test
-  - deploy
+  - release
 
 build-cli:
   stage: build
@@ -36,11 +36,11 @@ lint:
     - go get -u golang.org/x/lint/golint
     - golint --set_exit_status ./...
 
-deploy-cli:
-  stage: deploy
+release-cli:
+  stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - bash .gitlab/scripts/deploycli.sh
+    - bash .gitlab/scripts/releasecli.sh
   only:
     - tags
   after_script:
