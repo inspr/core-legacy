@@ -1,7 +1,5 @@
-VERSION=$(git describe --always)
+VERSION=$1
 BASE_URL="https://console.cloud.google.com/storage/browser/inspr-cli/bin"
-
-gsutil rsync bin gs://inspr-cli/$VERSION
 
 release-cli create --name "Release $VERSION" \
         --tag-name $VERSION \

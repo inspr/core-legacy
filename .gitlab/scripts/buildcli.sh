@@ -1,5 +1,5 @@
 #/bin/bash
-VERSION=$(git describe --always)
+VERSION=$1
 mkdir bin
 
 echo "Building CLI for Linux"
@@ -13,3 +13,4 @@ GOOS=windows GOARCH=386 go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./b
 echo "Building CLI for Mac"
 CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./bin/insprcli-darwin-amd64-$VERSION ./cmd/inspr
 
+gsutil rsync bin gs://inspr-cli/$VERSION
