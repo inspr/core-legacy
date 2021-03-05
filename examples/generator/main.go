@@ -1,13 +1,14 @@
 package main
 
 import (
-	"log"
+	"context"
 	"math/rand"
 	"os"
 	"strconv"
 	"time"
 
-	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
+	dappclient "gitlab.inspr.dev/inspr/core/pkg/client"
+	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
 
 const defaultMOD = 100
@@ -28,15 +29,14 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	// sets up client for sidecar
-	writer, err := kafkasc.NewWriter(false)
-	if err != nil {
-		log.Fatal(err)
-	}
+	c := dappclient.NewAppClient()
 
 	for {
 		select {
 		case <-ticker.C:
-			writer.WriteMessage("ch1", (rand.Int() % mod))
+			c.WriteMessage(context.Background(), "ch1", models.Message{
+				Data: (rand.Int() % mod),
+			})
 		}
 	}
 }
