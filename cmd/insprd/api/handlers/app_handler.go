@@ -25,8 +25,6 @@ func NewAppHandler(memManager memory.Manager) *AppHandler {
 // func to manage the http request
 func (ah *AppHandler) HandleCreateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.AppDI{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -60,8 +58,6 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 // func to manage the http request
 func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -88,8 +84,6 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 // func to manage the http request
 func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.AppDI{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -122,8 +116,6 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 // func to manage the http request
 func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 

@@ -25,8 +25,6 @@ func NewChannelHandler(memManager memory.Manager) *ChannelHandler {
 // manages the creation of a channel
 func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.ChannelDI{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -60,8 +58,6 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 // a channel by the reference given
 func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.ChannelQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -88,8 +84,6 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 // updates the channel with the parameters given in the request
 func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.ChannelDI{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -123,8 +117,6 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 // deletes the channel of the given path
 func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer rest.RecoverFromPanic(w)
-
 		data := models.ChannelQueryDI{}
 
 		err := json.NewDecoder(r.Body).Decode(&data)

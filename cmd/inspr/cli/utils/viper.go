@@ -97,6 +97,9 @@ func ChangeViperValues(key string, value interface{}) error {
 	if err := viper.WriteConfig(); err != nil {
 		return err
 	}
+	if key == configServerIP {
+		setGlobalClient()
+	}
 
 	return nil
 }

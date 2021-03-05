@@ -8,8 +8,11 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gopkg.in/yaml.v2"
 )
@@ -71,10 +74,11 @@ type applied struct {
 	component meta.Component
 }
 
-func doApply(_ context.Context, out io.Writer) error {
+func doApply(_ context.Context) error {
 	var files []string
 	var path string
 	var err error
+	out := cliutils.GetCliOutput()
 	hasFileFlag := (cmd.InsprOptions.AppliedFileStructure != "")
 	hasFolderFlag := (cmd.InsprOptions.AppliedFolderStructure != "")
 	if hasFileFlag == hasFolderFlag {

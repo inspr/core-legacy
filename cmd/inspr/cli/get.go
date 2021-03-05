@@ -2,17 +2,15 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
+
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+
 	"gitlab.inspr.dev/inspr/core/pkg/cmd"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
 var tabWriter *tabwriter.Writer
@@ -65,9 +63,10 @@ func NewGetCmd() *cobra.Command {
 
 }
 
-func getApps(_ context.Context, out io.Writer) error {
-	initTab(out)
-	err := getObj(printApps, out)
+func getApps(_ context.Context) error {
+
+	initTab()
+	err := getObj(printApps)
 	if err != nil {
 		return err
 	}
@@ -75,9 +74,9 @@ func getApps(_ context.Context, out io.Writer) error {
 	return nil
 }
 
-func getChannels(_ context.Context, out io.Writer) error {
-	initTab(out)
-	err := getObj(printChannels, out)
+func getChannels(_ context.Context) error {
+	initTab()
+	err := getObj(printChannels)
 	if err != nil {
 		return err
 	}
@@ -85,9 +84,9 @@ func getChannels(_ context.Context, out io.Writer) error {
 	return nil
 }
 
-func getCTypes(_ context.Context, out io.Writer) error {
-	initTab(out)
-	err := getObj(printCTypes, out)
+func getCTypes(_ context.Context) error {
+	initTab()
+	err := getObj(printCTypes)
 	if err != nil {
 		return err
 	}
@@ -95,9 +94,9 @@ func getCTypes(_ context.Context, out io.Writer) error {
 	return nil
 }
 
-func getNodes(_ context.Context, out io.Writer) error {
-	initTab(out)
-	err := getObj(printNodes, out)
+func getNodes(_ context.Context) error {
+	initTab()
+	err := getObj(printNodes)
 	if err != nil {
 		return err
 	}
@@ -105,9 +104,10 @@ func getNodes(_ context.Context, out io.Writer) error {
 	return nil
 }
 
-func getObj(printObj func(*meta.App), out io.Writer) error {
-	rc := request.NewClient().BaseURL(cliutils.GetConfiguredServerIP()).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
-	client := client.NewControllerClient(rc)
+func getObj(printObj func(*meta.App)) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+
 	scope, err := cliutils.GetScope()
 	if err != nil {
 		fmt.Fprint(out, err.Error()+"\n")
@@ -145,7 +145,7 @@ func printCTypes(app *meta.App) {
 		printLine(ct)
 	}
 	for _, child := range app.Spec.Apps {
-		printChannels(child)
+		printCTypes(child)
 	}
 }
 
@@ -162,7 +162,8 @@ func printLine(name string) {
 	lines = append(lines, fmt.Sprintf("%s\n", name))
 }
 
-func initTab(out io.Writer) {
+func initTab() {
+	out := cliutils.GetCliOutput()
 	tabWriter = tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
 	lines = append(lines, "NAME\n")
 }
