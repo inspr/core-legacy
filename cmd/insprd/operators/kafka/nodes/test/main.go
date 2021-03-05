@@ -48,7 +48,7 @@ func main() {
 			Node: meta.Node{
 				Spec: meta.NodeSpec{
 					Image:    "gcr.io/red-inspr/inspr/sidecar/test:latest",
-					Replicas: 3,
+					Replicas: 4,
 					Environment: utils.EnvironmentMap{
 						"THIS_IS_AN_ENV_VAR": "THIS IS ITS VALUE",
 					},
