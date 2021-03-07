@@ -100,7 +100,7 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if !environment.IsInOutputChannel(body.Channel, ch.OutputChannels) {
+	if !environment.IsInInputChannel(body.Channel, ch.InputChannels) {
 		insprError := ierrors.NewError().BadRequest().Message("channel not found")
 		rest.ERROR(w, insprError.Build())
 		return
