@@ -1,30 +1,24 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 // ChannelTypeHandler - contains handlers that uses the
 // ChannelTypeMemory interface methods
 type ChannelTypeHandler struct {
-	mem memory.Manager
-	op  operators.OperatorInterface
+	Handler
 }
 
 // NewChannelTypeHandler - returns the handle function that
 // manages the creation of a channelType
-func NewChannelTypeHandler(memManager memory.Manager, op operators.OperatorInterface) *ChannelTypeHandler {
+func NewChannelTypeHandler(handler Handler) *ChannelTypeHandler {
 	return &ChannelTypeHandler{
-		mem: memManager,
-		op:  op,
+		handler,
 	}
 }
 
@@ -41,18 +35,18 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 			return
 		}
 
-		cth.mem.InitTransaction()
+		cth.Memory.InitTransaction()
 		if !data.DryRun {
-			defer cth.mem.Commit()
+			defer cth.Memory.Commit()
 		} else {
-			defer cth.mem.Cancel()
+			defer cth.Memory.Cancel()
 		}
-		err = cth.mem.ChannelTypes().CreateChannelType(data.Ctx, &data.ChannelType)
+		err = cth.Memory.ChannelTypes().CreateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := cth.mem.GetTransactionChanges()
+		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -75,10 +69,10 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 			return
 		}
 
-		cth.mem.InitTransaction()
-		defer cth.mem.Cancel()
+		cth.Memory.InitTransaction()
+		defer cth.Memory.Cancel()
 
-		channelType, err := cth.mem.Root().ChannelTypes().Get(data.Ctx, data.CtName)
+		channelType, err := cth.Memory.Root().ChannelTypes().Get(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -101,48 +95,29 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			return
 		}
 
-		cth.mem.InitTransaction()
+		cth.Memory.InitTransaction()
 		if !data.DryRun {
-			defer cth.mem.Commit()
+			defer cth.Memory.Commit()
 		} else {
-			defer cth.mem.Cancel()
+			defer cth.Memory.Cancel()
 		}
 
-		err = cth.mem.ChannelTypes().UpdateChannelType(data.Ctx, &data.ChannelType)
+		err = cth.Memory.ChannelTypes().UpdateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
 
-		diff, err := cth.mem.GetTransactionChanges()
+		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
 
 		if !data.DryRun {
-			var errs string
-			ct, _ := cth.mem.Root().ChannelTypes().Get(data.Ctx, data.ChannelType.Meta.Name)
-			for _, chName := range ct.ConnectedChannels {
-				ch, _ := cth.mem.Channels().Get(data.Ctx, chName)
-				err = cth.op.Channels().Update(context.Background(), data.Ctx, ch)
-				if err != nil {
-					errs += err.Error() + "\n"
-					continue
-				}
-
-				for _, appName := range ch.ConnectedApps {
-					app, _ := cth.mem.Apps().Get(ch.Meta.Parent + "." + appName)
-					_, err = cth.op.Nodes().UpdateNode(context.Background(), app)
-					if err != nil {
-						errs += err.Error() + "\n"
-					}
-				}
-			}
-
-			if errs != "" {
-				rest.ERROR(w, ierrors.NewError().Message(errs).InternalServer().Build())
-				return
+			err = cth.applyChangesInDiff(diff)
+			if err != nil {
+				rest.ERROR(w, err)
 			}
 		}
 
@@ -164,18 +139,18 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 			return
 		}
 
-		cth.mem.InitTransaction()
+		cth.Memory.InitTransaction()
 		if !data.DryRun {
-			defer cth.mem.Commit()
+			defer cth.Memory.Commit()
 		} else {
-			defer cth.mem.Cancel()
+			defer cth.Memory.Cancel()
 		}
-		err = cth.mem.ChannelTypes().DeleteChannelType(data.Ctx, data.CtName)
+		err = cth.Memory.ChannelTypes().DeleteChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := cth.mem.GetTransactionChanges()
+		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return

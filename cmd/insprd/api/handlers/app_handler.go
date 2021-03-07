@@ -6,8 +6,6 @@ import (
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
@@ -17,15 +15,13 @@ import (
 
 // AppHandler - contains handlers that uses the AppMemory interface methods
 type AppHandler struct {
-	mem memory.Manager
-	op  operators.OperatorInterface
+	Handler
 }
 
 // NewAppHandler - generates a new AppHandler through the memoryManager interface
-func NewAppHandler(memManager memory.Manager, op operators.OperatorInterface) *AppHandler {
+func NewAppHandler(handler Handler) *AppHandler {
 	return &AppHandler{
-		op:  op,
-		mem: memManager,
+		handler,
 	}
 }
 
@@ -41,50 +37,28 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		ah.mem.InitTransaction()
+		ah.Memory.InitTransaction()
 		if !data.DryRun {
-			defer ah.mem.Commit()
+			defer ah.Memory.Commit()
 		} else {
-			defer ah.mem.Cancel()
+			defer ah.Memory.Cancel()
 		}
 
-		err = ah.mem.Apps().CreateApp(data.Ctx, &data.App)
+		err = ah.Memory.Apps().CreateApp(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		changes, err := ah.mem.GetTransactionChanges()
+		changes, err := ah.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
 
 		if !data.DryRun {
-			errs := ""
-			changes.ForEach(func(change diff.Change) {
-
-				app, _ := ah.mem.Apps().Get(change.Context)
-
-				if change.Kind&diff.ChannelKind > 0 { // if there is any difference in channels
-					change.FilterKind(diff.ChannelKind).ForEach(func(d diff.Difference) {
-						ch := app.Spec.Channels[d.Name]
-						err := ah.op.Channels().Create(context.Background(), change.Context, ch)
-						if err != nil {
-							errs += err.Error() + "\n"
-						}
-					})
-				}
-				if app.Spec.Node.Spec.Image != "" {
-
-					_, err := ah.op.Nodes().CreateNode(context.Background(), app)
-					if err != nil {
-						errs += err.Error() + "\n"
-					}
-				}
-			})
-			if errs != "" {
-				rest.ERROR(w, ierrors.NewError().InternalServer().Message(errs).Build())
-				return
+			err = ah.applyChangesInDiff(changes)
+			if err != nil {
+				rest.ERROR(w, err)
 			}
 		}
 
@@ -93,7 +67,7 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 	return rest.Handler(handler)
 }
 
-func (ah *AppHandler) applyChangesInDiff(changes diff.Changelog) error {
+func (handler *Handler) applyChangesInDiff(changes diff.Changelog) error {
 	var errs string // all errors from all operations
 
 	// apply this on deleted channels
@@ -103,7 +77,7 @@ func (ah *AppHandler) applyChangesInDiff(changes diff.Changelog) error {
 			return d.Kind&diff.ChannelKind > 0 && d.Operation&diff.Delete > 0
 		},
 		func(scope string, d diff.Difference) {
-			err := ah.op.Channels().Delete(context.Background(), scope, d.Name) // delete the channel from the cluster
+			err := handler.Operator.Channels().Delete(context.Background(), scope, d.Name) // delete the channel from the cluster
 			if err != nil {
 				errs = err.Error() + "\n"
 			}
@@ -117,8 +91,8 @@ func (ah *AppHandler) applyChangesInDiff(changes diff.Changelog) error {
 			return d.Kind&diff.ChannelKind > 0 && d.Operation&diff.Create > 0
 		},
 		func(scope string, d diff.Difference) {
-			ch, _ := ah.mem.Root().Channels().Get(scope, d.Name)            // get the actual channel definition from memory
-			err := ah.op.Channels().Create(context.Background(), scope, ch) // apply to the cluster
+			ch, _ := handler.Memory.Channels().Get(scope, d.Name)                      // get the actual channel definition from memory
+			err := handler.Operator.Channels().Create(context.Background(), scope, ch) // apply to the cluster
 			if err != nil {
 				errs += err.Error() + "\n"
 			}
@@ -132,12 +106,12 @@ func (ah *AppHandler) applyChangesInDiff(changes diff.Changelog) error {
 			return d.Kind&diff.AppKind > 0 && d.Operation&diff.Delete > 0
 		},
 		func(scope string, d diff.Difference) {
-			app, err := ah.mem.Root().Apps().Get(scope + "." + d.Name) // get the app definition from the cluster
+			app, err := handler.Memory.Root().Apps().Get(scope + "." + d.Name) // get the app definition from the cluster
 			if err != nil {
 				errs += err.Error() + "\n"
 				return
 			}
-			errs += ah.deleteApp(app) // delete app recursively (all nodes and channels defined) from the cluster
+			errs += handler.deleteApp(app) // delete app recursively (all nodes and channels defined) from the cluster
 		},
 	)
 
@@ -148,16 +122,16 @@ func (ah *AppHandler) applyChangesInDiff(changes diff.Changelog) error {
 			return d.Kind&diff.ChannelTypeKind > 0 && d.Operation&diff.Update > 0
 		},
 		func(scope string, d diff.Difference) {
-			ct, _ := ah.mem.ChannelTypes().Get(scope, d.Name)
+			ct, _ := handler.Memory.ChannelTypes().Get(scope, d.Name)
 
 			for _, channelName := range ct.ConnectedChannels { // for each channel connected to the channel type
-				channel, _ := ah.mem.Root().Channels().Get(scope, channelName)
+				channel, _ := handler.Memory.Channels().Get(scope, channelName)
 
 				for _, appName := range channel.ConnectedApps { // for each app connected to each channel
-					app, _ := ah.mem.Apps().Get(scope + "." + appName) // get the app definition from memory
+					app, _ := handler.Memory.Apps().Get(scope + "." + appName) // get the app definition from memory
 
 					if app.Spec.Node.Spec.Image != "" { // if the app is a node, update it
-						_, err := ah.op.Nodes().UpdateNode(context.Background(), app)
+						_, err := handler.Operator.Nodes().UpdateNode(context.Background(), app)
 						if err != nil {
 							errs += err.Error() + "\n"
 						}
@@ -174,8 +148,8 @@ func (ah *AppHandler) applyChangesInDiff(changes diff.Changelog) error {
 			return d.Kind&diff.ChannelKind > 0 && d.Operation&diff.Update > 0
 		},
 		func(scope string, d diff.Difference) {
-			channel, _ := ah.mem.Root().Channels().Get(scope, d.Name)
-			err := ah.op.Channels().Update(context.Background(), scope, channel)
+			channel, _ := handler.Memory.Channels().Get(scope, d.Name)
+			err := handler.Operator.Channels().Update(context.Background(), scope, channel)
 			if err != nil {
 				errs += err.Error() + "\n"
 				return
@@ -183,10 +157,10 @@ func (ah *AppHandler) applyChangesInDiff(changes diff.Changelog) error {
 			// this updates the connected nodes, so that the environment variables are consistent with
 			// the channel definition
 			for _, appName := range channel.ConnectedApps { // for each app connected to each channel
-				app, _ := ah.mem.Apps().Get(scope + "." + appName)
+				app, _ := handler.Memory.Apps().Get(scope + "." + appName)
 
 				if app.Spec.Node.Spec.Image != "" { // if the app is a node, update it
-					_, err := ah.op.Nodes().UpdateNode(context.Background(), app)
+					_, err := handler.Operator.Nodes().UpdateNode(context.Background(), app)
 					if err != nil {
 						errs += err.Error()
 					}
@@ -199,13 +173,13 @@ func (ah *AppHandler) applyChangesInDiff(changes diff.Changelog) error {
 	// aply this to updated nodes
 	updatedNodes := diff.NewChangeOperation(
 		func(c diff.Change) bool {
-			from, _ := ah.mem.Root().Apps().Get(c.Context)
+			from, _ := handler.Memory.Root().Apps().Get(c.Context)
 			// if there is a change in a given context and that context is a node
 			return from.Spec.Node.Spec.Image != ""
 		},
 		func(c diff.Change) {
 
-			to, _ := ah.mem.Apps().Get(c.Context)
+			to, _ := handler.Memory.Apps().Get(c.Context)
 			if to == nil || to.Spec.Node.Spec.Image == "" {
 
 				scope, name, err := utils.RemoveLastPartInScope(c.Context)
@@ -213,13 +187,13 @@ func (ah *AppHandler) applyChangesInDiff(changes diff.Changelog) error {
 					errs += err.Error() + "\n"
 					return
 				}
-				err = ah.op.Nodes().DeleteNode(context.Background(), scope, name)
+				err = handler.Operator.Nodes().DeleteNode(context.Background(), scope, name)
 				if err != nil {
 					errs += err.Error() + "\n"
 				}
 				return
 			}
-			_, err := ah.op.Nodes().UpdateNode(context.Background(), to) // update it in the cluster
+			_, err := handler.Operator.Nodes().UpdateNode(context.Background(), to) // update it in the cluster
 			if err != nil {
 				errs += err.Error() + "\n"
 			}
@@ -254,10 +228,10 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 			return
 		}
 
-		ah.mem.InitTransaction()
-		defer ah.mem.Cancel()
+		ah.Memory.InitTransaction()
+		defer ah.Memory.Cancel()
 
-		app, err := ah.mem.Root().Apps().Get(data.Ctx)
+		app, err := ah.Memory.Root().Apps().Get(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -280,17 +254,17 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 			return
 		}
 
-		ah.mem.InitTransaction()
+		ah.Memory.InitTransaction()
 		if !data.DryRun {
-			defer ah.mem.Commit()
+			defer ah.Memory.Commit()
 		} else {
-			defer ah.mem.Cancel()
+			defer ah.Memory.Cancel()
 		}
-		err = ah.mem.Apps().UpdateApp(data.Ctx, &data.App)
+		err = ah.Memory.Apps().UpdateApp(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, err)
 		}
-		changes, err := ah.mem.GetTransactionChanges()
+		changes, err := ah.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -322,32 +296,32 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		ah.mem.InitTransaction()
+		ah.Memory.InitTransaction()
 		if !data.DryRun {
-			defer ah.mem.Commit()
+			defer ah.Memory.Commit()
 		} else {
-			defer ah.mem.Cancel()
+			defer ah.Memory.Cancel()
 		}
-		app, err := ah.mem.Apps().Get(data.Ctx)
+		_, err = ah.Memory.Apps().Get(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, err)
 		}
 
-		err = ah.mem.Apps().DeleteApp(data.Ctx)
+		err = ah.Memory.Apps().DeleteApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		changes, err := ah.mem.GetTransactionChanges()
+		changes, err := ah.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
 		if !data.DryRun {
-			errs := ah.deleteApp(app)
+			err = ah.applyChangesInDiff(changes)
 
-			if errs != "" {
-				rest.ERROR(w, ierrors.NewError().InternalServer().Message(errs).Build())
+			if err != nil {
+				rest.ERROR(w, err)
 				return
 			}
 		}
@@ -357,21 +331,21 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 	return rest.Handler(handler)
 }
 
-func (ah *AppHandler) deleteApp(app *meta.App) (errs string) {
-	if app.Spec.Node.Meta.Name != "" {
-		err := ah.op.Nodes().DeleteNode(context.Background(), app.Meta.Parent, app.Meta.Name)
+func (handler *Handler) deleteApp(app *meta.App) (errs string) {
+	if app.Spec.Node.Spec.Image != "" {
+		err := handler.Operator.Nodes().DeleteNode(context.Background(), app.Meta.Parent, app.Meta.Name)
 		if err != nil {
 			errs += err.Error()
 		}
 
 	} else {
 		for _, subApp := range app.Spec.Apps {
-			errs += ah.deleteApp(subApp)
+			errs += handler.deleteApp(subApp)
 		}
 		for c := range app.Spec.Channels {
 			scope, _ := utils.JoinScopes(app.Meta.Parent, app.Meta.Name)
 
-			err := ah.op.Channels().Delete(context.Background(), scope, c)
+			err := handler.Operator.Channels().Delete(context.Background(), scope, c)
 			if err != nil {
 				errs += err.Error()
 			}

@@ -7,8 +7,9 @@ import (
 )
 
 func (s *Server) initRoutes() {
+	h := handler.Handler{Memory: s.MemoryManager, Operator: s.op}
 
-	ahandler := handler.NewAppHandler(s.MemoryManager, s.op)
+	ahandler := handler.NewAppHandler(h)
 	s.Mux.HandleFunc("/apps", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 
@@ -30,7 +31,7 @@ func (s *Server) initRoutes() {
 		}
 	})
 
-	chandler := handler.NewChannelHandler(s.MemoryManager, s.op)
+	chandler := handler.NewChannelHandler(h)
 	s.Mux.HandleFunc("/channels", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 
@@ -38,7 +39,7 @@ func (s *Server) initRoutes() {
 			chandler.HandleGetChannelByRef().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			chandler.HandleCreateChannel().JSON().Recover()(w, r)
+			chandler.HandleCreateChannel().JSON()(w, r)
 
 		case http.MethodPut:
 			chandler.HandleUpdateChannel().JSON().Recover()(w, r)
@@ -52,7 +53,7 @@ func (s *Server) initRoutes() {
 		}
 	})
 
-	cthandler := handler.NewChannelTypeHandler(s.MemoryManager, s.op)
+	cthandler := handler.NewChannelTypeHandler(h)
 	s.Mux.HandleFunc("/channeltypes", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 
@@ -60,7 +61,7 @@ func (s *Server) initRoutes() {
 			cthandler.HandleGetChannelTypeByRef().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			cthandler.HandleCreateChannelType().JSON().Recover()(w, r)
+			cthandler.HandleCreateChannelType().JSON()(w, r)
 
 		case http.MethodPut:
 			cthandler.HandleUpdateChannelType().JSON().Recover()(w, r)
