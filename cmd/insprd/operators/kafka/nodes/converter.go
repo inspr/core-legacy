@@ -1,7 +1,6 @@
 package nodes
 
 import (
-	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
@@ -161,7 +160,6 @@ func intToint32(v int) *int32 {
 func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 	var err error
 	node := meta.Node{}
-	fmt.Println(kdep.ObjectMeta.Name)
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
 	if err != nil {
 		return meta.Node{}, err

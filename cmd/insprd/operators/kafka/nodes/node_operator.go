@@ -89,7 +89,6 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 	var deploy string
 	kube := no.retrieveKube()
 	deploy = parseNodeName(environment.GetInsprEnvironment(), nodeContext, nodeName)
-	fmt.Println(deploy)
 	err := kube.Delete(deploy, &metav1.DeleteOptions{})
 
 	if err != nil {
