@@ -70,24 +70,31 @@ func (mm *MemoryManager) GetTransactionChanges() (diff.Changelog, error) {
 	return cl, err
 }
 
-type TreeRootGetter struct {
+// RootGetter is a structure that gets components from the root, without the current changes.
+type RootGetter struct {
 	tree *meta.App
 }
 
-func (t *TreeRootGetter) Apps() memory.AppGetInterface {
+// Apps returns a getter for apps on the root.
+func (t *RootGetter) Apps() memory.AppGetInterface {
 	return &AppRootGetter{
 		tree: t.tree,
 	}
 }
-func (t *TreeRootGetter) Channels() memory.ChannelGetInterface {
+
+// Channels returns a getter for channels on the root.
+func (t *RootGetter) Channels() memory.ChannelGetInterface {
 	return &ChannelRootGetter{}
 }
-func (t *TreeRootGetter) ChannelTypes() memory.ChannelTypeGetInterface {
+
+// ChannelTypes returns a getter for channel types on the root
+func (t *RootGetter) ChannelTypes() memory.ChannelTypeGetInterface {
 	return &ChannelTypeRootGetter{}
 }
 
+// Root returns a getter for objects on the root of the tree, without the current changes.
 func (mm *MemoryManager) Root() memory.GetInterface {
-	return &TreeRootGetter{
+	return &RootGetter{
 		tree: mm.tree,
 	}
 }

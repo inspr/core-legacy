@@ -137,6 +137,8 @@ func (ctm *ChannelTypeMemoryManager) UpdateChannelType(context string, ct *meta.
 	return nil
 }
 
+// ChannelTypeRootGetter returns a getter that gets channel types from the root structure of the app, without the current changes.
+// The getter does not allow changes in the structure, just visualization.
 type ChannelTypeRootGetter struct {
 	tree *meta.ChannelType
 }

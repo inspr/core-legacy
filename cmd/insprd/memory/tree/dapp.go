@@ -141,6 +141,8 @@ func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
 	return nil
 }
 
+// AppRootGetter returns a getter that gets apps from the root structure of the app, without the current changes.
+// The getter does not allow changes in the structure, just visualization.
 type AppRootGetter struct {
 	tree *meta.App
 }

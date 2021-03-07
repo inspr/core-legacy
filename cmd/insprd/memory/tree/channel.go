@@ -140,6 +140,8 @@ func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel)
 	return nil
 }
 
+// ChannelRootGetter returns a getter that gets channels from the root structure of the app, without the current changes.
+// The getter does not allow changes in the structure, just visualization.
 type ChannelRootGetter struct {
 	tree *meta.Channel
 }
