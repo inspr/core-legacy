@@ -7,6 +7,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	uti "gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 // Kind represents a kind of difference between two structures
@@ -87,23 +88,19 @@ func (cl Changelog) Print(out io.Writer) {
 	}
 }
 
-func (cl *Changelog) diff(appOrig *meta.App, appCurr *meta.App, ctx string) (Changelog, error) {
+func (cl *Changelog) diff(from, to *meta.App, ctx string) (Changelog, error) {
 
 	change := Change{
 		Context:   ctx,
 		changelog: cl,
 	}
 
-	err := change.diffMetadata(appOrig.Meta.Name, AppKind, appOrig.Meta, appCurr.Meta, "")
+	err := change.diffMetadata(from.Meta.Name, AppKind, from.Meta, to.Meta, "")
 	if err != nil {
 		return Changelog{}, err
 	}
 
-	if appCurr.Meta.Name != "" {
-		change.Context, _ = utils.JoinScopes(ctx, appOrig.Meta.Name)
-	}
-
-	err = change.diffAppSpec(appOrig.Spec, appCurr.Spec)
+	err = change.diffAppSpec(from.Spec, to.Spec)
 	if err != nil {
 		return Changelog{}, err
 	}
@@ -114,50 +111,66 @@ func (cl *Changelog) diff(appOrig *meta.App, appCurr *meta.App, ctx string) (Cha
 	return *cl, nil
 }
 
-func (change *Change) diffAppSpec(specOrig meta.AppSpec, specCurr meta.AppSpec) error {
-	err := change.diffNodes(specOrig.Node, specCurr.Node)
+func (change *Change) diffAppSpec(from, to meta.AppSpec) error {
+	err := change.diffNodes(from.Node, to.Node)
 	if err != nil {
 		return err
 	}
 
-	change.diffApps(specOrig.Apps, specCurr.Apps)
+	change.diffApps(from.Apps, to.Apps)
 
-	err = change.diffChannels(specOrig.Channels, specCurr.Channels)
+	err = change.diffChannels(from.Channels, to.Channels)
 	if err != nil {
 		return err
 	}
 
-	err = change.diffChannelTypes(specOrig.ChannelTypes, specCurr.ChannelTypes)
+	err = change.diffChannelTypes(from.ChannelTypes, to.ChannelTypes)
 	if err != nil {
 		return err
 	}
 
-	change.diffBoudaries(specOrig.Boundary, specCurr.Boundary)
+	change.diffBoudaries(from.Boundary, to.Boundary)
 
 	return nil
 }
 
-func (change *Change) diffNodes(nodeOrig meta.Node, nodeCurr meta.Node) error {
-	err := change.diffMetadata(nodeOrig.Meta.Name, NodeKind, nodeOrig.Meta, nodeCurr.Meta, "Spec.Node.")
+func (change *Change) diffNodes(from, to meta.Node) error {
+	err := change.diffMetadata(from.Meta.Name, NodeKind, from.Meta, to.Meta, "Spec.Node.")
 	if err != nil {
 		return err
 	}
 
-	if nodeOrig.Spec.Image != nodeCurr.Spec.Image {
+	if from.Spec.Image != to.Spec.Image {
 		change.Diff = append(change.Diff, Difference{
 			Field:     "Spec.Node.Spec.Image",
-			From:      nodeOrig.Spec.Image,
-			To:        nodeCurr.Spec.Image,
+			From:      from.Spec.Image,
+			To:        to.Spec.Image,
 			Kind:      NodeKind,
 			Operation: Update,
 		})
 		change.Kind |= NodeKind
 		change.Operation |= Update
 	}
+
+	if from.Spec.Replicas != to.Spec.Replicas {
+		change.Diff = append(change.Diff, Difference{
+			Field:     "Spec.Node.Spec.Replicas",
+			From:      fmt.Sprint(from.Spec.Replicas),
+			To:        fmt.Sprint(to.Spec.Replicas),
+			Kind:      NodeKind,
+			Operation: Update,
+		})
+		change.Kind |= NodeKind
+		change.Operation |= Update
+	}
+	change.diffEnv(from.Spec.Environment, to.Spec.Environment)
+
 	return nil
 }
+func (change *Change) diffEnv(from uti.EnvironmentMap, to uti.EnvironmentMap) {
 
-func (change *Change) diffBoudaries(boundOrig meta.AppBoundary, boundCurr meta.AppBoundary) {
+}
+func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 	var orig string
 	var curr string
 	inputSet := utils.ArrDisjuncSet(boundOrig.Input, boundCurr.Input)
@@ -216,30 +229,30 @@ func (change *Change) diffBoudaries(boundOrig meta.AppBoundary, boundCurr meta.A
 	}
 }
 
-func (change *Change) diffApps(appsOrig utils.MApps, appsCurr utils.MApps) {
-	set := utils.AppDisjuncSet(appsOrig, appsCurr)
+func (change *Change) diffApps(from, to utils.MApps) {
+	set := utils.AppDisjuncSet(from, to)
 
 	for k := range set {
 		var op Operation
-		_, orig := appsOrig[k]
+		_, orig := from[k]
 
-		from := "<nil>"
-		to := "<nil>"
+		fromStr := "<nil>"
+		toStr := "<nil>"
 
 		if orig {
-			from = "{...}"
+			fromStr = "{...}"
 			op = Delete
 		} else {
-			to = "{...}"
+			toStr = "{...}"
 			op = Create
 			newScope, _ := utils.JoinScopes(change.Context, k)
-			*change.changelog, _ = change.changelog.diff(&meta.App{}, appsCurr[k], newScope)
+			*change.changelog, _ = change.changelog.diff(&meta.App{}, to[k], newScope)
 		}
 
 		change.Diff = append(change.Diff, Difference{
 			Field:     fmt.Sprintf("Spec.Apps[%s]", k),
-			From:      from,
-			To:        to,
+			From:      fromStr,
+			To:        toStr,
 			Kind:      AppKind,
 			Operation: op,
 			Name:      k,
@@ -248,23 +261,23 @@ func (change *Change) diffApps(appsOrig utils.MApps, appsCurr utils.MApps) {
 		change.Operation |= op
 	}
 
-	intersection := utils.AppIntersecSet(appsOrig, appsCurr)
+	intersection := utils.AppIntersecSet(from, to)
 
 	for app := range intersection {
-		from := appsOrig[app]
-		to := appsCurr[app]
+		fromApp := from[app]
+		toApp := to[app]
 
-		newScope, _ := utils.JoinScopes(change.Context, from.Meta.Name)
-		change.changelog.diff(from, to, newScope)
+		newScope, _ := utils.JoinScopes(change.Context, fromApp.Meta.Name)
+		change.changelog.diff(fromApp, toApp, newScope)
 	}
 
 }
 
-func (change *Change) diffChannels(chOrig utils.MChannels, chCurr utils.MChannels) error {
-	disjunction := utils.ChsDisjuncSet(chOrig, chCurr)
+func (change *Change) diffChannels(from, to utils.MChannels) error {
+	disjunction := utils.ChsDisjuncSet(from, to)
 
 	for ch := range disjunction {
-		_, orig := chOrig[ch]
+		_, orig := from[ch]
 		from := "<nil>"
 		to := "<nil>"
 		var op Operation
@@ -288,16 +301,16 @@ func (change *Change) diffChannels(chOrig utils.MChannels, chCurr utils.MChannel
 		change.Operation |= op
 	}
 
-	intersection := utils.ChsIntersecSet(chOrig, chCurr)
+	intersection := utils.ChsIntersecSet(from, to)
 
 	for ch := range intersection {
-		origCh := chOrig[ch]
-		currCh := chCurr[ch]
-		if origCh.Spec.Type != currCh.Spec.Type {
+		fromCh := from[ch]
+		toCh := to[ch]
+		if fromCh.Spec.Type != toCh.Spec.Type {
 			change.Diff = append(change.Diff, Difference{
 				Field:     fmt.Sprintf("Spec.Channels[%s].Spec.Type", ch),
-				From:      origCh.Spec.Type,
-				To:        currCh.Spec.Type,
+				From:      fromCh.Spec.Type,
+				To:        toCh.Spec.Type,
 				Kind:      ChannelKind,
 				Operation: Update,
 				Name:      ch,
@@ -306,7 +319,7 @@ func (change *Change) diffChannels(chOrig utils.MChannels, chCurr utils.MChannel
 			change.Operation |= Update
 		}
 
-		err := change.diffMetadata(ch, ChannelKind, origCh.Meta, currCh.Meta, "Spec.Channels["+ch+"].")
+		err := change.diffMetadata(ch, ChannelKind, fromCh.Meta, toCh.Meta, "Spec.Channels["+ch+"].")
 		if err != nil {
 			return err
 		}
@@ -315,28 +328,28 @@ func (change *Change) diffChannels(chOrig utils.MChannels, chCurr utils.MChannel
 	return nil
 }
 
-func (change *Change) diffChannelTypes(chtOrig utils.MTypes, chtCurr utils.MTypes) error {
-	disjunction := utils.TypesDisjuncSet(chtOrig, chtCurr)
+func (change *Change) diffChannelTypes(from, to utils.MTypes) error {
+	disjunction := utils.TypesDisjuncSet(from, to)
 
 	for ct := range disjunction {
-		_, orig := chtOrig[ct]
+		_, orig := from[ct]
 
-		from := "<nil>"
-		to := "<nil>"
+		fromStr := "<nil>"
+		toStr := "<nil>"
 		var op Operation
 		if orig {
-			from = "{...}"
+			fromStr = "{...}"
 			op = Delete
 
 		} else {
-			to = "{...}"
+			toStr = "{...}"
 			op = Create
 		}
 
 		change.Diff = append(change.Diff, Difference{
 			Field:     fmt.Sprintf("Spec.ChannelTypes[%s]", ct),
-			From:      from,
-			To:        to,
+			From:      fromStr,
+			To:        toStr,
 			Kind:      ChannelTypeKind,
 			Operation: op,
 			Name:      ct,
@@ -345,17 +358,17 @@ func (change *Change) diffChannelTypes(chtOrig utils.MTypes, chtCurr utils.MType
 		change.Operation |= op
 	}
 
-	intersection := utils.TypesIntersecSet(chtOrig, chtCurr)
+	intersection := utils.TypesIntersecSet(from, to)
 
 	for ct := range intersection {
-		from := chtOrig[ct]
-		to := chtCurr[ct]
+		fromCT := from[ct]
+		toCT := to[ct]
 
-		if string(from.Schema) != string(to.Schema) {
+		if string(fromCT.Schema) != string(toCT.Schema) {
 			change.Diff = append(change.Diff, Difference{
 				Field:     fmt.Sprintf("Spec.ChannelTypes[%s].Spec.Schema", ct),
-				From:      string(from.Schema),
-				To:        string(to.Schema),
+				From:      string(fromCT.Schema),
+				To:        string(toCT.Schema),
 				Kind:      ChannelTypeKind,
 				Operation: Update,
 				Name:      ct,
@@ -364,7 +377,7 @@ func (change *Change) diffChannelTypes(chtOrig utils.MTypes, chtCurr utils.MType
 			change.Operation |= Update
 		}
 
-		err := change.diffMetadata(ct, ChannelTypeKind, from.Meta, to.Meta, fmt.Sprintf("Spec.ChannelTypes[%s].", ct))
+		err := change.diffMetadata(ct, ChannelTypeKind, fromCT.Meta, toCT.Meta, fmt.Sprintf("Spec.ChannelTypes[%s].", ct))
 		if err != nil {
 			return err
 		}
@@ -374,14 +387,14 @@ func (change *Change) diffChannelTypes(chtOrig utils.MTypes, chtCurr utils.MType
 	return nil
 }
 
-func (change *Change) diffMetadata(parentElement string, parentKind Kind, metaOrig meta.Metadata, metaCurr meta.Metadata, ctx string) error {
+func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, to meta.Metadata, ctx string) error {
 	var errs string
 
-	if metaOrig.Name != metaCurr.Name {
+	if from.Name != to.Name {
 		change.Diff = append(change.Diff, Difference{
 			Field:     ctx + "Meta.Name",
-			From:      metaOrig.Name,
-			To:        metaCurr.Name,
+			From:      from.Name,
+			To:        to.Name,
 			Kind:      MetaKind | parentKind,
 			Operation: Update,
 			Name:      parentElement,
@@ -390,11 +403,11 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, metaOr
 		change.Operation |= Update
 	}
 
-	if metaOrig.Reference != metaCurr.Reference {
+	if from.Reference != to.Reference {
 		change.Diff = append(change.Diff, Difference{
 			Field:     ctx + "Meta.Reference",
-			From:      metaOrig.Reference,
-			To:        metaCurr.Reference,
+			From:      from.Reference,
+			To:        to.Reference,
 			Kind:      MetaKind | parentKind,
 			Operation: Update,
 			Name:      parentElement,
@@ -403,12 +416,12 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, metaOr
 		change.Operation |= Update
 	}
 
-	if metaOrig.Parent != metaCurr.Parent {
+	if from.Parent != to.Parent {
 		errs += fmt.Sprintf("on %s Metadata: Different parent", ctx)
 		change.Diff = append(change.Diff, Difference{
 			Field:     ctx + "Meta.Parent",
-			From:      metaOrig.Parent,
-			To:        metaCurr.Parent,
+			From:      from.Parent,
+			To:        to.Parent,
 			Kind:      MetaKind | parentKind,
 			Operation: Update,
 			Name:      parentElement,
@@ -417,11 +430,11 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, metaOr
 		change.Operation |= Update
 	}
 
-	if metaOrig.SHA256 != metaCurr.SHA256 {
+	if from.SHA256 != to.SHA256 {
 		change.Diff = append(change.Diff, Difference{
 			Field:     ctx + "Meta.SHA256",
-			From:      metaOrig.SHA256,
-			To:        metaCurr.SHA256,
+			From:      from.SHA256,
+			To:        to.SHA256,
 			Kind:      MetaKind | parentKind,
 			Operation: Update,
 			Name:      parentElement,
@@ -430,12 +443,12 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, metaOr
 		change.Kind |= MetaKind | parentKind
 	}
 
-	set := utils.StrDisjuncSet(metaOrig.Annotations, metaCurr.Annotations)
+	set := utils.StrDisjuncSet(from.Annotations, to.Annotations)
 
 	for k := range set {
 		var op Operation
-		origVal := metaOrig.Annotations[k]
-		currVal := metaCurr.Annotations[k]
+		origVal := from.Annotations[k]
+		currVal := to.Annotations[k]
 
 		if origVal == "" {
 			origVal = "<nil>"
