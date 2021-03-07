@@ -23,6 +23,7 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 		var err error
 		config.numberOfPartitions, err = strconv.Atoi(nPart)
 		if err != nil {
+			config.numberOfPartitions = 1
 			return config, ierrors.NewError().
 				InvalidChannel().
 				Message(fmt.Sprintf("invalid partition configuration %s", ch.Meta.Annotations["kafka.partition.number"])).Build()
@@ -31,8 +32,9 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 
 	if nPart, ok := ch.Meta.Annotations["kafka.replication.factor"]; ok {
 		var err error
-		config.numberOfPartitions, err = strconv.Atoi(nPart)
+		config.replicationFactor, err = strconv.Atoi(nPart)
 		if err != nil {
+			config.replicationFactor = 1
 			return config, ierrors.NewError().
 				InvalidChannel().
 				Message(fmt.Sprintf("invalid replication configuration %s", ch.Meta.Annotations["kafka.replication.factor"])).Build()
