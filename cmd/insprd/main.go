@@ -1,4 +1,3 @@
-// THIS IS THE MASTER
 package main
 
 import (
@@ -15,6 +14,7 @@ import (
 func main() {
 	var memoryManager memory.Manager
 	var operator operators.OperatorInterface
+
 	var err error
 	if _, ok := os.LookupEnv("DEBUG"); ok {
 		memoryManager = fake.MockMemoryManager(nil)
