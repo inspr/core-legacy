@@ -4,16 +4,18 @@ image: golang:latest
 variables:
   # Please edit to your GitLab project
   REPO_NAME: gitlab.inspr.dev/inspr/core
+  VERSION: $(git describe --always)
 
 stages:
   - build
   - test
+  - push
   - release
 
 build-cli:
   stage: build
   script:
-    - bash .gitlab/scripts/buildcli.sh
+    - bash .gitlab/scripts/buildcli.sh VERSION
   only:
     refs:
       - develop
@@ -36,11 +38,23 @@ lint:
     - go get -u golang.org/x/lint/golint
     - golint --set_exit_status ./...
 
+push-cli:
+  stage: push
+  image: google/cloud-sdk
+  script: 
+    - bash .gitlab/scripts/pushcli.sh VERSION
+  only:
+    refs:
+      - develop
+      - tags
+  dependencies:
+    - build-cli
+
 release-cli:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - bash .gitlab/scripts/releasecli.sh
+    - sh .gitlab/scripts/releasecli.sh VERSION
   only:
     - tags
   after_script:
