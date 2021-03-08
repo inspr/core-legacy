@@ -12,14 +12,14 @@ import (
 )
 
 func main() {
-	var number int64
+	var number float64
 
 	// sets up ticker to sync with generator
 	ticker := time.NewTicker(2 * time.Second)
 	rand.Seed(time.Now().UnixNano())
 
 	// sets up client for sidecar
-	c := dappclient.NewAppClient()
+	client := dappclient.NewAppClient()
 
 	// channelName
 	inputChannel := "ch1"
@@ -28,15 +28,20 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			msg, err := c.ReadMessage(context.Background(), inputChannel)
+			msg, err := client.ReadMessage(context.Background(), inputChannel)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			number = msg.Data.(int64)
-			c.CommitMessage(context.Background(), inputChannel)
+			number = msg.Data.(float64)
+			fmt.Println("Read: ", number)
 
-			if big.NewInt(number).ProbablyPrime(0) {
-				c.WriteMessage(context.Background(), outputChannel, models.Message{
+			err = client.CommitMessage(context.Background(), inputChannel)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+
+			if big.NewInt(int64(number)).ProbablyPrime(0) {
+				client.WriteMessage(context.Background(), outputChannel, models.Message{
 					Data: number,
 				})
 			}
