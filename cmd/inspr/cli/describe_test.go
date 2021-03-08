@@ -307,3 +307,155 @@ func Test_displayAppState(t *testing.T) {
 		})
 	}
 }
+
+func Test_displayChannelState(t *testing.T) {
+	bufResp := bytes.NewBufferString("")
+	utils.PrintChannelTree(getMockApp().Spec.Channels["ch1"], bufResp)
+	outResp, _ := ioutil.ReadAll(bufResp)
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		data := models.ChannelQueryDI{}
+		decoder := json.NewDecoder(r.Body)
+
+		err := decoder.Decode(&data)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		ch := getMockApp().Spec.Channels[data.ChName]
+
+		rest.JSON(w, http.StatusOK, ch)
+	}
+
+	type args struct {
+		in0  context.Context
+		args []string
+	}
+	tests := []struct {
+		name           string
+		args           args
+		flagsAndArgs   []string
+		handlerFunc    func(w http.ResponseWriter, r *http.Request)
+		expectedOutput []byte
+	}{
+		{
+			name:           "Should describe the channel state",
+			flagsAndArgs:   []string{"ch", "appParent.ch1"},
+			handlerFunc:    handler,
+			expectedOutput: outResp,
+		},
+		{
+			name:           "Invalid scope flag, should not print",
+			flagsAndArgs:   []string{"ch", "ch1", "--scope", "invalid..scope"},
+			handlerFunc:    handler,
+			expectedOutput: []byte(""),
+		},
+		{
+			name:           "Valid scope flag",
+			flagsAndArgs:   []string{"ch", "ch1", "--scope", "appParent"},
+			handlerFunc:    handler,
+			expectedOutput: outResp,
+		},
+		{
+			name:           "Invalid arg",
+			flagsAndArgs:   []string{"ch", "invalid..args", "--scope", "appParent"},
+			handlerFunc:    handler,
+			expectedOutput: []byte(""),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := NewDescribeCmd()
+			buf := bytes.NewBufferString("")
+
+			cliutils.SetOutput(buf)
+			cmd.SetArgs(tt.flagsAndArgs)
+
+			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
+			cliutils.SetClient(server.URL)
+
+			cmd.Execute()
+			got, _ := ioutil.ReadAll(buf)
+
+			if !reflect.DeepEqual(got, tt.expectedOutput) {
+				t.Errorf("displayChannelState() = %v, want %v", string(got), string(tt.expectedOutput))
+			}
+		})
+	}
+}
+
+func Test_displayChannelTypeState(t *testing.T) {
+	bufResp := bytes.NewBufferString("")
+	utils.PrintChannelTypeTree(getMockApp().Spec.ChannelTypes["ct1"], bufResp)
+	outResp, _ := ioutil.ReadAll(bufResp)
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		data := models.ChannelTypeQueryDI{}
+		decoder := json.NewDecoder(r.Body)
+
+		err := decoder.Decode(&data)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		ct := getMockApp().Spec.ChannelTypes[data.CtName]
+
+		rest.JSON(w, http.StatusOK, ct)
+	}
+
+	type args struct {
+		in0  context.Context
+		args []string
+	}
+	tests := []struct {
+		name           string
+		args           args
+		flagsAndArgs   []string
+		handlerFunc    func(w http.ResponseWriter, r *http.Request)
+		expectedOutput []byte
+	}{
+		{
+			name:           "Should describe the channelType state",
+			flagsAndArgs:   []string{"ct", "appParent.ct1"},
+			handlerFunc:    handler,
+			expectedOutput: outResp,
+		},
+		{
+			name:           "Invalid scope flag, should not print",
+			flagsAndArgs:   []string{"ct", "ct1", "--scope", "invalid..scope"},
+			handlerFunc:    handler,
+			expectedOutput: []byte(""),
+		},
+		{
+			name:           "Valid scope flag",
+			flagsAndArgs:   []string{"ct", "ct1", "--scope", "appParent"},
+			handlerFunc:    handler,
+			expectedOutput: outResp,
+		},
+		{
+			name:           "Invalid arg",
+			flagsAndArgs:   []string{"ct", "invalid..args", "--scope", "appParent"},
+			handlerFunc:    handler,
+			expectedOutput: []byte(""),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := NewDescribeCmd()
+			buf := bytes.NewBufferString("")
+
+			cliutils.SetOutput(buf)
+			cmd.SetArgs(tt.flagsAndArgs)
+
+			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
+			cliutils.SetClient(server.URL)
+
+			cmd.Execute()
+			got, _ := ioutil.ReadAll(buf)
+
+			if !reflect.DeepEqual(got, tt.expectedOutput) {
+				t.Errorf("displayChannelTypeState() = %v, want %v", string(got), string(tt.expectedOutput))
+			}
+		})
+	}
+}
