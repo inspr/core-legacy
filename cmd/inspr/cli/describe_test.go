@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cobra"
 	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
@@ -231,9 +230,6 @@ func Test_displayAppState(t *testing.T) {
 	utils.PrintAppTree(getMockApp(), bufResp)
 	outResp, _ := ioutil.ReadAll(bufResp)
 
-	ah := fake.MockMemoryManager(nil)
-	ah.Apps().CreateApp("", getMockApp())
-
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
@@ -243,10 +239,8 @@ func Test_displayAppState(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		app, err := ah.Apps().GetApp(data.Ctx)
-		if err != nil {
-			fmt.Println(err)
-		}
+		app := getMockApp()
+
 		rest.JSON(w, http.StatusOK, app)
 	}
 
