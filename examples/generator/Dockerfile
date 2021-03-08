@@ -9,6 +9,6 @@ RUN go build
 
 FROM alpine
 WORKDIR /app
-COPY --from=build /app/examples/generator generator
+COPY --from=build /app/examples/generator/generator generator
 CMD ./generator
 

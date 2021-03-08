@@ -37,9 +37,13 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			err := c.WriteMessage(context.Background(), chName, models.Message{
-				Data: (rand.Int() % mod),
-			})
+			randNumber := rand.Int() % mod
+			fmt.Println("random number -> ", randNumber)
+			newMsg := models.Message{
+				Data: randNumber,
+			}
+
+			err := c.WriteMessage(context.Background(), chName, newMsg)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
