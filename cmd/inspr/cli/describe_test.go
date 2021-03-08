@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -251,13 +250,8 @@ func Test_displayAppState(t *testing.T) {
 		rest.JSON(w, http.StatusOK, app)
 	}
 
-	type args struct {
-		in0  context.Context
-		args []string
-	}
 	tests := []struct {
 		name           string
-		args           args
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput []byte
@@ -327,13 +321,8 @@ func Test_displayChannelState(t *testing.T) {
 		rest.JSON(w, http.StatusOK, ch)
 	}
 
-	type args struct {
-		in0  context.Context
-		args []string
-	}
 	tests := []struct {
 		name           string
-		args           args
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput []byte
@@ -403,13 +392,8 @@ func Test_displayChannelTypeState(t *testing.T) {
 		rest.JSON(w, http.StatusOK, ct)
 	}
 
-	type args struct {
-		in0  context.Context
-		args []string
-	}
 	tests := []struct {
 		name           string
-		args           args
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput []byte
