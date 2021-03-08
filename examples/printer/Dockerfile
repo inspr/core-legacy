@@ -7,7 +7,7 @@ WORKDIR /app/examples/printer
 RUN go build -tags musl
 
 
-FROM scratch
+FROM alpine
 WORKDIR /app
 COPY --from=build /app/examples/printer printer
 CMD ./printer

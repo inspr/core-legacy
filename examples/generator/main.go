@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"os"
 	"strconv"
@@ -36,9 +37,12 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			c.WriteMessage(context.Background(), chName, models.Message{
+			err := c.WriteMessage(context.Background(), chName, models.Message{
 				Data: (rand.Int() % mod),
 			})
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 		}
 	}
 }
