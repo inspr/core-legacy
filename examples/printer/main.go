@@ -28,10 +28,11 @@ func main() {
 			fmt.Println("Message -> ", message)
 			fmt.Println("Message Content -> ", message.Data)
 
+			err = c.CommitMessage(ctx, "ch1")
 			if err != nil {
 				log.Println(err.Error())
 			}
-			c.CommitMessage(ctx, "ch1")
+
 		}
 	}
 }
