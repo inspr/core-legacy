@@ -33,6 +33,7 @@ func main() {
 	c := dappclient.NewAppClient()
 	// channelName
 	chName := "ch1"
+	ctx := context.Background()
 
 	for {
 		select {
@@ -43,7 +44,7 @@ func main() {
 				Data: randNumber,
 			}
 
-			err := c.WriteMessage(context.Background(), chName, newMsg)
+			err := c.WriteMessage(ctx, chName, newMsg)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
