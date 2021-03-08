@@ -292,6 +292,8 @@ func Test_displayAppState(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
 			cliutils.SetClient(server.URL)
 
+			defer server.Close()
+
 			cmd.Execute()
 			got, _ := ioutil.ReadAll(buf)
 
@@ -363,6 +365,8 @@ func Test_displayChannelState(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
 			cliutils.SetClient(server.URL)
 
+			defer server.Close()
+
 			cmd.Execute()
 			got, _ := ioutil.ReadAll(buf)
 
@@ -433,6 +437,8 @@ func Test_displayChannelTypeState(t *testing.T) {
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
 			cliutils.SetClient(server.URL)
+
+			defer server.Close()
 
 			cmd.Execute()
 			got, _ := ioutil.ReadAll(buf)
