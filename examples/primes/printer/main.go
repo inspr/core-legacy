@@ -16,11 +16,12 @@ func main() {
 	// sets up ticker
 	ticker := time.NewTicker(2 * time.Second)
 	ctx := context.Background()
+	chName := "ch2"
 
 	for {
 		select {
 		case <-ticker.C:
-			message, err := c.ReadMessage(ctx, "ch1")
+			message, err := c.ReadMessage(ctx, chName)
 			if err != nil {
 				log.Println(err.Error())
 			}
@@ -28,7 +29,7 @@ func main() {
 			fmt.Println("Message -> ", message)
 			fmt.Println("Message Content -> ", message.Data)
 
-			err = c.CommitMessage(ctx, "ch1")
+			err = c.CommitMessage(ctx, chName)
 			if err != nil {
 				log.Println(err.Error())
 			}

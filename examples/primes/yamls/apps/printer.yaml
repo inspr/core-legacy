@@ -17,6 +17,7 @@ spec:
   boundary:
     input:
       - ch1
+      - ch2
     output:
       - ch2  
     

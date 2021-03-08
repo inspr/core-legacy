@@ -3,11 +3,12 @@ WORKDIR /app
 COPY go.mod go.mod
 RUN go mod download
 COPY . . 
-WORKDIR /app/examples/printer
+WORKDIR /app/examples/primes/generator
 RUN go build
 
 
 FROM alpine
 WORKDIR /app
-COPY --from=build /app/examples/printer/printer printer
-CMD ./printer
+COPY --from=build /app/examples/primes/generator/generator generator
+CMD ./generator
+
