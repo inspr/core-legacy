@@ -9,6 +9,7 @@ variables:
 stages:
   - build
   - test
+  - push
   - release
 
 build-cli:
@@ -36,6 +37,18 @@ lint:
   script:
     - go get -u golang.org/x/lint/golint
     - golint --set_exit_status ./...
+
+push-cli:
+  stage: push
+  image: google/cloud-sdk
+  script: 
+    - bash .gitlab/scripts/pushcli.sh VERSION
+  only:
+    refs:
+      - develop
+      - tags
+  dependencies:
+    - build-cli
 
 release-cli:
   stage: release
