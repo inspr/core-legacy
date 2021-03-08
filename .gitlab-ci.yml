@@ -9,6 +9,7 @@ variables:
 stages:
   - build
   - test
+  - push
   - release
 
 build-cli:
@@ -24,18 +25,6 @@ build-cli:
       - bin/
     expire_in: 30 days
 
-push-cli:
-  stage: build
-  image: google/cloud-sdk
-  script: 
-    - bash .gitlab/scripts/pushcli.sh VERSION
-  only:
-    refs:
-      - develop
-      - tags
-  dependencies:
-    - build-cli
-
 unit-tests:
   stage: test
   script:
@@ -48,6 +37,18 @@ lint:
   script:
     - go get -u golang.org/x/lint/golint
     - golint --set_exit_status ./...
+
+push-cli:
+  stage: push
+  image: google/cloud-sdk
+  script: 
+    - bash .gitlab/scripts/pushcli.sh VERSION
+  only:
+    refs:
+      - develop
+      - tags
+  dependencies:
+    - build-cli
 
 release-cli:
   stage: release
