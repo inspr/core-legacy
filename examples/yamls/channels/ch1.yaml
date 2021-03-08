@@ -4,7 +4,8 @@ meta:
   name: "ch1"
   reference: ""
   Annotations: 
-    mock: "mock"
+    kafka.partition.number: "1"
+    kafka.replication.factor: "1"
   parent: ""  
 spec:
   type: "ct1"

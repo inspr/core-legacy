@@ -2,18 +2,22 @@ apiVersion: v1
 kind: dapp
 meta:
   name: "printer"
+  reference: ""
+  parent: ""
 spec:
   node:
     meta:
       name: "node-printer"
-      parent: ""
+      parent: "printer"
     spec:
-      image: gcr.io/red-inspr/examples/primes/printer
+      image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
       replicas: 3
       environment:
         teste_env: "test"
-  
   boundary:
     input:
-      - ch2
+      - ch1
+    output:
+      - ch2  
+    
       

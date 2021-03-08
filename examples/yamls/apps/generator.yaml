@@ -10,12 +10,14 @@ spec:
       name: "node-generator"
       parent: "generator"
     spec:
-      image: gcr.io/red-inspr/examples/primes/generator
+      image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
       replicas: 3
       environment:
         MODULE: 100
   
   boundary:
+    input:
+      - ch2
     output:
       - ch1
       
