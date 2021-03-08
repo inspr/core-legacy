@@ -43,9 +43,7 @@ push-cli:
   script: 
     - bash .gitlab/scripts/pushcli.sh VERSION
   only:
-    refs:
-      - develop
-      - tags
+    - tags
   dependencies:
     - build-cli
 
