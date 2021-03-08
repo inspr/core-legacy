@@ -21,7 +21,7 @@ spec:
       - name: INSPR_APP_ID
         value: "abcdef"
       - name: "NODES_APPS_NAMESPACE"
-        value: "inspr-apps"
+        value: "default"
       - name: "INSPR_INPUT_CHANNELS"
         value: "default"
       - name: "INSPR_OUTPUT_CHANNELS"
