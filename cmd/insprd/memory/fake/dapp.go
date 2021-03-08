@@ -32,6 +32,9 @@ func (ch *Apps) CreateApp(context string, ct *meta.App) error {
 		return ch.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
+	if context == "" {
+		query = ct.Meta.Name
+	}
 	_, ok := ch.apps[query]
 	if ok {
 		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("dapp %s already exists", query)).Build()

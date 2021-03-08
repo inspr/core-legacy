@@ -2,13 +2,14 @@ package utils
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/disiqueira/gotree"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
 // PrintAppTree prints the app tree
-func PrintAppTree(app *meta.App) {
+func PrintAppTree(app *meta.App, out io.Writer) {
 	tree := gotree.New(app.Meta.Name)
 	meta := tree.Add("Meta")
 
@@ -43,12 +44,12 @@ func PrintAppTree(app *meta.App) {
 		output.Add(ch)
 	}
 
-	fmt.Println(tree.Print())
+	fmt.Fprintln(out, tree.Print())
 
 }
 
 // PrintChannelTree prints the channel structure
-func PrintChannelTree(ch *meta.Channel) {
+func PrintChannelTree(ch *meta.Channel, out io.Writer) {
 	channel := gotree.New(ch.Meta.Name)
 	meta := channel.Add("Meta")
 
@@ -62,11 +63,11 @@ func PrintChannelTree(ch *meta.Channel) {
 		conApps.Add(appName)
 	}
 
-	fmt.Println(channel.Print())
+	fmt.Fprintln(out, channel.Print())
 }
 
 // PrintChannelTypeTree prints the channel structure
-func PrintChannelTypeTree(ct *meta.ChannelType) {
+func PrintChannelTypeTree(ct *meta.ChannelType, out io.Writer) {
 	channelType := gotree.New(ct.Meta.Name)
 	meta := channelType.Add("Meta")
 
@@ -80,7 +81,7 @@ func PrintChannelTypeTree(ct *meta.ChannelType) {
 		conChannels.Add(appName)
 	}
 
-	fmt.Println(channelType.Print())
+	fmt.Println(out, channelType.Print())
 }
 
 func populateMeta(metaTree gotree.Tree, meta *meta.Metadata) {
