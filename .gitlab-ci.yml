@@ -24,6 +24,18 @@ build-cli:
       - bin/
     expire_in: 30 days
 
+push-cli:
+  stage: build
+  image: google/cloud-sdk
+  script: 
+    - bash .gitlab/scripts/pushcli.sh VERSION
+  only:
+    refs:
+      - develop
+      - tags
+  dependencies:
+    - build-cli
+
 unit-tests:
   stage: test
   script:
