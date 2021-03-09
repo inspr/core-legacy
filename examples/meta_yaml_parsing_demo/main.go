@@ -1,17 +1,19 @@
-package test
+package main
 
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
-	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	"gopkg.in/yaml.v2"
 )
 
-func TestYAMLTagsInMeta(t *testing.T) {
+// tests if the app written in the /tmp/inspr-meta-complete-yaml-test.yaml
+// when unmarshalled is equal to it's original definition
+func main() {
 	appTest := &meta.App{
 		Meta: meta.Metadata{
 			Name: "App1",
@@ -102,33 +104,29 @@ func TestYAMLTagsInMeta(t *testing.T) {
 	}
 
 	bytesYAML, err := yaml.Marshal(appTest)
-
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatalln(err)
 	}
 
-	file, err := os.Create("/tmp/averyuniquename.yaml")
+	file, err := os.Create("/tmp/inspr-meta-complete-yaml-test.yaml")
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatalln(err)
 	}
 	defer file.Close()
 
 	_, err = file.Write(bytesYAML)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatalln(err)
 	}
 
 	var app meta.App
 
-	data, err := ioutil.ReadFile("/tmp/averyuniquename.yaml")
+	data, _ := ioutil.ReadFile("/tmp/inspr-meta-complete-yaml-test.yaml")
 
 	yaml.Unmarshal(data, &app)
-
 	if changelog, _ := diff.Diff(appTest, &app); len(changelog) != 0 {
-		t.Errorf("TestServer_Init() = %v, want %v", app, appTest)
+		log.Fatalln("TestServer_Init() = ", app, ", want ", appTest)
 	}
 
+	fmt.Println("worked as expected")
 }

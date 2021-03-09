@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	test "gitlab.inspr.dev/inspr/core/pkg/testutils"
 	"gotest.tools/assert/cmp"
 	kubeCore "k8s.io/api/core/v1"
 )
@@ -301,7 +300,11 @@ func Test_parseToK8sArrEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.args.arrappEnv.ParseToK8sArrEnv()
 
-			var comp cmp.Comparison = cmp.DeepEqual(got, tt.want, test.GetMapCompareOptions())
+			var comp cmp.Comparison = cmp.DeepEqual(
+				got,
+				tt.want,
+				GetMapCompareOptions(),
+			)
 			if !comp().Success() {
 				t.Errorf("parseToK8sArrEnv() = %v, want %v", got, tt.want)
 			}
