@@ -39,9 +39,9 @@ lint:
 
 push-cli:
   stage: push
-  image: google/cloud-sdk
+  image: google/cloud-sdk:latest
   script: 
-    - bash .gitlab/scripts/pushcli.sh VERSION
+    - bash .gitlab/scripts/pushcli.sh $VERSION
   only:
     - tags
   dependencies:
@@ -51,7 +51,7 @@ release-cli:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - sh .gitlab/scripts/releasecli.sh VERSION
+    - sh .gitlab/scripts/releasecli.sh $VERSION
   only:
     - tags
   after_script:
