@@ -8,6 +8,8 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
+var version string
+
 func main() {
 	cli.GetFactory().Subscribe(meta.Component{
 		APIVersion: "v1",
@@ -24,5 +26,5 @@ func main() {
 		Kind:       "dapp",
 	}, cli.NewApplyApp())
 
-	cli.NewInsprCommand(os.Stdout, os.Stderr).Execute()
+	cli.NewInsprCommand(os.Stdout, os.Stderr, version).Execute()
 }

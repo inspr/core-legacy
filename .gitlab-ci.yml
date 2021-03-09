@@ -4,30 +4,31 @@ image: golang:latest
 variables:
   # Please edit to your GitLab project
   REPO_NAME: gitlab.inspr.dev/inspr/core
+  VERSION: $(git describe --always)
 
 stages:
   - build
   - test
-  - deploy
+  - push
+  - release
 
 build-cli:
   stage: build
   script:
-    - bash build-cli.sh
+    - bash .gitlab/scripts/buildcli.sh VERSION
   only:
-    - develop
-    - tags
+    refs:
+      - develop
+      - tags
   artifacts:
     paths:
-      - bin/*
+      - bin/
     expire_in: 30 days
-
 
 unit-tests:
   stage: test
   script:
-    - go test -v -coverprofile=profile.cov -coverpkg=./... ./...
-    - go tool cover -func profile.cov
+    - bash .gitlab/scripts/unittest.sh
   coverage: '/^total:\s+\(statements\)\s+(\d+\.\d+)\%$/'
 
 lint:
@@ -36,10 +37,22 @@ lint:
     - go get -u golang.org/x/lint/golint
     - golint --set_exit_status ./...
 
-
-release-cli:
-  stage: deploy
+push-cli:
+  stage: push
+  image: google/cloud-sdk:latest
   script:
-    bash .gitlab/scripts/release-cli.sh # get the built CLI, push it to gcloud or something, create a release on gitlab that contains the build CLIs
+    - bash .gitlab/scripts/pushcli.sh $VERSION
   only:
     - tags
+  dependencies:
+    - build-cli
+
+release-cli:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - sh .gitlab/scripts/releasecli.sh $VERSION
+  only:
+    - tags
+  after_script:
+    - echo "Release created!"
