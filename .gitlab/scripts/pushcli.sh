@@ -1,6 +1,8 @@
 #!/bin/bash
 VERSION=$1
 
+echo "This echo message is working"
+
 echo $GCR_ACCOUNT_KEY
 
 gcloud auth configure-docker
