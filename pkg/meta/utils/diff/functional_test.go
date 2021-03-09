@@ -9,7 +9,7 @@ import (
 func TestChangelog_ForEach(t *testing.T) {
 	var contexts []string
 	type args struct {
-		f func(c Change)
+		f func(c Change) error
 	}
 	tests := []struct {
 		name     string
@@ -34,8 +34,9 @@ func TestChangelog_ForEach(t *testing.T) {
 				},
 			},
 			args{
-				f: func(c Change) {
+				f: func(c Change) error {
 					contexts = append(contexts, c.Context)
+					return nil
 				},
 			},
 			func(t *testing.T) {
@@ -382,22 +383,23 @@ func TestNewDifferenceKindOperation(t *testing.T) {
 	var didDo int
 	type args struct {
 		kind  Kind
-		apply func(scope string, d Difference)
+		apply func(scope string, d Difference) error
 	}
 	tests := []struct {
 		name     string
 		args     args
-		wantFunc func(t *testing.T, got DifferenceOperation)
+		wantFunc func(t *testing.T, got DifferenceReaction)
 	}{
 		{
 			name: "one kind",
 			args: args{
 				kind: AnnotationKind,
-				apply: func(scope string, d Difference) {
+				apply: func(scope string, d Difference) error {
 					didDo = 1
+					return nil
 				},
 			},
-			wantFunc: func(t *testing.T, got DifferenceOperation) {
+			wantFunc: func(t *testing.T, got DifferenceReaction) {
 				if !got.filter("", Difference{Kind: AnnotationKind}) {
 					t.Error("did not apply filter correctly")
 				}
@@ -415,11 +417,12 @@ func TestNewDifferenceKindOperation(t *testing.T) {
 			name: "multiple kinds",
 			args: args{
 				kind: AnnotationKind | AppKind,
-				apply: func(scope string, d Difference) {
+				apply: func(scope string, d Difference) error {
 					didDo = 2
+					return nil
 				},
 			},
-			wantFunc: func(t *testing.T, got DifferenceOperation) {
+			wantFunc: func(t *testing.T, got DifferenceReaction) {
 				if !got.filter("", Difference{Kind: AnnotationKind}) {
 					t.Error("did not apply filter correctly")
 				}
@@ -438,7 +441,7 @@ func TestNewDifferenceKindOperation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewDifferenceKindOperation(tt.args.kind, tt.args.apply)
+			got := NewDifferenceKindReaction(tt.args.kind, tt.args.apply)
 			tt.wantFunc(t, got)
 		})
 	}

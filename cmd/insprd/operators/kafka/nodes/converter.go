@@ -169,11 +169,13 @@ func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 	var err error
 	node := meta.Node{}
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
+	node.Meta.Parent, err = toNodeParent(kdep.ObjectMeta.Name)
 	if err != nil {
 		return meta.Node{}, err
 	}
 	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
 	node.Spec.Environment = utils.ParseFromK8sEnviroment(kdep.Spec.Template.Spec.Containers[0].Env)
+	node.Spec.Replicas = int(*kdep.Spec.Replicas)
 	return node, nil
 }
 
@@ -182,5 +184,13 @@ func toNodeName(deployName string) (string, error) {
 	if len(strs) < 3 {
 		return "", ierrors.NewError().Message("invalid deployment name").Build()
 	}
-	return strs[2], nil
+	return strs[len(strs)-1], nil
+}
+
+func toNodeParent(deployName string) (string, error) {
+	strs := strings.Split(deployName, "-")
+	if len(strs) < 3 {
+		return "", ierrors.NewError().Message("invalid deployment name").Build()
+	}
+	return strs[len(strs)-2], nil
 }

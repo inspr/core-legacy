@@ -27,7 +27,21 @@ func TestDiff(t *testing.T) {
 			},
 			want: Changelog{
 				{
-					Context:   "*",
+					Context:   "app2.app3",
+					Kind:      NodeKind,
+					Operation: Update,
+					Diff: []Difference{
+						{
+							Field:     "Spec.Node.Spec.Image",
+							From:      "imageNodeApp3",
+							To:        "imageNodeApp3diff",
+							Kind:      NodeKind,
+							Operation: Update,
+						},
+					},
+				},
+				{
+					Context:   "",
 					Kind:      MetaKind | AnnotationKind | AppKind | ChannelKind | ChannelTypeKind,
 					Operation: Create | Update | Delete,
 					Diff: []Difference{
@@ -96,20 +110,6 @@ func TestDiff(t *testing.T) {
 						},
 					},
 				},
-				{
-					Context:   "*.Spec.Apps.app2.Spec.Apps.app3",
-					Kind:      NodeKind,
-					Operation: Update,
-					Diff: []Difference{
-						{
-							Field:     "Spec.Node.Spec.Image",
-							From:      "imageNodeApp3",
-							To:        "imageNodeApp3diff",
-							Kind:      NodeKind,
-							Operation: Update,
-						},
-					},
-				},
 			},
 			wantErr: false,
 		},
@@ -155,32 +155,15 @@ func TestChange_diffAppSpec(t *testing.T) {
 			},
 			want: Change{},
 		},
-		{
-			name:   "Uchanged Specs",
-			fields: fields{},
-			args: args{
-				specOrig: meta.AppSpec{},
-				specCurr: meta.AppSpec{
-					Apps: map[string]*meta.App{
-						"app1": {
-							Spec: meta.AppSpec{
-								Apps: map[string]*meta.App{
-									"app1": {},
-								},
-							},
-						},
-					},
-				},
-			},
-			want: Change{},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context: tt.fields.Context,
-				Diff:    tt.fields.Diff,
+				Context:   tt.fields.Context,
+				Diff:      tt.fields.Diff,
+				changelog: &Changelog{},
 			}
+
 			if err := change.diffAppSpec(tt.args.specOrig, tt.args.specCurr); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffAppSpec() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -505,8 +488,9 @@ func TestChange_diffApps(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context: tt.fields.Context,
-				Diff:    tt.fields.Diff,
+				Context:   tt.fields.Context,
+				Diff:      tt.fields.Diff,
+				changelog: &Changelog{},
 			}
 			change.diffApps(tt.args.appsOrig, tt.args.appsCurr)
 			if !equalChanges(*change, tt.want) {
@@ -954,7 +938,7 @@ func TestChange_diffMetadata(t *testing.T) {
 				ctx:        "",
 				parentKind: AppKind,
 			},
-			wantErr: true,
+			wantErr: false,
 			want: Change{
 				Kind:      MetaKind | AppKind,
 				Operation: Update,
@@ -990,7 +974,7 @@ func TestChange_diffMetadata(t *testing.T) {
 				ctx:        "",
 				parentKind: ChannelKind,
 			},
-			wantErr: true,
+			wantErr: false,
 			want: Change{
 				Kind:      MetaKind | ChannelKind,
 				Operation: Update,
@@ -1053,8 +1037,9 @@ func TestChange_diffMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context: tt.fields.Context,
-				Diff:    tt.fields.Diff,
+				Context:   tt.fields.Context,
+				Diff:      tt.fields.Diff,
+				changelog: &Changelog{},
 			}
 			if err := change.diffMetadata(tt.args.parentElement, tt.args.parentKind, tt.args.metaOrig, tt.args.metaCurr, tt.args.ctx); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffMetadata() error = %v, wantErr %v", err, tt.wantErr)

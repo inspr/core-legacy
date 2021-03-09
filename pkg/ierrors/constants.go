@@ -5,7 +5,7 @@ type InsprErrorCode int32
 
 // Error codes for inspr errors
 const (
-	NotFound InsprErrorCode = iota << 1
+	NotFound InsprErrorCode = 1 << iota
 	AlreadyExists
 	InternalServer
 	InvalidName

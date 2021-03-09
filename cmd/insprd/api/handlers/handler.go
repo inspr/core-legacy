@@ -15,7 +15,7 @@ type Handler struct {
 	changeReactions []diff.ChangeReaction
 }
 
-func NewHandler(memory memory.Manager, operator operators.OperatorInterface) Handler {
+func NewHandler(memory memory.Manager, operator operators.OperatorInterface) *Handler {
 	h := Handler{
 		Memory:          memory,
 		Operator:        operator,
@@ -23,5 +23,5 @@ func NewHandler(memory memory.Manager, operator operators.OperatorInterface) Han
 		changeReactions: []diff.ChangeReaction{},
 	}
 	h.initReactions()
-	return h
+	return &h
 }
