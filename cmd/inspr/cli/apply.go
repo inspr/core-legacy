@@ -133,6 +133,7 @@ func getFilesFromFolder(path string) ([]string, error) {
 	for _, file := range folder {
 		files = append(files, file.Name())
 	}
+
 	return files, nil
 }
 
@@ -143,7 +144,8 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 		if isYaml(file) {
 			fmt.Println(file)
 			comp := meta.Component{}
-			f, err := ioutil.ReadFile(path + file)
+
+			f, err := ioutil.ReadFile(filepath.Join(path, file))
 			if err != nil {
 				continue
 			}
