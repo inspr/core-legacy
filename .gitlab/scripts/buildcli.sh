@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=$(git describe --always)
+VERSION=$(git describe --always --tags)
 mkdir bin
 
 echo $VERSION > version
