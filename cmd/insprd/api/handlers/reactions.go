@@ -9,7 +9,7 @@ import (
 )
 
 var createdNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {
-	return diff.NewChangeOperation(
+	return diff.NewChangeReaction(
 		func(c diff.Change) bool {
 			_, errFrom := handler.Memory.Root().Apps().Get(c.Context)
 			to, errTo := handler.Memory.Apps().Get(c.Context)
@@ -143,7 +143,7 @@ var updatedChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 
 // apply this to updated nodes
 var updatedNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {
-	return diff.NewChangeOperation(
+	return diff.NewChangeReaction(
 		func(c diff.Change) bool {
 			from, _ := handler.Memory.Root().Apps().Get(c.Context)
 			// if there is a change in a given context and that context is a node
