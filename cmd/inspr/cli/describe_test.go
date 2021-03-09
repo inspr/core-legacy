@@ -55,6 +55,15 @@ func getMockApp() *meta.App {
 									SHA256:      "",
 								},
 								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "thenewapp",
+											Reference:   "app1.thenewapp",
+											Annotations: map[string]string{},
+											Parent:      "app1",
+											SHA256:      "",
+										},
+									},
 									Apps:         map[string]*meta.App{},
 									Channels:     map[string]*meta.Channel{},
 									ChannelTypes: map[string]*meta.ChannelType{},
