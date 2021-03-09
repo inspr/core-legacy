@@ -1,15 +1,16 @@
-# This file is a template, and might need editing before it works on your project.
 image: golang:latest
 
 variables:
   REPO_NAME: gitlab.inspr.dev/inspr/core
-  VERSION: $(git describe --always)
 
 stages:
   - build
   - test
   - push
   - release
+
+before_script:
+  - VERSION=$(git describe --always)
 
 build-cli:
   stage: build
