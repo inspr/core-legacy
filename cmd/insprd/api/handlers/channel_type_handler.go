@@ -11,12 +11,12 @@ import (
 // ChannelTypeHandler - contains handlers that uses the
 // ChannelTypeMemory interface methods
 type ChannelTypeHandler struct {
-	Handler
+	*Handler
 }
 
 // NewChannelTypeHandler - returns the handle function that
 // manages the creation of a channelType
-func NewChannelTypeHandler(handler Handler) *ChannelTypeHandler {
+func (handler *Handler) NewChannelTypeHandler() *ChannelTypeHandler {
 	return &ChannelTypeHandler{
 		handler,
 	}

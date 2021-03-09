@@ -10,11 +10,11 @@ import (
 
 // ChannelHandler - contains handlers that uses the ChannelMemory interface methods
 type ChannelHandler struct {
-	Handler
+	*Handler
 }
 
 // NewChannelHandler exports
-func NewChannelHandler(handler Handler) *ChannelHandler {
+func (handler *Handler) NewChannelHandler() *ChannelHandler {
 	return &ChannelHandler{
 		handler,
 	}
