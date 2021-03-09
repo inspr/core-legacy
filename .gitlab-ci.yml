@@ -2,7 +2,6 @@
 image: golang:latest
 
 variables:
-  # Please edit to your GitLab project
   REPO_NAME: gitlab.inspr.dev/inspr/core
   VERSION: $(git describe --always)
 
@@ -15,7 +14,7 @@ stages:
 build-cli:
   stage: build
   script:
-    - bash .gitlab/scripts/buildcli.sh VERSION
+    - bash .gitlab/scripts/buildcli.sh $VERSION
   only:
     refs:
       - develop
