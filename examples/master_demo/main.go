@@ -35,7 +35,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	utils.PrintChannelTypeTree(cType)
+	utils.PrintChannelTypeTree(cType, os.Stdout)
 
 	fmt.Println("[Creating ChannelOne inside HelloWorld app...]")
 	createChannelInsideHelloWorld(&client, false)
@@ -47,7 +47,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	utils.PrintChannelTree(ch)
+	utils.PrintChannelTree(ch, os.Stdout)
 
 	fmt.Println("[Getting ChannelTypeHello...]")
 	cType, err = client.ChannelTypes().Get(context.Background(), "HelloWorld", "ChannelTypeHello")
@@ -55,7 +55,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	utils.PrintChannelTypeTree(cType)
+	utils.PrintChannelTypeTree(cType, os.Stdout)
 
 	fmt.Println("[Creating NewApp inside HelloWorld app...]")
 	createNewAppInsideHelloWorld(&client, false)
@@ -98,7 +98,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	utils.PrintAppTree(resp)
+	utils.PrintAppTree(resp, os.Stdout)
 
 	fmt.Println("[Creating NewApp inside HelloWorld app NOT USING DRY RUN...]")
 	createNewAppInsideHelloWorld(&client, false)
@@ -110,7 +110,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	utils.PrintAppTree(resp)
+	utils.PrintAppTree(resp, os.Stdout)
 
 	fmt.Println("[Deleting HelloWorld App...]")
 	deleteHelloWorldApp(&client, false)
