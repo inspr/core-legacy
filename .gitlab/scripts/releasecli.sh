@@ -1,4 +1,4 @@
-VERSION=$1
+VERSION=$(cat version)
 BASE_URL="https://console.cloud.google.com/storage/browser/inspr-cli/bin"
 
 release-cli create --name "Release $VERSION" \

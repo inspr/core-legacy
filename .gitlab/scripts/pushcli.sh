@@ -1,11 +1,7 @@
 #!/bin/bash
-VERSION=$1
-
-echo "PRINT BEFORE"
+VERSION=$(cat version)
 
 echo $GCR_ACCOUNT_KEY
-
-echo "PRINT AFTER"
 
 gcloud auth configure-docker
 echo $GCR_ACCOUNT_KEY > $CI_PIPELINE_ID.json

@@ -9,13 +9,10 @@ stages:
   - push
   - release
 
-before_script:
-  - VERSION=$(git describe --always)
-
 build-cli:
   stage: build
   script:
-    - bash .gitlab/scripts/buildcli.sh $VERSION
+    - bash .gitlab/scripts/buildcli.sh
   only:
     refs:
       - develop
@@ -23,6 +20,7 @@ build-cli:
   artifacts:
     paths:
       - bin/
+      - version
     expire_in: 30 days
 
 unit-tests:
@@ -41,7 +39,7 @@ push-cli:
   stage: push
   image: google/cloud-sdk:latest
   script: 
-    - bash .gitlab/scripts/pushcli.sh $VERSION
+    - bash .gitlab/scripts/pushcli.sh
   only:
     - tags
   dependencies:
@@ -51,7 +49,7 @@ release-cli:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - sh .gitlab/scripts/releasecli.sh $VERSION
+    - sh .gitlab/scripts/releasecli.sh
   only:
     - tags
   after_script:
