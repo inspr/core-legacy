@@ -36,7 +36,7 @@ func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node,
 	nodeName := parseNodeName(insprEnv, app.Meta.Parent, app.Meta.Name)
 	dep, err := kube.Get(nodeName, metav1.GetOptions{})
 	if err != nil {
-		return &meta.Node{}, ierrors.NewError().Message("could't get deployment from kubernetes").InnerError(err).Build()
+		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
 	}
 	node, err := toNode(dep)
 	if err != nil {
@@ -58,7 +58,7 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 	deploy = dAppToDeployment(app)
 	dep, err := kube.Create(deploy)
 	if err != nil {
-		return &meta.Node{}, ierrors.NewError().Message("could't create deployment from kubernetes").InnerError(err).Build()
+		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
 	}
 	node, err := toNode(dep)
 	if err != nil {
@@ -75,7 +75,7 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 	deploy = dAppToDeployment(app)
 	dep, err := kube.Update(deploy)
 	if err != nil {
-		return &meta.Node{}, ierrors.NewError().Message("could't update deployment from kubernetes").InnerError(err).Build()
+		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
 	}
 	node, err := toNode(dep)
 	if err != nil {
@@ -92,7 +92,7 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 	err := kube.Delete(deploy, &metav1.DeleteOptions{})
 
 	if err != nil {
-		return ierrors.NewError().Message("could't delete deployment from kubernetes").InnerError(err).Build()
+		return ierrors.NewError().Message(err.Error()).Build()
 	}
 	return nil
 }
