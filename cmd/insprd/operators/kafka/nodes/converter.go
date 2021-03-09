@@ -174,7 +174,7 @@ func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 	}
 	node.Spec.Replicas = int(*kdep.Spec.Replicas)
 	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
-	node.Spec.Environment = utils.ParseFromK8sEnviroment(kdep.Spec.Template.Spec.Containers[0].Env)
+	node.Spec.Environment = utils.ParseFromK8sEnvironment(kdep.Spec.Template.Spec.Containers[0].Env)
 	return node, nil
 }
 

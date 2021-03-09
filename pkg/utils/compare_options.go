@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/google/go-cmp/cmp"
@@ -21,7 +20,6 @@ func GetMapCompareOptions() cmp.Options {
 		for _, e := range mapLeft.MapKeys() {
 			a := mapLeft.MapIndex(e)
 			b := mapRight.MapIndex(e)
-			fmt.Println(a, b)
 			if a.String() != b.String() {
 				return false
 			}

@@ -41,20 +41,22 @@ func Remove(vs []string, t string) []string {
 }
 
 /*
-StringSliceUnion returns the union of the two string slices.
+StringSliceUnion returns the sorted union of the two string slices.
 Remember that union dont have repeated elements
 */
 func StringSliceUnion(a, b []string) []string {
-	check := make(map[string]int)
+	check := make(map[string]bool)
+
 	d := append(a, b...)
 	res := make([]string, 0)
+
 	for _, val := range d {
-		check[val] = 1
+		if !check[val] {
+			res = append(res, val)
+		}
+		check[val] = true
 	}
 
-	for letter := range check {
-		res = append(res, letter)
-	}
 	return res
 }
 
@@ -107,8 +109,8 @@ func (m EnvironmentMap) ParseToK8sArrEnv() []kubeCore.EnvVar {
 	return arrEnv
 }
 
-//ParseFromK8sEnviroment is the oposing function to ParseToK8sArrEnv.
-func ParseFromK8sEnviroment(envs []kubeCore.EnvVar) EnvironmentMap {
+//ParseFromK8sEnvironment is the oposing function to ParseToK8sArrEnv.
+func ParseFromK8sEnvironment(envs []kubeCore.EnvVar) EnvironmentMap {
 	nodeEnv := make(map[string]string)
 	for _, env := range envs {
 		nodeEnv[env.Name] = env.Value
