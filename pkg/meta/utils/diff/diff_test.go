@@ -901,23 +901,81 @@ func TestChangelog_diff(t *testing.T) {
 	}{
 		{
 			name: "diff_output_test",
-			cl: Changelog{
-				Change{
-					Context: "some_ctx",
-					Diff: []Difference{
-						{
-							Field: "field_mock",
-							From:  "unmocked",
-							To:    "mocked",
-						},
-					},
-				},
-			},
+			cl:   Changelog{},
 			args: args{
 				appOrig: getMockRootApp(),
 				appCurr: getMockRootApp2(),
 				ctx:     "",
 			},
+			want: Changelog{
+				{
+					Context: "*",
+					Diff: []Difference{
+						{
+							Field: "Meta.SHA256",
+							From:  "1",
+							To:    "2",
+						},
+						{
+							Field: "Meta.Annotations[an1]",
+							From:  "<nil>",
+							To:    "a",
+						},
+						{
+							Field: "Meta.Annotations[an2]",
+							From:  "<nil>",
+							To:    "b",
+						},
+						{
+							Field: "Spec.Apps[app1]",
+							From:  "{...}",
+							To:    "<nil>",
+						},
+						{
+							Field: "Spec.Channels[ch2]",
+							From:  "{...}",
+							To:    "<nil>",
+						},
+						{
+							Field: "Spec.Channels[ch1].Meta.Reference",
+							From:  "root.ch1",
+							To:    "root.ch1diff",
+						},
+						{
+							Field: "Spec.ChannelTypes[ct2]",
+							From:  "{...}",
+							To:    "<nil>",
+						},
+						{
+							Field: "Spec.ChannelTypes[ct1].Meta.Reference",
+							From:  "root.ct1",
+							To:    "root.ct1diff",
+						},
+					},
+				},
+				{
+					Context: "*.Spec.Apps.app2.Spec.Apps.app3",
+					Diff: []Difference{
+						{
+							Field: "Spec.Node.Spec.Image",
+							From:  "imageNodeApp3",
+							To:    "imageNodeApp3diff",
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "diff_output_test_want_error",
+			cl:   Changelog{},
+			args: args{
+				appOrig: &meta.App{Meta: meta.Metadata{Name: "abc"}},
+				appCurr: &meta.App{Meta: meta.Metadata{Name: "dbc"}},
+				ctx:     "",
+			},
+			want:    Changelog{},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -929,11 +987,21 @@ func TestChangelog_diff(t *testing.T) {
 			)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Changelog.diff() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Changelog.diff() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Changelog.diff() = %v, want %v", got, tt.want)
+				fmt.Println(got)
+				t.Errorf(
+					"Changelog.diff() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
