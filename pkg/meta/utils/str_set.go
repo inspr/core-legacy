@@ -35,6 +35,11 @@ func (set *StrSet) ArrAppendSet(strings []string) {
 	}
 }
 
+//AppendSet extends a StrSeet with a string
+func (set *StrSet) AppendSet(str string) {
+	(*set)[str] = exists
+}
+
 //ArrDisjuncSet returns the disjunction set between two []string.
 func ArrDisjuncSet(arr1 []string, arr2 []string) StrSet {
 	set := make(StrSet)

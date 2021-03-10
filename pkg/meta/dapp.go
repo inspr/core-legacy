@@ -39,6 +39,6 @@ type AppSpec struct {
 	Apps         map[string]*App         `yaml:"apps,omitempty" json:"apps"`
 	Channels     map[string]*Channel     `yaml:"channels,omitempty" json:"channels"`
 	ChannelTypes map[string]*ChannelType `yaml:"channeltypes,omitempty" json:"channeltypes"`
-	Aliases      map[string]*Alias       `yaml:"aliases" json:"aliases`
+	Aliases      map[string]*Alias       `yaml:"aliases" json:"aliases"`
 	Boundary     AppBoundary             `yaml:"boundary,omitempty" json:"boundary"`
 }
