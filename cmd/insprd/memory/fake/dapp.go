@@ -68,3 +68,8 @@ func (ch *Apps) UpdateApp(context string, ct *meta.App) error {
 	ch.apps[query] = ct
 	return nil
 }
+
+// ResolveBoundary mock
+func (ch *Apps) ResolveBoundary(app *meta.App) (map[string]string, error) {
+	return nil, nil
+}
