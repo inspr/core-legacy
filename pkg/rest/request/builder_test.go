@@ -207,3 +207,72 @@ func TestClientBuilder_Build(t *testing.T) {
 		})
 	}
 }
+
+func TestNewJSONClient(t *testing.T) {
+	type args struct {
+		baseURL string
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Client
+	}{
+		{
+			name: "basic_newJsonClient_test",
+			args: args{baseURL: "mock_url:8080"},
+			want: &Client{
+				baseURL:          "mock_url:8080",
+				encoder:          json.Marshal,
+				decoderGenerator: JSONDecoderGenerator,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			// checking each component of the client
+			got := NewJSONClient(tt.args.baseURL)
+
+			// URL
+			if !reflect.DeepEqual(
+				got.baseURL,
+				tt.want.baseURL,
+			) {
+				t.Errorf(
+					"NewJSONClient() = %v, want %v",
+					got.baseURL,
+					tt.want.baseURL,
+				)
+			}
+
+			// encoder
+			gotBytes, _ := got.encoder(1)
+			wantBytes, _ := tt.want.encoder(1)
+			if !reflect.DeepEqual(
+				gotBytes,
+				wantBytes,
+			) {
+				t.Errorf(
+					"NewJSONClient() = %v, want %v",
+					gotBytes,
+					wantBytes,
+				)
+			}
+
+			// decoder
+			gotDecoder := got.decoderGenerator(bytes.NewBuffer(gotBytes))
+			wantDecoder := tt.want.decoderGenerator(bytes.NewBuffer(wantBytes))
+			if !reflect.DeepEqual(
+				gotDecoder,
+				wantDecoder,
+			) {
+				t.Errorf(
+					"NewJSONClient() = %v, want %v",
+					gotDecoder,
+					wantDecoder,
+				)
+			}
+
+		})
+	}
+}

@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -146,4 +148,43 @@ func TestRecoverFromPanic(t *testing.T) {
 		t.Errorf("RecoverFromPanic=%v, want %v", got, want)
 	}
 
+}
+
+func TestUnmarshalERROR(t *testing.T) {
+	type args struct {
+		r io.Reader
+	}
+
+	errBody := struct {
+		Error string `json:"error"`
+	}{Error: "my_error"}
+	errBytes, _ := json.Marshal(errBody)
+
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "basic_unmarshal_error",
+			args:    args{r: bytes.NewBuffer(errBytes)},
+			wantErr: true,
+		},
+		{
+			name:    "basic_unmarshal_empty_error",
+			args:    args{r: strings.NewReader("nothing")},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := UnmarshalERROR(tt.args.r)
+			if (err.Error() != "") != tt.wantErr {
+				t.Errorf("UnmarshalERROR() error = %v, wantErr %v",
+					err.Error(),
+					tt.wantErr,
+				)
+			}
+		})
+	}
 }
