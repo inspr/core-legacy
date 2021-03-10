@@ -10,7 +10,7 @@ type Node struct {
 
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.
 type NodeSpec struct {
-	Image string 					 `yaml:"image,omitempty"  json:"image"`
+	Image       string               `yaml:"image,omitempty"  json:"image"`
 	Replicas    int                  `yaml:"replicas,omitempty" json:"replicas"`
 	Environment utils.EnvironmentMap `yaml:"environment,omitempty" json:"environment"`
 }
@@ -39,5 +39,6 @@ type AppSpec struct {
 	Apps         map[string]*App         `yaml:"apps,omitempty" json:"apps"`
 	Channels     map[string]*Channel     `yaml:"channels,omitempty" json:"channels"`
 	ChannelTypes map[string]*ChannelType `yaml:"channeltypes,omitempty" json:"channeltypes"`
+	Aliases      map[string]*Alias       `yaml:"aliases" json:"aliases`
 	Boundary     AppBoundary             `yaml:"boundary,omitempty" json:"boundary"`
 }
