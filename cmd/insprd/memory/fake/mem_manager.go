@@ -15,14 +15,20 @@ type MemManager struct {
 	app         Apps
 }
 
+// LookupMemManager mocks getter for roots
 type LookupMemManager MemManager
 
+// Apps mocks an app getter
 func (l LookupMemManager) Apps() memory.AppGetInterface {
 	return &l.app
 }
+
+// Channels mocks a channel getter
 func (l LookupMemManager) Channels() memory.ChannelGetInterface {
 	return &l.channel
 }
+
+// ChannelTypes mocks a channel type getter
 func (l LookupMemManager) ChannelTypes() memory.ChannelTypeGetInterface {
 	return &l.channelType
 }
@@ -45,6 +51,7 @@ func MockMemoryManager(failErr error) memory.Manager {
 	}
 }
 
+// Root mocks a root getter interface
 func (mm *MemManager) Root() memory.GetInterface {
 	return (*LookupMemManager)(mm)
 }

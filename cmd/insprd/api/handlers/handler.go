@@ -15,6 +15,8 @@ type Handler struct {
 	changeReactions []diff.ChangeReaction
 }
 
+// NewHandler creates a handler from a memory manager and an operator. It also initializes the reactors for
+// changes on the cluster.
 func NewHandler(memory memory.Manager, operator operators.OperatorInterface) *Handler {
 	h := Handler{
 		Memory:          memory,
