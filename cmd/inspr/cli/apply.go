@@ -89,6 +89,8 @@ func doApply(_ context.Context) error {
 		return ierrors.NewError().Message("invalid flag arguments").Build()
 	}
 
+	fmt.Println(cmd.InsprOptions.AppliedFileStructure)
+
 	if hasFileFlag {
 		files = append(files, cmd.InsprOptions.AppliedFileStructure)
 	} else {
