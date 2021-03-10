@@ -779,6 +779,166 @@ func TestChange_diffMetadata(t *testing.T) {
 	}
 }
 
+func equalChanges(change1 Change, change2 Change) bool {
+	if change1.Context != change2.Context {
+		return false
+	}
+	if len(change1.Diff) != len(change2.Diff) {
+		return false
+	}
+	map1 := make(map[Difference]int)
+	map2 := make(map[Difference]int)
+	for _, diff := range change1.Diff {
+		map1[diff]++
+	}
+
+	for _, diff := range change2.Diff {
+		map2[diff]++
+	}
+
+	for key, val := range map1 {
+		if map2[key] != val {
+			return false
+		}
+	}
+	return true
+}
+
+func equalChangelogs(changelog1 Changelog, changelog2 Changelog) bool {
+	if len(changelog1) != len(changelog2) {
+		return false
+	}
+	map1 := make(map[string]map[Difference]int)
+	map2 := make(map[string]map[Difference]int)
+	for _, change := range changelog1 {
+		map1[change.Context] = make(map[Difference]int)
+		for _, diff := range change.Diff {
+			map1[change.Context][diff]++
+		}
+	}
+
+	for _, change := range changelog2 {
+		map2[change.Context] = make(map[Difference]int)
+		for _, diff := range change.Diff {
+			map2[change.Context][diff]++
+		}
+	}
+
+	for key, val := range map1 {
+		if len(map1[key]) != len(map2[key]) {
+			return false
+		}
+
+		for key2, val2 := range val {
+			if map2[key][key2] != val2 {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func TestChangelog_Print(t *testing.T) {
+	expectedOut := bytes.NewBufferString("On: abc\n")
+	w := tabwriter.NewWriter(expectedOut, 12, 0, 3, ' ', tabwriter.Debug)
+
+	// generating the expected output
+	fmt.Fprintln(w, "Field\t From\t To")
+	fmt.Fprintf(
+		w,
+		"%s\t %s\t %s\n",
+		"mock_field",
+		"unmocked",
+		"mocked",
+	)
+	w.Flush()
+
+	tests := []struct {
+		name    string
+		cl      Changelog
+		wantOut string
+	}{
+		{
+			name: "basic_changelog_print",
+			cl: Changelog{
+				Change{
+					Context: "abc",
+					Diff: []Difference{
+						{
+							Field: "mock_field",
+							From:  "unmocked",
+							To:    "mocked",
+						},
+					},
+				},
+			},
+			wantOut: expectedOut.String(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out := &bytes.Buffer{}
+			tt.cl.Print(out)
+			if gotOut := out.String(); gotOut != tt.wantOut {
+				t.Errorf("Changelog.Print() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
+func TestChangelog_diff(t *testing.T) {
+	type args struct {
+		appOrig *meta.App
+		appCurr *meta.App
+		ctx     string
+	}
+	tests := []struct {
+		name    string
+		cl      Changelog
+		args    args
+		want    Changelog
+		wantErr bool
+	}{
+		{
+			name: "diff_output_test",
+			cl: Changelog{
+				Change{
+					Context: "some_ctx",
+					Diff: []Difference{
+						{
+							Field: "field_mock",
+							From:  "unmocked",
+							To:    "mocked",
+						},
+					},
+				},
+			},
+			args: args{
+				appOrig: getMockRootApp(),
+				appCurr: getMockRootApp2(),
+				ctx:     "",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.cl.diff(
+				tt.args.appOrig,
+				tt.args.appCurr,
+				tt.args.ctx,
+			)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Changelog.diff() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Changelog.diff() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func getMockRootApp() *meta.App {
 	root := meta.App{
 		Meta: meta.Metadata{
@@ -1049,140 +1209,4 @@ func getMockRootApp2() *meta.App {
 		},
 	}
 	return &root
-}
-
-func equalChanges(change1 Change, change2 Change) bool {
-	if change1.Context != change2.Context {
-		return false
-	}
-	if len(change1.Diff) != len(change2.Diff) {
-		return false
-	}
-	map1 := make(map[Difference]int)
-	map2 := make(map[Difference]int)
-	for _, diff := range change1.Diff {
-		map1[diff]++
-	}
-
-	for _, diff := range change2.Diff {
-		map2[diff]++
-	}
-
-	for key, val := range map1 {
-		if map2[key] != val {
-			return false
-		}
-	}
-	return true
-}
-
-func equalChangelogs(changelog1 Changelog, changelog2 Changelog) bool {
-	if len(changelog1) != len(changelog2) {
-		return false
-	}
-	map1 := make(map[string]map[Difference]int)
-	map2 := make(map[string]map[Difference]int)
-	for _, change := range changelog1 {
-		map1[change.Context] = make(map[Difference]int)
-		for _, diff := range change.Diff {
-			map1[change.Context][diff]++
-		}
-	}
-
-	for _, change := range changelog2 {
-		map2[change.Context] = make(map[Difference]int)
-		for _, diff := range change.Diff {
-			map2[change.Context][diff]++
-		}
-	}
-
-	for key, val := range map1 {
-		if len(map1[key]) != len(map2[key]) {
-			return false
-		}
-
-		for key2, val2 := range val {
-			if map2[key][key2] != val2 {
-				return false
-			}
-		}
-	}
-	return true
-}
-
-func TestChangelog_Print(t *testing.T) {
-	expectedOut := bytes.NewBufferString("On: abc\n")
-	w := tabwriter.NewWriter(expectedOut, 12, 0, 3, ' ', tabwriter.Debug)
-
-	// generating the expected output
-	fmt.Fprintln(w, "Field\t From\t To")
-	fmt.Fprintf(
-		w,
-		"%s\t %s\t %s\n",
-		"mock_field",
-		"unmocked",
-		"mocked",
-	)
-	w.Flush()
-
-	tests := []struct {
-		name    string
-		cl      Changelog
-		wantOut string
-	}{
-		{
-			name: "basic_changelog_print",
-			cl: Changelog{
-				Change{
-					Context: "abc",
-					Diff: []Difference{
-						{
-							Field: "mock_field",
-							From:  "unmocked",
-							To:    "mocked",
-						},
-					},
-				},
-			},
-			wantOut: expectedOut.String(),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			out := &bytes.Buffer{}
-			tt.cl.Print(out)
-			if gotOut := out.String(); gotOut != tt.wantOut {
-				t.Errorf("Changelog.Print() = %v, want %v", gotOut, tt.wantOut)
-			}
-		})
-	}
-}
-
-func TestChangelog_diff(t *testing.T) {
-	type args struct {
-		appOrig *meta.App
-		appCurr *meta.App
-		ctx     string
-	}
-	tests := []struct {
-		name    string
-		cl      Changelog
-		args    args
-		want    Changelog
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.cl.diff(tt.args.appOrig, tt.args.appCurr, tt.args.ctx)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Changelog.diff() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Changelog.diff() = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }

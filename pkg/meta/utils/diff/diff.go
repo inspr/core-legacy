@@ -61,7 +61,12 @@ func (cl Changelog) Print(out io.Writer) {
 	}
 }
 
-func (cl Changelog) diff(appOrig *meta.App, appCurr *meta.App, ctx string) (Changelog, error) {
+func (cl Changelog) diff(
+	appOrig *meta.App,
+	appCurr *meta.App,
+	ctx string,
+) (Changelog, error) {
+
 	if ctx == "" {
 		ctx = "*"
 	}
