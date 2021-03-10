@@ -9,9 +9,9 @@ This folder contains the files necessary to run the primes example in your clust
 
 
 ## How to run it:
-Make sure the latest Inspr CLI version is installed. \
+Make sure the latest Inspr CLI version is installed. 
 - To get the latest version, run the following command:  
-`go install gitlab.inspr.dev/inspr/core/cmd/inspr`
+`go install gitlab.inspr.dev/inspr/core/cmd/inspr`  
 
 Before running the inspr command to create the app in your cluster be sure to set the configuration beforehand. 
 

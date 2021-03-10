@@ -25,8 +25,6 @@ func main() {
 			if err != nil {
 				log.Println(err.Error())
 			}
-
-			fmt.Println("Message -> ", message)
 			fmt.Println("Message Content -> ", message.Data)
 
 			err = c.CommitMessage(ctx, chName)

@@ -5,8 +5,8 @@ meta:
   reference: ""
   parent: ""
   Annotations: 
-    kafka.partition.number: "1"
-    kafka.replication.factor: "1"
+    kafka.partition.number: "3"
+    kafka.replication.factor: "3"
 spec:
   channeltypes:
     primes_ct1:
@@ -24,8 +24,8 @@ spec:
         name: "primes_ch1"
         reference: ""
         Annotations: 
-          kafka.partition.number: "1"
-          kafka.replication.factor: "1"
+          kafka.partition.number: "3"
+          kafka.replication.factor: "3"
         parent: ""  
       spec:
         type: "primes_ct1"
@@ -34,8 +34,8 @@ spec:
         name: "primes_ch2"
         reference: ""
         Annotations:     
-          kafka.partition.number: "1"
-          kafka.replication.factor: "1"
+          kafka.partition.number: "3"
+          kafka.replication.factor: "3"
         parent: ""  
       spec:
         type: "primes_ct2"
@@ -53,7 +53,7 @@ spec:
             parent: "generator"
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
-            replicas: 3
+            replicas: 8
             environment:
               MODULE: 100
         boundary:
@@ -72,10 +72,10 @@ spec:
         node:
           meta:
             name: "node-filter"
-            parent: "filter"
+            parent: "filter-primes"
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
-            replicas: 3            
+            replicas: 2            
 
         boundary:
           input:
@@ -98,7 +98,7 @@ spec:
             parent: "printer"
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
-            replicas: 3            
+            replicas: 2            
         boundary:
           input:
             - primes_ch1
