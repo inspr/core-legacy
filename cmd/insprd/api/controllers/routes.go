@@ -41,7 +41,7 @@ func (s *Server) initRoutes() {
 			chandler.HandleGetChannelByRef().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			chandler.HandleCreateChannel().JSON()(w, r)
+			chandler.HandleCreateChannel().JSON().Recover()(w, r)
 
 		case http.MethodPut:
 			chandler.HandleUpdateChannel().JSON().Recover()(w, r)
@@ -63,7 +63,7 @@ func (s *Server) initRoutes() {
 			cthandler.HandleGetChannelTypeByRef().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			cthandler.HandleCreateChannelType().JSON()(w, r)
+			cthandler.HandleCreateChannelType().JSON().Recover()(w, r)
 
 		case http.MethodPut:
 			cthandler.HandleUpdateChannelType().JSON().Recover()(w, r)
