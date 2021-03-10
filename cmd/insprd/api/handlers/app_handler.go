@@ -9,7 +9,6 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
@@ -65,19 +64,6 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
-}
-
-func (handler *Handler) applyChangesInDiff(changes diff.Changelog) error {
-	errs := ierrors.MultiError{
-		Errors: []error{},
-	}
-	errs.Add(changes.ForEachDiffFiltered(handler.diffReactions...))
-	errs.Add(changes.ForEachFiltered(handler.changeReactions...))
-	if errs.Empty() {
-		return nil
-	}
-
-	return ierrors.NewError().Message(errs.Error()).Build()
 }
 
 // HandleGetAppByRef - handler that generates the rest.Handle
@@ -223,18 +209,4 @@ func (handler *Handler) deleteApp(app *meta.App) error {
 		return &errs
 	}
 	return nil
-}
-
-func (handler *Handler) addDiffReactor(op ...diff.DifferenceReaction) {
-	if handler.diffReactions == nil {
-		handler.diffReactions = []diff.DifferenceReaction{}
-	}
-	handler.diffReactions = append(handler.diffReactions, op...)
-}
-
-func (handler *Handler) addChangeReactor(op ...diff.ChangeReaction) {
-	if handler.changeReactions == nil {
-		handler.changeReactions = []diff.ChangeReaction{}
-	}
-	handler.changeReactions = append(handler.changeReactions, op...)
 }

@@ -3,6 +3,7 @@ package handler
 import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 )
 
@@ -26,4 +27,31 @@ func NewHandler(memory memory.Manager, operator operators.OperatorInterface) *Ha
 	}
 	h.initReactions()
 	return &h
+}
+
+func (handler *Handler) addDiffReactor(op ...diff.DifferenceReaction) {
+	if handler.diffReactions == nil {
+		handler.diffReactions = []diff.DifferenceReaction{}
+	}
+	handler.diffReactions = append(handler.diffReactions, op...)
+}
+
+func (handler *Handler) addChangeReactor(op ...diff.ChangeReaction) {
+	if handler.changeReactions == nil {
+		handler.changeReactions = []diff.ChangeReaction{}
+	}
+	handler.changeReactions = append(handler.changeReactions, op...)
+}
+
+func (handler *Handler) applyChangesInDiff(changes diff.Changelog) error {
+	errs := ierrors.MultiError{
+		Errors: []error{},
+	}
+	errs.Add(changes.ForEachDiffFiltered(handler.diffReactions...))
+	errs.Add(changes.ForEachFiltered(handler.changeReactions...))
+	if errs.Empty() {
+		return nil
+	}
+
+	return ierrors.NewError().Message(errs.Error()).Build()
 }
