@@ -16,7 +16,7 @@ func main() {
 	// sets up ticker
 	ticker := time.NewTicker(2 * time.Second)
 	ctx := context.Background()
-	chName := "ch2"
+	chName := "primes_ch2"
 
 	for {
 		select {

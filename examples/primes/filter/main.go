@@ -22,8 +22,8 @@ func main() {
 	client := dappclient.NewAppClient()
 
 	// channelName
-	inputChannel := "ch1"
-	outputChannel := "ch2"
+	inputChannel := "primes_ch1"
+	outputChannel := "primes_ch2"
 
 	for {
 		select {
