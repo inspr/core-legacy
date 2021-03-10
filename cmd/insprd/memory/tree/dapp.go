@@ -175,14 +175,15 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	return nil, err
 }
 
+//ResolveBoundary recursive method that resolves connections for app boundaries
 func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
 	boundaries := make(map[string]string)
-	var unresolved metautils.StrSet
+	unresolved := metautils.StrSet{}
 	for _, bound := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
 		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
 		unresolved.AppendSet(bound)
 	}
-	parentApp, err := amm.Get(app.Meta.Parent)
+	parentApp, err := getParentApp(app.Meta.Reference)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +228,7 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 		}
 		return &merr
 	}
-	parentApp, err := amm.Get(app.Meta.Parent)
+	parentApp, err := getParentApp(app.Meta.Reference)
 	if err != nil {
 		return err
 	}
