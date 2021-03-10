@@ -72,7 +72,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	app, _ := mem.Apps().GetApp("app1")
+	app, _ := mem.Apps().Get("app1")
 	_, err = op.CreateNode(
 		context.Background(),
 		app,

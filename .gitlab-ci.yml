@@ -38,8 +38,8 @@ lint:
 push-cli:
   stage: push
   image: google/cloud-sdk:latest
-  script: 
-    - bash .gitlab/scripts/pushcli.sh
+  script:
+    - bash .gitlab/scripts/pushcli.sh $VERSION
   only:
     - tags
   dependencies:

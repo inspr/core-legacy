@@ -5,21 +5,20 @@ import (
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 // ChannelTypeHandler - contains handlers that uses the
 // ChannelTypeMemory interface methods
 type ChannelTypeHandler struct {
-	memory.ChannelTypeMemory
+	*Handler
 }
 
 // NewChannelTypeHandler - returns the handle function that
 // manages the creation of a channelType
-func NewChannelTypeHandler(memManager memory.Manager) *ChannelTypeHandler {
+func (handler *Handler) NewChannelTypeHandler() *ChannelTypeHandler {
 	return &ChannelTypeHandler{
-		ChannelTypeMemory: memManager.ChannelTypes(),
+		handler,
 	}
 }
 
@@ -36,18 +35,18 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 			return
 		}
 
-		cth.InitTransaction()
+		cth.Memory.InitTransaction()
 		if !data.DryRun {
-			defer cth.Commit()
+			defer cth.Memory.Commit()
 		} else {
-			defer cth.Cancel()
+			defer cth.Memory.Cancel()
 		}
-		err = cth.CreateChannelType(data.Ctx, &data.ChannelType)
+		err = cth.Memory.ChannelTypes().CreateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := cth.GetTransactionChanges()
+		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -70,10 +69,10 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 			return
 		}
 
-		cth.InitTransaction()
-		defer cth.Cancel()
+		cth.Memory.InitTransaction()
+		defer cth.Memory.Cancel()
 
-		channelType, err := cth.GetChannelType(data.Ctx, data.CtName)
+		channelType, err := cth.Memory.Root().ChannelTypes().Get(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -96,22 +95,32 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			return
 		}
 
-		cth.InitTransaction()
+		cth.Memory.InitTransaction()
 		if !data.DryRun {
-			defer cth.Commit()
+			defer cth.Memory.Commit()
 		} else {
-			defer cth.Cancel()
+			defer cth.Memory.Cancel()
 		}
-		err = cth.UpdateChannelType(data.Ctx, &data.ChannelType)
+
+		err = cth.Memory.ChannelTypes().UpdateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := cth.GetTransactionChanges()
+
+		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
+
+		if !data.DryRun {
+			err = cth.applyChangesInDiff(diff)
+			if err != nil {
+				rest.ERROR(w, err)
+			}
+		}
+
 		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
@@ -130,18 +139,18 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 			return
 		}
 
-		cth.InitTransaction()
+		cth.Memory.InitTransaction()
 		if !data.DryRun {
-			defer cth.Commit()
+			defer cth.Memory.Commit()
 		} else {
-			defer cth.Cancel()
+			defer cth.Memory.Cancel()
 		}
-		err = cth.DeleteChannelType(data.Ctx, data.CtName)
+		err = cth.Memory.ChannelTypes().DeleteChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := cth.GetTransactionChanges()
+		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return

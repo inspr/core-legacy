@@ -57,7 +57,7 @@ func NewReader() (*Reader, error) {
 
 /*
 ReadMessage reads message by message. Returns channel the message belongs to,
-the message and an error if any occured.
+the message and an error if any occurred.
 */
 func (reader *Reader) ReadMessage() (models.BrokerData, error) {
 	for {

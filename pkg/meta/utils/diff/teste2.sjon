@@ -1,0 +1,88 @@
+[
+                {
+                    "context": "*",
+                    "diff": [
+                        {
+                            "field": "Meta.SHA256",
+                            "from": "1",
+                            "to": "2",
+                            "Kind": 5,
+                            "Name": "",
+                            "Operation": 2
+                        },
+                        {
+                            "field": "Meta.Annotations[an1]",
+                            "from": "\u003cnil\u003e",
+                            "to": "a",
+                            "Kind": 133,
+                            "Name": "an1",
+                            "Operation": 4
+                        },
+                        {
+                            "field": "Meta.Annotations[an2]",
+                            "from": "\u003cnil\u003e",
+                            "to": "b",
+                            "Kind": 133,
+                            "Name": "an2",
+                            "Operation": 4
+                        },
+                        {
+                            "field": "Spec.Apps[app1]",
+                            "from": "{...}",
+                            "to": "\u003cnil\u003e",
+                            "Kind": 1,
+                            "Name": "app1",
+                            "Operation": 1
+                        },
+                        {
+                            "field": "Spec.Channels[ch2]",
+                            "from": "{...}",
+                            "to": "\u003cnil\u003e",
+                            "Kind": 8,
+                            "Name": "ct2",
+                            "Operation": 1
+                        },
+                        {
+                            "field": "Spec.Channels[ch1].Meta.Reference",
+                            "from": "root.ch1",
+                            "to": "root.ch1diff",
+                            "Kind": 12,
+                            "Name": "ct1",
+                            "Operation": 2
+                        },
+                        {
+                            "field": "Spec.ChannelTypes[ct2]",
+                            "from": "{...}",
+                            "to": "\u003cnil\u003e",
+                            "Kind": 16,
+                            "Name": "ct2",
+                            "Operation": 1
+                        },
+                        {
+                            "field": "Spec.ChannelTypes[ct1].Meta.Reference",
+                            "from": "root.ct1",
+                            "to": "root.ct1diff",
+                            "Kind": 20,
+                            "Name": "ct1",
+                            "Operation": 2
+                        }
+                    ],
+                    "Kind": 157,
+                    "Operation": 7
+                },
+                {
+                    "context": "*.Spec.Apps.app2.Spec.Apps.app3",
+                    "diff": [
+                        {
+                            "field": "Spec.Node.Spec.Image",
+                            "from": "imageNodeApp3",
+                            "to": "imageNodeApp3diff",
+                            "Kind": 2,
+                            "Name": "",
+                            "Operation": 2
+                        }
+                    ],
+                    "Kind": 2,
+                    "Operation": 2
+                }
+            ]

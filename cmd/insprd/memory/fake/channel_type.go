@@ -14,8 +14,8 @@ type ChannelTypes struct {
 	channelTypes map[string]*meta.ChannelType
 }
 
-// GetChannelType - simple mock
-func (chType *ChannelTypes) GetChannelType(context string, ctName string) (*meta.ChannelType, error) {
+// Get - simple mock
+func (chType *ChannelTypes) Get(context string, ctName string) (*meta.ChannelType, error) {
 	if chType.fail != nil {
 		return nil, chType.fail
 	}

@@ -131,13 +131,13 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			chh := GetTreeMemory().Channels()
-			got, err := chh.GetChannel(tt.args.context, tt.args.chName)
+			got, err := chh.Get(tt.args.context, tt.args.chName)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelMemoryManager.GetChannel() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ChannelMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ChannelMemoryManager.GetChannel() = %v, want %v", got, tt.want)
+				t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -288,7 +288,7 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 			want:    nil,
 			checkFunction: func() (bool, string) {
 				am := GetTreeMemory().ChannelTypes()
-				ct, err := am.GetChannelType("", "channelType1")
+				ct, err := am.Get("", "channelType1")
 				if err != nil {
 					return false, "cant get channelType 'channelType1'"
 				}
@@ -342,9 +342,9 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 				return
 			}
 			if tt.want != nil {
-				got, err := chh.GetChannel(tt.args.context, tt.want.Meta.Name)
+				got, err := chh.Get(tt.args.context, tt.want.Meta.Name)
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("ChannelMemoryManager.GetChannel() = %v, want %v", got, tt.want)
+					t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
 			if tt.checkFunction != nil {
@@ -465,9 +465,9 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 				t.Errorf("ChannelMemoryManager.DeleteChannel() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			got, _ := chh.GetChannel(tt.args.context, tt.args.chName)
+			got, _ := chh.Get(tt.args.context, tt.args.chName)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ChannelMemoryManager.GetChannel() = %v, want %v", got, tt.want)
+				t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -600,9 +600,9 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 				return
 			}
 			if tt.want != nil {
-				got, err := chh.GetChannel(tt.args.context, tt.want.Meta.Name)
+				got, err := chh.Get(tt.args.context, tt.want.Meta.Name)
 				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("ChannelMemoryManager.GetChannel() = %v, want %v", got, tt.want)
+					t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
 		})

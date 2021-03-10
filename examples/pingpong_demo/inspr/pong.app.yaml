@@ -1,0 +1,14 @@
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: pong
+spec:
+  node:
+    spec:
+      image: gcr.io/red-inspr/inspr/example/pong:latest
+  boundary:
+    input:
+      - ch1
+    output:
+      - ch2

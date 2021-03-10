@@ -11,7 +11,7 @@ build:
   - image: gcr.io/red-inspr/inspr/sidecar/kafka
     context: .
     docker:
-      dockerfile: cmd/sidecars/kafka/sidecar.Dockerfile
+      dockerfile: cmd/sidecars/kafka/Dockerfile
 deploy:
   helm:
     releases:

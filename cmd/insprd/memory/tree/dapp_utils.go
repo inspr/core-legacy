@@ -160,7 +160,7 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 	sonRef := strings.Split(sonQuery, ".")
 	parentQuery := strings.Join(sonRef[:len(sonRef)-1], ".")
 
-	parentApp, err := GetTreeMemory().Apps().GetApp(parentQuery)
+	parentApp, err := GetTreeMemory().Apps().Get(parentQuery)
 
 	return parentApp, err
 }
