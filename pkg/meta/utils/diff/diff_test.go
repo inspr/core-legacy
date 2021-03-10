@@ -1,7 +1,11 @@
 package diff
 
 import (
+	"bytes"
+	"fmt"
+	"reflect"
 	"testing"
+	"text/tabwriter"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
@@ -1104,4 +1108,81 @@ func equalChangelogs(changelog1 Changelog, changelog2 Changelog) bool {
 		}
 	}
 	return true
+}
+
+func TestChangelog_Print(t *testing.T) {
+	expectedOut := bytes.NewBufferString("On: abc\n")
+	w := tabwriter.NewWriter(expectedOut, 12, 0, 3, ' ', tabwriter.Debug)
+
+	// generating the expected output
+	fmt.Fprintln(w, "Field\t From\t To")
+	fmt.Fprintf(
+		w,
+		"%s\t %s\t %s\n",
+		"mock_field",
+		"unmocked",
+		"mocked",
+	)
+	w.Flush()
+
+	tests := []struct {
+		name    string
+		cl      Changelog
+		wantOut string
+	}{
+		{
+			name: "basic_changelog_print",
+			cl: Changelog{
+				Change{
+					Context: "abc",
+					Diff: []Difference{
+						{
+							Field: "mock_field",
+							From:  "unmocked",
+							To:    "mocked",
+						},
+					},
+				},
+			},
+			wantOut: expectedOut.String(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out := &bytes.Buffer{}
+			tt.cl.Print(out)
+			if gotOut := out.String(); gotOut != tt.wantOut {
+				t.Errorf("Changelog.Print() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
+func TestChangelog_diff(t *testing.T) {
+	type args struct {
+		appOrig *meta.App
+		appCurr *meta.App
+		ctx     string
+	}
+	tests := []struct {
+		name    string
+		cl      Changelog
+		args    args
+		want    Changelog
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.cl.diff(tt.args.appOrig, tt.args.appCurr, tt.args.ctx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Changelog.diff() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Changelog.diff() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

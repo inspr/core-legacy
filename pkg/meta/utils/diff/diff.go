@@ -45,12 +45,17 @@ func (cl Changelog) Print(out io.Writer) {
 	var w *tabwriter.Writer
 
 	for _, change := range cl {
-		fmt.Println("On: ", change.Context)
+		fmt.Fprintln(out, "On:", change.Context)
 		w = tabwriter.NewWriter(out, 12, 0, 3, ' ', tabwriter.Debug)
-		fmt.Fprintf(w, "Field\t From\t To\n")
+		fmt.Fprintln(w, "Field\t From\t To")
 		for _, diff := range change.Diff {
-			fmt.Fprintf(w, "%s\t %s\t %s\n",
-				diff.Field, diff.From, diff.To)
+			fmt.Fprintf(
+				w,
+				"%s\t %s\t %s\n",
+				diff.Field,
+				diff.From,
+				diff.To,
+			)
 		}
 		w.Flush()
 	}
