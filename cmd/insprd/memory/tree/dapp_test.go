@@ -448,219 +448,839 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 		want          *meta.App
 		checkFunction func(t *testing.T)
 	}{
+		// {
+		// 	name: "Creating app inside of root",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "",
+		// 		searchQuery: "appCr1",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "appCr1",
+		// 				Reference:   "appCr1",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node:         meta.Node{},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// 	want: &meta.App{
+		// 		Meta: meta.Metadata{
+		// 			Name:        "appCr1",
+		// 			Reference:   "appCr1",
+		// 			Annotations: map[string]string{},
+		// 			Parent:      "",
+		// 			SHA256:      "",
+		// 		},
+		// 		Spec: meta.AppSpec{
+		// 			Node:         meta.Node{},
+		// 			Apps:         map[string]*meta.App{},
+		// 			Channels:     map[string]*meta.Channel{},
+		// 			ChannelTypes: map[string]*meta.ChannelType{},
+		// 			Boundary: meta.AppBoundary{
+		// 				Input:  []string{},
+		// 				Output: []string{},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "Creating app inside of non-root app",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "app2",
+		// 		searchQuery: "app2.appCr2-1",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "appCr2-1",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node:         meta.Node{},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// 	want: &meta.App{
+		// 		Meta: meta.Metadata{
+		// 			Name:        "appCr2-1",
+		// 			Reference:   "",
+		// 			Annotations: map[string]string{},
+		// 			Parent:      "app2",
+		// 			SHA256:      "",
+		// 		},
+		// 		Spec: meta.AppSpec{
+		// 			Node:         meta.Node{},
+		// 			Apps:         map[string]*meta.App{},
+		// 			Channels:     map[string]*meta.Channel{},
+		// 			ChannelTypes: map[string]*meta.ChannelType{},
+		// 			Boundary: meta.AppBoundary{
+		// 				Input:  []string{},
+		// 				Output: []string{},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "Creating app with invalid context",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "invalidCtx",
+		// 		searchQuery: "invalidCtx.invalidApp",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "invalidApp",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node:         meta.Node{},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// 	want:    nil,
+		// },
+		// {
+		// 	name: "Invalid - Creating app inside of app with Node",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "appNode",
+		// 		searchQuery: "appNode.appInvalidWithNode",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "appInvalidWithNode",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node:         meta.Node{},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// 	want:    nil,
+		// },
+		// {
+		// 	name: "Creating app with conflicting name",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "",
+		// 		searchQuery: "app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node:         meta.Node{},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// 	want:    nil,
+		// },
+		// {
+		// 	name: "Creating app with existing name but not in the same context",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "app2",
+		// 		searchQuery: "app2.app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node:         meta.Node{},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// 	want: &meta.App{
+		// 		Meta: meta.Metadata{
+		// 			Name:        "app2",
+		// 			Reference:   "",
+		// 			Annotations: map[string]string{},
+		// 			Parent:      "app2",
+		// 			SHA256:      "",
+		// 		},
+		// 		Spec: meta.AppSpec{
+		// 			Node:         meta.Node{},
+		// 			Apps:         map[string]*meta.App{},
+		// 			Channels:     map[string]*meta.Channel{},
+		// 			ChannelTypes: map[string]*meta.ChannelType{},
+		// 			Boundary: meta.AppBoundary{
+		// 				Input:  []string{},
+		// 				Output: []string{},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "Creating app with valid boundary",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "app2",
+		// 		searchQuery: "app2.app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node:         meta.Node{},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{"ch1app2"},
+		// 					Output: []string{"ch2app2"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// 	want: &meta.App{
+		// 		Meta: meta.Metadata{
+		// 			Name:        "app2",
+		// 			Reference:   "",
+		// 			Annotations: map[string]string{},
+		// 			Parent:      "app2",
+		// 			SHA256:      "",
+		// 		},
+		// 		Spec: meta.AppSpec{
+		// 			Node:         meta.Node{},
+		// 			Apps:         map[string]*meta.App{},
+		// 			Channels:     map[string]*meta.Channel{},
+		// 			ChannelTypes: map[string]*meta.ChannelType{},
+		// 			Boundary: meta.AppBoundary{
+		// 				Input:  []string{"ch1app2"},
+		// 				Output: []string{"ch2app2"},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "Creating app with invalid boundary",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "app2",
+		// 		searchQuery: "app2.app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "app2",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node:         meta.Node{},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{"ch1app2invalid"},
+		// 					Output: []string{"ch2app2"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// 	want:    nil,
+		// },
+		// {
+		// 	name: "Creating app with node and other apps in it",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "app2",
+		// 		searchQuery: "app2.app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{
+		// 					Meta: meta.Metadata{
+		// 						Name:        "nodeApp2-2",
+		// 						Reference:   "",
+		// 						Annotations: map[string]string{},
+		// 						Parent:      "app2",
+		// 						SHA256:      "",
+		// 					},
+		// 					Spec: meta.NodeSpec{
+		// 						Image: "imageNodeAppTest",
+		// 					},
+		// 				},
+		// 				Apps: map[string]*meta.App{
+		// 					"appTest1": {},
+		// 				},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// 	want:    nil,
+		// },
+		// {
+		// 	name: "Creating app with Node",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "app2",
+		// 		searchQuery: "app2.app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{
+		// 					Meta: meta.Metadata{
+		// 						Name:        "app2",
+		// 						Reference:   "",
+		// 						Annotations: nil,
+		// 						Parent:      "",
+		// 						SHA256:      "",
+		// 					},
+		// 					Spec: meta.NodeSpec{
+		// 						Image: "imageNodeAppTest",
+		// 					},
+		// 				},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// 	want: &meta.App{
+		// 		Meta: meta.Metadata{
+		// 			Name:        "app2",
+		// 			Reference:   "",
+		// 			Annotations: map[string]string{},
+		// 			Parent:      "app2",
+		// 			SHA256:      "",
+		// 		},
+		// 		Spec: meta.AppSpec{
+		// 			Node: meta.Node{
+		// 				Meta: meta.Metadata{
+		// 					Name:        "app2",
+		// 					Reference:   "",
+		// 					Annotations: map[string]string{},
+		// 					Parent:      "app2",
+		// 					SHA256:      "",
+		// 				},
+		// 				Spec: meta.NodeSpec{
+		// 					Image: "imageNodeAppTest",
+		// 				},
+		// 			},
+		// 			Apps:         map[string]*meta.App{},
+		// 			Channels:     map[string]*meta.Channel{},
+		// 			ChannelTypes: map[string]*meta.ChannelType{},
+		// 			Boundary: meta.AppBoundary{
+		// 				Input:  []string{},
+		// 				Output: []string{},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "It should update the channel's connectedApps list",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context: "app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app7",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{},
+		// 				Apps: map[string]*meta.App{
+		// 					"app8": {
+		// 						Meta: meta.Metadata{
+		// 							Name:        "app8",
+		// 							Reference:   "",
+		// 							Annotations: map[string]string{},
+		// 							Parent:      "",
+		// 							SHA256:      "",
+		// 						},
+		// 						Spec: meta.AppSpec{
+		// 							Node:         meta.Node{},
+		// 							Apps:         map[string]*meta.App{},
+		// 							Channels:     map[string]*meta.Channel{},
+		// 							ChannelTypes: map[string]*meta.ChannelType{},
+		// 							Boundary: meta.AppBoundary{
+		// 								Input:  []string{"channel1"},
+		// 								Output: []string{},
+		// 							},
+		// 						},
+		// 					},
+		// 				},
+		// 				Channels: map[string]*meta.Channel{
+		// 					"channel1": {
+		// 						Meta: meta.Metadata{
+		// 							Name: "channel1",
+		// 						},
+		// 						ConnectedApps: []string{},
+		// 						Spec: meta.ChannelSpec{
+		// 							Type: "ct1",
+		// 						},
+		// 					},
+		// 				},
+		// 				ChannelTypes: map[string]*meta.ChannelType{
+		// 					"ct1": {
+		// 						Meta: meta.Metadata{
+		// 							Name: "ct1",
+		// 						},
+		// 						ConnectedChannels: []string{},
+		// 					},
+		// 				},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{"ch1app2"},
+		// 					Output: []string{"ch2app2"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// 	checkFunction: func(t *testing.T) {
+		// 		am := GetTreeMemory().Channels()
+		// 		ch, err := am.Get("app2.app7", "channel1")
+		// 		if err != nil {
+		// 			t.Errorf("cant get channel channel1")
+		// 		}
+		// 		if !utils.Includes(ch.ConnectedApps, "app8") {
+		// 			fmt.Println(ch.ConnectedApps)
+		// 			t.Errorf("connectedApps of channel1 dont have app8")
+		// 		}
+		// 	},
+		// },
+		// {
+		// 	name: "Create App with a channel that has a invalid channelType",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context: "app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{},
+		// 				Apps: map[string]*meta.App{},
+		// 				Channels: map[string]*meta.Channel{
+		// 					"channel1": {
+		// 						Meta: meta.Metadata{
+		// 							Name: "channel1",
+		// 						},
+		// 						ConnectedApps: []string{},
+		// 						Spec: meta.ChannelSpec{
+		// 							Type: "invalidChannelTypeName",
+		// 						},
+		// 					},
+		// 				},
+		// 				ChannelTypes: map[string]*meta.ChannelType{
+		// 					"ct1": {
+		// 						Meta: meta.Metadata{
+		// 							Name: "ct1",
+		// 						},
+		// 						ConnectedChannels: []string{},
+		// 					},
+		// 				},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{"ch1app2"},
+		// 					Output: []string{"ch2app2"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// },
+		// {
+		// 	name: "It should update the channelType's connectedChannels list",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context: "app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{},
+		// 				Apps: map[string]*meta.App{},
+		// 				Channels: map[string]*meta.Channel{
+		// 					"channel1": {
+		// 						Meta: meta.Metadata{
+		// 							Name: "channel1",
+		// 						},
+		// 						ConnectedApps: []string{},
+		// 						Spec: meta.ChannelSpec{
+		// 							Type: "ct1",
+		// 						},
+		// 					},
+		// 				},
+		// 				ChannelTypes: map[string]*meta.ChannelType{
+		// 					"ct1": {
+		// 						Meta: meta.Metadata{
+		// 							Name: "ct1",
+		// 						},
+		// 						ConnectedChannels: []string{},
+		// 					},
+		// 				},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{"ch1app2"},
+		// 					Output: []string{"ch2app2"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// 	checkFunction: func(t *testing.T) {
+		// 		am := GetTreeMemory().ChannelTypes()
+		// 		ct, err := am.Get("app2.app2", "ct1")
+		// 		if err != nil {
+		// 			t.Errorf("cant get channelType ct1")
+		// 		}
+		// 		if !utils.Includes(ct.ConnectedChannels, "channel1") {
+		// 			t.Errorf("connectedChannels of ct1 dont have channel1")
+		// 		}
+		// 	},
+		// },
+		// {
+		// 	name: "Invalid name - doesn't create app",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "",
+		// 		searchQuery: "appCr1",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app%Cr1",
+		// 				Reference:   "appCr1",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node:         meta.Node{},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// 	want:    nil,
+		// },
+		// {
+		// 	name: "Creating app with Node without name",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "app2",
+		// 		searchQuery: "app2.app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{
+		// 					Meta: meta.Metadata{
+		// 						Name:        "",
+		// 						Reference:   "",
+		// 						Annotations: nil,
+		// 						Parent:      "",
+		// 						SHA256:      "",
+		// 					},
+		// 					Spec: meta.NodeSpec{
+		// 						Image: "imageNodeAppTest",
+		// 					},
+		// 				},
+		// 				Apps:         map[string]*meta.App{},
+		// 				Channels:     map[string]*meta.Channel{},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{},
+		// 					Output: []string{},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: false,
+		// 	want: &meta.App{
+		// 		Meta: meta.Metadata{
+		// 			Name:        "app2",
+		// 			Reference:   "",
+		// 			Annotations: map[string]string{},
+		// 			Parent:      "app2",
+		// 			SHA256:      "",
+		// 		},
+		// 		Spec: meta.AppSpec{
+		// 			Node: meta.Node{
+		// 				Meta: meta.Metadata{
+		// 					Name:        "app2",
+		// 					Reference:   "",
+		// 					Annotations: map[string]string{},
+		// 					Parent:      "app2",
+		// 					SHA256:      "",
+		// 				},
+		// 				Spec: meta.NodeSpec{
+		// 					Image: "imageNodeAppTest",
+		// 				},
+		// 			},
+		// 			Apps:         map[string]*meta.App{},
+		// 			Channels:     map[string]*meta.Channel{},
+		// 			ChannelTypes: map[string]*meta.ChannelType{},
+		// 			Boundary: meta.AppBoundary{
+		// 				Input:  []string{},
+		// 				Output: []string{},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "Invalid - App with boundary and channel with same name",
+		// 	fields: fields{
+		// 		root:   getMockApp(),
+		// 		appErr: nil,
+		// 		mockC:  false,
+		// 		mockCT: false,
+		// 		mockA:  false,
+		// 	},
+		// 	args: args{
+		// 		context:     "app2",
+		// 		searchQuery: "app2.app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "",
+		// 				SHA256:      "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Node: meta.Node{
+		// 					Meta: meta.Metadata{
+		// 						Name:        "",
+		// 						Reference:   "",
+		// 						Annotations: nil,
+		// 						Parent:      "",
+		// 						SHA256:      "",
+		// 					},
+		// 					Spec: meta.NodeSpec{
+		// 						Image: "imageNodeAppTest",
+		// 					},
+		// 				},
+		// 				Apps: map[string]*meta.App{},
+		// 				Channels: map[string]*meta.Channel{
+		// 					"output1": {
+		// 						Meta: meta.Metadata{
+		// 							Name:   "output1",
+		// 							Parent: "",
+		// 						},
+		// 						ConnectedApps: []string{},
+		// 						Spec:          meta.ChannelSpec{},
+		// 					},
+		// 				},
+		// 				ChannelTypes: map[string]*meta.ChannelType{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Input:  []string{"input1"},
+		// 					Output: []string{"output1"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// 	want:    nil,
+		// },
 		{
-			name: "Creating app inside of root",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "",
-				searchQuery: "appCr1",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "appCr1",
-						Reference:   "appCr1",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			wantErr: false,
-			want: &meta.App{
-				Meta: meta.Metadata{
-					Name:        "appCr1",
-					Reference:   "appCr1",
-					Annotations: map[string]string{},
-					Parent:      "",
-					SHA256:      "",
-				},
-				Spec: meta.AppSpec{
-					Node:         meta.Node{},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
-					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
-					},
-				},
-			},
-		},
-		{
-			name: "Creating app inside of non-root app",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "app2",
-				searchQuery: "app2.appCr2-1",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "appCr2-1",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			wantErr: false,
-			want: &meta.App{
-				Meta: meta.Metadata{
-					Name:        "appCr2-1",
-					Reference:   "",
-					Annotations: map[string]string{},
-					Parent:      "app2",
-					SHA256:      "",
-				},
-				Spec: meta.AppSpec{
-					Node:         meta.Node{},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
-					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
-					},
-				},
-			},
-		},
-		{
-			name: "Creating app with invalid context",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "invalidCtx",
-				searchQuery: "invalidCtx.invalidApp",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "invalidApp",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			wantErr: true,
-			want:    nil,
-		},
-		{
-			name: "Invalid - Creating app inside of app with Node",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "appNode",
-				searchQuery: "appNode.appInvalidWithNode",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "appInvalidWithNode",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			wantErr: true,
-			want:    nil,
-		},
-		{
-			name: "Creating app with conflicting name",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "",
-				searchQuery: "app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app2",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			wantErr: true,
-			want:    nil,
-		},
-		{
-			name: "Creating app with existing name but not in the same context",
+			name: "Invalid alias",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -676,553 +1296,64 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 						Name:        "app2",
 						Reference:   "",
 						Annotations: map[string]string{},
-						Parent:      "",
+						Parent:      "app2",
 						SHA256:      "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			wantErr: false,
-			want: &meta.App{
-				Meta: meta.Metadata{
-					Name:        "app2",
-					Reference:   "",
-					Annotations: map[string]string{},
-					Parent:      "app2",
-					SHA256:      "",
-				},
-				Spec: meta.AppSpec{
-					Node:         meta.Node{},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
-					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
-					},
-				},
-			},
-		},
-		{
-			name: "Creating app with valid boundary",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "app2",
-				searchQuery: "app2.app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app2",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
-						},
-					},
-				},
-			},
-			wantErr: false,
-			want: &meta.App{
-				Meta: meta.Metadata{
-					Name:        "app2",
-					Reference:   "",
-					Annotations: map[string]string{},
-					Parent:      "app2",
-					SHA256:      "",
-				},
-				Spec: meta.AppSpec{
-					Node:         meta.Node{},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
-					Boundary: meta.AppBoundary{
-						Input:  []string{"ch1app2"},
-						Output: []string{"ch2app2"},
-					},
-				},
-			},
-		},
-		{
-			name: "Creating app with invalid boundary",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "app2",
-				searchQuery: "app2.app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app2",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2invalid"},
-							Output: []string{"ch2app2"},
-						},
-					},
-				},
-			},
-			wantErr: true,
-			want:    nil,
-		},
-		{
-			name: "Creating app with node and other apps in it",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "app2",
-				searchQuery: "app2.app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app2",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node: meta.Node{
-							Meta: meta.Metadata{
-								Name:        "nodeApp2-2",
-								Reference:   "",
-								Annotations: map[string]string{},
-								Parent:      "app2",
-								SHA256:      "",
-							},
-							Spec: meta.NodeSpec{
-								Image: "imageNodeAppTest",
+						Aliases: map[string]*meta.Alias{
+							"app6.output1": {
+								Target: "fakeChannel",
 							},
 						},
 						Apps: map[string]*meta.App{
-							"appTest1": {},
-						},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			wantErr: true,
-			want:    nil,
-		},
-		{
-			name: "Creating app with Node",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "app2",
-				searchQuery: "app2.app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app2",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node: meta.Node{
-							Meta: meta.Metadata{
-								Name:        "app2",
-								Reference:   "",
-								Annotations: nil,
-								Parent:      "",
-								SHA256:      "",
-							},
-							Spec: meta.NodeSpec{
-								Image: "imageNodeAppTest",
-							},
-						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			wantErr: false,
-			want: &meta.App{
-				Meta: meta.Metadata{
-					Name:        "app2",
-					Reference:   "",
-					Annotations: map[string]string{},
-					Parent:      "app2",
-					SHA256:      "",
-				},
-				Spec: meta.AppSpec{
-					Node: meta.Node{
-						Meta: meta.Metadata{
-							Name:        "app2",
-							Reference:   "",
-							Annotations: map[string]string{},
-							Parent:      "app2",
-							SHA256:      "",
-						},
-						Spec: meta.NodeSpec{
-							Image: "imageNodeAppTest",
-						},
-					},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
-					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
-					},
-				},
-			},
-		},
-		{
-			name: "It should update the channel's connectedApps list",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context: "app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app7",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node: meta.Node{},
-						Apps: map[string]*meta.App{
-							"app8": {
+							"app6": {
 								Meta: meta.Metadata{
-									Name:        "app8",
-									Reference:   "",
+									Name:        "app6",
+									Reference:   "app2.app6",
 									Annotations: map[string]string{},
-									Parent:      "",
+									Parent:      "app2.app2",
 									SHA256:      "",
 								},
 								Spec: meta.AppSpec{
-									Node:         meta.Node{},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "app6",
+											Reference:   "app6.nodeApp4",
+											Annotations: map[string]string{},
+											Parent:      "app4",
+											SHA256:      "",
+										},
+										Spec: meta.NodeSpec{
+											Image: "imageNodeApp4",
+										},
+									},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"channel1"},
-										Output: []string{},
+										Input:  []string{"output1"},
+										Output: []string{"output1"},
 									},
 								},
 							},
 						},
 						Channels: map[string]*meta.Channel{
-							"channel1": {
+							"output1": {
 								Meta: meta.Metadata{
-									Name: "channel1",
+									Name:   "output1",
+									Parent: "",
 								},
 								ConnectedApps: []string{},
-								Spec: meta.ChannelSpec{
-									Type: "ct1",
-								},
+								Spec:          meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"ct1": {
-								Meta: meta.Metadata{
-									Name: "ct1",
-								},
-								ConnectedChannels: []string{},
-							},
-						},
-						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
-						},
-					},
-				},
-			},
-			wantErr: false,
-			checkFunction: func(t *testing.T) {
-				am := GetTreeMemory().Channels()
-				ch, err := am.Get("app2.app7", "channel1")
-				if err != nil {
-					t.Errorf("cant get channel channel1")
-				}
-				if !utils.Includes(ch.ConnectedApps, "app8") {
-					fmt.Println(ch.ConnectedApps)
-					t.Errorf("connectedApps of channel1 dont have app8")
-				}
-			},
-		},
-		{
-			name: "Create App with a channel that has a invalid channelType",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context: "app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app2",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node: meta.Node{},
-						Apps: map[string]*meta.App{},
-						Channels: map[string]*meta.Channel{
-							"channel1": {
-								Meta: meta.Metadata{
-									Name: "channel1",
-								},
-								ConnectedApps: []string{},
-								Spec: meta.ChannelSpec{
-									Type: "invalidChannelTypeName",
-								},
-							},
-						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"ct1": {
-								Meta: meta.Metadata{
-									Name: "ct1",
-								},
-								ConnectedChannels: []string{},
-							},
-						},
-						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "It should update the channelType's connectedChannels list",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context: "app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app2",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node: meta.Node{},
-						Apps: map[string]*meta.App{},
-						Channels: map[string]*meta.Channel{
-							"channel1": {
-								Meta: meta.Metadata{
-									Name: "channel1",
-								},
-								ConnectedApps: []string{},
-								Spec: meta.ChannelSpec{
-									Type: "ct1",
-								},
-							},
-						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"ct1": {
-								Meta: meta.Metadata{
-									Name: "ct1",
-								},
-								ConnectedChannels: []string{},
-							},
-						},
-						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
-						},
-					},
-				},
-			},
-			wantErr: false,
-			checkFunction: func(t *testing.T) {
-				am := GetTreeMemory().ChannelTypes()
-				ct, err := am.Get("app2.app2", "ct1")
-				if err != nil {
-					t.Errorf("cant get channelType ct1")
-				}
-				if !utils.Includes(ct.ConnectedChannels, "channel1") {
-					t.Errorf("connectedChannels of ct1 dont have channel1")
-				}
-			},
-		},
-		{
-			name: "Invalid name - doesn't create app",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "",
-				searchQuery: "appCr1",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app%Cr1",
-						Reference:   "appCr1",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
 						ChannelTypes: map[string]*meta.ChannelType{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Input:  []string{"ch1app2"},
+							Output: []string{"ch1app2"},
 						},
 					},
 				},
 			},
 			wantErr: true,
 			want:    nil,
-		},
-		{
-			name: "Creating app with Node without name",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				context:     "app2",
-				searchQuery: "app2.app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app2",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "",
-						SHA256:      "",
-					},
-					Spec: meta.AppSpec{
-						Node: meta.Node{
-							Meta: meta.Metadata{
-								Name:        "",
-								Reference:   "",
-								Annotations: nil,
-								Parent:      "",
-								SHA256:      "",
-							},
-							Spec: meta.NodeSpec{
-								Image: "imageNodeAppTest",
-							},
-						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
-						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
-						},
-					},
-				},
-			},
-			wantErr: false,
-			want: &meta.App{
-				Meta: meta.Metadata{
-					Name:        "app2",
-					Reference:   "",
-					Annotations: map[string]string{},
-					Parent:      "app2",
-					SHA256:      "",
-				},
-				Spec: meta.AppSpec{
-					Node: meta.Node{
-						Meta: meta.Metadata{
-							Name:        "app2",
-							Reference:   "",
-							Annotations: map[string]string{},
-							Parent:      "app2",
-							SHA256:      "",
-						},
-						Spec: meta.NodeSpec{
-							Image: "imageNodeAppTest",
-						},
-					},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
-					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
-					},
-				},
-			},
 		},
 	}
 	for _, tt := range tests {
