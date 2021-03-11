@@ -17,7 +17,7 @@ spec:
   
   boundary:
     input:
-      - ch2
+      - primes_ch2
     output:
-      - ch1
+      - primes_ch1
       

@@ -16,9 +16,9 @@ spec:
         teste_env: "test"
   boundary:
     input:
-      - ch1
-      - ch2
+      - primes_ch1
+      - primes_ch2
     output:
-      - ch2  
+      - primes_ch2
     
       
