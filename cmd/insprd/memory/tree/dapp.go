@@ -1,11 +1,13 @@
 package tree
 
 import (
+	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -171,4 +173,64 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	}
 
 	return nil, err
+}
+
+//ResolveBoundary recursive method that resolves connections for app boundaries
+func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
+	boundaries := make(map[string]string)
+	unresolved := metautils.StrSet{}
+	for _, bound := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
+		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
+		unresolved.AppendSet(bound)
+	}
+	parentApp, err := getParentApp(app.Meta.Reference)
+	if err != nil {
+		return nil, err
+	}
+	err = amm.recursivelyResolve(parentApp, boundaries, unresolved)
+	if err != nil {
+		return nil, err
+	}
+	return boundaries, nil
+}
+
+func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[string]string, unresolved metautils.StrSet) error {
+	merr := ierrors.MultiError{
+		Errors: []error{},
+	}
+	if len(unresolved) == 0 {
+		return nil
+	}
+	for key := range unresolved {
+		val := boundaries[key]
+		if alias, ok := app.Spec.Aliases[val]; ok { //resolve in aliases
+			val = alias.Target //setup for alias resolve
+		} else {
+			_, val, _ = metautils.RemoveLastPartInScope(val) //setup for direct resolve
+		}
+		if ch, ok := app.Spec.Channels[val]; ok { // resolve in channels (direct or through alias)
+			boundaries[key], _ = metautils.JoinScopes(ch.Meta.Parent, ch.Meta.Name) // if channel exists, resolve
+			delete(unresolved, key)
+			continue
+		}
+		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val) { //resolve in boundaries
+			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, val) // if boundary exists, setup to resolve in parernt
+			continue
+		}
+		merr.Add(ierrors.NewError().Message("invalid boudary: %s invalid", key).Build())
+		delete(unresolved, key)
+
+	}
+	if !merr.Empty() {
+		// throwing erros for boundaries couldn't be resolved because of some invalid boundary
+		for key := range unresolved {
+			merr.Add(ierrors.NewError().Message("invalid boudary: %s unresolved", key).Build())
+		}
+		return &merr
+	}
+	parentApp, err := getParentApp(app.Meta.Reference)
+	if err != nil {
+		return err
+	}
+	return amm.recursivelyResolve(parentApp, boundaries, unresolved)
 }

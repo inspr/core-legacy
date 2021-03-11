@@ -32,6 +32,7 @@ type AppMemory interface {
 	CreateApp(context string, app *meta.App) error
 	DeleteApp(query string) error
 	UpdateApp(query string, app *meta.App) error
+	ResolveBoundary(app *meta.App) (map[string]string, error)
 }
 
 // AppGetInterface is an interface to get apps from memory
