@@ -179,7 +179,7 @@ func getMockApp() *meta.App {
 											Name:        "app4",
 											Reference:   "app4.nodeApp4",
 											Annotations: map[string]string{},
-											Parent:      "app4",
+											Parent:      "app2.app4",
 											SHA256:      "",
 										},
 										Spec: meta.NodeSpec{
@@ -295,7 +295,7 @@ func getMockApp() *meta.App {
 												Name:        "bound3",
 												Reference:   "bound.bound2.bound3",
 												Annotations: map[string]string{},
-												Parent:      "bound2",
+												Parent:      "bound.bound2",
 												SHA256:      "",
 											},
 											Spec: meta.AppSpec{
@@ -304,7 +304,7 @@ func getMockApp() *meta.App {
 														Name:        "bound3",
 														Reference:   "bound.bound2.bound3",
 														Annotations: map[string]string{},
-														Parent:      "bound2",
+														Parent:      "bound.bound2",
 														SHA256:      "",
 													},
 													Spec: meta.NodeSpec{
@@ -356,7 +356,7 @@ func getMockApp() *meta.App {
 												Name:        "boundNP2",
 												Reference:   "bound.boundNP.boundNP2",
 												Annotations: map[string]string{},
-												Parent:      "bound",
+												Parent:      "bound.boundNP",
 												SHA256:      "",
 											},
 											Spec: meta.AppSpec{
@@ -365,7 +365,7 @@ func getMockApp() *meta.App {
 														Name:        "boundNP2",
 														Reference:   "bound.boundNP.boundNP2",
 														Annotations: map[string]string{},
-														Parent:      "bound",
+														Parent:      "bound.boundNP",
 														SHA256:      "",
 													},
 													Spec: meta.NodeSpec{
