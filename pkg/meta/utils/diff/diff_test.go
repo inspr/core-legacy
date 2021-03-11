@@ -3,12 +3,14 @@ package diff
 import (
 	"bytes"
 	"fmt"
-	"reflect"
 	"testing"
 	"text/tabwriter"
 
+	"github.com/google/go-cmp/cmp"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+
+	pkgUtils "gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func TestDiff(t *testing.T) {
@@ -995,8 +997,7 @@ func TestChangelog_diff(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(got, tt.want) {
-				fmt.Println(got)
+			if !cmp.Equal(got, tt.want, pkgUtils.GeneralCompareOptions()) {
 				t.Errorf(
 					"Changelog.diff() = %v, want %v",
 					got,
