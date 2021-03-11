@@ -34,23 +34,21 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 		err := decoder.Decode(&data)
 		if err != nil || !data.Valid {
 			rest.ERROR(w, err)
+			ah.Memory.Cancel()
 			return
 		}
 		ah.Memory.InitTransaction()
-		if !data.DryRun {
-			defer ah.Memory.Commit()
-		} else {
-			defer ah.Memory.Cancel()
-		}
 
 		err = ah.Memory.Apps().CreateApp(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, err)
+			ah.Memory.Cancel()
 			return
 		}
 		changes, err := ah.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
+			ah.Memory.Cancel()
 			return
 		}
 
@@ -58,11 +56,20 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			err = ah.applyChangesInDiff(changes)
 			if err != nil {
 				rest.ERROR(w, err)
+				ah.Memory.Cancel()
+				return
 			}
+		}
+
+		if !data.DryRun {
+			defer ah.Memory.Commit()
+		} else {
+			defer ah.Memory.Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
 	}
+
 	return rest.Handler(handler)
 }
 
@@ -80,13 +87,16 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 		}
 
 		ah.Memory.InitTransaction()
-		defer ah.Memory.Cancel()
 
 		app, err := ah.Memory.Root().Apps().Get(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, err)
+			ah.Memory.Cancel()
 			return
 		}
+
+		defer ah.Memory.Cancel()
+
 		rest.JSON(w, http.StatusOK, app)
 	}
 	return rest.Handler(handler)
@@ -106,18 +116,17 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 		}
 
 		ah.Memory.InitTransaction()
-		if !data.DryRun {
-			defer ah.Memory.Commit()
-		} else {
-			defer ah.Memory.Cancel()
-		}
+
 		err = ah.Memory.Apps().UpdateApp(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, err)
+			ah.Memory.Cancel()
+			return
 		}
 		changes, err := ah.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
+			ah.Memory.Cancel()
 			return
 		}
 
@@ -126,8 +135,15 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 
 			if err != nil {
 				rest.ERROR(w, err)
+				ah.Memory.Cancel()
 				return
 			}
+		}
+
+		if !data.DryRun {
+			defer ah.Memory.Commit()
+		} else {
+			defer ah.Memory.Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
@@ -148,24 +164,24 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			return
 		}
 		ah.Memory.InitTransaction()
-		if !data.DryRun {
-			defer ah.Memory.Commit()
-		} else {
-			defer ah.Memory.Cancel()
-		}
+
 		_, err = ah.Memory.Apps().Get(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, err)
+			ah.Memory.Cancel()
+			return
 		}
 
 		err = ah.Memory.Apps().DeleteApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, err)
+			ah.Memory.Cancel()
 			return
 		}
 		changes, err := ah.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
+			ah.Memory.Cancel()
 			return
 		}
 		if !data.DryRun {
@@ -173,8 +189,15 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 
 			if err != nil {
 				rest.ERROR(w, err)
+				ah.Memory.Cancel()
 				return
 			}
+		}
+
+		if !data.DryRun {
+			defer ah.Memory.Commit()
+		} else {
+			defer ah.Memory.Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)

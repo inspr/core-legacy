@@ -15,11 +15,11 @@ type Apps struct {
 }
 
 // Get - simple mock
-func (ch *Apps) Get(query string) (*meta.App, error) {
-	if ch.fail != nil {
-		return nil, ch.fail
+func (a *Apps) Get(query string) (*meta.App, error) {
+	if a.fail != nil {
+		return nil, a.fail
 	}
-	ct, ok := ch.apps[query]
+	ct, ok := a.apps[query]
 	if !ok {
 		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("dapp %s not found", query)).Build()
 	}
@@ -27,49 +27,49 @@ func (ch *Apps) Get(query string) (*meta.App, error) {
 }
 
 // CreateApp - simple mock
-func (ch *Apps) CreateApp(context string, ct *meta.App) error {
-	if ch.fail != nil {
-		return ch.fail
+func (a *Apps) CreateApp(context string, ct *meta.App) error {
+	if a.fail != nil {
+		return a.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
 
-	_, ok := ch.apps[query]
+	_, ok := a.apps[query]
 	if ok {
 		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("dapp %s already exists", query)).Build()
 	}
-	ch.apps[query] = ct
+	a.apps[query] = ct
 	return nil
 }
 
 // DeleteApp - simple mock
-func (ch *Apps) DeleteApp(query string) error {
-	if ch.fail != nil {
-		return ch.fail
+func (a *Apps) DeleteApp(query string) error {
+	if a.fail != nil {
+		return a.fail
 	}
-	_, ok := ch.apps[query]
+	_, ok := a.apps[query]
 	if !ok {
 		return ierrors.NewError().NotFound().Message(fmt.Sprintf("dapp %s not found", query)).Build()
 	}
 
-	delete(ch.apps, query)
+	delete(a.apps, query)
 	return nil
 }
 
 // UpdateApp - simple mock
-func (ch *Apps) UpdateApp(context string, ct *meta.App) error {
-	if ch.fail != nil {
-		return ch.fail
+func (a *Apps) UpdateApp(context string, ct *meta.App) error {
+	if a.fail != nil {
+		return a.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
-	_, ok := ch.apps[query]
+	_, ok := a.apps[query]
 	if !ok {
 		return ierrors.NewError().NotFound().Message(fmt.Sprintf("dapp %s not found", query)).Build()
 	}
-	ch.apps[query] = ct
+	a.apps[query] = ct
 	return nil
 }
 
-// ResolveBoundary mock
-func (ch *Apps) ResolveBoundary(app *meta.App) (map[string]string, error) {
+// ResolveBoundary - simple mock
+func (a *Apps) ResolveBoundary(app *meta.App) (map[string]string, error) {
 	return nil, nil
 }

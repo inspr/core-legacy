@@ -33,21 +33,18 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			return
 		}
 		ch.Memory.InitTransaction()
-		if !data.DryRun {
-			defer ch.Memory.Commit()
-		} else {
-			defer ch.Memory.Cancel()
-		}
 
 		err = ch.Memory.Channels().CreateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, err)
+			ch.Memory.Cancel()
 			return
 		}
 
 		changes, err := ch.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
+			ch.Memory.Cancel()
 			return
 		}
 
@@ -55,8 +52,15 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			err = ch.applyChangesInDiff(changes)
 			if err != nil {
 				rest.ERROR(w, err)
+				ch.Memory.Cancel()
 				return
 			}
+		}
+
+		if !data.DryRun {
+			defer ch.Memory.Commit()
+		} else {
+			defer ch.Memory.Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
@@ -78,13 +82,16 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 		}
 
 		ch.Memory.InitTransaction()
-		defer ch.Memory.Cancel()
 
 		channel, err := ch.Memory.Root().Channels().Get(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, err)
+			ch.Memory.Cancel()
 			return
 		}
+
+		defer ch.Memory.Cancel()
+
 		rest.JSON(w, http.StatusOK, channel)
 	}
 	return rest.Handler(handler)
@@ -103,19 +110,17 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			return
 		}
 		ch.Memory.InitTransaction()
-		if !data.DryRun {
-			defer ch.Memory.Commit()
-		} else {
-			defer ch.Memory.Cancel()
-		}
+
 		err = ch.Memory.Channels().UpdateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, err)
+			ch.Memory.Cancel()
 			return
 		}
 		changes, err := ch.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
+			ch.Memory.Cancel()
 			return
 		}
 
@@ -124,8 +129,15 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 
 			if err != nil {
 				rest.ERROR(w, err)
+				ch.Memory.Cancel()
 				return
 			}
+		}
+
+		if !data.DryRun {
+			defer ch.Memory.Commit()
+		} else {
+			defer ch.Memory.Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
@@ -146,21 +158,18 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 		}
 
 		ch.Memory.InitTransaction()
-		if !data.DryRun {
-			defer ch.Memory.Commit()
-		} else {
-			defer ch.Memory.Cancel()
-		}
 
 		err = ch.Memory.Channels().DeleteChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, err)
+			ch.Memory.Cancel()
 			return
 		}
 
 		changes, err := ch.Memory.Channels().GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
+			ch.Memory.Cancel()
 			return
 		}
 		if !data.DryRun {
@@ -168,9 +177,17 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 
 			if err != nil {
 				rest.ERROR(w, err)
+				ch.Memory.Cancel()
 				return
 			}
 		}
+
+		if !data.DryRun {
+			defer ch.Memory.Commit()
+		} else {
+			defer ch.Memory.Cancel()
+		}
+
 		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
