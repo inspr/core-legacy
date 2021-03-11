@@ -3,6 +3,7 @@ package mocks
 import (
 	"context"
 
+	"gitlab.inspr.dev/inspr/core/pkg/controller"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 )
@@ -13,7 +14,7 @@ type AppMock struct {
 }
 
 // NewAppMock exports a mock of the App.interface
-func NewAppMock(err error) *AppMock {
+func NewAppMock(err error) controller.AppInterface {
 	return &AppMock{err: err}
 }
 
