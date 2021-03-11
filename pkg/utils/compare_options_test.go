@@ -83,3 +83,48 @@ func TestGetMapCompareOptions(t *testing.T) {
 		})
 	}
 }
+
+func TestGeneralCompareOptions(t *testing.T) {
+	tests := []struct {
+		name  string
+		left  interface{}
+		right interface{}
+		want  bool
+	}{
+		{
+			name:  "basic_values_cmp_equal",
+			left:  1,
+			right: 1,
+			want:  true,
+		},
+		{
+			name:  "basic_values_cmp_notEqual",
+			left:  "not_something",
+			right: "something",
+			want:  false,
+		},
+		{
+			name:  "slice_cmp_always_equal",
+			left:  []int{1, 2, 3},
+			right: []int{1, 2},
+			want:  true,
+		},
+		{
+			name:  "map_cmp_always_equal",
+			left:  map[int]int{1: 2, 2: 3},
+			right: map[int]int{5: 6, 7: 8},
+			want:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			cmpComparator := GeneralCompareOptions()
+			got := cmp.Equal(tt.left, tt.right, cmpComparator)
+
+			if got != tt.want {
+				t.Errorf("GeneralCompareOptions() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
