@@ -1,4 +1,4 @@
-# <img src="https://media.discordapp.net/attachments/798510909927981077/819559903786041344/Inspr.png" alt="img" style="zoom:20%;" />Inspr
+# ![logo](./doc/img/inspr_logo.png)Inspr
 
 Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
 
