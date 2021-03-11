@@ -1,6 +1,8 @@
-#/bin/bash
-VERSION=$1
+#!/bin/bash
+VERSION=$(git describe --always --tags)
 mkdir bin
+
+echo $VERSION > version
 
 echo "Building CLI for Linux"
 GOOS=linux GOARCH=arm64 go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./bin/insprcli-linux-arm64-$VERSION ./cmd/inspr 

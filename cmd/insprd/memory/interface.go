@@ -12,10 +12,15 @@ import (
 // the Channels in the cluster
 type ChannelMemory interface {
 	TransactionInterface
-	GetChannel(context string, chName string) (*meta.Channel, error)
+	ChannelGetInterface
 	CreateChannel(context string, ch *meta.Channel) error
 	DeleteChannel(context string, chName string) error
 	UpdateChannel(context string, ch *meta.Channel) error
+}
+
+// ChannelGetInterface is an interface to get channels from memory
+type ChannelGetInterface interface {
+	Get(context string, ctName string) (*meta.Channel, error)
 }
 
 // AppMemory is the interface that allows to obtain or
@@ -23,10 +28,15 @@ type ChannelMemory interface {
 // the DApps in the cluster
 type AppMemory interface {
 	TransactionInterface
-	GetApp(query string) (*meta.App, error)
+	AppGetInterface
 	CreateApp(context string, app *meta.App) error
 	DeleteApp(query string) error
 	UpdateApp(query string, app *meta.App) error
+}
+
+// AppGetInterface is an interface to get apps from memory
+type AppGetInterface interface {
+	Get(query string) (*meta.App, error)
 }
 
 // ChannelTypeMemory is the interface that allows to
@@ -34,10 +44,15 @@ type AppMemory interface {
 // state of the ChannelTypes in the cluster
 type ChannelTypeMemory interface {
 	TransactionInterface
-	GetChannelType(context string, ctName string) (*meta.ChannelType, error)
+	ChannelTypeGetInterface
 	CreateChannelType(context string, ct *meta.ChannelType) error
 	DeleteChannelType(context string, ctName string) error
 	UpdateChannelType(context string, ct *meta.ChannelType) error
+}
+
+// ChannelTypeGetInterface is an interface to get channel types from memory
+type ChannelTypeGetInterface interface {
+	Get(context string, ctName string) (*meta.ChannelType, error)
 }
 
 // Manager is the interface that allows the management
@@ -48,6 +63,14 @@ type Manager interface {
 	Apps() AppMemory
 	Channels() ChannelMemory
 	ChannelTypes() ChannelTypeMemory
+	Root() GetInterface
+}
+
+// GetInterface is an interface to get components from memory
+type GetInterface interface {
+	Apps() AppGetInterface
+	Channels() ChannelGetInterface
+	ChannelTypes() ChannelTypeGetInterface
 }
 
 // TransactionInterface makes transactions on a Memory manager

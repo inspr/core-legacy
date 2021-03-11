@@ -1,4 +1,4 @@
-FROM golang:alpine AS build-env
+FROM gcr.io/red-inspr/inspr/sidecar/kafka:build AS build-env
 
 WORKDIR /inspr
 COPY go.mod go.mod
@@ -6,9 +6,9 @@ RUN go mod download
 COPY . .
 
 WORKDIR /inspr/cmd/insprd
-RUN go build
+RUN go build -tags musl
 
-FROM alpine
+FROM gcr.io/red-inspr/inspr/sidecar/kafka:deploy
 WORKDIR /deploy
 COPY --from=build-env /inspr/cmd/insprd/insprd insprd
 ENTRYPOINT ./insprd

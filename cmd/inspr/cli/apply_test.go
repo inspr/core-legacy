@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,6 +9,7 @@ import (
 	"reflect"
 	"testing"
 
+	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gopkg.in/yaml.v2"
 )
@@ -132,26 +132,70 @@ func Test_printAppliedFiles(t *testing.T) {
 }
 
 func Test_doApply(t *testing.T) {
-	type args struct {
-		in0 context.Context
-	}
+	defer os.Remove(filePath)
+	yamlString := createYaml()
+
+	bufResp := bytes.NewBufferString("")
+	fmt.Fprintf(bufResp, "Applying: \nfiletest.yaml | app | v1\n")
+	outResp, _ := ioutil.ReadAll(bufResp)
+
+	bufResp2 := bytes.NewBufferString("")
+	fmt.Fprintln(bufResp2, "Invalid command call\nFor help, type 'inspr apply --help'")
+	outResp2, _ := ioutil.ReadAll(bufResp2)
+
+	bufResp3 := bytes.NewBufferString("")
+	fmt.Fprint(bufResp3, "No files were applied\nFiles to be applied must be .yaml or .yml\n")
+	outResp3, _ := ioutil.ReadAll(bufResp3)
+
+	// creates a file with the expected syntax
+	ioutil.WriteFile(
+		filePath,
+		[]byte(yamlString),
+		os.ModePerm,
+	)
+
 	tests := []struct {
-		name    string
-		args    args
-		wantOut string
-		wantErr bool
+		name           string
+		flagsAndArgs   []string
+		expectedOutput []byte
 	}{
-		// TODO: Add test cases.
+		{
+			name:           "Should apply the file",
+			flagsAndArgs:   []string{"-f", "filetest.yaml"},
+			expectedOutput: outResp,
+		},
+		{
+			name:           "Too many flags, should raise an error",
+			flagsAndArgs:   []string{"-f", "example", "-k", "example"},
+			expectedOutput: outResp2,
+		},
+		{
+			name:           "No files applied",
+			flagsAndArgs:   []string{"-f", "example.yaml"},
+			expectedOutput: outResp3,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			out := &bytes.Buffer{}
-			if err := doApply(tt.args.in0); (err != nil) != tt.wantErr {
-				t.Errorf("doApply() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if gotOut := out.String(); gotOut != tt.wantOut {
-				t.Errorf("doApply() = %v, want %v", gotOut, tt.wantOut)
+			GetFactory().Subscribe(meta.Component{
+				APIVersion: "v1",
+				Kind:       "app",
+			},
+				func(b []byte, out io.Writer) error {
+					return nil
+				})
+
+			cmd := NewApplyCmd()
+			buf := bytes.NewBufferString("")
+
+			cliutils.SetOutput(buf)
+			cmd.SetArgs(tt.flagsAndArgs)
+
+			cmd.Execute()
+			got, _ := ioutil.ReadAll(buf)
+
+			if !reflect.DeepEqual(got, tt.expectedOutput) {
+				t.Errorf("doApply() = %v, want %v", string(got), string(tt.expectedOutput))
 			}
 		})
 	}

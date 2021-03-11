@@ -46,6 +46,17 @@ func setGlobalOutput() {
 	defaults.out = os.Stdout
 }
 
+// SetOutput sets the default output of CLI
+func SetOutput(out io.Writer) {
+	defaults.out = out
+}
+
+// SetClient sets the default server IP of CLI
+func SetClient(url string) {
+	rc := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
+	defaults.client = client.NewControllerClient(rc)
+}
+
 //SetMockedClient configures singleton's client as a mocked client given a error
 func SetMockedClient(err error) {
 	defaults.client = mocks.NewClientMock(err)

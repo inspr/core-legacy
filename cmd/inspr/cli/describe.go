@@ -69,11 +69,7 @@ func displayAppState(_ context.Context, args []string) error {
 		return ierrors.NewError().Message("Invalid args").BadRequest().Build()
 	}
 
-	separator := ""
-	if scope != "" {
-		separator = "."
-	}
-	path := scope + separator + args[0]
+	path, _ := utils.JoinScopes(scope, args[0])
 
 	app, err := client.Apps().Get(context.Background(), path)
 	if err != nil {
@@ -81,7 +77,7 @@ func displayAppState(_ context.Context, args []string) error {
 		return err
 	}
 
-	utils.PrintAppTree(app)
+	utils.PrintAppTree(app, out)
 
 	return nil
 }
@@ -105,7 +101,7 @@ func displayChannelState(_ context.Context, args []string) error {
 		fmt.Fprint(out, err.Error()+"\n")
 		return err
 	}
-	utils.PrintChannelTree(channel)
+	utils.PrintChannelTree(channel, out)
 
 	return nil
 }
@@ -129,7 +125,7 @@ func displayChannelTypeState(_ context.Context, args []string) error {
 		fmt.Fprint(out, err.Error()+"\n")
 		return err
 	}
-	utils.PrintChannelTypeTree(channelType)
+	utils.PrintChannelTypeTree(channelType, out)
 
 	return nil
 }

@@ -14,8 +14,8 @@ func (ctm *ChannelTypeMockManager) CreateChannelType(context string, ct *meta.Ch
 	return nil
 }
 
-// GetChannelType mocks a channelType method for testing
-func (ctm *ChannelTypeMockManager) GetChannelType(context string, ctName string) (*meta.ChannelType, error) {
+// Get mocks a channelType method for testing
+func (ctm *ChannelTypeMockManager) Get(context string, ctName string) (*meta.ChannelType, error) {
 	return nil, nil
 }
 

@@ -13,9 +13,6 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
 
-var tabWriter *tabwriter.Writer
-var lines []string
-
 // NewGetCmd creates get command for Inspr CLI
 func NewGetCmd() *cobra.Command {
 	getApps := cmd.NewCmd("apps").
@@ -64,47 +61,50 @@ func NewGetCmd() *cobra.Command {
 }
 
 func getApps(_ context.Context) error {
-
-	initTab()
-	err := getObj(printApps)
+	lines := make([]string, 0)
+	initTab(&lines)
+	err := getObj(printApps, &lines)
 	if err != nil {
 		return err
 	}
-	printTab()
+	printTab(&lines)
 	return nil
 }
 
 func getChannels(_ context.Context) error {
-	initTab()
-	err := getObj(printChannels)
+	lines := make([]string, 0)
+	initTab(&lines)
+	err := getObj(printChannels, &lines)
 	if err != nil {
 		return err
 	}
-	printTab()
+	printTab(&lines)
 	return nil
 }
 
 func getCTypes(_ context.Context) error {
-	initTab()
-	err := getObj(printCTypes)
+	lines := make([]string, 0)
+	initTab(&lines)
+	err := getObj(printCTypes, &lines)
 	if err != nil {
 		return err
 	}
-	printTab()
+	printTab(&lines)
 	return nil
 }
 
 func getNodes(_ context.Context) error {
-	initTab()
-	err := getObj(printNodes)
+	lines := make([]string, 0)
+	initTab(&lines)
+	err := getObj(printNodes, &lines)
 	if err != nil {
 		return err
 	}
-	printTab()
+	printTab(&lines)
 	return nil
 }
 
-func getObj(printObj func(*meta.App)) error {
+func getObj(printObj func(*meta.App, *[]string), lines *[]string) error {
 	client := cliutils.GetCliClient()
 	out := cliutils.GetCliOutput()
 
@@ -113,63 +113,65 @@ func getObj(printObj func(*meta.App)) error {
 		fmt.Fprint(out, err.Error()+"\n")
 		return err
 	}
+
 	resp, err := client.Apps().Get(context.Background(), scope)
 	if err != nil {
 		fmt.Fprint(out, err.Error()+"\n")
 		return err
 	}
-	printObj(resp)
+
+	printObj(resp, lines)
 	return nil
 }
 
-func printApps(app *meta.App) {
+func printApps(app *meta.App, lines *[]string) {
 	if app.Meta.Name != "" {
-		printLine(app.Meta.Name)
+		printLine(app.Meta.Name, lines)
 	}
 	for _, child := range app.Spec.Apps {
-		printApps(child)
+		printApps(child, lines)
 	}
 }
 
-func printChannels(app *meta.App) {
+func printChannels(app *meta.App, lines *[]string) {
 	for ch := range app.Spec.Channels {
-		printLine(ch)
+		printLine(ch, lines)
 	}
 	for _, child := range app.Spec.Apps {
-		printChannels(child)
+		printChannels(child, lines)
 	}
 }
 
-func printCTypes(app *meta.App) {
+func printCTypes(app *meta.App, lines *[]string) {
 	for ct := range app.Spec.ChannelTypes {
-		printLine(ct)
+		printLine(ct, lines)
 	}
 	for _, child := range app.Spec.Apps {
-		printCTypes(child)
+		printCTypes(child, lines)
 	}
 }
 
-func printNodes(app *meta.App) {
+func printNodes(app *meta.App, lines *[]string) {
 	if app.Spec.Node.Meta.Name != "" {
-		printLine(app.Spec.Node.Meta.Name)
+		printLine(app.Spec.Node.Meta.Name, lines)
 	}
 	for _, child := range app.Spec.Apps {
-		printApps(child)
+		printNodes(child, lines)
 	}
 }
 
-func printLine(name string) {
-	lines = append(lines, fmt.Sprintf("%s\n", name))
+func printLine(name string, lines *[]string) {
+	*lines = append(*lines, fmt.Sprintf("%s\n", name))
 }
 
-func initTab() {
+func initTab(lines *[]string) {
+	*lines = append(*lines, "NAME\n")
+}
+
+func printTab(lines *[]string) {
 	out := cliutils.GetCliOutput()
-	tabWriter = tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
-	lines = append(lines, "NAME\n")
-}
-
-func printTab() {
-	for _, line := range lines {
+	tabWriter := tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	for _, line := range *lines {
 		fmt.Fprint(tabWriter, line)
 	}
 	tabWriter.Flush()

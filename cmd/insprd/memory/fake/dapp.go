@@ -14,8 +14,8 @@ type Apps struct {
 	apps map[string]*meta.App
 }
 
-// GetApp - simple mock
-func (ch *Apps) GetApp(query string) (*meta.App, error) {
+// Get - simple mock
+func (ch *Apps) Get(query string) (*meta.App, error) {
 	if ch.fail != nil {
 		return nil, ch.fail
 	}
@@ -32,6 +32,7 @@ func (ch *Apps) CreateApp(context string, ct *meta.App) error {
 		return ch.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
+
 	_, ok := ch.apps[query]
 	if ok {
 		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("dapp %s already exists", query)).Build()

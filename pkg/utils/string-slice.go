@@ -27,7 +27,7 @@ func Includes(vs []string, t string) bool {
 }
 
 /*
-Remove return a new slice without any occurence of the
+Remove return a new slice without any occurrence of the
 target string t
 */
 func Remove(vs []string, t string) []string {

@@ -1,10 +1,7 @@
-# This file is a template, and might need editing before it works on your project.
 image: golang:latest
 
 variables:
-  # Please edit to your GitLab project
   REPO_NAME: gitlab.inspr.dev/inspr/core
-  VERSION: $(git describe --always)
 
 stages:
   - build
@@ -15,7 +12,7 @@ stages:
 build-cli:
   stage: build
   script:
-    - bash .gitlab/scripts/buildcli.sh VERSION
+    - bash .gitlab/scripts/buildcli.sh
   only:
     refs:
       - develop
@@ -23,13 +20,13 @@ build-cli:
   artifacts:
     paths:
       - bin/
+      - version
     expire_in: 30 days
 
 unit-tests:
   stage: test
   script:
-    - go test -v -coverprofile=profile.cov -coverpkg=./... ./...
-    - go tool cover -func profile.cov
+    - bash .gitlab/scripts/unittest.sh
   coverage: '/^total:\s+\(statements\)\s+(\d+\.\d+)\%$/'
 
 lint:
@@ -40,13 +37,11 @@ lint:
 
 push-cli:
   stage: push
-  image: google/cloud-sdk
-  script: 
-    - bash .gitlab/scripts/pushcli.sh VERSION
+  image: google/cloud-sdk:latest
+  script:
+    - bash .gitlab/scripts/pushcli.sh $VERSION
   only:
-    refs:
-      - develop
-      - tags
+    - tags
   dependencies:
     - build-cli
 
@@ -54,7 +49,7 @@ release-cli:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - sh .gitlab/scripts/releasecli.sh VERSION
+    - sh .gitlab/scripts/releasecli.sh
   only:
     - tags
   after_script:
