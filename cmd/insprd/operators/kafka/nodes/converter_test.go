@@ -7,6 +7,10 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	mfake "gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
+	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
@@ -15,6 +19,7 @@ import (
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
 func TestInsprDAppToK8sDeployment(t *testing.T) {
@@ -154,10 +159,13 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 			},
 		},
 	}
-
+	op := &NodeOperator{
+		memory:    mfake.MockMemoryManager(nil),
+		clientSet: fake.NewSimpleClientset(),
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := dAppToDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
+			if got := op.dAppToDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
 				t.Errorf("InsprDAppToK8sDeployment() = \n%v, \nwant \n%v", got, tt.want)
 			}
 		})
@@ -233,6 +241,139 @@ func Test_intToint32(t *testing.T) {
 			}
 			if *got != *tt.want {
 				t.Errorf("intToint32() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_baseEnvironment(t *testing.T) {
+	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "bootstrap")
+	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
+	os.Setenv("INSPR_SIDECAR_IMAGE", "sidecar")
+	os.Setenv("INSPR_ENV", "environment")
+	kafkasc.RefreshEnviromentVariables()
+	mem := tree.GetTreeMemory()
+	mem.InitTransaction()
+	mem.Apps().CreateApp("", &meta.App{
+		Meta: meta.Metadata{
+			Name: "parent",
+		},
+		Spec: meta.AppSpec{
+			Channels: map[string]*meta.Channel{
+				"channel1": {
+					Meta: meta.Metadata{
+						Name:   "channel1",
+						Parent: "parent",
+					},
+					Spec: meta.ChannelSpec{
+						Type: "channelType1",
+					},
+				},
+				"channel2": {
+					Meta: meta.Metadata{
+						Name:   "channel2",
+						Parent: "parent",
+					},
+					Spec: meta.ChannelSpec{
+						Type: "channelType2",
+					},
+				},
+			},
+			Aliases: map[string]*meta.Alias{},
+			ChannelTypes: map[string]*meta.ChannelType{
+				"channelType1": {
+					Meta: meta.Metadata{
+						Name:   "channelType1",
+						Parent: "parent",
+					},
+					Schema: "schema1",
+				},
+				"channelType2": {
+					Meta: meta.Metadata{
+						Name:   "channelType2",
+						Parent: "parent",
+					},
+					Schema: "schema2",
+				},
+			},
+		},
+	})
+	mem.Commit()
+	type args struct {
+		app *meta.App
+	}
+	type fields struct {
+		memory memory.Manager
+	}
+	tests := []struct {
+		name   string
+		args   args
+		fields fields
+		want   utils.EnvironmentMap
+	}{
+		{
+			name: "no boundary",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:   "app1",
+						Parent: "parent",
+					},
+				},
+			},
+			want: utils.EnvironmentMap{
+				"INSPR_INPUT_CHANNELS":    "",
+				"INSPR_OUTPUT_CHANNELS":   "",
+				"INSPR_SIDECAR_IMAGE":     "sidecar",
+				"INSPR_APP_ID":            "inspr-environment-parent-app1",
+				"INSPR_APP_CTX":           "parent",
+				"INSPR_ENV":               "environment",
+				"KAFKA_BOOTSTRAP_SERVERS": "bootstrap",
+				"KAFKA_AUTO_OFFSET_RESET": "earliest",
+			},
+		},
+		{
+			name: "only input boundary",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:   "app1",
+						Parent: "parent",
+					},
+					Spec: meta.AppSpec{
+						Boundary: meta.AppBoundary{
+							Input: []string{
+								"channel1",
+								"channel2",
+							},
+						},
+					},
+				},
+			},
+			want: utils.EnvironmentMap{
+				"INSPR_INPUT_CHANNELS":    "channel1;channel2",
+				"INSPR_OUTPUT_CHANNELS":   "",
+				"INSPR_SIDECAR_IMAGE":     "sidecar",
+				"INSPR_APP_ID":            "inspr-environment-parent-app1",
+				"INSPR_APP_CTX":           "parent",
+				"INSPR_ENV":               "environment",
+				"KAFKA_BOOTSTRAP_SERVERS": "bootstrap",
+				"KAFKA_AUTO_OFFSET_RESET": "earliest",
+				"channel1_SCHEMA":         "schema1",
+				"channel2_SCHEMA":         "schema2",
+				"channel1_RESOLVED":       "parent.channel1",
+				"channel2_RESOLVED":       "parent.channel2",
+			},
+		},
+	}
+	for _, tt := range tests {
+		op := &NodeOperator{
+			memory:    mem,
+			clientSet: fake.NewSimpleClientset(),
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			if got := op.baseEnvironment(tt.args.app); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("baseEnvironment() = \n%v, want \n%v", got, tt.want)
 			}
 		})
 	}
