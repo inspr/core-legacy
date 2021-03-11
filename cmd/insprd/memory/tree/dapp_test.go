@@ -246,6 +246,249 @@ func getMockApp() *meta.App {
 						},
 					},
 				},
+				"bound": {
+					Meta: meta.Metadata{
+						Name:        "bound",
+						Reference:   "bound",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Meta: meta.Metadata{
+								Name:        "bound",
+								Reference:   "bound.bound",
+								Annotations: map[string]string{},
+								Parent:      "",
+								SHA256:      "",
+							},
+							Spec: meta.NodeSpec{
+								Image: "imageNodeAppNode",
+							},
+						},
+						Apps: map[string]*meta.App{
+							"bound2": {
+								Meta: meta.Metadata{
+									Name:        "bound2",
+									Reference:   "bound.bound2",
+									Annotations: map[string]string{},
+									Parent:      "bound",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "bound2",
+											Reference:   "bound.bound2",
+											Annotations: map[string]string{},
+											Parent:      "bound",
+											SHA256:      "",
+										},
+										Spec: meta.NodeSpec{
+											Image: "imageNodeAppNode",
+										},
+									},
+									Apps: map[string]*meta.App{
+										"bound3": {
+											Meta: meta.Metadata{
+												Name:        "bound3",
+												Reference:   "bound.bound2.bound3",
+												Annotations: map[string]string{},
+												Parent:      "bound2",
+												SHA256:      "",
+											},
+											Spec: meta.AppSpec{
+												Node: meta.Node{
+													Meta: meta.Metadata{
+														Name:        "bound3",
+														Reference:   "bound.bound2.bound3",
+														Annotations: map[string]string{},
+														Parent:      "bound2",
+														SHA256:      "",
+													},
+													Spec: meta.NodeSpec{
+														Image: "imageNodeAppNode",
+													},
+												},
+												Apps:         map[string]*meta.App{},
+												Channels:     map[string]*meta.Channel{},
+												ChannelTypes: map[string]*meta.ChannelType{},
+												Boundary: meta.AppBoundary{
+													Input:  []string{"alias1"},
+													Output: []string{"alias2"},
+												},
+											},
+										},
+									},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"alias1"},
+										Output: []string{"alias2"},
+									},
+								},
+							},
+							"boundNP": {
+								Meta: meta.Metadata{
+									Name:        "boundNP",
+									Reference:   "invalid.path",
+									Annotations: map[string]string{},
+									Parent:      "bound",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "boundNP",
+											Reference:   "invalid.path",
+											Annotations: map[string]string{},
+											Parent:      "bound",
+											SHA256:      "",
+										},
+										Spec: meta.NodeSpec{
+											Image: "imageNodeAppNode",
+										},
+									},
+									Apps: map[string]*meta.App{
+										"boundNP2": {
+											Meta: meta.Metadata{
+												Name:        "boundNP2",
+												Reference:   "bound.boundNP.boundNP2",
+												Annotations: map[string]string{},
+												Parent:      "bound",
+												SHA256:      "",
+											},
+											Spec: meta.AppSpec{
+												Node: meta.Node{
+													Meta: meta.Metadata{
+														Name:        "boundNP2",
+														Reference:   "bound.boundNP.boundNP2",
+														Annotations: map[string]string{},
+														Parent:      "bound",
+														SHA256:      "",
+													},
+													Spec: meta.NodeSpec{
+														Image: "imageNodeAppNode",
+													},
+												},
+												Apps:         map[string]*meta.App{},
+												Channels:     map[string]*meta.Channel{},
+												ChannelTypes: map[string]*meta.ChannelType{},
+												Boundary: meta.AppBoundary{
+													Input:  []string{"alias1"},
+													Output: []string{"alias2"},
+												},
+											},
+										},
+									},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"alias1"},
+										Output: []string{"alias2"},
+									},
+								},
+							},
+							"bound4": {
+								Meta: meta.Metadata{
+									Name:        "bound4",
+									Reference:   "bound.bound4",
+									Annotations: map[string]string{},
+									Parent:      "bound",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "bound4",
+											Reference:   "bound.bound4",
+											Annotations: map[string]string{},
+											Parent:      "bound",
+											SHA256:      "",
+										},
+										Spec: meta.NodeSpec{
+											Image: "imageNodeAppNode",
+										},
+									},
+									Apps:         map[string]*meta.App{},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"ch1"},
+										Output: []string{"alias3"},
+									},
+								},
+							},
+							"bound5": {
+								Meta: meta.Metadata{
+									Name:        "bound5",
+									Reference:   "bound.bound5",
+									Annotations: map[string]string{},
+									Parent:      "bound",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "bound5",
+											Reference:   "bound.bound5",
+											Annotations: map[string]string{},
+											Parent:      "bound",
+											SHA256:      "",
+										},
+										Spec: meta.NodeSpec{
+											Image: "imageNodeAppNode",
+										},
+									},
+									Apps:         map[string]*meta.App{},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"ch1"},
+										Output: []string{"alias4"},
+									},
+								},
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"bdch1": {
+								Meta: meta.Metadata{
+									Name:   "bdch1",
+									Parent: "",
+								},
+								ConnectedApps: []string{},
+								Spec:          meta.ChannelSpec{},
+							},
+							"bdch2": {
+								Meta: meta.Metadata{
+									Name:   "bdch2",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1"},
+							Output: []string{"ch2"},
+						},
+						Aliases: map[string]*meta.Alias{
+							"bound2.alias1": {
+								Target:        "bdch1",
+								ConnectedApps: []string{"bound2"},
+							},
+							"bound2.alias2": {
+								Target:        "bdch2",
+								ConnectedApps: []string{"bound2"},
+							},
+							"bound4.alias3": {
+								Target:        "bdch2",
+								ConnectedApps: []string{"bound4"},
+							},
+						},
+					},
+				},
 			},
 			Channels: map[string]*meta.Channel{
 				"ch1": {
@@ -257,7 +500,15 @@ func getMockApp() *meta.App {
 						Type: "ct1",
 					},
 				},
-				"ch2": {},
+				"ch2": {
+					Meta: meta.Metadata{
+						Name:   "ch2",
+						Parent: "",
+					},
+					Spec: meta.ChannelSpec{
+						Type: "ct2",
+					},
+				},
 			},
 			ChannelTypes: map[string]*meta.ChannelType{
 				"ct1": {
@@ -2010,6 +2261,165 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 			}
 			if tt.checkFunction != nil {
 				tt.checkFunction(t)
+			}
+		})
+	}
+}
+
+func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
+	type fields struct {
+		MemoryManager *MemoryManager
+		root          *meta.App
+		appErr        error
+		mockA         bool
+		mockC         bool
+		mockCT        bool
+	}
+	type args struct {
+		app *meta.App
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    map[string]string
+		wantErr bool
+	}{
+		{
+			name: "Valid - resolve direct boundary",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				app: getMockApp().Spec.Apps["bound"],
+			},
+			want: map[string]string{
+				"ch1": "ch1",
+				"ch2": "ch2",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Valid - resolve boundary through alias",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"],
+			},
+			want: map[string]string{
+				"alias1": "bdch1",
+				"alias2": "bdch2",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Valid - resolve boundary through recursive alias",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"].Spec.Apps["bound3"],
+			},
+			want: map[string]string{
+				"alias1": "bdch1",
+				"alias2": "bdch2",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Valid - resolve boundary through mixed references",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound4"],
+			},
+			want: map[string]string{
+				"ch1":    "ch1",
+				"alias3": "bdch2",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Invalid - app with bad parent",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				app: getMockApp().Spec.Apps["bound"].Spec.Apps["boundNP"],
+			},
+			wantErr: true,
+		},
+		{
+			name: "Invalid - app with bad grandpa",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				app: getMockApp().Spec.Apps["bound"].Spec.Apps["boundNP"].Spec.Apps["boundNP2"],
+			},
+			wantErr: true,
+		},
+		{
+			name: "Invalid - bad reference",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound5"],
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			setTree(&MockManager{
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+					tree: tt.fields.root,
+				},
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+			amm := GetTreeMemory().Apps()
+			got, err := amm.ResolveBoundary(tt.args.app)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("AppMemoryManager.ResolveBoundary() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("AppMemoryManager.ResolveBoundary() = %v, want %v", got, tt.want)
 			}
 		})
 	}
