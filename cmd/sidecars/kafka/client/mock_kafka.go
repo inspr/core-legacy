@@ -74,6 +74,8 @@ func createMockEnv() {
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "latest")
 	os.Setenv("ch1_SCHEMA", `{"type":"string"}`)
 	os.Setenv("ch2_SCHEMA", "hellotest")
+	os.Setenv("ch1_RESOLVED", `ch1_resolved`)
+	os.Setenv("ch2_RESOLVED", "ch2_resolved")
 	os.Setenv("INSPR_APP_ID", "testappid1")
 	os.Setenv("INSPR_SIDECAR_IMAGE", "random-sidecar-image")
 }
