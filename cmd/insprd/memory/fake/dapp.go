@@ -71,5 +71,9 @@ func (ch *Apps) UpdateApp(context string, ct *meta.App) error {
 
 // ResolveBoundary mock
 func (ch *Apps) ResolveBoundary(app *meta.App) (map[string]string, error) {
-	return nil, nil
+	ret := map[string]string{}
+	for _, ch := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
+		ret[ch] = ch + "_resolved"
+	}
+	return ret, nil
 }
