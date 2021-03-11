@@ -91,6 +91,9 @@ func deleteMockEnv() {
 	os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
 	os.Unsetenv("INSPR_APP_ID")
 	os.Unsetenv("INSPR_SIDECAR_IMAGE")
+
+	os.Unsetenv("ch1_RESOLVED")
+	os.Unsetenv("ch2_RESOLVED")
 }
 
 // mockMessageSender sends two messages to a kafka producer
