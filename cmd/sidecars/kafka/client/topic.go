@@ -28,13 +28,10 @@ func fromTopic(topic string) messageChannel {
 	return msgChan
 }
 
-// returns a topic name based on given channel
+// returns a topic name based on a resolved channel
 func toTopic(channel string) string {
 	var topic string
 	ctx, name, _ := utils.RemoveLastPartInScope(channel)
-	if ctx == "" {
-		ctx = environment.GetInsprAppContext()
-	}
 
 	if environment.GetInsprEnvironment() == "" {
 		topic = fmt.Sprintf("inspr-%s-%s", environment.GetInsprAppContext(), channel)
