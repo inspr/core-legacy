@@ -41,10 +41,11 @@ func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	if !environment.IsInOutputChannel(channel, outputChan) {
 		return kafka.NewError(kafka.ErrInvalidArg, "invalid output channel", false)
 	}
+	resolvedChannel, _ := environment.GetResolvedChannel(outputChan, "", outputChan)
 
 	go deliveryReport(writer.producer)
 
-	if errProduceMessage := writer.produceMessage(message, channel); errProduceMessage != nil {
+	if errProduceMessage := writer.produceMessage(message, resolvedChannel); errProduceMessage != nil {
 		return errProduceMessage
 	}
 

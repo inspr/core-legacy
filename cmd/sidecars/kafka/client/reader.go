@@ -42,7 +42,7 @@ func NewReader() (*Reader, error) {
 	}
 	reader.consumer = newConsumer
 
-	channelsList := globalEnv.GetInputChannelList(globalEnv.GetInputChannels())
+	channelsList := globalEnv.GetResolvedInputChannelList(globalEnv.GetInputChannels())
 	if len(channelsList) == 0 {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
 type messageChannel struct {
@@ -30,6 +31,10 @@ func fromTopic(topic string) messageChannel {
 // returns a topic name based on given channel
 func toTopic(channel string) string {
 	var topic string
+	ctx, name, _ := utils.RemoveLastPartInScope(channel)
+	if ctx == "" {
+		ctx = environment.GetInsprAppContext()
+	}
 
 	if environment.GetInsprEnvironment() == "" {
 		topic = fmt.Sprintf("inspr-%s-%s", environment.GetInsprAppContext(), channel)
@@ -37,8 +42,8 @@ func toTopic(channel string) string {
 		topic = fmt.Sprintf(
 			"inspr-%s-%s-%s",
 			environment.GetInsprEnvironment(),
-			environment.GetInsprAppContext(),
-			channel,
+			ctx,
+			name,
 		)
 	}
 
