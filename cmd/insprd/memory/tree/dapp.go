@@ -68,6 +68,11 @@ func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
 		return appErr
 	}
 	amm.addAppInTree(app, parentApp)
+	appErr = amm.recursiveBoundaryValidation(app)
+	if appErr != nil {
+		return appErr
+	}
+	amm.updateAppBoundary(app, parentApp)
 	return nil
 }
 
@@ -217,14 +222,14 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, val) // if boundary exists, setup to resolve in parernt
 			continue
 		}
-		merr.Add(ierrors.NewError().Message("invalid boudary: %s invalid", key).Build())
+		merr.Add(ierrors.NewError().Message("invalid boundary: %s invalid", key).Build())
 		delete(unresolved, key)
 
 	}
 	if !merr.Empty() {
 		// throwing erros for boundaries couldn't be resolved because of some invalid boundary
 		for key := range unresolved {
-			merr.Add(ierrors.NewError().Message("invalid boudary: %s unresolved", key).Build())
+			merr.Add(ierrors.NewError().Message("invalid boundary: %s unresolved", key).Build())
 		}
 		return &merr
 	}
