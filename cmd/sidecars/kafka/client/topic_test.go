@@ -83,6 +83,9 @@ func Test_toTopicNonPRD(t *testing.T) {
 	os.Setenv("INSPR_ENV", "test")
 	os.Setenv("INSPR_APP_CTX", "random.app1")
 	os.Setenv("nonPrdChan_RESOLVED", "random.app1.nonPrdChan")
+	defer os.Unsetenv("INSPR_ENV")
+	defer os.Unsetenv("INSPR_APP_CTX")
+	defer os.Unsetenv("nonPrdChan_RESOLVED")
 
 	defer deleteMockEnv()
 	environment.RefreshEnviromentVariables()
