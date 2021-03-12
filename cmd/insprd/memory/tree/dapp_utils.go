@@ -159,8 +159,13 @@ func updateSingleBoundary(appName string, bound meta.AppBoundary, parentChannels
 }
 
 func getParentApp(sonQuery string) (*meta.App, error) {
+	var parentQuery string
 	sonRef := strings.Split(sonQuery, ".")
-	parentQuery := strings.Join(sonRef[:len(sonRef)-1], ".")
+	if len(sonRef) == 1 {
+		parentQuery = sonRef[0]
+	} else {
+		parentQuery = strings.Join(sonRef[:len(sonRef)-1], ".")
+	}
 
 	parentApp, err := GetTreeMemory().Apps().Get(parentQuery)
 
