@@ -22,11 +22,11 @@ func (tmm *MemoryManager) Apps() memory.AppMemory {
 	}
 }
 
-// GetApp recieves a query string (format = 'x.y.z') and iterates through the
+// Get receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the dApp which name is equal to the last query element.
-// The root app is returned if the query string is an empty string.
+// The tree app is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
-func (amm *AppMemoryManager) GetApp(query string) (*meta.App, error) {
+func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	if query == "" {
 		return amm.root, nil
 	}
@@ -52,7 +52,7 @@ func (amm *AppMemoryManager) GetApp(query string) (*meta.App, error) {
 // If the dApp's information is invalid, returns an error. The same goes for an invalid context.
 // In case of context being an empty string, the dApp is created inside the root dApp.
 func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
-	parentApp, err := amm.GetApp(context)
+	parentApp, err := amm.Get(context)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 		return ierrors.NewError().BadRequest().Message("can't delete root dApp").Build()
 	}
 
-	app, err := amm.GetApp(query)
+	app, err := amm.Get(query)
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 // If the current dApp is found and the new structure is valid, it's updated.
 // Otherwise, returns an error.
 func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
-	currentApp, err := amm.GetApp(query)
+	currentApp, err := amm.Get(query)
 	if err != nil {
 		return err
 	}
@@ -139,4 +139,36 @@ func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
 	amm.addAppInTree(app, parent)
 
 	return nil
+}
+
+// AppRootGetter returns a getter that gets apps from the root structure of the app, without the current changes.
+// The getter does not allow changes in the structure, just visualization.
+type AppRootGetter struct {
+	tree *meta.App
+}
+
+// Get receives a query string (format = 'x.y.z') and iterates through the
+// memory tree until it finds the dApp which name is equal to the last query element.
+// The tree app is returned if the query string is an empty string.
+// If the specified dApp is found, it is returned. Otherwise, returns an error.
+func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
+	if query == "" {
+		return amm.tree, nil
+	}
+
+	reference := strings.Split(query, ".")
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query " + query).Build()
+
+	nxtApp := amm.tree
+	if nxtApp != nil {
+		for _, element := range reference {
+			nxtApp = nxtApp.Spec.Apps[element]
+			if nxtApp == nil {
+				return nil, err
+			}
+		}
+		return nxtApp, nil
+	}
+
+	return nil, err
 }

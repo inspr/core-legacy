@@ -27,7 +27,7 @@ func TestNewReader(t *testing.T) {
 			wantErr: false,
 			checkFunction: func(t *testing.T, reader *Reader) {
 				if !(reader.consumer != nil && reader.lastMessage == nil) {
-					t.Errorf("check function error = Reader not created sucesfully")
+					t.Errorf("check function error = Reader not created successfully")
 				}
 			},
 		},
@@ -159,7 +159,7 @@ func TestReader_Commit(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "It should not return a error since the message was commited",
+			name: "It should not return a error since the message was committed",
 			fields: fields{
 				consumer: &MockConsumer{
 					err: false,
@@ -169,7 +169,7 @@ func TestReader_Commit(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "It should return a error since the message was not commited",
+			name: "It should return a error since the message was not committed",
 			fields: fields{
 				consumer: &MockConsumer{
 					err: true,

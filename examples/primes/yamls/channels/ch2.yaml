@@ -1,0 +1,12 @@
+apiVersion: "v1"
+kind: "channel"
+meta:
+  name: "primes_ch2"
+  reference: ""
+  Annotations:     
+    kafka.partition.number: "1"
+    kafka.replication.factor: "1"
+  parent: ""  
+spec:
+  type: "primes_ct2"
+  

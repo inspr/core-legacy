@@ -15,7 +15,25 @@ type MemManager struct {
 	app         Apps
 }
 
-// MockMemoryManager mock exported with propagated error throught the functions
+// LookupMemManager mocks getter for roots
+type LookupMemManager MemManager
+
+// Apps mocks an app getter
+func (l LookupMemManager) Apps() memory.AppGetInterface {
+	return &l.app
+}
+
+// Channels mocks a channel getter
+func (l LookupMemManager) Channels() memory.ChannelGetInterface {
+	return &l.channel
+}
+
+// ChannelTypes mocks a channel type getter
+func (l LookupMemManager) ChannelTypes() memory.ChannelTypeGetInterface {
+	return &l.channelType
+}
+
+// MockMemoryManager mock exported with propagated error through the functions
 func MockMemoryManager(failErr error) memory.Manager {
 	return &MemManager{
 		channelType: ChannelTypes{
@@ -31,6 +49,11 @@ func MockMemoryManager(failErr error) memory.Manager {
 			apps: make(map[string]*meta.App),
 		},
 	}
+}
+
+// Root mocks a root getter interface
+func (mm *MemManager) Root() memory.GetInterface {
+	return (*LookupMemManager)(mm)
 }
 
 // Apps returns manager of DApps

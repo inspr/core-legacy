@@ -14,8 +14,8 @@ type Channels struct {
 	channels map[string]*meta.Channel
 }
 
-// GetChannel - simple mock
-func (ch *Channels) GetChannel(context string, name string) (*meta.Channel, error) {
+// Get - simple mock
+func (ch *Channels) Get(context string, name string) (*meta.Channel, error) {
 	if ch.fail != nil {
 		return nil, ch.fail
 	}

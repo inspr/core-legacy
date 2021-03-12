@@ -1,23 +1,26 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 // AppHandler - contains handlers that uses the AppMemory interface methods
 type AppHandler struct {
-	memory.AppMemory
+	*Handler
 }
 
 // NewAppHandler - generates a new AppHandler through the memoryManager interface
-func NewAppHandler(memManager memory.Manager) *AppHandler {
+func (handler *Handler) NewAppHandler() *AppHandler {
 	return &AppHandler{
-		AppMemory: memManager.Apps(),
+		handler,
 	}
 }
 
@@ -33,23 +36,32 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		ah.InitTransaction()
+		ah.Memory.InitTransaction()
 		if !data.DryRun {
-			defer ah.Commit()
+			defer ah.Memory.Commit()
 		} else {
-			defer ah.Cancel()
+			defer ah.Memory.Cancel()
 		}
-		err = ah.CreateApp(data.Ctx, &data.App)
+
+		err = ah.Memory.Apps().CreateApp(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := ah.GetTransactionChanges()
+		changes, err := ah.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, diff)
+
+		if !data.DryRun {
+			err = ah.applyChangesInDiff(changes)
+			if err != nil {
+				rest.ERROR(w, err)
+			}
+		}
+
+		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
 }
@@ -67,10 +79,10 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 			return
 		}
 
-		ah.InitTransaction()
-		defer ah.Cancel()
+		ah.Memory.InitTransaction()
+		defer ah.Memory.Cancel()
 
-		app, err := ah.GetApp(data.Ctx)
+		app, err := ah.Memory.Root().Apps().Get(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -92,22 +104,33 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		ah.InitTransaction()
+
+		ah.Memory.InitTransaction()
 		if !data.DryRun {
-			defer ah.Commit()
+			defer ah.Memory.Commit()
 		} else {
-			defer ah.Cancel()
+			defer ah.Memory.Cancel()
 		}
-		err = ah.UpdateApp(data.Ctx, &data.App)
+		err = ah.Memory.Apps().UpdateApp(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, err)
 		}
-		diff, err := ah.GetTransactionChanges()
+		changes, err := ah.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, diff)
+
+		if !data.DryRun {
+			err = ah.applyChangesInDiff(changes)
+
+			if err != nil {
+				rest.ERROR(w, err)
+				return
+			}
+		}
+
+		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
 }
@@ -124,23 +147,66 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		ah.InitTransaction()
+		ah.Memory.InitTransaction()
 		if !data.DryRun {
-			defer ah.Commit()
+			defer ah.Memory.Commit()
 		} else {
-			defer ah.Cancel()
+			defer ah.Memory.Cancel()
 		}
-		err = ah.DeleteApp(data.Ctx)
+		_, err = ah.Memory.Apps().Get(data.Ctx)
+		if err != nil {
+			rest.ERROR(w, err)
+		}
+
+		err = ah.Memory.Apps().DeleteApp(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := ah.GetTransactionChanges()
+		changes, err := ah.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, diff)
+		if !data.DryRun {
+			err = ah.applyChangesInDiff(changes)
+
+			if err != nil {
+				rest.ERROR(w, err)
+				return
+			}
+		}
+
+		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
+}
+
+func (handler *Handler) deleteApp(app *meta.App) error {
+	errs := ierrors.MultiError{
+		Errors: []error{},
+	}
+	if app.Spec.Node.Spec.Image != "" {
+		err := handler.Operator.Nodes().DeleteNode(context.Background(), app.Meta.Parent, app.Meta.Name)
+		if err != nil {
+			errs.Add(err)
+		}
+
+	} else {
+		for _, subApp := range app.Spec.Apps {
+			errs.Add(handler.deleteApp(subApp))
+		}
+		for c := range app.Spec.Channels {
+			scope, _ := utils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+
+			err := handler.Operator.Channels().Delete(context.Background(), scope, c)
+			if err != nil {
+				errs.Add(err)
+			}
+		}
+	}
+	if len(errs.Errors) > 0 {
+		return &errs
+	}
+	return nil
 }

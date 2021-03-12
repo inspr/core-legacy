@@ -5,19 +5,18 @@ import (
 	"net/http"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 // ChannelHandler - contains handlers that uses the ChannelMemory interface methods
 type ChannelHandler struct {
-	memory.ChannelMemory
+	*Handler
 }
 
 // NewChannelHandler exports
-func NewChannelHandler(memManager memory.Manager) *ChannelHandler {
+func (handler *Handler) NewChannelHandler() *ChannelHandler {
 	return &ChannelHandler{
-		ChannelMemory: memManager.Channels(),
+		handler,
 	}
 }
 
@@ -33,23 +32,34 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		ch.InitTransaction()
+		ch.Memory.InitTransaction()
 		if !data.DryRun {
-			defer ch.Commit()
+			defer ch.Memory.Commit()
 		} else {
-			defer ch.Cancel()
+			defer ch.Memory.Cancel()
 		}
-		err = ch.CreateChannel(data.Ctx, &data.Channel)
+
+		err = ch.Memory.Channels().CreateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := ch.GetTransactionChanges()
+
+		changes, err := ch.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, diff)
+
+		if !data.DryRun {
+			err = ch.applyChangesInDiff(changes)
+			if err != nil {
+				rest.ERROR(w, err)
+				return
+			}
+		}
+
+		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
 }
@@ -67,10 +77,10 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 			return
 		}
 
-		ch.InitTransaction()
-		defer ch.Cancel()
+		ch.Memory.InitTransaction()
+		defer ch.Memory.Cancel()
 
-		channel, err := ch.GetChannel(data.Ctx, data.ChName)
+		channel, err := ch.Memory.Root().Channels().Get(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -92,23 +102,33 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		ch.InitTransaction()
+		ch.Memory.InitTransaction()
 		if !data.DryRun {
-			defer ch.Commit()
+			defer ch.Memory.Commit()
 		} else {
-			defer ch.Cancel()
+			defer ch.Memory.Cancel()
 		}
-		err = ch.UpdateChannel(data.Ctx, &data.Channel)
+		err = ch.Memory.Channels().UpdateChannel(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := ch.GetTransactionChanges()
+		changes, err := ch.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, diff)
+
+		if !data.DryRun {
+			err = ch.applyChangesInDiff(changes)
+
+			if err != nil {
+				rest.ERROR(w, err)
+				return
+			}
+		}
+
+		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
 }
@@ -124,23 +144,34 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		ch.InitTransaction()
+
+		ch.Memory.InitTransaction()
 		if !data.DryRun {
-			defer ch.Commit()
+			defer ch.Memory.Commit()
 		} else {
-			defer ch.Cancel()
+			defer ch.Memory.Cancel()
 		}
-		err = ch.DeleteChannel(data.Ctx, data.ChName)
+
+		err = ch.Memory.Channels().DeleteChannel(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		diff, err := ch.GetTransactionChanges()
+
+		changes, err := ch.Memory.Channels().GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, diff)
+		if !data.DryRun {
+			err = ch.applyChangesInDiff(changes)
+
+			if err != nil {
+				rest.ERROR(w, err)
+				return
+			}
+		}
+		rest.JSON(w, http.StatusOK, changes)
 	}
 	return rest.Handler(handler)
 }

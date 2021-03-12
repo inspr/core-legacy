@@ -14,8 +14,8 @@ type Apps struct {
 	apps map[string]*meta.App
 }
 
-// GetApp - simple mock
-func (ch *Apps) GetApp(query string) (*meta.App, error) {
+// Get - simple mock
+func (ch *Apps) Get(query string) (*meta.App, error) {
 	if ch.fail != nil {
 		return nil, ch.fail
 	}

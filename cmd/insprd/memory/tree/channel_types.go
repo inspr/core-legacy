@@ -35,13 +35,13 @@ func (ctm *ChannelTypeMemoryManager) CreateChannelType(context string, ct *meta.
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
-	_, err := ctm.GetChannelType(context, ct.Meta.Name)
+	_, err := ctm.Get(context, ct.Meta.Name)
 	if err == nil {
 		return ierrors.NewError().AlreadyExists().
 			Message("target app already has a '" + ct.Meta.Name + "' ChannelType").Build()
 	}
 
-	parentApp, err := GetTreeMemory().Apps().GetApp(context)
+	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
 		return err
 	}
@@ -55,12 +55,12 @@ func (ctm *ChannelTypeMemoryManager) CreateChannelType(context string, ct *meta.
 }
 
 /*
-GetChannelType returns, if it exists, a specific ChannellType from a given app.
+Get returns, if it exists, a specific ChannellType from a given app.
 ctName: Name of desired Channel Type.
 context: Path to reference app (x.y.z...)
 */
-func (ctm *ChannelTypeMemoryManager) GetChannelType(context string, ctName string) (*meta.ChannelType, error) {
-	parentApp, err := GetTreeMemory().Apps().GetApp(context)
+func (ctm *ChannelTypeMemoryManager) Get(context string, ctName string) (*meta.ChannelType, error) {
+	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
 		return nil, ierrors.NewError().BadRequest().InnerError(err).
 			Message("target app doesn't exist").Build()
@@ -83,7 +83,7 @@ ctName: Name of desired Channel Type.
 context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName string) error {
-	curCt, err := ctm.GetChannelType(context, ctName)
+	curCt, err := ctm.Get(context, ctName)
 	if curCt == nil || err != nil {
 		return ierrors.NewError().BadRequest().
 			Message("target app doesn't contain a '" + context + "' ChannelType").Build()
@@ -96,7 +96,7 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 			Build()
 	}
 
-	parentApp, err := GetTreeMemory().Apps().GetApp(context)
+	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
 		return ierrors.NewError().InternalServer().InnerError(err).
 			Message("target app doesn't exist").Build()
@@ -104,7 +104,7 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 
 	delete(parentApp.Spec.ChannelTypes, ctName)
 
-	curCt, err = ctm.GetChannelType(context, ctName)
+	curCt, err = ctm.Get(context, ctName)
 	if curCt != nil {
 		return ierrors.NewError().InternalServer().
 			Message("couldn't delete '" + context + "' ChannelType from target app").Build()
@@ -119,7 +119,7 @@ context: Path to reference app (x.y.z...)
 */
 func (ctm *ChannelTypeMemoryManager) UpdateChannelType(context string, ct *meta.ChannelType) error {
 
-	oldChType, err := ctm.GetChannelType(context, ct.Meta.Name)
+	oldChType, err := ctm.Get(context, ct.Meta.Name)
 	if err != nil {
 		return ierrors.NewError().BadRequest().
 			Message("target app doesn't contain a '" + context + "' ChannelType").Build()
@@ -127,7 +127,7 @@ func (ctm *ChannelTypeMemoryManager) UpdateChannelType(context string, ct *meta.
 
 	ct.ConnectedChannels = oldChType.ConnectedChannels
 
-	parentApp, err := GetTreeMemory().Apps().GetApp(context)
+	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
 		return ierrors.NewError().InternalServer().InnerError(err).
 			Message("target app doesn't exist").Build()
@@ -135,4 +135,31 @@ func (ctm *ChannelTypeMemoryManager) UpdateChannelType(context string, ct *meta.
 
 	parentApp.Spec.ChannelTypes[ct.Meta.Name] = ct
 	return nil
+}
+
+// ChannelTypeRootGetter returns a getter that gets channel types from the root structure of the app, without the current changes.
+// The getter does not allow changes in the structure, just visualization.
+type ChannelTypeRootGetter struct {
+	tree *meta.ChannelType
+}
+
+// Get receives a query string (format = 'x.y.z') and iterates through the
+// memory tree until it finds the dChannelType which name is equal to the last query element.
+// The tree ChannelType is returned if the query string is an empty string.
+// If the specified dChannelType is found, it is returned. Otherwise, returns an error.
+func (amm *ChannelTypeRootGetter) Get(context string, name string) (*meta.ChannelType, error) {
+	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
+	if err != nil {
+		newError := ierrors.NewError().InnerError(err).NotFound().Message("ChannelType was not found because the app context has an error").Build()
+		return nil, newError
+	}
+
+	if parentApp.Spec.ChannelTypes != nil {
+		if ch, ok := parentApp.Spec.ChannelTypes[name]; ok {
+			return ch, nil
+		}
+	}
+
+	newError := ierrors.NewError().NotFound().Message("ChannelType not found").Build()
+	return nil, newError
 }

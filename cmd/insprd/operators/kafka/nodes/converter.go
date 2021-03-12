@@ -36,8 +36,8 @@ func baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
 	}
 	channels.Map(func(s string) string {
-		ch, _ := tree.GetTreeMemory().Channels().GetChannel(app.Meta.Parent, s)
-		ct, _ := tree.GetTreeMemory().ChannelTypes().GetChannelType(app.Meta.Parent, ch.Spec.Type)
+		ch, _ := tree.GetTreeMemory().Channels().Get(app.Meta.Parent, s)
+		ct, _ := tree.GetTreeMemory().ChannelTypes().Get(app.Meta.Parent, ch.Spec.Type)
 		env[s+"_SCHEMA"] = ct.Schema
 		return s
 	})
@@ -169,19 +169,28 @@ func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 	var err error
 	node := meta.Node{}
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
+	node.Meta.Parent, err = toNodeParent(kdep.ObjectMeta.Name)
 	if err != nil {
 		return meta.Node{}, err
 	}
-	node.Spec.Replicas = int(*kdep.Spec.Replicas)
 	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
-	node.Spec.Environment = utils.ParseFromK8sEnvironment(kdep.Spec.Template.Spec.Containers[0].Env)
+	node.Spec.Environment = utils.ParseFromK8sEnviroment(kdep.Spec.Template.Spec.Containers[0].Env)
+	node.Spec.Replicas = int(*kdep.Spec.Replicas)
 	return node, nil
 }
 
 func toNodeName(deployName string) (string, error) {
-	strs := strings.Split(deployName, ".")
+	strs := strings.Split(deployName, "-")
 	if len(strs) < 3 {
 		return "", ierrors.NewError().Message("invalid deployment name").Build()
 	}
-	return strs[2], nil
+	return strs[len(strs)-1], nil
+}
+
+func toNodeParent(deployName string) (string, error) {
+	strs := strings.Split(deployName, "-")
+	if len(strs) < 3 {
+		return "", ierrors.NewError().Message("invalid deployment name").Build()
+	}
+	return strs[len(strs)-2], nil
 }

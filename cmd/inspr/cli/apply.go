@@ -133,6 +133,7 @@ func getFilesFromFolder(path string) ([]string, error) {
 	for _, file := range folder {
 		files = append(files, file.Name())
 	}
+
 	return files, nil
 }
 
@@ -143,10 +144,12 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 		if isYaml(file) {
 			fmt.Println(file)
 			comp := meta.Component{}
-			f, err := ioutil.ReadFile(path + file)
+
+			f, err := ioutil.ReadFile(filepath.Join(path, file))
 			if err != nil {
 				continue
 			}
+
 			err = yaml.Unmarshal(f, &comp)
 			if err != nil || comp.APIVersion == "" || comp.Kind == "" {
 				continue
@@ -156,11 +159,18 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 			if err != nil {
 				continue
 			}
+
 			err = apply(f, out)
 			if err != nil {
-				fmt.Fprintf(out, "error while applying file '%v' :\n %v\n", file, err.Error())
+				fmt.Fprintf(
+					out,
+					"error while applying file '%v' :\n %v\n",
+					file,
+					err.Error(),
+				)
 				continue
 			}
+
 			appliedFiles = append(appliedFiles, applied{file: file, component: comp})
 
 		}

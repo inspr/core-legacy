@@ -48,7 +48,7 @@ func setTree(tmm memory.Manager) {
 //InitTransaction copies and reserves the current tree structure so that changes can be reversed
 func (mm *MemoryManager) InitTransaction() {
 	mm.Lock()
-	mm.root = utils.DCopy(mm.tree)
+	mm.root = utils.DeepCopy(mm.tree)
 }
 
 //Commit applies changes from a transaction in to the tree structure
@@ -68,4 +68,33 @@ func (mm *MemoryManager) Cancel() {
 func (mm *MemoryManager) GetTransactionChanges() (diff.Changelog, error) {
 	cl, err := diff.Diff(mm.tree, mm.root)
 	return cl, err
+}
+
+// RootGetter is a structure that gets components from the root, without the current changes.
+type RootGetter struct {
+	tree *meta.App
+}
+
+// Apps returns a getter for apps on the root.
+func (t *RootGetter) Apps() memory.AppGetInterface {
+	return &AppRootGetter{
+		tree: t.tree,
+	}
+}
+
+// Channels returns a getter for channels on the root.
+func (t *RootGetter) Channels() memory.ChannelGetInterface {
+	return &ChannelRootGetter{}
+}
+
+// ChannelTypes returns a getter for channel types on the root
+func (t *RootGetter) ChannelTypes() memory.ChannelTypeGetInterface {
+	return &ChannelTypeRootGetter{}
+}
+
+// Root returns a getter for objects on the root of the tree, without the current changes.
+func (mm *MemoryManager) Root() memory.GetInterface {
+	return &RootGetter{
+		tree: mm.tree,
+	}
 }

@@ -27,7 +27,7 @@ func TestHandler_HTTPHandlerFunc(t *testing.T) {
 		want http.HandlerFunc
 	}{
 		{
-			name: "convertion testing",
+			name: "conversion testing",
 			h:    myHandler,
 			want: HTTPMyHandler,
 		},
