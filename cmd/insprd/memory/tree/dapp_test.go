@@ -475,16 +475,13 @@ func getMockApp() *meta.App {
 						},
 						Aliases: map[string]*meta.Alias{
 							"bound2.alias1": {
-								Target:        "bdch1",
-								ConnectedApps: []string{"bound2"},
+								Target: "bdch1",
 							},
 							"bound2.alias2": {
-								Target:        "bdch2",
-								ConnectedApps: []string{"bound2"},
+								Target: "bdch2",
 							},
 							"bound4.alias3": {
-								Target:        "bdch2",
-								ConnectedApps: []string{"bound4"},
+								Target: "bdch2",
 							},
 						},
 					},

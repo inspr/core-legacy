@@ -7,6 +7,9 @@ var exists = true
 //MApps is a string->App map
 type MApps map[string]*meta.App
 
+// MAliases is a string->Alias map
+type MAliases map[string]meta.Alias
+
 //MChannels is a string->channel map
 type MChannels map[string]*meta.Channel
 
@@ -77,6 +80,24 @@ func (set *StrSet) AppAppendSet(apps MApps) {
 	}
 }
 
+//AliasesMakeSet creates a StrSet from a Aliasess map.
+func AliasesMakeSet(apps MAliases) StrSet {
+	set := make(StrSet)
+
+	for k := range apps {
+		set[k] = exists
+	}
+
+	return set
+}
+
+//AliasAppendSet extends a StrSet with a Apps map.
+func (set *StrSet) AliasAppendSet(apps MAliases) {
+	for k := range apps {
+		(*set)[k] = exists
+	}
+}
+
 //AppDisjuncSet returns the disjunction set between two Apps maps.
 func AppDisjuncSet(apps1 MApps, apps2 MApps) StrSet {
 	set := make(StrSet)
@@ -88,6 +109,42 @@ func AppDisjuncSet(apps1 MApps, apps2 MApps) StrSet {
 		_, first := apps1[k]
 		_, second := apps2[k]
 		if first != second {
+			set[k] = exists
+		}
+	}
+
+	return set
+}
+
+//AliasDisjuctSet returns the disjunction set between two Apps maps.
+func AliasDisjuctSet(apps1 MAliases, apps2 MAliases) StrSet {
+	set := make(StrSet)
+
+	setTemp := AliasesMakeSet(apps1)
+	setTemp.AliasAppendSet(apps2)
+
+	for k := range setTemp {
+		_, first := apps1[k]
+		_, second := apps2[k]
+		if first != second {
+			set[k] = exists
+		}
+	}
+
+	return set
+}
+
+//AliasIntersecSet returns the intersection set between two Aliases maps.
+func AliasIntersecSet(apps1 MAliases, apps2 MAliases) StrSet {
+	set := make(StrSet)
+
+	setTemp := AliasesMakeSet(apps1)
+	setTemp.AliasAppendSet(apps2)
+
+	for k := range setTemp {
+		_, first := apps1[k]
+		_, second := apps2[k]
+		if first && second {
 			set[k] = exists
 		}
 	}

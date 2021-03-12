@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func TestDiff(t *testing.T) {
@@ -242,6 +243,40 @@ func TestChange_diffNodes(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:   "updated replicas",
+			fields: fields{},
+			args: args{
+				nodeOrig: meta.Node{
+					Meta: meta.Metadata{},
+					Spec: meta.NodeSpec{
+						Image:    "image",
+						Replicas: 3,
+					},
+				},
+				nodeCurr: meta.Node{
+					Meta: meta.Metadata{},
+					Spec: meta.NodeSpec{
+						Image:    "image",
+						Replicas: 1,
+					},
+				},
+			},
+			wantErr: false,
+			want: Change{
+				Kind:      NodeKind,
+				Operation: Update,
+				Diff: []Difference{
+					{
+						Field:     "Spec.Node.Spec.Replicas",
+						From:      "3",
+						To:        "1",
+						Kind:      NodeKind,
+						Operation: Update,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -394,8 +429,8 @@ func TestChange_diffApps(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		appsOrig utils.MApps
-		appsCurr utils.MApps
+		appsOrig metautils.MApps
+		appsCurr metautils.MApps
 	}
 	tests := []struct {
 		name   string
@@ -407,7 +442,7 @@ func TestChange_diffApps(t *testing.T) {
 			name:   "Unchanged Apps",
 			fields: fields{},
 			args: args{
-				appsOrig: utils.MApps{
+				appsOrig: metautils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{
@@ -420,7 +455,7 @@ func TestChange_diffApps(t *testing.T) {
 						},
 					},
 				},
-				appsCurr: utils.MApps{
+				appsCurr: metautils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{
@@ -440,7 +475,7 @@ func TestChange_diffApps(t *testing.T) {
 			name:   "Valid changes on Apps",
 			fields: fields{},
 			args: args{
-				appsOrig: utils.MApps{
+				appsOrig: metautils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{},
@@ -450,7 +485,7 @@ func TestChange_diffApps(t *testing.T) {
 						Spec: meta.AppSpec{},
 					},
 				},
-				appsCurr: utils.MApps{
+				appsCurr: metautils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{},
@@ -506,8 +541,8 @@ func TestChange_diffChannels(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		chOrig utils.MChannels
-		chCurr utils.MChannels
+		chOrig metautils.MChannels
+		chCurr metautils.MChannels
 	}
 	tests := []struct {
 		name    string
@@ -520,7 +555,7 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Unchanged Channel Types",
 			fields: fields{},
 			args: args{
-				chOrig: utils.MChannels{
+				chOrig: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -528,7 +563,7 @@ func TestChange_diffChannels(t *testing.T) {
 						},
 					},
 				},
-				chCurr: utils.MChannels{
+				chCurr: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -544,7 +579,7 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Valid changes on Channel Types",
 			fields: fields{},
 			args: args{
-				chOrig: utils.MChannels{
+				chOrig: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -552,7 +587,7 @@ func TestChange_diffChannels(t *testing.T) {
 						},
 					},
 				},
-				chCurr: utils.MChannels{
+				chCurr: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -581,7 +616,7 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Channel deleted",
 			fields: fields{},
 			args: args{
-				chOrig: utils.MChannels{
+				chOrig: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -589,7 +624,7 @@ func TestChange_diffChannels(t *testing.T) {
 						},
 					},
 				},
-				chCurr: utils.MChannels{},
+				chCurr: metautils.MChannels{},
 			},
 			wantErr: false,
 			want: Change{
@@ -611,8 +646,8 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Channel created",
 			fields: fields{},
 			args: args{
-				chOrig: utils.MChannels{},
-				chCurr: utils.MChannels{
+				chOrig: metautils.MChannels{},
+				chCurr: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -660,8 +695,8 @@ func TestChange_diffChannelTypes(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		chtOrig utils.MTypes
-		chtCurr utils.MTypes
+		chtOrig metautils.MTypes
+		chtCurr metautils.MTypes
 	}
 	tests := []struct {
 		name    string
@@ -674,13 +709,13 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "Unchanged Channel Types",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.MTypes{
+				chtOrig: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta:   meta.Metadata{},
 						Schema: "",
 					},
 				},
-				chtCurr: utils.MTypes{
+				chtCurr: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta:   meta.Metadata{},
 						Schema: "",
@@ -694,7 +729,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "Valid changes on Channel Types",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.MTypes{
+				chtOrig: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -706,7 +741,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 						Schema: string([]byte{0, 1, 0, 1, 0, 0, 1, 1, 1, 0}),
 					},
 				},
-				chtCurr: utils.MTypes{
+				chtCurr: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -739,8 +774,8 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "create channel type",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.MTypes{},
-				chtCurr: utils.MTypes{
+				chtOrig: metautils.MTypes{},
+				chtCurr: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -773,7 +808,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "delete channel type",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.MTypes{
+				chtOrig: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -785,7 +820,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 						Schema: string([]byte{0, 1, 0, 1, 0, 1, 1, 1, 1, 1}),
 					},
 				},
-				chtCurr: utils.MTypes{},
+				chtCurr: metautils.MTypes{},
 			},
 			wantErr: false,
 			want: Change{
@@ -1046,6 +1081,331 @@ func TestChange_diffMetadata(t *testing.T) {
 			}
 			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
+			}
+		})
+	}
+}
+
+func TestChange_diffAliases(t *testing.T) {
+	type fields struct {
+		Context   string
+		Diff      []Difference
+		Kind      Kind
+		Operation Operation
+		changelog *Changelog
+	}
+	type args struct {
+		from map[string]meta.Alias
+		to   map[string]meta.Alias
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Change
+	}{
+		{
+			name: "no changes in aliases",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+				to: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+			},
+			want: Change{
+				Context:   "context",
+				changelog: &Changelog{},
+				Diff:      []Difference{},
+			},
+		},
+		{
+			name: "updated aliases",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: map[string]meta.Alias{
+					"alias1": {
+						Target: "target3",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+				to: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+			},
+			want: Change{
+				Context:   "context",
+				changelog: &Changelog{},
+				Diff: []Difference{
+					{
+						Field:     "Spec.Aliases[alias1]",
+						From:      "target3",
+						To:        "target1",
+						Kind:      AliasKind,
+						Name:      "alias1",
+						Operation: Update,
+					},
+				},
+				Kind:      AliasKind,
+				Operation: Update,
+			},
+		},
+		{
+			name: "created alias",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+				},
+				to: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+			},
+			want: Change{
+				Context:   "context",
+				changelog: &Changelog{},
+				Diff: []Difference{
+					{
+						Field:     "Spec.Aliases[alias2]",
+						From:      "<nil>",
+						To:        "target2",
+						Kind:      AliasKind,
+						Name:      "alias2",
+						Operation: Create,
+					},
+				},
+				Kind:      AliasKind,
+				Operation: Create,
+			},
+		},
+		{
+			name: "deleted alias",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+
+					"alias2": {
+						Target: "target2",
+					},
+				},
+				to: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+				},
+			},
+			want: Change{
+				Context:   "context",
+				changelog: &Changelog{},
+				Diff: []Difference{
+					{
+						Field:     "Spec.Aliases[alias2]",
+						From:      "target2",
+						To:        "<nil>",
+						Kind:      AliasKind,
+						Name:      "alias2",
+						Operation: Delete,
+					},
+				},
+				Kind:      AliasKind,
+				Operation: Delete,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			change := &Change{
+				Context:   tt.fields.Context,
+				Diff:      tt.fields.Diff,
+				Kind:      tt.fields.Kind,
+				Operation: tt.fields.Operation,
+				changelog: tt.fields.changelog,
+			}
+			change.diffAliases(tt.args.from, tt.args.to)
+			if !equalChanges(*change, tt.want) {
+				t.Errorf("Changelog.diff() = \n%v, want \n%v", *change, tt.want)
+			}
+		})
+	}
+}
+
+func TestChange_diffEnv(t *testing.T) {
+	type fields struct {
+		Context   string
+		Diff      []Difference
+		Kind      Kind
+		Operation Operation
+		changelog *Changelog
+	}
+	type args struct {
+		from utils.EnvironmentMap
+		to   utils.EnvironmentMap
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Change
+	}{
+		{
+			name: "updated environment variable",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: utils.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+					"ENVIRONMENT2": "VALUE2",
+				},
+				to: utils.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE3",
+					"ENVIRONMENT2": "VALUE2",
+				},
+			},
+			want: Change{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff: []Difference{
+					{
+						Field:     "Spec.Node.Spec.Environment[ENVIRONMENT1]",
+						From:      "VALUE1",
+						To:        "VALUE3",
+						Kind:      EnvironmentKind,
+						Name:      "ENVIRONMENT1",
+						Operation: Update,
+					},
+				},
+				Kind:      EnvironmentKind,
+				Operation: Update,
+			},
+		},
+		{
+			name: "deleted environment variable",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: utils.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+					"ENVIRONMENT2": "VALUE2",
+				},
+				to: utils.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+				},
+			},
+			want: Change{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff: []Difference{
+					{
+						Field:     "Spec.Node.Spec.Environment[ENVIRONMENT2]",
+						From:      "VALUE2",
+						To:        "<nil>",
+						Kind:      EnvironmentKind,
+						Name:      "ENVIRONMENT2",
+						Operation: Delete,
+					},
+				},
+				Kind:      EnvironmentKind,
+				Operation: Delete,
+			},
+		},
+
+		{
+			name: "created environment variable",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: utils.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+				},
+				to: utils.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+					"ENVIRONMENT2": "VALUE2",
+				},
+			},
+			want: Change{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff: []Difference{
+					{
+						Field:     "Spec.Node.Spec.Environment[ENVIRONMENT2]",
+						From:      "<nil>",
+						To:        "VALUE2",
+						Kind:      EnvironmentKind,
+						Name:      "ENVIRONMENT2",
+						Operation: Create,
+					},
+				},
+				Kind:      EnvironmentKind,
+				Operation: Create,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			change := &Change{
+				Context:   tt.fields.Context,
+				Diff:      tt.fields.Diff,
+				Kind:      tt.fields.Kind,
+				Operation: tt.fields.Operation,
+				changelog: tt.fields.changelog,
+			}
+			change.diffEnv(tt.args.from, tt.args.to)
+			if !equalChanges(*change, tt.want) {
+				t.Errorf("Changelog.diff() = \n%v, want \n%v", *change, tt.want)
 			}
 		})
 	}
