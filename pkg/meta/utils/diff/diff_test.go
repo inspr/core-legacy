@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	uti "gitlab.inspr.dev/inspr/core/pkg/utils"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func TestDiff(t *testing.T) {
@@ -429,8 +429,8 @@ func TestChange_diffApps(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		appsOrig utils.MApps
-		appsCurr utils.MApps
+		appsOrig metautils.MApps
+		appsCurr metautils.MApps
 	}
 	tests := []struct {
 		name   string
@@ -442,7 +442,7 @@ func TestChange_diffApps(t *testing.T) {
 			name:   "Unchanged Apps",
 			fields: fields{},
 			args: args{
-				appsOrig: utils.MApps{
+				appsOrig: metautils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{
@@ -455,7 +455,7 @@ func TestChange_diffApps(t *testing.T) {
 						},
 					},
 				},
-				appsCurr: utils.MApps{
+				appsCurr: metautils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{
@@ -475,7 +475,7 @@ func TestChange_diffApps(t *testing.T) {
 			name:   "Valid changes on Apps",
 			fields: fields{},
 			args: args{
-				appsOrig: utils.MApps{
+				appsOrig: metautils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{},
@@ -485,7 +485,7 @@ func TestChange_diffApps(t *testing.T) {
 						Spec: meta.AppSpec{},
 					},
 				},
-				appsCurr: utils.MApps{
+				appsCurr: metautils.MApps{
 					"app1": {
 						Meta: meta.Metadata{},
 						Spec: meta.AppSpec{},
@@ -541,8 +541,8 @@ func TestChange_diffChannels(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		chOrig utils.MChannels
-		chCurr utils.MChannels
+		chOrig metautils.MChannels
+		chCurr metautils.MChannels
 	}
 	tests := []struct {
 		name    string
@@ -555,7 +555,7 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Unchanged Channel Types",
 			fields: fields{},
 			args: args{
-				chOrig: utils.MChannels{
+				chOrig: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -563,7 +563,7 @@ func TestChange_diffChannels(t *testing.T) {
 						},
 					},
 				},
-				chCurr: utils.MChannels{
+				chCurr: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -579,7 +579,7 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Valid changes on Channel Types",
 			fields: fields{},
 			args: args{
-				chOrig: utils.MChannels{
+				chOrig: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -587,7 +587,7 @@ func TestChange_diffChannels(t *testing.T) {
 						},
 					},
 				},
-				chCurr: utils.MChannels{
+				chCurr: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -616,7 +616,7 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Channel deleted",
 			fields: fields{},
 			args: args{
-				chOrig: utils.MChannels{
+				chOrig: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -624,7 +624,7 @@ func TestChange_diffChannels(t *testing.T) {
 						},
 					},
 				},
-				chCurr: utils.MChannels{},
+				chCurr: metautils.MChannels{},
 			},
 			wantErr: false,
 			want: Change{
@@ -646,8 +646,8 @@ func TestChange_diffChannels(t *testing.T) {
 			name:   "Channel created",
 			fields: fields{},
 			args: args{
-				chOrig: utils.MChannels{},
-				chCurr: utils.MChannels{
+				chOrig: metautils.MChannels{},
+				chCurr: metautils.MChannels{
 					"ch1": &meta.Channel{
 						Meta: meta.Metadata{},
 						Spec: meta.ChannelSpec{
@@ -695,8 +695,8 @@ func TestChange_diffChannelTypes(t *testing.T) {
 		Diff    []Difference
 	}
 	type args struct {
-		chtOrig utils.MTypes
-		chtCurr utils.MTypes
+		chtOrig metautils.MTypes
+		chtCurr metautils.MTypes
 	}
 	tests := []struct {
 		name    string
@@ -709,13 +709,13 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "Unchanged Channel Types",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.MTypes{
+				chtOrig: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta:   meta.Metadata{},
 						Schema: "",
 					},
 				},
-				chtCurr: utils.MTypes{
+				chtCurr: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta:   meta.Metadata{},
 						Schema: "",
@@ -729,7 +729,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "Valid changes on Channel Types",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.MTypes{
+				chtOrig: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -741,7 +741,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 						Schema: string([]byte{0, 1, 0, 1, 0, 0, 1, 1, 1, 0}),
 					},
 				},
-				chtCurr: utils.MTypes{
+				chtCurr: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -774,8 +774,8 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "create channel type",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.MTypes{},
-				chtCurr: utils.MTypes{
+				chtOrig: metautils.MTypes{},
+				chtCurr: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -808,7 +808,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			name:   "delete channel type",
 			fields: fields{},
 			args: args{
-				chtOrig: utils.MTypes{
+				chtOrig: metautils.MTypes{
 					"ct1": &meta.ChannelType{
 						Meta: meta.Metadata{
 							Name:        "ct1",
@@ -820,7 +820,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 						Schema: string([]byte{0, 1, 0, 1, 0, 1, 1, 1, 1, 1}),
 					},
 				},
-				chtCurr: utils.MTypes{},
+				chtCurr: metautils.MTypes{},
 			},
 			wantErr: false,
 			want: Change{
@@ -1283,8 +1283,8 @@ func TestChange_diffEnv(t *testing.T) {
 		changelog *Changelog
 	}
 	type args struct {
-		from uti.EnvironmentMap
-		to   uti.EnvironmentMap
+		from utils.EnvironmentMap
+		to   utils.EnvironmentMap
 	}
 	tests := []struct {
 		name   string
@@ -1300,11 +1300,11 @@ func TestChange_diffEnv(t *testing.T) {
 				Diff:      []Difference{},
 			},
 			args: args{
-				from: uti.EnvironmentMap{
+				from: utils.EnvironmentMap{
 					"ENVIRONMENT1": "VALUE1",
 					"ENVIRONMENT2": "VALUE2",
 				},
-				to: uti.EnvironmentMap{
+				to: utils.EnvironmentMap{
 					"ENVIRONMENT1": "VALUE3",
 					"ENVIRONMENT2": "VALUE2",
 				},
@@ -1334,11 +1334,11 @@ func TestChange_diffEnv(t *testing.T) {
 				Diff:      []Difference{},
 			},
 			args: args{
-				from: uti.EnvironmentMap{
+				from: utils.EnvironmentMap{
 					"ENVIRONMENT1": "VALUE1",
 					"ENVIRONMENT2": "VALUE2",
 				},
-				to: uti.EnvironmentMap{
+				to: utils.EnvironmentMap{
 					"ENVIRONMENT1": "VALUE1",
 				},
 			},
@@ -1368,10 +1368,10 @@ func TestChange_diffEnv(t *testing.T) {
 				Diff:      []Difference{},
 			},
 			args: args{
-				from: uti.EnvironmentMap{
+				from: utils.EnvironmentMap{
 					"ENVIRONMENT1": "VALUE1",
 				},
-				to: uti.EnvironmentMap{
+				to: utils.EnvironmentMap{
 					"ENVIRONMENT1": "VALUE1",
 					"ENVIRONMENT2": "VALUE2",
 				},
