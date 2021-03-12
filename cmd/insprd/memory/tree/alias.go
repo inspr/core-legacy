@@ -20,9 +20,9 @@ func (tmm *MemoryManager) Alias() memory.AliasMemory {
 }
 
 // CreateAlias DOC TODO
-func (amm *AliasMemoryManager) CreateAlias(context string, targetBoundary string, targetChannel string) error {
-	// get app from context
-	app, err := GetTreeMemory().Apps().Get(context)
+func (amm *AliasMemoryManager) CreateAlias(query string, targetBoundary string, alias *meta.Alias) error {
+	// get app from query
+	app, err := GetTreeMemory().Apps().Get(query)
 	if err != nil {
 		return err
 	}
@@ -34,15 +34,17 @@ func (amm *AliasMemoryManager) CreateAlias(context string, targetBoundary string
 	}
 
 	// get parentApp of app
-	parentApp, err := getParentApp(context)
+	parentApp, err := getParentApp(query)
 	if err != nil {
 		return err
 	}
 
+	targetChannel := alias.Target
+
 	// check if targetChannel exists in channels or boundaries of parentApp
-	parentBound := parentApp.Spec.Boundary
-	if _, ok := parentApp.Spec.Channels[targetChannel]; !ok && !parentBound.Input.Contains(targetChannel) && !parentBound.Output.Contains(targetChannel) {
-		return ierrors.NewError().BadRequest().Message("channel doesn't exist in parent app").Build()
+	err = validTargetChannel(parentApp, targetChannel)
+	if err != nil {
+		return err
 	}
 
 	aliasKey := app.Meta.Name + "." + targetBoundary
@@ -52,14 +54,43 @@ func (amm *AliasMemoryManager) CreateAlias(context string, targetBoundary string
 		return ierrors.NewError().BadRequest().Message("alias already exists in parent app").Build()
 	}
 
-	// create alias structure
-	newAlias := &meta.Alias{
-		Target: targetChannel,
-	}
-
 	// add new alias to Aliases list in parentApp
-	parentApp.Spec.Aliases[aliasKey] = newAlias
+	parentApp.Spec.Aliases[aliasKey] = alias
 
 	return nil
 
+}
+
+// UpdateAlias DOC TODO
+func (amm *AliasMemoryManager) UpdateAlias(context string, aliasKey string, alias *meta.Alias) error {
+	// get app from context
+	app, err := GetTreeMemory().Apps().Get(context)
+	if err != nil {
+		return err
+	}
+
+	// check if alias key exist in context
+	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
+		return ierrors.NewError().BadRequest().Message("alias not found for the given key " + aliasKey).Build()
+	}
+
+	// valid target channel
+	err = validTargetChannel(app, alias.Target)
+	if err != nil {
+		return err
+	}
+
+	//update alias
+	app.Spec.Aliases[aliasKey] = alias
+
+	return nil
+}
+
+func validTargetChannel(parentApp *meta.App, targetChannel string) error {
+	parentBound := parentApp.Spec.Boundary
+	if _, ok := parentApp.Spec.Channels[targetChannel]; !ok && !parentBound.Input.Contains(targetChannel) && !parentBound.Output.Contains(targetChannel) {
+		return ierrors.NewError().BadRequest().Message("channel doesn't exist in app").Build()
+	}
+
+	return nil
 }
