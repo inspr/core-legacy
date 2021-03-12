@@ -6,6 +6,8 @@ var exists = true
 
 //MApps is a string->App map
 type MApps map[string]*meta.App
+
+// MAliases is a string->Alias map
 type MAliases map[string]meta.Alias
 
 //MChannels is a string->channel map
