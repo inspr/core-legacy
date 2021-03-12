@@ -63,11 +63,7 @@ func deleteApps(_ context.Context, args []string) error {
 		return ierrors.NewError().Message("Invalid args").BadRequest().Build()
 	}
 
-	path, err := utils.JoinScopes(scope, args[0])
-	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
-		return err
-	}
+	path, _ := utils.JoinScopes(scope, args[0])
 
 	cl, err := client.Apps().Delete(context.Background(), path, cmd.InsprOptions.DryRun)
 	if err != nil {

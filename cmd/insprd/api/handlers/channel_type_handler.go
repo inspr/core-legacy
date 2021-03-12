@@ -36,21 +36,26 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 		}
 
 		cth.Memory.InitTransaction()
-		if !data.DryRun {
-			defer cth.Memory.Commit()
-		} else {
-			defer cth.Memory.Cancel()
-		}
+
 		err = cth.Memory.ChannelTypes().CreateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, err)
+			cth.Memory.Cancel()
 			return
 		}
 		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
+			cth.Memory.Cancel()
 			return
 		}
+
+		if !data.DryRun {
+			defer cth.Memory.Commit()
+		} else {
+			defer cth.Memory.Cancel()
+		}
+
 		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)
@@ -70,13 +75,16 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 		}
 
 		cth.Memory.InitTransaction()
-		defer cth.Memory.Cancel()
 
 		channelType, err := cth.Memory.Root().ChannelTypes().Get(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, err)
+			cth.Memory.Cancel()
 			return
 		}
+
+		defer cth.Memory.Cancel()
+
 		rest.JSON(w, http.StatusOK, channelType)
 	}
 	return rest.Handler(handler)
@@ -96,21 +104,18 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 		}
 
 		cth.Memory.InitTransaction()
-		if !data.DryRun {
-			defer cth.Memory.Commit()
-		} else {
-			defer cth.Memory.Cancel()
-		}
 
 		err = cth.Memory.ChannelTypes().UpdateChannelType(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, err)
+			cth.Memory.Cancel()
 			return
 		}
 
 		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
+			cth.Memory.Cancel()
 			return
 		}
 
@@ -118,7 +123,15 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 			err = cth.applyChangesInDiff(diff)
 			if err != nil {
 				rest.ERROR(w, err)
+				cth.Memory.Cancel()
+				return
 			}
+		}
+
+		if !data.DryRun {
+			defer cth.Memory.Commit()
+		} else {
+			defer cth.Memory.Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, diff)
@@ -140,21 +153,26 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 		}
 
 		cth.Memory.InitTransaction()
-		if !data.DryRun {
-			defer cth.Memory.Commit()
-		} else {
-			defer cth.Memory.Cancel()
-		}
+
 		err = cth.Memory.ChannelTypes().DeleteChannelType(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, err)
+			cth.Memory.Cancel()
 			return
 		}
 		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
+			cth.Memory.Cancel()
 			return
 		}
+
+		if !data.DryRun {
+			defer cth.Memory.Commit()
+		} else {
+			defer cth.Memory.Cancel()
+		}
+
 		rest.JSON(w, http.StatusOK, diff)
 	}
 	return rest.Handler(handler)

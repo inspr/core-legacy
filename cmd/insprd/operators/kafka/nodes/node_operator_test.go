@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -190,6 +191,7 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			nop := &NodeOperator{
 				clientSet: tt.fields.clientSet,
+				memory:    tree.GetTreeMemory(),
 			}
 			got, err := nop.CreateNode(tt.args.ctx, tt.args.app)
 			if (err != nil) != tt.wantErr {
@@ -247,6 +249,7 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			nop := &NodeOperator{
 				clientSet: tt.fields.clientSet,
+				memory:    tree.GetTreeMemory(),
 			}
 			got, err := nop.UpdateNode(tt.args.ctx, tt.args.app)
 			if (err != nil) != tt.wantErr {

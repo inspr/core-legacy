@@ -82,6 +82,11 @@ func Test_toTopicNonPRD(t *testing.T) {
 	createMockEnv()
 	os.Setenv("INSPR_ENV", "test")
 	os.Setenv("INSPR_APP_CTX", "random.app1")
+	os.Setenv("nonPrdChan_RESOLVED", "random.app1.nonPrdChan")
+	defer os.Unsetenv("INSPR_ENV")
+	defer os.Unsetenv("INSPR_APP_CTX")
+	defer os.Unsetenv("nonPrdChan_RESOLVED")
+
 	defer deleteMockEnv()
 	environment.RefreshEnviromentVariables()
 	type args struct {
@@ -96,7 +101,7 @@ func Test_toTopicNonPRD(t *testing.T) {
 		{
 			name: "PRD Environment topic",
 			args: args{
-				channel: "nonPrdChan",
+				channel: "random.app1.nonPrdChan",
 				isPrd: func() bool {
 					os.Unsetenv("INSPR_ENV")
 					os.Setenv("INSPR_ENV", "test")
