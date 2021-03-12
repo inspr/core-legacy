@@ -219,15 +219,15 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 
 	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
 	for _, boundary := range appBoundary {
+		aliasQuery, _ := metautils.JoinScopes(app.Meta.Name, boundary)
+		if _, ok := parentApp.Spec.Aliases[aliasQuery]; ok {
+			continue
+		}
 		if ch, ok := parentApp.Spec.Channels[boundary]; ok {
 			ch.ConnectedApps = append(ch.ConnectedApps, app.Meta.Name)
 			continue
 		}
 		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(boundary) {
-			continue
-		}
-		aliasQuery, _ := metautils.JoinScopes(app.Meta.Name, boundary)
-		if _, ok := parentApp.Spec.Aliases[aliasQuery]; ok {
 			continue
 		}
 		merr.Add(ierrors.NewError().Message("error: %s boundary: %s is invalid", parentApp.Meta.Name, boundary).Build())
