@@ -6,6 +6,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	uti "gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func TestDiff(t *testing.T) {
@@ -236,6 +237,40 @@ func TestChange_diffNodes(t *testing.T) {
 						Field:     "Spec.Node.Spec.Image",
 						From:      "image",
 						To:        "imagediff",
+						Kind:      NodeKind,
+						Operation: Update,
+					},
+				},
+			},
+		},
+		{
+			name:   "updated replicas",
+			fields: fields{},
+			args: args{
+				nodeOrig: meta.Node{
+					Meta: meta.Metadata{},
+					Spec: meta.NodeSpec{
+						Image:    "image",
+						Replicas: 3,
+					},
+				},
+				nodeCurr: meta.Node{
+					Meta: meta.Metadata{},
+					Spec: meta.NodeSpec{
+						Image:    "image",
+						Replicas: 1,
+					},
+				},
+			},
+			wantErr: false,
+			want: Change{
+				Kind:      NodeKind,
+				Operation: Update,
+				Diff: []Difference{
+					{
+						Field:     "Spec.Node.Spec.Replicas",
+						From:      "3",
+						To:        "1",
 						Kind:      NodeKind,
 						Operation: Update,
 					},
@@ -1046,6 +1081,331 @@ func TestChange_diffMetadata(t *testing.T) {
 			}
 			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
+			}
+		})
+	}
+}
+
+func TestChange_diffAliases(t *testing.T) {
+	type fields struct {
+		Context   string
+		Diff      []Difference
+		Kind      Kind
+		Operation Operation
+		changelog *Changelog
+	}
+	type args struct {
+		from map[string]meta.Alias
+		to   map[string]meta.Alias
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Change
+	}{
+		{
+			name: "no changes in aliases",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+				to: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+			},
+			want: Change{
+				Context:   "context",
+				changelog: &Changelog{},
+				Diff:      []Difference{},
+			},
+		},
+		{
+			name: "updated aliases",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: map[string]meta.Alias{
+					"alias1": {
+						Target: "target3",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+				to: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+			},
+			want: Change{
+				Context:   "context",
+				changelog: &Changelog{},
+				Diff: []Difference{
+					{
+						Field:     "Spec.Aliases[alias1]",
+						From:      "target3",
+						To:        "target1",
+						Kind:      AliasKind,
+						Name:      "alias1",
+						Operation: Update,
+					},
+				},
+				Kind:      AliasKind,
+				Operation: Update,
+			},
+		},
+		{
+			name: "created alias",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+				},
+				to: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+					"alias2": {
+						Target: "target2",
+					},
+				},
+			},
+			want: Change{
+				Context:   "context",
+				changelog: &Changelog{},
+				Diff: []Difference{
+					{
+						Field:     "Spec.Aliases[alias2]",
+						From:      "<nil>",
+						To:        "target2",
+						Kind:      AliasKind,
+						Name:      "alias2",
+						Operation: Create,
+					},
+				},
+				Kind:      AliasKind,
+				Operation: Create,
+			},
+		},
+		{
+			name: "deleted alias",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+
+					"alias2": {
+						Target: "target2",
+					},
+				},
+				to: map[string]meta.Alias{
+					"alias1": {
+						Target: "target1",
+					},
+				},
+			},
+			want: Change{
+				Context:   "context",
+				changelog: &Changelog{},
+				Diff: []Difference{
+					{
+						Field:     "Spec.Aliases[alias2]",
+						From:      "target2",
+						To:        "<nil>",
+						Kind:      AliasKind,
+						Name:      "alias2",
+						Operation: Delete,
+					},
+				},
+				Kind:      AliasKind,
+				Operation: Delete,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			change := &Change{
+				Context:   tt.fields.Context,
+				Diff:      tt.fields.Diff,
+				Kind:      tt.fields.Kind,
+				Operation: tt.fields.Operation,
+				changelog: tt.fields.changelog,
+			}
+			change.diffAliases(tt.args.from, tt.args.to)
+			if !equalChanges(*change, tt.want) {
+				t.Errorf("Changelog.diff() = \n%v, want \n%v", *change, tt.want)
+			}
+		})
+	}
+}
+
+func TestChange_diffEnv(t *testing.T) {
+	type fields struct {
+		Context   string
+		Diff      []Difference
+		Kind      Kind
+		Operation Operation
+		changelog *Changelog
+	}
+	type args struct {
+		from uti.EnvironmentMap
+		to   uti.EnvironmentMap
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Change
+	}{
+		{
+			name: "updated environment variable",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: uti.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+					"ENVIRONMENT2": "VALUE2",
+				},
+				to: uti.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE3",
+					"ENVIRONMENT2": "VALUE2",
+				},
+			},
+			want: Change{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff: []Difference{
+					{
+						Field:     "Spec.Node.Spec.Environment[ENVIRONMENT1]",
+						From:      "VALUE1",
+						To:        "VALUE3",
+						Kind:      EnvironmentKind,
+						Name:      "ENVIRONMENT1",
+						Operation: Update,
+					},
+				},
+				Kind:      EnvironmentKind,
+				Operation: Update,
+			},
+		},
+		{
+			name: "deleted environment variable",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: uti.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+					"ENVIRONMENT2": "VALUE2",
+				},
+				to: uti.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+				},
+			},
+			want: Change{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff: []Difference{
+					{
+						Field:     "Spec.Node.Spec.Environment[ENVIRONMENT2]",
+						From:      "VALUE2",
+						To:        "<nil>",
+						Kind:      EnvironmentKind,
+						Name:      "ENVIRONMENT2",
+						Operation: Delete,
+					},
+				},
+				Kind:      EnvironmentKind,
+				Operation: Delete,
+			},
+		},
+
+		{
+			name: "created environment variable",
+			fields: fields{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff:      []Difference{},
+			},
+			args: args{
+				from: uti.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+				},
+				to: uti.EnvironmentMap{
+					"ENVIRONMENT1": "VALUE1",
+					"ENVIRONMENT2": "VALUE2",
+				},
+			},
+			want: Change{
+				changelog: &Changelog{},
+				Context:   "context",
+				Diff: []Difference{
+					{
+						Field:     "Spec.Node.Spec.Environment[ENVIRONMENT2]",
+						From:      "<nil>",
+						To:        "VALUE2",
+						Kind:      EnvironmentKind,
+						Name:      "ENVIRONMENT2",
+						Operation: Create,
+					},
+				},
+				Kind:      EnvironmentKind,
+				Operation: Create,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			change := &Change{
+				Context:   tt.fields.Context,
+				Diff:      tt.fields.Diff,
+				Kind:      tt.fields.Kind,
+				Operation: tt.fields.Operation,
+				changelog: tt.fields.changelog,
+			}
+			change.diffEnv(tt.args.from, tt.args.to)
+			if !equalChanges(*change, tt.want) {
+				t.Errorf("Changelog.diff() = \n%v, want \n%v", *change, tt.want)
 			}
 		})
 	}

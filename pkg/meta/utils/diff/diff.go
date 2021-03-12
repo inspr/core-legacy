@@ -23,6 +23,8 @@ const (
 	BoundaryKind
 	FieldKind
 	AnnotationKind
+	AliasKind
+	EnvironmentKind
 )
 
 // Operation represents an operation that has been applied in a diff
@@ -134,6 +136,56 @@ func (change *Change) diffAppSpec(from, to meta.AppSpec) error {
 	return nil
 }
 
+func (change *Change) diffAliases(from, to map[string]meta.Alias) {
+	set := utils.AliasDisjuctSet(from, to)
+
+	for alias := range set {
+		var op Operation
+		_, orig := from[alias]
+
+		fromStr := "<nil>"
+		toStr := "<nil>"
+
+		if orig {
+			fromStr = from[alias].Target
+			op = Delete
+		} else {
+			toStr = to[alias].Target
+			op = Create
+		}
+
+		change.Diff = append(change.Diff, Difference{
+			Field:     fmt.Sprintf("Spec.Aliases[%s]", alias),
+			From:      fromStr,
+			To:        toStr,
+			Kind:      AliasKind,
+			Operation: op,
+			Name:      alias,
+		})
+		change.Kind |= AliasKind
+		change.Operation |= op
+	}
+
+	intersection := utils.AliasIntersecSet(from, to)
+
+	for alias := range intersection {
+		fromApp := from[alias]
+		toApp := to[alias]
+		if fromApp.Target != toApp.Target {
+			change.Diff = append(change.Diff, Difference{
+				Field:     fmt.Sprintf("Spec.Aliases[%s]", alias),
+				From:      fromApp.Target,
+				To:        toApp.Target,
+				Kind:      AliasKind,
+				Name:      alias,
+				Operation: Update,
+			})
+			change.Kind |= AliasKind
+			change.Operation |= Update
+		}
+	}
+}
+
 func (change *Change) diffNodes(from, to meta.Node) error {
 	err := change.diffMetadata(from.Meta.Name, NodeKind, from.Meta, to.Meta, "Spec.Node.")
 	if err != nil {
@@ -168,6 +220,49 @@ func (change *Change) diffNodes(from, to meta.Node) error {
 	return nil
 }
 func (change *Change) diffEnv(from uti.EnvironmentMap, to uti.EnvironmentMap) {
+	for key, fromValue := range from {
+		if toValue, ok := to[key]; ok {
+			if toValue != fromValue {
+				change.Diff = append(change.Diff, Difference{
+					Field:     fmt.Sprintf("Spec.Node.Spec.Environment[%s]", key),
+					From:      fromValue,
+					To:        toValue,
+					Kind:      EnvironmentKind,
+					Name:      key,
+					Operation: Update,
+				})
+				change.Kind |= EnvironmentKind
+				change.Operation |= Update
+			}
+		} else {
+			change.Diff = append(change.Diff, Difference{
+				Field:     fmt.Sprintf("Spec.Node.Spec.Environment[%s]", key),
+				From:      fromValue,
+				To:        "<nil>",
+				Kind:      EnvironmentKind,
+				Name:      key,
+				Operation: Delete,
+			})
+			change.Operation |= Delete
+			change.Kind |= EnvironmentKind
+		}
+	}
+
+	for key, toValue := range to {
+		if _, ok := from[key]; !ok {
+			change.Diff = append(change.Diff, Difference{
+				Field:     fmt.Sprintf("Spec.Node.Spec.Environment[%s]", key),
+				From:      "<nil>",
+				To:        toValue,
+				Kind:      EnvironmentKind,
+				Name:      key,
+				Operation: Create,
+			})
+
+			change.Operation |= Create
+			change.Kind |= EnvironmentKind
+		}
+	}
 
 }
 func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
