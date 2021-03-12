@@ -548,12 +548,9 @@ func getMockApp() *meta.App {
 							},
 							"bound4.alias3": {
 								Target: "bdch2",
-<<<<<<< HEAD
 							},
 							"bound6.alias3": {
 								Target: "bdch2",
-=======
->>>>>>> story/core-229
 							},
 						},
 					},
