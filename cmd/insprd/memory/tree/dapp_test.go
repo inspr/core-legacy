@@ -978,7 +978,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app2",
-						Reference:   "",
+						Reference:   "app2.app2",
 						Annotations: map[string]string{},
 						Parent:      "",
 						SHA256:      "",
@@ -999,7 +999,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			want: &meta.App{
 				Meta: meta.Metadata{
 					Name:        "app2",
-					Reference:   "",
+					Reference:   "app2.app2",
 					Annotations: map[string]string{},
 					Parent:      "app2",
 					SHA256:      "",
@@ -1188,7 +1188,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app7",
-						Reference:   "",
+						Reference:   "app2.app7",
 						Annotations: map[string]string{},
 						Parent:      "",
 						SHA256:      "",
@@ -1199,9 +1199,9 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 							"app8": {
 								Meta: meta.Metadata{
 									Name:        "app8",
-									Reference:   "",
+									Reference:   "app2.app7.app8",
 									Annotations: map[string]string{},
-									Parent:      "",
+									Parent:      "app2.app7",
 									SHA256:      "",
 								},
 								Spec: meta.AppSpec{
@@ -1319,7 +1319,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app2",
-						Reference:   "",
+						Reference:   "app2.app2",
 						Annotations: map[string]string{},
 						Parent:      "",
 						SHA256:      "",
