@@ -61,6 +61,7 @@ type AliasMemory interface {
 	AliasGetInterface
 	CreateAlias(query string, targetBoundary string, alias *meta.Alias) error
 	UpdateAlias(context string, aliasKey string, alias *meta.Alias) error
+	DeleteAlias(context string, aliasKey string) error
 }
 
 type AliasGetInterface interface {

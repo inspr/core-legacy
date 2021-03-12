@@ -1,6 +1,8 @@
 package tree
 
 import (
+	"strings"
+
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -61,6 +63,23 @@ func (amm *AliasMemoryManager) CreateAlias(query string, targetBoundary string, 
 
 }
 
+// GetAlias DOC TODO
+func (amm *AliasMemoryManager) GetAlias(context string, aliasKey string) (*meta.Alias, error) {
+	// get app from context
+	app, err := GetTreeMemory().Apps().Get(context)
+	if err != nil {
+		return nil, err
+	}
+
+	// check if alias key exist in context
+	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
+		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key " + aliasKey).Build()
+	}
+
+	//return alias
+	return app.Spec.Aliases[aliasKey], nil
+}
+
 // UpdateAlias DOC TODO
 func (amm *AliasMemoryManager) UpdateAlias(context string, aliasKey string, alias *meta.Alias) error {
 	// get app from context
@@ -86,21 +105,33 @@ func (amm *AliasMemoryManager) UpdateAlias(context string, aliasKey string, alia
 	return nil
 }
 
-// GetAlias DOC TODO
-func (amm *AliasMemoryManager) GetAlias(context string, aliasKey string) (*meta.Alias, error) {
+func (amm *AliasMemoryManager) DeleteAlias(context string, aliasKey string) error {
 	// get app from context
 	app, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key " + aliasKey).Build()
+		return ierrors.NewError().BadRequest().Message("alias not found for the given key " + aliasKey).Build()
 	}
 
-	//return alias
-	return app.Spec.Aliases[aliasKey], nil
+	childName := strings.Split(aliasKey, ".")[0]
+	target := strings.Split(aliasKey, ".")[1]
+
+	// check if its being used by a child app
+	if childApp, ok := app.Spec.Apps[childName]; ok {
+		childBound := childApp.Spec.Boundary
+		if childBound.Input.Contains(target) || childBound.Output.Contains(target) {
+			return ierrors.NewError().BadRequest().Message("can't delete the alias since it's being used by a child app").Build()
+		}
+	}
+
+	// delete alias
+	delete(app.Spec.Aliases, aliasKey)
+
+	return nil
 }
 
 func validTargetChannel(parentApp *meta.App, targetChannel string) error {
