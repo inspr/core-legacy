@@ -76,6 +76,7 @@ type Manager interface {
 	Apps() AppMemory
 	Channels() ChannelMemory
 	ChannelTypes() ChannelTypeMemory
+	Alias() AliasMemory
 	Root() GetInterface
 }
 
