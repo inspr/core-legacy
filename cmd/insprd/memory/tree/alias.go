@@ -150,9 +150,9 @@ func (amm *AliasMemoryManager) DeleteAlias(context, aliasKey string) error {
 	return nil
 }
 
-func validTargetChannel(parentApp *meta.App, targetChannel string) error {
-	parentBound := parentApp.Spec.Boundary
-	if _, ok := parentApp.Spec.Channels[targetChannel]; !ok && !parentBound.Input.Contains(targetChannel) && !parentBound.Output.Contains(targetChannel) {
+func validTargetChannel(app *meta.App, targetChannel string) error {
+	parentBound := app.Spec.Boundary
+	if _, ok := app.Spec.Channels[targetChannel]; !ok && !parentBound.Input.Contains(targetChannel) && !parentBound.Output.Contains(targetChannel) {
 		return ierrors.NewError().BadRequest().Message("channel doesn't exist in app").Build()
 	}
 
