@@ -325,7 +325,11 @@ func TestAliasMemoryManager_UpdateAlias(t *testing.T) {
 
 func TestAliasMemoryManager_DeleteAlias(t *testing.T) {
 	type fields struct {
-		MemoryManager *MemoryManager
+		root   *meta.App
+		appErr error
+		mockA  bool
+		mockC  bool
+		mockCT bool
 	}
 	type args struct {
 		context  string
@@ -337,13 +341,65 @@ func TestAliasMemoryManager_DeleteAlias(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "invalid context - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				context:  "invalid.context",
+				aliasKey: "app1.aliaschannel",
+			},
+			wantErr: true,
+		},
+		{
+			name: "alias key not exist - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				context:  "",
+				aliasKey: "invalid.alias",
+			},
+			wantErr: true,
+		},
+		{
+			name: "alias exist but its being used - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				context:  "",
+				aliasKey: "app1.aliaschannel",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Valid query - it should not return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				context:  "",
+				aliasKey: "app2.aliaschannel",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			amm := &AliasMemoryManager{
-				MemoryManager: tt.fields.MemoryManager,
-			}
+			setTree(&MockManager{
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+					tree: tt.fields.root,
+				},
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+
+			amm := GetTreeMemory().Alias()
 			if err := amm.DeleteAlias(tt.args.context, tt.args.aliasKey); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.DeleteAlias() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -473,6 +529,9 @@ func getMockAlias() *meta.App {
 			},
 			Aliases: map[string]*meta.Alias{
 				"app1.aliaschannel": {
+					Target: "channel2",
+				},
+				"app2.aliaschannel": {
 					Target: "channel2",
 				},
 			},
