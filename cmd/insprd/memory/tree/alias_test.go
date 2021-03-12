@@ -417,7 +417,30 @@ func Test_validTargetChannel(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "target channel doesn't exist in app - it should return an error",
+			args: args{
+				parentApp:     getMockAlias(),
+				targetChannel: "invalid_channel",
+			},
+			wantErr: true,
+		},
+		{
+			name: "channel exist in app channels - it should not return an error",
+			args: args{
+				parentApp:     getMockAlias(),
+				targetChannel: "channel1",
+			},
+			wantErr: false,
+		},
+		{
+			name: "channel exist in app boundary - it should not return an error",
+			args: args{
+				parentApp:     getMockAlias(),
+				targetChannel: "somechannel",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -524,7 +547,7 @@ func getMockAlias() *meta.App {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Input:  []string{},
+				Input:  []string{"somechannel"},
 				Output: []string{},
 			},
 			Aliases: map[string]*meta.Alias{
