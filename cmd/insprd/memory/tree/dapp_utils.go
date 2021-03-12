@@ -209,9 +209,12 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 	for key, val := range parentApp.Spec.Aliases {
 		if ch, ok := parentApp.Spec.Channels[val.Target]; ok {
 			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
-		} else {
-			merr.Add(ierrors.NewError().Message("error: %s alias: %s points to an unexisting channel", parentApp.Meta.Name, key).Build())
+			continue
 		}
+		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(val.Target) {
+			continue
+		}
+		merr.Add(ierrors.NewError().Message("error: %s alias: %s points to an unexisting channel", parentApp.Meta.Name, key).Build())
 	}
 	if !merr.Empty() {
 		return &merr
