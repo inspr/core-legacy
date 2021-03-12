@@ -148,7 +148,7 @@ func TestAliasMemoryManager_CreateAlias(t *testing.T) {
 	}
 }
 
-func TestAliasMemoryManager_GetAlias(t *testing.T) {
+func TestAliasMemoryManager_Get(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -218,13 +218,13 @@ func TestAliasMemoryManager_GetAlias(t *testing.T) {
 			})
 			amm := GetTreeMemory().Alias()
 
-			got, err := amm.GetAlias(tt.args.context, tt.args.aliasKey)
+			got, err := amm.Get(tt.args.context, tt.args.aliasKey)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AliasMemoryManager.GetAlias() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AliasMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AliasMemoryManager.GetAlias() = %v, want %v", got, tt.want)
+				t.Errorf("AliasMemoryManager.Get() = %v, want %v", got, tt.want)
 			}
 		})
 	}

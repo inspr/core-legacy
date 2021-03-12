@@ -9,8 +9,8 @@ type Alias struct {
 	alias map[string]*meta.Alias
 }
 
-// GetAlias - simple mock
-func (a *Alias) GetAlias(context string, aliasKey string) (*meta.Alias, error) {
+// Get - simple mock
+func (a *Alias) Get(context string, aliasKey string) (*meta.Alias, error) {
 	return &meta.Alias{}, nil
 }
 

@@ -27,9 +27,9 @@ func (ah *AliasHandler) HandleCreateAlias() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetAlias - handler that generates the rest.Handle
+// HandleGet - handler that generates the rest.Handle
 // func to manage the http request
-func (ah *AliasHandler) HandleGetAlias() rest.Handler {
+func (ah *AliasHandler) HandleGet() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
 	}
