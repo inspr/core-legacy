@@ -26,7 +26,7 @@ func GetConfiguredServerIP() string {
 //GetConfiguredScope is responsible for returning config value for scope.
 //Avoids having to constants public.
 func GetConfiguredScope() string {
-	return viper.GetString(configServerIP)
+	return viper.GetString(configScope)
 }
 
 //InitViperConfig - sets defaults values and where is the file in which new values can be read

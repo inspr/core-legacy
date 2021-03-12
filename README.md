@@ -1,14 +1,37 @@
-# Inspr Core
-This is the core for Inspr. It's what makes the cluster run.
+# ![logo](./doc/img/inspr_logo.png)Inspr
 
-## Dependencies
-```sh
-go get -u k8s.io/client-go@v0.17.2 github.com/googleapis/gnostic@v0.3.1
-```
+Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
 
-## Protobuffers
-Protobuffers can be compiled using this command (from within the folder). Assuming you're on folder `pkg/operator/channel` and want to include `pkg/meta/meta.proto` on your protobuffer file, you can use `protoc` by running the include commands below:
+- :muscle: Robust: built on top of golang, kubernetes and other state of the art technologies
 
-```sh
-protoc -I../../../ -I.  --go-grpc_out=. channel.proto
-```
+- :sparkles:   Distributed: created to allow complex and hierarchical distributed design patterns
+
+- :cloud:  Cloud native: lightweight and modular, built with interchangeable pieces
+
+- :hammer_and_wrench:   Versatile: can adapt to any cloud environment
+
+## Installation
+
+### Insprd
+
+To install Insprd, add the helm chart repository using the following command:
+
+`helm repo add inspr https://inspr-charts.storage.googleapis.com`
+
+Install the latest version with
+
+`helm install inspr_name inspr/insprd`
+
+The default values file is included in the `build/helm` folder.
+
+### CLI
+
+To install the CLI get the latest release for your architecture from the [`releases`](https://gitlab.inspr.dev/inspr/core/-/releases) page and add it to your PATH.
+
+## Documentation
+
+You can check the documentation on the [Confluence page for Inspr](https://inspr.atlassian.net/wiki/spaces/INX/overview)
+
+## License
+
+> TODO

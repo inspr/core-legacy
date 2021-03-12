@@ -1,0 +1,17 @@
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: ping
+spec:
+  node:
+    spec:
+      replicas: 1
+      environment:
+        SUPER_SECRET_0001: "false"
+      image: gcr.io/red-inspr/inspr/example/ping:latest
+  boundary:
+    input:
+      - ch2
+    output:
+      - ch1

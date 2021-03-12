@@ -9,8 +9,8 @@ type ChannelMockManager struct {
 	*MockManager
 }
 
-// GetChannel mocks a channel method for testing
-func (cmm *ChannelMockManager) GetChannel(context string, chName string) (*meta.Channel, error) {
+// Get mocks a channel method for testing
+func (cmm *ChannelMockManager) Get(context string, chName string) (*meta.Channel, error) {
 	return nil, nil
 }
 

@@ -95,7 +95,7 @@ func (err *InsprError) Is(target error) bool {
 	if !ok {
 		return false
 	}
-	return t.Code == err.Code
+	return t.Code&err.Code > 0
 }
 
 // HasCode Compares error with error code

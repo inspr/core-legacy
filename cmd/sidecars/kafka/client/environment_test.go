@@ -45,21 +45,21 @@ func Test_getEnv(t *testing.T) {
 		want string
 	}{
 		{
-			name: "Get bootstrap servers enviroment variable",
+			name: "Get bootstrap servers environment variable",
 			args: args{
 				name: "KAFKA_BOOTSTRAP_SERVERS",
 			},
 			want: "localhost",
 		},
 		{
-			name: "Get auto offset reset enviroment variable",
+			name: "Get auto offset reset environment variable",
 			args: args{
 				name: "KAFKA_AUTO_OFFSET_RESET",
 			},
 			want: "101019",
 		},
 		{
-			name: "Invalid - Get invalid enviroment variable",
+			name: "Invalid - Get invalid environment variable",
 			args: args{
 				name: "KAFKA_INVALID_ENV_VAR",
 			},

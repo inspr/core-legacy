@@ -16,7 +16,7 @@ image:
 
 securityContext: {}
 
-
+insprEnvironment: test
 deployment:
   insprdName: insprd-deployment
 
