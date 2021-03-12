@@ -39,10 +39,7 @@ func (amm *AliasMemoryManager) CreateAlias(query string, targetBoundary string, 
 	}
 
 	// get parentApp of app
-	parentApp, err := getParentApp(query)
-	if err != nil {
-		return err
-	}
+	parentApp, _ := getParentApp(query)
 
 	targetChannel := alias.Target
 
