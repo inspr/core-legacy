@@ -233,7 +233,7 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 		}
 		return &merr
 	}
-	parentApp, err := getParentApp(app.Meta.Reference)
+	parentApp, err := amm.MemoryManager.Apps().Get(app.Meta.Parent)
 	if err != nil {
 		return err
 	}

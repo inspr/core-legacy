@@ -162,12 +162,20 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 	var parentQuery string
 	sonRef := strings.Split(sonQuery, ".")
 	if len(sonRef) == 1 {
-		parentQuery = sonRef[0]
+		parentQuery = ""
 	} else {
 		parentQuery = strings.Join(sonRef[:len(sonRef)-1], ".")
 	}
 
 	parentApp, err := GetTreeMemory().Apps().Get(parentQuery)
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := parentApp.Spec.Apps[sonQuery]; parentQuery == "" && !ok {
+		return nil, ierrors.NewError().NotFound().
+			Message(fmt.Sprintf("dApp %s doesn't exist in root", sonQuery)).
+			Build()
+	}
 
 	return parentApp, err
 }
