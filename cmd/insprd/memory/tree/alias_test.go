@@ -190,7 +190,7 @@ func TestAliasMemoryManager_GetAlias(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Valid query, alias key exist - it should return an error",
+			name: "Valid query, alias key exist - it should not return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
@@ -232,7 +232,11 @@ func TestAliasMemoryManager_GetAlias(t *testing.T) {
 
 func TestAliasMemoryManager_UpdateAlias(t *testing.T) {
 	type fields struct {
-		MemoryManager *MemoryManager
+		root   *meta.App
+		appErr error
+		mockA  bool
+		mockC  bool
+		mockCT bool
 	}
 	type args struct {
 		context  string
@@ -245,13 +249,73 @@ func TestAliasMemoryManager_UpdateAlias(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "invalid context - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				context:  "invalid.context",
+				aliasKey: "app1.aliaschannel",
+				alias:    &meta.Alias{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "alias key not exist - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				context:  "",
+				aliasKey: "invalid.alias",
+				alias:    &meta.Alias{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "target channel don't exist in parent - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				context:  "",
+				aliasKey: "app1.aliaschannel",
+				alias: &meta.Alias{
+					Target: "invalid",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "Valid query - it should not return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				context:  "",
+				aliasKey: "app1.aliaschannel",
+				alias: &meta.Alias{
+					Target: "channel1",
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			amm := &AliasMemoryManager{
-				MemoryManager: tt.fields.MemoryManager,
-			}
+			setTree(&MockManager{
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+					tree: tt.fields.root,
+				},
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+			amm := GetTreeMemory().Alias()
+
 			if err := amm.UpdateAlias(tt.args.context, tt.args.aliasKey, tt.args.alias); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.UpdateAlias() error = %v, wantErr %v", err, tt.wantErr)
 			}
