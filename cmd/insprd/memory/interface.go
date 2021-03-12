@@ -56,6 +56,7 @@ type ChannelTypeGetInterface interface {
 	Get(context string, ctName string) (*meta.ChannelType, error)
 }
 
+// AliasMemory is an interface to get alias types from memory
 type AliasMemory interface {
 	TransactionInterface
 	AliasGetInterface
@@ -64,6 +65,7 @@ type AliasMemory interface {
 	DeleteAlias(context string, aliasKey string) error
 }
 
+// AliasGetInterface is an interface to get alias types from memory
 type AliasGetInterface interface {
 	GetAlias(context string, aliasKey string) (*meta.Alias, error)
 }
