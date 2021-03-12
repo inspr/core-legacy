@@ -3,13 +3,75 @@ package sidecarserv
 import (
 	"context"
 	"net/http"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
 
 	env "gitlab.inspr.dev/inspr/core/pkg/environment"
+	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/transports"
 )
+
+func TestNewServer(t *testing.T) {
+	tests := []struct {
+		name string
+		want *Server
+	}{
+		{
+			name: "test_basic_server_creation",
+			want: &Server{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewServer(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewServer() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestServer_Init(t *testing.T) {
+	type args struct {
+		r models.Reader
+		w models.Writer
+	}
+	test := struct {
+		name string
+		addr string
+		args args
+	}{
+		name: "basic init test",
+		addr: "localhost:8080",
+		args: args{
+			r: MockServer(nil).Reader,
+			w: &mockWriter{},
+		},
+	}
+
+	createMockEnvVars() // creates mock values for test
+	defer deleteMockEnvVars()
+
+	t.Run("basic init test", func(t *testing.T) {
+		s := &Server{
+			Mux:  MockServer(nil).Mux,
+			addr: test.addr,
+		}
+		s.Init(test.args.r, test.args.w)
+
+		// checking reader methods
+		if got := s.Reader.CommitMessage(); got != nil {
+			t.Errorf("expected CommitMessage() == nil, received %v", got)
+		}
+		if _, got := s.Reader.ReadMessage(); got != nil {
+			t.Errorf("expected CommitMessage() == nil, received %v", got)
+		}
+		if got := s.Writer.WriteMessage("channel", "msg"); got != nil {
+			t.Errorf("expected CommitMessage() == nil, received %v", got)
+		}
+	})
+}
 
 func TestServer_Run(t *testing.T) {
 	routes := []string{"commit", "writeMessage", "readMessage"}

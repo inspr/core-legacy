@@ -10,7 +10,6 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	test "gitlab.inspr.dev/inspr/core/pkg/testutils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
@@ -157,7 +156,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := dAppToDeployment(tt.args.app); !cmp.Equal(got, tt.want, test.GetMapCompareOptions()) {
+			if got := dAppToDeployment(tt.args.app); !cmp.Equal(got, tt.want, utils.GetMapCompareOptions()) {
 				t.Errorf("InsprDAppToK8sDeployment() = \n%v, \nwant \n%v", got, tt.want)
 			}
 		})

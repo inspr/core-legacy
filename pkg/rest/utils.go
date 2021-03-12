@@ -61,7 +61,7 @@ func ERROR(w http.ResponseWriter, err error) {
 	}
 }
 
-// UnmarshalERROR generates a golang erro with the
+// UnmarshalERROR generates a golang error with the
 // response body created by the ERROR function
 func UnmarshalERROR(r io.Reader) error {
 	errBody := struct {
@@ -70,5 +70,4 @@ func UnmarshalERROR(r io.Reader) error {
 	decoder := json.NewDecoder(r)
 	decoder.Decode(&errBody)
 	return errors.New(errBody.Error)
-
 }

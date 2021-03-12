@@ -11,7 +11,7 @@ type Client struct {
 }
 
 // NewControllerClient return a new Client
-func NewControllerClient(rc *request.Client) *Client {
+func NewControllerClient(rc *request.Client) controller.Interface {
 	return &Client{
 		HTTPClient: rc,
 	}

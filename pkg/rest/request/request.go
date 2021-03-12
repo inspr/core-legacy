@@ -82,7 +82,11 @@ func (c *Client) handleResponseErr(resp *http.Response) error {
 	default:
 		decoder.Decode(&err)
 		if err == nil {
-			return ierrors.NewError().InternalServer().Message("cannot retrieve error from server").Build()
+			return ierrors.
+				NewError().
+				InternalServer().
+				Message("cannot retrieve error from server").
+				Build()
 		}
 
 		return err
