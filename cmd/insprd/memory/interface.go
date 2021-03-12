@@ -56,6 +56,12 @@ type ChannelTypeGetInterface interface {
 	Get(context string, ctName string) (*meta.ChannelType, error)
 }
 
+type AliasMemory interface {
+	TransactionInterface
+	AliasGetInterface
+	CreateAlias(context string, targetBoundary string, targetChannel string) error
+}
+
 // Manager is the interface that allows the management
 // of the current state of the cluster. Permiting the
 // modification of Channels, DApps and ChannelTypes
