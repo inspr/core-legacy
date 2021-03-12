@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -21,6 +22,7 @@ import (
 //NodeOperator defines a node operations interface.
 type NodeOperator struct {
 	clientSet kubernetes.Interface
+	memory    memory.Manager
 }
 
 func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
@@ -55,7 +57,7 @@ func (no *NodeOperator) Nodes() operators.NodeOperatorInterface {
 func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	var deploy *kubeApp.Deployment
 	kube := no.retrieveKube()
-	deploy = dAppToDeployment(app)
+	deploy = no.dAppToDeployment(app)
 	dep, err := kube.Create(deploy)
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
@@ -72,7 +74,7 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	var deploy *kubeApp.Deployment
 	kube := no.retrieveKube()
-	deploy = dAppToDeployment(app)
+	deploy = no.dAppToDeployment(app)
 	dep, err := kube.Update(deploy)
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
@@ -120,8 +122,10 @@ func parseNodeName(insprEnv string, context string, name string) string {
 }
 
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration
-func NewOperator() (nop *NodeOperator, err error) {
-	nop = &NodeOperator{}
+func NewOperator(memory memory.Manager) (nop *NodeOperator, err error) {
+	nop = &NodeOperator{
+		memory: memory,
+	}
 	if _, exists := os.LookupEnv("DEBUG"); exists {
 		nop.clientSet = fake.NewSimpleClientset()
 	} else {
