@@ -81,7 +81,7 @@ func PrintChannelTypeTree(ct *meta.ChannelType, out io.Writer) {
 		conChannels.Add(appName)
 	}
 
-	fmt.Println(out, channelType.Print())
+	fmt.Fprintln(out, channelType.Print())
 }
 
 func populateMeta(metaTree gotree.Tree, meta *meta.Metadata) {

@@ -48,5 +48,9 @@ func (cb *ClientBuilder) Build() *Client {
 
 // NewJSONClient returns a client for the given url with json encoding and decoding
 func NewJSONClient(baseURL string) *Client {
-	return NewClient().BaseURL(baseURL).Encoder(json.Marshal).Decoder(JSONDecoderGenerator).Build()
+	return NewClient().
+		BaseURL(baseURL).
+		Encoder(json.Marshal).
+		Decoder(JSONDecoderGenerator).
+		Build()
 }
