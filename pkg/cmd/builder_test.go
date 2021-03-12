@@ -129,11 +129,18 @@ func Test_builder_WithExample(t *testing.T) {
 
 func Test_builder_WithExamples(t *testing.T) {
 	t.Run("build_with_multiple_examples", func(t *testing.T) {
-		cmd := NewCmd("").WithExample("comment1", "run --flag1").WithExample("comment2", "run --flag2").NoArgs(nil)
+		cmd := NewCmd("").
+			WithExample("comment1", "run --flag1").
+			WithExample("comment2", "run --flag2").
+			NoArgs(nil)
 		expected := "  # comment1\n inspr run --flag1\n\n  # comment2\n inspr run --flag2\n"
 
 		if !reflect.DeepEqual(cmd.Example, expected) {
-			t.Errorf("builder.WithExample() = %v, want %v", cmd.Example, expected)
+			t.Errorf(
+				"builder.WithExample() = %v, want %v",
+				cmd.Example,
+				expected,
+			)
 		}
 	})
 }
@@ -221,4 +228,222 @@ func listFlags(set *pflag.FlagSet) map[string]*pflag.Flag {
 	})
 
 	return flagsByName
+}
+
+func Test_builder_WithCommonFlags(t *testing.T) {
+	type fields struct {
+		cmd cobra.Command
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		{
+			name: "common_flags_test",
+			fields: fields{
+				cmd: cobra.Command{},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &builder{
+				cmd: tt.fields.cmd,
+			}
+
+			// commonFlags create a flagSet, previously was null
+			got := b.WithCommonFlags().NoArgs(nil)
+			if got.Flags() == nil {
+				t.Errorf(
+					"builder.WithCommonFlags() = %v, want not nil",
+					got,
+				)
+			}
+		})
+	}
+}
+
+func Test_builder_WithFlagAdder(t *testing.T) {
+	// out := newB
+	type fields struct {
+		cmd cobra.Command
+	}
+	type args struct {
+		adder func(*pflag.FlagSet)
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Builder
+	}{
+		{
+			name: "flag_adder_test",
+			fields: fields{
+				cmd: *NewCmd("mock").WithCommonFlags().NoArgs(nil),
+			},
+			args: args{
+				adder: func(*pflag.FlagSet) {
+
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &builder{
+				cmd: tt.fields.cmd,
+			}
+			if got := b.WithFlagAdder(tt.args.adder); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("builder.WithFlagAdder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_builder_WithFlags(t *testing.T) {
+	type fields struct {
+		cmd cobra.Command
+	}
+	type args struct {
+		flags []*Flag
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Builder
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &builder{
+				cmd: tt.fields.cmd,
+			}
+			if got := b.WithFlags(tt.args.flags); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("builder.WithFlags() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_builder_Hidden(t *testing.T) {
+	type fields struct {
+		cmd cobra.Command
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   Builder
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &builder{
+				cmd: tt.fields.cmd,
+			}
+			if got := b.Hidden(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("builder.Hidden() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_builder_AddSubCommand(t *testing.T) {
+	type fields struct {
+		cmd cobra.Command
+	}
+	type args struct {
+		cmds []*cobra.Command
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Builder
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &builder{
+				cmd: tt.fields.cmd,
+			}
+			if got := b.AddSubCommand(tt.args.cmds...); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("builder.AddSubCommand() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_builder_Super(t *testing.T) {
+	type fields struct {
+		cmd cobra.Command
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *cobra.Command
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &builder{
+				cmd: tt.fields.cmd,
+			}
+			if got := b.Super(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("builder.Super() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_handleWellKnownErrors(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := handleWellKnownErrors(tt.args.err); (err != nil) != tt.wantErr {
+				t.Errorf("handleWellKnownErrors() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_builder_WithAliases(t *testing.T) {
+	type fields struct {
+		cmd cobra.Command
+	}
+	type args struct {
+		alias []string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Builder
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &builder{
+				cmd: tt.fields.cmd,
+			}
+			if got := b.WithAliases(tt.args.alias); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("builder.WithAliases() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

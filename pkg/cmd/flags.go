@@ -63,6 +63,8 @@ var flagRegistry = []Flag{
 func methodNameByType(v reflect.Value) string {
 	t := v.Type().Kind()
 	switch t {
+	case reflect.Int:
+		return "IntVar"
 	case reflect.Bool:
 		return "BoolVar"
 	case reflect.String:
