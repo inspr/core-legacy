@@ -334,7 +334,7 @@ func getMockApp() *meta.App {
 									Name:        "boundNP",
 									Reference:   "invalid.path",
 									Annotations: map[string]string{},
-									Parent:      "bound",
+									Parent:      "invalid.path",
 									SHA256:      "",
 								},
 								Spec: meta.AppSpec{
@@ -450,6 +450,72 @@ func getMockApp() *meta.App {
 									},
 								},
 							},
+							"bound6": {
+								Meta: meta.Metadata{
+									Name:        "bound6",
+									Reference:   "bound.bound6",
+									Annotations: map[string]string{},
+									Parent:      "bound",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "bound6",
+											Reference:   "bound.bound6",
+											Annotations: map[string]string{},
+											Parent:      "bound",
+											SHA256:      "",
+										},
+										Spec: meta.NodeSpec{
+											Image: "imageNodeAppNode",
+										},
+									},
+									Apps: map[string]*meta.App{
+										"bound7": {
+											Meta: meta.Metadata{
+												Name:        "bound7",
+												Reference:   "bound.bound6",
+												Annotations: map[string]string{},
+												Parent:      "bound.bound6",
+												SHA256:      "",
+											},
+											Spec: meta.AppSpec{
+												Node: meta.Node{
+													Meta: meta.Metadata{
+														Name:        "bound6",
+														Reference:   "bound.bound6",
+														Annotations: map[string]string{},
+														Parent:      "bound",
+														SHA256:      "",
+													},
+													Spec: meta.NodeSpec{
+														Image: "imageNodeAppNode",
+													},
+												},
+												Apps:         map[string]*meta.App{},
+												Channels:     map[string]*meta.Channel{},
+												ChannelTypes: map[string]*meta.ChannelType{},
+												Boundary: meta.AppBoundary{
+													Input:  []string{"bdch1"},
+													Output: []string{"alias3"},
+												},
+											},
+										},
+									},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"bdch1"},
+										Output: []string{"alias3"},
+									},
+									Aliases: map[string]*meta.Alias{
+										"bound8.alias": {
+											Target: "notch",
+										},
+									},
+								},
+							},
 						},
 						Channels: map[string]*meta.Channel{
 							"bdch1": {
@@ -481,6 +547,9 @@ func getMockApp() *meta.App {
 								Target: "bdch2",
 							},
 							"bound4.alias3": {
+								Target: "bdch2",
+							},
+							"bound6.alias3": {
 								Target: "bdch2",
 							},
 						},

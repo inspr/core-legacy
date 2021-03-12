@@ -191,6 +191,53 @@ func getParentString(app, parentApp *meta.App) string {
 	return parentStr
 }
 
+func (amm *AppMemoryManager) connectAppsBoundaries(app *meta.App) error {
+	for _, childApp := range app.Spec.Apps {
+		amm.connectAppsBoundaries(childApp)
+	}
+	return amm.connectAppBoundary(app)
+}
+
+func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
+	merr := ierrors.MultiError{
+		Errors: []error{},
+	}
+	parentApp, err := amm.Get(app.Meta.Parent)
+	if err != nil {
+		return err
+	}
+	for key, val := range parentApp.Spec.Aliases {
+		if ch, ok := parentApp.Spec.Channels[val.Target]; ok {
+			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
+		} else {
+			merr.Add(ierrors.NewError().Message("error: %s alias: %s points to an unexisting channel", parentApp.Meta.Name, key).Build())
+		}
+	}
+	if !merr.Empty() {
+		return &merr
+	}
+
+	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+	for _, boundary := range appBoundary {
+		if ch, ok := parentApp.Spec.Channels[boundary]; ok {
+			ch.ConnectedApps = append(ch.ConnectedApps, app.Meta.Name)
+			continue
+		}
+		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(boundary) {
+			continue
+		}
+		aliasQuery, _ := metautils.JoinScopes(app.Meta.Name, boundary)
+		if _, ok := parentApp.Spec.Aliases[aliasQuery]; ok {
+			continue
+		}
+		merr.Add(ierrors.NewError().Message("error: %s boundary: %s is invalid", parentApp.Meta.Name, boundary).Build())
+	}
+	if !merr.Empty() {
+		return &merr
+	}
+	return nil
+}
+
 func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
