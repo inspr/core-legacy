@@ -86,6 +86,23 @@ func (amm *AliasMemoryManager) UpdateAlias(context string, aliasKey string, alia
 	return nil
 }
 
+// GetAlias DOC TODO
+func (amm *AliasMemoryManager) GetAlias(context string, aliasKey string) (*meta.Alias, error) {
+	// get app from context
+	app, err := GetTreeMemory().Apps().Get(context)
+	if err != nil {
+		return nil, err
+	}
+
+	// check if alias key exist in context
+	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
+		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key " + aliasKey).Build()
+	}
+
+	//return alias
+	return app.Spec.Aliases[aliasKey], nil
+}
+
 func validTargetChannel(parentApp *meta.App, targetChannel string) error {
 	parentBound := parentApp.Spec.Boundary
 	if _, ok := parentApp.Spec.Channels[targetChannel]; !ok && !parentBound.Input.Contains(targetChannel) && !parentBound.Output.Contains(targetChannel) {

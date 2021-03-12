@@ -58,8 +58,13 @@ type ChannelTypeGetInterface interface {
 
 type AliasMemory interface {
 	TransactionInterface
+	AliasGetInterface
 	CreateAlias(query string, targetBoundary string, alias *meta.Alias) error
 	UpdateAlias(context string, aliasKey string, alias *meta.Alias) error
+}
+
+type AliasGetInterface interface {
+	GetAlias(context string, aliasKey string) (*meta.Alias, error)
 }
 
 // Manager is the interface that allows the management
