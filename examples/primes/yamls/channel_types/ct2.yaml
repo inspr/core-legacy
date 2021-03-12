@@ -1,7 +1,7 @@
 apiVersion: "v1"
 kind: "channeltype"
 meta:
-  name: "ct2"
+  name: "primes_ct2"
   reference: ""
   parent: ""  
 schema: '{"type":"int"}'

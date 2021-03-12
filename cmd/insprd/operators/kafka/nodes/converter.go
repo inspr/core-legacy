@@ -3,11 +3,11 @@ package nodes
 import (
 	"strings"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 
 	kubeApp "k8s.io/api/apps/v1"
@@ -15,7 +15,7 @@ import (
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func baseEnvironment(app *meta.App) utils.EnvironmentMap {
+func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 	input := app.Spec.Boundary.Input
 	output := app.Spec.Boundary.Output
 	channels := input.Union(output)
@@ -35,19 +35,28 @@ func baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
 		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
 	}
-	channels.Map(func(s string) string {
-		ch, _ := tree.GetTreeMemory().Channels().Get(app.Meta.Parent, s)
-		ct, _ := tree.GetTreeMemory().ChannelTypes().Get(app.Meta.Parent, ch.Spec.Type)
-		env[s+"_SCHEMA"] = ct.Schema
-		return s
+	no.memory.InitTransaction()
+	resolves, err := no.memory.Apps().ResolveBoundary(app)
+	if err != nil {
+		panic(err)
+	}
+	channels.Map(func(boundary string) string {
+		resolved := resolves[boundary]
+		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
+		ch, _ := no.memory.Channels().Get(parent, chName)
+		ct, _ := no.memory.ChannelTypes().Get(parent, ch.Spec.Type)
+		env[boundary+"_SCHEMA"] = ct.Schema
+		env[boundary+"_RESOLVED"] = resolved
+		return boundary
 	})
+	no.memory.Cancel()
 	return env
 }
 
 // dAppToDeployment translates the DApp
-func dAppToDeployment(app *meta.App) *kubeApp.Deployment {
+func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 
-	sidecarEnvironment := baseEnvironment(app)
+	sidecarEnvironment := no.baseEnvironment(app)
 
 	nodeKubeEnv := append(app.Spec.Node.Spec.Environment.ParseToK8sArrEnv(), kubeCore.EnvVar{
 		Name: "INSPR_UNIX_SOCKET",

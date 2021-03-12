@@ -147,8 +147,9 @@ func TestWriter_produceMessage(t *testing.T) {
 		producer *kafka.Producer
 	}
 	type args struct {
-		message interface{}
-		channel string
+		message         interface{}
+		channel         string
+		resolvedChannel string
 	}
 	tests := []struct {
 		name    string
@@ -162,8 +163,9 @@ func TestWriter_produceMessage(t *testing.T) {
 				producer: mProd.producer,
 			},
 			args: args{
-				message: "testProducingMessage",
-				channel: "ch1",
+				message:         "testProducingMessage",
+				channel:         "ch1",
+				resolvedChannel: "ch1_resolved",
 			},
 			wantErr: false,
 		},
@@ -184,7 +186,7 @@ func TestWriter_produceMessage(t *testing.T) {
 			writer := &Writer{
 				producer: tt.fields.producer,
 			}
-			if err := writer.produceMessage(tt.args.message, tt.args.channel); (err != nil) != tt.wantErr {
+			if err := writer.produceMessage(tt.args.message, tt.args.channel, tt.args.resolvedChannel); (err != nil) != tt.wantErr {
 				t.Errorf("Writer.produceMessage() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

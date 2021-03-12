@@ -179,7 +179,7 @@ func getMockApp() *meta.App {
 											Name:        "app4",
 											Reference:   "app4.nodeApp4",
 											Annotations: map[string]string{},
-											Parent:      "app4",
+											Parent:      "app2.app4",
 											SHA256:      "",
 										},
 										Spec: meta.NodeSpec{
@@ -304,7 +304,7 @@ func getMockApp() *meta.App {
 														Name:        "bound3",
 														Reference:   "bound.bound2.bound3",
 														Annotations: map[string]string{},
-														Parent:      "bound2",
+														Parent:      "bound.bound2",
 														SHA256:      "",
 													},
 													Spec: meta.NodeSpec{
@@ -365,7 +365,7 @@ func getMockApp() *meta.App {
 														Name:        "boundNP2",
 														Reference:   "bound.boundNP.boundNP2",
 														Annotations: map[string]string{},
-														Parent:      "bound",
+														Parent:      "bound.boundNP",
 														SHA256:      "",
 													},
 													Spec: meta.NodeSpec{
@@ -1044,7 +1044,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app2",
-						Reference:   "",
+						Reference:   "app2.app2",
 						Annotations: map[string]string{},
 						Parent:      "",
 						SHA256:      "",
@@ -1065,7 +1065,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 			want: &meta.App{
 				Meta: meta.Metadata{
 					Name:        "app2",
-					Reference:   "",
+					Reference:   "app2.app2",
 					Annotations: map[string]string{},
 					Parent:      "app2",
 					SHA256:      "",
@@ -1099,7 +1099,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 						Name:        "app2",
 						Reference:   "",
 						Annotations: map[string]string{},
-						Parent:      "",
+						Parent:      "app2",
 						SHA256:      "",
 					},
 					Spec: meta.AppSpec{
@@ -1254,7 +1254,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app7",
-						Reference:   "",
+						Reference:   "app2.app7",
 						Annotations: map[string]string{},
 						Parent:      "",
 						SHA256:      "",
@@ -1265,9 +1265,9 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 							"app8": {
 								Meta: meta.Metadata{
 									Name:        "app8",
-									Reference:   "",
+									Reference:   "app2.app7.app8",
 									Annotations: map[string]string{},
-									Parent:      "",
+									Parent:      "app2.app7",
 									SHA256:      "",
 								},
 								Spec: meta.AppSpec{
@@ -1385,7 +1385,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app2",
-						Reference:   "",
+						Reference:   "app2.app2",
 						Annotations: map[string]string{},
 						Parent:      "",
 						SHA256:      "",
@@ -1540,6 +1540,137 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			name: "Invalid - App with boundary and channel with same name",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				context:     "app2",
+				searchQuery: "app2.app2",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app2",
+						Reference:   "",
+						Annotations: map[string]string{},
+						Parent:      "",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Meta: meta.Metadata{
+								Name:        "",
+								Reference:   "",
+								Annotations: nil,
+								Parent:      "",
+								SHA256:      "",
+							},
+							Spec: meta.NodeSpec{
+								Image: "imageNodeAppTest",
+							},
+						},
+						Apps: map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{
+							"output1": {
+								Meta: meta.Metadata{
+									Name:   "output1",
+									Parent: "",
+								},
+								ConnectedApps: []string{},
+								Spec:          meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"input1"},
+							Output: []string{"output1"},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Invalid alias",
+			fields: fields{
+				root:   getMockApp(),
+				appErr: nil,
+				mockC:  false,
+				mockCT: false,
+				mockA:  false,
+			},
+			args: args{
+				context:     "app2",
+				searchQuery: "app2.app2",
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:        "app2",
+						Reference:   "",
+						Annotations: map[string]string{},
+						Parent:      "app2",
+						SHA256:      "",
+					},
+					Spec: meta.AppSpec{
+						Aliases: map[string]*meta.Alias{
+							"app6.output1": {
+								Target: "fakeChannel",
+							},
+						},
+						Apps: map[string]*meta.App{
+							"app6": {
+								Meta: meta.Metadata{
+									Name:        "app6",
+									Reference:   "app2.app6",
+									Annotations: map[string]string{},
+									Parent:      "app2.app2",
+									SHA256:      "",
+								},
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "app6",
+											Reference:   "app6.nodeApp4",
+											Annotations: map[string]string{},
+											Parent:      "app4",
+											SHA256:      "",
+										},
+										Spec: meta.NodeSpec{
+											Image: "imageNodeApp4",
+										},
+									},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"output1"},
+										Output: []string{"output1"},
+									},
+								},
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"output1": {
+								Meta: meta.Metadata{
+									Name:   "output1",
+									Parent: "",
+								},
+								ConnectedApps: []string{},
+								Spec:          meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1app2"},
+							Output: []string{"ch1app2"},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			want:    nil,
 		},
 	}
 	for _, tt := range tests {

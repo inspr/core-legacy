@@ -3,6 +3,7 @@ package kafka
 import (
 	"os"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/fake"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/kafka/channels"
@@ -34,7 +35,7 @@ func (op *Operator) Channels() operators.ChannelOperatorInterface {
 // NewKafkaOperator creates a kafka operator.
 //
 // View Operator
-func NewKafkaOperator() (operators.OperatorInterface, error) {
+func NewKafkaOperator(memory memory.Manager) (operators.OperatorInterface, error) {
 	var err error
 	var chOp operators.ChannelOperatorInterface
 	if _, ok := os.LookupEnv("DEBUG"); !ok {
@@ -45,7 +46,7 @@ func NewKafkaOperator() (operators.OperatorInterface, error) {
 	} else {
 		chOp = fake.NewFakeOperator().Channels()
 	}
-	nOp, err := nodes.NewOperator()
+	nOp, err := nodes.NewOperator(memory)
 	if err != nil {
 		return nil, err
 	}

@@ -149,6 +149,7 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 			if err != nil {
 				continue
 			}
+
 			err = yaml.Unmarshal(f, &comp)
 			if err != nil || comp.APIVersion == "" || comp.Kind == "" {
 				continue
@@ -158,11 +159,18 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 			if err != nil {
 				continue
 			}
+
 			err = apply(f, out)
 			if err != nil {
-				fmt.Fprintf(out, "error while applying file '%v' :\n %v\n", file, err.Error())
+				fmt.Fprintf(
+					out,
+					"error while applying file '%v' :\n %v\n",
+					file,
+					err.Error(),
+				)
 				continue
 			}
+
 			appliedFiles = append(appliedFiles, applied{file: file, component: comp})
 
 		}

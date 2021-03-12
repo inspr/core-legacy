@@ -16,17 +16,10 @@ func ProcessArg(arg, scope string) (string, string, error) {
 			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
 		}
 
-		newScope, lastName, err := utils.RemoveLastPartInScope(arg)
-		if err != nil {
-			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
-		}
+		newScope, lastName, _ := utils.RemoveLastPartInScope(arg)
+		path, _ = utils.JoinScopes(path, newScope)
 
-		path, err = utils.JoinScopes(path, newScope)
-		if err != nil {
-			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
-		}
 		component = lastName
-
 	} else {
 		component = arg
 	}

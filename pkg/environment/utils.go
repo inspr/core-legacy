@@ -29,6 +29,24 @@ func GetInputChannelList(inputChan string) []string {
 	return arr
 }
 
+// GetResolvedInputChannelList gets the list of resolved channels from the input boundary
+func GetResolvedInputChannelList(inputChan string) []string {
+	arr := utils.StringArray(GetInputChannelList(inputChan))
+	return arr.Map(func(s string) string {
+		resolved, _ := GetResolvedChannel(s, inputChan, "")
+		return resolved
+	})
+}
+
+// GetResolvedOutputChannelList gets the list of resolved channels from the output boundary
+func GetResolvedOutputChannelList(outputChan string) []string {
+	arr := utils.StringArray(GetOutputChannelList(outputChan))
+	return arr.Map(func(s string) string {
+		resolved, _ := GetResolvedChannel(s, outputChan, "")
+		return resolved
+	})
+}
+
 // GetOutputChannelList returns a string list with the channels in insprEnv.OutputChannels
 func GetOutputChannelList(outputChan string) []string {
 	if outputChan == "" {
@@ -42,6 +60,17 @@ func GetOutputChannelList(outputChan string) []string {
 func GetSchema(channel, inputChan, outputChan string) (string, error) {
 	if IsInInputChannel(channel, inputChan) || IsInOutputChannel(channel, outputChan) {
 		return os.Getenv(channel + "_SCHEMA"), nil
+	}
+	return "", ierrors.NewError().
+		InvalidChannel().
+		Message("channel " + channel + " not listed as an input or output").
+		Build()
+}
+
+// GetResolvedChannel gets a resolved channel from a channel name
+func GetResolvedChannel(channel, inputChan, outputChan string) (string, error) {
+	if IsInInputChannel(channel, inputChan) || IsInOutputChannel(channel, outputChan) {
+		return os.Getenv(channel + "_RESOLVED"), nil
 	}
 	return "", ierrors.NewError().
 		InvalidChannel().

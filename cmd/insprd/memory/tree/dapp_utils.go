@@ -57,15 +57,13 @@ func validAppStructure(app, parentApp *meta.App) string {
 
 func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
 	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp)
-	if structureErrors == "" {
-		return nil
+	if structureErrors != "" {
+		return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
 	}
-	return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
+	return nil
 }
 
 func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
-	updateAppBoundary(app, parentApp)
-
 	parentStr := getParentString(app, parentApp)
 
 	app.Meta.Parent = parentStr
@@ -81,6 +79,7 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 }
 
 func checkAndUpdateChannels(app *meta.App) (bool, string) {
+	boundaries := app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)
 	channels := app.Spec.Channels
 	chTypes := app.Spec.ChannelTypes
 	for ctName := range chTypes {
@@ -115,6 +114,9 @@ func checkAndUpdateChannels(app *meta.App) (bool, string) {
 			}
 
 		}
+		if len(boundaries) > 0 && boundaries.Contains(channelName) {
+			return false, "channel and boundary with same name: " + channelName
+		}
 	}
 	return true, ""
 }
@@ -140,9 +142,9 @@ func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[
 	return ""
 }
 
-func updateAppBoundary(app *meta.App, parentApp *meta.App) {
+func (amm *AppMemoryManager) updateAppBoundary(app *meta.App, parentApp *meta.App) {
 	for _, childApp := range app.Spec.Apps {
-		updateAppBoundary(childApp, app)
+		amm.updateAppBoundary(childApp, app)
 	}
 	updateSingleBoundary(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
 }
@@ -157,10 +159,23 @@ func updateSingleBoundary(appName string, bound meta.AppBoundary, parentChannels
 }
 
 func getParentApp(sonQuery string) (*meta.App, error) {
+	var parentQuery string
 	sonRef := strings.Split(sonQuery, ".")
-	parentQuery := strings.Join(sonRef[:len(sonRef)-1], ".")
+	if len(sonRef) == 1 {
+		parentQuery = ""
+	} else {
+		parentQuery = strings.Join(sonRef[:len(sonRef)-1], ".")
+	}
 
 	parentApp, err := GetTreeMemory().Apps().Get(parentQuery)
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := parentApp.Spec.Apps[sonQuery]; parentQuery == "" && !ok {
+		return nil, ierrors.NewError().NotFound().
+			Message(fmt.Sprintf("dApp %s doesn't exist in root", sonQuery)).
+			Build()
+	}
 
 	return parentApp, err
 }
@@ -220,5 +235,28 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 	if !merr.Empty() {
 		return &merr
 	}
+	return nil
+}
+
+func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
+	merr := ierrors.MultiError{
+		Errors: []error{},
+	}
+	_, err := amm.ResolveBoundary(app)
+	if err != nil {
+		merr.Add(ierrors.NewError().Message(err.Error()).Build())
+		return &merr
+	}
+	for _, childApp := range app.Spec.Apps {
+		err = amm.recursiveBoundaryValidation(childApp)
+		if err != nil {
+			merr.Add(ierrors.NewError().Message(err.Error()).Build())
+		}
+	}
+
+	if !merr.Empty() {
+		return &merr
+	}
+
 	return nil
 }
