@@ -179,8 +179,8 @@ var updatedAliases func(handler *Handler) diff.DifferenceReaction = func(handler
 			appName, boundaryName, _ := utils.RemoveLastPartInScope(d.Name)
 			newScope, _ := utils.JoinScopes(scope, appName)
 			app, err := handler.Memory.Apps().Get(newScope)
-			if err != nil && app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(boundaryName) {
-				_, err := handler.Operator.Nodes().CreateNode(context.Background(), app)
+			if err == nil && app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(boundaryName) {
+				_, err := handler.Operator.Nodes().UpdateNode(context.Background(), app)
 				if err != nil {
 					return err
 				}
