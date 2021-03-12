@@ -9,7 +9,7 @@ type Alias struct {
 	alias map[string]*meta.Alias
 }
 
-// Get - simple mock
+// GetAlias - simple mock
 func (ch *Alias) GetAlias(context string, aliasKey string) (*meta.Alias, error) {
 	return &meta.Alias{}, nil
 }
