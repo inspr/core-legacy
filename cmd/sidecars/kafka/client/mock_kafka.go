@@ -31,7 +31,8 @@ func (mc *MockConsumer) Poll(timeout int) (event kafka.Event) {
 		return kafka.NewError(kafka.ErrAllBrokersDown, "", false)
 	}
 
-	msg, _ := encode(mc.pollMsg, mc.senderChannel)
+	ch, _ := fromResolvedChannel(mc.senderChannel)
+	msg, _ := ch.encode(mc.pollMsg)
 	return &kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic: &mc.topic,
@@ -72,8 +73,8 @@ func createMockEnv() {
 	os.Setenv("INSPR_ENV", "random")
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "latest")
-	os.Setenv("ch1_SCHEMA", `{"type":"string"}`)
-	os.Setenv("ch2_SCHEMA", "hellotest")
+	os.Setenv("ch1_resolved_SCHEMA", `{"type":"string"}`)
+	os.Setenv("ch2_resolved_SCHEMA", "hellotest")
 	os.Setenv("ch1_RESOLVED", `ch1_resolved`)
 	os.Setenv("ch2_RESOLVED", "ch2_resolved")
 	os.Setenv("INSPR_APP_ID", "testappid1")

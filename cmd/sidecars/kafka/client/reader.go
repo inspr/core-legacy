@@ -5,7 +5,6 @@ import (
 	globalEnv "gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 const pollTimeout = 100
@@ -47,7 +46,10 @@ func NewReader() (*Reader, error) {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
 
-	channelsAsTopics := utils.Map(channelsList, toTopic)
+	channelsAsTopics := channelsList.Map(func(s string) string {
+		ch, _ := fromResolvedChannel(s)
+		return ch.toTopic()
+	})
 
 	if err := reader.consumer.SubscribeTopics(channelsAsTopics, nil); err != nil {
 		return nil, err
@@ -65,16 +67,17 @@ func (reader *Reader) ReadMessage() (models.BrokerData, error) {
 		switch ev := event.(type) {
 		case *kafka.Message:
 
-			channel := *ev.TopicPartition.Topic
+			topic := *ev.TopicPartition.Topic
+			channel := fromTopic(topic)
 
 			// Decoding Message
-			message, errDecode := decode(ev.Value, fromTopic(channel).channel)
+			message, errDecode := channel.decode(ev.Value)
 			if errDecode != nil {
 				return models.BrokerData{}, errDecode
 			}
 
 			reader.lastMessage = ev
-			channelName := fromTopic(channel).channel
+			channelName := channel.channel
 
 			return models.BrokerData{Message: models.Message{Data: message}, Channel: channelName}, nil
 

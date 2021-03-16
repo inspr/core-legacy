@@ -40,10 +40,13 @@ func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	outputChan := environment.GetOutputChannels()
 
 	resolvedChannel, _ := environment.GetResolvedChannel(channel, "", outputChan)
-
+	resolvedCh, err := fromResolvedChannel(resolvedChannel)
+	if err != nil {
+		return err
+	}
 	go deliveryReport(writer.producer)
 
-	if errProduceMessage := writer.produceMessage(message, channel, resolvedChannel); errProduceMessage != nil {
+	if errProduceMessage := writer.produceMessage(message, resolvedCh); errProduceMessage != nil {
 		return errProduceMessage
 	}
 
@@ -70,13 +73,13 @@ func deliveryReport(producer *kafka.Producer) {
 }
 
 // creates a Kafka message and sends it through the ProduceChannel
-func (writer *Writer) produceMessage(message interface{}, channel, resolvedChannel string) error {
-	messageEncoded, errorEncode := encode(message, channel)
+func (writer *Writer) produceMessage(message interface{}, resolvedChannel messageChannel) error {
+	messageEncoded, errorEncode := resolvedChannel.encode(message)
 	if errorEncode != nil {
 		return errorEncode
 	}
 
-	topic := toTopic(resolvedChannel)
+	topic := resolvedChannel.toTopic()
 
 	writer.producer.ProduceChannel() <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{

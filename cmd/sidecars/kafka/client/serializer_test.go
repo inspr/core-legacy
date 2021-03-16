@@ -59,8 +59,7 @@ func Test_getSchema(t *testing.T) {
 	defer deleteMockEnv()
 	environment.RefreshEnviromentVariables()
 	type args struct {
-		channel string
-		context string
+		channel messageChannel
 	}
 	tests := []struct {
 		name    string
@@ -71,8 +70,7 @@ func Test_getSchema(t *testing.T) {
 		{
 			name: "Invalid channel",
 			args: args{
-				channel: "invalid",
-				context: "",
+				channel: messageChannel{channel: "invalid"},
 			},
 			want:    "",
 			wantErr: true,
@@ -80,8 +78,7 @@ func Test_getSchema(t *testing.T) {
 		{
 			name: "Valid channel with schema",
 			args: args{
-				channel: "ch2",
-				context: "",
+				channel: messageChannel{channel: "ch2_resolved"},
 			},
 			want:    "hellotest",
 			wantErr: false,
@@ -89,7 +86,7 @@ func Test_getSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getSchema(tt.args.channel)
+			got, err := tt.args.channel.getSchema()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getSchema() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -108,7 +105,7 @@ func Test_decode(t *testing.T) {
 	defer deleteMockEnv()
 	type args struct {
 		messageEncoded []byte
-		channel        string
+		channel        messageChannel
 	}
 	tests := []struct {
 		name    string
@@ -119,7 +116,7 @@ func Test_decode(t *testing.T) {
 		{
 			name: "Invalid channel",
 			args: args{
-				channel:        "invalid",
+				channel:        messageChannel{channel: "invalid"},
 				messageEncoded: []byte{},
 			},
 			wantErr: true,
@@ -128,7 +125,7 @@ func Test_decode(t *testing.T) {
 		{
 			name: "Invalid schema",
 			args: args{
-				channel:        "ch2",
+				channel:        messageChannel{channel: "ch2_resolved"},
 				messageEncoded: []byte{104, 101, 108, 108, 111, 116, 101, 115, 116},
 			},
 			wantErr: true,
@@ -137,7 +134,7 @@ func Test_decode(t *testing.T) {
 		{
 			name: "Valid schema",
 			args: args{
-				channel:        "ch1",
+				channel:        messageChannel{channel: "ch1_resolved"},
 				messageEncoded: returnEncodedMessage("testSchemaString"),
 			},
 			wantErr: false,
@@ -146,7 +143,7 @@ func Test_decode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := decode(tt.args.messageEncoded, tt.args.channel)
+			got, err := tt.args.channel.decode(tt.args.messageEncoded)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("decode() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -165,7 +162,7 @@ func Test_encode(t *testing.T) {
 	defer deleteMockEnv()
 	type args struct {
 		message interface{}
-		channel string
+		channel messageChannel
 	}
 	tests := []struct {
 		name    string
@@ -176,7 +173,7 @@ func Test_encode(t *testing.T) {
 		{
 			name: "Invalid channel",
 			args: args{
-				channel: "invalid",
+				channel: messageChannel{channel: "invalid"},
 				message: []byte{},
 			},
 			wantErr: true,
@@ -185,7 +182,7 @@ func Test_encode(t *testing.T) {
 		{
 			name: "Invalid schema",
 			args: args{
-				channel: "ch2",
+				channel: messageChannel{channel: "ch2_resolved"},
 				message: []byte{104, 101, 108, 108, 111, 116, 101, 115, 116},
 			},
 			wantErr: true,
@@ -194,7 +191,7 @@ func Test_encode(t *testing.T) {
 		{
 			name: "Valid encoding",
 			args: args{
-				channel: "ch1",
+				channel: messageChannel{channel: "ch1_resolved"},
 				message: "testMessageEncodingString",
 			},
 			wantErr: false,
@@ -203,7 +200,7 @@ func Test_encode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := encode(tt.args.message, tt.args.channel)
+			got, err := tt.args.channel.encode(tt.args.message)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("encode() error = %v, wantErr %v", err, tt.wantErr)
 				return
