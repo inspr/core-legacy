@@ -22,6 +22,27 @@ func (tmm *MemoryManager) Alias() memory.AliasMemory {
 }
 
 /*
+Get receives a context and a alias key. The context defines
+the path to an App. If this App has a pointer to a alias that has the
+same key as the key passed as an argument, the pointer to that alias is returned
+*/
+func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error) {
+	// get app from context
+	app, err := GetTreeMemory().Apps().Get(context)
+	if err != nil {
+		return nil, err
+	}
+
+	// check if alias key exist in context
+	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
+		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
+	}
+
+	//return alias
+	return app.Spec.Aliases[aliasKey], nil
+}
+
+/*
 CreateAlias receives a query that defines a path to the App in
 which we want to add an alias in his parent
 */
@@ -63,12 +84,18 @@ func (amm *AliasMemoryManager) CreateAlias(query, targetBoundary string, alias *
 
 }
 
+// AliasRootGetter returns a getter that gets alias from the root structure of the app, without the current changes.
+// The getter does not allow changes in the structure, just visualization.
+type AliasRootGetter struct {
+	tree *meta.Alias
+}
+
 /*
 Get receives a context and a alias key. The context defines
 the path to an App. If this App has a pointer to a alias that has the
 same key as the key passed as an argument, the pointer to that alias is returned
 */
-func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error) {
+func (amm *AliasRootGetter) Get(context, aliasKey string) (*meta.Alias, error) {
 	// get app from context
 	app, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {

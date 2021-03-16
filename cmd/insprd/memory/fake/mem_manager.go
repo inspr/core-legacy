@@ -34,6 +34,11 @@ func (l LookupMemManager) ChannelTypes() memory.ChannelTypeGetInterface {
 	return &l.channelType
 }
 
+// Alias mocks a alias getter
+func (l LookupMemManager) Alias() memory.AliasGetInterface {
+	return &l.alias
+}
+
 // MockMemoryManager mock exported with propagated error through the functions
 func MockMemoryManager(failErr error) memory.Manager {
 	return &MemManager{
