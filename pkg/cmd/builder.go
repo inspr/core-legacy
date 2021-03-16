@@ -21,6 +21,7 @@ type Builder interface {
 	WithCommonFlags() Builder
 	Hidden() Builder
 	ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command
+	MinimumArgs(argCount int, action func(context.Context, []string) error) *cobra.Command
 	NoArgs(action func(context.Context) error) *cobra.Command
 	AddSubCommand(cmds ...*cobra.Command) Builder
 	Super() *cobra.Command
@@ -118,6 +119,18 @@ func (b *builder) AddSubCommand(cmds ...*cobra.Command) Builder {
 // it will show the cmd.help() content
 func (b *builder) ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command {
 	b.cmd.Args = cobra.ExactArgs(argCount)
+	b.cmd.RunE = func(_ *cobra.Command, args []string) error {
+		err := handleWellKnownErrors(action(b.cmd.Context(), args))
+		return err
+	}
+	return &b.cmd
+}
+
+// MinimumArgs - imposes the condition in which the function will only be executed
+// if the minimum amount of arguments are given, if didn't received the proper args
+// it will show the cmd.help() content
+func (b *builder) MinimumArgs(minArgs int, action func(context.Context, []string) error) *cobra.Command {
+	b.cmd.Args = cobra.MinimumNArgs(minArgs)
 	b.cmd.RunE = func(_ *cobra.Command, args []string) error {
 		err := handleWellKnownErrors(action(b.cmd.Context(), args))
 		return err
