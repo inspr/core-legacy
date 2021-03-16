@@ -1683,37 +1683,6 @@ func getMockRootApp2() *meta.App {
 	return &root
 }
 
-func equalChanges(change1 Change, change2 Change) bool {
-	if change1.Context != change2.Context {
-		return false
-	}
-	if change1.Kind != change2.Kind {
-		return false
-	}
-	if change1.Operation != change2.Operation {
-		return false
-	}
-	if len(change1.Diff) != len(change2.Diff) {
-		return false
-	}
-	map1 := make(map[Difference]int)
-	map2 := make(map[Difference]int)
-	for _, diff := range change1.Diff {
-		map1[diff]++
-	}
-
-	for _, diff := range change2.Diff {
-		map2[diff]++
-	}
-
-	for key, val := range map1 {
-		if map2[key] != val {
-			return false
-		}
-	}
-	return true
-}
-
 func equalChangelogs(changelog1 Changelog, changelog2 Changelog) bool {
 	if len(changelog1) != len(changelog2) {
 		return false
@@ -1743,6 +1712,37 @@ func equalChangelogs(changelog1 Changelog, changelog2 Changelog) bool {
 			if map2[key][key2] != val2 {
 				return false
 			}
+		}
+	}
+	return true
+}
+
+func equalChanges(change1 Change, change2 Change) bool {
+	if change1.Context != change2.Context {
+		return false
+	}
+	if change1.Kind != change2.Kind {
+		return false
+	}
+	if change1.Operation != change2.Operation {
+		return false
+	}
+	if len(change1.Diff) != len(change2.Diff) {
+		return false
+	}
+	map1 := make(map[Difference]int)
+	map2 := make(map[Difference]int)
+	for _, diff := range change1.Diff {
+		map1[diff]++
+	}
+
+	for _, diff := range change2.Diff {
+		map2[diff]++
+	}
+
+	for key, val := range map1 {
+		if map2[key] != val {
+			return false
 		}
 	}
 	return true

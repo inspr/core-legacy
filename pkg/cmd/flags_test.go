@@ -44,6 +44,8 @@ func TestHasCmdAnnotation(t *testing.T) {
 }
 
 func Test_methodNameByType(t *testing.T) {
+	holder := 1
+	holderPointer := &holder
 	type args struct {
 		v reflect.Value
 	}
@@ -52,7 +54,47 @@ func Test_methodNameByType(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "type_int",
+			args: args{v: reflect.ValueOf(1)},
+			want: "IntVar",
+		},
+		{
+			name: "type_bool",
+			args: args{v: reflect.ValueOf(true)},
+			want: "BoolVar",
+		},
+		{
+			name: "type_string",
+			args: args{v: reflect.ValueOf("mock")},
+			want: "StringVar",
+		},
+		{
+			name: "type_string_slice",
+			args: args{v: reflect.ValueOf([]string{"a", "b"})},
+			want: "StringSliceVar",
+		},
+		{
+			name: "type_struct",
+			args: args{
+				v: reflect.ValueOf(struct{ x int }{x: 10}),
+			},
+			want: "Var",
+		},
+		{
+			name: "type_pointer",
+			args: args{
+				v: reflect.ValueOf(holderPointer),
+			},
+			want: "IntVar",
+		},
+		{
+			name: "type_double",
+			args: args{
+				v: reflect.ValueOf(2.0),
+			},
+			want: "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -3,6 +3,7 @@ package mocks
 import (
 	"context"
 
+	"gitlab.inspr.dev/inspr/core/pkg/controller"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 )
@@ -13,7 +14,7 @@ type ChannelMock struct {
 }
 
 // NewChannelMock exports a mock of the channel.interface
-func NewChannelMock(err error) *ChannelMock {
+func NewChannelMock(err error) controller.ChannelInterface {
 	return &ChannelMock{err: err}
 }
 

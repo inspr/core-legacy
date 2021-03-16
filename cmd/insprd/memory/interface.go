@@ -67,7 +67,7 @@ type AliasMemory interface {
 
 // AliasGetInterface is an interface to get alias types from memory
 type AliasGetInterface interface {
-	GetAlias(context string, aliasKey string) (*meta.Alias, error)
+	Get(context string, aliasKey string) (*meta.Alias, error)
 }
 
 // Manager is the interface that allows the management

@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	test "gitlab.inspr.dev/inspr/core/pkg/testutils"
 	"gotest.tools/assert/cmp"
 	kubeCore "k8s.io/api/core/v1"
 )
@@ -43,6 +42,14 @@ func TestIndex(t *testing.T) {
 				t:  "c",
 			},
 			want: 2,
+		},
+		{
+			name: "It should return -1",
+			args: args{
+				vs: []string{"a", "b", "c"},
+				t:  "non_existant",
+			},
+			want: -1,
 		},
 	}
 	for _, tt := range tests {
@@ -137,8 +144,15 @@ func TestStringSliceUnion(t *testing.T) {
 			},
 			want: []string{"a", "b", "c", "d"},
 			checkFunction: func(t *testing.T, got []string) {
-				if !(Includes(got, "a") && Includes(got, "b") && Includes(got, "c") && Includes(got, "d") && len(got) == 4) {
-					t.Errorf("StringSliceUnion() = %v, want %v", got, "[a b c d]")
+				if !(Includes(got, "a") &&
+					Includes(got, "b") &&
+					Includes(got, "c") &&
+					Includes(got, "d") && len(got) == 4) {
+					t.Errorf(
+						"StringSliceUnion() = %v, want %v",
+						got,
+						"[a b c d]",
+					)
 				}
 			},
 		},
@@ -171,7 +185,8 @@ func TestMap(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Map(tt.args.vs, tt.args.f); !reflect.DeepEqual(got, tt.want) {
+			got := Map(tt.args.vs, tt.args.f)
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Map() = %v, want %v", got, tt.want)
 			}
 		})
@@ -188,12 +203,25 @@ func TestStringArray_Map(t *testing.T) {
 		args args
 		want StringArray
 	}{
-		// TODO: Add test cases.
+		{
+			name: "apply_func_to_stringArray",
+			c:    StringArray{"hello", "world", "mock"},
+			args: args{
+				f: strings.ToUpper,
+			},
+			want: StringArray{"HELLO", "WORLD", "MOCK"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.c.Map(tt.args.f); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("StringArray.Map() = %v, want %v", got, tt.want)
+
+			got := tt.c.Map(tt.args.f)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf(
+					"StringArray.Map() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -209,11 +237,20 @@ func TestStringArray_Union(t *testing.T) {
 		args args
 		want StringArray
 	}{
-		// TODO: Add test cases.
+		{
+			name: "union_string_to_stringArray",
+			c:    StringArray{"hello", "world", "mock"},
+			args: args{
+				other: StringArray{"hello", "world", "extra", "words"},
+			},
+			want: StringArray{"hello", "world", "mock", "extra", "words"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.c.Union(tt.args.other); !reflect.DeepEqual(got, tt.want) {
+
+			got := tt.c.Union(tt.args.other)
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("StringArray.Union() = %v, want %v", got, tt.want)
 			}
 		})
@@ -230,7 +267,22 @@ func TestStringArray_Contains(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "check_if_stringArray_contain_item_expect_true",
+			c:    StringArray{"hello", "world", "mock"},
+			args: args{
+				item: "hello",
+			},
+			want: true,
+		},
+		{
+			name: "check_if_stringArray_contain_item_expect_false",
+			c:    StringArray{"hello", "world", "mock"},
+			args: args{
+				item: "non_existant",
+			},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -251,7 +303,12 @@ func TestStringArray_Join(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "join_StringArray",
+			c:    StringArray{"the", "man", "who", "changed", "the", "world"},
+			args: args{sep: "-"},
+			want: "the-man-who-changed-the-world",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -301,7 +358,107 @@ func Test_parseToK8sArrEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.args.arrappEnv.ParseToK8sArrEnv()
 
-			var comp cmp.Comparison = cmp.DeepEqual(got, tt.want, test.GetMapCompareOptions())
+			var comp cmp.Comparison = cmp.DeepEqual(
+				got,
+				tt.want,
+				GetMapCompareOptions(),
+			)
+			if !comp().Success() {
+				t.Errorf("parseToK8sArrEnv() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEnvironmentMap_ParseToK8sArrEnv(t *testing.T) {
+	tests := []struct {
+		name string
+		m    EnvironmentMap
+		want []kubeCore.EnvVar
+	}{
+		{
+			name: "basic_EnvironmentMap_test",
+			m: EnvironmentMap{
+				"key_1": "value_1",
+				"key_2": "value_2",
+				"key_3": "value_3",
+			},
+			want: []kubeCore.EnvVar{
+				{
+					Name:  "key_1",
+					Value: "value_1",
+				},
+				{
+					Name:  "key_2",
+					Value: "value_2",
+				},
+				{
+					Name:  "key_3",
+					Value: "value_3",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got := tt.m.ParseToK8sArrEnv()
+
+			var comp cmp.Comparison = cmp.DeepEqual(
+				got,
+				tt.want,
+				GetMapCompareOptions(),
+			)
+			if !comp().Success() {
+				t.Errorf("parseToK8sArrEnv() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseFromK8sEnvironment(t *testing.T) {
+	type args struct {
+		envs []kubeCore.EnvVar
+	}
+	tests := []struct {
+		name string
+		args args
+		want EnvironmentMap
+	}{
+		{
+			name: "parser_From_K8s_Environment",
+			args: args{envs: []kubeCore.EnvVar{
+				{
+					Name:  "key_1",
+					Value: "value_1",
+				},
+				{
+					Name:  "key_2",
+					Value: "value_2",
+				},
+				{
+					Name:  "key_3",
+					Value: "value_3",
+				},
+			}},
+			want: EnvironmentMap{
+				"key_1": "value_1",
+				"key_2": "value_2",
+				"key_3": "value_3",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got := ParseFromK8sEnvironment(tt.args.envs)
+
+			var comp cmp.Comparison = cmp.DeepEqual(
+				got,
+				tt.want,
+				GetMapCompareOptions(),
+			)
+
 			if !comp().Success() {
 				t.Errorf("parseToK8sArrEnv() = %v, want %v", got, tt.want)
 			}

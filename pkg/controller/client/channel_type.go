@@ -52,6 +52,7 @@ func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *me
 		Ctx:         context,
 		ChannelType: *ch,
 		Valid:       true,
+		DryRun:      dryRun,
 	}
 
 	var resp diff.Changelog
@@ -77,6 +78,7 @@ func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name s
 		Ctx:    context,
 		CtName: name,
 		Valid:  true,
+		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
@@ -102,6 +104,7 @@ func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *me
 		Ctx:         context,
 		ChannelType: *ch,
 		Valid:       true,
+		DryRun:      dryRun,
 	}
 
 	var resp diff.Changelog
