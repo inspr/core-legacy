@@ -2382,8 +2382,8 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"],
 			},
 			want: map[string]string{
-				"alias1": "bdch1",
-				"alias2": "bdch2",
+				"alias1": "bound.bdch1",
+				"alias2": "bound.bdch2",
 			},
 			wantErr: false,
 		},
@@ -2400,8 +2400,8 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"].Spec.Apps["bound3"],
 			},
 			want: map[string]string{
-				"alias1": "bdch1",
-				"alias2": "bdch2",
+				"alias1": "bound.bdch1",
+				"alias2": "bound.bdch2",
 			},
 			wantErr: false,
 		},
@@ -2419,7 +2419,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 			},
 			want: map[string]string{
 				"ch1":    "ch1",
-				"alias3": "bdch2",
+				"alias3": "bound.bdch2",
 			},
 			wantErr: false,
 		},
