@@ -70,8 +70,9 @@ It can be called with the flag --dry-run so the changes that would be made are s
 }
 
 type applied struct {
-	file      string
+	fileName  string
 	component meta.Component
+	content   []byte
 }
 
 func doApply(_ context.Context) error {
@@ -117,9 +118,9 @@ func isYaml(file string) bool {
 }
 
 func printAppliedFiles(appliedFiles []applied, out io.Writer) {
-	fmt.Fprint(out, "Applying: \n")
+	fmt.Fprint(out, "\nApplied: \n")
 	for _, file := range appliedFiles {
-		fmt.Fprint(out, file.file+" | "+file.component.Kind+" | "+file.component.APIVersion+"\n")
+		fmt.Fprint(out, file.fileName+" | "+file.component.Kind+" | "+file.component.APIVersion+"\n")
 	}
 }
 
@@ -140,9 +141,40 @@ func getFilesFromFolder(path string) ([]string, error) {
 func applyValidFiles(path string, files []string, out io.Writer) []applied {
 	var appliedFiles []applied
 
+	filesToApply := getOrderedFiles(path, files)
+
+	if len(filesToApply) != 0 {
+		for _, file := range filesToApply {
+
+			fmt.Fprintf(out, "%v\n", file.fileName)
+
+			apply, err := GetFactory().GetRunMethod(file.component)
+			if err != nil {
+				continue
+			}
+
+			err = apply(file.content, out)
+			if err != nil {
+				fmt.Fprintf(
+					out,
+					"error while applying file '%v':\n%v\n",
+					file.fileName,
+					err.Error(),
+				)
+				continue
+			}
+
+			appliedFiles = append(appliedFiles, file)
+
+		}
+	}
+	return appliedFiles
+}
+
+func getOrderedFiles(path string, files []string) []applied {
+	var apps, channels, ctypes []applied
 	for _, file := range files {
 		if isYaml(file) {
-			fmt.Println(file)
 			comp := meta.Component{}
 
 			f, err := ioutil.ReadFile(filepath.Join(path, file))
@@ -155,26 +187,16 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 				continue
 			}
 
-			apply, err := GetFactory().GetRunMethod(comp)
-			if err != nil {
-				continue
+			if comp.Kind == "dapp" {
+				apps = append(apps, applied{component: comp, fileName: file, content: f})
+			} else if comp.Kind == "channel" {
+				channels = append(channels, applied{component: comp, fileName: file, content: f})
+			} else if comp.Kind == "channeltype" {
+				ctypes = append(ctypes, applied{component: comp, fileName: file, content: f})
 			}
-
-			err = apply(f, out)
-			if err != nil {
-				fmt.Fprintf(
-					out,
-					"error while applying file '%v' :\n %v\n",
-					file,
-					err.Error(),
-				)
-				continue
-			}
-
-			appliedFiles = append(appliedFiles, applied{file: file, component: comp})
-
 		}
 	}
-
-	return appliedFiles
+	ordered := append(apps, ctypes...)
+	ordered = append(ordered, channels...)
+	return ordered
 }

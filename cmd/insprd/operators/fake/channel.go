@@ -2,7 +2,6 @@ package fake
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
@@ -26,7 +25,6 @@ func NewChannelOperator(err error) operators.ChannelOperatorInterface {
 
 // Create mock
 func (o ChannelOperator) Create(ctx context.Context, context string, ch *meta.Channel) error {
-	fmt.Println(ch.Meta.Name)
 	if o.err != nil {
 		return o.err
 	}
