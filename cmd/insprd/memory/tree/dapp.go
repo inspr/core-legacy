@@ -72,7 +72,7 @@ func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
 	if appErr != nil {
 		return appErr
 	}
-	amm.updateAppBoundary(app, parentApp)
+	amm.connectAppsBoundaries(app)
 	return nil
 }
 
@@ -214,7 +214,7 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 			_, val, _ = metautils.RemoveLastPartInScope(val) //setup for direct resolve
 		}
 		if ch, ok := app.Spec.Channels[val]; ok { // resolve in channels (direct or through alias)
-			boundaries[key], _ = metautils.JoinScopes(ch.Meta.Parent, ch.Meta.Name) // if channel exists, resolve
+			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, ch.Meta.Name) // if channel exists, resolve
 			delete(unresolved, key)
 			continue
 		}
