@@ -1095,8 +1095,8 @@ func TestChange_diffAliases(t *testing.T) {
 		changelog *Changelog
 	}
 	type args struct {
-		from map[string]meta.Alias
-		to   map[string]meta.Alias
+		from map[string]*meta.Alias
+		to   map[string]*meta.Alias
 	}
 	tests := []struct {
 		name   string
@@ -1112,7 +1112,7 @@ func TestChange_diffAliases(t *testing.T) {
 				Diff:      []Difference{},
 			},
 			args: args{
-				from: map[string]meta.Alias{
+				from: map[string]*meta.Alias{
 					"alias1": {
 						Target: "target1",
 					},
@@ -1120,7 +1120,7 @@ func TestChange_diffAliases(t *testing.T) {
 						Target: "target2",
 					},
 				},
-				to: map[string]meta.Alias{
+				to: map[string]*meta.Alias{
 					"alias1": {
 						Target: "target1",
 					},
@@ -1143,7 +1143,7 @@ func TestChange_diffAliases(t *testing.T) {
 				Diff:      []Difference{},
 			},
 			args: args{
-				from: map[string]meta.Alias{
+				from: map[string]*meta.Alias{
 					"alias1": {
 						Target: "target3",
 					},
@@ -1151,7 +1151,7 @@ func TestChange_diffAliases(t *testing.T) {
 						Target: "target2",
 					},
 				},
-				to: map[string]meta.Alias{
+				to: map[string]*meta.Alias{
 					"alias1": {
 						Target: "target1",
 					},
@@ -1185,12 +1185,12 @@ func TestChange_diffAliases(t *testing.T) {
 				Diff:      []Difference{},
 			},
 			args: args{
-				from: map[string]meta.Alias{
+				from: map[string]*meta.Alias{
 					"alias1": {
 						Target: "target1",
 					},
 				},
-				to: map[string]meta.Alias{
+				to: map[string]*meta.Alias{
 					"alias1": {
 						Target: "target1",
 					},
@@ -1224,7 +1224,7 @@ func TestChange_diffAliases(t *testing.T) {
 				Diff:      []Difference{},
 			},
 			args: args{
-				from: map[string]meta.Alias{
+				from: map[string]*meta.Alias{
 					"alias1": {
 						Target: "target1",
 					},
@@ -1233,7 +1233,7 @@ func TestChange_diffAliases(t *testing.T) {
 						Target: "target2",
 					},
 				},
-				to: map[string]meta.Alias{
+				to: map[string]*meta.Alias{
 					"alias1": {
 						Target: "target1",
 					},

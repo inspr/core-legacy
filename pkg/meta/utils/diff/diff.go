@@ -132,11 +132,11 @@ func (change *Change) diffAppSpec(from, to meta.AppSpec) error {
 	}
 
 	change.diffBoudaries(from.Boundary, to.Boundary)
-
+	change.diffAliases(from.Aliases, to.Aliases)
 	return nil
 }
 
-func (change *Change) diffAliases(from, to map[string]meta.Alias) {
+func (change *Change) diffAliases(from, to map[string]*meta.Alias) {
 	set := metautils.AliasDisjuctSet(from, to)
 
 	for alias := range set {
