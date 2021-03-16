@@ -10,3 +10,6 @@ export GOOGLE_APPLICATION_CREDENTIALS=$CI_PIPELINE_ID.json
 gcloud config set project red-inspr
 
 gsutil rsync bin gs://inspr-cli/$VERSION
+
+cat $VERSION > latest-version
+gsutil rsync latest-version gs://inspr-cli/latest-version
