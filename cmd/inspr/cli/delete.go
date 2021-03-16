@@ -21,21 +21,21 @@ func NewDeleteCmd() *cobra.Command {
 		WithExample("Delete app from the default scope", "delete apps <appname> ").
 		WithExample("Delete app from a custom scope", "delete apps <appname> --scope app1.app2").
 		WithCommonFlags().
-		ExactArgs(1, deleteApps)
+		MinimumArgs(1, deleteApps)
 	deleteChannels := cmd.NewCmd("channels").
 		WithDescription("Delete channels from context").
 		WithExample("Delete channel from the default scope", "delete channels <channelname>").
 		WithExample("Delete channels from a custom scope", "delete channels <channelname> --scope app1.app2").
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
-		ExactArgs(1, deleteChannels)
+		MinimumArgs(1, deleteChannels)
 	deleteTypes := cmd.NewCmd("ctypes").
 		WithDescription("Delete channel types from context").
 		WithExample("Delete channel type from the default scope", "delete ctypes <ctypename>").
 		WithExample("Delete channel type from a custom scope", "delete ctypes <ctypename> --scope app1.app2 ").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
-		ExactArgs(1, deleteCTypes)
+		MinimumArgs(1, deleteCTypes)
 	return cmd.NewCmd("delete").
 		WithDescription("Delete component of object type").
 		WithLongDescription("Delete takes a component type (apps | channels | ctypes) its scope and name, and deletes it from the cluster").
@@ -58,19 +58,21 @@ func deleteApps(_ context.Context, args []string) error {
 		return err
 	}
 
-	if !utils.IsValidScope(args[0]) {
-		fmt.Fprint(out, "invalid args\n")
-		return ierrors.NewError().Message("Invalid args").BadRequest().Build()
+	for _, arg := range args {
+		if !utils.IsValidScope(arg) {
+			fmt.Fprint(out, "invalid args\n")
+			return ierrors.NewError().Message("Invalid args").BadRequest().Build()
+		}
+		path, _ := utils.JoinScopes(scope, arg)
+
+		cl, err := client.Apps().Delete(context.Background(), path, cmd.InsprOptions.DryRun)
+		if err != nil {
+			fmt.Fprint(out, err.Error()+"\n")
+			return err
+		}
+		cl.Print(out)
 	}
 
-	path, _ := utils.JoinScopes(scope, args[0])
-
-	cl, err := client.Apps().Delete(context.Background(), path, cmd.InsprOptions.DryRun)
-	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
-		return err
-	}
-	cl.Print(out)
 	return nil
 }
 
@@ -82,17 +84,19 @@ func deleteChannels(_ context.Context, args []string) error {
 		return err
 	}
 
-	path, chName, err := cliutils.ProcessArg(args[0], scope)
-	if err != nil {
-		return err
-	}
+	for _, arg := range args {
+		path, chName, err := cliutils.ProcessArg(arg, scope)
+		if err != nil {
+			return err
+		}
 
-	cl, err := client.Channels().Delete(context.Background(), path, chName, cmd.InsprOptions.DryRun)
-	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
-		return err
+		cl, err := client.Channels().Delete(context.Background(), path, chName, cmd.InsprOptions.DryRun)
+		if err != nil {
+			fmt.Fprint(out, err.Error()+"\n")
+			return err
+		}
+		cl.Print(out)
 	}
-	cl.Print(out)
 
 	return nil
 }
@@ -106,17 +110,19 @@ func deleteCTypes(_ context.Context, args []string) error {
 		return err
 	}
 
-	path, ctName, err := cliutils.ProcessArg(args[0], scope)
-	if err != nil {
-		return err
-	}
+	for _, arg := range args {
+		path, ctName, err := cliutils.ProcessArg(arg, scope)
+		if err != nil {
+			return err
+		}
 
-	cl, err := client.ChannelTypes().Delete(context.Background(), path, ctName, cmd.InsprOptions.DryRun)
-	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
-		return err
+		cl, err := client.ChannelTypes().Delete(context.Background(), path, ctName, cmd.InsprOptions.DryRun)
+		if err != nil {
+			fmt.Fprint(out, err.Error()+"\n")
+			return err
+		}
+		cl.Print(out)
 	}
-	cl.Print(out)
 
 	return nil
 }
