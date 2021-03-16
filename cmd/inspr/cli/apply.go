@@ -143,30 +143,28 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 
 	filesToApply := getOrderedFiles(path, files)
 
-	if len(filesToApply) != 0 {
-		for _, file := range filesToApply {
+	for _, file := range filesToApply {
 
-			fmt.Fprintf(out, "%v\n", file.fileName)
+		fmt.Fprintf(out, "%v\n", file.fileName)
 
-			apply, err := GetFactory().GetRunMethod(file.component)
-			if err != nil {
-				continue
-			}
-
-			err = apply(file.content, out)
-			if err != nil {
-				fmt.Fprintf(
-					out,
-					"error while applying file '%v':\n%v\n",
-					file.fileName,
-					err.Error(),
-				)
-				continue
-			}
-
-			appliedFiles = append(appliedFiles, file)
-
+		apply, err := GetFactory().GetRunMethod(file.component)
+		if err != nil {
+			continue
 		}
+
+		err = apply(file.content, out)
+		if err != nil {
+			fmt.Fprintf(
+				out,
+				"error while applying file '%v':\n%v\n",
+				file.fileName,
+				err.Error(),
+			)
+			continue
+		}
+
+		appliedFiles = append(appliedFiles, file)
+
 	}
 	return appliedFiles
 }

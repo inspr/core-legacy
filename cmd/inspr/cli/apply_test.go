@@ -18,7 +18,7 @@ const (
 	filePath = "filetest.yaml"
 )
 
-func createYaml() string {
+func createDAppYaml() string {
 	comp := meta.Component{
 		Kind:       "dapp",
 		APIVersion: "v1",
@@ -160,7 +160,7 @@ func Test_printAppliedFiles(t *testing.T) {
 
 func Test_doApply(t *testing.T) {
 	defer os.Remove(filePath)
-	yamlString := createYaml()
+	yamlString := createDAppYaml()
 
 	bufResp := bytes.NewBufferString("")
 	fmt.Fprintf(bufResp, "filetest.yaml\n\nApplied:\nfiletest.yaml | dapp | v1\n")
@@ -272,7 +272,7 @@ func Test_getFilesFromFolder(t *testing.T) {
 func Test_applyValidFiles(t *testing.T) {
 	defer os.Remove(filePath)
 	tempFiles := []string{filePath}
-	yamlString := createYaml()
+	yamlString := createDAppYaml()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
 		filePath,
@@ -337,7 +337,7 @@ func Test_getOrderedFiles(t *testing.T) {
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
 		"app.yml",
-		[]byte(createYaml()),
+		[]byte(createDAppYaml()),
 		os.ModePerm,
 	)
 	ioutil.WriteFile(
@@ -391,7 +391,7 @@ func orderedContent() []applied {
 				Kind:       "dapp",
 				APIVersion: "v1",
 			},
-			content: []byte(createYaml()),
+			content: []byte(createDAppYaml()),
 		},
 		{
 			fileName: "ct.yml",
