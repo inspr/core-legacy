@@ -19,10 +19,10 @@ func (a *Alias) Get(context string, aliasKey string) (*meta.Alias, error) {
 	if a.fail != nil {
 		return nil, a.fail
 	}
-	query := fmt.Sprintf("%s", context)
-	alias, ok := a.alias[query]
+
+	alias, ok := a.alias[context]
 	if !ok {
-		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("alias %s not found", query)).Build()
+		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("alias %s not found", context)).Build()
 	}
 
 	return alias, nil
@@ -47,13 +47,13 @@ func (a *Alias) DeleteAlias(context string, aliasKey string) error {
 	if a.fail != nil {
 		return a.fail
 	}
-	query := fmt.Sprintf("%s", context)
-	_, ok := a.alias[query]
+
+	_, ok := a.alias[context]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", query)).Build()
+		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", context)).Build()
 	}
 
-	delete(a.alias, query)
+	delete(a.alias, context)
 	return nil
 }
 
@@ -62,11 +62,10 @@ func (a *Alias) UpdateAlias(context string, aliasKey string, alias *meta.Alias) 
 	if a.fail != nil {
 		return a.fail
 	}
-	query := fmt.Sprintf("%s", context)
-	_, ok := a.alias[query]
+	_, ok := a.alias[context]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", query)).Build()
+		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", context)).Build()
 	}
-	a.alias[query] = alias
+	a.alias[context] = alias
 	return nil
 }
