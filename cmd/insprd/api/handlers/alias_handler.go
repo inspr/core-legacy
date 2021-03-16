@@ -167,7 +167,7 @@ func (ah *AliasHandler) HandleDeleteAlias() rest.Handler {
 			return
 		}
 
-		changes, err := ah.Memory.Channels().GetTransactionChanges()
+		changes, err := ah.Memory.Alias().GetTransactionChanges()
 		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
