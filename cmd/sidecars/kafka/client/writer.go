@@ -38,7 +38,7 @@ func NewWriter(mock bool) (*Writer, error) {
 // WriteMessage receives a message and sends it to the topic defined by the given channel
 func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	outputChan := environment.GetOutputChannels()
-	if !environment.IsInOutputChannel(channel, outputChan) {
+	if !environment.IsInChannelBoundary(channel, outputChan) {
 		return kafka.NewError(kafka.ErrInvalidArg, "invalid output channel", false)
 	}
 
