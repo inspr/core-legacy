@@ -204,5 +204,4 @@ func (h *Handler) initReactions() {
 		updatedChannelTypes(h),
 		updatedAliases(h),
 	)
-
 }
