@@ -118,7 +118,7 @@ func isYaml(file string) bool {
 }
 
 func printAppliedFiles(appliedFiles []applied, out io.Writer) {
-	fmt.Fprint(out, "\nApplied: \n")
+	fmt.Fprint(out, "\nApplied:\n")
 	for _, file := range appliedFiles {
 		fmt.Fprint(out, file.fileName+" | "+file.component.Kind+" | "+file.component.APIVersion+"\n")
 	}
