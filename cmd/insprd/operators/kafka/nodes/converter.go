@@ -35,7 +35,6 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
 		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
 	}
-	no.memory.InitTransaction()
 	resolves, err := no.memory.Apps().ResolveBoundary(app)
 	if err != nil {
 		panic(err)
@@ -45,11 +44,10 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 		ch, _ := no.memory.Channels().Get(parent, chName)
 		ct, _ := no.memory.ChannelTypes().Get(parent, ch.Spec.Type)
-		env[boundary+"_SCHEMA"] = ct.Schema
+		env[resolved+"_SCHEMA"] = ct.Schema
 		env[boundary+"_RESOLVED"] = resolved
 		return boundary
 	})
-	no.memory.Cancel()
 	return env
 }
 

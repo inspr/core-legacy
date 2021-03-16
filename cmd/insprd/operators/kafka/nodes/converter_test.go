@@ -363,22 +363,25 @@ func Test_baseEnvironment(t *testing.T) {
 				"INSPR_ENV":               "environment",
 				"KAFKA_BOOTSTRAP_SERVERS": "bootstrap",
 				"KAFKA_AUTO_OFFSET_RESET": "earliest",
-				"channel1_SCHEMA":         "schema1",
-				"channel2_SCHEMA":         "schema2",
+				"parent.channel1_SCHEMA":  "schema1",
+				"parent.channel2_SCHEMA":  "schema2",
 				"channel1_RESOLVED":       "parent.channel1",
 				"channel2_RESOLVED":       "parent.channel2",
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		op := &NodeOperator{
 			memory:    mem,
 			clientSet: fake.NewSimpleClientset(),
 		}
 		t.Run(tt.name, func(t *testing.T) {
+			mem.InitTransaction()
 			if got := op.baseEnvironment(tt.args.app); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("baseEnvironment() = \n%v, want \n%v", got, tt.want)
 			}
+			mem.Cancel()
 		})
 	}
 }
