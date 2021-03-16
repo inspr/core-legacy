@@ -6,8 +6,6 @@ spec:
   channeltypes:
     ct1:
       schema: '{"type":"string"}'
-    ct2:
-      schema: "cli/test/schema_example.schema"
   channels:
     ch1:
       spec:

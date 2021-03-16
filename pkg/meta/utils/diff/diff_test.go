@@ -1185,17 +1185,6 @@ func TestChangelog_diff(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		{
-			name: "diff_output_test_want_error",
-			cl:   Changelog{},
-			args: args{
-				appOrig: &meta.App{Meta: meta.Metadata{Name: "abc"}},
-				appCurr: &meta.App{Meta: meta.Metadata{Name: "dbc"}},
-				ctx:     "",
-			},
-			want:    Changelog{},
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
