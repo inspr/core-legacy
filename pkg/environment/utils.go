@@ -8,13 +8,13 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
-// IsInBoundaryChannel - checks if a channel exists in the insprEnv.OutputChannels
+// IsInChannelBoundary - checks if a channel exists in the insprEnv.OutputChannels
 func IsInChannelBoundary(channel, outputChan string) bool {
 	channelsList := GetChannelBoundaryList(outputChan)
 	return utils.Includes(channelsList, channel)
 }
 
-// GetChannelList returns a string list with the channels in insprEnv.OutputChannels
+// GetChannelBoundaryList returns a string list with the channels in insprEnv.OutputChannels
 func GetChannelBoundaryList(channels string) []string {
 	if channels == "" {
 		return []string{}
