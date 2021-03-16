@@ -58,12 +58,12 @@ func deleteApps(_ context.Context, args []string) error {
 		return err
 	}
 
-	for idx := range args {
-		if !utils.IsValidScope(args[idx]) {
+	for _, arg := range args {
+		if !utils.IsValidScope(arg) {
 			fmt.Fprint(out, "invalid args\n")
 			return ierrors.NewError().Message("Invalid args").BadRequest().Build()
 		}
-		path, _ := utils.JoinScopes(scope, args[idx])
+		path, _ := utils.JoinScopes(scope, arg)
 
 		cl, err := client.Apps().Delete(context.Background(), path, cmd.InsprOptions.DryRun)
 		if err != nil {
@@ -84,8 +84,8 @@ func deleteChannels(_ context.Context, args []string) error {
 		return err
 	}
 
-	for idx := range args {
-		path, chName, err := cliutils.ProcessArg(args[idx], scope)
+	for _, arg := range args {
+		path, chName, err := cliutils.ProcessArg(arg, scope)
 		if err != nil {
 			return err
 		}
@@ -110,8 +110,8 @@ func deleteCTypes(_ context.Context, args []string) error {
 		return err
 	}
 
-	for idx := range args {
-		path, ctName, err := cliutils.ProcessArg(args[idx], scope)
+	for _, arg := range args {
+		path, ctName, err := cliutils.ProcessArg(arg, scope)
 		if err != nil {
 			return err
 		}
