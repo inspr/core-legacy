@@ -34,11 +34,6 @@ func validAppStructure(app, parentApp *meta.App) string {
 	validSubstructure = appWithoutNode || (len(app.Spec.Apps) == 0)
 	validChannels, msg := checkAndUpdateChannels(app)
 
-	boundariesExist := len(app.Spec.Boundary.Input) > 0 || len(app.Spec.Boundary.Output) > 0
-	if boundariesExist {
-		errDescription = errDescription + validBoundaries(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
-	}
-
 	if nameErr != nil {
 		errDescription = errDescription + "invalid dApp name;"
 	}
@@ -64,11 +59,14 @@ func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
 }
 
 func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
+
 	parentStr := getParentString(app, parentApp)
 
 	app.Meta.Parent = parentStr
 	parentApp.Spec.Apps[app.Meta.Name] = app
-
+	for _, child := range app.Spec.Apps {
+		amm.addAppInTree(child, app)
+	}
 	if !nodeIsEmpty(app.Spec.Node) {
 		app.Spec.Node.Meta.Parent = parentStr
 		app.Spec.Node.Meta.Name = app.Meta.Name
@@ -142,22 +140,6 @@ func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[
 	return ""
 }
 
-func (amm *AppMemoryManager) updateAppBoundary(app *meta.App, parentApp *meta.App) {
-	for _, childApp := range app.Spec.Apps {
-		amm.updateAppBoundary(childApp, app)
-	}
-	updateSingleBoundary(app.Meta.Name, app.Spec.Boundary, parentApp.Spec.Channels)
-}
-
-func updateSingleBoundary(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) {
-	appBoundary := utils.StringSliceUnion(bound.Input, bound.Output)
-	for _, chName := range appBoundary {
-		if !utils.Includes(parentChannels[chName].ConnectedApps, appName) {
-			parentChannels[chName].ConnectedApps = append(parentChannels[chName].ConnectedApps, appName)
-		}
-	}
-}
-
 func getParentApp(sonQuery string) (*meta.App, error) {
 	var parentQuery string
 	sonRef := strings.Split(sonQuery, ".")
@@ -181,13 +163,7 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 }
 
 func getParentString(app, parentApp *meta.App) string {
-	parentStr := ""
-	if parentApp.Meta.Parent != "" {
-		parentStr = fmt.Sprintf("%s.", parentApp.Meta.Parent)
-	}
-	if parentApp.Meta.Name != "" {
-		parentStr = fmt.Sprintf("%s%s", parentStr, parentApp.Meta.Name)
-	}
+	parentStr, _ := metautils.JoinScopes(parentApp.Meta.Parent, parentApp.Meta.Name)
 	return parentStr
 }
 
