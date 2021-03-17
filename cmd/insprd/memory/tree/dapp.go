@@ -95,13 +95,7 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 	if errParent != nil {
 		return errParent
 	}
-
-	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
-
-	for _, chName := range appBoundary {
-		parent.Spec.Channels[chName].ConnectedApps = utils.
-			Remove(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
-	}
+	amm.removeFromParentBoundary(app, parent)
 
 	delete(parent.Spec.Apps, app.Meta.Name)
 
@@ -134,12 +128,7 @@ func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
 		return appErr
 	}
 
-	appBoundary := utils.StringSliceUnion(currentApp.Spec.Boundary.Input, currentApp.Spec.Boundary.Output)
-
-	for _, chName := range appBoundary {
-		parent.Spec.Channels[chName].ConnectedApps = utils.
-			Remove(parent.Spec.Channels[chName].ConnectedApps, currentApp.Meta.Name)
-	}
+	amm.removeFromParentBoundary(app, parent)
 
 	delete(parent.Spec.Apps, currentApp.Meta.Name)
 
@@ -214,7 +203,8 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 			_, val, _ = metautils.RemoveLastPartInScope(val) //setup for direct resolve
 		}
 		if ch, ok := app.Spec.Channels[val]; ok { // resolve in channels (direct or through alias)
-			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, ch.Meta.Name) // if channel exists, resolve
+			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+			boundaries[key], _ = metautils.JoinScopes(scope, ch.Meta.Name) // if channel exists, resolve
 			delete(unresolved, key)
 			continue
 		}
@@ -238,4 +228,19 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 		return err
 	}
 	return amm.recursivelyResolve(parentApp, boundaries, unresolved)
+}
+
+func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
+
+	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+	resolution, _ := amm.ResolveBoundary(app)
+	for _, chName := range appBoundary {
+		resolved := resolution[chName]
+		_, chName, _ := metautils.RemoveLastPartInScope(resolved)
+		if _, ok := parent.Spec.Channels[chName]; ok {
+			parent.Spec.Channels[chName].ConnectedApps = utils.
+				Remove(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
+		}
+	}
+
 }

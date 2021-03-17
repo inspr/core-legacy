@@ -264,6 +264,9 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 }
 
 func TestNodeOperator_DeleteNode(t *testing.T) {
+	mem := tree.GetTreeMemory()
+	mem.InitTransaction()
+
 	type fields struct {
 		clientSet kubernetes.Interface
 	}
@@ -303,12 +306,14 @@ func TestNodeOperator_DeleteNode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			nop := &NodeOperator{
 				clientSet: tt.fields.clientSet,
+				memory:    mem,
 			}
 			if err := nop.DeleteNode(tt.args.ctx, tt.args.nodeContext, tt.args.nodeName); (err != nil) != tt.wantErr {
 				t.Errorf("NodeOperator.DeleteNode() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
+	mem.Cancel()
 }
 
 func TestNodeOperator_GetAllNodes(t *testing.T) {
@@ -387,49 +392,10 @@ func TestNodeOperator_GetAllNodes(t *testing.T) {
 	}
 }
 
-func Test_parseNodeName(t *testing.T) {
-	type args struct {
-		insprEnv string
-		context  string
-		name     string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			name: "Parse full name",
-			args: args{
-				insprEnv: "env",
-				context:  "ctx",
-				name:     "name",
-			},
-			want: "inspr-env-ctx-name",
-		},
-		{
-			name: "Parse partial name",
-			args: args{
-				insprEnv: "",
-				context:  "ctx",
-				name:     "name",
-			},
-			want: "inspr-ctx-name",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := parseNodeName(tt.args.insprEnv, tt.args.context, tt.args.name); got != tt.want {
-				t.Errorf("parseNodeName() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func mockDeployment() kubeApp.Deployment {
 	return kubeApp.Deployment{
 		ObjectMeta: kubeMeta.ObjectMeta{
-			Name:   "inspr-name.name-name",
+			Name:   "name-name-name",
 			Labels: map[string]string{"app": "name"},
 		},
 		Spec: kubeApp.DeploymentSpec{
@@ -451,7 +417,7 @@ func mockDeployment() kubeApp.Deployment {
 				Spec: kubeCore.PodSpec{
 					Volumes: []kubeCore.Volume{
 						{
-							Name: "inspr-name.name-name" + "-volume",
+							Name: "name-name-name" + "-volume",
 							VolumeSource: kubeCore.VolumeSource{
 								EmptyDir: &kubeCore.EmptyDirVolumeSource{
 									Medium: kubeCore.StorageMediumMemory,
@@ -461,7 +427,7 @@ func mockDeployment() kubeApp.Deployment {
 					},
 					Containers: []kubeCore.Container{
 						{
-							Name: "inspr-name.name-name",
+							Name: "name-name-name",
 							Ports: func() []kubeCore.ContainerPort {
 								return nil
 							}(),
@@ -477,12 +443,12 @@ func mockDeployment() kubeApp.Deployment {
 							},
 						},
 						{
-							Name:            "inspr-name.name-name" + "-sidecar",
+							Name:            "name-name-name" + "-sidecar",
 							Image:           "sidecar-image",
 							ImagePullPolicy: kubeCore.PullIfNotPresent,
 							VolumeMounts: []kubeCore.VolumeMount{
 								{
-									Name:      "inspr-name.name-name" + "-sidecar-volume",
+									Name:      "name-name-name" + "-volume",
 									MountPath: "/inspr",
 								},
 							},

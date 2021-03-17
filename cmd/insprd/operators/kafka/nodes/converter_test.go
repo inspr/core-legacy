@@ -66,7 +66,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 		"INSPR_APP_ID":          appID,
 	}
 
-	appDeployName := toDeploymentName(environment.GetInsprEnvironment(), &testApp)
+	appDeployName := toDeploymentName(&testApp)
 
 	type args struct {
 		app *meta.App
@@ -180,8 +180,7 @@ func Test_toDeploymentName(t *testing.T) {
 		},
 	}
 	type args struct {
-		filePath string
-		app      *meta.App
+		app *meta.App
 	}
 	tests := []struct {
 		name string
@@ -191,23 +190,24 @@ func Test_toDeploymentName(t *testing.T) {
 		{
 			name: "successful_need_replacement",
 			args: args{
-				filePath: "test",
-				app:      &testApp,
+				app: &testApp,
 			},
-			want: "inspr-test-parent-app1",
+			want: "parent-app1",
 		},
 		{
-			name: "removing_first_character_when_dot",
-			args: args{
-				filePath: "",
-				app:      &testApp,
-			},
-			want: "inspr-parent-app1",
+			name: "complex parent",
+			args: args{app: &meta.App{
+				Meta: meta.Metadata{
+					Name:   "app1",
+					Parent: "ggp.gp.p",
+				},
+			}},
+			want: "ggp-gp-p-app1",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := toDeploymentName(tt.args.filePath, tt.args.app); got != tt.want {
+			if got := toDeploymentName(tt.args.app); got != tt.want {
 				t.Errorf("toDeploymentName() = %v, want %v", got, tt.want)
 			}
 		})
@@ -328,7 +328,7 @@ func Test_baseEnvironment(t *testing.T) {
 				"INSPR_INPUT_CHANNELS":    "",
 				"INSPR_OUTPUT_CHANNELS":   "",
 				"INSPR_SIDECAR_IMAGE":     "sidecar",
-				"INSPR_APP_ID":            "inspr-environment-parent-app1",
+				"INSPR_APP_ID":            "parent-app1",
 				"INSPR_APP_CTX":           "parent",
 				"INSPR_ENV":               "environment",
 				"KAFKA_BOOTSTRAP_SERVERS": "bootstrap",
@@ -357,7 +357,7 @@ func Test_baseEnvironment(t *testing.T) {
 				"INSPR_INPUT_CHANNELS":    "channel1;channel2",
 				"INSPR_OUTPUT_CHANNELS":   "",
 				"INSPR_SIDECAR_IMAGE":     "sidecar",
-				"INSPR_APP_ID":            "inspr-environment-parent-app1",
+				"INSPR_APP_ID":            "parent-app1",
 				"INSPR_APP_CTX":           "parent",
 				"INSPR_ENV":               "environment",
 				"KAFKA_BOOTSTRAP_SERVERS": "bootstrap",

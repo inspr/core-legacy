@@ -50,4 +50,4 @@ affinity: {}
 kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
 kafkaBootstrap: kafka.default.svc:9092
 kafkaAutoOffsetReset: earliest
-insprAppsNamespace: default
+insprAppsNamespace: inspr-apps
