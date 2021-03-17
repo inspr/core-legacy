@@ -203,7 +203,8 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 			_, val, _ = metautils.RemoveLastPartInScope(val) //setup for direct resolve
 		}
 		if ch, ok := app.Spec.Channels[val]; ok { // resolve in channels (direct or through alias)
-			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, ch.Meta.Name) // if channel exists, resolve
+			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+			boundaries[key], _ = metautils.JoinScopes(scope, ch.Meta.Name) // if channel exists, resolve
 			delete(unresolved, key)
 			continue
 		}
