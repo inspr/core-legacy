@@ -555,6 +555,73 @@ func getMockApp() *meta.App {
 						},
 					},
 				},
+				"connectedApp": {
+					Meta: meta.Metadata{
+						Name: "connectedApp",
+					},
+					Spec: meta.AppSpec{
+						Apps: map[string]*meta.App{
+							"noAliasSon": {
+								Meta: meta.Metadata{
+									Name:   "noAliasSon",
+									Parent: "connectedApp",
+								},
+								Spec: meta.AppSpec{
+									Boundary: meta.AppBoundary{
+										Input: utils.StringArray{
+											"channel1",
+										},
+										Output: utils.StringArray{
+											"channel2",
+										},
+									},
+								},
+							},
+							"aliasSon": {
+								Meta: meta.Metadata{
+									Name:   "aliasSon",
+									Parent: "connectedApp",
+								},
+								Spec: meta.AppSpec{
+									Boundary: meta.AppBoundary{
+										Input: utils.StringArray{
+											"alias1",
+										},
+										Output: utils.StringArray{
+											"alias2S",
+										},
+									},
+								},
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{
+									Name: "channel1",
+								},
+								ConnectedApps: utils.StringArray{
+									"noAliasSon",
+								},
+							},
+							"channel2": {
+								Meta: meta.Metadata{
+									Name: "channel2",
+								},
+								ConnectedApps: utils.StringArray{
+									"noAliasSon",
+								},
+							},
+						},
+						Aliases: map[string]*meta.Alias{
+							"aliasSon.alias1": {
+								Target: "channel1",
+							},
+							"aliasSon.alias2": {
+								Target: "channel2",
+							},
+						},
+					},
+				},
 			},
 			Channels: map[string]*meta.Channel{
 				"ch1": {
@@ -2487,6 +2554,79 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AppMemoryManager.ResolveBoundary() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestAppMemoryManager_removeFromParentBoundary(t *testing.T) {
+	type args struct {
+		app    *meta.App
+		parent *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]*meta.Channel
+	}{
+		{
+			name: "no alias should remove",
+			args: args{
+				app:    getMockApp().Spec.Apps["connectedApp"].Spec.Apps["noAliasSon"],
+				parent: getMockApp().Spec.Apps["connectedApp"],
+			},
+			want: map[string]*meta.Channel{
+				"channel1": {
+					Meta: meta.Metadata{
+						Name: "channel1",
+					},
+				},
+				"channel2": {
+					Meta: meta.Metadata{
+						Name: "channel2",
+					},
+				},
+			},
+		},
+		{
+			name: "alias should not remove",
+			args: args{
+				app:    getMockApp().Spec.Apps["connectedApp"].Spec.Apps["aliasSon"],
+				parent: getMockApp().Spec.Apps["connectedApp"],
+			},
+			want: map[string]*meta.Channel{
+				"channel1": {
+					Meta: meta.Metadata{
+						Name: "channel1",
+					},
+					ConnectedApps: utils.StringArray{
+						"noAliasSon",
+					},
+				},
+				"channel2": {
+					Meta: meta.Metadata{
+						Name: "channel2",
+					},
+					ConnectedApps: utils.StringArray{
+						"noAliasSon",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			setTree(&MockManager{
+				MemoryManager: &MemoryManager{
+					root: getMockApp(),
+					tree: getMockApp(),
+				},
+			})
+			amm := GetTreeMemory().Apps().(*AppMemoryManager)
+			amm.removeFromParentBoundary(tt.args.app, tt.args.parent)
+			if !reflect.DeepEqual(tt.args.parent.Spec.Channels, tt.want) {
+				t.Errorf("removeFromParentBoundary() result =\n%#v, want\n%#v", tt.args.parent.Spec.Channels, tt.want)
+			}
+
 		})
 	}
 }
