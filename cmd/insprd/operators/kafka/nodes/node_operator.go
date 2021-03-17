@@ -2,14 +2,13 @@ package nodes
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"k8s.io/client-go/rest"
 
 	kubeApp "k8s.io/api/apps/v1"
@@ -34,8 +33,7 @@ func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
 // Otherwise, returns an error
 func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	kube := no.retrieveKube()
-	insprEnv := environment.GetInsprEnvironment()
-	nodeName := parseNodeName(insprEnv, app.Meta.Parent, app.Meta.Name)
+	nodeName := toDeploymentName(app)
 	dep, err := kube.Get(nodeName, metav1.GetOptions{})
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
@@ -90,7 +88,9 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
 	var deploy string
 	kube := no.retrieveKube()
-	deploy = parseNodeName(environment.GetInsprEnvironment(), nodeContext, nodeName)
+	scope, _ := utils.JoinScopes(nodeContext, nodeName)
+	app, _ := no.memory.Root().Apps().Get(scope)
+	deploy = toDeploymentName(app)
 	err := kube.Delete(deploy, &metav1.DeleteOptions{})
 
 	if err != nil {
@@ -109,16 +109,6 @@ func (no *NodeOperator) GetAllNodes() []meta.Node {
 		nodes = append(nodes, node)
 	}
 	return nodes
-}
-
-func parseNodeName(insprEnv string, context string, name string) string {
-	var s string
-	if insprEnv == "" {
-		s = fmt.Sprintf("inspr-%s-%s", context, name)
-	} else {
-		s = fmt.Sprintf("inspr-%s-%s-%s", insprEnv, context, name)
-	}
-	return s
 }
 
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration
