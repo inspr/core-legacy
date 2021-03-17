@@ -25,4 +25,6 @@ CURL_URL=$CURL_URL"-"$CLI_VERSION
 
 curl $CURL_URL -o inspr
 chmod +x inspr 
+echo 'Moving binary into /usr/local/bin, need sudo permission'
 sudo mv inspr /usr/local/bin
+echo 'Files moved to to /usr/local/bin'
