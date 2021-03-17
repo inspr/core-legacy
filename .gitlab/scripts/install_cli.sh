@@ -4,6 +4,7 @@ CLI_VERSION=$(curl -s https://storage.googleapis.com/inspr-cli/latest-version)
 CURL_URL="https://storage.googleapis.com/inspr-cli/${CLI_VERSION}/insprcli"
 
 OS_NAME=$(uname -o)
+echo 'Your operating system is '$OS_NAME
 if [[ $OS_NAME == 'GNU/Linux' ]]; then # windows
     CURL_URL=$CURL_URL"-linux"
 elif [[ $OS_NAME == 'Windows' ]]; then # linux
@@ -13,6 +14,7 @@ elif  [[ $OS_NAME == 'Darwin' ]]; then  # darwin
 fi
 
 ARCH=$(uname -i)
+echo 'Your computer architecture is '$ARCH
 if [[ $ARCH == x86_64* ]]; then # x64
     CURL_URL=$CURL_URL"-amd64"
 elif [[ $ARCH == i*86 ]]; then # x32
@@ -23,7 +25,7 @@ fi
 
 CURL_URL=$CURL_URL"-"$CLI_VERSION
 
-echo $CURL_URL
+echo 'Downloading the inspr cli binary'
 curl $CURL_URL -o /tmp/inspr
 
 ENCODING=utf-8
