@@ -23,8 +23,16 @@ fi
 
 CURL_URL=$CURL_URL"-"$CLI_VERSION
 
+echo $CURL_URL
 curl $CURL_URL -o inspr
-chmod +x inspr 
-echo 'Moving binary into /usr/local/bin, need sudo permission'
-sudo mv inspr /usr/local/bin
-echo 'Files moved to to /usr/local/bin'
+
+ENCODING=utf-8
+if iconv --from-code="$ENCODING" --to-code="$ENCODING" inspr > /dev/null 2>&1; then
+    echo "error, coudln't find the binary, in the url used"
+    echo $CURL_URL
+else    
+    chmod +x inspr 
+    echo 'Moving binary into /usr/local/bin, need sudo permission'
+    sudo mv inspr /usr/local/bin
+    echo 'Files moved to to /usr/local/bin'
+fi
