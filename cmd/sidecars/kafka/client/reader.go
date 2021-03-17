@@ -20,27 +20,28 @@ type Consumer interface {
 
 // Reader reads/commit messages from the channels defined in the env
 type Reader struct {
-	consumer    Consumer
+	// consumer    Consumer //deprecated
+	consumers   map[string]Consumer
 	lastMessage *kafka.Message
 }
 
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
-	kafkaEnv := GetEnvironment()
+	// kafkaEnv := GetEnvironment()
 
 	var reader Reader
 
-	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
-		"group.id":           globalEnv.GetInsprAppID(),
-		"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
-		"enable.auto.commit": false,
-	})
+	// newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
+	// 	"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
+	// 	"group.id":           globalEnv.GetInsprAppID(),
+	// 	"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
+	// 	"enable.auto.commit": false,
+	// })
 
-	if errKafkaConsumer != nil {
-		return nil, ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
-	}
-	reader.consumer = newConsumer
+	// if errKafkaConsumer != nil {
+	// 	return nil, ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
+	// }
+	// reader.consumer = newConsumer
 
 	channelsList := globalEnv.GetInputChannelList(globalEnv.GetInputChannels())
 	if len(channelsList) == 0 {
@@ -48,9 +49,10 @@ func NewReader() (*Reader, error) {
 	}
 
 	channelsAsTopics := utils.Map(channelsList, toTopic)
-
-	if err := reader.consumer.SubscribeTopics(channelsAsTopics, nil); err != nil {
-		return nil, err
+	for _, ch := range channelsAsTopics {
+		if err := reader.NewSingleChannelConsumer(ch); err != nil {
+			return nil, err
+		}
 	}
 	return &reader, nil
 }
@@ -59,9 +61,9 @@ func NewReader() (*Reader, error) {
 ReadMessage reads message by message. Returns channel the message belongs to,
 the message and an error if any occurred.
 */
-func (reader *Reader) ReadMessage() (models.BrokerData, error) {
+func (reader *Reader) ReadMessage(channel string) (models.BrokerData, error) {
 	for {
-		event := reader.consumer.Poll(pollTimeout)
+		event := reader.consumers[channel].Poll(pollTimeout)
 		switch ev := event.(type) {
 		case *kafka.Message:
 
@@ -95,8 +97,8 @@ func (reader *Reader) ReadMessage() (models.BrokerData, error) {
 }
 
 // CommitMessage commits the last message read by Reader
-func (reader *Reader) CommitMessage() error {
-	_, errCommit := reader.consumer.CommitMessage(reader.lastMessage)
+func (reader *Reader) CommitMessage(channel string) error {
+	_, errCommit := reader.consumers[channel].CommitMessage(reader.lastMessage)
 	if errCommit != nil {
 		return ierrors.
 			NewError().
@@ -110,9 +112,32 @@ func (reader *Reader) CommitMessage() error {
 
 // Close close the reader consumer
 func (reader *Reader) Close() error {
-	err := reader.consumer.Close()
-	if err != nil {
+	for _, consumer := range reader.consumers {
+		err := consumer.Close()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (reader *Reader) NewSingleChannelConsumer(channel string) error {
+	kafkaEnv := GetEnvironment()
+	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
+		"group.id":           globalEnv.GetInsprAppID(),
+		"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
+		"enable.auto.commit": false,
+	})
+	if errKafkaConsumer != nil {
+		return ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
+	}
+
+	newTopic := toTopic(channel)
+
+	if err := newConsumer.Subscribe(newTopic, nil); err != nil {
 		return err
 	}
+	reader.consumers[channel] = newConsumer
 	return nil
 }
