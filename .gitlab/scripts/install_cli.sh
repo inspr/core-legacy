@@ -1,7 +1,6 @@
 #!/bin/bash
 
 CLI_VERSION=$(curl -s https://storage.googleapis.com/inspr-cli/latest-version)
-
 CURL_URL="https://storage.googleapis.com/inspr-cli/${CLI_VERSION}/insprcli"
 
 OS_NAME=$(uname -o)

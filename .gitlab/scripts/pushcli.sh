@@ -11,5 +11,5 @@ gcloud config set project red-inspr
 
 gsutil rsync bin gs://inspr-cli/$VERSION
 
-cat $VERSION > latest-version
-gsutil rsync latest-version gs://inspr-cli/latest-version
+echo $VERSION > latest-version
+gsutil cp latest-version gs://inspr-cli/latest-version
