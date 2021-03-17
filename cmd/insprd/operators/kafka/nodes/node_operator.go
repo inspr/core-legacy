@@ -33,11 +33,13 @@ func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
 // Otherwise, returns an error
 func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	kube := no.retrieveKube()
-	nodeName := toDeploymentName(app)
-	dep, err := kube.Get(nodeName, metav1.GetOptions{})
+	deployName := toDeploymentName(app)
+
+	dep, err := kube.Get(deployName, metav1.GetOptions{})
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
 	}
+
 	node, err := toNode(dep)
 	if err != nil {
 		return &meta.Node{}, err
@@ -56,10 +58,12 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 	var deploy *kubeApp.Deployment
 	kube := no.retrieveKube()
 	deploy = no.dAppToDeployment(app)
+
 	dep, err := kube.Create(deploy)
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
 	}
+
 	node, err := toNode(dep)
 	if err != nil {
 		return &meta.Node{}, err
@@ -73,10 +77,12 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 	var deploy *kubeApp.Deployment
 	kube := no.retrieveKube()
 	deploy = no.dAppToDeployment(app)
+
 	dep, err := kube.Update(deploy)
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
 	}
+
 	node, err := toNode(dep)
 	if err != nil {
 		return &meta.Node{}, err
@@ -86,12 +92,14 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 
 // DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
 func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
-	var deploy string
+	var deployName string
 	kube := no.retrieveKube()
+
 	scope, _ := utils.JoinScopes(nodeContext, nodeName)
 	app, _ := no.memory.Root().Apps().Get(scope)
-	deploy = toDeploymentName(app)
-	err := kube.Delete(deploy, &metav1.DeleteOptions{})
+	deployName = toDeploymentName(app)
+
+	err := kube.Delete(deployName, &metav1.DeleteOptions{})
 
 	if err != nil {
 		return ierrors.NewError().Message(err.Error()).Build()
