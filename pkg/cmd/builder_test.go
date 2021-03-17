@@ -156,7 +156,7 @@ func Test_builder_NoArgs(t *testing.T) {
 		}
 		err = cmd.Args(cmd, []string{"extract arg"})
 		if err == nil {
-			t.Errorf("expected error and receiver nil")
+			t.Errorf("expected error and received nil")
 		}
 
 	})
@@ -178,6 +178,25 @@ func Test_builder_ExactArgs(t *testing.T) {
 	err = cmd.Args(cmd, []string{"valid", "extra"})
 	if err == nil {
 		t.Error("expected error and received nil")
+	}
+}
+
+func Test_builder_MinimumArgs(t *testing.T) {
+	cmd := NewCmd("").MinimumArgs(1, nil)
+
+	err := cmd.Args(cmd, []string{})
+	if err == nil {
+		t.Error("expected error and received nil")
+	}
+
+	err = cmd.Args(cmd, []string{"valid"})
+	if err != nil {
+		t.Errorf("expected nil and received %v", err)
+	}
+
+	err = cmd.Args(cmd, []string{"valid", "extra"})
+	if err != nil {
+		t.Errorf("expected nil and received %v", err)
 	}
 }
 
