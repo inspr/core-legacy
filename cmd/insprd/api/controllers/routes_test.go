@@ -62,6 +62,16 @@ func TestServer_initRoutes(t *testing.T) {
 			},
 		},
 		{
+			name: "alias",
+			want: [...]int{
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusMethodNotAllowed,
+			},
+		},
+		{
 			name: "wrong_route",
 			want: [...]int{
 				http.StatusNotFound,

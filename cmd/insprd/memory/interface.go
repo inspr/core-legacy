@@ -87,6 +87,7 @@ type GetInterface interface {
 	Apps() AppGetInterface
 	Channels() ChannelGetInterface
 	ChannelTypes() ChannelTypeGetInterface
+	Alias() AliasGetInterface
 }
 
 // TransactionInterface makes transactions on a Memory manager
