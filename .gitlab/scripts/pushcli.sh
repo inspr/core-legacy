@@ -13,4 +13,3 @@ gsutil rsync bin gs://inspr-cli/$VERSION
 
 echo $VERSION > latest-version
 gsutil cp latest-version gs://inspr-cli/latest-version
-gsutil cp install_cli.sh gs://inspr-cli/install_cli.sh
