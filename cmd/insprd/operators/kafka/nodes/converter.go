@@ -143,8 +143,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	}
 }
 
-// toDeployment - receives the context of an app and it's context
-// creates a unique deployment name to be used in the k8s deploy
+// toDeployment - creates the kubernetes deployment name from the app
 func toDeploymentName(app *meta.App) string {
 	var arr utils.StringArray
 	arr = strings.Split(app.Meta.Parent, ".")
@@ -173,8 +172,7 @@ func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 }
 
 func toNodeName(deployName string) (string, error) {
-	var strs utils.StringArray
-	strs = strings.Split(deployName, "-")
+	strs := strings.Split(deployName, "-")
 	return strs[len(strs)-1], nil
 }
 
