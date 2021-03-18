@@ -2,7 +2,7 @@
 This document gives a brief introduction to Inspr's main structures, on how they are arranged and how they interect with each other. Through the use of images and clear descriptions, this introduction will help you understand how and why your applications can be much more scalable and composable.
 
 ## What are dApps?  
-A dApp is the base without which none of the other structures would exist, and it contains all the other structures inside of it. That is to say, a dApp is the base structure of Inspr, and inside of it there can be created Nodes, Channels, Channel Types and even other dApps!  
+A dApp is the base without which none of the other structures would exist, it contains all other structures inside of it. That is to say, a dApp is the base structure of Inspr, and inside of it there can be created Nodes, Channels, Channel Types and even other dApps!  
 
 ![dapp](img/dapp-struct.jpg)  
 
