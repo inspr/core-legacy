@@ -8,7 +8,7 @@ A dApp is the base without which none of the other structures would exist, and i
 
 ### It is relevant to point out that:
 - All structures created by the user are (directly or not) inside of a **root dApp**;  
-- A dApp **can't** contain other dApps if it contains a Node, and vice versa;
+- A dApp **can't** contain other dApps if it is a Node, and vice versa;
 - Boundary defines by which Channels a dApp exchanges information with it's parent dApp;
 - The global dApps organization is a tree-like structure:  
 
@@ -22,7 +22,7 @@ A Node unique characteristics are defined by three structures set by the user wh
 - **Environment**: user-defined environment variables that can be accessed from within the Node;  
 
 **Nodes are created insite a Kubernetes cluster as Deployments.**  
-As described previously in "What are dApps?", a dApp that contains a Node can't have child dApps. This means that:
+As described previously in "What are dApps?", a dApp that is a Node can't have child dApps. This means that:
 1) A Node is a dApp that has a Node structure defined in it.
     - This implies that Nodes make use of all the structures defined within it's dApp (Channels, Channel Types, Boundaries and Aliases)
 2) In the tree-like organization, Nodes are always leaves.
