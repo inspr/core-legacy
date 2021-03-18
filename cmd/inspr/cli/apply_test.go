@@ -18,10 +18,37 @@ const (
 	filePath = "filetest.yaml"
 )
 
-func createYaml() string {
+func createDAppYaml() string {
 	comp := meta.Component{
-		Kind:       "app",
+		Kind:       "dapp",
 		APIVersion: "v1",
+	}
+	data, _ := yaml.Marshal(&comp)
+	return string(data)
+}
+
+func createChannelYaml() string {
+	comp := meta.Component{
+		Kind:       "channel",
+		APIVersion: "v1",
+	}
+	data, _ := yaml.Marshal(&comp)
+	return string(data)
+}
+
+func createChannelTypeYaml() string {
+	comp := meta.Component{
+		Kind:       "channeltype",
+		APIVersion: "v1",
+	}
+	data, _ := yaml.Marshal(&comp)
+	return string(data)
+}
+
+func createInvalidYaml() string {
+	comp := meta.Component{
+		Kind:       "none",
+		APIVersion: "",
 	}
 	data, _ := yaml.Marshal(&comp)
 	return string(data)
@@ -110,14 +137,14 @@ func Test_printAppliedFiles(t *testing.T) {
 			name: "Prints a valid file",
 			args: args{
 				[]applied{{
-					file: "aFile.yaml",
+					fileName: "aFile.yaml",
 					component: meta.Component{
 						Kind:       "randKind",
 						APIVersion: "v1",
 					},
 				}},
 			},
-			wantOut: "Applying: \naFile.yaml | randKind | v1\n",
+			wantOut: "\nApplied:\naFile.yaml | randKind | v1\n",
 		},
 	}
 	for _, tt := range tests {
@@ -133,10 +160,10 @@ func Test_printAppliedFiles(t *testing.T) {
 
 func Test_doApply(t *testing.T) {
 	defer os.Remove(filePath)
-	yamlString := createYaml()
+	yamlString := createDAppYaml()
 
 	bufResp := bytes.NewBufferString("")
-	fmt.Fprintf(bufResp, "Applying: \nfiletest.yaml | app | v1\n")
+	fmt.Fprintf(bufResp, "filetest.yaml\n\nApplied:\nfiletest.yaml | dapp | v1\n")
 	outResp, _ := ioutil.ReadAll(bufResp)
 
 	bufResp2 := bytes.NewBufferString("")
@@ -179,7 +206,7 @@ func Test_doApply(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			GetFactory().Subscribe(meta.Component{
 				APIVersion: "v1",
-				Kind:       "app",
+				Kind:       "dapp",
 			},
 				func(b []byte, out io.Writer) error {
 					return nil
@@ -195,7 +222,7 @@ func Test_doApply(t *testing.T) {
 			got, _ := ioutil.ReadAll(buf)
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("doApply() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf("doApply() = %v, want\n%v", string(got), string(tt.expectedOutput))
 			}
 		})
 	}
@@ -243,8 +270,9 @@ func Test_getFilesFromFolder(t *testing.T) {
 }
 
 func Test_applyValidFiles(t *testing.T) {
+	defer os.Remove(filePath)
 	tempFiles := []string{filePath}
-	yamlString := createYaml()
+	yamlString := createDAppYaml()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
 		filePath,
@@ -268,11 +296,12 @@ func Test_applyValidFiles(t *testing.T) {
 				files: tempFiles,
 			},
 			want: []applied{{
-				file: filePath,
+				fileName: filePath,
 				component: meta.Component{
-					Kind:       "app",
+					Kind:       "dapp",
 					APIVersion: "v1",
 				},
+				content: []byte(yamlString),
 			}},
 		},
 	}
@@ -281,7 +310,7 @@ func Test_applyValidFiles(t *testing.T) {
 			out := &bytes.Buffer{}
 			GetFactory().Subscribe(meta.Component{
 				APIVersion: "v1",
-				Kind:       "app",
+				Kind:       "dapp",
 			},
 				func(b []byte, out io.Writer) error {
 					ch := meta.Channel{}
@@ -296,5 +325,91 @@ func Test_applyValidFiles(t *testing.T) {
 			}
 		})
 	}
-	os.Remove(filePath)
+}
+
+func Test_getOrderedFiles(t *testing.T) {
+	defer os.Remove("app.yml")
+	defer os.Remove("ch.yml")
+	defer os.Remove("ct.yml")
+	defer os.Remove("invalid.yml")
+	tempFiles := []string{"app.yml", "invalid.yml",
+		"ch.yml", "ct.yml"}
+	// creates a file with the expected syntax
+	ioutil.WriteFile(
+		"app.yml",
+		[]byte(createDAppYaml()),
+		os.ModePerm,
+	)
+	ioutil.WriteFile(
+		"ch.yml",
+		[]byte(createChannelYaml()),
+		os.ModePerm,
+	)
+	ioutil.WriteFile(
+		"ct.yml",
+		[]byte(createChannelTypeYaml()),
+		os.ModePerm,
+	)
+	ioutil.WriteFile(
+		"invalid.yml",
+		[]byte(createInvalidYaml()),
+		os.ModePerm,
+	)
+
+	type args struct {
+		path  string
+		files []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []applied
+	}{
+		{
+			name: "Return ordered files",
+			args: args{
+				path:  ".",
+				files: tempFiles,
+			},
+			want: orderedContent(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getOrderedFiles(tt.args.path, tt.args.files); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getOrderedFiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func orderedContent() []applied {
+	ordered := []applied{
+		{
+			fileName: "app.yml",
+			component: meta.Component{
+				Kind:       "dapp",
+				APIVersion: "v1",
+			},
+			content: []byte(createDAppYaml()),
+		},
+		{
+			fileName: "ct.yml",
+			component: meta.Component{
+				Kind:       "channeltype",
+				APIVersion: "v1",
+			},
+			content: []byte(createChannelTypeYaml()),
+		},
+		{
+			fileName: "ch.yml",
+			component: meta.Component{
+				Kind:       "channel",
+				APIVersion: "v1",
+			},
+			content: []byte(createChannelYaml()),
+		},
+	}
+
+	return ordered
 }

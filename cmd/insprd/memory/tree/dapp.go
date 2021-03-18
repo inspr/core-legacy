@@ -34,7 +34,7 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query " + query).Build()
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
 
 	nxtApp := amm.root
 	if nxtApp != nil {
@@ -153,7 +153,7 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query " + query).Build()
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
 
 	nxtApp := amm.tree
 	if nxtApp != nil {

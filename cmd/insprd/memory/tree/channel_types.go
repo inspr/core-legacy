@@ -43,7 +43,10 @@ func (ctm *ChannelTypeMemoryManager) CreateChannelType(context string, ct *meta.
 
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
-		return err
+		newError := ierrors.NewError().InnerError(err).InvalidChannel().
+			Message("couldn't create channel type " + ct.Meta.Name + "\n" + err.Error()).
+			Build()
+		return newError
 	}
 
 	if parentApp.Spec.ChannelTypes == nil {

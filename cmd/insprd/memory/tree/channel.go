@@ -62,7 +62,9 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).InvalidChannel().Message("app for channel creation not found").Build()
+		newError := ierrors.NewError().InnerError(err).InvalidChannel().
+			Message("couldn't create channel " + ch.Meta.Name + "\n" + err.Error()).
+			Build()
 		return newError
 	}
 
