@@ -3,6 +3,7 @@ package utils
 import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 var exists = true
@@ -64,6 +65,20 @@ func MakeStrSet(obj interface{}) (StrSet, error) {
 
 	case StrSet:
 		value := obj.(StrSet)
+		for k := range value {
+			set[k] = exists
+		}
+		return set, nil
+
+	case utils.StringArray:
+		value := obj.(utils.StringArray)
+		for _, str := range value {
+			set[str] = exists
+		}
+		return set, nil
+
+	case map[string]string:
+		value := obj.(map[string]string)
 		for k := range value {
 			set[k] = exists
 		}
