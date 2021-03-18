@@ -8,7 +8,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
-var exists = true
+const exists = true
 
 //MApps is a string->App map
 type MApps map[string]*meta.App
