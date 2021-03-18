@@ -179,10 +179,7 @@ func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 	var orig string
 	var curr string
 
-	origSet, err := utils.MakeStrSet(boundOrig.Input)
-	if err != nil {
-		fmt.Println(err)
-	}
+	origSet, _ := utils.MakeStrSet(boundOrig.Input)
 	currSet, _ := utils.MakeStrSet(boundCurr.Input)
 
 	inputSet := utils.DisjunctSet(origSet, currSet)
