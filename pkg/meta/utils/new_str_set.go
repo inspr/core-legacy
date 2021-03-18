@@ -1,6 +1,26 @@
 package utils
 
-import "gitlab.inspr.dev/inspr/core/pkg/ierrors"
+import (
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/meta"
+)
+
+var exists = true
+
+//MApps is a string->App map
+type MApps map[string]*meta.App
+
+//MChannels is a string->channel map
+type MChannels map[string]*meta.Channel
+
+//MTypes is a string->ChannelType map
+type MTypes map[string]*meta.ChannelType
+
+//MStr is a string->string map
+type MStr map[string]string
+
+//StrSet implements a set of strings.
+type StrSet map[string]bool
 
 //MakeStrSet creates a StrSet from a supported type.
 func MakeStrSet(obj interface{}) (StrSet, error) {

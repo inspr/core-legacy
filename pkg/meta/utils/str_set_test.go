@@ -52,7 +52,8 @@ func TestStrSet_ArrAppendSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.set.ArrAppendSet(tt.args.strings)
+			argSet, _ := MakeStrSet(tt.args.strings)
+			tt.set.AppendSet(argSet)
 			aux := *tt.set
 			if !aux["set"] || !aux["indeed"] || !aux["its"] || !aux["a"] {
 				t.Errorf("ArrAppendSet() got %v", aux)
@@ -136,7 +137,8 @@ func TestStrSet_AppAppendSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.set.AppAppendSet(tt.args.apps)
+			argSet, _ := MakeStrSet(tt.args.apps)
+			tt.set.AppendSet(argSet)
 			aux := *tt.set
 			if !aux["app1"] || !aux["app2"] {
 				t.Errorf("AppAppendSet() got %v", aux)
@@ -250,7 +252,8 @@ func TestStrSet_ChsAppendSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.set.ChsAppendSet(tt.args.apps)
+			argSet, _ := MakeStrSet(tt.args.apps)
+			tt.set.AppendSet(argSet)
 			aux := *tt.set
 			if !aux["ch1"] || !aux["ch2"] {
 				t.Errorf("ChsAppendSet() got %v", aux)
@@ -364,7 +367,8 @@ func TestStrSet_TypesAppendSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.set.TypesAppendSet(tt.args.types)
+			argSet, _ := MakeStrSet(tt.args.types)
+			tt.set.AppendSet(argSet)
 			aux := *tt.set
 			if !aux["ct1"] || !aux["ct2"] {
 				t.Errorf("TypesAppendSet() got %v", aux)
@@ -478,7 +482,8 @@ func TestStrSet_StrAppendSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.set.StrAppendSet(tt.args.strings)
+			argSet, _ := MakeStrSet(tt.args.strings)
+			tt.set.AppendSet(argSet)
 			aux := *tt.set
 			if !aux["str1"] || !aux["str2"] {
 				t.Errorf("StrAppendSet() got %v", aux)
