@@ -521,3 +521,35 @@ func TestStrDisjuncSet(t *testing.T) {
 		})
 	}
 }
+
+func TestMakeStrSet(t *testing.T) {
+	type args struct {
+		obj interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    StrSet
+		wantErr bool
+	}{
+		{
+			name: "Type not supported - it should return an error",
+			args: args{
+				obj: 3,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := MakeStrSet(tt.args.obj)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MakeStrSet() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MakeStrSet() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
