@@ -48,6 +48,7 @@ func NewReader() (*Reader, error) {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
 
+	reader.consumers = make(map[string]Consumer)
 	channelsAsTopics := utils.Map(channelsList, toTopic)
 	for _, ch := range channelsAsTopics {
 		if err := reader.NewSingleChannelConsumer(ch); err != nil {
@@ -121,6 +122,7 @@ func (reader *Reader) Close() error {
 	return nil
 }
 
+//NewSingleChannelConsumer creates a consumer for a single Kafka channel on the reader's consumers map.
 func (reader *Reader) NewSingleChannelConsumer(channel string) error {
 	kafkaEnv := GetEnvironment()
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{

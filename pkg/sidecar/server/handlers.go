@@ -78,7 +78,7 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	brokerResp, err := ch.r.ReadMessage()
+	brokerResp, err := ch.r.ReadMessage(body.Channel)
 	if err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's ReadMessage returned an error")
 		rest.ERROR(w, insprError.Build())
@@ -106,7 +106,7 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if err := ch.r.CommitMessage(); err != nil {
+	if err := ch.r.CommitMessage(body.Channel); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's commitMessage failed")
 		rest.ERROR(w, insprError.Build())
 	}
