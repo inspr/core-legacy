@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func TestArrMakeSet(t *testing.T) {
@@ -538,6 +539,28 @@ func TestMakeStrSet(t *testing.T) {
 				obj: 3,
 			},
 			wantErr: true,
+		},
+		{
+			name: "string array type",
+			args: args{
+				obj: utils.StringArray{"Hello"},
+			},
+			wantErr: false,
+			want: StrSet{
+				"Hello": true,
+			},
+		},
+		{
+			name: "map of string to string type",
+			args: args{
+				obj: map[string]string{
+					"Hello": "World",
+				},
+			},
+			wantErr: false,
+			want: StrSet{
+				"Hello": true,
+			},
 		},
 	}
 	for _, tt := range tests {
