@@ -53,7 +53,6 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Me
 	}
 
 	var resp interface{}
-
 	err := c.client.Send(ctx, "/writeMessage", http.MethodPost, data, &resp)
 	return err
 }
@@ -67,12 +66,6 @@ func (c *Client) ReadMessage(
 	data := clientMessage{
 		Channel: channel,
 	}
-
-	// if reflect.ValueOf(message).Kind() != reflect.Struct {
-	// 	return ierrors.NewError().
-	// 		Message("message was not a struct").
-	// 		Build()
-	// }
 
 	err := c.client.Send(
 		ctx,
@@ -92,7 +85,6 @@ func (c *Client) CommitMessage(ctx context.Context, channel string) error {
 	}
 
 	var resp interface{}
-
 	err := c.client.Send(ctx, "/commit", http.MethodPost, data, &resp)
 
 	return err

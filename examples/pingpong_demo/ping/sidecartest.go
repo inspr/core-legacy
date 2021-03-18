@@ -30,6 +30,7 @@ func main() {
 			fmt.Println(err)
 			continue
 		}
+
 		fmt.Println("Mensagem lida: ")
 		fmt.Println(recMsg.Data)
 
