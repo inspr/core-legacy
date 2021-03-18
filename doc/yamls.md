@@ -1,5 +1,3 @@
-`{::options parse_block_html="true" /}`
-
 # Yamls Documentation
 
 
@@ -11,7 +9,7 @@ Something in **markdown**.
 
 ## DApps
 
-| <div style={width: 250px}>Field</div> | Meaning   |
+| Field | Meaning   |
 | --- | --- |
 | meta                                      | metadata of DApp      |
 | meta&rarr;name                             | defines DApp name |
@@ -58,13 +56,35 @@ Something in **markdown**.
 | Field                         | Meaning |
 | ---                           | ---     |
 | meta                          | metadata of Channel_Type     |
-| meta&rarr;name                 | channel_type_name   |
-| meta&rarr;reference            | url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own.     |
-| meta&rarr;parent               | It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.       |
-| meta&rarr;sha256               | tags images with their sha256 digest.     |
+| \|&rarr;name                 | channel_type_name   |
+| \|&rarr;reference            | url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own.     |
+| \|&rarr;parent               | It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.       |
+| \|&rarr;sha256               | tags images with their sha256 digest.     |
 | schema                        | defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`     |
 | connectedchannels             | Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon` |
-| connectedchannels&rarr;item_channel         | name of the channel currently using this type     |
+| \|&rarr;item_channel         | name of the channel currently using this type     |
+
+
+## Channel Type Structure
+
+
+Channel_Type:
+ - meta: <br>
+    metadata of Channel_Type
+    - name: <br>
+        channel_type_name
+    - reference: <br>
+        url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own. 
+    - parent:<br>
+        It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.
+    - sha256:<br>
+        tags images with their sha256 digest.
+ - schema: <br>
+    defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`
+ - connected: <br>
+    Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon`
+    - item_channel: <br>
+    name of the channel currently using this type
 
 
 
