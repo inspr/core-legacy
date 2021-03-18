@@ -7,9 +7,9 @@ A dApp is the base without which none of the other structures would exist, it co
 ![dapp](img/dapp-struct.jpg)  
 
 ### It is relevant to point out that:
-- All structures created by the user are (directly or not) inside of a **root dApp**;  
-- A dApp **can't** contain other dApps if it is a Node, and vice versa;
-- Boundary defines by which Channels a dApp exchanges information with it's parent dApp;
+- All structures created by the user are (directly or not) inside of a **root dApp**.  
+- A dApp **can't** contain other dApps if it is a Node, and vice versa.
+- Boundary defines by which Channels a dApp exchanges information with it's parent dApp.
 - The global dApps organization is a tree-like structure:  
 
 ![tree](img/dapp-tree.jpg)  
@@ -17,9 +17,9 @@ A dApp is the base without which none of the other structures would exist, it co
 ## What are Nodes?
 Nodes are central control structures that have unique characteristics and generate/process the information that is used throughout the Inspr environment.  
 A Node unique characteristics are defined by three structures set by the user when creating or updating a Node:
-- **Image**: references the **Docker Image** of the application that will be run in the Node;
-- **Replicas**: number of Node's replicas that will be created in the **k8s cluster**;
-- **Environment**: user-defined environment variables that can be accessed from within the Node;  
+- **Image**: references the **Docker Image** of the application that will be run in the Node.
+- **Replicas**: number of Node's replicas that will be created in the **k8s cluster**.
+- **Environment**: user-defined environment variables that can be accessed from within the Node.  
 
 **Nodes are created insite a Kubernetes cluster as Deployments.**  
 As described previously in "What are dApps?", a dApp that is a Node can't have child dApps. This means that:
@@ -35,8 +35,8 @@ A dApp/Node inputs and outputs are defined by it's Boundary. The Boundary, on th
 ![channel](img/chan-func.jpg)  
 
 Channels are created to receive and send a specific kind of information. This specification is defined by a **Channel's Type**, which is a reference to a Channel Type structure defined in the same context (in the same dApp) as the Channel. In other words:
-- A Channel only carries a specific kind of data (such as *int*, *string*, or an object defined by the user);
-- A Channel can't exist without a Channel Type;  
+- A Channel only carries a specific kind of data (such as *int*, *string*, or an object defined by the user).
+- A Channel can't exist without a Channel Type.  
 
 In a more detailed explanation, the cluster's structures communication is done through a [Message Broker](https://en.wikipedia.org/wiki/Message_broker) (such as Apache Kafka, RabbitMQ, etc.). So what a Channel really does is to define from which part of the broker (which Topic) a Node should read a message, or to which part it should write a message.  
 
