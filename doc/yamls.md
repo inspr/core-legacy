@@ -1,6 +1,12 @@
 # Yamls Documentation
 
+The creation of yaml files allows for the proper usage of the Inspr cli.
+
+The reason for this is that the file when written in a one of the formats described bellow it can be processed and applied to the cluster throught the `inspr apply -f <file_path>` or `inspr apply -k <files_dir>` commands.
+
 ## DApps
+
+### Definitions
 
 | Field | Meaning   |
 | --- | --- |
@@ -27,8 +33,36 @@
 | \|&rarr; \|&rarr; Input                   | List of channels that are used for the input of this DApp      |
 | \|&rarr; \|&rarr; Output                  | List of channels that are used for the output of this DApp      |    
 
+### yaml example
+```
+apiVersion: v1
+kind: dapp
+meta:
+  name: "generator"
+  reference: ""
+  parent: ""
+spec:
+  node:
+    meta:
+      name: "node-generator"
+      parent: "generator"
+    spec:
+      image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
+      replicas: 3
+      environment:
+        MODULE: 100
+  
+  boundary:
+    input:
+      - primes_ch2
+    output:
+      - primes_ch1
+      
+```
 
-## Channels -> Table example
+## Channels 
+
+### Definitions
 
 | Field                         | Meaning |
 | ---                           | ---     |
@@ -42,8 +76,25 @@
 | connectedapss                 |  List of app names that are using this channel, this is injected by the inspr daemon    |
 | \|&rarr; item_DApp            | name of the DApp currently using this channel     |
 
+### yaml example
+```
+apiVersion: "v1"
+kind: "channel"
+meta:
+  name: "primes_ch1"
+  reference: ""
+  Annotations: 
+    kafka.partition.number: "1"
+    kafka.replication.factor: "1"
+  parent: ""  
+spec:
+  type: "primes_ct1"
+  ```
 
-## Channel_Types -> list Example
+
+## Channel_Types 
+
+### Definitions
 
 | Field                         | Meaning |
 | ---                           | ---     |
@@ -57,9 +108,7 @@
 | \|&rarr;item_channel         | name of the channel currently using this type     |
 
 
-## Channel Type Structure
-
-
+### list definitions
 Channel_Type:
  - meta: 
     - name: channel_type_name
@@ -70,7 +119,133 @@ Channel_Type:
  - connected: Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon`
     - item_channel: name of the channel currently using this type
 
-
+### yaml example
+```
+apiVersion: "v1"
+kind: "channeltype"
+meta:
+  name: "primes_ct1"
+  reference: ""
+  parent: ""  
+schema: '{"type":"int"}'
+```
 
 ## General file
 
+### Definition
+
+The so called general file or composed file is nothing more than a yaml that congregates two or more definitions of one of the elements above. 
+
+For example an App that has a collection of other apps plus some definitions of channel_types and channels.
+
+### yaml example
+
+```
+apiVersion: v1
+kind: dapp
+meta:
+  name: "basic-example"
+  reference: ""
+  parent: ""
+  Annotations: 
+    kafka.partition.number: "3"
+    kafka.replication.factor: "3"
+spec:
+  channeltypes:
+    primes_ct1:
+      meta:
+        name: "primes_ct1"
+      schema: '{"type":"int"}'
+    primes_ct2:
+      meta:
+        name: "primes_ct2"
+      schema: '{"type":"int"}'
+
+  channels:
+    primes_ch1:
+      meta:
+        name: "primes_ch1"
+        reference: ""
+        Annotations: 
+          kafka.partition.number: "3"
+          kafka.replication.factor: "3"
+        parent: ""  
+      spec:
+        type: "primes_ct1"
+    primes_ch2:
+      meta:
+        name: "primes_ch2"
+        reference: ""
+        Annotations:     
+          kafka.partition.number: "3"
+          kafka.replication.factor: "3"
+        parent: ""  
+      spec:
+        type: "primes_ct2"
+        
+         
+  apps:
+    # number generators
+    generator:
+      meta:
+        name: "generator"
+      spec:
+        node:
+          meta:
+            name: "node-generator"
+            parent: "generator"
+          spec:
+            image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
+            replicas: 8
+            environment:
+              MODULE: 100
+        boundary:
+          input:
+            - primes_ch2
+          output:
+            - primes_ch1
+
+    # filters primes
+    filter: 
+      meta:
+        name: "filter-primes"
+        reference: ""
+        parent: ""
+      spec:
+        node:
+          meta:
+            name: "node-filter"
+            parent: "filter-primes"
+          spec:
+            image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
+            replicas: 2            
+
+        boundary:
+          input:
+            - primes_ch1
+          output:
+            - primes_ch2
+        
+        
+
+    # prints the filtered
+    printer: 
+      meta:
+        name: "printer-primes"
+        reference: ""
+        parent: ""
+      spec:        
+        node:
+          meta:
+            name: "node-printer"
+            parent: "printer"
+          spec:
+            image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
+            replicas: 2            
+        boundary:
+          input:
+            - primes_ch1
+            - primes_ch2
+          output:
+            - primes_ch2
+```
