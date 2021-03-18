@@ -13,7 +13,7 @@ const pollTimeout = 100
 type Consumer interface {
 	Poll(timeout int) (event kafka.Event)
 	SubscribeTopics(topics []string, rebalanceCb kafka.RebalanceCb) (err error)
-	CommitMessage(m *kafka.Message) ([]kafka.TopicPartition, error)
+	CommitMessage(m *kafka.Message) ([]kafka.TopicPartition, error) //deprecated
 	Commit() ([]kafka.TopicPartition, error)
 	Close() (err error)
 }

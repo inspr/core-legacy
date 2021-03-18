@@ -55,6 +55,14 @@ func (mc *MockConsumer) CommitMessage(m *kafka.Message) ([]kafka.TopicPartition,
 	return nil, nil
 }
 
+//Commit mock
+func (mc *MockConsumer) Commit() ([]kafka.TopicPartition, error) {
+	if mc.err {
+		return nil, kafka.NewError(kafka.ErrApplication, "", false)
+	}
+	return nil, nil
+}
+
 //Close mock
 func (mc *MockConsumer) Close() (err error) {
 	if mc.err {
