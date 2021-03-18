@@ -1,5 +1,5 @@
 # dApp Architecture Overview
-This document gives a brief introduction to Inspr's main structures, on how they are arranged and how they interect with eachother. Through the use of images and clear descriptions, this introduction will help you understand how and why your applications can be much more scalable and composable.
+This document gives a brief introduction to Inspr's main structures, on how they are arranged and how they interect with each other. Through the use of images and clear descriptions, this introduction will help you understand how and why your applications can be much more scalable and composable.
 
 ## What are dApps?  
 A dApp is the base without which none of the other structures would exist, and it contains all the other structures inside of it. That is to say, a dApp is the base structure of Inspr, and inside of it there can be created Nodes, Channels, Channel Types and even other dApps!  
@@ -29,7 +29,7 @@ As described previously in "What are dApps?", a dApp that is a Node can't have c
 
 
 ## What are Channels?  
-Channels are the structures that allow dApps and Nodes to exchange informations between eachother.  
+Channels are the structures that allow dApps and Nodes to exchange informations between each other.  
 A dApp/Node inputs and outputs are defined by it's Boundary. The Boundary, on the other hand, references a parent dApp's Channel (or Alias, which will be described ahead).
 
 ![channel](img/chan-func.jpg)  
@@ -49,7 +49,7 @@ Also, the kind of information that can go through a Channel is defined in it's C
 Generate Avro schema from a JSON [here](https://toolslick.com/generation/metadata/avro-schema-from-json).
 
 ## How is information passed between Nodes?
-As pointed out previously, an Inspr environment containing one or multiple dApps does nothing if there aren't any Nodes in it. Nodes are the structures which generate and/or process data. For that reason, it's important to understand how Nodes communicate with eachother.  
+As pointed out previously, an Inspr environment containing one or multiple dApps does nothing if there aren't any Nodes in it. Nodes are the structures which generate and/or process data. For that reason, it's important to understand how Nodes communicate with each other.  
 - In "What are Nodes?" it's explained that a Node is a dApp that has a Node structure defined in it. For that, a Node uses the Boundaries defined in it's context as input and/or output to communicate with other Nodes.
 - In "What are Channels?" it's shown that Channels point out to/from where informations should be read/wrote, informations which are genereted and processed by the Nodes.  
 
@@ -68,7 +68,7 @@ The overall communication in between Nodes can be seen as going up or down the t
 ![node-communication](img/node-comm.jpg)
 
 ## What are Aliases?
-As shown in the image above, Nodes communicate with eachother throught it's parent dApp Channels. This implies that the communication is one-layered only, because the parent dApp, by definition, isn't a Node and therefore isn't able to send or receive messages (it only defines where it's child Nodes can read and write from):
+As shown in the image above, Nodes communicate with each other throught it's parent dApp Channels. This implies that the communication is one-layered only, because the parent dApp, by definition, isn't a Node and therefore isn't able to send or receive messages (it only defines where it's child Nodes can read and write from):
 
 ![without-alias](img/no-alias.jpg)  
 
