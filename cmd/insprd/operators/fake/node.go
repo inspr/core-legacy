@@ -25,7 +25,6 @@ func NewNodeOperator(err error) operators.NodeOperatorInterface {
 
 // CreateNode mock
 func (o *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
-	fmt.Println(app.Meta.Parent, app.Meta.Name)
 
 	if o.err != nil {
 		return nil, o.err
@@ -63,13 +62,11 @@ func (o *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Nod
 
 // DeleteNode mock
 func (o *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
-	fmt.Println(nodeContext, nodeName)
 	if o.err != nil {
 		return o.err
 	}
 	_, ok := o.nodes[nodeContext+nodeName]
 	if !ok {
-		fmt.Println(o.nodes)
 		return ierrors.NewError().NotFound().Message(fmt.Sprintf("node %s not found", nodeContext+nodeName)).Build()
 	}
 	delete(o.nodes, nodeContext+nodeName)

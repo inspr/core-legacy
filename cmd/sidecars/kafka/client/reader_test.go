@@ -83,18 +83,18 @@ func TestReader_ReadMessage(t *testing.T) {
 			name: "It should read a message",
 			fields: fields{
 				consumers: map[string]Consumer{
-					"ch1": &MockConsumer{
+					"ch1_resolved": &MockConsumer{
 						err:           false,
 						pollMsg:       "Hello World!",
-						topic:         toTopic("ch1"),
+						topic:         messageChannel{channel: "ch1_resolved"}.toTopic(),
 						errCode:       0,
-						senderChannel: "ch1",
+						senderChannel: "ch1_resolved",
 					},
 				},
 				lastMessage: nil,
 			},
 			wantErr:       false,
-			uniqueChannel: "ch1",
+			uniqueChannel: "ch1_resolved",
 			want:          "ch1",
 			want1:         "Hello World!",
 		},
@@ -102,34 +102,34 @@ func TestReader_ReadMessage(t *testing.T) {
 			name: "It should return a message poll error",
 			fields: fields{
 				consumers: map[string]Consumer{
-					"ch1": &MockConsumer{
+					"ch1_resolved": &MockConsumer{
 						err:           true,
 						pollMsg:       "Hello World!",
-						topic:         toTopic("ch1"),
+						topic:         messageChannel{channel: "ch1_resolved"}.toTopic(),
 						errCode:       0,
-						senderChannel: "ch1",
+						senderChannel: "ch1_resolved",
 					},
 				},
 				lastMessage: nil,
 			},
-			uniqueChannel: "ch1",
+			uniqueChannel: "ch1_resolved",
 			wantErr:       true,
 		},
 		{
 			name: "It should return a decode error (sender channel invalid)",
 			fields: fields{
 				consumers: map[string]Consumer{
-					"ch1": &MockConsumer{
+					"ch1_resolved": &MockConsumer{
 						err:           false,
 						pollMsg:       "Hello World!",
-						topic:         toTopic("ch1"),
+						topic:         messageChannel{channel: "ch1_resolved"}.toTopic(),
 						errCode:       0,
 						senderChannel: "ch2",
 					},
 				},
 				lastMessage: nil,
 			},
-			uniqueChannel: "ch1",
+			uniqueChannel: "ch1_resolved",
 			wantErr:       true,
 		},
 	}

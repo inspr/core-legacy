@@ -148,7 +148,7 @@ func TestWriter_produceMessage(t *testing.T) {
 	}
 	type args struct {
 		message interface{}
-		channel string
+		channel messageChannel
 	}
 	tests := []struct {
 		name    string
@@ -163,7 +163,7 @@ func TestWriter_produceMessage(t *testing.T) {
 			},
 			args: args{
 				message: "testProducingMessage",
-				channel: "ch1",
+				channel: messageChannel{channel: "ch1_resolved"},
 			},
 			wantErr: false,
 		},
@@ -174,7 +174,7 @@ func TestWriter_produceMessage(t *testing.T) {
 			},
 			args: args{
 				message: "testProducingMessage",
-				channel: "invalid",
+				channel: messageChannel{channel: "invalid"},
 			},
 			wantErr: true,
 		},

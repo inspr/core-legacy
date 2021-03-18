@@ -5,7 +5,6 @@ import (
 	globalEnv "gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 const pollTimeout = 100
@@ -27,29 +26,17 @@ type Reader struct {
 
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
-	// kafkaEnv := GetEnvironment()
-
 	var reader Reader
-
-	// newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
-	// 	"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
-	// 	"group.id":           globalEnv.GetInsprAppID(),
-	// 	"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
-	// 	"enable.auto.commit": false,
-	// })
-
-	// if errKafkaConsumer != nil {
-	// 	return nil, ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
-	// }
-	// reader.consumer = newConsumer
-
-	channelsList := globalEnv.GetInputChannelList(globalEnv.GetInputChannels())
+	channelsList := globalEnv.GetResolvedInputChannelList(globalEnv.GetInputChannels())
 	if len(channelsList) == 0 {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
 
 	reader.consumers = make(map[string]Consumer)
-	channelsAsTopics := utils.Map(channelsList, toTopic)
+	channelsAsTopics := channelsList.Map(func(s string) string {
+		ch, _ := fromResolvedChannel(s)
+		return ch.toTopic()
+	})
 	for _, ch := range channelsAsTopics {
 		if err := reader.NewSingleChannelConsumer(ch); err != nil {
 			return nil, err
@@ -68,16 +55,17 @@ func (reader *Reader) ReadMessage(channel string) (models.BrokerData, error) {
 		switch ev := event.(type) {
 		case *kafka.Message:
 
-			channel := *ev.TopicPartition.Topic
+			topic := *ev.TopicPartition.Topic
+			channel := fromTopic(topic)
 
 			// Decoding Message
-			message, errDecode := decode(ev.Value, fromTopic(channel).channel)
+			message, errDecode := channel.decode(ev.Value)
 			if errDecode != nil {
 				return models.BrokerData{}, errDecode
 			}
 
 			reader.lastMessage = ev
-			channelName := fromTopic(channel).channel
+			channelName := channel.channel
 
 			return models.BrokerData{Message: models.Message{Data: message}, Channel: channelName}, nil
 
@@ -135,7 +123,7 @@ func (reader *Reader) NewSingleChannelConsumer(channel string) error {
 		return ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
 	}
 
-	newTopic := toTopic(channel)
+	newTopic := messageChannel{channel: channel}.toTopic()
 
 	if err := newConsumer.Subscribe(newTopic, nil); err != nil {
 		return err

@@ -76,4 +76,26 @@ func (s *Server) initRoutes() {
 			return
 		}
 	})
+
+	aliasHandler := h.NewAliasHandler()
+	s.Mux.HandleFunc("/alias", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+
+		case http.MethodGet:
+			aliasHandler.HandleGet().JSON().Recover()(w, r)
+
+		case http.MethodPost:
+			aliasHandler.HandleCreateAlias().JSON().Recover()(w, r)
+
+		case http.MethodPut:
+			aliasHandler.HandleUpdateAlias().JSON().Recover()(w, r)
+
+		case http.MethodDelete:
+			aliasHandler.HandleDeleteAlias().JSON().Recover()(w, r)
+
+		default:
+			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+	})
 }

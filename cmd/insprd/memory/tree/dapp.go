@@ -1,11 +1,13 @@
 package tree
 
 import (
+	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -32,7 +34,7 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query " + query).Build()
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
 
 	nxtApp := amm.root
 	if nxtApp != nil {
@@ -66,6 +68,11 @@ func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
 		return appErr
 	}
 	amm.addAppInTree(app, parentApp)
+	appErr = amm.recursiveBoundaryValidation(app)
+	if appErr != nil {
+		return appErr
+	}
+	amm.connectAppsBoundaries(app)
 	return nil
 }
 
@@ -88,13 +95,7 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 	if errParent != nil {
 		return errParent
 	}
-
-	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
-
-	for _, chName := range appBoundary {
-		parent.Spec.Channels[chName].ConnectedApps = utils.
-			Remove(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
-	}
+	amm.removeFromParentBoundary(app, parent)
 
 	delete(parent.Spec.Apps, app.Meta.Name)
 
@@ -127,12 +128,7 @@ func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
 		return appErr
 	}
 
-	appBoundary := utils.StringSliceUnion(currentApp.Spec.Boundary.Input, currentApp.Spec.Boundary.Output)
-
-	for _, chName := range appBoundary {
-		parent.Spec.Channels[chName].ConnectedApps = utils.
-			Remove(parent.Spec.Channels[chName].ConnectedApps, currentApp.Meta.Name)
-	}
+	amm.removeFromParentBoundary(app, parent)
 
 	delete(parent.Spec.Apps, currentApp.Meta.Name)
 
@@ -157,7 +153,7 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query " + query).Build()
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
 
 	nxtApp := amm.tree
 	if nxtApp != nil {
@@ -171,4 +167,80 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	}
 
 	return nil, err
+}
+
+//ResolveBoundary recursive method that resolves connections for app boundaries
+func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
+	boundaries := make(map[string]string)
+	unresolved := metautils.StrSet{}
+	for _, bound := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
+		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
+		unresolved.AppendSet(bound)
+	}
+	parentApp, err := amm.MemoryManager.Apps().Get(app.Meta.Parent)
+	if err != nil {
+		return nil, err
+	}
+	err = amm.recursivelyResolve(parentApp, boundaries, unresolved)
+	if err != nil {
+		return nil, err
+	}
+	return boundaries, nil
+}
+
+func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[string]string, unresolved metautils.StrSet) error {
+	merr := ierrors.MultiError{
+		Errors: []error{},
+	}
+	if len(unresolved) == 0 {
+		return nil
+	}
+	for key := range unresolved {
+		val := boundaries[key]
+		if alias, ok := app.Spec.Aliases[val]; ok { //resolve in aliases
+			val = alias.Target //setup for alias resolve
+		} else {
+			_, val, _ = metautils.RemoveLastPartInScope(val) //setup for direct resolve
+		}
+		if ch, ok := app.Spec.Channels[val]; ok { // resolve in channels (direct or through alias)
+			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+			boundaries[key], _ = metautils.JoinScopes(scope, ch.Meta.Name) // if channel exists, resolve
+			delete(unresolved, key)
+			continue
+		}
+		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val) { //resolve in boundaries
+			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, val) // if boundary exists, setup to resolve in parernt
+			continue
+		}
+		merr.Add(ierrors.NewError().Message("invalid boundary: %s invalid", key).Build())
+		delete(unresolved, key)
+
+	}
+	if !merr.Empty() {
+		// throwing erros for boundaries couldn't be resolved because of some invalid boundary
+		for key := range unresolved {
+			merr.Add(ierrors.NewError().Message("invalid boundary: %s unresolved", key).Build())
+		}
+		return &merr
+	}
+	parentApp, err := amm.MemoryManager.Apps().Get(app.Meta.Parent)
+	if err != nil {
+		return err
+	}
+	return amm.recursivelyResolve(parentApp, boundaries, unresolved)
+}
+
+func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
+
+	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+	resolution, _ := amm.ResolveBoundary(app)
+	for _, chName := range appBoundary {
+		resolved := resolution[chName]
+		_, chName, _ := metautils.RemoveLastPartInScope(resolved)
+		if _, ok := parent.Spec.Channels[chName]; ok {
+			parent.Spec.Channels[chName].ConnectedApps = utils.
+				Remove(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
+		}
+	}
+
 }

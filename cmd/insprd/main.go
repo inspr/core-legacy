@@ -19,13 +19,13 @@ func main() {
 	if _, ok := os.LookupEnv("DEBUG"); ok {
 		memoryManager = fake.MockMemoryManager(nil)
 		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator()
+		operator, err = kafka.NewKafkaOperator(memoryManager)
 		if err != nil {
 			panic(err)
 		}
 	} else {
 		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator()
+		operator, err = kafka.NewKafkaOperator(memoryManager)
 		if err != nil {
 			panic(err)
 		}
