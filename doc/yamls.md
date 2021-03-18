@@ -10,6 +10,8 @@ The reason for this is that the file when written in a one of the formats descri
 
 | Field | Meaning   |
 | --- | --- |
+| apiVersion                    | specify what version of the api to use, for example `"v1"`     |
+| kind                          | specifies what kind of structure the file is, in this case it would be `"dapp"`     |
 | meta                                      | metadata of DApp      |
 | \|&rarr;name                             | defines DApp name |
 | \|&rarr;reference                        | url to the inspr repository containing a already constructed DApp, it will load from this address the image containing all the necessary information for the creation of this DApp in your cluster.      |
@@ -66,6 +68,8 @@ spec:
 
 | Field                         | Meaning |
 | ---                           | ---     |
+| apiVersion                    | specify what version of the api to use, for example `"v1"`     |
+| kind                          | specifies what kind of structure the file is, in this case it would be `"channel"`     |
 | meta                          | metadata of Channel     |
 | \|&rarr; name                 | defines the Channel name     |
 | \|&rarr; reference            | url reference to the channel definition in the inspr repository, there are already well defined channel that can be used instead of defining your own.     |
@@ -98,8 +102,10 @@ spec:
 
 | Field                         | Meaning |
 | ---                           | ---     |
+| apiVersion                    | specify what version of the api to use, for example `"v1"`     |
+| kind                          | specifies what kind of structure the file is, in this case it would be `"channeltype"`     |
 | meta                          | metadata of Channel_Type     |
-| \|&rarr;name                 | channel_type_name   |
+| \|&rarr;name                  | channel_type_name   |
 | \|&rarr;reference            | url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own.     |
 | \|&rarr;parent               | It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.       |
 | \|&rarr;sha256               | tags images with their sha256 digest.     |
@@ -110,6 +116,8 @@ spec:
 
 ### list definitions
 Channel_Type:
+ - apiVersion: specify what version of the api to use, for example `"v1"`
+ - kind: specifies what kind of structure the file is, in this case it would be `"dapp"`
  - meta: 
     - name: channel_type_name
     - reference: url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own. 
