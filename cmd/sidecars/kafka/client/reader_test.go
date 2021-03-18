@@ -95,7 +95,7 @@ func TestReader_ReadMessage(t *testing.T) {
 			},
 			wantErr:       false,
 			uniqueChannel: "ch1_resolved",
-			want:          "ch1",
+			want:          "ch1_resolved",
 			want1:         "Hello World!",
 		},
 		{
