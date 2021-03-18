@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"reflect"
+
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
@@ -85,9 +87,10 @@ func MakeStrSet(obj interface{}) (StrSet, error) {
 		return set, nil
 
 	default:
+		objType := reflect.TypeOf(obj)
 		return nil, ierrors.NewError().
 			InternalServer().
-			Message("error while making set: type not supported").
+			Message("error while making set: '" + objType.Name() + "' type not supported").
 			Build()
 	}
 }
