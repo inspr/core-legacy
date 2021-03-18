@@ -147,6 +147,9 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 func toDeploymentName(app *meta.App) string {
 	var arr utils.StringArray
 	arr = strings.Split(app.Meta.Parent, ".")
+	if arr[0] == "" {
+		arr = utils.StringArray{}
+	}
 	arr = append(arr, app.Meta.Name)
 	return arr.Join("-")
 }

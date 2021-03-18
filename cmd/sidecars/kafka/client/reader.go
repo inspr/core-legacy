@@ -27,18 +27,16 @@ type Reader struct {
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
 	var reader Reader
-	channelsList := globalEnv.GetResolvedInputChannelList(globalEnv.GetInputChannels())
-	if len(channelsList) == 0 {
+	channelsList := globalEnv.GetInputChannelList(globalEnv.GetInputChannels())
+	resolvedChList := globalEnv.GetResolvedInputChannelList(globalEnv.GetInputChannels())
+	if len(resolvedChList) == 0 {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
 
 	reader.consumers = make(map[string]Consumer)
-	channelsAsTopics := channelsList.Map(func(s string) string {
-		ch, _ := fromResolvedChannel(s)
-		return ch.toTopic()
-	})
-	for _, ch := range channelsAsTopics {
-		if err := reader.NewSingleChannelConsumer(ch); err != nil {
+
+	for idx, ch := range channelsList {
+		if err := reader.NewSingleChannelConsumer(ch, resolvedChList[idx]); err != nil {
 			return nil, err
 		}
 	}
@@ -111,7 +109,7 @@ func (reader *Reader) Close() error {
 }
 
 //NewSingleChannelConsumer creates a consumer for a single Kafka channel on the reader's consumers map.
-func (reader *Reader) NewSingleChannelConsumer(channel string) error {
+func (reader *Reader) NewSingleChannelConsumer(channel, resolved string) error {
 	kafkaEnv := GetEnvironment()
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
@@ -123,7 +121,7 @@ func (reader *Reader) NewSingleChannelConsumer(channel string) error {
 		return ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
 	}
 
-	newTopic := messageChannel{channel: channel}.toTopic()
+	newTopic := messageChannel{channel: resolved}.toTopic()
 
 	if err := newConsumer.Subscribe(newTopic, nil); err != nil {
 		return err
