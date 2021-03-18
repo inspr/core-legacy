@@ -16,7 +16,7 @@ A dApp is the base without which none of the other structures would exist, it co
 
 ## What are Nodes?
 Nodes are central control structures that have unique characteristics and generate/process the information that is used throughout the Inspr environment.  
-A Node unique characteristics are defined by three structures set by the user when creating or updating a Node:
+The unique characteristics of a Node are defined by three structures set by the user when creating or updating a Node:
 - **Image**: references the **Docker Image** of the application that will be run in the Node.
 - **Replicas**: number of Node's replicas that will be created in the **k8s cluster**.
 - **Environment**: user-defined environment variables that can be accessed from within the Node.  
