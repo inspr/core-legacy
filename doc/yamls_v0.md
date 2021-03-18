@@ -5,21 +5,21 @@
 
 | Field                     | Meaning   |
 | ---                       | ---       |
-|
 | meta                      | metadata of DApp      |
 | \|&rarr; name             | defines DApp name |
 | \|&rarr; reference        | url to the inspr repository containing a already constructed DApp, it will load from this address the image containing all the necessary information for the creation of this DApp in your cluster.      |
 | \|&rarr; parent           | defines DApp context in relation to the clust for example `*.app1.app2` would mean that this app is located on the path `root->app1->app2->app-name`. It is injected by the inspr daemon.    |
 | \|&rarr; sha256           | tags images with their sha256 digest.     |
-|
 | spec                      | specification of DApp      |
 | \|&rarr; Node             |       |
 | \|&rarr; \|&rarr; Meta    |       |
 | \|&rarr; \|&rarr; Spec    |       |
-| \|&rarr; Apss             |       |    
+| \|&rarr; Apps             |       |    
 | \|&rarr; Channels         |       |    
 | \|&rarr; ChannelTypes     |       |    
-| \|&rarr; Boundary         |       |    
+| \|&rarr; Boundary         |       |
+| \|&rarr; \|&rarr; Input   |       |
+| \|&rarr; \|&rarr; Output  |       |    
 
 
 
