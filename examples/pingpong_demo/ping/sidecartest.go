@@ -24,7 +24,8 @@ func main() {
 			continue
 		}
 
-		recMsg, err := client.ReadMessage(ctx, "ch2")
+		var recMsg models.Message
+		err := client.ReadMessage(ctx, "ch2", &recMsg)
 		if err != nil {
 			fmt.Println(err)
 			continue

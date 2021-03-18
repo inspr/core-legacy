@@ -28,7 +28,8 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			msg, err := client.ReadMessage(context.Background(), inputChannel)
+			var msg models.Message
+			err := client.ReadMessage(context.Background(), inputChannel, &msg)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
@@ -41,9 +42,13 @@ func main() {
 			}
 
 			if big.NewInt(int64(number)).ProbablyPrime(0) {
-				client.WriteMessage(context.Background(), outputChannel, models.Message{
-					Data: number,
-				})
+				client.WriteMessage(
+					context.Background(),
+					outputChannel,
+					models.Message{
+						Data: number,
+					},
+				)
 			}
 		}
 	}

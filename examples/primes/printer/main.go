@@ -7,6 +7,7 @@ import (
 	"time"
 
 	dappclient "gitlab.inspr.dev/inspr/core/pkg/client"
+	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
 
 func main() {
@@ -21,7 +22,8 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			message, err := c.ReadMessage(ctx, chName)
+			var message models.Message
+			err := c.ReadMessage(ctx, chName, &message)
 			if err != nil {
 				log.Println(err.Error())
 			}

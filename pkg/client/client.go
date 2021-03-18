@@ -59,15 +59,30 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Me
 }
 
 // ReadMessage receives a channel and sends it in a request to the sidecar server
-func (c *Client) ReadMessage(ctx context.Context, channel string) (models.Message, error) {
+func (c *Client) ReadMessage(
+	ctx context.Context,
+	channel string,
+	message interface{},
+) error {
 	data := clientMessage{
 		Channel: channel,
 	}
 
-	var msg models.BrokerData
+	// if reflect.ValueOf(message).Kind() != reflect.Struct {
+	// 	return ierrors.NewError().
+	// 		Message("message was not a struct").
+	// 		Build()
+	// }
 
-	err := c.client.Send(ctx, "/readMessage", http.MethodPost, data, &msg)
-	return msg.Message, err
+	err := c.client.Send(
+		ctx,
+		"/readMessage",
+		http.MethodPost,
+		data,
+		&message,
+	)
+
+	return err
 }
 
 // CommitMessage receives a channel and sends it in a request to the sidecar server
