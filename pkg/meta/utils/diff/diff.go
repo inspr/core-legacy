@@ -273,8 +273,12 @@ func (change *Change) diffEnv(from utils.EnvironmentMap, to utils.EnvironmentMap
 func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 	var orig string
 	var curr string
-	inputSet := metautils.ArrDisjuncSet(boundOrig.Input, boundCurr.Input)
-	inputOrig := metautils.ArrMakeSet(boundOrig.Input)
+
+	origSet, _ := utils.MakeStrSet(boundOrig.Input)
+	currSet, _ := utils.MakeStrSet(boundCurr.Input)
+
+	inputSet := utils.DisjunctSet(origSet, currSet)
+	inputOrig, _ := utils.MakeStrSet(boundOrig.Input)
 	for k := range inputSet {
 		var op Operation
 		orig = "<nil>"
@@ -301,8 +305,11 @@ func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 		change.Operation |= op
 	}
 
-	outputSet := metautils.ArrDisjuncSet(boundOrig.Output, boundCurr.Output)
-	outputOrig := metautils.ArrMakeSet(boundOrig.Output)
+	origSetOut, _ := utils.MakeStrSet(boundOrig.Output)
+	currSetOut, _ := utils.MakeStrSet(boundCurr.Output)
+
+	outputSet := utils.DisjunctSet(origSetOut, currSetOut)
+	outputOrig, _ := utils.MakeStrSet(boundOrig.Output)
 	for k := range outputSet {
 		var op Operation
 		orig = "<nil>"
@@ -329,8 +336,11 @@ func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 	}
 }
 
-func (change *Change) diffApps(from, to metautils.MApps) {
-	set := metautils.AppDisjuncSet(from, to)
+func (change *Change) diffApps(from, to utils.MApps) {
+	fromSet, _ := utils.MakeStrSet(from)
+	toSet, _ := utils.MakeStrSet(to)
+
+	set := utils.DisjunctSet(fromSet, toSet)
 
 	for k := range set {
 		var op Operation
@@ -361,7 +371,7 @@ func (change *Change) diffApps(from, to metautils.MApps) {
 		change.Operation |= op
 	}
 
-	intersection := metautils.AppIntersecSet(from, to)
+	intersection := utils.IntersectSet(fromSet, toSet)
 
 	for app := range intersection {
 		fromApp := from[app]
@@ -373,8 +383,11 @@ func (change *Change) diffApps(from, to metautils.MApps) {
 
 }
 
-func (change *Change) diffChannels(from, to metautils.MChannels) error {
-	disjunction := metautils.ChsDisjuncSet(from, to)
+func (change *Change) diffChannels(from, to utils.MChannels) error {
+	fromSet, _ := utils.MakeStrSet(from)
+	toSet, _ := utils.MakeStrSet(to)
+
+	disjunction := utils.DisjunctSet(fromSet, toSet)
 
 	for ch := range disjunction {
 		_, orig := from[ch]
@@ -401,7 +414,7 @@ func (change *Change) diffChannels(from, to metautils.MChannels) error {
 		change.Operation |= op
 	}
 
-	intersection := metautils.ChsIntersecSet(from, to)
+	intersection := utils.IntersectSet(fromSet, toSet)
 
 	for ch := range intersection {
 		fromCh := from[ch]
@@ -428,8 +441,11 @@ func (change *Change) diffChannels(from, to metautils.MChannels) error {
 	return nil
 }
 
-func (change *Change) diffChannelTypes(from, to metautils.MTypes) error {
-	disjunction := metautils.TypesDisjuncSet(from, to)
+func (change *Change) diffChannelTypes(from, to utils.MTypes) error {
+	fromSet, _ := utils.MakeStrSet(from)
+	toSet, _ := utils.MakeStrSet(to)
+
+	disjunction := utils.DisjunctSet(fromSet, toSet)
 
 	for ct := range disjunction {
 		_, orig := from[ct]
@@ -458,7 +474,7 @@ func (change *Change) diffChannelTypes(from, to metautils.MTypes) error {
 		change.Operation |= op
 	}
 
-	intersection := metautils.TypesIntersecSet(from, to)
+	intersection := utils.IntersectSet(fromSet, toSet)
 
 	for ct := range intersection {
 		fromCT := from[ct]
@@ -543,7 +559,10 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 		change.Kind |= MetaKind | parentKind
 	}
 
-	set := metautils.StrDisjuncSet(from.Annotations, to.Annotations)
+	fromSet, _ := utils.MakeStrSet(from.Annotations)
+	toSet, _ := utils.MakeStrSet(to.Annotations)
+
+	set := utils.DisjunctSet(fromSet, toSet)
 
 	for k := range set {
 		var op Operation
