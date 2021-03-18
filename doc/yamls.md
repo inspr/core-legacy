@@ -1,25 +1,18 @@
 # Yamls Documentation
 
-
-Something in **markdown**.
-
-<p>Then an HTML tag with crazy **markup** _all over_ the place!</p>
-
-
-
 ## DApps
 
 | Field | Meaning   |
 | --- | --- |
 | meta                                      | metadata of DApp      |
-| meta&rarr;name                             | defines DApp name |
-| meta&rarr;reference                        | url to the inspr repository containing a already constructed DApp, it will load from this address the image containing all the necessary information for the creation of this DApp in your cluster.      |
-| meta&rarr;parent                           | defines DApp context in relation to the clust for example `*.app1.app2` would mean that this app is located on the path `root->app1->app2->app-name`. It is injected by the inspr daemon.    |
-| meta&rarr;sha256                           | tags images with their sha256 digest.     |
+| \|&rarr;name                             | defines DApp name |
+| \|&rarr;reference                        | url to the inspr repository containing a already constructed DApp, it will load from this address the image containing all the necessary information for the creation of this DApp in your cluster.      |
+| \|&rarr;parent                           | defines DApp context in relation to the clust for example `*.app1.app2` would mean that this app is located on the path `root->app1->app2->app-name`. It is injected by the inspr daemon.    |
+| \|&rarr;sha256                           | tags images with their sha256 digest.     |
 | spec                                      | specification of DApp      |
-| meta&rarr;Node                             | Section describing the DApp node       |
-| meta&rarr;Node&rarr;Meta                    |       |
-| meta&rarr;Node&rarr;Meta&rarr; name           | defines node name |
+| \|&rarr;Node                             | Section describing the DApp node       |
+| \|&rarr;\|&rarr;Meta                    |       |
+| \|&rarr;\|&rarr;\|&rarr; name           | defines node name |
 | \|&rarr; \|&rarr; \|&rarr; reference      | url to the inspr repository containing a already constructed DApp-Node, it will load from this address the image containing all the necessary information for the creation of this node in your cluster.      |
 | \|&rarr; \|&rarr; \|&rarr; parent         | defines the node context in relation to the clust for example `*.app1.app2` would mean that this node is located on the path `root->app1->app2`. It is injected by the inspr daemon.    |
 | \|&rarr; \|&rarr; \|&rarr; sha256         | tags images with their sha256 digest.     |
@@ -33,10 +26,9 @@ Something in **markdown**.
 | \|&rarr; Boundary                         |       |
 | \|&rarr; \|&rarr; Input                   | List of channels that are used for the input of this DApp      |
 | \|&rarr; \|&rarr; Output                  | List of channels that are used for the output of this DApp      |    
-{: .custom-class}
 
 
-## Channels
+## Channels -> Table example
 
 | Field                         | Meaning |
 | ---                           | ---     |
@@ -51,7 +43,7 @@ Something in **markdown**.
 | \|&rarr; item_DApp            | name of the DApp currently using this channel     |
 
 
-## Channel_Types
+## Channel_Types -> list Example
 
 | Field                         | Meaning |
 | ---                           | ---     |
@@ -69,22 +61,14 @@ Something in **markdown**.
 
 
 Channel_Type:
- - meta: <br>
-    metadata of Channel_Type
-    - name: <br>
-        channel_type_name
-    - reference: <br>
-        url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own. 
-    - parent:<br>
-        It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.
-    - sha256:<br>
-        tags images with their sha256 digest.
- - schema: <br>
-    defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`
- - connected: <br>
-    Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon`
-    - item_channel: <br>
-    name of the channel currently using this type
+ - meta: 
+    - name: channel_type_name
+    - reference: url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own. 
+    - parent:It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.
+    - sha256: tags images with their sha256 digest.
+ - schema: defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`
+ - connected: Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon`
+    - item_channel: name of the channel currently using this type
 
 
 
