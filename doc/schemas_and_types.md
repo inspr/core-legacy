@@ -1,11 +1,11 @@
 # Schemas and Types
 
-A Channel Type defines the type for the channel. It is important for a channel to have a type, as this is how the types of messages that are passed through it are defined. In this way, we can handle the messages and convert them both in the sender and in the receiver. It is also mandatory since every Inspr channel must be typed. A Channel Type basically has two attributes:
+A Channel Type defines the type for the channel. It is important for a channel to have a type, as this is how the types of messages that are passed through it are defined. In this way, it is possible to build a well-defined communication structure between dApps, handling the messages efficiently and convert them both in the sender and in the receiver. It is also mandatory since every Inspr channel must be typed. A Channel Type basically has two attributes:
 
 * `meta`, in which metadata is defined for the Channel Type, such as its name and annotations. For a more detailed information about the meta field, take a look [here]()
 * `schema`, in which a type is properly declared.
 
-Inspr dApps use Avro for serialization and deserialization of messages, so Schemas are defined as an Avro Schema. An example of Schema will be given, but if you are not familiar with Avro, it is recommended that you take a look at the official Avro documentation for the definition of Schemas:
+Inspr dApps use Avro for serialization and deserialization of messages, so Schemas are defined as an Avro Schema. This allows the size of the messages exchanged to be significantly reduced. An example of Schema will be given, but if you are not familiar with Avro, it is recommended that you take a look at the official Avro documentation for the definition of Schemas:
 
 [Avro Schema documentation](https://avro.apache.org/docs/current/spec.html#schemas)
 
