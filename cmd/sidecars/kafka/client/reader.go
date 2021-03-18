@@ -14,6 +14,7 @@ type Consumer interface {
 	Poll(timeout int) (event kafka.Event)
 	SubscribeTopics(topics []string, rebalanceCb kafka.RebalanceCb) (err error)
 	CommitMessage(m *kafka.Message) ([]kafka.TopicPartition, error)
+	Commit() ([]kafka.TopicPartition, error)
 	Close() (err error)
 }
 
@@ -85,7 +86,7 @@ func (reader *Reader) ReadMessage(channel string) (models.BrokerData, error) {
 
 // CommitMessage commits the last message read by Reader
 func (reader *Reader) CommitMessage(channel string) error {
-	_, errCommit := reader.consumers[channel].CommitMessage(reader.lastMessage)
+	_, errCommit := reader.consumers[channel].Commit()
 	if errCommit != nil {
 		return ierrors.
 			NewError().
