@@ -29,58 +29,50 @@ type StrSet map[string]bool
 func MakeStrSet(obj interface{}) (StrSet, error) {
 	set := make(StrSet)
 
-	switch obj.(type) {
+	switch value := obj.(type) {
 	case MApps:
-		value := obj.(MApps)
 		for k := range value {
 			set[k] = exists
 		}
 		return set, nil
 
 	case MChannels:
-		value := obj.(MChannels)
 		for k := range value {
 			set[k] = exists
 		}
 		return set, nil
 
 	case MTypes:
-		value := obj.(MTypes)
 		for k := range value {
 			set[k] = exists
 		}
 		return set, nil
 
 	case MStr:
-		value := obj.(MStr)
 		for k := range value {
 			set[k] = exists
 		}
 		return set, nil
 
 	case []string:
-		value := obj.([]string)
 		for _, str := range value {
 			set[str] = exists
 		}
 		return set, nil
 
 	case StrSet:
-		value := obj.(StrSet)
 		for k := range value {
 			set[k] = exists
 		}
 		return set, nil
 
 	case utils.StringArray:
-		value := obj.(utils.StringArray)
 		for _, str := range value {
 			set[str] = exists
 		}
 		return set, nil
 
 	case map[string]string:
-		value := obj.(map[string]string)
 		for k := range value {
 			set[k] = exists
 		}
