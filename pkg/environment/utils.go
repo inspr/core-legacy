@@ -15,9 +15,13 @@ func IsInChannelBoundary(channel, outputChan string) bool {
 }
 
 // GetChannelBoundaryList returns a string list with the channels in insprEnv.OutputChannels
-func GetChannelBoundaryList(channels string) []string {
+func GetChannelBoundaryList(channels string) utils.StringArray {
 	if channels == "" {
-		return []string{}
+		return utils.StringArray{}
+	}
+	arr := strings.Split(channels, ";")
+	return arr
+}
 
 // GetResolvedBoundaryChannelList gets the list of resolved channels from the input boundary
 func GetResolvedBoundaryChannelList(channels string) utils.StringArray {
@@ -39,7 +43,7 @@ func GetSchema(channel string) (string, error) {
 
 // GetResolvedChannel gets a resolved channel from a channel name
 func GetResolvedChannel(channel, inputChan, outputChan string) (string, error) {
-	if IsInInputChannel(channel, inputChan) || IsInOutputChannel(channel, outputChan) {
+	if IsInChannelBoundary(channel, inputChan) || IsInChannelBoundary(channel, outputChan) {
 		return os.Getenv(channel + "_RESOLVED"), nil
 	}
 	return "", ierrors.NewError().
