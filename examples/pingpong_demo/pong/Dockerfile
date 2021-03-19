@@ -1,4 +1,4 @@
 FROM golang:alpine
 WORKDIR /app
 COPY . .
-CMD go run test/pong/sidecartest.go
+CMD go run examples/pingpong_demo/pong/sidecartest.go

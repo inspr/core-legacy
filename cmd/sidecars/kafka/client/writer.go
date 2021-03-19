@@ -38,13 +38,15 @@ func NewWriter(mock bool) (*Writer, error) {
 // WriteMessage receives a message and sends it to the topic defined by the given channel
 func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	outputChan := environment.GetOutputChannels()
-	if !environment.IsInOutputChannel(channel, outputChan) {
-		return kafka.NewError(kafka.ErrInvalidArg, "invalid output channel", false)
-	}
 
+	resolvedChannel, _ := environment.GetResolvedChannel(channel, "", outputChan)
+	resolvedCh, err := fromResolvedChannel(resolvedChannel)
+	if err != nil {
+		return err
+	}
 	go deliveryReport(writer.producer)
 
-	if errProduceMessage := writer.produceMessage(message, channel); errProduceMessage != nil {
+	if errProduceMessage := writer.produceMessage(message, resolvedCh); errProduceMessage != nil {
 		return errProduceMessage
 	}
 
@@ -71,13 +73,13 @@ func deliveryReport(producer *kafka.Producer) {
 }
 
 // creates a Kafka message and sends it through the ProduceChannel
-func (writer *Writer) produceMessage(message interface{}, channel string) error {
-	messageEncoded, errorEncode := encode(message, channel)
+func (writer *Writer) produceMessage(message interface{}, resolvedChannel messageChannel) error {
+	messageEncoded, errorEncode := resolvedChannel.encode(message)
 	if errorEncode != nil {
 		return errorEncode
 	}
 
-	topic := toTopic(channel)
+	topic := resolvedChannel.toTopic()
 
 	writer.producer.ProduceChannel() <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{

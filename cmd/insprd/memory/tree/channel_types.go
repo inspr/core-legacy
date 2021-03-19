@@ -107,8 +107,8 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 
 	delete(parentApp.Spec.ChannelTypes, ctName)
 
-	curCt, err = ctm.Get(context, ctName)
-	if curCt != nil {
+	_, err = ctm.Get(context, ctName)
+	if err == nil {
 		return ierrors.NewError().InternalServer().
 			Message("couldn't delete '" + context + "' ChannelType from target app").Build()
 	}
@@ -143,7 +143,6 @@ func (ctm *ChannelTypeMemoryManager) UpdateChannelType(context string, ct *meta.
 // ChannelTypeRootGetter returns a getter that gets channel types from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
 type ChannelTypeRootGetter struct {
-	tree *meta.ChannelType
 }
 
 // Get receives a query string (format = 'x.y.z') and iterates through the

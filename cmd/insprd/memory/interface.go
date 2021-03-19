@@ -32,6 +32,7 @@ type AppMemory interface {
 	CreateApp(context string, app *meta.App) error
 	DeleteApp(query string) error
 	UpdateApp(query string, app *meta.App) error
+	ResolveBoundary(app *meta.App) (map[string]string, error)
 }
 
 // AppGetInterface is an interface to get apps from memory
@@ -55,6 +56,20 @@ type ChannelTypeGetInterface interface {
 	Get(context string, ctName string) (*meta.ChannelType, error)
 }
 
+// AliasMemory is an interface to get alias types from memory
+type AliasMemory interface {
+	TransactionInterface
+	AliasGetInterface
+	CreateAlias(query string, targetBoundary string, alias *meta.Alias) error
+	UpdateAlias(context string, aliasKey string, alias *meta.Alias) error
+	DeleteAlias(context string, aliasKey string) error
+}
+
+// AliasGetInterface is an interface to get alias types from memory
+type AliasGetInterface interface {
+	Get(context string, aliasKey string) (*meta.Alias, error)
+}
+
 // Manager is the interface that allows the management
 // of the current state of the cluster. Permiting the
 // modification of Channels, DApps and ChannelTypes
@@ -63,6 +78,7 @@ type Manager interface {
 	Apps() AppMemory
 	Channels() ChannelMemory
 	ChannelTypes() ChannelTypeMemory
+	Alias() AliasMemory
 	Root() GetInterface
 }
 
@@ -71,6 +87,7 @@ type GetInterface interface {
 	Apps() AppGetInterface
 	Channels() ChannelGetInterface
 	ChannelTypes() ChannelTypeGetInterface
+	Alias() AliasGetInterface
 }
 
 // TransactionInterface makes transactions on a Memory manager

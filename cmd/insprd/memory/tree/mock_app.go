@@ -30,3 +30,8 @@ func (mock *MockAppManager) DeleteApp(query string) error {
 func (mock *MockAppManager) UpdateApp(query string, app *meta.App) error {
 	return nil
 }
+
+// ResolveBoundary Mock
+func (mock *MockAppManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
+	return nil, nil
+}
