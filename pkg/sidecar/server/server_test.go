@@ -38,9 +38,10 @@ func TestServer_Init(t *testing.T) {
 		w models.Writer
 	}
 	test := struct {
-		name string
-		addr string
-		args args
+		name    string
+		addr    string
+		channel string
+		args    args
 	}{
 		name: "basic init test",
 		addr: "localhost:8080",
@@ -48,6 +49,7 @@ func TestServer_Init(t *testing.T) {
 			r: MockServer(nil).Reader,
 			w: &mockWriter{},
 		},
+		channel: "testing",
 	}
 
 	createMockEnvVars() // creates mock values for test
@@ -61,10 +63,10 @@ func TestServer_Init(t *testing.T) {
 		s.Init(test.args.r, test.args.w)
 
 		// checking reader methods
-		if got := s.Reader.CommitMessage(); got != nil {
+		if got := s.Reader.CommitMessage(test.channel); got != nil {
 			t.Errorf("expected CommitMessage() == nil, received %v", got)
 		}
-		if _, got := s.Reader.ReadMessage(); got != nil {
+		if _, got := s.Reader.ReadMessage(test.channel); got != nil {
 			t.Errorf("expected CommitMessage() == nil, received %v", got)
 		}
 		if got := s.Writer.WriteMessage("channel", "msg"); got != nil {

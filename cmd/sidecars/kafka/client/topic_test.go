@@ -82,10 +82,15 @@ func Test_toTopicNonPRD(t *testing.T) {
 	createMockEnv()
 	os.Setenv("INSPR_ENV", "test")
 	os.Setenv("INSPR_APP_CTX", "random.app1")
+	os.Setenv("nonPrdChan_RESOLVED", "random.app1.nonPrdChan")
+	defer os.Unsetenv("INSPR_ENV")
+	defer os.Unsetenv("INSPR_APP_CTX")
+	defer os.Unsetenv("nonPrdChan_RESOLVED")
+
 	defer deleteMockEnv()
 	environment.RefreshEnviromentVariables()
 	type args struct {
-		channel string
+		channel messageChannel
 		isPrd   bool
 	}
 	tests := []struct {
@@ -96,7 +101,7 @@ func Test_toTopicNonPRD(t *testing.T) {
 		{
 			name: "PRD Environment topic",
 			args: args{
-				channel: "nonPrdChan",
+				channel: messageChannel{channel: "nonPrdChan", appCtx: "random.app1"},
 				isPrd: func() bool {
 					os.Unsetenv("INSPR_ENV")
 					os.Setenv("INSPR_ENV", "test")
@@ -108,7 +113,7 @@ func Test_toTopicNonPRD(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := toTopic(tt.args.channel); got != tt.want {
+			if got := tt.args.channel.toTopic(); got != tt.want {
 				t.Errorf("toTopic() = %v, want %v", got, tt.want)
 			}
 		})
@@ -122,7 +127,7 @@ func Test_toTopicPRD(t *testing.T) {
 	defer deleteMockEnv()
 	environment.RefreshEnviromentVariables()
 	type args struct {
-		channel string
+		channel messageChannel
 		isPrd   bool
 	}
 	tests := []struct {
@@ -133,7 +138,7 @@ func Test_toTopicPRD(t *testing.T) {
 		{
 			name: "PRD Environment topic",
 			args: args{
-				channel: "prdChan",
+				channel: messageChannel{channel: "prdChan", appCtx: "random.app1"},
 				isPrd: func() bool {
 					os.Unsetenv("INSPR_ENV")
 					os.Setenv("INSPR_ENV", "")
@@ -145,7 +150,7 @@ func Test_toTopicPRD(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := toTopic(tt.args.channel); got != tt.want {
+			if got := tt.args.channel.toTopic(); got != tt.want {
 				t.Errorf("toTopic() = %v, want %v", got, tt.want)
 			}
 		})
