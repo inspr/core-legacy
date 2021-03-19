@@ -22,13 +22,6 @@ import (
 	k8stesting "k8s.io/client-go/testing"
 )
 
-func newTestK8s() *NodeOperator {
-	client := NodeOperator{
-		clientSet: &fake.Clientset{},
-	}
-	return &client
-}
-
 func mockK8sClientset(verb string, dep kubeApp.Deployment, erro error) kubernetes.Interface {
 	environment.SetMockEnv()
 	client := &fake.Clientset{}

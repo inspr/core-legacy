@@ -1,11 +1,8 @@
 package kafka
 
 import (
-	"os"
-
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/fake"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/kafka/channels"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/kafka/nodes"
 )
@@ -38,13 +35,9 @@ func (op *Operator) Channels() operators.ChannelOperatorInterface {
 func NewKafkaOperator(memory memory.Manager) (operators.OperatorInterface, error) {
 	var err error
 	var chOp operators.ChannelOperatorInterface
-	if _, ok := os.LookupEnv("DEBUG"); !ok {
-		chOp, err = channels.NewOperator()
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		chOp = fake.NewFakeOperator().Channels()
+	chOp, err = channels.NewOperator()
+	if err != nil {
+		return nil, err
 	}
 	nOp, err := nodes.NewOperator(memory)
 	if err != nil {

@@ -87,7 +87,6 @@ func (amm *AliasMemoryManager) CreateAlias(query, targetBoundary string, alias *
 // AliasRootGetter returns a getter that gets alias from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
 type AliasRootGetter struct {
-	tree *meta.Alias
 }
 
 /*

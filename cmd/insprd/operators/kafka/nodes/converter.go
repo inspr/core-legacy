@@ -164,6 +164,9 @@ func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 	var err error
 	node := meta.Node{}
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
+	if err != nil {
+		return meta.Node{}, err
+	}
 	node.Meta.Parent, err = toNodeParent(kdep.ObjectMeta.Name)
 	if err != nil {
 		return meta.Node{}, err
@@ -180,7 +183,7 @@ func toNodeName(deployName string) (string, error) {
 }
 
 func toNodeParent(deployName string) (string, error) {
-	var strs utils.StringArray
-	strs = strings.Split(deployName, "-")
+
+	strs := utils.StringArray(strings.Split(deployName, "-"))
 	return strs[:len(strs)-1].Join("."), nil
 }
