@@ -1,6 +1,8 @@
 # Schemas and Types
 
-A Channel Type defines the type of the information that can go through a Channel.  It is mandatory for a Channel to have a type, since it allows communication between dApps to be well defined. In this way, messages can be handled easily, and converted to both the sender and the receiver. A Channel Type basically has two attributes:
+A Channel Type defines the type of the information that can go through a Channel.  It is mandatory for a Channel to have a type, since it allows communication between dApps to be well defined. In this way, messages can be handled easily, and converted to both the sender and the receiver. 
+
+A Channel Type basically has two attributes:
 
 * `meta`, in which metadata is defined for the Channel Type, such as its name and annotations. For more information about the meta field, take a look [here]()
 * `schema`, in which a type is properly declared.
@@ -10,7 +12,7 @@ Inspr dApps use Avro for serialization and deserialization of messages, so Schem
 [Avro Schema documentation](https://avro.apache.org/docs/current/spec.html#schemas)
 
 
-Messages can have types in many forms, and it is common to define them as a JSON object. There is online support for converting a JSON object to an Avro Schema, and you can check an example [here](https://toolslick.com/generation/metadata/avro-schema-from-json).
+Messages can have types in many forms, and it is common to define them as a JSON object. There is online support for converting a JSON object to an Avro Schema, like this [one](https://toolslick.com/generation/metadata/avro-schema-from-json).
 
 ## Defining a Schema
 
@@ -34,7 +36,7 @@ kind: channeltype
 apiVersion: v1
 meta:
   name: channel_type_example
-schema: {"type":"int"}
+schema: "{"type":"int"}"
 ```
 It is also possible to define the schema as a path to an `.avsc` or `.schema` file (which describes an Avro Schema). In this way, the defined schema will be the one written in the file. For example, if we define the schema file `my_type_schema.avsc` as:
 
