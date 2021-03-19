@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	mfake "gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
@@ -306,7 +305,6 @@ func Test_baseEnvironment(t *testing.T) {
 		app *meta.App
 	}
 	type fields struct {
-		memory memory.Manager
 	}
 	tests := []struct {
 		name   string

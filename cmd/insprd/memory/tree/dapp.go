@@ -175,7 +175,7 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, 
 	unresolved := metautils.StrSet{}
 	for _, bound := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
 		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
-		unresolved.AppendSet(bound)
+		unresolved[bound] = true
 	}
 	parentApp, err := amm.MemoryManager.Apps().Get(app.Meta.Parent)
 	if err != nil {
