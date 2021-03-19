@@ -8,6 +8,8 @@ The reason for this is that the file when written in a one of the formats descri
 - review the TODO sections
 - ask about the annotation on the node metadata, comparison with the environment variable
 - ask to pedrinho to review the whole thing
+- ask which is prefered the table or the list
+- format table to have a bigger column
 
 
 
@@ -126,16 +128,16 @@ spec:
 
 ### list definitions
 Channel_Type:
- - apiVersion: specify what version of the api to use, for example `"v1"`
- - kind: specifies what kind of structure the file is, in this case it would be `"dapp"`
- - meta: 
-    - name: channel_type_name
-    - reference: url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own. 
-    - parent:It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.
-    - sha256: tags images with their sha256 digest.
- - schema: defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`
- - connected: Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon`
-    - item_channel: name of the channel currently using this type
+ - **apiVersion**: specify what version of the api to use, for example `"v1"`
+ - **kind**: specifies what kind of structure the file is, in this case it would be `"dapp"`
+ - **meta**: 
+    - **name**: channel_type_name
+    - **reference**: url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own. 
+    - **parent**:It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.
+    - **sha256**: tags images with their sha256 digest.
+ - **schema**: defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`
+ - **connected**: Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon`
+    - **item_channel**: name of the channel currently using this type
 
 ### yaml example
 ```yaml
