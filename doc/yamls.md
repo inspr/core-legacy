@@ -207,7 +207,7 @@ spec:
             - primes_ch1
 
     # prints the filtered
-    W: 
+    filter: 
       meta:
         name: "printer-primes"
         reference: ""
