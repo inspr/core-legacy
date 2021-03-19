@@ -2,10 +2,10 @@
 
 A Channel Type defines the type for the channel. It is important for a channel to have a type, as this is how the types of messages that are passed through it are defined. In this way, it is possible to build a well-defined communication structure between dApps, handling the messages efficiently and convert them both in the sender and in the receiver. It is also mandatory since every Inspr channel must be typed. A Channel Type basically has two attributes:
 
-* `meta`, in which metadata is defined for the Channel Type, such as its name and annotations. For a more detailed information about the meta field, take a look [here]()
+* `meta`, in which metadata is defined for the Channel Type, such as its name and annotations. For more information about the meta field, take a look [here]()
 * `schema`, in which a type is properly declared.
 
-Inspr dApps use Avro for serialization and deserialization of messages, so Schemas are defined as an Avro Schema. This allows the size of the messages exchanged to be significantly reduced. An example of Schema will be given, but if you are not familiar with Avro, it is recommended that you take a look at the official Avro documentation for the definition of Schemas:
+Inspr dApps use Avro for serialization and deserialization of messages, so Schemas are defined as an Avro Schema. This allows the size of the messages exchanged to be significantly reduced. If you are not familiar with Avro, it is recommended that you take a look at the official Avro documentation for the definition of Schemas:
 
 [Avro Schema documentation](https://avro.apache.org/docs/current/spec.html#schemas)
 
@@ -27,7 +27,7 @@ meta:
 spec:
   type: channel_type_example
 ```
-Notice that the channel above has the type `channel_type_example`. If, for example, we want messages that pass through this Channel to be an `integer`, we can define `channel_type_example` as:
+Notice that the Channel above has the type `channel_type_example`. If, for example, we want messages that pass through this Channel to be an `integer`, we can define `channel_type_example` as:
 
 ```yaml
 kind: channeltype
@@ -36,7 +36,7 @@ meta:
   name: channel_type_example
 schema: {"type":"int"}
 ```
-It is also possible to define the schema as a path to an `.avsc` file (which describes an Avro Schema). In this way, the defined schema will be the one written in the file. For example, if we define the schema file `my_type_schema.avsc` as:
+It is also possible to define the schema as a path to an `.avsc` or `.schema` file (which describes an Avro Schema). In this way, the defined schema will be the one written in the file. For example, if we define the schema file `my_type_schema.avsc` as:
 
 ```avsc
 {"type":"int"}
