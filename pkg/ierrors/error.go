@@ -1,5 +1,7 @@
 package ierrors
 
+import "fmt"
+
 // InsprError is an error that happened inside inspr
 type InsprError struct {
 	Message string         `yaml:"message"  json:"message"`
@@ -73,8 +75,8 @@ func (b *ErrBuilder) InvalidChannelType() *ErrBuilder {
 }
 
 // Message adds a message to the error
-func (b *ErrBuilder) Message(msg string) *ErrBuilder {
-	b.err.Message = msg
+func (b *ErrBuilder) Message(format string, values ...interface{}) *ErrBuilder {
+	b.err.Message = fmt.Sprintf(format, values...)
 	return b
 }
 

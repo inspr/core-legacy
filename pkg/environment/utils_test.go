@@ -4,6 +4,8 @@ import (
 	"os"
 	"reflect"
 	"testing"
+
+	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func TestInsprEnvironment_IsInInputChannel(t *testing.T) {
@@ -112,7 +114,7 @@ func TestInsprEnvVars_GetInputChannelList(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   []string
+		want   utils.StringArray
 	}{
 		{
 			name: "It should get all the channels in the InputChannels env",
@@ -123,7 +125,7 @@ func TestInsprEnvVars_GetInputChannelList(t *testing.T) {
 				InsprAppContext:  "",
 				InsprEnvironment: "",
 			},
-			want: []string{"ch1", "ch2", "ch3", "ch4"},
+			want: utils.StringArray{"ch1", "ch2", "ch3", "ch4"},
 		},
 		{
 			name: "Returns empty string slice",
@@ -134,7 +136,7 @@ func TestInsprEnvVars_GetInputChannelList(t *testing.T) {
 				InsprAppContext:  "",
 				InsprEnvironment: "",
 			},
-			want: []string{},
+			want: utils.StringArray{},
 		},
 	}
 	for _, tt := range tests {
@@ -157,7 +159,7 @@ func TestInsprEnvVars_GetOutputChannelList(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   []string
+		want   utils.StringArray
 	}{
 		{
 			name: "It should get all the channels in the InputChannels env",
@@ -168,7 +170,7 @@ func TestInsprEnvVars_GetOutputChannelList(t *testing.T) {
 				InsprAppContext:  "",
 				InsprEnvironment: "",
 			},
-			want: []string{"ch1", "ch2", "ch3", "ch4"},
+			want: utils.StringArray{"ch1", "ch2", "ch3", "ch4"},
 		},
 		{
 			name: "Returns empty string slice",
@@ -179,7 +181,7 @@ func TestInsprEnvVars_GetOutputChannelList(t *testing.T) {
 				InsprAppContext:  "",
 				InsprEnvironment: "",
 			},
-			want: []string{},
+			want: utils.StringArray{},
 		},
 	}
 	for _, tt := range tests {
@@ -236,7 +238,7 @@ func TestInsprEnvVars_GetSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetSchema(tt.channel, tt.fields.InputChannels, tt.fields.OutputChannels)
+			got, err := GetSchema(tt.channel)
 			if tt.wantErr && err == nil {
 				t.Errorf("InsprEnvVars.GetSchema() = %v, want %v", err, tt.wantErr)
 			}

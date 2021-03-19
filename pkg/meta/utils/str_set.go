@@ -13,6 +13,9 @@ const exists = true
 //MApps is a string->App map
 type MApps map[string]*meta.App
 
+// MAliases is a string->Alias map
+type MAliases map[string]*meta.Alias
+
 //MChannels is a string->channel map
 type MChannels map[string]*meta.Channel
 
@@ -73,6 +76,11 @@ func MakeStrSet(obj interface{}) (StrSet, error) {
 		return set, nil
 
 	case map[string]string:
+		for k := range value {
+			set[k] = exists
+		}
+		return set, nil
+	case MAliases:
 		for k := range value {
 			set[k] = exists
 		}

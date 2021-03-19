@@ -26,7 +26,7 @@ func TestNewReader(t *testing.T) {
 			name:    "It should return a new Reader",
 			wantErr: false,
 			checkFunction: func(t *testing.T, reader *Reader) {
-				if !(reader.consumer != nil && reader.lastMessage == nil) {
+				if !(reader.consumers != nil && reader.lastMessage == nil && len(reader.consumers) > 0) {
 					t.Errorf("check function error = Reader not created successfully")
 				}
 			},
@@ -67,70 +67,80 @@ func TestReader_ReadMessage(t *testing.T) {
 	RefreshEnviromentVariables()
 
 	type fields struct {
-		consumer    Consumer
+		consumers   map[string]Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		before  func()
-		want    string
-		want1   interface{}
-		wantErr bool
+		name          string
+		fields        fields
+		before        func()
+		uniqueChannel string
+		want          string
+		want1         interface{}
+		wantErr       bool
 	}{
 		{
 			name: "It should read a message",
 			fields: fields{
-				consumer: &MockConsumer{
-					err:           false,
-					pollMsg:       "Hello World!",
-					topic:         toTopic("ch1"),
-					errCode:       0,
-					senderChannel: "ch1",
+				consumers: map[string]Consumer{
+					"ch1_resolved": &MockConsumer{
+						err:           false,
+						pollMsg:       "Hello World!",
+						topic:         messageChannel{channel: "ch1_resolved"}.toTopic(),
+						errCode:       0,
+						senderChannel: "ch1_resolved",
+					},
 				},
 				lastMessage: nil,
 			},
-			wantErr: false,
-			want:    "ch1",
-			want1:   "Hello World!",
+			wantErr:       false,
+			uniqueChannel: "ch1_resolved",
+			want:          "ch1_resolved",
+			want1:         "Hello World!",
 		},
 		{
 			name: "It should return a message poll error",
 			fields: fields{
-				consumer: &MockConsumer{
-					err:           true,
-					pollMsg:       "Hello World!",
-					topic:         toTopic("ch1"),
-					errCode:       0,
-					senderChannel: "ch1",
+				consumers: map[string]Consumer{
+					"ch1_resolved": &MockConsumer{
+						err:           true,
+						pollMsg:       "Hello World!",
+						topic:         messageChannel{channel: "ch1_resolved"}.toTopic(),
+						errCode:       0,
+						senderChannel: "ch1_resolved",
+					},
 				},
 				lastMessage: nil,
 			},
-			wantErr: true,
+			uniqueChannel: "ch1_resolved",
+			wantErr:       true,
 		},
 		{
 			name: "It should return a decode error (sender channel invalid)",
 			fields: fields{
-				consumer: &MockConsumer{
-					err:           false,
-					pollMsg:       "Hello World!",
-					topic:         toTopic("ch1"),
-					errCode:       0,
-					senderChannel: "ch2",
+				consumers: map[string]Consumer{
+					"ch1_resolved": &MockConsumer{
+						err:           false,
+						pollMsg:       "Hello World!",
+						topic:         messageChannel{channel: "ch1_resolved"}.toTopic(),
+						errCode:       0,
+						senderChannel: "ch2",
+					},
 				},
 				lastMessage: nil,
 			},
-			wantErr: true,
+			uniqueChannel: "ch1_resolved",
+			wantErr:       true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			reader := &Reader{
-				consumer:    tt.fields.consumer,
+				consumers:   tt.fields.consumers,
 				lastMessage: tt.fields.lastMessage,
 			}
 
-			bData, err := reader.ReadMessage()
+			bData, err := reader.ReadMessage(tt.uniqueChannel)
 			got := bData.Channel
 			got1 := bData.Message.Data
 
@@ -150,42 +160,49 @@ func TestReader_ReadMessage(t *testing.T) {
 
 func TestReader_Commit(t *testing.T) {
 	type fields struct {
-		consumer    Consumer
+		consumers   map[string]Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
+		name          string
+		fields        fields
+		uniqueChannel string
+		wantErr       bool
 	}{
 		{
 			name: "It should not return a error since the message was committed",
 			fields: fields{
-				consumer: &MockConsumer{
-					err: false,
+				consumers: map[string]Consumer{
+					"ch1": &MockConsumer{
+						err: false,
+					},
 				},
 				lastMessage: nil,
 			},
-			wantErr: false,
+			uniqueChannel: "ch1",
+			wantErr:       false,
 		},
 		{
 			name: "It should return a error since the message was not committed",
 			fields: fields{
-				consumer: &MockConsumer{
-					err: true,
+				consumers: map[string]Consumer{
+					"ch1": &MockConsumer{
+						err: true,
+					},
 				},
 				lastMessage: nil,
 			},
-			wantErr: true,
+			uniqueChannel: "ch1",
+			wantErr:       true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			reader := &Reader{
-				consumer:    tt.fields.consumer,
+				consumers:   tt.fields.consumers,
 				lastMessage: tt.fields.lastMessage,
 			}
-			if err := reader.CommitMessage(); (err != nil) != tt.wantErr {
+			if err := reader.CommitMessage(tt.uniqueChannel); (err != nil) != tt.wantErr {
 				t.Errorf("Reader.Commit() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -194,18 +211,23 @@ func TestReader_Commit(t *testing.T) {
 
 func TestReader_Close(t *testing.T) {
 	type fields struct {
-		consumer    Consumer
+		consumers   map[string]Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
+		name          string
+		fields        fields
+		uniqueChannel string
+		wantErr       bool
 	}{
 		{
 			name: "Close the consumer",
 			fields: fields{
-				consumer:    &MockConsumer{},
+				consumers: map[string]Consumer{
+					"ch1": &MockConsumer{
+						err: false,
+					},
+				},
 				lastMessage: nil,
 			},
 			wantErr: false,
@@ -213,8 +235,10 @@ func TestReader_Close(t *testing.T) {
 		{
 			name: "Error when trying to close the consumer",
 			fields: fields{
-				consumer: &MockConsumer{
-					err: true,
+				consumers: map[string]Consumer{
+					"ch1": &MockConsumer{
+						err: true,
+					},
 				},
 				lastMessage: nil,
 			},
@@ -224,7 +248,7 @@ func TestReader_Close(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			reader := &Reader{
-				consumer:    tt.fields.consumer,
+				consumers:   tt.fields.consumers,
 				lastMessage: tt.fields.lastMessage,
 			}
 			if err := reader.Close(); (err != nil) != tt.wantErr {
