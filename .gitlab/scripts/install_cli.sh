@@ -12,7 +12,7 @@ case "${OS_NAME}" in
     CYGWIN*)    CURL_URL=$CURL_URL"-windows";;
     MINGW*)     CURL_URL=$CURL_URL"-windows";;
     Windows*)   CURL_URL=$CURL_URL"-windows";;
-    *)          echo "ERROR identifing the os"
+    *)          echo "ERROR identifying the os"
 esac
 
 
@@ -24,7 +24,7 @@ case "${ARCH}" in
     i*86) CURL_URL=$CURL_URL"-386";;
     arm*) CURL_URL=$CURL_URL"-arm64";;
     aarch64) CURL_URL=$CURL_URL"-arm64";;
-    *)  echo "ERROR identifing the architecture"
+    *)  echo "ERROR identifying the architecture"
 esac
 
 CURL_URL=$CURL_URL"-"$CLI_VERSION
