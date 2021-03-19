@@ -178,8 +178,12 @@ func (change *Change) diffEnv(from uti.EnvironmentMap, to uti.EnvironmentMap) {
 func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 	var orig string
 	var curr string
-	inputSet := utils.ArrDisjuncSet(boundOrig.Input, boundCurr.Input)
-	inputOrig := utils.ArrMakeSet(boundOrig.Input)
+
+	origSet, _ := utils.MakeStrSet(boundOrig.Input)
+	currSet, _ := utils.MakeStrSet(boundCurr.Input)
+
+	inputSet := utils.DisjunctSet(origSet, currSet)
+	inputOrig, _ := utils.MakeStrSet(boundOrig.Input)
 	for k := range inputSet {
 		var op Operation
 		orig = "<nil>"
@@ -206,8 +210,11 @@ func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 		change.Operation |= op
 	}
 
-	outputSet := utils.ArrDisjuncSet(boundOrig.Output, boundCurr.Output)
-	outputOrig := utils.ArrMakeSet(boundOrig.Output)
+	origSetOut, _ := utils.MakeStrSet(boundOrig.Output)
+	currSetOut, _ := utils.MakeStrSet(boundCurr.Output)
+
+	outputSet := utils.DisjunctSet(origSetOut, currSetOut)
+	outputOrig, _ := utils.MakeStrSet(boundOrig.Output)
 	for k := range outputSet {
 		var op Operation
 		orig = "<nil>"
@@ -235,7 +242,10 @@ func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 }
 
 func (change *Change) diffApps(from, to utils.MApps) {
-	set := utils.AppDisjuncSet(from, to)
+	fromSet, _ := utils.MakeStrSet(from)
+	toSet, _ := utils.MakeStrSet(to)
+
+	set := utils.DisjunctSet(fromSet, toSet)
 
 	for k := range set {
 		var op Operation
@@ -266,7 +276,7 @@ func (change *Change) diffApps(from, to utils.MApps) {
 		change.Operation |= op
 	}
 
-	intersection := utils.AppIntersecSet(from, to)
+	intersection := utils.IntersectSet(fromSet, toSet)
 
 	for app := range intersection {
 		fromApp := from[app]
@@ -279,7 +289,10 @@ func (change *Change) diffApps(from, to utils.MApps) {
 }
 
 func (change *Change) diffChannels(from, to utils.MChannels) error {
-	disjunction := utils.ChsDisjuncSet(from, to)
+	fromSet, _ := utils.MakeStrSet(from)
+	toSet, _ := utils.MakeStrSet(to)
+
+	disjunction := utils.DisjunctSet(fromSet, toSet)
 
 	for ch := range disjunction {
 		_, orig := from[ch]
@@ -306,7 +319,7 @@ func (change *Change) diffChannels(from, to utils.MChannels) error {
 		change.Operation |= op
 	}
 
-	intersection := utils.ChsIntersecSet(from, to)
+	intersection := utils.IntersectSet(fromSet, toSet)
 
 	for ch := range intersection {
 		fromCh := from[ch]
@@ -334,7 +347,10 @@ func (change *Change) diffChannels(from, to utils.MChannels) error {
 }
 
 func (change *Change) diffChannelTypes(from, to utils.MTypes) error {
-	disjunction := utils.TypesDisjuncSet(from, to)
+	fromSet, _ := utils.MakeStrSet(from)
+	toSet, _ := utils.MakeStrSet(to)
+
+	disjunction := utils.DisjunctSet(fromSet, toSet)
 
 	for ct := range disjunction {
 		_, orig := from[ct]
@@ -363,7 +379,7 @@ func (change *Change) diffChannelTypes(from, to utils.MTypes) error {
 		change.Operation |= op
 	}
 
-	intersection := utils.TypesIntersecSet(from, to)
+	intersection := utils.IntersectSet(fromSet, toSet)
 
 	for ct := range intersection {
 		fromCT := from[ct]
@@ -448,7 +464,10 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 		change.Kind |= MetaKind | parentKind
 	}
 
-	set := utils.StrDisjuncSet(from.Annotations, to.Annotations)
+	fromSet, _ := utils.MakeStrSet(from.Annotations)
+	toSet, _ := utils.MakeStrSet(to.Annotations)
+
+	set := utils.DisjunctSet(fromSet, toSet)
 
 	for k := range set {
 		var op Operation
