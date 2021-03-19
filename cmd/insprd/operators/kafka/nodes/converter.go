@@ -145,10 +145,13 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 
 // toDeployment - creates the kubernetes deployment name from the app
 func toDeploymentName(app *meta.App) string {
-	var arr utils.StringArray
-	arr = strings.Split(app.Meta.Parent, ".")
-	arr = append(arr, app.Meta.Name)
-	return arr.Join("-")
+	var depNames utils.StringArray
+	depNames = strings.Split(app.Meta.Parent, ".")
+	if depNames[0] == "" {
+		depNames = utils.StringArray{}
+	}
+	depNames = append(depNames, app.Meta.Name)
+	return depNames.Join("-")
 }
 
 // intToint32 - converts an integer to a *int32
