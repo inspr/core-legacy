@@ -8,26 +8,25 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
-// IsInChannelBoundary - checks if a channel exists in the insprEnv.OutputChannels
-func IsInChannelBoundary(channel, outputChan string) bool {
-	channelsList := GetChannelBoundaryList(outputChan)
+// IsInChannelBoundary - checks if given channel exists in given boundary
+func IsInChannelBoundary(channel, boundary string) bool {
+	channelsList := GetChannelBoundaryList(boundary)
 	return utils.Includes(channelsList, channel)
 }
 
-// GetChannelBoundaryList returns a string list with the channels in insprEnv.OutputChannels
-func GetChannelBoundaryList(channels string) utils.StringArray {
-	if channels == "" {
+// GetChannelBoundaryList returns a string slice with the channels in given boundary
+func GetChannelBoundaryList(boundary string) utils.StringArray {
+	if boundary == "" {
 		return utils.StringArray{}
 	}
-	arr := strings.Split(channels, ";")
-	return arr
+	return strings.Split(boundary, ";")
 }
 
-// GetResolvedBoundaryChannelList gets the list of resolved channels from the input boundary
-func GetResolvedBoundaryChannelList(channels string) utils.StringArray {
-	arr := utils.StringArray(GetChannelBoundaryList(channels))
-	return arr.Map(func(s string) string {
-		resolved, _ := GetResolvedChannel(s, channels, "")
+// GetResolvedBoundaryChannelList gets the list of resolved channels from given boundary
+func GetResolvedBoundaryChannelList(boundary string) utils.StringArray {
+	channels := utils.StringArray(GetChannelBoundaryList(boundary))
+	return channels.Map(func(s string) string {
+		resolved, _ := GetResolvedChannel(s, boundary, "")
 		return resolved
 	})
 }

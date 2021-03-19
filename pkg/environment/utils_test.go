@@ -8,7 +8,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
-func TestInsprEnvironment_IsInChannelBoundary(t *testing.T) {
+func TestIsInChannelBoundary(t *testing.T) {
 	type fields struct {
 		InputChannels  string
 		OutputChannels string
@@ -55,7 +55,7 @@ func TestInsprEnvironment_IsInChannelBoundary(t *testing.T) {
 	}
 }
 
-func TestInsprEnvVars_GetChannelBoundaryList(t *testing.T) {
+func TestGetChannelBoundaryList(t *testing.T) {
 	type fields struct {
 		InputChannels    string
 		OutputChannels   string
@@ -100,8 +100,9 @@ func TestInsprEnvVars_GetChannelBoundaryList(t *testing.T) {
 	}
 }
 
-func TestInsprEnvVars_GetSchema(t *testing.T) {
+func TestGetSchema(t *testing.T) {
 	os.Setenv("ch1_SCHEMA", "this_is_a_schema")
+	defer os.Unsetenv("ch1_SCHEMA")
 	type fields struct {
 		InputChannels    string
 		OutputChannels   string
@@ -151,6 +152,84 @@ func TestInsprEnvVars_GetSchema(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("InsprEnvVars.GetSchema() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetResolvedBoundaryChannelList(t *testing.T) {
+	os.Setenv("ch1_RESOLVED", "channel1_resolved")
+	os.Setenv("ch2_RESOLVED", "channel2_resolved")
+	defer os.Unsetenv("ch1_RESOLVED")
+	defer os.Unsetenv("ch2_RESOLVED")
+
+	type args struct {
+		boundary string
+	}
+	tests := []struct {
+		name string
+		args args
+		want utils.StringArray
+	}{
+		{
+			name: "Returns resolved boundary",
+			args: args{
+				boundary: "ch1;ch2",
+			},
+			want: utils.StringArray{"channel1_resolved", "channel2_resolved"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetResolvedBoundaryChannelList(tt.args.boundary); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetResolvedBoundaryChannelList() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetResolvedChannel(t *testing.T) {
+	os.Setenv("ch1_RESOLVED", "channel1_resolved")
+	defer os.Unsetenv("ch1_RESOLVED")
+	type args struct {
+		channel    string
+		inputChan  string
+		outputChan string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "Returns resolved channel",
+			args: args{
+				channel:   "ch1",
+				inputChan: "ch1;ch2",
+			},
+			wantErr: false,
+			want:    "channel1_resolved",
+		},
+		{
+			name: "Invalid channel",
+			args: args{
+				channel:   "ch3",
+				inputChan: "ch1;ch2",
+			},
+			wantErr: true,
+			want:    "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetResolvedChannel(tt.args.channel, tt.args.inputChan, tt.args.outputChan)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetResolvedChannel() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("GetResolvedChannel() = %v, want %v", got, tt.want)
 			}
 		})
 	}
