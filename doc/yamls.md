@@ -4,6 +4,13 @@ The creation of yaml files allows for the proper usage of the Inspr cli.
 
 The reason for this is that the file when written in a one of the formats described bellow it can be processed and applied to the cluster throught the `inspr apply -f <file_path>` or `inspr apply -k <files_dir>` commands.
 
+### TODO
+- review the TODO sections
+- ask about the annotation on the node metadata, comparison with the environment variable
+- ask to pedrinho to review the whole thing
+
+
+
 ## DApps
 
 ### Definitions
@@ -14,20 +21,22 @@ The reason for this is that the file when written in a one of the formats descri
 | kind                          | specifies what kind of structure the file is, in this case it would be `"dapp"`     |
 | meta                                      | metadata of DApp      |
 | \|&rarr;name                             | defines DApp name |
-| \|&rarr;reference                        | url to the inspr repository containing a already constructed DApp, it will load from this address the image containing all the necessary information for the creation of this DApp in your cluster.      |
+| \|&rarr;reference                        | url to the inspr repository containing a already defined DApp, it will load from this address the image containing all the necessary information for the creation of this DApp in your cluster.      |
+| \|&rarr;Annotations | defines the environment variables of the DApp, for a better understanding of how to use it see the example below. |
 | \|&rarr;parent                           | defines DApp context in relation to the clust for example `*.app1.app2` would mean that this app is located on the path `root->app1->app2->app-name`. It is injected by the inspr daemon.    |
 | \|&rarr;sha256                           | tags images with their sha256 digest.     |
 | spec                                      | specification of DApp      |
 | \|&rarr;Node                             | Section describing the DApp node       |
-| \|&rarr;\|&rarr;Meta                    |       |
+| \|&rarr;\|&rarr;Meta                    | metadata of the Node      |
 | \|&rarr;\|&rarr;\|&rarr; name           | defines node name |
-| \|&rarr; \|&rarr; \|&rarr; reference      | url to the inspr repository containing a already constructed DApp-Node, it will load from this address the image containing all the necessary information for the creation of this node in your cluster.      |
-| \|&rarr; \|&rarr; \|&rarr; parent         | defines the node context in relation to the clust for example `*.app1.app2` would mean that this node is located on the path `root->app1->app2`. It is injected by the inspr daemon.    |
-| \|&rarr; \|&rarr; \|&rarr; sha256         | tags images with their sha256 digest.     |
-| \|&rarr; \|&rarr; Spec                    |       |
-| \|&rarr; \|&rarr; \|&rarr; Image          | url to the location of the already defined node in the inspr repository      |
-| \|&rarr; \|&rarr; \|&rarr; Replicas       | defines the amount of replicas to be created in your cluster       |
-| \|&rarr; \|&rarr; \|&rarr; Envioronment   | defines the envioronment variables of your pods      |
+| \|&rarr;\|&rarr;\|&rarr; reference      | url to the inspr repository containing a already defined DApp-Node, it will load from this address the image containing all the necessary information for the creation of this node in your cluster.      |
+| \|&rarr;\|&rarr;\|&rarr; Annotations |  TODO |
+| \|&rarr;\|&rarr;\|&rarr; parent         | defines the node context in relation to the clust for example `*.app1.app2` would mean that this node is located on the path `root->app1->app2`. It is injected by the inspr daemon.    |
+| \|&rarr;\|&rarr;\|&rarr; sha256         | tags images with their sha256 digest.     |
+| \|&rarr;\|&rarr; Spec                    |       |
+| \|&rarr;\|&rarr;\|&rarr; Image          | url to the location of the already defined node in the inspr repository      |
+| \|&rarr;\|&rarr;\|&rarr; Replicas       | defines the amount of replicas to be created in your cluster       |
+| \|&rarr;\|&rarr;\|&rarr; Envioronment   | defines the envioronment variables of your pods      |
 | \|&rarr; Apps                             | set of DApps that are connected to this DApp, can be either specified when creating a new app or is modified by the inspr daemon when creating/updating different DApps      |    
 | \|&rarr; Channels                         | set of Channels that are created in the context of this DApp      |    
 | \|&rarr; ChannelTypes                     | set of Channel Types that are created in the context of this DApp      |    
@@ -36,7 +45,7 @@ The reason for this is that the file when written in a one of the formats descri
 | \|&rarr; \|&rarr; Output                  | List of channels that are used for the output of this DApp      |    
 
 ### yaml example
-```
+```yaml
 apiVersion: v1
 kind: dapp
 meta:
@@ -58,8 +67,7 @@ spec:
     input:
       - primes_ch2
     output:
-      - primes_ch1
-      
+      - primes_ch1   
 ```
 
 ## Channels 
@@ -73,6 +81,7 @@ spec:
 | meta                          | metadata of Channel     |
 | \|&rarr; name                 | defines the Channel name     |
 | \|&rarr; reference            | url reference to the channel definition in the inspr repository, there are already well defined channel that can be used instead of defining your own.     |
+| \|&rarr;Annotations | defines the environment variables of the Channel, for a better understanding of how to use it see the example below. |
 | \|&rarr; parent               | it is injected by the inspr daemon, defines the Channel context in the cluster through the path of the app in which the channel is stored, for example: "*.app1.app2" means that the channel is defined in the app2.    |
 | \|&rarr; sha256               | tags images with their sha256 digest.     |
 | spec                          |      |
@@ -81,7 +90,7 @@ spec:
 | \|&rarr; item_DApp            | name of the DApp currently using this channel     |
 
 ### yaml example
-```
+```yaml
 apiVersion: "v1"
 kind: "channel"
 meta:
@@ -93,7 +102,7 @@ meta:
   parent: ""  
 spec:
   type: "primes_ct1"
-  ```
+```
 
 
 ## Channel_Types 
@@ -107,6 +116,7 @@ spec:
 | meta                          | metadata of Channel_Type     |
 | \|&rarr;name                  | channel_type_name   |
 | \|&rarr;reference            | url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own.     |
+| \|&rarr;Annotations |  TODO |
 | \|&rarr;parent               | It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.       |
 | \|&rarr;sha256               | tags images with their sha256 digest.     |
 | schema                        | defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`     |
@@ -128,7 +138,7 @@ Channel_Type:
     - item_channel: name of the channel currently using this type
 
 ### yaml example
-```
+```yaml
 apiVersion: "v1"
 kind: "channeltype"
 meta:
@@ -148,7 +158,7 @@ For example an App that has a collection of other apps plus some definitions of 
 
 ### yaml example
 
-```
+```yaml
 apiVersion: v1
 kind: dapp
 meta:
@@ -164,10 +174,6 @@ spec:
       meta:
         name: "primes_ct1"
       schema: '{"type":"int"}'
-    primes_ct2:
-      meta:
-        name: "primes_ct2"
-      schema: '{"type":"int"}'
 
   channels:
     primes_ch1:
@@ -180,17 +186,6 @@ spec:
         parent: ""  
       spec:
         type: "primes_ct1"
-    primes_ch2:
-      meta:
-        name: "primes_ch2"
-        reference: ""
-        Annotations:     
-          kafka.partition.number: "3"
-          kafka.replication.factor: "3"
-        parent: ""  
-      spec:
-        type: "primes_ct2"
-        
          
   apps:
     # number generators
@@ -209,35 +204,12 @@ spec:
               MODULE: 100
         boundary:
           input:
-            - primes_ch2
-          output:
-            - primes_ch1
-
-    # filters primes
-    filter: 
-      meta:
-        name: "filter-primes"
-        reference: ""
-        parent: ""
-      spec:
-        node:
-          meta:
-            name: "node-filter"
-            parent: "filter-primes"
-          spec:
-            image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
-            replicas: 2            
-
-        boundary:
-          input:
             - primes_ch1
           output:
-            - primes_ch2
-        
-        
+            - primes_ch1
 
     # prints the filtered
-    printer: 
+    W: 
       meta:
         name: "printer-primes"
         reference: ""
@@ -253,7 +225,6 @@ spec:
         boundary:
           input:
             - primes_ch1
-            - primes_ch2
           output:
-            - primes_ch2
+            - primes_ch1
 ```
