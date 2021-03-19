@@ -3,6 +3,9 @@ kind: "dapp"
 meta:
   name: "app1"
 spec:
+  boundary:
+    input:
+      - "bananita"
   channeltypes:
     ct1:
       schema: '{"type":"string"}'
