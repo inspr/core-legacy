@@ -20,7 +20,6 @@ type Consumer interface {
 
 // Reader reads/commit messages from the channels defined in the env
 type Reader struct {
-	// consumer    Consumer //deprecated
 	consumers   map[string]Consumer
 	lastMessage *kafka.Message
 }
