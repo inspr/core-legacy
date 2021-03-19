@@ -14,33 +14,33 @@ In this way, when the file is written in one of the formats described below it c
 ### Definitions
 
 | Field                | Meaning                                                                                                                                                                                              |
-| :------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | apiVersion           | specify what version of the api to use, for example `v1`                                                                                                                                             |
 | kind                 | specifies which structure the file represents, in this case it would be `dapp`                                                                                                                       |
 | meta                 | metadata of dApp                                                                                                                                                                                     |
-| &nbsp;name           | defines dApp name                                                                                                                                                                                    |
-| &nbsp;reference      | url to the inspr repository containing a already defined dApp. It will load from this address the image containing all the necessary information for the creation of this dApp in your cluster.      |
-| &nbsp;Annotations    | definitions that can describe characteristics of the app that later on can be used to process/group the apps in your cluster.                                                                        |
-| &nbsp;parent         | defines dApp context in relation to the cluster, for example `*.app1.app2` would mean that this app is located on the path `root->app1->app2->app-name`. It is injected by the inspr daemon.         |
-| &nbsp;sha256         | tags images with their sha256 digest.                                                                                                                                                                |
+| &rarr;name           | defines dApp name                                                                                                                                                                                    |
+| &rarr;reference      | url to the inspr repository containing a already defined dApp. It will load from this address the image containing all the necessary information for the creation of this dApp in your cluster.      |
+| &rarr;Annotations    | definitions that can describe characteristics of the app that later on can be used to process/group the apps in your cluster.                                                                        |
+| &rarr;parent         | defines dApp context in relation to the cluster, for example `*.app1.app2` would mean that this app is located on the path `root->app1->app2->app-name`. It is injected by the inspr daemon.         |
+| &rarr;sha256         | tags images with their sha256 digest.                                                                                                                                                                |
 | spec                 | specification of dApp                                                                                                                                                                                |
-| &nbsp;Node           | Section describing the dApp node                                                                                                                                                                     |
-| &nbsp;&nbsp;Meta     | metadata of the Node                                                                                                                                                                                 |
+| &rarr;Node           | Section describing the dApp node                                                                                                                                                                     |
+| &rarr;&rarr;Meta     | metadata of the Node                                                                                                                                                                                 |
 | name                 | defines node name                                                                                                                                                                                    |
 | reference            | url to the inspr repository containing a already defined dApp-Node. It will load from this address the image containing all the necessary information for the creation of this node in your cluster. |
 | Annotations          | definitions that can describe characteristics of the node that later on can be used to process/group the nodes in your cluster.                                                                      |
 | parent               | defines the node context in relation to the clust for example `*.app1.app2` would mean that this node is located on the path `root->app1->app2`. It is injected by the inspr daemon.                 |
 | sha256               | tags images with their sha256 digest.                                                                                                                                                                |
-| &nbsp;&nbsp; Spec    |                                                                                                                                                                                                      |
+| &rarr;&rarr; Spec    |                                                                                                                                                                                                      |
 | Image                | url to the location of the already defined node in the inspr repository                                                                                                                              |
 | Replicas             | defines the amount of replicas to be created in your cluster                                                                                                                                         |
 | Envioronment         | defines the envioronment variables of your pods                                                                                                                                                      |
-| &nbsp; Apps          | set of dApps that are connected to this dApp, can be either specified when creating a new app or is modified by the inspr daemon when creating/updating different dApps                              |
-| &nbsp; Channels      | set of Channels that are created in the context of this dApp                                                                                                                                         |
-| &nbsp; ChannelTypes  | set of Channel Types that are created in the context of this dApp                                                                                                                                    |
-| &nbsp; Boundary      |                                                                                                                                                                                                      |
-| &nbsp; &nbsp; Input  | List of channels that are used for the input of this dApp                                                                                                                                            |
-| &nbsp; &nbsp; Output | List of channels that are used for the output of this dApp                                                                                                                                           |
+| &rarr; Apps          | set of dApps that are connected to this dApp, can be either specified when creating a new app or is modified by the inspr daemon when creating/updating different dApps                              |
+| &rarr; Channels      | set of Channels that are created in the context of this dApp                                                                                                                                         |
+| &rarr; ChannelTypes  | set of Channel Types that are created in the context of this dApp                                                                                                                                    |
+| &rarr; Boundary      |                                                                                                                                                                                                      |
+| &rarr; &rarr; Input  | List of channels that are used for the input of this dApp                                                                                                                                            |
+| &rarr; &rarr; Output | List of channels that are used for the output of this dApp                                                                                                                                           |
 
 ### YAML example
 ```yaml
@@ -77,15 +77,15 @@ spec:
 | apiVersion        | specify what version of the api to use, for example `"v1"`                                                                                                                                                           |
 | kind              | specifies which structure the file represents, in this case it would be `channel`                                                                                                                                    |
 | meta              | metadata of Channel                                                                                                                                                                                                  |
-| &nbsp; name       | defines the Channel name                                                                                                                                                                                             |
-| &nbsp; reference  | url reference to the channel definition in the inspr repository, there are already well defined channel that can be used instead of defining your own.                                                               |
-| &nbsp;Annotations | definitions that can describe characteristics of the channel that later on can be used to process/group the channels in your cluster.                                                                                |
-| &nbsp; parent     | it is injected by the inspr daemon, defines the Channel context in the cluster through the path of the app in which the channel is stored, for example: "*.app1.app2" means that the channel is defined in the app2. |
-| &nbsp; sha256     | tags images with their sha256 digest.                                                                                                                                                                                |
+| &rarr; name       | defines the Channel name                                                                                                                                                                                             |
+| &rarr; reference  | url reference to the channel definition in the inspr repository, there are already well defined channel that can be used instead of defining your own.                                                               |
+| &rarr;Annotations | definitions that can describe characteristics of the channel that later on can be used to process/group the channels in your cluster.                                                                                |
+| &rarr; parent     | it is injected by the inspr daemon, defines the Channel context in the cluster through the path of the app in which the channel is stored, for example: "*.app1.app2" means that the channel is defined in the app2. |
+| &rarr; sha256     | tags images with their sha256 digest.                                                                                                                                                                                |
 | spec              |                                                                                                                                                                                                                      |
-| &nbsp; type       | defines the type of the channel, this field is a string that contains the name of any of the channel_types defined in your cluster                                                                                   |
+| &rarr; type       | defines the type of the channel, this field is a string that contains the name of any of the channel_types defined in your cluster                                                                                   |
 | connectedapss     | List of app names that are using this channel, this is injected by the inspr daemon                                                                                                                                  |
-| &nbsp; item_dApp  | name of the dApp currently using this channel                                                                                                                                                                        |
+| &rarr; item_dApp  | name of the dApp currently using this channel                                                                                                                                                                        |
 
 ### YAML example
 ```yaml
@@ -112,14 +112,14 @@ spec:
 | apiVersion         | specify what version of the api to use, for example `"v1"`                                                                                                                        |
 | kind               | specifies which structure the file represents, in this case it would be `channeltype`                                                                                             |
 | meta               | metadata of Channel_Type                                                                                                                                                          |
-| &nbsp;name         | channel_type_name                                                                                                                                                                 |
-| &nbsp;reference    | url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own.                 |
-| &nbsp;Annotations  | definitions that can describe characteristics of the channel_type that later on can be used to process/group the channel_types in your cluster.                                   |
-| &nbsp;parent       | It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster. |
-| &nbsp;sha256       | tags images with their sha256 digest.                                                                                                                                             |
+| &rarr;name         | channel_type_name                                                                                                                                                                 |
+| &rarr;reference    | url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own.                 |
+| &rarr;Annotations  | definitions that can describe characteristics of the channel_type that later on can be used to process/group the channel_types in your cluster.                                   |
+| &rarr;parent       | It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster. |
+| &rarr;sha256       | tags images with their sha256 digest.                                                                                                                                             |
 | schema             | defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`                                                                                  |
 | connectedchannels  | Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon`                                                         |
-| &nbsp;item_channel | name of the channel currently using this type                                                                                                                                     |
+| &rarr;item_channel | name of the channel currently using this type                                                                                                                                     |
 
 
 ### list definitions
