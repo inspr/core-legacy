@@ -22,7 +22,7 @@ In this way, when the file is written in one of the formats described below it c
 | meta | metadata of dApp |
 | &nbsp;&nbsp;&nbsp;&nbsp;name    | defines dApp name |
 | &nbsp;&nbsp;&nbsp;&nbsp;reference    | url to the inspr repository containing a already defined dApp. It will load from this address the image containing all the necessary information for the creation of this dApp in your cluster. |
-| &nbsp;&nbsp;&nbsp;&nbsp;Annotations | defines the environment variables of the dApp, for a better understanding of how to use it see the example below. |
+| &nbsp;&nbsp;&nbsp;&nbsp;Annotations | definitions that can describe characteristics of the app that later on can be used to process/group the apps in your cluster. |
 | &nbsp;&nbsp;&nbsp;&nbsp;parent  | defines dApp context in relation to the cluster, for example `*.app1.app2` would mean that this app is located on the path `root->app1->app2->app-name`. It is injected by the inspr daemon.    |
 | &nbsp;&nbsp;&nbsp;&nbsp;sha256  | tags images with their sha256 digest.|
 | spec   | specification of dApp |
@@ -30,7 +30,7 @@ In this way, when the file is written in one of the formats described below it c
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Meta| metadata of the Node |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name | defines node name |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; reference | url to the inspr repository containing a already defined dApp-Node. It will load from this address the image containing all the necessary information for the creation of this node in your cluster. |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Annotations |  TODO |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Annotations |  definitions that can describe characteristics of the node that later on can be used to process/group the nodes in your cluster. |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parent    | defines the node context in relation to the clust for example `*.app1.app2` would mean that this node is located on the path `root->app1->app2`. It is injected by the inspr daemon.    |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sha256    | tags images with their sha256 digest.|
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Spec|  |
@@ -81,7 +81,7 @@ spec:
 | meta      | metadata of Channel     |
 | &nbsp;&nbsp;&nbsp;&nbsp; name                 | defines the Channel name     |
 | &nbsp;&nbsp;&nbsp;&nbsp; reference            | url reference to the channel definition in the inspr repository, there are already well defined channel that can be used instead of defining your own.     |
-| &nbsp;&nbsp;&nbsp;&nbsp;Annotations | defines the environment variables of the Channel, for a better understanding of how to use it see the example below. |
+| &nbsp;&nbsp;&nbsp;&nbsp;Annotations | definitions that can describe characteristics of the channel that later on can be used to process/group the channels in your cluster.|
 | &nbsp;&nbsp;&nbsp;&nbsp; parent               | it is injected by the inspr daemon, defines the Channel context in the cluster through the path of the app in which the channel is stored, for example: "*.app1.app2" means that the channel is defined in the app2.    |
 | &nbsp;&nbsp;&nbsp;&nbsp; sha256               | tags images with their sha256 digest.     |
 | spec      |      |
@@ -116,7 +116,7 @@ spec:
 | meta      | metadata of Channel_Type     |
 | &nbsp;&nbsp;&nbsp;&nbsp;name                  | channel_type_name   |
 | &nbsp;&nbsp;&nbsp;&nbsp;reference            | url reference to the channel_type definition in the inspr repository, there are already well defined channel_types that can be used instead of defining your own.     |
-| &nbsp;&nbsp;&nbsp;&nbsp;Annotations |  TODO |
+| &nbsp;&nbsp;&nbsp;&nbsp;Annotations |  definitions that can describe characteristics of the channel_type that later on can be used to process/group the channel_types in your cluster. |
 | &nbsp;&nbsp;&nbsp;&nbsp;parent               | It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.       |
 | &nbsp;&nbsp;&nbsp;&nbsp;sha256               | tags images with their sha256 digest.     |
 | schema    | defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`     |
