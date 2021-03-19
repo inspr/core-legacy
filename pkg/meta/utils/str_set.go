@@ -80,6 +80,11 @@ func MakeStrSet(obj interface{}) (StrSet, error) {
 			set[k] = exists
 		}
 		return set, nil
+	case MAliases:
+		for k := range value {
+			set[k] = exists
+		}
+		return set, nil
 
 	default:
 		objType := reflect.TypeOf(obj)

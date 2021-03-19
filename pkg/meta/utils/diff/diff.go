@@ -141,7 +141,7 @@ func (change *Change) diffAppSpec(from, to meta.AppSpec) error {
 	return nil
 }
 
-func (change *Change) diffAliases(from, to map[string]*meta.Alias) {
+func (change *Change) diffAliases(from, to metautils.MAliases) {
 	fromSet, _ := metautils.MakeStrSet(from)
 	toSet, _ := metautils.MakeStrSet(to)
 
