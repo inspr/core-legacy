@@ -81,7 +81,7 @@ Alias structure applied in the previous example:
 
 ![with-alias](img/alias.jpg)  
 
-The image shows that Nodes 3 and 4 boundaries are not direct references to Channels defined in dApp2, they are actually used in dApp2's Alias structure. In this structure, the child Node's boundaries are pointed to Channels that belong to their parend dApp's (dApp2) Boundary.  
+The image shows that Nodes 3 and 4 boundaries are not direct references to Channels defined in dApp2, they are actually used in dApp2's Alias structure. In this structure, the child Node's boundaries are pointed to Channels that belong to their parent dApp's (dApp2) Boundary.  
 In conclusion, Nodes 3 and 4 boundaries are Channels defined in dApp1 (which is located two layers above from the Nodes), so now they can exchange information with Node 5!
 
-Besides providing a higher level communication between structures, Aliases make Inspr dApps much more attachable. If a user wants to add a new dApp to an already existing structure, there is no need to change the whole structure so Channels and Boundaries are readapted - the user can simply create Aliases for the new dApp's Channels to redirect it's inputs and outputs.
+Besides providing a higher level communication between structures, Aliases make Inspr dApps much more attachable. If a user wants to add a new dApp to an already existing structure, there is no need to change the whole structure so Channels and Boundaries are readapted. The user can simply create Aliases for the new dApp's Channels to redirect it's inputs and outputs.
