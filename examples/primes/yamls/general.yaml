@@ -53,7 +53,7 @@ spec:
             parent: "generator"
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
-            replicas: 8
+            replicas: 1
             environment:
               MODULE: 100
         boundary:
@@ -75,7 +75,7 @@ spec:
             parent: "filter-primes"
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
-            replicas: 2            
+            replicas: 1          
 
         boundary:
           input:
@@ -98,7 +98,7 @@ spec:
             parent: "printer"
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
-            replicas: 2            
+            replicas: 1            
         boundary:
           input:
             - primes_ch1

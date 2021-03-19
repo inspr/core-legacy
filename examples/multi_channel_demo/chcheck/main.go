@@ -18,7 +18,8 @@ func main() {
 
 	for {
 		for i := 0; i < 3; i++ {
-			testMsg, err := client.ReadMessage(ctx, testChannels[i])
+			var testMsg models.Message
+			err := client.ReadMessage(ctx, testChannels[i], &testMsg)
 			if err != nil {
 				fmt.Println(err)
 				continue
