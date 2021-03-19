@@ -1,6 +1,6 @@
 # Schemas and Types
 
-A Channel Type defines the type for the channel. It is important for a channel to have a type, as this is how the types of messages that are passed through it are defined. In this way, it is possible to build a well-defined communication structure between dApps, handling the messages efficiently and convert them both in the sender and in the receiver. It is also mandatory since every Inspr channel must be typed. A Channel Type basically has two attributes:
+A Channel Type defines the type of the information that can go through a Channel.  It is mandatory for a Channel to have a type, since it allows communication between dApps to be well defined. In this way, messages can be handled easily, and converted to both the sender and the receiver. A Channel Type basically has two attributes:
 
 * `meta`, in which metadata is defined for the Channel Type, such as its name and annotations. For more information about the meta field, take a look [here]()
 * `schema`, in which a type is properly declared.
