@@ -1,6 +1,6 @@
 # YAML Documentation
 
-The creation of yaml files allows for the proper usage of the Inspr cli.
+The creation of YAML files allows for the proper usage of the Inspr CLI.
 
 In this way, when the file is written in one of the formats described below it can be processed and applied to the cluster throught the `inspr apply -f <file_path>` or `inspr apply -k <files_dir>` commands.
 
@@ -21,7 +21,7 @@ In this way, when the file is written in one of the formats described below it c
 | &rarr;name           | defines dApp name                                                                                                                                                                                    |
 | &rarr;reference      | url to the inspr repository containing a already defined dApp. It will load from this address the image containing all the necessary information for the creation of this dApp in your cluster.      |
 | &rarr;Annotations    | definitions that can describe characteristics of the app that later on can be used to process/group the apps in your cluster.                                                                        |
-| &rarr;parent         | defines dApp context in relation to the cluster, for example `*.app1.app2` would mean that this app is located on the path `root->app1->app2->app-name`. It is injected by the inspr daemon.         |
+| &rarr;parent         | defines dApp context in relation to the cluster. For example `*.app1.app2` would mean that this app is located on the path `root->app1->app2->app-name`. It is injected by the inspr daemon.         |
 | &rarr;sha256         | tags images with their sha256 digest.                                                                                                                                                                |
 | spec                 | specification of dApp                                                                                                                                                                                |
 | &rarr;Node           | Section describing the dApp node                                                                                                                                                                     |
@@ -118,7 +118,7 @@ spec:
 | &rarr;parent       | It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster. |
 | &rarr;sha256       | tags images with their sha256 digest.                                                                                                                                             |
 | schema             | defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`                                                                                  |
-| connectedchannels  | Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon`                                                         |
+| connectedchannels  | Is a list of channels that are created using this specific type, this is injected through the `inspr_CLI`/ `inspr_daemon`                                                         |
 | &rarr;item_channel | name of the channel currently using this type                                                                                                                                     |
 
 
@@ -132,7 +132,7 @@ Channel_Type:
     - **parent**: It is injected by the inspr daemon and it's string composed of it's location's path, for example `'*.app1.app2'` means that the channel type belongs to the app2 in your cluster.
     - **sha256**: tags images with their sha256 digest.
  - **schema**: defines the message structure  that goes through this channel_type, example:  `'{"type":"int"}'`
- - **connected**: Is a list of channels that are created using this specific type, this is injected through the `inspr_cli`/ `inspr_daemon`
+ - **connected**: Is a list of channels that are created using this specific type, this is injected through the `inspr_CLI`/ `inspr_daemon`
     - **item_channel**: name of the channel currently using this type
 
 ### YAML example
@@ -150,7 +150,7 @@ schema: '{"type":"int"}'
 
 ### Definition
 
-The so called general file or composed file is nothing more than a yaml that congregates two or more definitions of one of the elements above. 
+The so called general file or composed file is nothing more than a YAML that congregates two or more definitions of one of the elements above. 
 
 For example an App that has a collection of other apps plus some definitions of channel_types and channels.
 
