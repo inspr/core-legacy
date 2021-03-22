@@ -25,14 +25,16 @@ func main() {
 				fmt.Println(err)
 				continue
 			}
-			var checkMsg models.Message
+			var checkMsg models.BrokerData
 			err := client.ReadMessage(ctx, checkChannel, &checkMsg)
 			if err != nil {
 				fmt.Println(err)
 				continue
 			}
+
 			fmt.Println("Check received: ")
-			fmt.Println(checkMsg.Data)
+			fmt.Println(checkMsg.Message.Data)
+
 			if err := client.CommitMessage(ctx, checkChannel); err != nil {
 				fmt.Println(err.Error())
 			}
