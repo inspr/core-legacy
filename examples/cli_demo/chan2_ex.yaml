@@ -1,0 +1,7 @@
+apiVersion: "v1"
+kind: "channel"
+meta:
+  parent: ""
+  name: "bananita"
+spec:
+  type: "ctroot1"

@@ -27,8 +27,8 @@ type Reader struct {
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
 	var reader Reader
-	channelsList := globalEnv.GetInputChannelList(globalEnv.GetInputChannels())
-	resolvedChList := globalEnv.GetResolvedInputChannelList(globalEnv.GetInputChannels())
+	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannels())
+	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannels())
 	if len(resolvedChList) == 0 {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
