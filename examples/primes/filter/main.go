@@ -33,6 +33,8 @@ func main() {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
+
+			fmt.Println("i have read -> ", msg)
 			number = msg.Data.(float64)
 			fmt.Println("Read: ", number)
 

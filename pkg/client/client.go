@@ -72,7 +72,7 @@ func (c *Client) ReadMessage(
 		"/readMessage",
 		http.MethodPost,
 		data,
-		&message,
+		message,
 	)
 
 	return err
