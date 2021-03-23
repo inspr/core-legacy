@@ -7,6 +7,7 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
+	"go.uber.org/zap"
 )
 
 func TestNewReader(t *testing.T) {
@@ -135,9 +136,11 @@ func TestReader_ReadMessage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			logger, _ := zap.NewDevelopment()
 			reader := &Reader{
 				consumers:   tt.fields.consumers,
 				lastMessage: tt.fields.lastMessage,
+				logger:      logger,
 			}
 
 			bData, err := reader.ReadMessage(tt.uniqueChannel)
