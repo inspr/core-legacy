@@ -92,8 +92,7 @@ func TestChannelClient_Delete(t *testing.T) {
 }
 
 func TestChannelClient_Get(t *testing.T) {
-	type fields struct {
-	}
+
 	type args struct {
 		ctx     context.Context
 		context string
@@ -101,7 +100,6 @@ func TestChannelClient_Get(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    *meta.Channel
 		wantErr bool

@@ -88,15 +88,13 @@ func TestAppClient_Delete(t *testing.T) {
 }
 
 func TestAppClient_Get(t *testing.T) {
-	type fields struct {
-	}
+
 	type args struct {
 		ctx     context.Context
 		context string
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    *meta.App
 		wantErr bool
