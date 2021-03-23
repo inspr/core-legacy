@@ -1,12 +1,7 @@
 apiVersion: v1
 kind: dapp
 meta:
-  name: "basic-example"
-  reference: ""
-  parent: ""
-  Annotations: 
-    kafka.partition.number: "3"
-    kafka.replication.factor: "3"
+  name: "basicexample"
 spec:
   channeltypes:
     primes_ct1:
@@ -23,85 +18,85 @@ spec:
       meta:
         name: "primes_ch1"
         reference: ""
-        Annotations: 
-          kafka.partition.number: "3"
+        annotations:
+          kafka.partition.number: "10"
           kafka.replication.factor: "3"
-        parent: ""  
+        parent: ""
       spec:
         type: "primes_ct1"
     primes_ch2:
       meta:
         name: "primes_ch2"
         reference: ""
-        Annotations:     
+        annotations:
           kafka.partition.number: "3"
           kafka.replication.factor: "3"
-        parent: ""  
+        parent: ""
       spec:
         type: "primes_ct2"
-        
-         
+
+  aliases:
+    primes.input:
+      target: primes_ch1
+    primes.output:
+      target: primes_ch2
+
   apps:
     # number generators
     generator:
-      meta:
-        name: "generator"
       spec:
         node:
-          meta:
-            name: "node-generator"
-            parent: "generator"
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
             replicas: 1
             environment:
-              MODULE: 100
+              MODULE: 300
         boundary:
-          input:
-            - primes_ch2
           output:
             - primes_ch1
 
-    # filters primes
-    filter: 
-      meta:
-        name: "filter-primes"
-        reference: ""
-        parent: ""
+    primes:
       spec:
-        node:
-          meta:
-            name: "node-filter"
-            parent: "filter-primes"
-          spec:
-            image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
-            replicas: 1          
-
         boundary:
           input:
-            - primes_ch1
+            - input
           output:
-            - primes_ch2
-        
-        
+            - output
+        aliases:
+          printer.input:
+            target: output
+        apps:
+          # filters primes
+          filter:
+            meta:
+              name: "filter"
+              reference: ""
+              parent: ""
+            spec:
+              node:
+                spec:
+                  image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
+                  replicas: 2
+              boundary:
+                input:
+                  - input
+                output:
+                  - output
 
-    # prints the filtered
-    printer: 
-      meta:
-        name: "printer-primes"
-        reference: ""
-        parent: ""
-      spec:        
-        node:
-          meta:
-            name: "node-printer"
-            parent: "printer"
-          spec:
-            image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
-            replicas: 1            
-        boundary:
-          input:
-            - primes_ch1
-            - primes_ch2
-          output:
-            - primes_ch2
+          # prints the filtered
+          printer:
+            meta:
+              name: "printer-primes"
+              reference: ""
+              parent: ""
+            spec:
+              node:
+                meta:
+                  name: "node-printer"
+                  parent: "printer"
+                spec:
+                  image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
+                  replicas: 1
+              boundary:
+                input:
+                  - input
