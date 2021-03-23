@@ -1,8 +1,6 @@
 package diff
 
 import (
-	"strings"
-
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
@@ -21,7 +19,6 @@ func (c Changelog) FilterDiffsByKind(kind Kind) Changelog {
 func (c Changelog) ForEach(f func(c Change) error) error {
 	errors := ierrors.MultiError{Errors: []error{}}
 	for _, change := range c {
-		change.Context = strings.Replace(change.Context, "*.", "", 0)
 		if change.Context == "*" {
 			change.Context = ""
 		}
@@ -34,7 +31,6 @@ func (c Changelog) ForEach(f func(c Change) error) error {
 func (c Changelog) FilterDiffs(comp DifferenceFilter) Changelog {
 	newChangelog := Changelog{}
 	for _, change := range c {
-		change.Context = strings.Replace(change.Context, "*.", "", 0)
 		if change.Context == "*" {
 			change.Context = ""
 		}
@@ -101,7 +97,6 @@ func (c Changelog) ForEachDiffFiltered(operations ...DifferenceReaction) error {
 		Errors: []error{},
 	}
 	for _, change := range c {
-		change.Context = strings.Replace(change.Context, "*.", "", 0)
 		if change.Context == "*" {
 			change.Context = ""
 		}
@@ -186,7 +181,6 @@ func (c Changelog) ForEachFiltered(operations ...ChangeReaction) error {
 		Errors: []error{},
 	}
 	for _, change := range c {
-		change.Context = strings.Replace(change.Context, "*.", "", 0)
 		if change.Context == "*" {
 			change.Context = ""
 		}

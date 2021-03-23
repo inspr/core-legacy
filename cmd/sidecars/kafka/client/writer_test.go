@@ -40,6 +40,9 @@ func TestNewWriter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewWriter(tt.args.mock)
+			if err != nil {
+				t.Error(err)
+			}
 			defer got.Close()
 			if tt.wantErr && (got.producer.GetFatalError() != nil) {
 				t.Errorf("NewWriter() error = %v, wantErr %v", err, tt.wantErr)

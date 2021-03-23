@@ -18,13 +18,16 @@ func main() {
 
 	for {
 		for i := 0; i < 3; i++ {
-			testMsg, err := client.ReadMessage(ctx, testChannels[i])
+			var testMsg models.BrokerData
+			err := client.ReadMessage(ctx, testChannels[i], &testMsg)
 			if err != nil {
 				fmt.Println(err)
 				continue
 			}
+
 			fmt.Println("Test received: ")
-			fmt.Println(testMsg.Data)
+			fmt.Println(testMsg.Message.Data)
+
 			if err := client.CommitMessage(ctx, testChannels[i]); err != nil {
 				fmt.Println(err.Error())
 			}

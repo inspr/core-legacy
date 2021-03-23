@@ -131,8 +131,6 @@ func ParseFlags(cmd *cobra.Command, flags []*Flag) {
 
 // AddFlags adds to the command the common flags that are annotated with the command name.
 func AddFlags(cmd *cobra.Command) {
-	var flagsForCommand []*Flag
-
 	for i := range flagRegistry {
 		fl := &flagRegistry[i]
 		if !hasCmdAnnotation(cmd.Use, fl.DefinedOn) {
@@ -141,7 +139,6 @@ func AddFlags(cmd *cobra.Command) {
 
 		cmd.Flags().AddFlag(fl.Flag())
 
-		flagsForCommand = append(flagsForCommand, fl)
 	}
 }
 
