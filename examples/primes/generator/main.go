@@ -34,20 +34,17 @@ func main() {
 	// channelName
 	chName := "primes_ch1"
 	ctx := context.Background()
+	fmt.Println("starting...")
+	for range ticker.C {
+		randNumber := rand.Int() % mod
+		fmt.Println("random number -> ", randNumber)
+		newMsg := models.Message{
+			Data: randNumber,
+		}
 
-	for {
-		select {
-		case <-ticker.C:
-			randNumber := rand.Int() % mod
-			fmt.Println("random number -> ", randNumber)
-			newMsg := models.Message{
-				Data: randNumber,
-			}
-
-			err := c.WriteMessage(ctx, chName, newMsg)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
+		err := c.WriteMessage(ctx, chName, newMsg)
+		if err != nil {
+			fmt.Println(err.Error())
 		}
 	}
 }
