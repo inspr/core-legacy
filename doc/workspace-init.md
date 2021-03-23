@@ -1,13 +1,19 @@
+TODO:
+1) Fix Ping and Pong code so it uses the latest version of ReadMessage (and documento how it works)
+2) Run pingpong demo and print the results (apply results and it working in the cluster)
+3) Record a video of everything
+
 # Workspace Initialization
-This document is a detailed guide on how to create an application and deploy an Inspr environment that cointains it into a Kubernetes cluster.  
+This document is a detailed guide on how to create an application and deploy an Inspr workspace that cointains it into a Kubernetes cluster.  
 
-**It is mandatory to have [Docker](https://docs.docker.com/get-docker/), [Kubernetes](https://kubernetes.io/docs/tasks/tools/), [Inspr](helm-install.md) and [Inspr CLI](cli-install.md) installed. [Skaffold](https://skaffold.dev/docs/install/) can also be very useful.**
+**It is mandatory to have [Docker](https://docs.docker.com/get-docker/), [Kubernetes](https://kubernetes.io/docs/tasks/tools/), [Inspr](helm_installation.md) and [Inspr CLI](cli-install.md) installed.**  
+Also, this tutorial will be using the Message Broker [Apache Kafka](https://kafka.apache.org/). You can see how to install it in your cluster [here](https://bitnami.com/stack/kafka/helm). 
 
-The Inspr environment that will be created through this guide contains two applications that communicate with each other:
+The Inspr workspace that will be created through this guide contains two applications that communicate with each other:
 - **Ping**, that writes the string "Ping!" into a Channel, and reads what's written by the other application in another Channel.
 - **Pong**, that writes the string "Pong!" into a Channel, and reads what's written by the other application in another Channel.    
 
-The tree-like structure of this Inspr environment will be similar to this:  
+The tree-like structure of this Inspr workspace will be similar to this:  
 
 ![structure](img/pingpong-app.jpg)
 
@@ -17,7 +23,7 @@ First of all, let's create the folders in which we will store all of our files (
 
 Create a folder called "pingpong_demo", and inside of it create other three folders: "ping", "pong" and "yamls".  
 
-The first two, "ping" and "pong", will store the applications code and their respective Dockerfiles. The last one, "yamls", will store all the *.yaml* files that define the structures which will be used to create the Inspr environment in the cluster.  
+The first two, "ping" and "pong", will store the applications code and their respective Dockerfiles. The last one, "yamls", will store all the *.yaml* files that define the structures which will be used to create the Inspr workspace in the cluster.  
 
 The following command creates the wanted folder structure:
 ```
@@ -176,21 +182,23 @@ CMD go run pingpong_demo/pong/pong.go
 ```
 
 ### Docker Image deployment
-After creating the Dockerfiles, we must build the Docker Images and push each of them into the cluster, so they are available to be used in the Inspr environment.  
+After creating the Dockerfiles, we must build the Docker Images and push each of them into the cluster, so they are available to be used in the Inspr workspace.  
 
 First, from "/pingpong_demo", go into "/ping" folder:
 ```
 cd ping
 ```
 
-Then we must build the Docker Image by using the Dockerfile previously created, applying the tag `latest` to it:
+In the next steps, it's important to have a live [container registry](https://cloud.google.com/container-registry) up and running, so it's possible to store and use the images that will be built.
+
+Then we must build the Docker Image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
 ```
-docker build -f Dockerfile -t YOUR-CLUSTER-URL/app/ping:latest
+docker build -f Dockerfile -t PING_IMAGE_TAG/app/ping:TAG_NAME
 ```
 
-Finally, we push the builded image into the cluster:
+Finally, we push the builded image into the cluster, where **PING_IMAGE_TAG is a reference to the container registry**:
 ```
-docker push YOUR-CLUSTER-URL/app/ping:latest
+docker push PING_IMAGE_TAG/app/ping:latest
 ```
 
 Now the same must be done to Pong. Go back to "/pingpong_demo" folder, and access "/pong" folder:
@@ -199,19 +207,228 @@ cd ..
 cd pong
 ```
 
-Build the Docker Image by using the Dockerfile previously created, applying the tag `latest` to it:
+Build the Docker Image by using the Dockerfile previously created (and applying a tag to it, if desired). Similarly, **PONG_IMAGE_TAG is a reference to the container registry**:
 ```
-docker build -f Dockerfile -t YOUR-CLUSTER-URL/app/pong:latest
+docker build -f Dockerfile -t PONG_IMAGE_TAG/app/pong:TAG_NAME
 ```
 
 Push the builded image into the cluster:
 ```
-docker push YOUR-CLUSTER-URL/app/pong:latest
+docker push PONG_IMAGE_TAG/app/pong:TAG_NAME
 ```  
 
-**Alternatively, you can use Skaffold to do the steps described above, in a much simpler way.**  
-If you have Skaffold installed, just go into the main folder "/pingpong_demo" and run the build command:
+**Alternatively, you can create a [Makefile](https://opensource.com/article/18/8/what-how-makefile) that will do the previous steps for you.**  
+Inside "/pingpong_demo" folder, create a new file called "Makefile:
 ```
-skaffold build
+touch Makefile
 ```
-And it's done!
+The Makefile should contain the same Docker commands that you'd use to build and push Ping and Pong Docker images. The gain here is that instead of writing and executing four different commands, you just execute the Makefile. It should look like this:
+```
+build:
+	docker build -t PING_IMAGE_TAG/app/pong:TAG_NAME -f ping/Dockerfile
+	docker push PING_IMAGE_TAG/app/pong:TAG_NAME
+	docker build -t PONG_IMAGE_TAG/app/pong:TAG_NAME -f pong/Dockerfile
+	docker push PONG_IMAGE_TAG/app/pong:TAG_NAME
+```
+
+And then execute the Makefile through the terminal:
+```
+make
+```
+
+## Creating Inspr Workspace
+
+Now that we have our applications implemented and their Docker images available in the cluster, we're good to go and build Inspr structures to use what we created.
+
+### YAML Files
+First of all, from "/pingpong_demo" we access the folder "/yamls" created previously.
+```
+cd yamls
+```
+And within this folder we will create the *.yaml* files which describe each of the Inspr structures that will be built inside the cluster. This part of the tutorial wont take a closer look at every minimum detail on writing the YAML files, but you can find more information about it [here](yamls.md).
+
+**1) dApp YAMLs**  
+The first file to be created is *table.yaml*, which is the dApp that will contain all the other structures (Ping and Pong Nodes, Channels and Channel Type):
+```
+touch table.yaml
+```
+
+As it's described in Inspr YAMLs documentation, we must specify the kind, apiVersion and then the dApp information. This file have a really simple dApp definition, for its the base on which everything else will be created on. It should be like this:  
+```
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: ppTable
+```
+
+The next file to be created is *ping.app.yaml*, in which we describe the Node that contains Ping. For better organization, let's create a new folder inside of "/yamls" called "nodes", inside of which we will store the Nodes YAMLs:
+```
+mkdir nodes
+touch nodes/ping.app.yaml
+```
+
+Then, insite of *ping.app.yaml* we must specify the kind, apiVersion and then the Node information (such as name, boundaries, image, etc.).  
+It should look like this:
+```
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: ping
+  parent: ppTable
+spec:
+  node:
+    spec:
+      replicas: 1
+      environment:
+        SUPER_SECRET_0001: "false"
+      image: PING_IMAGE_TAG/app/ping:TAG_NAME
+  boundary:
+    input:
+      - ppChannel2
+    output:
+      - ppChannel1
+```
+The `image` field must be a reference to the same image built in the step "Docker Image deployment". Also, the `environment` field is defined just so we can see that the environment variable "SUPER_SECRET_0001" will be created in the cluster, inside Ping's deployment.  
+
+Now, we do the same for Pong:
+```
+touch nodes/pong.app.yaml
+```
+And *pong.app.yaml* should look like this:
+```
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: pong
+  parent: ppTable
+spec:
+  node:
+    spec:
+      image: PONG_IMAGE_TAG/app/pong:TAG_NAME
+  boundary:
+    input:
+      - ppChannel1
+    output:
+      - ppChannel2
+```
+Notice that we didn't specify the number of replicas for Pong. This is to show that, **if not specified, the default number of replicas is created, which is one.**  
+
+**2) Channel YAMLs**  
+As it can be seen in Ping and Pong YAMLs, there are two Channels that need to be created. Similar to dApp, we must specify the kind, apiVersion and then the Channel information. Notice that the Channels annotations refer to Kafka attributes.  
+
+Let's proceed to create "/channels" folder inside of "/yamls", and then create *ch1.yaml*:
+```
+mkdir channels
+touch channels/ch1.yaml
+```
+
+It's content should be:
+```
+kind: channel
+apiVersion: v1
+
+meta:
+  name: ppChannel1
+  parent: ppTable
+  annotations:
+    kafka.replication.factor: 1
+    kafka.partition.number: 2
+spec:
+  type: ppCType1
+```
+
+Now we do the same for *ch2.yaml*:
+```
+touch channels/ch2.yaml
+```
+
+And it's content should be:
+```
+kind: channel
+apiVersion: v1
+
+meta:
+  name: ppChannel2
+  parent: ppTable
+  annotations:
+    kafka.replication.factor: 1
+    kafka.partition.number: 2
+spec:
+  type: ppCType1
+```  
+
+**3) Channel Type YAML**
+Both Channels use the same Channel Type to define the kind of message that goes through them. So, again, we must specify the kind, apiVersion and then the Channel Type information.  
+First we create "/ctypes" folder and *ct1.yaml*:
+```
+mkdir ctypes
+touch ctypes/ct1.yaml
+```
+
+And it's content should be:
+```
+kind: channeltype
+apiVersion: v1
+
+meta:
+  name: ppCType1
+  parent: ppTable
+schema: yamls/ctypes/schema.avsc
+```
+
+Notice that the `schema` field is actually a reference to an **Avro Schema** file. By defining it like this, when a Channel Type is created Inspr searches for the file and injects its value into the `schema`. You can find more information on how schemas should be created to be used in Inspr [here](schemas_and_types.md).  
+To make everythink work properly, let's create *schema.avsc*:  
+```
+touch ctypes/schema.avsc
+```
+
+As we defined in our Ping and Pong applications, the type of information that they will send and receive is just a simple string. To do so, *schema.avsc* content should be:
+```
+{"type":"string"}
+```
+
+After creating all of these folders and files, you should have this:
+```
+pingpong_demo
+├── Makefile
+├── ping
+│   ├── Dockerfile
+│   └── ping.go
+├── pong
+│   ├── Dockerfile
+│   └── pong.go
+└── yamls
+    ├── channels
+    │   ├── ch1.yaml
+    │   └── ch2.yaml
+    ├── ctypes
+    │   ├── ct1.yaml
+    │   └── schema.avsc
+    ├── nodes
+    │   ├── ping.app.yaml
+    │   └── pong.app.yaml
+    └── table.yaml
+```
+
+### Deploying dApps, Channels and Channel Type
+Finally, now that we have Ping and Pong images in the cluster and all Inspr workspace structures well-defined in YAML files, we can deploy everything that we created and see it working in our cluster.  
+
+From within "/pingpong_demo" folder, we apply the YAML files by using **Inspr CLIs** commands. The files should be applied in the following order:  
+1) dApp `ppTable`
+2) Channel Type `ppCType1`
+3) Channels `ppChannel1` and `ppChannel2`
+4) Nodes `ping` and `pong`  
+
+You can do so by running the following commands from within "/pingpong_demo" folder:
+```
+inspr apply -f yamls/table.yaml
+inspr apply -k yamls/ctypes
+inspr apply -k yamls/channels
+inspr apply -k yamls/nodes
+```
+To learn more about Inspr CLI, check [this](cli_commands.md) documentation.  
+
+If everything worked fine, the Inspr Workspace changelog will have printed something similar to this in your terminal:  
