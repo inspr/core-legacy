@@ -3,6 +3,7 @@ apiVersion: v1
 
 meta:
   name: ping
+  parent: ppTable
 spec:
   node:
     spec:
@@ -12,6 +13,6 @@ spec:
       image: gcr.io/red-inspr/inspr/example/ping:latest
   boundary:
     input:
-      - ch2
+      - ppChannel2
     output:
-      - ch1
+      - ppChannel1

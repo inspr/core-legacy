@@ -1,9 +1,10 @@
 kind: channel
 apiVersion: v1
 meta:
-  name: ch1
+  name: ppChannel2
+  parent: ppTable
   annotations:
     kafka.replication.factor: 1
     kafka.partition.number: 2
 spec:
-  type: channelType1
+  type: ppCType1
