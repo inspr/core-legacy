@@ -9,6 +9,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
+	"go.uber.org/zap"
 )
 
 // customHandlers is a struct that contains the handlers
@@ -19,17 +20,22 @@ type customHandlers struct {
 	w              models.Writer
 	InputChannels  string
 	OutputChannels string
+	logger         *zap.Logger
 }
 
 // newCustomHandlers returns a struct composed of the
 // Reader and Writer given in the parameters
 func newCustomHandlers(l sync.Locker, r models.Reader, w models.Writer) *customHandlers {
+	logger, _ := zap.NewDevelopment(
+		zap.Fields(zap.String("section", "handlers"), zap.String("id", environment.GetInsprAppID())),
+	)
 	return &customHandlers{
 		Locker:         l,
 		r:              r,
 		w:              w,
 		InputChannels:  environment.GetInputChannels(),
 		OutputChannels: environment.GetOutputChannels(),
+		logger:         logger,
 	}
 }
 
@@ -37,7 +43,7 @@ func newCustomHandlers(l sync.Locker, r models.Reader, w models.Writer) *customH
 func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Request) {
 	ch.Lock()
 	defer ch.Unlock()
-
+	ch.logger.Info("handling message write")
 	body := models.BrokerData{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
@@ -50,7 +56,7 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 		rest.ERROR(w, insprError.Build())
 		return
 	}
-
+	ch.logger.Info("writing message to broker", zap.String("channel", body.Channel))
 	if err := ch.w.WriteMessage(body.Channel, body.Message.Data); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's writeMessage failed")
 		rest.ERROR(w, insprError.Build())
@@ -62,6 +68,7 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Request) {
 	ch.Lock()
 	defer ch.Unlock()
+	ch.logger.Info("handling message read")
 
 	body := models.BrokerData{}
 
@@ -76,6 +83,7 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		rest.ERROR(w, insprError.Build())
 		return
 	}
+	ch.logger.Info("reading message from broker", zap.String("channel", body.Channel))
 
 	brokerResp, err := ch.r.ReadMessage(body.Channel)
 	if err != nil {
