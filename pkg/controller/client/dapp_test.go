@@ -49,7 +49,7 @@ func TestAppClient_Delete(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest())
+					encoder.Encode(ierrors.NewError().BadRequest().Build())
 					return
 				}
 
@@ -88,16 +88,13 @@ func TestAppClient_Delete(t *testing.T) {
 }
 
 func TestAppClient_Get(t *testing.T) {
-	type fields struct {
-		c *request.Client
-	}
+
 	type args struct {
 		ctx     context.Context
 		context string
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    *meta.App
 		wantErr bool
@@ -143,7 +140,7 @@ func TestAppClient_Get(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest())
+					encoder.Encode(ierrors.NewError().BadRequest().Build())
 					return
 				}
 
@@ -238,7 +235,7 @@ func TestAppClient_Create(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest())
+					encoder.Encode(ierrors.NewError().BadRequest().Build())
 					return
 				}
 
@@ -331,7 +328,7 @@ func TestAppClient_Update(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest())
+					encoder.Encode(ierrors.NewError().BadRequest().Build())
 					return
 				}
 

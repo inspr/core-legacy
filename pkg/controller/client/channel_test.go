@@ -50,7 +50,7 @@ func TestChannelClient_Delete(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest())
+					encoder.Encode(ierrors.NewError().BadRequest().Build())
 					return
 				}
 
@@ -92,9 +92,7 @@ func TestChannelClient_Delete(t *testing.T) {
 }
 
 func TestChannelClient_Get(t *testing.T) {
-	type fields struct {
-		c *request.Client
-	}
+
 	type args struct {
 		ctx     context.Context
 		context string
@@ -102,7 +100,6 @@ func TestChannelClient_Get(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    *meta.Channel
 		wantErr bool
@@ -139,7 +136,7 @@ func TestChannelClient_Get(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest())
+					encoder.Encode(ierrors.NewError().BadRequest().Build())
 					return
 				}
 
@@ -229,7 +226,7 @@ func TestChannelClient_Create(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest())
+					encoder.Encode(ierrors.NewError().BadRequest().Build())
 					return
 				}
 
@@ -314,7 +311,7 @@ func TestChannelClient_Update(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest())
+					encoder.Encode(ierrors.NewError().BadRequest().Build())
 					return
 				}
 

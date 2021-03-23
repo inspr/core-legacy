@@ -28,6 +28,9 @@ func NewApplyChannelType() RunMethod {
 		if schemaNeedsInjection(channelType.Schema) {
 			channelType.Schema, err = injectedSchema(channelType.Schema)
 		}
+		if err != nil {
+			return err
+		}
 
 		flagDryRun := cmd.InsprOptions.DryRun
 		flagIsUpdate := cmd.InsprOptions.Update
