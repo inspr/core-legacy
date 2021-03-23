@@ -223,7 +223,7 @@ func Test_builder_NewCmdWithFlags(t *testing.T) {
 		t.Errorf("expected flags to be of length 1, found %v", len(flags))
 	}
 
-	if "usage" != flags["test"].Usage {
+	if flags["test"].Usage != "usage" {
 		t.Errorf("expected 'usage', got %v", flags["test"].Usage)
 	}
 }
