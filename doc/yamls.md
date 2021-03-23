@@ -127,7 +127,7 @@ schema: '{"type":"int"}'
 
 The so called general file, or composed file, is nothing more than a YAML that congregates two or more definitions of the elements described above into a single dApp. 
 
-For example a dApp that has a collection of other dApps plus some definitions of channel Types and channels.
+For example a basic example dApp, that has a collection of other smaller dApps like number-generator and filter, plus some definitions of channel Types and channels.
 
 ### YAML example
 
