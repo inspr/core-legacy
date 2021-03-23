@@ -169,6 +169,27 @@ var updatedNodes func(handler *Handler) diff.ChangeReaction = func(handler *Hand
 	)
 }
 
+// apply this to updated aliases
+var updatedAliases func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
+	return diff.NewDifferenceReaction(
+		func(scope string, d diff.Difference) bool {
+			return (d.Kind|diff.AliasKind > 0) && (d.Operation&diff.Update > 0)
+		},
+		func(scope string, d diff.Difference) error {
+			appName, boundaryName, _ := utils.RemoveLastPartInScope(d.Name)
+			newScope, _ := utils.JoinScopes(scope, appName)
+			app, err := handler.Memory.Apps().Get(newScope)
+			if err == nil && app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(boundaryName) {
+				_, err := handler.Operator.Nodes().UpdateNode(context.Background(), app)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+	)
+}
+
 func (h *Handler) initReactions() {
 	h.addChangeReactor(
 		updatedNodes(h),
@@ -181,6 +202,6 @@ func (h *Handler) initReactions() {
 		deletedApps(h),
 		updatedChannels(h),
 		updatedChannelTypes(h),
+		updatedAliases(h),
 	)
-
 }

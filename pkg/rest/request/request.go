@@ -13,7 +13,13 @@ import (
 
 // Send sends a request to the url specified in instantiation, with the given route and method, using
 // the encoder to encode the body and the decoder to decode the response into the responsePtr
-func (c *Client) Send(ctx context.Context, route string, method string, body interface{}, responsePtr interface{}) (err error) {
+func (c *Client) Send(
+	ctx context.Context,
+	route string,
+	method string,
+	body interface{},
+	responsePtr interface{},
+) (err error) {
 	buf, err := c.encoder(body)
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message("error encoding body to json").InnerError(err).Build()

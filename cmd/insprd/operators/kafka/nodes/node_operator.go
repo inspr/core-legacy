@@ -2,13 +2,13 @@ package nodes
 
 import (
 	"context"
-	"fmt"
 	"os"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"k8s.io/client-go/rest"
 
 	kubeApp "k8s.io/api/apps/v1"
@@ -21,6 +21,7 @@ import (
 //NodeOperator defines a node operations interface.
 type NodeOperator struct {
 	clientSet kubernetes.Interface
+	memory    memory.Manager
 }
 
 func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
@@ -32,12 +33,13 @@ func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
 // Otherwise, returns an error
 func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	kube := no.retrieveKube()
-	insprEnv := environment.GetInsprEnvironment()
-	nodeName := parseNodeName(insprEnv, app.Meta.Parent, app.Meta.Name)
-	dep, err := kube.Get(nodeName, metav1.GetOptions{})
+	deployName := toDeploymentName(app)
+
+	dep, err := kube.Get(deployName, metav1.GetOptions{})
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
 	}
+
 	node, err := toNode(dep)
 	if err != nil {
 		return &meta.Node{}, err
@@ -55,11 +57,13 @@ func (no *NodeOperator) Nodes() operators.NodeOperatorInterface {
 func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	var deploy *kubeApp.Deployment
 	kube := no.retrieveKube()
-	deploy = dAppToDeployment(app)
+	deploy = no.dAppToDeployment(app)
+
 	dep, err := kube.Create(deploy)
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
 	}
+
 	node, err := toNode(dep)
 	if err != nil {
 		return &meta.Node{}, err
@@ -72,11 +76,13 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	var deploy *kubeApp.Deployment
 	kube := no.retrieveKube()
-	deploy = dAppToDeployment(app)
+	deploy = no.dAppToDeployment(app)
+
 	dep, err := kube.Update(deploy)
 	if err != nil {
 		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
 	}
+
 	node, err := toNode(dep)
 	if err != nil {
 		return &meta.Node{}, err
@@ -86,10 +92,14 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 
 // DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
 func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
-	var deploy string
+	var deployName string
 	kube := no.retrieveKube()
-	deploy = parseNodeName(environment.GetInsprEnvironment(), nodeContext, nodeName)
-	err := kube.Delete(deploy, &metav1.DeleteOptions{})
+
+	scope, _ := utils.JoinScopes(nodeContext, nodeName)
+	app, _ := no.memory.Root().Apps().Get(scope)
+	deployName = toDeploymentName(app)
+
+	err := kube.Delete(deployName, &metav1.DeleteOptions{})
 
 	if err != nil {
 		return ierrors.NewError().Message(err.Error()).Build()
@@ -109,19 +119,11 @@ func (no *NodeOperator) GetAllNodes() []meta.Node {
 	return nodes
 }
 
-func parseNodeName(insprEnv string, context string, name string) string {
-	var s string
-	if insprEnv == "" {
-		s = fmt.Sprintf("inspr-%s-%s", context, name)
-	} else {
-		s = fmt.Sprintf("inspr-%s-%s-%s", insprEnv, context, name)
-	}
-	return s
-}
-
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration
-func NewOperator() (nop *NodeOperator, err error) {
-	nop = &NodeOperator{}
+func NewOperator(memory memory.Manager) (nop *NodeOperator, err error) {
+	nop = &NodeOperator{
+		memory: memory,
+	}
 	if _, exists := os.LookupEnv("DEBUG"); exists {
 		nop.clientSet = fake.NewSimpleClientset()
 	} else {

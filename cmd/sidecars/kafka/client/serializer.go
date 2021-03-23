@@ -6,6 +6,7 @@ import (
 	"github.com/linkedin/goavro"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
 // creates Avro codec based on given schema
@@ -19,10 +20,9 @@ func getCodec(schema string) (*goavro.Codec, error) {
 }
 
 // returns the channel's channel type schema
-func getSchema(channel string) (string, error) {
-	inputChan := environment.GetInputChannels()
-	outputChan := environment.GetOutputChannels()
-	schema, err := environment.GetSchema(channel, inputChan, outputChan)
+func (ch messageChannel) getSchema() (string, error) {
+	name, _ := utils.JoinScopes(ch.appCtx, ch.channel)
+	schema, err := environment.GetSchema(name)
 	if err != nil {
 		return "", ierrors.NewError().InnerError(err).Message(err.Error()).Build()
 	}
@@ -30,8 +30,9 @@ func getSchema(channel string) (string, error) {
 	return schema, nil
 }
 
-func decode(messageEncoded []byte, channel string) (interface{}, error) {
-	schema, errGetSchema := getSchema(channel)
+func (ch messageChannel) decode(messageEncoded []byte) (interface{}, error) {
+
+	schema, errGetSchema := ch.getSchema()
 	if errGetSchema != nil {
 		return nil, errGetSchema
 	}
@@ -49,8 +50,8 @@ func decode(messageEncoded []byte, channel string) (interface{}, error) {
 	return message, nil
 }
 
-func encode(message interface{}, channel string) ([]byte, error) {
-	schema, errGetSchema := getSchema(channel)
+func (ch messageChannel) encode(message interface{}) ([]byte, error) {
+	schema, errGetSchema := ch.getSchema()
 	if errGetSchema != nil {
 		return nil, errGetSchema
 	}
