@@ -29,7 +29,7 @@ In this way, when the file is written in one of the formats described below it c
 | &rarr;&rarr; Spec    |                                                                                                                                                                                             |
 | Image                | An URL that serve to point to the location in which the docker image of your application is stored                                                                                          |
 | Replicas             | Defines the amount of replicas to be created in your cluster                                                                                                                                |
-| Environment          | Defines the environment variables of your pods                                                                                                                                              |
+| Environment          | Defines the environment variables of your Node                                                                                                                                              |
 | &rarr; Apps          | Set of dApps that are connected to this dApp, can be specified when creating a new dApp or modified when a dApp is updated.                                                                 |
 | &rarr; Channels      | Set of Channels that are created in the context of this dApp                                                                                                                                |
 | &rarr; ChannelTypes  | Set of Channel Types that are created in the context of this dApp                                                                                                                           |
@@ -42,20 +42,17 @@ In this way, when the file is written in one of the formats described below it c
 apiVersion: v1
 kind: dapp
 meta:
-  name: "generator"
-  reference: ""
-  parent: ""
+  name: generator  
 spec:
   node:
     meta:
-      name: "node-generator"
-      parent: "generator"
+      name: node-generator
+      parent: generator
     spec:
       image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
       replicas: 3
       environment:
         MODULE: 100
-  
   boundary:
     input:
       - primes_ch2
@@ -67,34 +64,32 @@ spec:
 
 ### Definitions
 
-| Field             | Meaning                                                                                                                                                                           |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| apiVersion        | Specify what version of the API to use, for example `"v1"`                                                                                                                        |
-| kind              | Specifies which structure the file represents, in this case it would be `channel`                                                                                                 |
-| meta              | Metadata of Channel                                                                                                                                                               |
-| &rarr; name       | Defines the Channel name                                                                                                                                                          |
-| &rarr; reference  | String that is utilized to defined certain tags to the Channel in question, a way for the user to categorize the numerous Channels in the cluster.                                |
-| &rarr;Annotations | Definitions that can describe characteristics of the Channel that later on can be used to process/group the Channels in your cluster.                                             |
+| Field             | Meaning                                                                                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| apiVersion        | Specify what version of the API to use, for example `"v1"`                                                                                                               |
+| kind              | Specifies which structure the file represents, in this case it would be `channel`                                                                                        |
+| meta              | Metadata of Channel                                                                                                                                                      |
+| &rarr; name       | Defines the Channel name                                                                                                                                                 |
+| &rarr; reference  | String that is utilized to defined certain tags to the Channel in question, a way for the user to categorize the numerous Channels in the cluster.                       |
+| &rarr;Annotations | Definitions that can describe characteristics of the Channel that later on can be used to process/group the Channels in your cluster.                                    |
 | &rarr; parent     | Defines the Channel context in the cluster through the path of the dApp in which it is stored, for example: `app1.app2` means that the Channel is defined in the `app2`. |
-| &rarr; sha256     | Tags images with their sha256 digest.                                                                                                                                             |
-| spec              |                                                                                                                                                                                   |
-| &rarr; type       | Defines the type of the Channel, this is a string that contains the name of any Channel Type on the same context as the dApp that the channel is being created on.                |
-| connectedapps     | List of dApp names that are using this Channel, this is injected by the Inspr daemon                                                                                              |
-| connectedaliasses | A simple list of the aliases that are being used for to reference this channel.                                                                                                   |
+| &rarr; sha256     | Tags images with their sha256 digest.                                                                                                                                    |
+| spec              |                                                                                                                                                                          |
+| &rarr; type       | Defines the type of the Channel, this is a string that contains the name of any Channel Type on the same context as the dApp that the channel is being created on.       |
+| connectedapps     | List of dApp names that are using this Channel, this is injected by the Inspr daemon                                                                                     |
+| connectedaliasses | A simple list of the aliases that are being used for to reference this channel.                                                                                          |
 
 ### YAML example
 ```yaml
-apiVersion: "v1"
-kind: "channel"
+apiVersion: v1
+kind: channel
 meta:
-  name: "primes_ch1"
-  reference: ""
+  name: primes_ch1  
   Annotations: 
-    kafka.partition.number: "1"
-    kafka.replication.factor: "1"
-  parent: ""  
+    kafka.partition.number: 1
+    kafka.replication.factor: 1  
 spec:
-  type: "primes_ct1"
+  type: primes_ct1
 ```
 
 
@@ -119,12 +114,10 @@ spec:
 
 ### YAML example
 ```yaml
-apiVersion: "v1"
-kind: "channeltype"
+apiVersion: v1
+kind: channeltype
 meta:
-  name: "primes_ct1"
-  reference: ""
-  parent: ""  
+  name: primes_ct1  
 schema: '{"type":"int"}'
 ```
 
@@ -132,7 +125,7 @@ schema: '{"type":"int"}'
 
 ### Definition
 
-The so called general file, or composed file, is nothing more than a YAML that congregates two or more definitions of the elements described above. 
+The so called general file, or composed file, is nothing more than a YAML that congregates two or more definitions of the elements described above into a single dApp. 
 
 For example a dApp that has a collection of other dApps plus some definitions of channel Types and channels.
 
@@ -142,41 +135,37 @@ For example a dApp that has a collection of other dApps plus some definitions of
 apiVersion: v1
 kind: dapp
 meta:
-  name: "basic-example"
-  reference: ""
-  parent: ""
+  name: basic-example  
   Annotations: 
-    kafka.partition.number: "3"
-    kafka.replication.factor: "3"
+    kafka.partition.number: 3
+    kafka.replication.factor: 3
 spec:
   channeltypes:
     primes_ct1:
       meta:
-        name: "primes_ct1"
+        name: primes_ct1
       schema: '{"type":"int"}'
 
   channels:
     primes_ch1:
       meta:
-        name: "primes_ch1"
-        reference: ""
+        name: primes_ch1        
         Annotations: 
-          kafka.partition.number: "3"
-          kafka.replication.factor: "3"
-        parent: ""  
+          kafka.partition.number: 3
+          kafka.replication.factor: 3        
       spec:
-        type: "primes_ct1"
+        type: primes_ct1
          
   apps:
     # number generators
     generator:
       meta:
-        name: "generator"
+        name: generator
       spec:
         node:
           meta:
-            name: "node-generator"
-            parent: "generator"
+            name: node-generator
+            parent: generator
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
             replicas: 8
@@ -191,14 +180,12 @@ spec:
     # prints the filtered
     filter: 
       meta:
-        name: "printer-primes"
-        reference: ""
-        parent: ""
+        name: printer-primes
       spec:        
         node:
           meta:
-            name: "node-printer"
-            parent: "printer"
+            name: node-printer
+            parent: printer
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
             replicas: 2            
