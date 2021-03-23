@@ -22,12 +22,6 @@ type clientMessage struct {
 	Channel string         `json:"channel"`
 }
 
-// requestReturn is the struct that represents the sidecar server's response
-type requestReturn struct {
-	Error   error          `json:"error"`
-	Message models.Message `json:"message"`
-}
-
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
 	socket := os.Getenv("INSPR_UNIX_SOCKET")
