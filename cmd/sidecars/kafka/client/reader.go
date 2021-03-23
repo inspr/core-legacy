@@ -4,7 +4,9 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	globalEnv "gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
+	"go.uber.org/zap"
 )
 
 const pollTimeout = 100
@@ -22,6 +24,7 @@ type Consumer interface {
 type Reader struct {
 	consumers   map[string]Consumer
 	lastMessage *kafka.Message
+	logger      *zap.Logger
 }
 
 // NewReader return a new Reader
@@ -29,10 +32,11 @@ func NewReader() (*Reader, error) {
 	var reader Reader
 	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannels())
 	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannels())
+	logger, _ := zap.NewDevelopment(zap.Fields(zap.String("section", "kafka sidecar")))
 	if len(resolvedChList) == 0 {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
-
+	reader.logger = logger
 	reader.consumers = make(map[string]Consumer)
 
 	for idx, ch := range channelsList {
@@ -48,17 +52,23 @@ ReadMessage reads message by message. Returns channel the message belongs to,
 the message and an error if any occurred.
 */
 func (reader *Reader) ReadMessage(channel string) (models.BrokerData, error) {
+	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannels(), "")
+	reader.logger.Info("trying to read message from topic",
+		zap.String("channel", channel),
+		zap.String("resolved channel", resolved),
+	)
 	for {
 		event := reader.consumers[channel].Poll(pollTimeout)
 		switch ev := event.(type) {
 		case *kafka.Message:
-
 			topic := *ev.TopicPartition.Topic
+			reader.logger.Info("reading message from topic", zap.String("topic", topic))
 			channel := fromTopic(topic)
 
 			// Decoding Message
 			message, errDecode := channel.decode(ev.Value)
 			if errDecode != nil {
+				reader.logger.Error("error in decoding message", zap.Any("error", errDecode))
 				return models.BrokerData{}, errDecode
 			}
 
@@ -121,7 +131,11 @@ func (reader *Reader) NewSingleChannelConsumer(channel, resolved string) error {
 		return ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
 	}
 
-	newTopic := messageChannel{channel: resolved}.toTopic()
+	ctx, ch, _ := utils.RemoveLastPartInScope(resolved)
+	newTopic := messageChannel{
+		appCtx:  ctx,
+		channel: ch,
+	}.toTopic()
 
 	if err := newConsumer.Subscribe(newTopic, nil); err != nil {
 		return err
