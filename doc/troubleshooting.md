@@ -13,6 +13,6 @@
 
 ## I can't apply a folder because the CLI complains that there is no Channel named X, when it is defined inside the folder
 
-This happens because the Inspr CLI tries to apply dapps first, so that you have your contexts already created.
+This happens because the Inspr CLI tries to apply dApps first, so that you have your contexts already created.
 
 To fix it, either apply your channels and Channel types before your dApps or create a base dApp that contains all channels and Channel types, and instantiate your other dApps inside the context defined previously.
