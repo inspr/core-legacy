@@ -2,7 +2,7 @@
 
 ## Adding the Inspr Helm Repository
 
-If you’re installing the Inspr chart via helm, you first need to add the Inspr reposiroty with the command:
+If you’re installing the Inspr chart via helm, first you need to add the Inspr repository with the command:
 
 ```
 $ helm repo add inspr https://inspr-charts.storage.googleapis.com/
@@ -13,7 +13,7 @@ Then, make sure everything is up-to-date:
 ```
 $ helm repo update
 ```
-And finnaly, install it running
+And finally, install it by running the command:
 
 ```
 $ helm upgrade --install insprd inspr/insprd
@@ -25,14 +25,14 @@ The following table lists the configurable parameters of the Inspr Ingress contr
 
 | Parameter | Description | Default
 |--|--|--|
-| replicaCount | The number of replicas of the Inspr Ingress controller deployment. | 1 |
-| insprIngress.host | The main route for the Inspr Ingress Controller | inspr.com |
-| deployment.insprdName | The name of the Ingress Inspr deployment  | insprd-deployment|
-| insprEnvironment | The Inspr Sevice Environment.  | test |
+| replicaCount | Number of replicas of the Inspr Ingress controller deployment. | 1 |
+| insprIngress.host | Main route for the Inspr Ingress Controller | inspr.com |
+| deployment.insprdName | Name of the Ingress Inspr deployment  | insprd-deployment|
+| insprEnvironment | Inspr Sevice Environment.  | test |
 | service.type | Insprd Kubernetes Service type | ClusterIP |
 | service.insprdName | Insprd Kubernetes Service name | insprd-svc |
-| service.insprdPort | The HTTP port of the Inspr controller service.  | 80 |
-| service.insprdTargetPort | The target port of the insprdPort. | 8080 |
+| service.insprdPort | HTTP port of the Inspr controller service.  | 80 |
+| service.insprdTargetPort | Target port of the insprdPort. | 8080 |
 | kafkaSidecarImage | Kafka operator sidecar image | gcr.io/red-inspr/inspr/sidecar/kafka |
 | kafkaBootstrap | Kafka operator bootstrap configuration | kafka.default.svc:9092 |
 | kafkaAutoOffsetReset | Kafka operator offset reset  | earliest |
@@ -40,7 +40,7 @@ The following table lists the configurable parameters of the Inspr Ingress contr
 
 ## Exposing Inspr via NGINX
 
-Inspr Controller will already be exposed via NGINX by default. So you just need to have NGINX installed. Follow the instructions in the [official NGINX documentation](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/) to install it.
+Inspr Controller will be exposed via NGINX by default, so you just need to have NGINX installed. Follow the instructions in the [official NGINX documentation](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/) to install it.
 
 ## Exposing Inspr via port forward
 
