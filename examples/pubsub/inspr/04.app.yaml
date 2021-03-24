@@ -1,0 +1,16 @@
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: discordpub
+  parent: multiMessage
+spec:
+  node:
+    spec:
+      replicas: 1
+      environment:
+      image: gcr.io/red-inspr/inspr/example/discordpub:latest
+  boundary:
+    input:
+      - discodMessages
+    output:

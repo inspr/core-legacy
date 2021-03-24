@@ -1,0 +1,14 @@
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: multiMessage
+spec:
+  node:
+    spec:
+      replicas: 1
+      environment:
+      image: 
+  boundary:
+    input:
+    output:

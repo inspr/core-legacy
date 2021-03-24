@@ -1,0 +1,10 @@
+kind: channel
+apiVersion: v1
+meta:
+  name: discodMessages
+  parent: multiMessage
+  annotations:
+    kafka.replication.factor: 1
+    kafka.partition.number: 1
+spec:
+  type: multiMessageCT

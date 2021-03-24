@@ -1,0 +1,6 @@
+kind: channeltype
+apiVersion: v1
+meta:
+  name: multiMessageCT
+  parent: multiMessage
+schema: inspr/schema.avsc
