@@ -8,7 +8,7 @@
 | kind              | Specifies which structure the file represents, in this case it would be `channeltype`                                                                                              |
 | meta              | Metadata of Channel Type                                                                                                                                                           |
 | &rarr;name        | Channel Type Name                                                                                                                                                                  |
-| &rarr;reference   | String that is utilized to define certain tags to the Channel Type in question, a way for the user to categorize the numerous Channel Types in the cluster.                       |
+| &rarr;reference   | String that is utilized to define certain tags to the Channel Type in question, a way for the user to categorize the numerous Channel Types in the cluster.                        |
 | &rarr;Annotations | Definitions that can describe characteristics of the Channel Type that later on can be used to process/group the Channel Types in your cluster.                                    |
 | &rarr;parent      | Defines the Channel Type context in the cluster through the path of the dApp in which it is stored, for example: `app1.app2` means that the Channel Type is defined in the `app2`. |
 |                   |
