@@ -6,12 +6,12 @@ In this way, when the file is written in one of the formats described below it c
 
 
 ## dApps
-> A dApps is an Inspr structure that allows the user to contain his application in a container that can interact with the other components of the Inspr structure. One could call it an extra layer of abstraction that allows the simplification of communications between microservices in your cluster.
+> A dApp is an Inspr structure that allows the user to contain his application in a container that can interact with the other components of the Inspr structure. One could call it an extra layer of abstraction that allows the simplification of communications between multiple dApps in your cluster.
 
 [definitions and examples](dapp.md)
 
 ## Channels
-> Channels are a Inspr definition that facilitates the user's control over the message broker used to send message between dApps. 
+> Resposible for creating a message broker's topic, that means that a Channel serve as a path in which two or more dApps can exchange data. It must have a Channel Type defined.
 
 [definitions and examples](channel.md)
 
@@ -24,9 +24,7 @@ In this way, when the file is written in one of the formats described below it c
 
 ## General file
 
-### Definition
-
-The so called general file, or composed file, is nothing more than a YAML that congregates two or more definitions of the elements described above into a single dApp. 
+>The so called general file, or composed file, is nothing more than a YAML that congregates two or more definitions of the elements described above into a single dApp. 
 
 For example a basic example dApp, that has a collection of other smaller dApps like number-generator and filter, plus some definitions of channel Types and channels.
 
