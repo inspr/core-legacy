@@ -44,11 +44,11 @@ All of these three methods are responsible to establish a solid communication be
 func (c *Client) ReadMessage( ctx context.Context, channel string, message interface{} ) error
 ```
 
-> Description of parameters
->- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
->- Channel: Name of the Channel in which the message will be read from.
->- Message: A user defined struct that allows him to establish his own format to the message going to the Channel:
->    - Message{ defined struct inside of here } 'json:"message"'
+ Description of parameters
+- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
+- Channel: Name of the Channel in which the message will be read from.
+- Message: A user defined struct that allows him to establish his own format to the message going to the Channel:
+    - Message{ defined struct inside of here } 'json:"message"'
 
 ##### Snippet example:
 ```go
@@ -74,9 +74,9 @@ err := client.ReadMessage(
 func (c *Client) CommitMessage(ctx context.Context, channel string) error 
 ```
 
-> Description of parameters
->- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
->- Channel: Name of the Channel in which the message will be read from.
+ Description of parameters
+- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
+- Channel: Name of the Channel in which the message will be read from.
 
 ##### Snippet example:
 ```go
@@ -103,11 +103,11 @@ err = client.CommitMessage(
 func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Message) error
 ```
 
-> Description of parameters
->- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
->- Channel: Name of the Channel in which the message will be read from.
->- Message: A struct that contains only one field
->    - Data: An interface{} type that allows the user to send anything to the channel.
+ Description of parameters
+- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
+- Channel: Name of the Channel in which the message will be read from.
+- Message: A struct that contains only one field
+    - Data: An interface{} type that allows the user to send anything to the channel.
 
 ##### Snippet example
 ```go
