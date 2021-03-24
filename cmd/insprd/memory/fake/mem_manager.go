@@ -13,6 +13,7 @@ type MemManager struct {
 	channelType ChannelTypes
 	channel     Channels
 	app         Apps
+	alias       Alias
 }
 
 // LookupMemManager mocks getter for roots
@@ -33,6 +34,11 @@ func (l LookupMemManager) ChannelTypes() memory.ChannelTypeGetInterface {
 	return &l.channelType
 }
 
+// Alias mocks a alias getter
+func (l LookupMemManager) Alias() memory.AliasGetInterface {
+	return &l.alias
+}
+
 // MockMemoryManager mock exported with propagated error through the functions
 func MockMemoryManager(failErr error) memory.Manager {
 	return &MemManager{
@@ -47,6 +53,10 @@ func MockMemoryManager(failErr error) memory.Manager {
 		app: Apps{
 			fail: failErr,
 			apps: make(map[string]*meta.App),
+		},
+		alias: Alias{
+			fail:  failErr,
+			alias: make(map[string]*meta.Alias),
 		},
 	}
 }
@@ -69,6 +79,11 @@ func (mm *MemManager) Channels() memory.ChannelMemory {
 // ChannelTypes returns manager's DApp
 func (mm *MemManager) ChannelTypes() memory.ChannelTypeMemory {
 	return &mm.channelType
+}
+
+// Alias returns manager's Alias
+func (mm *MemManager) Alias() memory.AliasMemory {
+	return &mm.alias
 }
 
 //InitTransaction mock interface structure

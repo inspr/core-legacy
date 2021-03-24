@@ -1,10 +1,13 @@
 package meta
 
+import "gitlab.inspr.dev/inspr/core/pkg/utils"
+
 // Channel is an Inspr component that represents a Channel.
 type Channel struct {
-	Meta          Metadata    `yaml:"meta,omitempty"  json:"meta"`
-	Spec          ChannelSpec `yaml:"spec,omitempty"  json:"spec"`
-	ConnectedApps []string    `yaml:"connectedapps,omitempty"  json:"connectedapps"`
+	Meta             Metadata          `yaml:"meta,omitempty"  json:"meta"`
+	Spec             ChannelSpec       `yaml:"spec,omitempty"  json:"spec"`
+	ConnectedApps    utils.StringArray `yaml:"connectedapps,omitempty"  json:"connectedapps"`
+	ConnectedAliases utils.StringArray `yaml:"connectedaliases,omitempty"  json:"connectedaliasses"`
 }
 
 // ChannelSpec is the specification of a channel.

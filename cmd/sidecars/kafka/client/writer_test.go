@@ -40,6 +40,9 @@ func TestNewWriter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewWriter(tt.args.mock)
+			if err != nil {
+				t.Error(err)
+			}
 			defer got.Close()
 			if tt.wantErr && (got.producer.GetFatalError() != nil) {
 				t.Errorf("NewWriter() error = %v, wantErr %v", err, tt.wantErr)
@@ -148,7 +151,7 @@ func TestWriter_produceMessage(t *testing.T) {
 	}
 	type args struct {
 		message interface{}
-		channel string
+		channel messageChannel
 	}
 	tests := []struct {
 		name    string
@@ -163,7 +166,7 @@ func TestWriter_produceMessage(t *testing.T) {
 			},
 			args: args{
 				message: "testProducingMessage",
-				channel: "ch1",
+				channel: messageChannel{channel: "ch1_resolved"},
 			},
 			wantErr: false,
 		},
@@ -174,7 +177,7 @@ func TestWriter_produceMessage(t *testing.T) {
 			},
 			args: args{
 				message: "testProducingMessage",
-				channel: "invalid",
+				channel: messageChannel{channel: "invalid"},
 			},
 			wantErr: true,
 		},

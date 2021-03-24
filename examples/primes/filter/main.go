@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	var number float64
+	var number int
 
 	// sets up ticker to sync with generator
 	ticker := time.NewTicker(2 * time.Second)
@@ -22,29 +22,40 @@ func main() {
 	client := dappclient.NewAppClient()
 
 	// channelName
-	inputChannel := "primes_ch1"
-	outputChannel := "primes_ch2"
+	inputChannel := "input"
+	outputChannel := "output"
 
-	for {
-		select {
-		case <-ticker.C:
-			msg, err := client.ReadMessage(context.Background(), inputChannel)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			number = msg.Data.(float64)
-			fmt.Println("Read: ", number)
+	type Message struct {
+		Message struct {
+			Data int `json:"data"`
+		} `json:"message"`
+		Channel string `json:"channel"`
+	}
+	fmt.Println("starting...")
+	for range ticker.C {
+		var msg Message
+		fmt.Println("reading message...")
+		err := client.ReadMessage(context.Background(), inputChannel, &msg)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 
-			err = client.CommitMessage(context.Background(), inputChannel)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
+		number = msg.Message.Data
+		fmt.Println("Read: ", number)
 
-			if big.NewInt(int64(number)).ProbablyPrime(0) {
-				client.WriteMessage(context.Background(), outputChannel, models.Message{
+		err = client.CommitMessage(context.Background(), inputChannel)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		if big.NewInt(int64(number)).ProbablyPrime(0) {
+			client.WriteMessage(
+				context.Background(),
+				outputChannel,
+				models.Message{
 					Data: number,
-				})
-			}
+				},
+			)
 		}
 	}
 }
