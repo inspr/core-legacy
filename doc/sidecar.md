@@ -4,11 +4,11 @@
 
 ### Overview
 
-When creating a inspr's dApp in your cluster is possible to define the Input and Output of your application, that means that in the eyes of the the `dApp` there is a way in which he can easily communicate between other dApps, this is the so called `Channel`. This component is somewhat intuitive but he alone is not responsible for the exchange of data between dApps, the one that allows for easy communication is the so-called `sidecar`.
+When creating a inspr's dApp in your cluster is possible to define the Input and Output of your application, that means that in the perspective of the the `dApp` there is a way in which he can easily communicate between other dApps, this is the Inspr's `Channel`. This component is somewhat intuitive but he alone is not responsible for the exchange of data between dApps, the one that allows for easy communication is the so-called `sidecar`.
 
 But what is exactly a `sidecar` and how can it be utilized? Firstly is important to remember that what inspr actually uses for communication is a message broker, this means that there are topics that our application can write to and read from. This is nice to know about but here is where the `sidecar` acts, being a layer of abstraction that simplifies the whole process by a substantial margin.
 
-This component is already implemented and resolves most of the proceedings that one must do to send data to a topic in the message broker, or to read from it. This means that using the sidecar API the developer can focus on its application, when trying to communicate with another dApp of his cluster there is only the need to do a http request with the content of the message.
+This component is already implemented and resolves most of the proceedings that one must do to send data to a topic in the message broker, or to read from it. This means that using the sidecar API the developer can focus on his application, and when trying to communicate with another dApp of his cluster there is only the need to do a http request with the content of the message.
 
 ![overview](img/sidecar.png)
 
@@ -39,9 +39,12 @@ All of these three methods are responsible to establish a solid communication be
 
 
 #### ReadMessage
-> Responsible for reading a message from a Channel
-> 
-> This method receives as parameters
+```go
+// ReadMessage receives a channel and sends it in a request to the sidecar server
+func (c *Client) ReadMessage( ctx context.Context, channel string, message interface{} ) error
+```
+
+> Description of parameters
 >- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
 >- Channel: Name of the Channel in which the message will be read from.
 >- Message: A user defined struct that allows him to establish his own format to the message going to the Channel:
@@ -66,9 +69,12 @@ err := client.ReadMessage(
 
 #### CommitMessage
 
-> Responsible for confirming that it successfully processed the message previously read.
-> 
->This method receives as parameters
+```go
+// CommitMessage receives a channel and sends it in a request to the sidecar server
+func (c *Client) CommitMessage(ctx context.Context, channel string) error 
+```
+
+> Description of parameters
 >- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
 >- Channel: Name of the Channel in which the message will be read from.
 
@@ -91,9 +97,13 @@ err = client.CommitMessage(
 
 
 #### WriteMessage
-> Responsible for writing the message into the Channel
->
->This method receives as parameters
+
+```go
+// WriteMessage receives a channel and a message and sends it in a request to the sidecar server
+func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Message) error
+```
+
+> Description of parameters
 >- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
 >- Channel: Name of the Channel in which the message will be read from.
 >- Message: A struct that contains only one field
