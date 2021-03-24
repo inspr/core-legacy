@@ -87,7 +87,7 @@ err := client.ReadMessage(
     &msg,
 )
 ...
-# do stuff with the data
+// do stuff with the data
 ...
 err = client.CommitMessage(
     context.Background(),
