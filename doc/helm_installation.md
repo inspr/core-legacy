@@ -1,5 +1,7 @@
 # Helm Chart Installation
 
+This page will walk you through the installation of Inspr using Helm, as well as showing the available configurations. Make sure you have `helm` and` kubectl` installed.
+
 ## Adding the Inspr Helm Repository
 
 If you’re installing the Inspr chart via helm, first you need to add the Inspr repository with the command:
