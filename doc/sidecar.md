@@ -41,7 +41,7 @@ All of these three methods are responsible to establish a solid communication be
 >    - ```Message{ defined struct inside of here } `json:"message"` ```
 
 ##### Snippet example:
-```
+```go
 type Message struct {
     Message struct {
         Data int `json:"data"`
@@ -66,7 +66,7 @@ err := client.ReadMessage(
 >- Channel: Name of the Channel in which the message will be read from.
 
 ##### Snippet example:
-```
+```go
 ...
 err := client.ReadMessage(
     context.Background(),
@@ -93,7 +93,7 @@ err = client.CommitMessage(
 >    - Data: An interface{} type that allows the user to send anything to the channel.
 
 ##### Snippet example
-```
+```go
 client.WriteMessage(
     context.Background(),
     outputChannel,
