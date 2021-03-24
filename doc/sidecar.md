@@ -45,7 +45,7 @@ All of these three methods are responsible to establish a solid communication be
 >- Context: [golang's context](https://golang.org/pkg/context/), a way to carry deadlines and cancel signals.
 >- Channel: Name of the Channel in which the message will be read from.
 >- Message: A user defined struct that allows him to establish his own format to the message going to the Channel:
->    - ```Message{ defined struct inside of here } `json:"message"` ```
+>    - Message{ defined struct inside of here } 'json:"message"'
 
 ##### Snippet example:
 ```go
