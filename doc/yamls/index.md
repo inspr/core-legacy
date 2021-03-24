@@ -6,19 +6,20 @@ In this way, when the file is written in one of the formats described below it c
 
 
 ## dApps
-> A dApp is an Inspr structure that allows the user to contain his application in a container that can interact with the other components of the Inspr structure. One could call it an extra layer of abstraction that allows the simplification of communications between multiple dApps in your cluster.
+> A dApp is an Inspr structure that allows the user to contain his application in a component that can interact with the other dApps in the cluster. In essence is a layer of abstration that facilitates the communication between multiple microservices by layerying each of one of them in a dApp.
 
 [definitions and examples](dapp.md)
 
 ## Channels
-> Resposible for creating a message broker's topic, that means that a Channel serve as a path in which two or more dApps can exchange data. It must have a Channel Type defined.
+> Responsible for creating a message broker's topic, a Channel serve as a path in which two or more dApps can exchange data. It must have a Channel Type defined.
 
 [definitions and examples](channel.md)
 
 ## Channel Types
-> Responsible for defining the message format for any channel defined with this type.
+> Responsible for defining the message format for any Channel defined with this Channel Type.
 > 
-> A Channel Type must always have it's schema specified, this would be a either a string containing a json structure specifing the format of the message or a path to a file containing such information.
+> A Channel Type must always have it's schema specified, this has to be an [avro structure](https://avro.apache.org/docs/current/).
+> This would be either a string containing a json structure specifying the format of the message or a path to a file containing such information.
 
 [definitions and examples](type.md)
 
@@ -26,7 +27,7 @@ In this way, when the file is written in one of the formats described below it c
 
 >The so called general file, or composed file, is nothing more than a YAML that congregates two or more definitions of the elements described above into a single dApp. 
 
-For example a basic example dApp, that has a collection of other smaller dApps like number-generator and filter, plus some definitions of channel Types and channels.
+For example a basic example dApp, that has a collection of other smaller dApps like number-generator and filter, plus some definitions of Channel Types and Channels.
 
 ### YAML example
 

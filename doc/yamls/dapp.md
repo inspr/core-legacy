@@ -8,7 +8,7 @@
 | kind                 | Specifies which structure the file represents, in this case it would be `dapp`                                                                                                              |
 | meta                 | Metadata of dApp                                                                                                                                                                            |
 | &rarr;name           | Defines dApp name                                                                                                                                                                           |
-| &rarr;reference      | String that is utilized to defined certain tags to the dApp in question, a way for the user to categorize the numerous dApps in the cluster.                                                |
+| &rarr;reference      | String that is utilized to define certain tags to the dApp in question, a way for the user to categorize the numerous dApps in the cluster.                                                |
 | &rarr;Annotations    | Definitions that can describe characteristics of the dApp that later on can be used to process/group the dApps in your cluster.                                                             |
 | &rarr;parent         | Defines dApp context in relation to the cluster. For example `app1.app2` would mean that this dApp is located on the path `root->app1->app2->app-name`. It is injected by the Inspr daemon. |
 | &rarr;sha256         | Tags images with their sha256 digest.                                                                                                                                                       |
@@ -16,7 +16,7 @@
 | &rarr;Node           | Section describing the dApp Node                                                                                                                                                            |
 | &rarr;&rarr;Meta     | Metadata of the Node                                                                                                                                                                        |
 | name                 | Defines Node name                                                                                                                                                                           |
-| reference            | String that is utilized to defined certain tags to the Node in question, a way for the user to categorize the numerous Nodes in the cluster.                                                |
+| reference            | String that is utilized to define certain tags to the Node in question, a way for the user to categorize the numerous Nodes in the cluster.                                                |
 | Annotations          | Definitions that can describe characteristics of the Node that later on can be used to process/group the Nodes in your cluster.                                                             |
 | parent               | Defines the Node context in relation to the cluster for example `app1.app2` would mean that this Node is located on the path `root->app1->app2`. It is injected by the Inspr daemon.        |
 | sha256               | tags images with their sha256 digest.                                                                                                                                                       |
