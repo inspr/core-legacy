@@ -44,6 +44,15 @@ The following table lists the configurable parameters of the Inspr Ingress contr
 
 Inspr Controller will be exposed via NGINX by default, so you just need to have NGINX installed. Follow the instructions in the [official NGINX documentation](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/) to install it.
 
+
+### Hostname
+
+To properly access the cluster via the Inspr CLI it is necessary to configure the hostname in your machine to comport the Ingress host.
+
+This can be done in unix machines editting the file `etc/hosts` and adding `<cluster_IP> <insprIngress.host>`. For futher understanding of what is happening access this [link](https://debian-handbook.info/browse/stable/sect.hostname-name-service.html)
+
+For Windows is recommended to follow the steps in [here](https://docs.microsoft.com/en-us/windows-server/networking/technologies/ipam/add-a-dns-resource-record).
+
 ## Exposing Inspr via port forward
 
 After installing Inspr, you can also expose the port without using NGINX. To do so, follow the commands below:
@@ -61,6 +70,7 @@ And now, use both to expose Inspr via port forward:
 $ kubectl --namespace default port-forward $POD_NAME 8080:$CONTAINER_PORT
 ```
 
+
 ## Installing Kafka via Helm
 
 To install Kafka via Helm, first add the `bitnami` repository:
@@ -76,3 +86,5 @@ $ helm install my-release bitnami/kafka
 ```
 
 You can also check how to do the installation on the [official bitnami Kafka page](https://bitnami.com/stack/kafka/helm).
+
+
