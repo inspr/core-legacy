@@ -1,7 +1,3 @@
-TODO:
-2) Run pingpong demo and print the results (apply results and it working in the cluster)
-3) Record a video of everything
-
 # Workspace Initialization
 This document is a detailed guide on how to create an application and deploy an Inspr workspace that cointains it into a Kubernetes cluster.  
 
@@ -25,7 +21,7 @@ Create a folder called "pingpong_demo", and inside of it create other three fold
 The first two, "ping" and "pong", will store the applications code and their respective Dockerfiles. The last one, "yamls", will store all the *.yaml* files that define the structures which will be used to create the Inspr workspace in the cluster.  
 
 The following command creates the wanted folder structure:
-```
+```zsh
 mkdir -p pingpong_demo/ping pingpong_demo/pong pingpong_demo/yamls
 ```
 
@@ -44,14 +40,14 @@ In this part, we will implement Ping and Pong using Golang. Also, we will create
 ### Ping and Pong implementation  
 
 From within "pingpong_demo", create a file called *ping.go* inside folder "ping":  
-```
+```zsh
 touch ping/ping.go
 ```  
 
 In *ping.go*, we will define a `main` function that does the following:
 
 1) Creates a new dApp Client, which is used to write and read messages in Channels through the Sidecar (check [dApp Architecture Overview](dapp-overview.md) for more details).
-2) Initiates an endless `for loop` in which the message "Ping!" is written in the Channel *ppChannel1*, then the application proceeds to read a message from Channel *ppChannel2*. If there is a message, it's read and displayed in the terminal.
+2) Initiates an endless `for loop` in which the message "Ping!" is written in the Channel *pingoutput*, then the application proceeds to read a message from Channel *pinginput*. If there are any messages, they are read and displayed in the terminal.
 
 *ping.go* should look like this:
 ```Go
@@ -67,7 +63,7 @@ import (
 
 type expectedDataType struct {
 	Message struct {
-		Data int `json:"data"`
+		Data string `json:"data"`
 	} `json:"message"`
 	Channel string `json:"channel"`
 }
@@ -83,13 +79,13 @@ func main() {
 			Data: "Ping!",
 		}
 
-		if err := client.WriteMessage(ctx, "ppChannel1", sentMsg); err != nil {
+		if err := client.WriteMessage(ctx, "pingoutput", sentMsg); err != nil {
 			fmt.Println(err)
 			continue
 		}
 
 		var recMsg expectedDataType
-		err := client.ReadMessage(ctx, "ppChannel2", &recMsg)
+		err := client.ReadMessage(ctx, "pinginput", &recMsg)
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -97,7 +93,7 @@ func main() {
 		fmt.Println("Read message: ")
 		fmt.Println(recMsg.Message.Data)
 
-		if err := client.CommitMessage(ctx, "ppChannel2"); err != nil {
+		if err := client.CommitMessage(ctx, "pinginput"); err != nil {
 			fmt.Println(err.Error())
 		}
 	}
@@ -106,7 +102,7 @@ func main() {
 
 Notice that before the `main` function a new structure called `Message` is declared, which contains a field called "Channel" that is a string, and another field called "Message" aswell.  
 **In Inspr, the user is encouraged to define which type of message he expects to read from a Channel, so that unexpected messages of different types don't cause unexpected errors.**  
-So everytime one implements an application that reads messages, a structure such as the following should be created and passed as an argument for `ReadMessage` method:
+So everytime one implements an application that reads messages, a structure such as the following should be created and passed as an argument for the `ReadMessage` method:
 ```Go
 type YOUR_STRUCTURE_NAME struct {
 	Message struct {
@@ -122,7 +118,7 @@ As seen above, the only mandatory fields inside of your custom structure are `Me
 
 
 Proceeding the tutorial, a similar folder/file structure and code must be done to implement Pong. So, from within "pingpong_demo", create *pong.go* in /pong folder:  
-```
+```zsh
 touch pong/pong.go
 ```  
 
@@ -140,7 +136,7 @@ import (
 
 type expectedDataType struct {
 	Message struct {
-		Data int `json:"data"`
+		Data string `json:"data"`
 	} `json:"message"`
 	Channel string `json:"channel"`
 }
@@ -156,13 +152,13 @@ func main() {
 			Data: "Pong!",
 		}
 
-		if err := client.WriteMessage(ctx, "ppChannel2", sentMsg); err != nil {
+		if err := client.WriteMessage(ctx, "pongoutput", sentMsg); err != nil {
 			fmt.Println(err)
 			continue
 		}
 
 		var recMsg expectedDataType
-		err := client.ReadMessage(ctx, "ppChannel1", &recMsg)
+		err := client.ReadMessage(ctx, "ponginput", &recMsg)
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -170,7 +166,7 @@ func main() {
 		fmt.Println("Read message: ")
 		fmt.Println(recMsg.Message.Data)
 
-		if err := client.CommitMessage(ctx, "ppChannel1"); err != nil {
+		if err := client.CommitMessage(ctx, "ponginput"); err != nil {
 			fmt.Println(err.Error())
 		}
 	}
@@ -178,32 +174,37 @@ func main() {
 ```
 
 ### Dockerfiles
-Now that we have Ping and Pong implemented and doing what they are supossed to do, we must create their Dockerfiles, so we can generate a Docker Image for each of them, and make these images available in our cluster.  
-If you are not familiar with Docker, click on the following for more information:
+Now that we have Ping and Pong implemented and doing what they are supossed to do, we must create their Dockerfiles so a Docker Image for each of them can be generated, and make these images available in our cluster.  
+If you are not familiar with Docker, click on the following links for more information:
 - [Docker overview](https://docs.docker.com/get-started/overview/)
 - [Docker Images](https://jfrog.com/knowledge-base/a-beginners-guide-to-understanding-and-building-docker-images/#:~:text=A%20Docker%20image%20is%20a,publicly%20with%20other%20Docker%20users.)
 - [Dockerfiles](https://docs.docker.com/engine/reference/builder/)  
 
 From within "pingpong_demo", create a file called *Dockerfile* inside folder "ping":  
-```
+```zsh
 touch ping/Dockerfile
 ```  
 The Dockerfile structure will be created to do the following:
 1) Use Golang alpine version as base to run the commands.
 2) Define "/app" as the working directory where Ping will be build.
 3) Copy the *ping.go* file into "/app".
-4) Compile and build the *ping.go* file.
+4) Build *ping.go* to generate a binary for this file.
+5) Execute the binary generated.
 
 Ping's Dockerfile should look like this:
 ```Docker
 FROM golang:alpine
 WORKDIR /app
 COPY . .
-CMD go run pingpong_demo/ping/ping.go
+RUN go build examples/pingpong_demo/ping/ping.go
+
+FROM alpine
+WORKDIR /app
+CMD ./ping
 ```
 
 Then, do the same steps for Pong:
-```
+```zsh
 touch pong/Dockerfile
 ```  
 
@@ -212,61 +213,65 @@ And Pong's Dockerfile content:
 FROM golang:alpine
 WORKDIR /app
 COPY . .
-CMD go run pingpong_demo/pong/pong.go
+RUN go build examples/pingpong_demo/pong/pong.go
+
+FROM alpine
+WORKDIR /app
+CMD ./pong
 ```
 
 ### Docker Image deployment
-After creating the Dockerfiles, we must build the Docker Images and push each of them into the cluster, so they are available to be used in the Inspr workspace.  
+After creating the Dockerfiles, we must build the Docker images and push each of them into the cluster, so they are available to be used in the Inspr workspace.  
 
 First, from "/pingpong_demo", go into "/ping" folder:
-```
+```zsh
 cd ping
 ```
 
-In the next steps, it's important to have a live [container registry](https://cloud.google.com/container-registry) up and running, so it's possible to store and use the images that will be built.
+In the next steps, it's important to have a [container registry](https://cloud.google.com/container-registry) up and running, so it's possible to store and use the images that will be built.
 
-Then we must build the Docker Image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
-```
-docker build -f Dockerfile -t PING_IMAGE_TAG/app/ping:TAG_NAME
+Then we must build the Docker image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
+```zsh
+docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/ping:TAG_NAME
 ```
 
-Finally, we push the builded image into the cluster, where **PING_IMAGE_TAG is a reference to the container registry**:
-```
-docker push PING_IMAGE_TAG/app/ping:latest
+Finally, we push the builded image into the cluster, where **CONTAINER_REGISTRY_REF is a reference to the container registry**:
+```zsh
+docker push CONTAINER_REGISTRY_REF/app/ping:latest
 ```
 
 Now the same must be done to Pong. Go back to "/pingpong_demo" folder, and access "/pong" folder:
-```
+```zsh
 cd ..
 cd pong
 ```
 
-Build the Docker Image by using the Dockerfile previously created (and applying a tag to it, if desired). Similarly, **PONG_IMAGE_TAG is a reference to the container registry**:
-```
-docker build -f Dockerfile -t PONG_IMAGE_TAG/app/pong:TAG_NAME
+Build the Docker image by using the Dockerfile previously created (and applying a tag to it, if desired):
+```zsh
+docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
 ```
 
 Push the builded image into the cluster:
-```
-docker push PONG_IMAGE_TAG/app/pong:TAG_NAME
+```zsh
+docker push CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
 ```  
 
 **Alternatively, you can create a [Makefile](https://opensource.com/article/18/8/what-how-makefile) that will do the previous steps for you.**  
 Inside "/pingpong_demo" folder, create a new file called "Makefile:
-```
+```zsh
 touch Makefile
 ```
 The Makefile should contain the same Docker commands that you'd use to build and push Ping and Pong Docker images. The gain here is that instead of writing and executing four different commands, you just execute the Makefile. It should look like this:
 ```Makefile
 build:
-	docker build -t PING_IMAGE_TAG/app/pong:TAG_NAME -f ping/Dockerfile
-	docker push PING_IMAGE_TAG/app/pong:TAG_NAME
-	docker build -t PONG_IMAGE_TAG/app/pong:TAG_NAME -f pong/Dockerfile
-	docker push PONG_IMAGE_TAG/app/pong:TAG_NAME
+	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f ping/Dockerfile
+	docker push CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
+	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f pong/Dockerfile
+	docker push CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
 ```
 
 And then execute the Makefile through the terminal:
-```
+```zsh
 make
 ```
 
@@ -276,28 +281,44 @@ Now that we have our applications implemented and their Docker images available 
 
 ### YAML Files
 First of all, from "/pingpong_demo" we access the folder "/yamls" created previously.
-```
+```zsh
 cd yamls
 ```
-And within this folder we will create the *.yaml* files which describe each of the Inspr structures that will be built inside the cluster. This part of the tutorial wont take a closer look at every minimum detail on writing the YAML files, but you can find more information about it [here](yamls.md).
+And within this folder we will create the *.yaml* files which describe each of the Inspr structures that will be built inside the cluster. This part of the tutorial wont take a closer look at every minimum detail on how to write the YAML files, but you can find more information about it [here](yamls.md).
 
 **1) dApp YAMLs**  
-The first file to be created is *table.yaml*, which is the dApp that will contain all the other structures (Ping and Pong Nodes, Channels and Channel Type):
-```
+The first file to be created is *table.yaml*, which is the dApp that will contain Ping and Pong Nodes:
+```zsh
 touch table.yaml
 ```
 
-As it's described in Inspr YAMLs documentation, we must specify the kind, apiVersion and then the dApp information. This file have a really simple dApp definition, for its the base on which everything else will be created on. It should be like this:  
+As it's described in Inspr YAMLs documentation, we must specify the kind, apiVersion and then the dApp information. This specific dApp will work as a link between Ping/Pong and the Channels which they'll communicate through. Basically, it will connect Ping and Poung's Boundaries to Channels defined in the root dApp through Aliases. You can read more about Aliases and this dApp structure [here](dapp-overview.md).  
+The YAML should be the following:  
 ```YAML
 kind: dapp
 apiVersion: v1
 
 meta:
-  name: ppTable
+  name: pptable
+spec:
+  aliases:
+    ping.pingoutput:
+      target: ppchannel1
+    ping.pinginput:
+      target: ppchannel2
+    pong.ponginput:
+      target: ppchannel1
+    pong.pongoutput:
+      target: ppchannel2
+  boundary:
+    input:
+      - ppchannel1
+    output:
+      - ppchannel2
 ```
 
 The next file to be created is *ping.app.yaml*, in which we describe the Node that contains Ping. For better organization, let's create a new folder inside of "/yamls" called "nodes", inside of which we will store the Nodes YAMLs:
-```
+```zsh
 mkdir nodes
 touch nodes/ping.app.yaml
 ```
@@ -310,24 +331,24 @@ apiVersion: v1
 
 meta:
   name: ping
-  parent: ppTable
+  parent: pptable
 spec:
   node:
     spec:
       replicas: 1
       environment:
         SUPER_SECRET_0001: "false"
-      image: PING_IMAGE_TAG/app/ping:TAG_NAME
+      image: gcr.io/red-inspr/inspr/example/ping:latest
   boundary:
     input:
-      - ppChannel2
+      - pinginput
     output:
-      - ppChannel1
+      - pingoutput
 ```
 The `image` field must be a reference to the same image built in the step "Docker Image deployment". Also, the `environment` field is defined just so we can see that the environment variable "SUPER_SECRET_0001" will be created in the cluster, inside Ping's deployment.  
 
 Now, we do the same for Pong:
-```
+```zsh
 touch nodes/pong.app.yaml
 ```
 And *pong.app.yaml* should look like this:
@@ -337,24 +358,25 @@ apiVersion: v1
 
 meta:
   name: pong
-  parent: ppTable
+  parent: pptable
 spec:
   node:
     spec:
-      image: PONG_IMAGE_TAG/app/pong:TAG_NAME
+      image: gcr.io/red-inspr/inspr/example/pong:latest
   boundary:
     input:
-      - ppChannel1
+      - ponginput
     output:
-      - ppChannel2
+      - pongoutput
 ```
-Notice that we didn't specify the number of replicas for Pong. This is to show that, **if not specified, the default number of replicas is created, which is one.**  
+Notice that we didn't specify the number of replicas for Pong. This is to show that, **if not specified, the default number of replicas is created, which is one replica.**  
 
 **2) Channel YAMLs**  
-As it can be seen in Ping and Pong YAMLs, there are two Channels that need to be created. Similar to dApp, we must specify the kind, apiVersion and then the Channel information. Notice that the Channels annotations refer to Kafka attributes.  
+As it can be seen in dApp Table YAML, the four different Boundaries defined in Ping and Pong (`pinginput`, `pingoutput`, `ponginput` and `pongoutput`) actually refer only to two Channels, `ppchannel1` and `ppchannel2`, which need to be created in the root dApp.  
+Similar to a dApp, we must specify the kind, apiVersion and then the Channel information. Notice that the Channels annotations refer to Kafka attributes, as we're using Kafka as our Message Broker.  
 
 Let's proceed to create "/channels" folder inside of "/yamls", and then create *ch1.yaml*:
-```
+```zsh
 mkdir channels
 touch channels/ch1.yaml
 ```
@@ -363,19 +385,17 @@ It's content should be:
 ```YAML
 kind: channel
 apiVersion: v1
-
 meta:
-  name: ppChannel1
-  parent: ppTable
+  name: ppchannel1
   annotations:
     kafka.replication.factor: 1
     kafka.partition.number: 2
 spec:
-  type: ppCType1
+  type: ppctype1
 ```
 
 Now we do the same for *ch2.yaml*:
-```
+```zsh
 touch channels/ch2.yaml
 ```
 
@@ -385,19 +405,18 @@ kind: channel
 apiVersion: v1
 
 meta:
-  name: ppChannel2
-  parent: ppTable
+  name: ppchannel2
   annotations:
     kafka.replication.factor: 1
     kafka.partition.number: 2
 spec:
-  type: ppCType1
+  type: ppctype1
 ```  
 
 **3) Channel Type YAML**
-Both Channels use the same Channel Type to define the kind of message that goes through them. So, again, we must specify the kind, apiVersion and then the Channel Type information.  
+Both Channels use the same Channel Type to define the kind of message that goes through them. So we must specify the kind, apiVersion and then the Channel Type information for it to be created in the same context (the same dApp) as the Channels'.  
 First we create "/ctypes" folder and *ct1.yaml*:
-```
+```zsh
 mkdir ctypes
 touch ctypes/ct1.yaml
 ```
@@ -408,14 +427,13 @@ kind: channeltype
 apiVersion: v1
 
 meta:
-  name: ppCType1
-  parent: ppTable
+  name: ppctype1
 schema: yamls/ctypes/schema.avsc
 ```
 
-Notice that the `schema` field is actually a reference to an **Avro Schema** file. By defining it like this, when a Channel Type is created Inspr searches for the file and injects its value into the `schema`. You can find more information on how schemas should be created to be used in Inspr [here](schemas_and_types.md).  
+Notice that the `schema` field is actually a reference to an **Avro Schema** file. By defining it like this, when a Channel Type is created Inspr searches for the file and injects its value into the `schema` fiel. You can find more information on how schemas should be created to be used in Inspr [here](schemas_and_types.md).  
 To make everythink work properly, let's create *schema.avsc*:  
-```
+```zsh
 touch ctypes/schema.avsc
 ```
 
@@ -451,38 +469,136 @@ pingpong_demo
 Finally, now that we have Ping and Pong images in the cluster and all Inspr workspace structures well-defined in YAML files, we can deploy everything that we created and see it working in our cluster.  
 
 First of all, we need to check if **Inspr CLI** is referring to the [cluster ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) address, so we're able to send requests to it. To do so, run the command:
-```
+```zsh
 inspr config list
 ```
 And something similar to the following should be shown:
-```
+```zsh
 Available configurations: 
 - scope: ""
 - serverip: "http://localhost:8080"
 ```
-If the `serverip` is not your cluster ingress host, as the example above, you must change it:
-```
+If the `serverip` is not your cluster ingress host, such as the example above, you must change it:
+```zsh
 inspr config serverip "CLUSTER_INGRESS_HOST"
 ```
 And this will be printed in the terminal:
-```
+```zsh
 Success: inspr config [serverip] changed to 'CLUSTER_INGRESS_HOST'
 ```
 
 
 Now, from within "/pingpong_demo" folder, we apply the YAML files by using Inspr CLIs commands. The files should be applied in the following order:  
-1) dApp `ppTable`
-2) Channel Type `ppCType1`
-3) Channels `ppChannel1` and `ppChannel2`
+1) Channel Type `ppctype1`
+2) Channels `ppchannel1` and `ppchannel2`
+3) dApp `pptable`
 4) Nodes `ping` and `pong`  
 
 You can do so by running the following commands from within "/pingpong_demo" folder:
 ```
-inspr apply -f yamls/table.yaml
 inspr apply -k yamls/ctypes
 inspr apply -k yamls/channels
+inspr apply -f yamls/table.yaml
 inspr apply -k yamls/nodes
 ```
 To learn more about Inspr CLI, check [this](cli_commands.md) documentation.  
 
-If everything worked fine, the Inspr Workspace changelog will have printed something similar to this in your terminal:  
+If everything worked fine, the Inspr deamon will have printed a changelog similar to the following for each command written in your terminal:
+```zsh
+➜  pingpong_demo ✗ inspr apply -k yamls/ctypes   
+ct1.yaml
+On: 
+Field                         | From       | To
+Spec.ChannelTypes[ppctype1]   | <nil>      | {...}
+
+Applied:
+ct1.yaml | channeltype | v1
+
+➜  pingpong_demo ✗ inspr apply -k yamls/channels
+ch1.yaml
+On: 
+Field                       | From       | To
+Spec.Channels[ppchannel1]   | <nil>      | {...}
+ch2.yaml
+On: 
+Field                       | From       | To
+Spec.Channels[ppchannel2]   | <nil>      | {...}
+
+Applied:
+ch1.yaml | channel | v1
+ch2.yaml | channel | v1
+
+➜  pingpong_demo ✗ inspr apply -f yamls/table.yaml
+yamls/table.yaml
+On: pptable
+Field                           | From       | To
+Meta.Name                       |            | pptable
+Spec.Boundary.Input             | <nil>      | ppchannel1
+Spec.Boundary.Output            | <nil>      | ppchannel2
+Spec.Aliases[pong.ponginput]    | <nil>      | ppchannel1
+Spec.Aliases[pong.pongoutput]   | <nil>      | ppchannel2
+Spec.Aliases[ping.pinginput]    | <nil>      | ppchannel2
+Spec.Aliases[ping.pingoutput]   | <nil>      | ppchannel1
+On: 
+Field                | From       | To
+Spec.Apps[pptable]   | <nil>      | {...}
+
+Applied:
+yamls/table.yaml | dapp | v1
+
+➜  pingpong_demo ✗ inspr apply -k yamls/nodes     
+ping.app.yaml
+On: pptable.ping
+Field                                           | From       | To
+Meta.Name                                       |            | ping
+Meta.Parent                                     |            | pptable
+Spec.Node.Meta.Name                             |            | ping
+Spec.Node.Meta.Parent                           |            | pptable
+Spec.Node.Spec.Image                            |            | gcr.io/red-inspr/inspr/example/ping:latest
+Spec.Node.Spec.Replicas                         | 0          | 1
+Spec.Node.Spec.Environment[SUPER_SECRET_0001]   | <nil>      | false
+Spec.Boundary.Input                             | <nil>      | pinginput
+Spec.Boundary.Output                            | <nil>      | pingoutput
+On: pptable
+Field             | From       | To
+Spec.Apps[ping]   | <nil>      | {...}
+pong.app.yaml
+On: pptable.pong
+Field                   | From       | To
+Meta.Name               |            | pong
+Meta.Parent             |            | pptable
+Spec.Node.Meta.Name     |            | pong
+Spec.Node.Meta.Parent   |            | pptable
+Spec.Node.Spec.Image    |            | gcr.io/red-inspr/inspr/example/pong:latest
+Spec.Boundary.Input     | <nil>      | ponginput
+Spec.Boundary.Output    | <nil>      | pongoutput
+On: pptable
+Field             | From       | To
+Spec.Apps[pong]   | <nil>      | {...}
+
+Applied:
+ping.app.yaml | dapp | v1
+pong.app.yaml | dapp | v1
+```
+
+## And, finally, it's done! You have just initialized your Inspr workspace!
+To check if everything worked and that Ping and Pong deployments were created, run the following command in your terminal:
+```zsh
+kubectl get deploy --namespace inspr-apps
+```
+
+And a message like this should be displayed:
+```
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+pptable-ping   1/1     1            1           12m
+pptable-pong   1/1     1            1           12m
+```
+
+To check if Ping and Pong are actually writing and reading messages, you can access you cluster informations by using [k9s](https://github.com/derailed/k9s).  
+In k9s, access the deployments `pptable-ping` or `pptable-pong`, then access the pod within it. The pod should contain two containers, one for the Node and the other for it's Sidecar:  
+
+![structure](img/k9s-container.jpg)
+
+And by accessing the Node's container, you'll be able to see the application running!
+
+![structure](img/k9s-log.jpg)
