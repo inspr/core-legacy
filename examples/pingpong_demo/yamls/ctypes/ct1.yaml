@@ -1,6 +1,6 @@
 kind: channeltype
 apiVersion: v1
+
 meta:
-  name: ppCType1
-  parent: ppTable
+  name: ppctype1
 schema: yamls/ctypes/schema.avsc

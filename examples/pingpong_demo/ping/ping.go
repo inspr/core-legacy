@@ -10,7 +10,7 @@ import (
 
 type expectedDataType struct {
 	Message struct {
-		Data int `json:"data"`
+		Data string `json:"data"`
 	} `json:"message"`
 	Channel string `json:"channel"`
 }
@@ -26,13 +26,13 @@ func main() {
 			Data: "Ping!",
 		}
 
-		if err := client.WriteMessage(ctx, "ppChannel1", sentMsg); err != nil {
+		if err := client.WriteMessage(ctx, "pingoutput", sentMsg); err != nil {
 			fmt.Println(err)
 			continue
 		}
 
 		var recMsg expectedDataType
-		err := client.ReadMessage(ctx, "ppChannel2", &recMsg)
+		err := client.ReadMessage(ctx, "pinginput", &recMsg)
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -40,7 +40,7 @@ func main() {
 		fmt.Println("Read message: ")
 		fmt.Println(recMsg.Message.Data)
 
-		if err := client.CommitMessage(ctx, "ppChannel2"); err != nil {
+		if err := client.CommitMessage(ctx, "pinginput"); err != nil {
 			fmt.Println(err.Error())
 		}
 	}

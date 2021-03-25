@@ -3,13 +3,13 @@ apiVersion: v1
 
 meta:
   name: pong
-  parent: ppTable
+  parent: pptable
 spec:
   node:
     spec:
       image: gcr.io/red-inspr/inspr/example/pong:latest
   boundary:
     input:
-      - ppChannel1
+      - ponginput
     output:
-      - ppChannel2
+      - pongoutput

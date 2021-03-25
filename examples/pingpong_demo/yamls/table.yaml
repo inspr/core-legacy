@@ -2,4 +2,19 @@ kind: dapp
 apiVersion: v1
 
 meta:
-  name: ppTable
+  name: pptable
+spec:
+  aliases:
+    ping.pingoutput:
+      target: ppchannel1
+    ping.pinginput:
+      target: ppchannel2
+    pong.ponginput:
+      target: ppchannel1
+    pong.pongoutput:
+      target: ppchannel2
+  boundary:
+    input:
+      - ppchannel1
+    output:
+      - ppchannel2
