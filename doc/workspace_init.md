@@ -1,12 +1,11 @@
 TODO:
-1) Fix Ping and Pong code so it uses the latest version of ReadMessage (and documento how it works)
 2) Run pingpong demo and print the results (apply results and it working in the cluster)
 3) Record a video of everything
 
 # Workspace Initialization
 This document is a detailed guide on how to create an application and deploy an Inspr workspace that cointains it into a Kubernetes cluster.  
 
-**It is mandatory to have [Docker](https://docs.docker.com/get-docker/), [Kubernetes](https://kubernetes.io/docs/tasks/tools/), [Inspr](helm_installation.md) and [Inspr CLI](cli-install.md) installed.**  
+**It is mandatory to have [Docker](https://docs.docker.com/get-docker/), [Kubernetes](https://kubernetes.io/docs/tasks/tools/), [Insprd](helm_installation.md) and [Inspr CLI](cli-install.md) installed.**  
 Also, this tutorial will be using the Message Broker [Apache Kafka](https://kafka.apache.org/). You can see how to install it in your cluster [here](https://bitnami.com/stack/kafka/helm). 
 
 The Inspr workspace that will be created through this guide contains two applications that communicate with each other:
@@ -55,15 +54,23 @@ In *ping.go*, we will define a `main` function that does the following:
 2) Initiates an endless `for loop` in which the message "Ping!" is written in the Channel *ppChannel1*, then the application proceeds to read a message from Channel *ppChannel2*. If there is a message, it's read and displayed in the terminal.
 
 *ping.go* should look like this:
-```
+```Go
 package main
 
 import (
 	"fmt"
+
 	dappclient "gitlab.inspr.dev/inspr/core/pkg/client"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 	"golang.org/x/net/context"
 )
+
+type expectedDataType struct {
+	Message struct {
+		Data int `json:"data"`
+	} `json:"message"`
+	Channel string `json:"channel"`
+}
 
 func main() {
 
@@ -81,13 +88,14 @@ func main() {
 			continue
 		}
 
-		recMsg, err := client.ReadMessage(ctx, "ppChannel2")
+		var recMsg expectedDataType
+		err := client.ReadMessage(ctx, "ppChannel2", &recMsg)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 		fmt.Println("Read message: ")
-		fmt.Println(recMsg.Data)
+		fmt.Println(recMsg.Message.Data)
 
 		if err := client.CommitMessage(ctx, "ppChannel2"); err != nil {
 			fmt.Println(err.Error())
@@ -96,13 +104,30 @@ func main() {
 }
 ```
 
-A similar folder/file structure and code must be done to implement Pong. So, from within "pingpong_demo", create *pong.go* in /pong folder:  
+Notice that before the `main` function a new structure called `Message` is declared, which contains a field called "Channel" that is a string, and another field called "Message" aswell.  
+**In Inspr, the user is encouraged to define which type of message he expects to read from a Channel, so that unexpected messages of different types don't cause unexpected errors.**  
+So everytime one implements an application that reads messages, a structure such as the following should be created and passed as an argument for `ReadMessage` method:
+```Go
+type YOUR_STRUCTURE_NAME struct {
+	Message struct {
+		Data DESIRED_DATA_TYPE `json:"data"`
+	} `json:"message"`
+	OPTIONAL_FIELD_1 string `json:"OPTIONAL_FIELD_1_TAG"`
+	OPTIONAL_FIELD_2 int `json:"OPTIONAL_FIELD_2_TAG"`
+	OPTIONAL_FIELD_3 struct `json:"OPTIONAL_FIELD_3_TAG"`
+	...
+}
+```
+As seen above, the only mandatory fields inside of your custom structure are `Message` and `Data`, and their respective [JSON tags](https://medium.com/golangspec/tags-in-golang-3e5db0b8ef3e). `Data`'s field type is chosen by you, and can even be a new structure!  
+
+
+Proceeding the tutorial, a similar folder/file structure and code must be done to implement Pong. So, from within "pingpong_demo", create *pong.go* in /pong folder:  
 ```
 touch pong/pong.go
 ```  
 
 And then write a code similar to *ping.go*'s, just remember to swich the Channels and the message that is written. It should look like this:
-```
+```Go
 package main
 
 import (
@@ -113,11 +138,19 @@ import (
 	"golang.org/x/net/context"
 )
 
+type expectedDataType struct {
+	Message struct {
+		Data int `json:"data"`
+	} `json:"message"`
+	Channel string `json:"channel"`
+}
+
 func main() {
 
 	client := dappclient.NewAppClient()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
 	for {
 		sentMsg := models.Message{
 			Data: "Pong!",
@@ -128,13 +161,14 @@ func main() {
 			continue
 		}
 
-		recMsg, err := client.ReadMessage(ctx, "ppChannel1")
+		var recMsg expectedDataType
+		err := client.ReadMessage(ctx, "ppChannel1", &recMsg)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 		fmt.Println("Read message: ")
-		fmt.Println(recMsg.Data)
+		fmt.Println(recMsg.Message.Data)
 
 		if err := client.CommitMessage(ctx, "ppChannel1"); err != nil {
 			fmt.Println(err.Error())
@@ -161,7 +195,7 @@ The Dockerfile structure will be created to do the following:
 4) Compile and build the *ping.go* file.
 
 Ping's Dockerfile should look like this:
-```
+```Docker
 FROM golang:alpine
 WORKDIR /app
 COPY . .
@@ -174,7 +208,7 @@ touch pong/Dockerfile
 ```  
 
 And Pong's Dockerfile content:
-```
+```Docker
 FROM golang:alpine
 WORKDIR /app
 COPY . .
@@ -223,7 +257,7 @@ Inside "/pingpong_demo" folder, create a new file called "Makefile:
 touch Makefile
 ```
 The Makefile should contain the same Docker commands that you'd use to build and push Ping and Pong Docker images. The gain here is that instead of writing and executing four different commands, you just execute the Makefile. It should look like this:
-```
+```Makefile
 build:
 	docker build -t PING_IMAGE_TAG/app/pong:TAG_NAME -f ping/Dockerfile
 	docker push PING_IMAGE_TAG/app/pong:TAG_NAME
@@ -254,7 +288,7 @@ touch table.yaml
 ```
 
 As it's described in Inspr YAMLs documentation, we must specify the kind, apiVersion and then the dApp information. This file have a really simple dApp definition, for its the base on which everything else will be created on. It should be like this:  
-```
+```YAML
 kind: dapp
 apiVersion: v1
 
@@ -270,7 +304,7 @@ touch nodes/ping.app.yaml
 
 Then, insite of *ping.app.yaml* we must specify the kind, apiVersion and then the Node information (such as name, boundaries, image, etc.).  
 It should look like this:
-```
+```YAML
 kind: dapp
 apiVersion: v1
 
@@ -297,7 +331,7 @@ Now, we do the same for Pong:
 touch nodes/pong.app.yaml
 ```
 And *pong.app.yaml* should look like this:
-```
+```YAML
 kind: dapp
 apiVersion: v1
 
@@ -326,7 +360,7 @@ touch channels/ch1.yaml
 ```
 
 It's content should be:
-```
+```YAML
 kind: channel
 apiVersion: v1
 
@@ -346,7 +380,7 @@ touch channels/ch2.yaml
 ```
 
 And it's content should be:
-```
+```YAML
 kind: channel
 apiVersion: v1
 
@@ -369,7 +403,7 @@ touch ctypes/ct1.yaml
 ```
 
 And it's content should be:
-```
+```YAML
 kind: channeltype
 apiVersion: v1
 
@@ -416,7 +450,27 @@ pingpong_demo
 ### Deploying dApps, Channels and Channel Type
 Finally, now that we have Ping and Pong images in the cluster and all Inspr workspace structures well-defined in YAML files, we can deploy everything that we created and see it working in our cluster.  
 
-From within "/pingpong_demo" folder, we apply the YAML files by using **Inspr CLIs** commands. The files should be applied in the following order:  
+First of all, we need to check if **Inspr CLI** is referring to the [cluster ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) address, so we're able to send requests to it. To do so, run the command:
+```
+inspr config list
+```
+And something similar to the following should be shown:
+```
+Available configurations: 
+- scope: ""
+- serverip: "http://localhost:8080"
+```
+If the `serverip` is not your cluster ingress host, as the example above, you must change it:
+```
+inspr config serverip "CLUSTER_INGRESS_HOST"
+```
+And this will be printed in the terminal:
+```
+Success: inspr config [serverip] changed to 'CLUSTER_INGRESS_HOST'
+```
+
+
+Now, from within "/pingpong_demo" folder, we apply the YAML files by using Inspr CLIs commands. The files should be applied in the following order:  
 1) dApp `ppTable`
 2) Channel Type `ppCType1`
 3) Channels `ppChannel1` and `ppChannel2`
