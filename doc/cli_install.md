@@ -26,3 +26,5 @@ This will allow you to see all the cli environment values and their current valu
 
 To be able to make changes to your cluster the `serverip` variable has to be changed to comport the hostname currently being used to access the cluster IP. This can be done using the following command 
 `inspr config serverip http://<your_domain>.com`
+
+[<center>Get Started</center>](readme.md) 
