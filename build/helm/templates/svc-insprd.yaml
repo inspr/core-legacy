@@ -6,7 +6,7 @@ metadata:
     {{- include "insprd.labels" . | nindent 4 }}
     app: {{ .Values.service.insprdName }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.insprdPort }}
       targetPort: {{ .Values.service.insprdTargetport }}
