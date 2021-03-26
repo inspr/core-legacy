@@ -42,7 +42,7 @@ func main() {
 			continue
 		}
 
-		msg := DiscordMessage{
+		msg := discordMessage{
 			Content:   fmt.Sprintf("%v", subMsg.Message.Data),
 			Username:  "Notifications",
 			AvatarURL: "",
