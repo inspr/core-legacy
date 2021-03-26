@@ -1,10 +1,10 @@
 # Getting Started
 
-This file is directed for those who are running the Inspr plataform for the first time, it is recommended that you take your time through each step and read carefully all the documentation linked below.
+This file is directed for those who are running the Inspr plataform for the first time. It is recommended that you take your time through each step and read carefully all the documentation linked below.
 
 ## Helm
 
-To be able to use the Inspr daemon there is the requirement that you have a cluster available to use. There is also a possibility to use [minikube](https://minikube.sigs.k8s.io/docs/start/) to test it locally.
+To be able to use the Inspr daemon it's required that you have a cluster available to use. There is also the possibility to use [minikube](https://minikube.sigs.k8s.io/docs/start/) to test it locally.
 
 For the step by step installation of all the necessary software in the cluster please follow this [tutorial](./helm_installation.md).
 
