@@ -73,7 +73,7 @@ So to create a dApp inside `app1` with the name app2 you would call `ac.Create(c
 ```go
 func (ac *AppClient) Update(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error)
 ```
-`Update` updates an dApp inside the Insprd. If the dApp doesn't exist, it will return a error. The `context string` refers to the parent dApp where the actual dApp will be instantiated, represented with a dot separated query, such as **app1.app2**. The information of the dApp, such as name and other metadata, will be extracted from the definition of the dApp itself.   
+`Update` updates a dApp inside the Insprd. If the dApp doesn't exist, it will return a error. The `context string` refers to the parent dApp where the actual dApp will be instantiated, represented with a dot separated query, such as **app1.app2**. The information of the dApp, such as name and other metadata, will be extracted from the definition of the dApp itself.   
 So to update a dApp inside `app1` with the name `app2` you would call `ac.Update(context.Background(), "app1", &meta.App{...}, false)`.
 
 ### func \(\*AppClient) Delete
@@ -81,7 +81,7 @@ So to update a dApp inside `app1` with the name `app2` you would call `ac.Update
 ```go
 func (ac *AppClient) Delete(ctx context.Context, context string, dryRun bool) (diff.Changelog, error)
 ```
-`Delete` deletes an dApp inside the Insprd. The `context string` refers to the dApp itself, represented with a dot separated query, such as **app1.app2**.  
+`Delete` deletes a dApp inside the Insprd. The `context string` refers to the dApp itself, represented with a dot separated query, such as **app1.app2**.  
 So to delete a dApp inside `app1` with the name `app2` you would call `ac.Delete(context.Background(), "app1.app2")`.
 
 ## Channels
