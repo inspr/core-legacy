@@ -50,9 +50,9 @@ func NewApplyApp() RunMethod {
 		}
 		// creates or updates it
 		if flagIsUpdate {
-			updateQuery, err := metautils.JoinScopes(query, app.Meta.Name)
-			if err != nil {
-				return err
+			updateQuery, errQuery := metautils.JoinScopes(query, app.Meta.Name)
+			if errQuery != nil {
+				return errQuery
 			}
 			log, err = c.Update(context.Background(), updateQuery, &app, flagDryRun)
 		} else {

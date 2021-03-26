@@ -256,7 +256,8 @@ func TestClient_ReadMessage(t *testing.T) {
 				s.Close()
 			}
 
-			got, err := c.ReadMessage(context.Background(), "chan1")
+			var got models.Message
+			err := c.ReadMessage(context.Background(), "chan1", &got)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.ReadMessage() error = %v, wantErr %v", err, tt.wantErr)
 				return
