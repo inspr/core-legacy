@@ -1,5 +1,0 @@
-kind: channeltype
-apiVersion: v1
-meta:
-  name: channelType1
-schema: inspr/schema.avsc

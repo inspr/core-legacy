@@ -20,11 +20,10 @@ insprEnvironment: test
 deployment:
   insprdName: insprd-deployment
 
-insprdRepository: gcr.io/red-inspr/insprd:e807184-dirty
+insprdRepository: gcr.io/red-inspr/insprd
 
 service:
   type: ClusterIP
-  port: 80
   insprdName: insprd-svc
   insprdPort: 80
   insprdTargetport: 8080
@@ -37,7 +36,6 @@ ingress:
     - host: chart-example.local
       paths: []
   tls: []
-
 
 resources: {}
 
