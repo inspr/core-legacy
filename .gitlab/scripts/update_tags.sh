@@ -1,6 +1,7 @@
 #!/bin/bash
 CHART_URL=$1
 CHART_GS_URI=$2
+curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v1.21.0/skaffold-linux-amd64 && chmod +x skaffold && mv skaffold /usr/local/bin
 echo "Updating helm chart tags"
 INSPRD_TAG=$(printf '%s' $(grep -Eo "gcr\.io\/red\-inspr\/insprd\:[^@]+\@sha256\:[[:alnum:]]+" tags.out) | sed -e 's/[\/&]/\\&/g')
 KAFKA_SIDECAR_TAG=$(printf '%s' $(grep -Eo "gcr\.io\/red\-inspr\/inspr\/sidecar\/kafka\:[^@]+\@sha256\:[[:alnum:]]+" tags.out) | sed -e 's/[\/&]/\\&/g')
