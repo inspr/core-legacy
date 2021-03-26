@@ -8,6 +8,13 @@ import (
 	"golang.org/x/net/context"
 )
 
+type expectedDataType struct {
+	Message struct {
+		Data string `json:"data"`
+	} `json:"message"`
+	Channel string `json:"channel"`
+}
+
 func main() {
 
 	client := dappclient.NewAppClient()
@@ -16,26 +23,25 @@ func main() {
 
 	for {
 		sentMsg := models.Message{
-			Data: "Boa tarde amigos",
+			Data: "Pong!",
 		}
 
-		if err := client.WriteMessage(ctx, "ch2", sentMsg); err != nil {
+		if err := client.WriteMessage(ctx, "pongoutput", sentMsg); err != nil {
 			fmt.Println(err)
 			continue
 		}
 
-		var recMsg models.Message
-		err := client.ReadMessage(ctx, "ch1", &recMsg)
+		var recMsg expectedDataType
+		err := client.ReadMessage(ctx, "ponginput", &recMsg)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		fmt.Println("Mensagem lida: ")
-		fmt.Println(recMsg.Data)
+		fmt.Println("Read message: ")
+		fmt.Println(recMsg.Message.Data)
 
-		if err := client.CommitMessage(ctx, "ch1"); err != nil {
+		if err := client.CommitMessage(ctx, "ponginput"); err != nil {
 			fmt.Println(err.Error())
-			continue
 		}
 	}
 }
