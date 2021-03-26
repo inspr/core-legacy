@@ -65,7 +65,7 @@ So to get a dApp inside `app1` that is called `app2` you would call ac.Get(conte
 ```go
 func (ac *AppClient) Create(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error)
 ```
-`Create` creates an dApp inside the Insprd. The `context string` refers to the parent dApp where the actual dApp will be instantiated, represented with a dot separated query, such as **app1.app2**. The information of the dApp, such as name and other metadata, will be extracted from the definition of the dApp itself.   
+`Create` creates a dApp inside the Insprd. The `context string` refers to the parent dApp where the actual dApp will be instantiated, represented with a dot separated query, such as **app1.app2**. The information of the dApp, such as name and other metadata, will be extracted from the definition of the dApp itself.   
 So to create a dApp inside `app1` with the name app2 you would call `ac.Create(context.Background(), "app1", &meta.App{...}, false)`.
 
 ### func \(\*AppClient) Update
