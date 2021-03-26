@@ -12,16 +12,11 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
-type DiscordMessage struct {
-	Content   string `json:"content"`
-	Username  string `json:"username"`
-	AvatarURL string `json:"avatar_url"`
-	TTS       bool   `json:"tts"`
-	File      []byte `json:"file"`
-	Embeded   []byte `json:"embeds"`
+type SlackMessage struct {
+	Text string `json:"text"`
 }
 
-var webhook = "https://discord.com/api/webhooks/823903452475162666/o9aKLMVOb9-ZhfDD7RJ84OCW6WgU2PQnsEj0CzPgFzKC1icqgqWqF8LZxHSFXEzH1NED"
+var webhook = "https://hooks.slack.com/services/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"
 var channel = "pubsubch"
 
 func main() {
@@ -34,12 +29,10 @@ func main() {
 			log.Printf("%#v", err.(*ierrors.InsprError).Err)
 			continue
 		}
+		fmt.Println(subMsg.Data)
 
-		msg := DiscordMessage{
-			Content:   fmt.Sprintf("%v", subMsg.Data),
-			Username:  "Notifications",
-			AvatarURL: "",
-			TTS:       true,
+		msg := SlackMessage{
+			Text: fmt.Sprintf("%v", subMsg.Data),
 		}
 
 		msgBuff, _ := json.Marshal(msg)
@@ -58,4 +51,5 @@ func main() {
 			log.Println(err.Error())
 		}
 	}
+
 }

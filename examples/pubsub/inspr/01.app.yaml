@@ -2,7 +2,7 @@ kind: dapp
 apiVersion: v1
 
 meta:
-  name: multiMessage
+  name: pubsub
 spec:
   node:
     spec:

@@ -18,7 +18,7 @@ type Server struct {
 	Mux *http.ServeMux
 }
 
-var discordCH = "discodMessages"
+var discordCH = "pubsubch"
 
 type Message struct {
 	Message string `json:"message"`
@@ -31,9 +31,9 @@ type Message struct {
 func (s *Server) Init() {
 	s.Mux = http.NewServeMux()
 	client := dappclient.NewAppClient()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	s.Mux.HandleFunc("/publish", func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		data := Message{}
 		decoder := json.NewDecoder(r.Body)
 
@@ -43,14 +43,12 @@ func (s *Server) Init() {
 			return
 		}
 
-		if data.Discord {
-			discordMsg := models.Message{
-				Data: data.Message,
-			}
-			if err := client.WriteMessage(ctx, discordCH, discordMsg); err != nil {
-				fmt.Println(err)
-				rest.ERROR(w, err)
-			}
+		discordMsg := models.Message{
+			Data: data.Message,
+		}
+		if err := client.WriteMessage(ctx, discordCH, discordMsg); err != nil {
+			fmt.Println(err)
+			rest.ERROR(w, err)
 		}
 
 		rest.JSON(w, http.StatusOK, nil)
@@ -58,7 +56,7 @@ func (s *Server) Init() {
 }
 
 // Run starts the server on the port given in addr
-func (s *Server) Run(addr string) {
-	fmt.Printf("MultiMessage api is up! Listening on port: %s\n", addr)
+func (s *Server) Run(addr string) { // this is called by the main()
+	fmt.Printf("pubsub api is up! Listening on port: %s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, s.Mux))
 }
