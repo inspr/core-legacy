@@ -4,7 +4,7 @@ The client controller is the entry point for making changes to the Inspr tree st
 
 ## Instantiating a new Client
 
-The structure of the `client` basically needs a `request.Client` that allows to define where the requests will be made. So the first step is to instantiate a new `request.Client`. For this, it is possible to use the builder defined in the `request` package:
+The structure of the `client` basically needs a `request.Client` that defines where the requests will be sent. So the first step is to instantiate a new `request.Client`. For this, it is possible to use the builder defined in the `request` package:
 
 ```go
 rc := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
