@@ -24,19 +24,26 @@ type DiscordMessage struct {
 var webhook = "https://discord.com/api/webhooks/823903452475162666/o9aKLMVOb9-ZhfDD7RJ84OCW6WgU2PQnsEj0CzPgFzKC1icqgqWqF8LZxHSFXEzH1NED"
 var channel = "pubsubch"
 
+type expectedDataType struct {
+	Message struct {
+		Data string `json:"data"`
+	} `json:"message"`
+	Channel string `json:"channel"`
+}
+
 func main() {
 	c := &http.Client{}
 	client := dappclient.NewAppClient()
 	for {
-
-		subMsg, err := client.ReadMessage(context.Background(), channel)
+		subMsg := expectedDataType{}
+		err := client.ReadMessage(context.Background(), channel, &subMsg)
 		if err != nil {
 			log.Printf("%#v", err.(*ierrors.InsprError).Err)
 			continue
 		}
 
 		msg := DiscordMessage{
-			Content:   fmt.Sprintf("%v", subMsg.Data),
+			Content:   fmt.Sprintf("%v", subMsg.Message.Data),
 			Username:  "Notifications",
 			AvatarURL: "",
 			TTS:       true,

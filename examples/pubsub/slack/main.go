@@ -16,6 +16,13 @@ type SlackMessage struct {
 	Text string `json:"text"`
 }
 
+type expectedDataType struct {
+	Message struct {
+		Data string `json:"data"`
+	} `json:"message"`
+	Channel string `json:"channel"`
+}
+
 var webhook = "https://hooks.slack.com/services/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"
 var channel = "pubsubch"
 
@@ -23,16 +30,15 @@ func main() {
 	c := &http.Client{}
 	client := dappclient.NewAppClient()
 	for {
-
-		subMsg, err := client.ReadMessage(context.Background(), channel)
+		subMsg := expectedDataType{}
+		err := client.ReadMessage(context.Background(), channel, &subMsg)
 		if err != nil {
 			log.Printf("%#v", err.(*ierrors.InsprError).Err)
 			continue
 		}
-		fmt.Println(subMsg.Data)
 
 		msg := SlackMessage{
-			Text: fmt.Sprintf("%v", subMsg.Data),
+			Text: fmt.Sprintf("%v", subMsg.Message.Data),
 		}
 
 		msgBuff, _ := json.Marshal(msg)
