@@ -12,7 +12,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
-type SlackMessage struct {
+type slackMessage struct {
 	Text string `json:"text"`
 }
 
@@ -37,7 +37,7 @@ func main() {
 			continue
 		}
 
-		msg := SlackMessage{
+		msg := slackMessage{
 			Text: fmt.Sprintf("%v", subMsg.Message.Data),
 		}
 

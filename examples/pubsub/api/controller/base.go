@@ -20,7 +20,7 @@ type Server struct {
 
 var discordCH = "pubsubch"
 
-type Message struct {
+type message struct {
 	Message string `json:"message"`
 	Discord bool   `json:"discord"`
 	Slack   bool   `json:"slack"`
@@ -34,7 +34,7 @@ func (s *Server) Init() {
 	s.Mux.HandleFunc("/publish", func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		data := Message{}
+		data := message{}
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
