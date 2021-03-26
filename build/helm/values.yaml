@@ -20,7 +20,7 @@ insprEnvironment: test
 deployment:
   insprdName: insprd-deployment
 
-insprdRepository: gcr.io/red-inspr/insprd:e807184-dirty
+insprdRepository: gcr.io/red-inspr/insprd
 
 service:
   type: ClusterIP
@@ -36,7 +36,6 @@ ingress:
     - host: chart-example.local
       paths: []
   tls: []
-
 
 resources: {}
 
