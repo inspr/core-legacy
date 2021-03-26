@@ -87,4 +87,6 @@ $ helm install my-release bitnami/kafka
 
 You can also check how to do the installation on the [official bitnami Kafka page](https://bitnami.com/stack/kafka/helm).
 
-[<center>Get Started</center>](readme.md) 
+
+[Get Started](readme.md)
+

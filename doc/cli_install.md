@@ -19,7 +19,7 @@ To get other Inspr CLI versions, download the binary file from the GitLab reposi
 
 You can check if the installation was successful by typing `inspr -h` on your terminal.
 
-It's important to remeber that if you already have a server with all the necessary helm configuration, you **have** to set the inspr **serverip** to your cluster.
+It's important to remeber that if you already have a server with all the necessary helm configuration, you **have** to set the Inspr's **serverip** to your cluster.
 
 First check the current config using `inspr config list`. 
 This will allow you to see all the cli environment values and their current values.
