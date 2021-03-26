@@ -2,7 +2,7 @@
 
 ## Sidecar Architecture
 
-The content below is a documentation about the Inspr Sidecar component. The main purpose of the text is to abord the following questions, how it is created, how it acts in the context of the cluster and what are its genereal responsibilities.
+The content below is a documentation about the Inspr Sidecar component. The main purpose of the text is to abord how it is created, how it acts in the context of the cluster and what are its genereal responsibilities.
 
 ### Overview
 
@@ -10,7 +10,7 @@ When creating an Inspr's dApp in your cluster it's possible to define the Input 
 
 But what is exactly a `sidecar` and how can it be utilized? 
 
-Firstly is important to remember that what inspr actually uses for communication is a message broker, this means that there are topics that our application can write to and read from. And this is exactly where the `sidecar` acts, by being a layer of abstraction that simplifies the whole process by a substantial margin.
+First is important to remember that Inspr uses message brokers for communication. This means that there are topics in which applications can write to and read from. And this is exactly where the `sidecar` acts, by being a layer of abstraction that simplifies the whole process by a substantial margin.
 
 The Sidecar is already implemented and resolves most of the proceedings that one must do to send data to a topic in the message broker, or to read from it. This means that, by using the Sidecar API, a developer can focus on his application, and when trying to communicate with another dApp in his cluster there is only the need to do a HTTP request with the content of the message.
 
@@ -18,7 +18,7 @@ The Sidecar is already implemented and resolves most of the proceedings that one
 
 ### How is the Sidecar created?
 
-When creating a dApp that contains a Node the user must specify its content, that means creating the docker image of his application and in the yaml of the Node adding the location of the image. It is also specified the Channels which this dApp/Node can communicate with.
+When creating a dApp that contains a Node the user must specify its content, that means creating the docker image of his application and in the yaml of the Node adding the location of the image. It is also necessary to specify the Channels which this dApp/Node can communicate through.
 
 When the Inspr daemon receives both of this information, the Node is created according to the Docker image specified in it. It also creates a Sidecar attached to it, like the example below:
 
@@ -39,7 +39,7 @@ On the client side there are three main methods that are used to process informa
  - WriteMessage
  - CommitMessage
 
-These three methods are responsible to establish a solid communication between the dApp and the Sidecar, and all of this are done through the Unix Socket.
+These three methods are responsible to establish a solid communication between the dApp and the Sidecar, and all of this is done through the Unix Socket.
 
 
 #### ReadMessage
@@ -138,10 +138,10 @@ These endpoints are:
 - "/commit".
  
 Respectively these implement the server-side functionalities to: 
-- ReadMessage: reads a message from a specific channel
-- WriteMessage: writes a message to a specific channel
+- ReadMessage: reads a message from a specific Channel
+- WriteMessage: writes a message to a specific Channel
 - Commit: confirms that a message has been read
 
-Each server has two environment variables that determine which channels it can use for input and output. When it receives a request it first checks whether or not the channel specified on the request is valid for the requested operation. Following that, it simply completes the operation.
+Each server has two environment variables that determine which Channels it can use for input and output. When it receives a request it first checks whether or not the Channel specified on the request is valid for the requested operation. Following that, it simply completes the operation.
 
 One small observation is that when trying to send a message, if an unknown Channel is specified in the Client, the server will identify that such Channel doesn't exist and return an error to the Client request.
