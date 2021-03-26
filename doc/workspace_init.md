@@ -50,7 +50,7 @@ In *ping.go*, we will define a `main` function that does the following:
 2) Initiates an endless `for loop` in which the message "Ping!" is written in the Channel *pingoutput*, then the application proceeds to read a message from Channel *pinginput*. If there are any messages, they are read and displayed in the terminal.
 
 *ping.go* should look like this:
-```Go
+```go
 package main
 
 import (
@@ -100,10 +100,10 @@ func main() {
 }
 ```
 
-Notice that before the `main` function a new structure called `Message` is declared, which contains a field called "Channel" that is a string, and another field called "Message" aswell.  
+Notice that before the `main` function a new structure called `expectedDataType` is declared, which contains a field called "Channel" that is a string, and another field called "Message" as well.  
 **In Inspr, the user is encouraged to define which type of message he expects to read from a Channel, so that unexpected messages of different types don't cause unexpected errors.**  
 So everytime one implements an application that reads messages, a structure such as the following should be created and passed as an argument for the `ReadMessage` method:
-```Go
+```go
 type YOUR_STRUCTURE_NAME struct {
 	Message struct {
 		Data DESIRED_DATA_TYPE `json:"data"`
@@ -122,8 +122,8 @@ Proceeding the tutorial, a similar folder/file structure and code must be done t
 touch pong/pong.go
 ```  
 
-And then write a code similar to *ping.go*'s, just remember to swich the Channels and the message that is written. It should look like this:
-```Go
+And then write a code similar to *ping.go*'s, just remember to switch the Channels and the message that is written. It should look like this:
+```go
 package main
 
 import (
@@ -192,7 +192,7 @@ The Dockerfile structure will be created to do the following:
 5) Execute the binary generated.
 
 Ping's Dockerfile should look like this:
-```Docker
+```docker
 FROM golang:alpine
 WORKDIR /app
 COPY . .
@@ -209,7 +209,7 @@ touch pong/Dockerfile
 ```  
 
 And Pong's Dockerfile content:
-```Docker
+```docker
 FROM golang:alpine
 WORKDIR /app
 COPY . .
@@ -262,7 +262,7 @@ Inside "/pingpong_demo" folder, create a new file called "Makefile:
 touch Makefile
 ```
 The Makefile should contain the same Docker commands that you'd use to build and push Ping and Pong Docker images. The gain here is that instead of writing and executing four different commands, you just execute the Makefile. It should look like this:
-```Makefile
+```makefile
 build:
 	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f ping/Dockerfile
 	docker push CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
@@ -294,7 +294,7 @@ touch table.yaml
 
 As it's described in Inspr YAMLs documentation, we must specify the kind, apiVersion and then the dApp information. This specific dApp will work as a link between Ping/Pong and the Channels which they'll communicate through. Basically, it will connect Ping and Poung's Boundaries to Channels defined in the root dApp through Aliases. You can read more about Aliases and this dApp structure [here](dapp-overview.md).  
 The YAML should be the following:  
-```YAML
+```yaml
 kind: dapp
 apiVersion: v1
 
@@ -325,7 +325,7 @@ touch nodes/ping.app.yaml
 
 Then, insite of *ping.app.yaml* we must specify the kind, apiVersion and then the Node information (such as name, boundaries, image, etc.).  
 It should look like this:
-```YAML
+```yaml
 kind: dapp
 apiVersion: v1
 
@@ -338,7 +338,7 @@ spec:
       replicas: 1
       environment:
         SUPER_SECRET_0001: "false"
-      image: gcr.io/red-inspr/inspr/example/ping:latest
+      image: CONTAINER_REGISTRY_REF/app/ping:TAG_NAME
   boundary:
     input:
       - pinginput
@@ -352,7 +352,7 @@ Now, we do the same for Pong:
 touch nodes/pong.app.yaml
 ```
 And *pong.app.yaml* should look like this:
-```YAML
+```yaml
 kind: dapp
 apiVersion: v1
 
@@ -362,7 +362,7 @@ meta:
 spec:
   node:
     spec:
-      image: gcr.io/red-inspr/inspr/example/pong:latest
+      image: CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
   boundary:
     input:
       - ponginput
@@ -382,7 +382,7 @@ touch channels/ch1.yaml
 ```
 
 It's content should be:
-```YAML
+```yaml
 kind: channel
 apiVersion: v1
 meta:
@@ -400,7 +400,7 @@ touch channels/ch2.yaml
 ```
 
 And it's content should be:
-```YAML
+```yaml
 kind: channel
 apiVersion: v1
 
@@ -422,7 +422,7 @@ touch ctypes/ct1.yaml
 ```
 
 And it's content should be:
-```YAML
+```yaml
 kind: channeltype
 apiVersion: v1
 
