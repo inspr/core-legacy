@@ -279,7 +279,7 @@ Keep in mind slack an discord are only examples.
  
 Deployment:
 You have to apply every yaml we created, apps channels and types can be done by running:
-   inspr apply -k inspr 
+   inspr apply -k yamls 
  
 Your ingress and service have to be deployed as well, run:
    kubectl apply -f k8s/ingress.yaml
