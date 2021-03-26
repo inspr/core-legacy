@@ -59,7 +59,9 @@ func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
 }
 
 func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
-
+	if parentApp.Spec.Apps == nil {
+		parentApp.Spec.Apps = make(map[string]*meta.App)
+	}
 	parentStr := getParentString(app, parentApp)
 
 	app.Meta.Parent = parentStr
