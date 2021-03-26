@@ -1,8 +1,9 @@
-FROM golang:alpine
+FROM golang:alpine AS build
 WORKDIR /app
 COPY . .
-RUN go build examples/pingpong_demo/pong/pong.go
+RUN go build -o main examples/pingpong_demo/pong/pong.go
 
-FROM alpine
+FROM alpine AS final
 WORKDIR /app
-CMD ./pong
+COPY --from=build /app/main .
+CMD ./main

@@ -36,10 +36,16 @@ pingpong_demo
 ## Creating the applications
 
 In this part, we will implement Ping and Pong using Golang. Also, we will create their respective Dockerfiles, build the Docker Images and push them into the cluster.  
+To start off, inside of "/pingpong_demo", run the following command:
+```go
+go mod init
+```
+
+If you're not familiar with `go mod`, you can learn more about it [here](https://golang.org/ref/mod#go-mod-init)
 
 ### Ping and Pong implementation  
 
-From within "pingpong_demo", create a file called *ping.go* inside folder "ping":  
+From within "pingpong_demo", create a file called *ping.go* inside the folder "ping":  
 ```zsh
 touch ping/ping.go
 ```  
@@ -173,6 +179,11 @@ func main() {
 }
 ```
 
+To finish implementing the applications, we must assure that all dependencies are resolved. To do so, inside of "/pingpong_demo", run the following command:
+```go
+go mod tidy
+```
+
 ### Dockerfiles
 Now that we have Ping and Pong implemented and doing what they are supossed to do, we must create their Dockerfiles so a Docker Image for each of them can be generated, and make these images available in our cluster.  
 If you are not familiar with Docker, click on the following links for more information:
@@ -193,14 +204,15 @@ The Dockerfile structure will be created to do the following:
 
 Ping's Dockerfile should look like this:
 ```docker
-FROM golang:alpine
+FROM golang:alpine AS build
 WORKDIR /app
 COPY . .
-RUN go build examples/pingpong_demo/ping/ping.go
+RUN go build -o main ping/ping.go
 
-FROM alpine
+FROM alpine AS final
 WORKDIR /app
-CMD ./ping
+COPY --from=build /app/main .
+CMD ./main
 ```
 
 Then, do the same steps for Pong:
@@ -210,14 +222,15 @@ touch pong/Dockerfile
 
 And Pong's Dockerfile content:
 ```docker
-FROM golang:alpine
+FROM golang:alpine AS build
 WORKDIR /app
 COPY . .
-RUN go build examples/pingpong_demo/pong/pong.go
+RUN go build -o main pong/pong.go
 
-FROM alpine
+FROM alpine AS final
 WORKDIR /app
-CMD ./pong
+COPY --from=build /app/main .
+CMD ./main
 ```
 
 ### Docker Image deployment
@@ -232,7 +245,7 @@ In the next steps, it's important to have a [container registry](https://cloud.g
 
 Then we must build the Docker image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
 ```zsh
-docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/ping:TAG_NAME
+docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/ping:TAG_NAME .
 ```
 
 Finally, we push the builded image into the cluster, where **CONTAINER_REGISTRY_REF is a reference to the container registry**:
@@ -248,7 +261,7 @@ cd pong
 
 Build the Docker image by using the Dockerfile previously created (and applying a tag to it, if desired):
 ```zsh
-docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
+docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME .
 ```
 
 Push the builded image into the cluster:
@@ -264,9 +277,9 @@ touch Makefile
 The Makefile should contain the same Docker commands that you'd use to build and push Ping and Pong Docker images. The gain here is that instead of writing and executing four different commands, you just execute the Makefile. It should look like this:
 ```makefile
 build:
-	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f ping/Dockerfile
+	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f ping/Dockerfile .
 	docker push CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
-	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f pong/Dockerfile
+	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f pong/Dockerfile .
 	docker push CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
 ```
 
@@ -292,7 +305,7 @@ The first file to be created is *table.yaml*, which is the dApp that will contai
 touch table.yaml
 ```
 
-As it's described in Inspr YAMLs documentation, we must specify the kind, apiVersion and then the dApp information. This specific dApp will work as a link between Ping/Pong and the Channels which they'll communicate through. Basically, it will connect Ping and Poung's Boundaries to Channels defined in the root dApp through Aliases. You can read more about Aliases and this dApp structure [here](dapp-overview.md).  
+As it's described in Inspr YAMLs documentation, we must specify the kind, apiVersion and then the dApp information. This specific dApp will work as a link between Ping/Pong and the Channels which they'll communicate through. Basically, it will connect Ping and Pong's Boundaries to Channels defined in the root dApp through Aliases. You can read more about Aliases and this dApp structure [here](dapp_overview.md).  
 The YAML should be the following:  
 ```yaml
 kind: dapp
