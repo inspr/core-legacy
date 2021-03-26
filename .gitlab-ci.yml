@@ -1,13 +1,35 @@
 image: golang:latest
+services:
+  - docker:19.03.11-dind
 
 variables:
+  DOCKER_HOST: tcp://dind.dind.svc:2375
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  DANGER_GITLAB_HOST: "https://gitlab.inspr.com"
+  DANGER_GITLAB_API_BASE_URL: "https://gitlab.inspr.com/api/v4"
   REPO_NAME: gitlab.inspr.dev/inspr/core
+
 
 stages:
   - build
   - test
   - push
   - release
+
+
+.base-build:
+  image: inspr/ci-chimera:latest
+  cache:
+    paths:
+      - tags.out
+  before_script:
+    - gcloud auth configure-docker
+    - echo $GCR_ACCOUNT_KEY > /tmp/$CI_PIPELINE_ID.json
+    - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+    - export GOOGLE_APPLICATION_CREDENTIALS=/tmp/$CI_PIPELINE_ID.json
+    - gcloud config set project red-inspr
+
 
 build-cli:
   stage: build
@@ -23,6 +45,15 @@ build-cli:
       - version
     expire_in: 30 days
 
+build-helm:
+  extends: .base-build
+  stage: build
+  only:
+    - tags
+  script: 
+    - skaffold build --file-output=tags.out
+    - bash .gitlab/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
+
 unit-tests:
   stage: test
   script:
@@ -35,7 +66,9 @@ lint:
     - go get -u golang.org/x/lint/golint
     - golint --set_exit_status ./...
 
+
 push-cli:
+  extends: .base-build
   stage: push
   image: google/cloud-sdk:latest
   script:
