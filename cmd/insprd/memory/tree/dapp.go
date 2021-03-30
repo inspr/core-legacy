@@ -9,6 +9,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"go.uber.org/zap"
 )
 
 // AppMemoryManager implements the App interface
@@ -29,6 +30,8 @@ func (tmm *MemoryManager) Apps() memory.AppMemory {
 // The tree app is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
+	logger.Info("trying to get a dApp", zap.String("dApp", query))
+
 	if query == "" {
 		return amm.root, nil
 	}
@@ -54,6 +57,10 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 // If the dApp's information is invalid, returns an error. The same goes for an invalid context.
 // In case of context being an empty string, the dApp is created inside the root dApp.
 func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
+	logger.Info("trying to create a dApp",
+		zap.String("dApp", app.Meta.Name),
+		zap.String("in context", context))
+
 	parentApp, err := amm.Get(context)
 	if err != nil {
 		return err
@@ -63,15 +70,22 @@ func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
 		return ierrors.NewError().InvalidApp().Message("this app already exists in parentApp").Build()
 	}
 
+	logger.Debug("checking dApp structure")
 	appErr := amm.checkApp(app, parentApp)
 	if appErr != nil {
 		return appErr
 	}
+
+	logger.Debug("adding dApp to the memory tree")
 	amm.addAppInTree(app, parentApp)
+
+	logger.Debug("trying to resolve dApp boundaries")
 	appErr = amm.recursiveBoundaryValidation(app)
 	if appErr != nil {
 		return appErr
 	}
+
+	logger.Debug("updating connected dApps and Aliases to resolved Channels")
 	amm.connectAppsBoundaries(app)
 	return nil
 }
@@ -83,10 +97,13 @@ func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
 // dApp's reference inside of it's parent is also deleted.
 // In case of dApp not found an error is returned.
 func (amm *AppMemoryManager) DeleteApp(query string) error {
+	logger.Info("trying to delete a dApp", zap.String("dApp query", query))
+
 	if query == "" {
 		return ierrors.NewError().BadRequest().Message("can't delete root dApp").Build()
 	}
 
+	logger.Debug("getting dApp to be deleted")
 	app, err := amm.Get(query)
 	if err != nil {
 		return err
@@ -95,8 +112,13 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 	if errParent != nil {
 		return errParent
 	}
+
+	logger.Debug("updating Channels to which the dApp was connected")
 	amm.removeFromParentBoundary(app, parent)
 
+	logger.Debug("removing dApp from its parents 'Apps' structure",
+		zap.String("dApp", app.Meta.Name),
+		zap.String("parent dApp", parent.Meta.Name))
 	delete(parent.Spec.Apps, app.Meta.Name)
 
 	return nil
@@ -106,11 +128,17 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 // If the current dApp is found and the new structure is valid, it's updated.
 // Otherwise, returns an error.
 func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
+	logger.Info("trying to update a dApp",
+		zap.String("dApp", app.Meta.Name),
+		zap.String("in context", query))
+
+	logger.Debug("getting dApp to be updated")
 	currentApp, err := amm.Get(query)
 	if err != nil {
 		return err
 	}
 
+	logger.Debug("validating new dApp structure")
 	if currentApp.Meta.Name != app.Meta.Name {
 		return ierrors.NewError().InvalidName().Message("dApp's name mustn't change when updating").Build()
 	}
@@ -128,10 +156,12 @@ func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
 		return appErr
 	}
 
+	logger.Debug("deleting old dApp")
 	amm.removeFromParentBoundary(app, parent)
 
 	delete(parent.Spec.Apps, currentApp.Meta.Name)
 
+	logger.Debug("creating new dApp")
 	amm.addAppInTree(app, parent)
 
 	return nil
@@ -145,9 +175,12 @@ type AppRootGetter struct {
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the dApp which name is equal to the last query element.
-// The tree app is returned if the query string is an empty string.
+// The tree root dApp is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
+// This method is used to get the structure as it is in the cluster, before any modifications.
 func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
+	logger.Info("trying to get a dApp (Root Getter)", zap.String("dApp", query))
+
 	if query == "" {
 		return amm.tree, nil
 	}
@@ -171,6 +204,9 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 
 //ResolveBoundary recursive method that resolves connections for app boundaries
 func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
+	logger.Debug("resolving dApp boundary",
+		zap.String("dApp", app.Meta.Name))
+
 	boundaries := make(map[string]string)
 	unresolved := metautils.StrSet{}
 	for _, bound := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
@@ -181,6 +217,11 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, 
 	if err != nil {
 		return nil, err
 	}
+
+	logger.Debug("recursively resolving dApp boundaries",
+		zap.String("dApp", app.Meta.Name),
+		zap.Any("boundaries", boundaries))
+
 	err = amm.recursivelyResolve(parentApp, boundaries, unresolved)
 	if err != nil {
 		return nil, err
@@ -231,6 +272,9 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 }
 
 func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
+	logger.Debug("removing dApp from parent's Channels connected apps list",
+		zap.String("dApp", app.Meta.Name),
+		zap.String("parent", parent.Meta.Name))
 
 	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
 	resolution, _ := amm.ResolveBoundary(app)
@@ -242,5 +286,4 @@ func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
 				Remove(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
 		}
 	}
-
 }

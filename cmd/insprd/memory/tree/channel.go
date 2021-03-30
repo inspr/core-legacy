@@ -6,6 +6,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"go.uber.org/zap"
 )
 
 /*
@@ -29,6 +30,10 @@ the path to an App. If this App has a pointer to a channel that has the
 same name as the name passed as an argument, the pointer to that channel is returned
 */
 func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Channel, error) {
+	logger.Info("trying to get a Channel",
+		zap.String("channel", chName),
+		zap.String("context", context))
+
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel was not found because the app context has an error").Build()
@@ -50,16 +55,24 @@ CreateChannel receives a context that defines a path to the App
 in which to add a pointer to the channel passed as an argument
 */
 func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel) error {
+	logger.Info("trying to create a Channel",
+		zap.String("channel", ch.Meta.Name),
+		zap.String("context", context))
+
 	nameErr := metautils.StructureNameIsValid(ch.Meta.Name)
 	if nameErr != nil {
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
+	logger.Debug("checking if Channel already exists",
+		zap.String("channel", ch.Meta.Name),
+		zap.String("context", context))
 	chAlreadyExist, _ := chh.Get(context, ch.Meta.Name)
 	if chAlreadyExist != nil {
 		return ierrors.NewError().AlreadyExists().Message("channel with name " + ch.Meta.Name + " already exists in the context " + context).Build()
 	}
 
+	logger.Debug("getting Channel parent dApp")
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).InvalidChannel().
@@ -68,6 +81,7 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 		return newError
 	}
 
+	logger.Debug("checking if Channel's type is valid")
 	if _, ok := parentApp.Spec.ChannelTypes[ch.Spec.Type]; !ok {
 		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
 	}
@@ -78,6 +92,9 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 		parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels = connectedChannels
 	}
 
+	logger.Debug("adding Channel to dApp",
+		zap.String("channel", ch.Meta.Name),
+		zap.String("dApp", parentApp.Meta.Name))
 	if parentApp.Spec.Channels == nil {
 		parentApp.Spec.Channels = map[string]*meta.Channel{}
 	}
@@ -93,12 +110,18 @@ has a pointer to a channel that has the same name as the name passed
 as an argument, that pointer is removed from the list of App channels
 */
 func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) error {
+	logger.Info("trying to delete a Channel",
+		zap.String("channel", chName),
+		zap.String("context", context))
+
 	channel, err := chh.Get(context, chName)
+
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
 		return newError
 	}
 
+	logger.Debug("checking if Channel can be deleted")
 	if len(channel.ConnectedApps) > 0 {
 		return ierrors.NewError().
 			BadRequest().
@@ -109,7 +132,16 @@ func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) er
 	parentApp, _ := GetTreeMemory().Apps().Get(context)
 
 	channelType := parentApp.Spec.ChannelTypes[channel.Spec.Type]
+
+	logger.Debug("removing Channel from ChannelType connected channels list",
+		zap.String("channel", chName),
+		zap.String("channelType", channelType.Meta.Name))
+
 	channelType.ConnectedChannels = utils.Remove(channelType.ConnectedChannels, channel.Meta.Name)
+
+	logger.Debug("removing Channel from its parents 'Channels' structure",
+		zap.String("channel", chName),
+		zap.String("dApp", parentApp.Meta.Name))
 
 	delete(parentApp.Spec.Channels, chName)
 
@@ -123,6 +155,10 @@ a channel pointer that has the same name as that passed as an argument,
 this pointer will be replaced by the new one
 */
 func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel) error {
+	logger.Info("trying to update a Channel",
+		zap.String("channel", ch.Meta.Name),
+		zap.String("context", context))
+
 	oldCh, err := chh.Get(context, ch.Meta.Name)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
@@ -133,9 +169,15 @@ func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel)
 
 	parentApp, _ := GetTreeMemory().Apps().Get(context)
 
+	logger.Debug("validating new Channel structure")
+
 	if _, ok := parentApp.Spec.ChannelTypes[ch.Spec.Type]; !ok {
 		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
 	}
+
+	logger.Debug("replacing old Channel with the new one in dApps 'Channels",
+		zap.String("channel", ch.Meta.Name),
+		zap.String("dApp", parentApp.Meta.Name))
 
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
@@ -148,10 +190,14 @@ type ChannelRootGetter struct {
 }
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
-// memory tree until it finds the dChannel which name is equal to the last query element.
-// The tree Channel is returned if the query string is an empty string.
-// If the specified dChannel is found, it is returned. Otherwise, returns an error.
-func (amm *ChannelRootGetter) Get(context string, name string) (*meta.Channel, error) {
+// memory tree until it finds the Channel which name is equal to the last query element.
+// If the specified Channel is found, it is returned. Otherwise, returns an error.
+// This method is used to get the structure as it is in the cluster, before any modifications.
+func (amm *ChannelRootGetter) Get(context string, chName string) (*meta.Channel, error) {
+	logger.Info("trying to get a Channel (Root Getter)",
+		zap.String("channel", chName),
+		zap.String("context", context))
+
 	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel was not found because the app context has an error").Build()
@@ -159,7 +205,7 @@ func (amm *ChannelRootGetter) Get(context string, name string) (*meta.Channel, e
 	}
 
 	if parentApp.Spec.Channels != nil {
-		if ch, ok := parentApp.Spec.Channels[name]; ok {
+		if ch, ok := parentApp.Spec.Channels[chName]; ok {
 			return ch, nil
 		}
 	}
