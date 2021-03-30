@@ -42,8 +42,7 @@ func appDICases(funcName string) []appAPITest {
 				Name: "mock_app",
 			},
 		},
-		Ctx:   "",
-		Valid: true,
+		Ctx: "",
 	})
 	wrongFormatData, _ := json.Marshal([]byte{1})
 	return []appAPITest{
@@ -121,8 +120,7 @@ func appDICases(funcName string) []appAPITest {
 // For example, HandleGetAppByRef and HandleDeleteApp use these test cases
 func appQueryDICases(funcName string) []appAPITest {
 	parsedQueryAppDI, _ := json.Marshal(models.AppQueryDI{
-		Ctx:   ".mock_app",
-		Valid: true,
+		Ctx: ".mock_app",
 	})
 	wrongFormatData, _ := json.Marshal([]byte{1})
 	return []appAPITest{

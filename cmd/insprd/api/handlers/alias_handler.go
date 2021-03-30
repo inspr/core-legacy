@@ -28,7 +28,7 @@ func (ah *AliasHandler) HandleCreateAlias() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
 			return
@@ -77,7 +77,7 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
 			return
@@ -106,7 +106,7 @@ func (ah *AliasHandler) HandleUpdateAlias() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -153,7 +153,7 @@ func (ah *AliasHandler) HandleDeleteAlias() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasQueryDI{}
 		err := json.NewDecoder(r.Body).Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}

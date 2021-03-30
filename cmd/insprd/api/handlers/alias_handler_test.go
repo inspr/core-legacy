@@ -33,8 +33,7 @@ func AliasDICases(funcName string) []AliasAPITest {
 		Alias: meta.Alias{
 			Target: "mock_Alias",
 		},
-		Ctx:   "",
-		Valid: true,
+		Ctx: "",
 	})
 	wrongFormatData := []byte{1}
 	return []AliasAPITest{
@@ -114,7 +113,6 @@ func AliasQueryDICases(funcName string) []AliasAPITest {
 	parsedAliasQueryDI, _ := json.Marshal(models.AliasQueryDI{
 		Ctx:    "",
 		Key:    "mock_Alias",
-		Valid:  true,
 		DryRun: false,
 	})
 	wrongFormatData := []byte{1}
