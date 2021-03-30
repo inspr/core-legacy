@@ -7,7 +7,6 @@ type AliasDI struct {
 	Alias  meta.Alias `json:"alias"`
 	Ctx    string     `json:"ctx"`
 	Target string     `json:"target"`
-	Valid  bool       `json:"valid"`
 	DryRun bool       `json:"dry"`
 }
 
@@ -15,6 +14,5 @@ type AliasDI struct {
 type AliasQueryDI struct {
 	Ctx    string `json:"ctx"`
 	Key    string `json:"key"`
-	Valid  bool   `json:"valid"`
 	DryRun bool   `json:"dry"`
 }
