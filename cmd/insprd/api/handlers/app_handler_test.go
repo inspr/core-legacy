@@ -118,7 +118,7 @@ func appDICases(funcName string) []appAPITest {
 
 // appQueryDICases - generates the test cases to be used in functions that
 // handle the use the appQueryDI struct of the models package.
-// For example, HandleGetAppByRef and HandleDelete use these test cases
+// For example, HandleGet and HandleDelete use these test cases
 func appQueryDICases(funcName string) []appAPITest {
 	parsedQueryAppDI, _ := json.Marshal(models.AppQueryDI{
 		Ctx:   ".mock_app",
@@ -248,8 +248,8 @@ func TestAppHandler_HandleCreate(t *testing.T) {
 	}
 }
 
-func TestAppHandler_HandleGetAppByRef(t *testing.T) {
-	tests := appQueryDICases("HandleGetAppByRef")
+func TestAppHandler_HandleGet(t *testing.T) {
+	tests := appQueryDICases("HandleGet")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			handlerFunc := tt.ah.HandleGet().HTTPHandlerFunc()

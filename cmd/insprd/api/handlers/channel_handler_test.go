@@ -110,7 +110,7 @@ func channelDICases(funcName string) []channelAPITest {
 
 // channelQueryDICases - generates the test cases to be used in functions
 // that handle the use the channelQueryDI struct of the models package.
-// For example, HandleGetChannelByRef and HandleDelete use these test cases
+// For example, HandleGet and HandleDelete use these test cases
 func channelQueryDICases(funcName string) []channelAPITest {
 	parsedChannelQueryDI, _ := json.Marshal(models.ChannelQueryDI{
 		Ctx:    "",
@@ -246,8 +246,8 @@ func TestChannelHandler_HandleCreate(t *testing.T) {
 	}
 }
 
-func TestChannelHandler_HandleGetChannelByRef(t *testing.T) {
-	tests := channelQueryDICases("HandleGetChannelByRef")
+func TestChannelHandler_HandleGet(t *testing.T) {
+	tests := channelQueryDICases("HandleGet")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			handlerFunc := tt.ch.HandleGet().HTTPHandlerFunc()
@@ -265,7 +265,7 @@ func TestChannelHandler_HandleGetChannelByRef(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("ChannelHandler.HandleGetChannelByRef() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("ChannelHandler.HandleGet() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
