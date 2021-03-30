@@ -10,6 +10,12 @@ import (
 
 var version string
 
+func init() {
+	if version == "" {
+		version = "not given"
+	}
+}
+
 func main() {
 	cli.GetFactory().Subscribe(meta.Component{
 		APIVersion: "v1",
