@@ -175,7 +175,7 @@ func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel)
 		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
 	}
 
-	logger.Debug("replacing old Channel with the new one in dApps 'Channels",
+	logger.Debug("replacing old Channel with the new one in dApps 'Channels'",
 		zap.String("channel", ch.Meta.Name),
 		zap.String("dApp", parentApp.Meta.Name))
 
