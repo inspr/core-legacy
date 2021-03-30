@@ -9,30 +9,55 @@ echo 'Your operating system is '$OS_NAME
 case "${OS_NAME}" in
     Linux*)     CURL_URL=$CURL_URL"-linux";;
     Darwin*)    CURL_URL=$CURL_URL"-darwin";;
-    CYGWIN*)    CURL_URL=$CURL_URL"-windows";;
-    MINGW*)     CURL_URL=$CURL_URL"-windows";;
-    Windows*)   CURL_URL=$CURL_URL"-windows";;
-    *)          echo "ERROR identifying the os"
-    exit 1
+    CYGWIN* | MINGW* | Windows*)
+        echo "For windows system trying to run the bash script, please download the executable from the release page"
+        exit 1
+    ;;
+    *)          
+        echo "ERROR identifying the os"
+        exit 1
     ;;
 esac
-
 
 ARCH=$(uname -p)
 echo 'Your computer architecture is '$ARCH
 
 case "${ARCH}" in
-    x86_64*) CURL_URL=$CURL_URL"-amd64";;
-    amd64*) CURL_URL=$CURL_URL"-amd64";;
-    i*86) CURL_URL=$CURL_URL"-amd64";;
-    arm*) CURL_URL=$CURL_URL"-arm64";;
-    aarch64) CURL_URL=$CURL_URL"-arm64";;
-    *)  echo "ERROR identifying the architecture"
-    exit 2
+    x86_64* | amd64*) 
+        CURL_URL=$CURL_URL"-amd64"
+    ;;
+    
+    i*86)
+        if [[ $OS_NAME == Darwin* ]]; then
+            echo 'There is no i386 binary for darwin OS.'
+            exit 2
+        else
+            CURL_URL=$CURL_URL"-386"
+        fi
+    ;;
+    
+    arm) 
+        # in the repo there is no arm binary for systems other than Linux
+        if [[ $OS_NAME == Darwin* ]]; then
+            CURL_URL=$CURL_URL"-arm64"
+        else
+            CURL_URL=$CURL_URL"-arm"
+        fi
+    ;;
+
+    arm* | aarch64) 
+        CURL_URL=$CURL_URL"-arm64"
+    ;;
+    
+    *)  
+        echo "ERROR identifying the architecture"
+        exit 2
     ;;
 esac
 
+# adding the version to the curl URL
 CURL_URL=$CURL_URL"-"$CLI_VERSION
+
 echo 'Downloading the inspr cli binary'
 curl $CURL_URL -o /tmp/inspr
 
