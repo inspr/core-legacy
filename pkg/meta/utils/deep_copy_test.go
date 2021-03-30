@@ -49,7 +49,7 @@ func TestDeepCopy(t *testing.T) {
 
 	type args struct {
 		orig interface{}
-		copy interface{}
+		dest interface{}
 	}
 	tests := []struct {
 		name          string
@@ -61,7 +61,7 @@ func TestDeepCopy(t *testing.T) {
 			name: "Deep Copy: meta.App",
 			args: args{
 				orig: getMockedTree(),
-				copy: &metaApp,
+				dest: &metaApp,
 			},
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
@@ -74,7 +74,7 @@ func TestDeepCopy(t *testing.T) {
 			name: "Deep Copy: string array",
 			args: args{
 				orig: []string{"A", "B", "C"},
-				copy: &stringArr,
+				dest: &stringArr,
 			},
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
@@ -87,7 +87,7 @@ func TestDeepCopy(t *testing.T) {
 			name: "Deep Copy: integer",
 			args: args{
 				orig: 11,
-				copy: &integer,
+				dest: &integer,
 			},
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
@@ -100,14 +100,22 @@ func TestDeepCopy(t *testing.T) {
 			name: "Types dont match - it should return an error",
 			args: args{
 				orig: 11,
-				copy: &metaApp,
+				dest: &metaApp,
+			},
+			wantErr: true,
+		},
+		{
+			name: "dest its not a pointer - it should return an error",
+			args: args{
+				orig: 11,
+				dest: integer,
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := DeepCopy(tt.args.orig, tt.args.copy); (err != nil) != tt.wantErr {
+			if err := DeepCopy(tt.args.orig, tt.args.dest); (err != nil) != tt.wantErr {
 				t.Errorf("DeepCopy() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
