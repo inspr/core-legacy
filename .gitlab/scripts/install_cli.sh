@@ -17,22 +17,55 @@ case "${OS_NAME}" in
     ;;
 esac
 
-
 ARCH=$(uname -p)
 echo 'Your computer architecture is '$ARCH
 
 case "${ARCH}" in
-    x86_64*) CURL_URL=$CURL_URL"-amd64";;
-    amd64*) CURL_URL=$CURL_URL"-amd64";;
-    i*86) CURL_URL=$CURL_URL"-amd64";;
-    arm*) CURL_URL=$CURL_URL"-arm64";;
-    aarch64) CURL_URL=$CURL_URL"-arm64";;
-    *)  echo "ERROR identifying the architecture"
-    exit 2
+    x86_64*) 
+        CURL_URL=$CURL_URL"-amd64"
+    ;;
+    
+    amd64*) 
+        CURL_URL=$CURL_URL"-amd64"
+    ;;
+    
+    *86)
+        if [[ $OS_NAME == Darwin* ]]; then
+            CURL_URL=$CURL_URL"-amd64"
+        else
+            CURL_URL=$CURL_URL"-386"
+        fi
+    ;;
+    
+    arm) 
+        if [[ $OS_NAME == Linux* ]]; then
+            CURL_URL=$CURL_URL"-arm"
+        else
+            CURL_URL=$CURL_URL"-arm64"
+        fi
+    ;;
+
+    arm*) 
+        CURL_URL=$CURL_URL"-arm64"
+    ;;
+    
+    aarch64)
+        CURL_URL=$CURL_URL"-arm64"
+    ;;
+
+    armv8*) 
+        CURL_URL=$CURL_URL"-arm64"
+    ;;
+    
+    *)  
+        echo "ERROR identifying the architecture"
+        exit 2
     ;;
 esac
 
+# adding the version to the curl URL
 CURL_URL=$CURL_URL"-"$CLI_VERSION
+
 echo 'Downloading the inspr cli binary'
 curl $CURL_URL -o /tmp/inspr
 
