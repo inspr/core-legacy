@@ -24,6 +24,9 @@ stages:
     paths:
       - tags.out
   before_script:
+    - curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v1.21.0/skaffold-linux-amd64 
+    - chmod +x skaffold 
+    - mv skaffold /usr/local/bin 
     - gcloud auth configure-docker
     - echo $GCR_ACCOUNT_KEY > /tmp/$CI_PIPELINE_ID.json
     - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json

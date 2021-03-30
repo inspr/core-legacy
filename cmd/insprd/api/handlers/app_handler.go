@@ -24,22 +24,22 @@ func (handler *Handler) NewAppHandler() *AppHandler {
 	}
 }
 
-// HandleCreateApp - handler that generates the rest.Handle
+// HandleCreate - handler that generates the rest.Handle
 // func to manage the http request
-func (ah *AppHandler) HandleCreateApp() rest.Handler {
+func (ah *AppHandler) HandleCreate() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppDI{}
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
 			return
 		}
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Apps().CreateApp(data.Ctx, &data.App)
+		err = ah.Memory.Apps().Create(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -73,15 +73,15 @@ func (ah *AppHandler) HandleCreateApp() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetAppByRef - handler that generates the rest.Handle
+// HandleGet - handler that generates the rest.Handle
 // func to manage the http request
-func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
+func (ah *AppHandler) HandleGet() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -102,22 +102,22 @@ func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleUpdateApp - handler that generates the rest.Handle
+// HandleUpdate - handler that generates the rest.Handle
 // func to manage the http request
-func (ah *AppHandler) HandleUpdateApp() rest.Handler {
+func (ah *AppHandler) HandleUpdate() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppDI{}
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
 
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Apps().UpdateApp(data.Ctx, &data.App)
+		err = ah.Memory.Apps().Update(data.Ctx, &data.App)
 		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -151,15 +151,15 @@ func (ah *AppHandler) HandleUpdateApp() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleDeleteApp - handler that generates the rest.Handle
+// HandleDelete - handler that generates the rest.Handle
 // func to manage the http request
-func (ah *AppHandler) HandleDeleteApp() rest.Handler {
+func (ah *AppHandler) HandleDelete() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -172,7 +172,7 @@ func (ah *AppHandler) HandleDeleteApp() rest.Handler {
 			return
 		}
 
-		err = ah.Memory.Apps().DeleteApp(data.Ctx)
+		err = ah.Memory.Apps().Delete(data.Ctx)
 		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()

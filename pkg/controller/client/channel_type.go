@@ -25,7 +25,6 @@ func (ctc *ChannelTypeClient) Get(ctx context.Context, context string, name stri
 	ctdi := models.ChannelTypeQueryDI{
 		Ctx:    context,
 		CtName: name,
-		Valid:  true,
 	}
 
 	var resp meta.ChannelType
@@ -51,7 +50,6 @@ func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *me
 	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
 		ChannelType: *ch,
-		Valid:       true,
 		DryRun:      dryRun,
 	}
 
@@ -77,7 +75,6 @@ func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name s
 	ctdi := models.ChannelTypeQueryDI{
 		Ctx:    context,
 		CtName: name,
-		Valid:  true,
 		DryRun: dryRun,
 	}
 
@@ -103,7 +100,6 @@ func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *me
 	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
 		ChannelType: *ch,
-		Valid:       true,
 		DryRun:      dryRun,
 	}
 

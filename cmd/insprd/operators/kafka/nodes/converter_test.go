@@ -256,7 +256,7 @@ func Test_baseEnvironment(t *testing.T) {
 	kafkasc.RefreshEnviromentVariables()
 	mem := tree.GetTreeMemory()
 	mem.InitTransaction()
-	mem.Apps().CreateApp("", &meta.App{
+	mem.Apps().Create("", &meta.App{
 		Meta: meta.Metadata{
 			Name: "parent",
 		},

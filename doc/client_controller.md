@@ -30,7 +30,7 @@ resp, err := client.Apps().Create(context.Background(), "", &meta.App{
 }, dryRun)
 ```
 
-In the example above, the function for creating an dApp receives:
+In the example above, the function for creating a dApp receives:
 *  A [go context](https://golang.org/pkg/context/) (context.Background())
 *  The path in which that dApp will be created("")
 *  The dApp itself (&meta.App{...})

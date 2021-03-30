@@ -1,0 +1,9 @@
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: pubsub
+spec:
+  node:
+    spec:
+      replicas: 1

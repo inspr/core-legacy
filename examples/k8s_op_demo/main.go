@@ -14,7 +14,7 @@ import (
 func main() {
 	mem := tree.GetTreeMemory()
 	mem.InitTransaction()
-	err := mem.ChannelTypes().CreateChannelType("", &meta.ChannelType{
+	err := mem.ChannelTypes().Create("", &meta.ChannelType{
 		Meta: meta.Metadata{
 			Name: "channelType1",
 		},
@@ -24,7 +24,7 @@ func main() {
 		panic(err)
 	}
 
-	err = mem.Channels().CreateChannel("", &meta.Channel{
+	err = mem.Channels().Create("", &meta.Channel{
 		Meta: meta.Metadata{
 			Name: "ch1",
 		},
@@ -36,7 +36,7 @@ func main() {
 		panic(err)
 	}
 
-	err = mem.Apps().CreateApp("", &meta.App{
+	err = mem.Apps().Create("", &meta.App{
 		Meta: meta.Metadata{
 			Name:      "app1",
 			Reference: "reference",

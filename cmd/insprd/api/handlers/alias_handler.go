@@ -20,22 +20,22 @@ func (handler *Handler) NewAliasHandler() *AliasHandler {
 	}
 }
 
-// HandleCreateAlias - handler that generates the rest.Handle
+// HandleCreate - handler that generates the rest.Handle
 // func to manage the http request
-func (ah *AliasHandler) HandleCreateAlias() rest.Handler {
+func (ah *AliasHandler) HandleCreate() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasDI{}
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
 			return
 		}
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Alias().CreateAlias(data.Ctx, data.Target, &data.Alias)
+		err = ah.Memory.Alias().Create(data.Ctx, data.Target, &data.Alias)
 		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -77,7 +77,7 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
 			return
@@ -98,22 +98,22 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleUpdateAlias - handler that generates the rest.Handle
+// HandleUpdate - handler that generates the rest.Handle
 // func to manage the http request
-func (ah *AliasHandler) HandleUpdateAlias() rest.Handler {
+func (ah *AliasHandler) HandleUpdate() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasDI{}
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
 
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Alias().UpdateAlias(data.Ctx, data.Target, &data.Alias)
+		err = ah.Memory.Alias().Update(data.Ctx, data.Target, &data.Alias)
 		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -147,20 +147,20 @@ func (ah *AliasHandler) HandleUpdateAlias() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleDeleteAlias - handler that generates the rest.Handle
+// HandleDelete - handler that generates the rest.Handle
 // func to manage the http request
-func (ah *AliasHandler) HandleDeleteAlias() rest.Handler {
+func (ah *AliasHandler) HandleDelete() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasQueryDI{}
 		err := json.NewDecoder(r.Body).Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
 
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Alias().DeleteAlias(data.Ctx, data.Key)
+		err = ah.Memory.Alias().Delete(data.Ctx, data.Key)
 		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()

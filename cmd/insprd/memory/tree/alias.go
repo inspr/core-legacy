@@ -46,7 +46,7 @@ func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error
 
 // CreateAlias receives a context that defines a path to the dApp in
 // which we want to add an alias in his parent
-func (amm *AliasMemoryManager) CreateAlias(context, targetBoundary string, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) Create(context, targetBoundary string, alias *meta.Alias) error {
 	logger.Info("trying to create an Alias",
 		zap.Any("alias", alias),
 		zap.String("context", context))
@@ -97,7 +97,7 @@ func (amm *AliasMemoryManager) CreateAlias(context, targetBoundary string, alias
 // defines the path to the App that will have the Update. If the App has
 // a alias that has the given alias key passed as an argument,
 // that alias will be replaced by the new alias
-func (amm *AliasMemoryManager) UpdateAlias(context, aliasKey string, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alias) error {
 	logger.Info("trying to update an Alias",
 		zap.Any("alias", alias),
 		zap.String("context", context))
@@ -134,7 +134,7 @@ func (amm *AliasMemoryManager) UpdateAlias(context, aliasKey string, alias *meta
 // has an alias that has the same key as the key passed
 // as an argument, that alias is removed from the list of App Aliases only
 // if the alias it's not being used
-func (amm *AliasMemoryManager) DeleteAlias(context, aliasKey string) error {
+func (amm *AliasMemoryManager) Delete(context, aliasKey string) error {
 	logger.Info("trying to delete an Alias",
 		zap.Any("alias", aliasKey),
 		zap.String("context", context))
