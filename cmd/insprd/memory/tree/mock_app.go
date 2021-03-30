@@ -16,18 +16,18 @@ func (mock *MockAppManager) Get(query string) (*meta.App, error) {
 	return mock.root, nil
 }
 
-// CreateApp Mock
-func (mock *MockAppManager) CreateApp(context string, app *meta.App) error {
+// Create Mock
+func (mock *MockAppManager) Create(context string, app *meta.App) error {
 	return nil
 }
 
-// DeleteApp Mock
-func (mock *MockAppManager) DeleteApp(query string) error {
+// Delete Mock
+func (mock *MockAppManager) Delete(query string) error {
 	return nil
 }
 
-// UpdateApp Mock
-func (mock *MockAppManager) UpdateApp(query string, app *meta.App) error {
+// Update Mock
+func (mock *MockAppManager) Update(query string, app *meta.App) error {
 	return nil
 }
 

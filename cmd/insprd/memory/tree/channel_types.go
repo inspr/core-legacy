@@ -25,11 +25,11 @@ func (tmm *MemoryManager) ChannelTypes() memory.ChannelTypeMemory {
 }
 
 /*
-CreateChannelType creates, if it doesn't already exist, a new ChannellType for a given app.
+Create creates, if it doesn't already exist, a new ChannellType for a given app.
 ct: ChannetType to be created.
 context: Path to reference app (x.y.z...)
 */
-func (ctm *ChannelTypeMemoryManager) CreateChannelType(context string, ct *meta.ChannelType) error {
+func (ctm *ChannelTypeMemoryManager) Create(context string, ct *meta.ChannelType) error {
 	nameErr := utils.StructureNameIsValid(ct.Meta.Name)
 	if nameErr != nil {
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
@@ -81,11 +81,11 @@ func (ctm *ChannelTypeMemoryManager) Get(context string, ctName string) (*meta.C
 }
 
 /*
-DeleteChannelType deletes, if it exists, a ChannellType from a given app.
+Delete deletes, if it exists, a ChannellType from a given app.
 ctName: Name of desired Channel Type.
 context: Path to reference app (x.y.z...)
 */
-func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName string) error {
+func (ctm *ChannelTypeMemoryManager) Delete(context string, ctName string) error {
 	curCt, err := ctm.Get(context, ctName)
 	if curCt == nil || err != nil {
 		return ierrors.NewError().BadRequest().
@@ -116,11 +116,11 @@ func (ctm *ChannelTypeMemoryManager) DeleteChannelType(context string, ctName st
 }
 
 /*
-UpdateChannelType updates, if it exists, a ChannellType of a given app.
+Update updates, if it exists, a ChannellType of a given app.
 ct: Updated ChannetType to be updated on app
 context: Path to reference app (x.y.z...)
 */
-func (ctm *ChannelTypeMemoryManager) UpdateChannelType(context string, ct *meta.ChannelType) error {
+func (ctm *ChannelTypeMemoryManager) Update(context string, ct *meta.ChannelType) error {
 
 	oldChType, err := ctm.Get(context, ct.Meta.Name)
 	if err != nil {

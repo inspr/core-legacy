@@ -27,7 +27,7 @@ type AliasAPITest struct {
 
 // AliasDICases - generates the test cases to be used in functions that
 // handle the use the AliasDI struct of the models package.
-// For example, HandleCreateAlias and HandleUpdateAlias use these test cases
+// For example, HandleCreate and HandleUpdate use these test cases
 func AliasDICases(funcName string) []AliasAPITest {
 	parsedAliasDI, _ := json.Marshal(models.AliasDI{
 		Alias: meta.Alias{
@@ -109,7 +109,7 @@ func AliasDICases(funcName string) []AliasAPITest {
 
 // AliasQueryDICases - generates the test cases to be used in functions
 // that handle the use the AliasQueryDI struct of the models package.
-// For example, HandleGetAliasByRef and HandleDeleteAlias use these test cases
+// For example, HandleGetAliasByRef and HandleDelete use these test cases
 func AliasQueryDICases(funcName string) []AliasAPITest {
 	parsedAliasQueryDI, _ := json.Marshal(models.AliasQueryDI{
 		Ctx:    "",
@@ -203,7 +203,7 @@ func TestNewAliasHandler(t *testing.T) {
 		want *AliasHandler
 	}{
 		{
-			name: "success_CreateAliasHandler",
+			name: "success_CreateHandler",
 			args: args{
 				memManager: fake.MockMemoryManager(nil),
 				op:         ofake.NewFakeOperator(),
@@ -222,11 +222,11 @@ func TestNewAliasHandler(t *testing.T) {
 	}
 }
 
-func TestAliasHandler_HandleCreateAlias(t *testing.T) {
-	tests := AliasDICases("HandleCreateAlias")
+func TestAliasHandler_HandleCreate(t *testing.T) {
+	tests := AliasDICases("HandleCreate")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleCreateAlias().HTTPHandlerFunc()
+			handlerFunc := tt.ah.HandleCreate().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
@@ -239,7 +239,7 @@ func TestAliasHandler_HandleCreateAlias(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AliasHandler.HandleCreateAlias() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("AliasHandler.HandleCreate() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
@@ -253,7 +253,7 @@ func TestAliasHandler_HandleGetAlias(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Alias().CreateAlias("", "ch", &meta.Alias{Target: "mock_Alias"})
+			tt.ah.Memory.Alias().Create("", "ch", &meta.Alias{Target: "mock_Alias"})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -270,15 +270,15 @@ func TestAliasHandler_HandleGetAlias(t *testing.T) {
 	}
 }
 
-func TestAliasHandler_HandleUpdateAlias(t *testing.T) {
-	tests := AliasDICases("HandleUpdateAlias")
+func TestAliasHandler_HandleUpdate(t *testing.T) {
+	tests := AliasDICases("HandleUpdate")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleUpdateAlias().HTTPHandlerFunc()
+			handlerFunc := tt.ah.HandleUpdate().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Alias().CreateAlias("", "ch", &meta.Alias{Target: "mock_Alias"})
+			tt.ah.Memory.Alias().Create("", "ch", &meta.Alias{Target: "mock_Alias"})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -289,21 +289,21 @@ func TestAliasHandler_HandleUpdateAlias(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AliasHandler.HandleUpdateAlias() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("AliasHandler.HandleUpdate() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
 }
 
-func TestAliasHandler_HandleDeleteAlias(t *testing.T) {
-	tests := AliasQueryDICases("HandleDeleteAlias")
+func TestAliasHandler_HandleDelete(t *testing.T) {
+	tests := AliasQueryDICases("HandleDelete")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleDeleteAlias()
+			handlerFunc := tt.ah.HandleDelete()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Alias().CreateAlias("", "ch", &meta.Alias{Target: "mock_Alias"})
+			tt.ah.Memory.Alias().Create("", "ch", &meta.Alias{Target: "mock_Alias"})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -314,7 +314,7 @@ func TestAliasHandler_HandleDeleteAlias(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AliasHandler.HandleDeleteAlias() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("AliasHandler.HandleDelete() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}

@@ -32,7 +32,7 @@ func validAppStructure(app, parentApp *meta.App) string {
 	}
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = appWithoutNode || (len(app.Spec.Apps) == 0)
-	validChannels, msg := checkAndUpdateChannels(app)
+	validChannels, msg := checkAndUpdates(app)
 
 	if nameErr != nil {
 		errDescription = errDescription + "invalid dApp name;"
@@ -78,7 +78,7 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 	}
 }
 
-func checkAndUpdateChannels(app *meta.App) (bool, string) {
+func checkAndUpdates(app *meta.App) (bool, string) {
 	boundaries := app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)
 	channels := app.Spec.Channels
 	chTypes := app.Spec.ChannelTypes

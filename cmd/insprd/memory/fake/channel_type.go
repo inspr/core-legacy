@@ -27,8 +27,8 @@ func (chType *ChannelTypes) Get(context string, ctName string) (*meta.ChannelTyp
 	return ct, nil
 }
 
-// CreateChannelType - simple mock
-func (chType *ChannelTypes) CreateChannelType(context string, ct *meta.ChannelType) error {
+// Create - simple mock
+func (chType *ChannelTypes) Create(context string, ct *meta.ChannelType) error {
 	if chType.fail != nil {
 		return chType.fail
 	}
@@ -41,8 +41,8 @@ func (chType *ChannelTypes) CreateChannelType(context string, ct *meta.ChannelTy
 	return nil
 }
 
-// DeleteChannelType - simple mock
-func (chType *ChannelTypes) DeleteChannelType(context string, ctName string) error {
+// Delete - simple mock
+func (chType *ChannelTypes) Delete(context string, ctName string) error {
 	if chType.fail != nil {
 		return chType.fail
 	}
@@ -56,8 +56,8 @@ func (chType *ChannelTypes) DeleteChannelType(context string, ctName string) err
 	return nil
 }
 
-// UpdateChannelType - simple mock
-func (chType *ChannelTypes) UpdateChannelType(context string, ct *meta.ChannelType) error {
+// Update - simple mock
+func (chType *ChannelTypes) Update(context string, ct *meta.ChannelType) error {
 	if chType.fail != nil {
 		return chType.fail
 	}

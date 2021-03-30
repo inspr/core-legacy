@@ -34,7 +34,7 @@ type appAPITest struct {
 
 // appDICases - generates the test cases to be used in functions that handle
 // the use the appDI struct of the models package.
-// For example, HandleCreateApp and HandleUpdateApp use these test cases
+// For example, HandleCreate and HandleUpdate use these test cases
 func appDICases(funcName string) []appAPITest {
 	parsedAppDI, _ := json.Marshal(models.AppDI{
 		App: meta.App{
@@ -118,7 +118,7 @@ func appDICases(funcName string) []appAPITest {
 
 // appQueryDICases - generates the test cases to be used in functions that
 // handle the use the appQueryDI struct of the models package.
-// For example, HandleGetAppByRef and HandleDeleteApp use these test cases
+// For example, HandleGetAppByRef and HandleDelete use these test cases
 func appQueryDICases(funcName string) []appAPITest {
 	parsedQueryAppDI, _ := json.Marshal(models.AppQueryDI{
 		Ctx:   ".mock_app",
@@ -225,11 +225,11 @@ func TestNewAppHandler(t *testing.T) {
 	}
 }
 
-func TestAppHandler_HandleCreateApp(t *testing.T) {
-	tests := appDICases("HandleCreateApp")
+func TestAppHandler_HandleCreate(t *testing.T) {
+	tests := appDICases("HandleCreate")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleCreateApp().HTTPHandlerFunc()
+			handlerFunc := tt.ah.HandleCreate().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
@@ -242,7 +242,7 @@ func TestAppHandler_HandleCreateApp(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AppHandler.HandleCreateApp() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("AppHandler.HandleCreate() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
@@ -256,7 +256,7 @@ func TestAppHandler_HandleGetAppByRef(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Apps().CreateApp("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
+			tt.ah.Memory.Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -267,22 +267,22 @@ func TestAppHandler_HandleGetAppByRef(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("AppHandler.HandleDelete() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
 }
 
-func TestAppHandler_HandleUpdateApp(t *testing.T) {
-	tests := appDICases("HandleUpdateApp")
+func TestAppHandler_HandleUpdate(t *testing.T) {
+	tests := appDICases("HandleUpdate")
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleUpdateApp().HTTPHandlerFunc()
+			handlerFunc := tt.ah.HandleUpdate().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Apps().CreateApp("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
+			tt.ah.Memory.Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -293,21 +293,21 @@ func TestAppHandler_HandleUpdateApp(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("AppHandler.HandleDelete() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
 }
 
-func TestAppHandler_HandleDeleteApp(t *testing.T) {
-	tests := appQueryDICases("HandleDeleteApp")
+func TestAppHandler_HandleDelete(t *testing.T) {
+	tests := appQueryDICases("HandleDelete")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleDeleteApp()
+			handlerFunc := tt.ah.HandleDelete()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Apps().CreateApp("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
+			tt.ah.Memory.Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -318,7 +318,7 @@ func TestAppHandler_HandleDeleteApp(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AppHandler.HandleDeleteApp() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("AppHandler.HandleDelete() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}

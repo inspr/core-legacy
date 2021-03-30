@@ -22,9 +22,9 @@ func (handler *Handler) NewChannelTypeHandler() *ChannelTypeHandler {
 	}
 }
 
-// HandleCreateChannelType - returns the handle function that
+// HandleCreate - returns the handle function that
 // manages the creation of a channelType
-func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
+func (cth *ChannelTypeHandler) HandleCreate() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeDI{}
 		decoder := json.NewDecoder(r.Body)
@@ -37,7 +37,7 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.ChannelTypes().CreateChannelType(data.Ctx, &data.ChannelType)
+		err = cth.Memory.ChannelTypes().Create(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
@@ -90,9 +90,9 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleUpdateChannelType - returns a handle function that
+// HandleUpdate - returns a handle function that
 // updates the channelType with the parameters given in the request
-func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
+func (cth *ChannelTypeHandler) HandleUpdate() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeDI{}
 		decoder := json.NewDecoder(r.Body)
@@ -105,7 +105,7 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.ChannelTypes().UpdateChannelType(data.Ctx, &data.ChannelType)
+		err = cth.Memory.ChannelTypes().Update(data.Ctx, &data.ChannelType)
 		if err != nil {
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
@@ -139,9 +139,9 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleDeleteChannelType - returns a handle function that
+// HandleDelete - returns a handle function that
 // deletes the channelType of the given path
-func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
+func (cth *ChannelTypeHandler) HandleDelete() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
 		decoder := json.NewDecoder(r.Body)
@@ -154,7 +154,7 @@ func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
 
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.ChannelTypes().DeleteChannelType(data.Ctx, data.CtName)
+		err = cth.Memory.ChannelTypes().Delete(data.Ctx, data.CtName)
 		if err != nil {
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()

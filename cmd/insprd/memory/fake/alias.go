@@ -28,8 +28,8 @@ func (a *Alias) Get(context string, aliasKey string) (*meta.Alias, error) {
 	return alias, nil
 }
 
-// CreateAlias - simple mock
-func (a *Alias) CreateAlias(query string, targetBoundary string, alias *meta.Alias) error {
+// Create - simple mock
+func (a *Alias) Create(query string, targetBoundary string, alias *meta.Alias) error {
 	if a.fail != nil {
 		return a.fail
 	}
@@ -42,8 +42,8 @@ func (a *Alias) CreateAlias(query string, targetBoundary string, alias *meta.Ali
 	return nil
 }
 
-// DeleteAlias - simple mock
-func (a *Alias) DeleteAlias(context string, aliasKey string) error {
+// Delete - simple mock
+func (a *Alias) Delete(context string, aliasKey string) error {
 	if a.fail != nil {
 		return a.fail
 	}
@@ -57,8 +57,8 @@ func (a *Alias) DeleteAlias(context string, aliasKey string) error {
 	return nil
 }
 
-// UpdateAlias - simple mock
-func (a *Alias) UpdateAlias(context string, aliasKey string, alias *meta.Alias) error {
+// Update - simple mock
+func (a *Alias) Update(context string, aliasKey string, alias *meta.Alias) error {
 	if a.fail != nil {
 		return a.fail
 	}

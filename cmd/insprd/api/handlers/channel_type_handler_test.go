@@ -27,7 +27,7 @@ type channelTypeAPITest struct {
 
 // channelTypeDICases - generates the test cases to be used in functions
 // that handle the use the channelTypeDI struct of the models package.
-// For example, HandleCreateChannelType and HandleUpdateChannelType
+// For example, HandleCreate and HandleUpdate
 // use these test cases
 func channelTypeDICases(funcName string) []channelTypeAPITest {
 	parsedCTDI, _ := json.Marshal(models.ChannelTypeDI{
@@ -109,7 +109,7 @@ func channelTypeDICases(funcName string) []channelTypeAPITest {
 
 // channelTypeQueryDICases - generates the test cases to be used in functions
 // that handle the use the ChannelTypeQueryDI struct of the models package.
-// For example, HandleGetChannelTypeByRef and HandleDeleteChannelType
+// For example, HandleGetChannelTypeByRef and HandleDelete
 // use these test cases
 func channelTypeQueryDICases(funcName string) []channelTypeAPITest {
 	parsedCTQDI, _ := json.Marshal(models.ChannelTypeQueryDI{
@@ -204,7 +204,7 @@ func TestNewChannelTypeHandler(t *testing.T) {
 		want *ChannelTypeHandler
 	}{
 		{
-			name: "success_CreateChannelHandler",
+			name: "success_CreateHandler",
 			args: args{
 				memManager: fake.MockMemoryManager(nil),
 				op:         ofake.NewFakeOperator(),
@@ -223,11 +223,11 @@ func TestNewChannelTypeHandler(t *testing.T) {
 	}
 }
 
-func TestChannelTypeHandler_HandleCreateChannelType(t *testing.T) {
-	tests := channelTypeDICases("HandleCreateChannelType")
+func TestChannelTypeHandler_HandleCreate(t *testing.T) {
+	tests := channelTypeDICases("HandleCreate")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.cth.HandleCreateChannelType().HTTPHandlerFunc()
+			handlerFunc := tt.cth.HandleCreate().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
@@ -240,7 +240,7 @@ func TestChannelTypeHandler_HandleCreateChannelType(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("ChannelHandler.HandleCreateChannelType() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("ChannelHandler.HandleCreate() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
@@ -254,7 +254,7 @@ func TestChannelTypeHandler_HandleGetChannelTypeByRef(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.cth.Memory.ChannelTypes().CreateChannelType("", &meta.ChannelType{Meta: meta.Metadata{Name: "mock_channelType"}})
+			tt.cth.Memory.ChannelTypes().Create("", &meta.ChannelType{Meta: meta.Metadata{Name: "mock_channelType"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -271,15 +271,15 @@ func TestChannelTypeHandler_HandleGetChannelTypeByRef(t *testing.T) {
 	}
 }
 
-func TestChannelTypeHandler_HandleUpdateChannelType(t *testing.T) {
-	tests := channelTypeDICases("HandleUpdateChannelType")
+func TestChannelTypeHandler_HandleUpdate(t *testing.T) {
+	tests := channelTypeDICases("HandleUpdate")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.cth.HandleUpdateChannelType().HTTPHandlerFunc()
+			handlerFunc := tt.cth.HandleUpdate().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.cth.Memory.ChannelTypes().CreateChannelType("", &meta.ChannelType{Meta: meta.Metadata{Name: "mock_channelType"}})
+			tt.cth.Memory.ChannelTypes().Create("", &meta.ChannelType{Meta: meta.Metadata{Name: "mock_channelType"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -290,21 +290,21 @@ func TestChannelTypeHandler_HandleUpdateChannelType(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("ChannelHandler.HandleUpdateChannelType() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("ChannelHandler.HandleUpdate() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}
 }
 
-func TestChannelTypeHandler_HandleDeleteChannelType(t *testing.T) {
-	tests := channelTypeQueryDICases("HandleDeleteChannelType")
+func TestChannelTypeHandler_HandleDelete(t *testing.T) {
+	tests := channelTypeQueryDICases("HandleDelete")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.cth.HandleDeleteChannelType().HTTPHandlerFunc()
+			handlerFunc := tt.cth.HandleDelete().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.cth.Memory.ChannelTypes().CreateChannelType("", &meta.ChannelType{Meta: meta.Metadata{Name: "mock_channelType"}})
+			tt.cth.Memory.ChannelTypes().Create("", &meta.ChannelType{Meta: meta.Metadata{Name: "mock_channelType"}})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -315,7 +315,7 @@ func TestChannelTypeHandler_HandleDeleteChannelType(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("ChannelHandler.HandleDeleteChannelType() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf("ChannelHandler.HandleDelete() = %v, want %v", res.StatusCode, tt.want.status)
 			}
 		})
 	}

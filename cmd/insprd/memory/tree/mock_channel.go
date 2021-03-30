@@ -14,17 +14,17 @@ func (cmm *ChannelMockManager) Get(context string, chName string) (*meta.Channel
 	return nil, nil
 }
 
-// CreateChannel mocks a channel method for testing
-func (cmm *ChannelMockManager) CreateChannel(context string, ch *meta.Channel) error {
+// Create mocks a channel method for testing
+func (cmm *ChannelMockManager) Create(context string, ch *meta.Channel) error {
 	return nil
 }
 
-// DeleteChannel mocks a channel method for testing
-func (cmm *ChannelMockManager) DeleteChannel(context string, chName string) error {
+// Delete mocks a channel method for testing
+func (cmm *ChannelMockManager) Delete(context string, chName string) error {
 	return nil
 }
 
-// UpdateChannel mocks a channel method for testing
-func (cmm *ChannelMockManager) UpdateChannel(query string, ch *meta.Channel) error {
+// Update mocks a channel method for testing
+func (cmm *ChannelMockManager) Update(query string, ch *meta.Channel) error {
 	return nil
 }
