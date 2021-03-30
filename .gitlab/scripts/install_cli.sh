@@ -32,6 +32,8 @@ case "${ARCH}" in
     ;;
     
     *86)
+        # in the repo there is no 386 binary for the Darwin system
+        # so it's used amd-64
         if [[ $OS_NAME == Darwin* ]]; then
             CURL_URL=$CURL_URL"-amd64"
         else
@@ -40,6 +42,7 @@ case "${ARCH}" in
     ;;
     
     arm) 
+        # in the repo there is no arm binary for systems other than Linux
         if [[ $OS_NAME == Linux* ]]; then
             CURL_URL=$CURL_URL"-arm"
         else
