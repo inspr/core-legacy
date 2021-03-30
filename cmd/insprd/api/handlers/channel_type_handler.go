@@ -61,9 +61,9 @@ func (cth *ChannelTypeHandler) HandleCreate() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetChannelTypeByRef - return a handle function that obtains
+// HandleGet - return a handle function that obtains
 // a channelType by the reference given
-func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
+func (cth *ChannelTypeHandler) HandleGet() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
 		decoder := json.NewDecoder(r.Body)

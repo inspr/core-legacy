@@ -252,7 +252,7 @@ func TestAppHandler_HandleGetAppByRef(t *testing.T) {
 	tests := appQueryDICases("HandleGetAppByRef")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.ah.HandleGetAppByRef().HTTPHandlerFunc()
+			handlerFunc := tt.ah.HandleGet().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 

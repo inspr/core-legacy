@@ -2378,7 +2378,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 			am := GetTreeMemory().Apps()
 			err := am.Update(tt.args.query, tt.args.app)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AppMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {

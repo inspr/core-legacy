@@ -18,7 +18,7 @@ const (
 
 func TestYamlToChannelType(t *testing.T) {
 
-	yamlString, mockCT := CreateYaml()
+	yamlString, mockCT := createChannelTypeYaml()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
 		channelTypeFile,
@@ -81,7 +81,7 @@ func TestNonExistantCTypeFile(t *testing.T) {
 }
 
 // CreateYaml - creates an yaml example
-func CreateYaml() (string, meta.ChannelType) {
+func createChannelTypeYaml() (string, meta.ChannelType) {
 	ct := meta.ChannelType{
 		Meta: meta.Metadata{
 			Name:        "mock_name",

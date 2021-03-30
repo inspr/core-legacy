@@ -68,9 +68,9 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetChannelByRef - return a handle function that obtains
+// HandleGet - return a handle function that obtains
 // a channel by the reference given
-func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
+func (ch *ChannelHandler) HandleGet() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
 		decoder := json.NewDecoder(r.Body)

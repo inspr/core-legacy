@@ -250,7 +250,7 @@ func TestChannelTypeHandler_HandleGetChannelTypeByRef(t *testing.T) {
 	tests := channelTypeQueryDICases("HandleGetChannelTypeByRef")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := tt.cth.HandleGetChannelTypeByRef().HTTPHandlerFunc()
+			handlerFunc := tt.cth.HandleGet().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 

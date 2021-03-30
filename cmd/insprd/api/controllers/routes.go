@@ -16,7 +16,7 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			ahandler.HandleGetAppByRef().JSON().Recover()(w, r)
+			ahandler.HandleGet().JSON().Recover()(w, r)
 
 		case http.MethodPost:
 			ahandler.HandleCreate().JSON().Recover()(w, r)
@@ -38,7 +38,7 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			chandler.HandleGetChannelByRef().JSON().Recover()(w, r)
+			chandler.HandleGet().JSON().Recover()(w, r)
 
 		case http.MethodPost:
 			chandler.HandleCreate().JSON().Recover()(w, r)
@@ -60,7 +60,7 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			cthandler.HandleGetChannelTypeByRef().JSON().Recover()(w, r)
+			cthandler.HandleGet().JSON().Recover()(w, r)
 
 		case http.MethodPost:
 			cthandler.HandleCreate().JSON().Recover()(w, r)

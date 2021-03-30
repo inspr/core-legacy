@@ -73,9 +73,9 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetAppByRef - handler that generates the rest.Handle
+// HandleGet - handler that generates the rest.Handle
 // func to manage the http request
-func (ah *AppHandler) HandleGetAppByRef() rest.Handler {
+func (ah *AppHandler) HandleGet() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
