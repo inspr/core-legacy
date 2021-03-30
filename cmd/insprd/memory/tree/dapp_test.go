@@ -811,7 +811,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 	}
 }
 
-func TestAppMemoryManager_CreateApp(t *testing.T) {
+func TestAppMemoryManager_Create(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -1753,9 +1753,9 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			am := GetTreeMemory().Apps()
-			err := am.CreateApp(tt.args.context, tt.args.app)
+			err := am.Create(tt.args.context, tt.args.app)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AppMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {
@@ -1772,7 +1772,7 @@ func TestAppMemoryManager_CreateApp(t *testing.T) {
 	}
 }
 
-func TestAppMemoryManager_DeleteApp(t *testing.T) {
+func TestAppMemoryManager_Delete(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -1904,9 +1904,9 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			am := GetTreeMemory().Apps()
-			err := am.DeleteApp(tt.args.query)
+			err := am.Delete(tt.args.query)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.DeleteApp() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AppMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !tt.wantErr {
@@ -1922,7 +1922,7 @@ func TestAppMemoryManager_DeleteApp(t *testing.T) {
 	}
 }
 
-func TestAppMemoryManager_UpdateApp(t *testing.T) {
+func TestAppMemoryManager_Update(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -2376,9 +2376,9 @@ func TestAppMemoryManager_UpdateApp(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			am := GetTreeMemory().Apps()
-			err := am.UpdateApp(tt.args.query, tt.args.app)
+			err := am.Update(tt.args.query, tt.args.app)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AppMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {

@@ -20,9 +20,9 @@ func (handler *Handler) NewChannelHandler() *ChannelHandler {
 	}
 }
 
-// HandleCreateChannel - returns the handle function that
+// HandleCreate - returns the handle function that
 // manages the creation of a channel
-func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
+func (ch *ChannelHandler) HandleCreate() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelDI{}
 		decoder := json.NewDecoder(r.Body)
@@ -34,7 +34,7 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 		}
 		ch.Memory.InitTransaction()
 
-		err = ch.Memory.Channels().CreateChannel(data.Ctx, &data.Channel)
+		err = ch.Memory.Channels().Create(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -68,9 +68,9 @@ func (ch *ChannelHandler) HandleCreateChannel() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetChannelByRef - return a handle function that obtains
+// HandleGet - return a handle function that obtains
 // a channel by the reference given
-func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
+func (ch *ChannelHandler) HandleGet() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
 		decoder := json.NewDecoder(r.Body)
@@ -97,9 +97,9 @@ func (ch *ChannelHandler) HandleGetChannelByRef() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleUpdateChannel - returns a handle function that
+// HandleUpdate - returns a handle function that
 // updates the channel with the parameters given in the request
-func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
+func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelDI{}
 		decoder := json.NewDecoder(r.Body)
@@ -111,7 +111,7 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 		}
 		ch.Memory.InitTransaction()
 
-		err = ch.Memory.Channels().UpdateChannel(data.Ctx, &data.Channel)
+		err = ch.Memory.Channels().Update(data.Ctx, &data.Channel)
 		if err != nil {
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -145,9 +145,9 @@ func (ch *ChannelHandler) HandleUpdateChannel() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleDeleteChannel - returns a handle function that
+// HandleDelete - returns a handle function that
 // deletes the channel of the given path
-func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
+func (ch *ChannelHandler) HandleDelete() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
 
@@ -159,7 +159,7 @@ func (ch *ChannelHandler) HandleDeleteChannel() rest.Handler {
 
 		ch.Memory.InitTransaction()
 
-		err = ch.Memory.Channels().DeleteChannel(data.Ctx, data.ChName)
+		err = ch.Memory.Channels().Delete(data.Ctx, data.ChName)
 		if err != nil {
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
