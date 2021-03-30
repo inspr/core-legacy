@@ -1,6 +1,6 @@
 # Publish / Subscribe
  
-Pub/Sub is an asynchronous messaging service that decouples services that produce events from services that process events.
+Pub/Sub is an asynchronous messaging service that decouples services that produce events from services that process events. It is an architectural pattern where messages are sent in a 1:n manner
  
 Very popular and useful, Pub/Sub offers reliable message storage and real-time delivery. Inspr is the perfect environment for these applications,  seen that they benefit heavily from microservice structure as well as the shared communication Channels, both part of Inspr's main features. Being able to easily publish and change the dApp's structure also allows for great expandability, especially when it comes to adding new subscriber to the service.
  
@@ -41,7 +41,7 @@ Scope app (01.app.yaml) :
    meta:
        name: pubsub
 ``` 
-Note that this dApp isn't a ![Node](./dapp_overview.md), that's because it serves as a workspace definition, it doesn't run any code.
+Note that this dApp isn't a [Node](dapp_overview.md), that's because it serves as a workspace definition, it doesn't run any code.
  
 Next we have to create a Channel the publisher can write text to and the subscribers can read from. Doing so is as simple as defining the following:
  
@@ -168,7 +168,7 @@ These examples were implemented using webhooks that receive JSON objects with sp
    }
  
    var webhook = <your webhook link>
-   var Channel = "pubsubch" // <Channel created on parent app>
+   var channel = "pubsubch" // <Channel created on parent app>
  
    func main() {
        c := &http.Client{}
@@ -177,7 +177,7 @@ These examples were implemented using webhooks that receive JSON objects with sp
  
            subMsg, err := client.ReadMessage(context.Background(), Channel)
            if err != nil {
-               log.Printf("%#v", err.(*ierrors.InsprError).Err)
+               log.Println(err)
                continue
            }
            //Body object instansiation
@@ -208,10 +208,10 @@ These examples were implemented using webhooks that receive JSON objects with sp
 ``` 
 ## Connection
  
-Hosting a server with an entry point on your cluster doesn't make it so that you can access it remotely, to do so you must create a kubernetes ingress point and a service. Luckily  these are easy to make and there is an example right here!
+Hosting a server with an entry point on your cluster doesn't make it so that you can access it remotely, to do so you must create a kubernetes ingress point and a service. Luckily these are easy to make and there is an example right here! To connect your application to these entrypoints you sould remember that on the cluster an app's name is the full path to the app, separated by hyphens. 
  
 SVC:
- 
+```yaml 
    apiVersion: v1
    kind: Service
    metadata:
@@ -219,13 +219,14 @@ SVC:
    namespace: inspr-apps
    spec:
    selector:
-       app: pubsub-pubsubapi
+       app: pubsub-pubsubapi //app cluster name
    ports:
        - protocol: TCP
        port: 80
        targetPort: 8080
- 
+``` 
 Ingress:
+```yaml
    apiVersion: networking.k8s.io/v1beta1
    kind: Ingress
    metadata:
@@ -244,9 +245,9 @@ Ingress:
                backend:
                serviceName: pubsub-publish-front
                servicePort: 80
- 
+``` 
 ## Publishing it
-Your app is now done, but before publishing it first you must build it. Inspr requires code to be built into an accessible Docker image in order for it to be deployed on the cluster. You should create simple Dockerfiles to build your dApps and push them to any storage were they are accessible your cluster. That being done is finally time to publish your Pub/Sub application. Publishing it to your Inspr cluster is easy, but first make sure your files look something like this:
+Your app is now done, but before publishing it first you must build it. Inspr requires code to be built into an accessible Docker image in order for it to be deployed on the cluster. There is an example for building on the `pingpong example`. You should create simple Dockerfiles to build your dApps and push them to any storage were they are accessible your cluster. That being done is finally time to publish your Pub/Sub application. Publishing it to your Inspr cluster is easy, but first make sure your files look something like this:
 
 ```tree 
    pubsub

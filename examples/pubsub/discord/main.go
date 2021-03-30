@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	dappclient "gitlab.inspr.dev/inspr/core/pkg/client"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
 type discordMessage struct {
@@ -38,7 +37,7 @@ func main() {
 		subMsg := expectedDataType{}
 		err := client.ReadMessage(context.Background(), channel, &subMsg)
 		if err != nil {
-			log.Printf("%#v", err.(*ierrors.InsprError).Err)
+			log.Println(err)
 			continue
 		}
 
