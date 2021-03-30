@@ -23,19 +23,14 @@ ARCH=$(uname -p)
 echo 'Your computer architecture is '$ARCH
 
 case "${ARCH}" in
-    x86_64*) 
+    x86_64* | amd64*) 
         CURL_URL=$CURL_URL"-amd64"
     ;;
     
-    amd64*) 
-        CURL_URL=$CURL_URL"-amd64"
-    ;;
-    
-    *86)
-        # in the repo there is no 386 binary for the Darwin system
-        # so it's used amd-64
+    i*86)
         if [[ $OS_NAME == Darwin* ]]; then
-            CURL_URL=$CURL_URL"-amd64"
+            echo 'There is no i386 binary for darwin OS.'
+            exit 2
         else
             CURL_URL=$CURL_URL"-386"
         fi
@@ -43,22 +38,14 @@ case "${ARCH}" in
     
     arm) 
         # in the repo there is no arm binary for systems other than Linux
-        if [[ $OS_NAME == Linux* ]]; then
-            CURL_URL=$CURL_URL"-arm"
-        else
+        if [[ $OS_NAME == Darwin* ]]; then
             CURL_URL=$CURL_URL"-arm64"
+        else
+            CURL_URL=$CURL_URL"-arm"
         fi
     ;;
 
-    arm*) 
-        CURL_URL=$CURL_URL"-arm64"
-    ;;
-    
-    aarch64)
-        CURL_URL=$CURL_URL"-arm64"
-    ;;
-
-    armv8*) 
+    arm* | aarch64) 
         CURL_URL=$CURL_URL"-arm64"
     ;;
     

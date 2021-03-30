@@ -16,11 +16,11 @@ GOOS=linux GOARCH=arm64 go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./b
 
 echo "Building CLI for Windows"
 # amd64
-GOOS=windows GOARCH=amd64 go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./bin/insprcli-windows-amd64-$VERSION ./cmd/inspr
+GOOS=windows GOARCH=amd64 go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./bin/insprcli-windows-amd64-$VERSION.exe ./cmd/inspr
 # 386
-GOOS=windows GOARCH=386 go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./bin/insprcli-windows-386-$VERSION ./cmd/inspr
+GOOS=windows GOARCH=386 go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./bin/insprcli-windows-386-$VERSION.exe ./cmd/inspr
 # arm
-GOOS=windows GOARCH=arm go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./bin/insprcli-windows-arm-$VERSION ./cmd/inspr
+GOOS=windows GOARCH=arm go build -ldflags "-X cmd.inspr.version=$VERSION" -o ./bin/insprcli-windows-arm-$VERSION.exe ./cmd/inspr
 
 echo "Building CLI for Darwin"
 # amd64
