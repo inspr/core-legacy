@@ -38,7 +38,7 @@ pingpong_demo
 In this part, we will implement Ping and Pong using Golang. Also, we will create their respective Dockerfiles, build the Docker Images and push them into the cluster.  
 To start off, inside of "/pingpong_demo", run the following command:
 ```go
-go mod init
+go mod init pingpong
 ```
 
 If you're not familiar with `go mod`, you can learn more about it [here](https://golang.org/ref/mod#go-mod-init)
@@ -259,7 +259,7 @@ WORKDIR /app
 COPY . .
 RUN go build -o main ping/ping.go
 
-FROM alpine AS final
+FROM alpine
 WORKDIR /app
 COPY --from=build /app/main .
 CMD ./main
@@ -277,7 +277,7 @@ WORKDIR /app
 COPY . .
 RUN go build -o main pong/pong.go
 
-FROM alpine AS final
+FROM alpine
 WORKDIR /app
 COPY --from=build /app/main .
 CMD ./main
@@ -293,9 +293,9 @@ cd ping
 
 In the next steps, it's important to have a [container registry](https://cloud.google.com/container-registry) up and running, so it's possible to store and use the images that will be built.
 
-Then we must build the Docker image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
+Then, from "pingpong_demo" folder, we must build the Docker image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
 ```zsh
-docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/ping:TAG_NAME .
+docker build -f ping/Dockerfile -t CONTAINER_REGISTRY_REF/app/ping:TAG_NAME .
 ```
 
 Finally, we push the builded image into the cluster, where **CONTAINER_REGISTRY_REF is a reference to the container registry**:
@@ -309,9 +309,9 @@ cd ..
 cd pong
 ```
 
-Build the Docker image by using the Dockerfile previously created (and applying a tag to it, if desired):
+From "/pingpong_demo" folder, build the Docker image by using the Dockerfile previously created (and applying a tag to it, if desired):
 ```zsh
-docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME .
+docker build -f pong/Dockerfile -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME .
 ```
 
 Push the builded image into the cluster:
