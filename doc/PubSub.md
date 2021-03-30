@@ -247,7 +247,7 @@ Ingress:
                servicePort: 80
 ``` 
 ## Publishing it
-Your app is now done, but before publishing it first you must build it. Inspr requires code to be built into an accessible Docker image in order for it to be deployed on the cluster. There is an example for building on the `pingpong example`. You should create simple Dockerfiles to build your dApps and push them to any storage were they are accessible your cluster. That being done is finally time to publish your Pub/Sub application. Publishing it to your Inspr cluster is easy, but first make sure your files look something like this:
+Your app is now done, but before publishing it first you must build it. Inspr requires code to be built into an accessible Docker image in order for it to be deployed on the cluster. There is an example for building on the [pingpong example](../examples/pingpong_demo/README.md). You should create simple Dockerfiles to build your dApps and push them to any storage were they are accessible your cluster. That being done is finally time to publish your Pub/Sub application. Publishing it to your Inspr cluster is easy, but first make sure your files look something like this:
 
 ```tree 
    pubsub
