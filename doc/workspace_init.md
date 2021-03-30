@@ -65,7 +65,7 @@ type expectedDataType struct {
 }
 ```
 
-**In Inspr, the user is encouraged to define which type of message he expects to read from a Channel, so that unexpected messages of different types don't cause unexpected errors.**  
+**In Inspr, the user must define which type of message he expects to read from a Channel, so that unexpected messages of different types don't cause unexpected errors.**  
 So everytime one implements an application that reads messages, a structure such as the following should be created and passed as an argument for the `ReadMessage` method:
 ```go
 type YOUR_STRUCTURE_NAME struct {
@@ -80,7 +80,7 @@ type YOUR_STRUCTURE_NAME struct {
 ```
 As seen above, the only mandatory fields inside of your custom structure are `Message` and `Data`, and their respective [JSON tags](https://medium.com/golangspec/tags-in-golang-3e5db0b8ef3e). `Data`'s field type is chosen by you, and can even be a new structure!  
 
-We then can proceed to create the `main` function itself. Before starting the `for loop` referenced previously a new dApp client, which is used to make the Node-Sidecar communication possible, must be created:
+We then can proceed to create the `main` function itself. Before starting the `for loop` (referenced previously) a new dApp client must be instantiated to enable the Node-Sidecar communication:
 ```go
 func main() {
 
