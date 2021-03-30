@@ -7,8 +7,3 @@ spec:
   node:
     spec:
       replicas: 1
-      environment:
-      image: 
-  boundary:
-    input:
-    output:

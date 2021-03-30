@@ -11,6 +11,5 @@ spec:
       environment:
       image: gcr.io/red-inspr/inspr/example/pubsubapi:latest
   boundary:
-    input:
     output:
       - pubsubch

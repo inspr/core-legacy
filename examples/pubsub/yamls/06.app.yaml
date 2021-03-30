@@ -13,4 +13,3 @@ spec:
   boundary:
     input:
       - pubsubch
-    output:
