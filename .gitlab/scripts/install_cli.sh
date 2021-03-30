@@ -13,18 +13,23 @@ case "${OS_NAME}" in
     MINGW*)     CURL_URL=$CURL_URL"-windows";;
     Windows*)   CURL_URL=$CURL_URL"-windows";;
     *)          echo "ERROR identifying the os"
+    exit 1
+    ;;
 esac
 
 
-ARCH=$(uname -i)
+ARCH=$(uname -p)
 echo 'Your computer architecture is '$ARCH
 
 case "${ARCH}" in
     x86_64*) CURL_URL=$CURL_URL"-amd64";;
-    i*86) CURL_URL=$CURL_URL"-386";;
+    amd64*) CURL_URL=$CURL_URL"-amd64";;
+    i*86) CURL_URL=$CURL_URL"-amd64";;
     arm*) CURL_URL=$CURL_URL"-arm64";;
     aarch64) CURL_URL=$CURL_URL"-arm64";;
     *)  echo "ERROR identifying the architecture"
+    exit 2
+    ;;
 esac
 
 CURL_URL=$CURL_URL"-"$CLI_VERSION

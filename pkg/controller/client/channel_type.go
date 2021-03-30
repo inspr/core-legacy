@@ -19,8 +19,8 @@ type ChannelTypeClient struct {
 // The context refers to the parent app of the given channel type, represented with a dot separated query
 // such as app1.app2
 //
-// The name is the name of the channel type. So to search for a channel type inside app1 with the name channel1 you
-// would call ctc.Get(context.Background(), "app1", "channel1")
+// The name is the name of the channel type. So to search for a channel type inside app1 with the name channeltype1 you
+// would call ctc.Get(context.Background(), "app1", "channeltype1")
 func (ctc *ChannelTypeClient) Get(ctx context.Context, context string, name string) (*meta.ChannelType, error) {
 	ctdi := models.ChannelTypeQueryDI{
 		Ctx:    context,
@@ -45,8 +45,8 @@ func (ctc *ChannelTypeClient) Get(ctx context.Context, context string, name stri
 //
 // The channel type information such as name and etc will be inferred from the given channel type's metadata.
 //
-// So to create a channel type inside app1 with the name channel1 you
-// would call ctc.Create(context.Background(), "app1", &meta.{...})
+// So to create a channel type inside app1 with the name channeltype1 you
+// would call ctc.Create(context.Background(), "app1", &meta.ChannelType{...})
 func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
@@ -71,8 +71,8 @@ func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *me
 //
 // The name is the name of the channel type to be deleted.
 //
-// So to delete a channel type inside app1 with the name channel1 you
-// would call ctc.Delete(context.Background(), "app1", "channel1")
+// So to delete a channel type inside app1 with the name channeltype1 you
+// would call ctc.Delete(context.Background(), "app1", "channeltype1")
 func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name string, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeQueryDI{
 		Ctx:    context,
@@ -97,8 +97,8 @@ func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name s
 //
 // The channel type information such as name and etc will be inferred from the given channel type's metadata.
 //
-// So to update a channel type inside app1 with the name channel1 you
-// would call ctc.Create(context.Background(), "app1", &meta.{...})
+// So to update a channel type inside app1 with the name channeltype1 you
+// would call ctc.Create(context.Background(), "app1", &meta.ChannelType{...})
 func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeDI{
 		Ctx:         context,
