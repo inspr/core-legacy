@@ -9,11 +9,13 @@ echo 'Your operating system is '$OS_NAME
 case "${OS_NAME}" in
     Linux*)     CURL_URL=$CURL_URL"-linux";;
     Darwin*)    CURL_URL=$CURL_URL"-darwin";;
-    CYGWIN*)    CURL_URL=$CURL_URL"-windows";;
-    MINGW*)     CURL_URL=$CURL_URL"-windows";;
-    Windows*)   CURL_URL=$CURL_URL"-windows";;
-    *)          echo "ERROR identifying the os"
-    exit 1
+    CYGWIN* | MINGW* | Windows*)
+        echo "For windows system trying to run the bash script, please download the executable from the release page"
+        exit 1
+    ;;
+    *)          
+        echo "ERROR identifying the os"
+        exit 1
     ;;
 esac
 
