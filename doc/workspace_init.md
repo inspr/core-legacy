@@ -293,7 +293,7 @@ cd ping
 
 In the next steps, it's important to have a [container registry](https://cloud.google.com/container-registry) up and running, so it's possible to store and use the images that will be built.
 
-Then, from "pingpong_demo" folder, we must build the Docker image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
+Then, from the "pingpong_demo" folder, we must build the Docker image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
 ```zsh
 docker build -f ping/Dockerfile -t CONTAINER_REGISTRY_REF/app/ping:TAG_NAME .
 ```
