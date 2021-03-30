@@ -55,7 +55,74 @@ In *ping.go*, we will define a `main` function that does the following:
 1) Creates a new dApp Client, which is used to write and read messages in Channels through the Sidecar (check [dApp Architecture Overview](dapp-overview.md) for more details).
 2) Initiates an endless `for loop` in which the message "Ping!" is written in the Channel *pingoutput*, then the application proceeds to read a message from Channel *pinginput*. If there are any messages, they are read and displayed in the terminal.
 
-*ping.go* should look like this:
+To begin the implementation we first must declare a new structure type, here called `expectedDataType`, which contains a field called "Channel" that is a string, and another field called "Message" that is a struct:
+```go
+type expectedDataType struct {
+	Message struct {
+		Data string `json:"data"`
+	} `json:"message"`
+	Channel string `json:"channel"`
+}
+```
+
+**In Inspr, the user is encouraged to define which type of message he expects to read from a Channel, so that unexpected messages of different types don't cause unexpected errors.**  
+So everytime one implements an application that reads messages, a structure such as the following should be created and passed as an argument for the `ReadMessage` method:
+```go
+type YOUR_STRUCTURE_NAME struct {
+	Message struct {
+		Data DESIRED_DATA_TYPE `json:"data"`
+	} `json:"message"`
+	OPTIONAL_FIELD_1 string `json:"OPTIONAL_FIELD_1_TAG"`
+	OPTIONAL_FIELD_2 int `json:"OPTIONAL_FIELD_2_TAG"`
+	OPTIONAL_FIELD_3 struct `json:"OPTIONAL_FIELD_3_TAG"`
+	...
+}
+```
+As seen above, the only mandatory fields inside of your custom structure are `Message` and `Data`, and their respective [JSON tags](https://medium.com/golangspec/tags-in-golang-3e5db0b8ef3e). `Data`'s field type is chosen by you, and can even be a new structure!  
+
+We then can proceed to create the `main` function itself. Before starting the `for loop` referenced previously a new dApp client, which is used to make the Node-Sidecar communication possible, must be created:
+```go
+func main() {
+
+	client := dappclient.NewAppClient()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+}
+```
+
+Now the `for loop` must be created. Inside of it, the following steps must be implemented:  
+1) Define which message will be written by this application, which will be the string "Ping!":
+```go
+	sentMsg := models.Message{
+		Data: "Ping!",
+	}
+```  
+2) Send the message defined in step 1 to the Ping dApp's output Channel:
+```go
+	if err := client.WriteMessage(ctx, "pingoutput", sentMsg); err != nil {
+		fmt.Println(err)
+		continue
+	}
+```
+3) Use the structure `expectedDataType` created by us to read messages from Ping dApp's input Channel, and then print these messages:
+```go
+	var recMsg expectedDataType
+	err := client.ReadMessage(ctx, "pinginput", &recMsg)
+	if err != nil {
+		fmt.Println(err)
+		continue
+	}
+	fmt.Println("Read message: ")
+	fmt.Println(recMsg.Message.Data)
+```
+4) Send a commit to the Message Broker, which signs it that our application has finished processing the message (click [here](https://quarkus.io/blog/kafka-commit-strategies/) for more information about Commit in Kafka):  
+```go
+	if err := client.CommitMessage(ctx, "pinginput"); err != nil {
+		fmt.Println(err.Error())
+	}
+```
+
+When completed, your Ping implementation should look like this:
 ```go
 package main
 
@@ -106,24 +173,7 @@ func main() {
 }
 ```
 
-Notice that before the `main` function a new structure called `expectedDataType` is declared, which contains a field called "Channel" that is a string, and another field called "Message" as well.  
-**In Inspr, the user is encouraged to define which type of message he expects to read from a Channel, so that unexpected messages of different types don't cause unexpected errors.**  
-So everytime one implements an application that reads messages, a structure such as the following should be created and passed as an argument for the `ReadMessage` method:
-```go
-type YOUR_STRUCTURE_NAME struct {
-	Message struct {
-		Data DESIRED_DATA_TYPE `json:"data"`
-	} `json:"message"`
-	OPTIONAL_FIELD_1 string `json:"OPTIONAL_FIELD_1_TAG"`
-	OPTIONAL_FIELD_2 int `json:"OPTIONAL_FIELD_2_TAG"`
-	OPTIONAL_FIELD_3 struct `json:"OPTIONAL_FIELD_3_TAG"`
-	...
-}
-```
-As seen above, the only mandatory fields inside of your custom structure are `Message` and `Data`, and their respective [JSON tags](https://medium.com/golangspec/tags-in-golang-3e5db0b8ef3e). `Data`'s field type is chosen by you, and can even be a new structure!  
-
-
-Proceeding the tutorial, a similar folder/file structure and code must be done to implement Pong. So, from within "pingpong_demo", create *pong.go* in /pong folder:  
+A similar folder/file structure and code must be done to implement Pong. So, from within "pingpong_demo", create *pong.go* in /pong folder:  
 ```zsh
 touch pong/pong.go
 ```  
