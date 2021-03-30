@@ -28,7 +28,7 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -76,7 +76,7 @@ func (ch *ChannelHandler) HandleGet() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -105,7 +105,7 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -152,7 +152,7 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 		data := models.ChannelQueryDI{}
 
 		err := json.NewDecoder(r.Body).Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}

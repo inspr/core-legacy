@@ -30,7 +30,7 @@ func (cth *ChannelTypeHandler) HandleCreate() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -69,7 +69,7 @@ func (cth *ChannelTypeHandler) HandleGet() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -98,7 +98,7 @@ func (cth *ChannelTypeHandler) HandleUpdate() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -147,7 +147,7 @@ func (cth *ChannelTypeHandler) HandleDelete() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}

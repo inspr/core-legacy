@@ -32,7 +32,7 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
 			return
@@ -81,7 +81,7 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -110,7 +110,7 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}
@@ -159,7 +159,7 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
-		if err != nil || !data.Valid {
+		if err != nil {
 			rest.ERROR(w, err)
 			return
 		}

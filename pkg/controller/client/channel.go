@@ -25,7 +25,6 @@ func (cc *ChannelClient) Get(ctx context.Context, context string, name string) (
 	cdi := models.ChannelQueryDI{
 		Ctx:    context,
 		ChName: name,
-		Valid:  true,
 	}
 
 	var resp meta.Channel
@@ -51,7 +50,6 @@ func (cc *ChannelClient) Create(ctx context.Context, context string, ch *meta.Ch
 	cdi := models.ChannelDI{
 		Ctx:     context,
 		Channel: *ch,
-		Valid:   true,
 		DryRun:  dryRun,
 	}
 
@@ -77,7 +75,6 @@ func (cc *ChannelClient) Delete(ctx context.Context, context string, name string
 	cdi := models.ChannelQueryDI{
 		Ctx:    context,
 		ChName: name,
-		Valid:  true,
 		DryRun: dryRun,
 	}
 
@@ -103,7 +100,6 @@ func (cc *ChannelClient) Update(ctx context.Context, context string, ch *meta.Ch
 	cdi := models.ChannelDI{
 		Ctx:     context,
 		Channel: *ch,
-		Valid:   true,
 		DryRun:  dryRun,
 	}
 
