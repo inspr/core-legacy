@@ -51,7 +51,7 @@ func (bd *builder) SetScope(scope ...string) Builder {
 	return bd
 }
 
-//AsAdmin congires the user as an Admin
+//AsAdmin configures the user as an Admin
 func (bd *builder) AsAdmin() Builder {
 	bd.usr.Role = 1
 	return bd
