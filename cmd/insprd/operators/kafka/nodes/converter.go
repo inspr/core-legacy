@@ -8,6 +8,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"go.uber.org/zap"
 
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
@@ -15,6 +16,7 @@ import (
 )
 
 func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
+	logger.Debug("getting necessary environment variables for Node structure deployment")
 	input := app.Spec.Boundary.Input
 	output := app.Spec.Boundary.Output
 	channels := input.Union(output)
@@ -34,10 +36,15 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
 		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
 	}
+
 	resolves, err := no.memory.Apps().ResolveBoundary(app)
 	if err != nil {
+		logger.Error("unable to resolve Node boundaries",
+			zap.Any("boundaries", app.Spec.Boundary))
 		panic(err)
 	}
+
+	logger.Debug("resolving Node Boundary in the cluster")
 	channels.Map(func(boundary string) string {
 		resolved := resolves[boundary]
 		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
@@ -52,9 +59,11 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 
 // dAppToDeployment translates the DApp
 func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
+	logger.Debug("converting a dApp structure to a k8s deployment")
 
 	sidecarEnvironment := no.baseEnvironment(app)
 
+	logger.Debug("defining Node's env vars")
 	nodeKubeEnv := append(app.Spec.Node.Spec.Environment.ParseToK8sArrEnv(), kubeCore.EnvVar{
 		Name: "INSPR_UNIX_SOCKET",
 		ValueFrom: &kubeCore.EnvVarSource{
@@ -64,6 +73,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	})
 
+	logger.Debug("defining Node's k8s container data")
 	appDeployName := toDeploymentName(app)
 	nodeContainer := kubeCore.Container{
 		Name:  appDeployName,
@@ -78,6 +88,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		Env: nodeKubeEnv,
 	}
 
+	logger.Debug("defining Sidecars's k8s env vars")
 	sidecarKubeEnv := append(sidecarEnvironment.ParseToK8sArrEnv(), kubeCore.EnvVar{
 		Name: "INSPR_UNIX_SOCKET",
 		ValueFrom: &kubeCore.EnvVarSource{
@@ -87,6 +98,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	})
 
+	logger.Debug("defining Sidecar's k8s container data")
 	sidecarContainer := kubeCore.Container{
 		Name:  appDeployName + "-sidecar",
 		Image: environment.GetSidecarImage(),
@@ -117,6 +129,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 
 	*replicas = int32(app.Spec.Node.Spec.Replicas)
 
+	logger.Debug("building and returning the k8s complete deployment")
 	return &kubeApp.Deployment{
 		ObjectMeta: kubeMeta.ObjectMeta{
 			Name:   appDeployName,
@@ -183,7 +196,6 @@ func toNodeName(deployName string) (string, error) {
 }
 
 func toNodeParent(deployName string) (string, error) {
-
 	strs := utils.StringArray(strings.Split(deployName, "-"))
 	return strs[:len(strs)-1].Join("."), nil
 }
