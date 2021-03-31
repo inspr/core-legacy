@@ -1,6 +1,8 @@
 package tree
 
 import (
+	"fmt"
+
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -31,7 +33,12 @@ same name as the name passed as an argument, the pointer to that channel is retu
 func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Channel, error) {
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel was not found because the app context has an error").Build()
+		newError := ierrors.
+			NewError().
+			InnerError(err).
+			NotFound().
+			Message("channel was not found because the app context has an error").
+			Build()
 		return nil, newError
 	}
 
@@ -41,7 +48,11 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 		}
 	}
 
-	newError := ierrors.NewError().NotFound().Message("channel not found").Build()
+	newError := ierrors.
+		NewError().
+		NotFound().
+		Message(fmt.Sprintf("channel %s not found", chName)).
+		Build()
 	return nil, newError
 }
 
@@ -95,7 +106,12 @@ as an argument, that pointer is removed from the list of App channels
 func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 	channel, err := chh.Get(context, chName)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
+		newError := ierrors.
+			NewError().
+			InnerError(err).
+			NotFound().
+			Message(fmt.Sprintf("channel %s not found", chName)).
+			Build()
 		return newError
 	}
 
@@ -125,7 +141,12 @@ this pointer will be replaced by the new one
 func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error {
 	oldCh, err := chh.Get(context, ch.Meta.Name)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
+		newError := ierrors.
+			NewError().
+			InnerError(err).
+			NotFound().
+			Message(fmt.Sprintf("channel %s not found", ch.Meta.Name)).
+			Build()
 		return newError
 	}
 
@@ -151,7 +172,7 @@ type ChannelRootGetter struct {
 // memory tree until it finds the dChannel which name is equal to the last query element.
 // The tree Channel is returned if the query string is an empty string.
 // If the specified dChannel is found, it is returned. Otherwise, returns an error.
-func (amm *ChannelRootGetter) Get(context string, name string) (*meta.Channel, error) {
+func (amm *ChannelRootGetter) Get(context string, chName string) (*meta.Channel, error) {
 	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel was not found because the app context has an error").Build()
@@ -159,11 +180,15 @@ func (amm *ChannelRootGetter) Get(context string, name string) (*meta.Channel, e
 	}
 
 	if parentApp.Spec.Channels != nil {
-		if ch, ok := parentApp.Spec.Channels[name]; ok {
+		if ch, ok := parentApp.Spec.Channels[chName]; ok {
 			return ch, nil
 		}
 	}
 
-	newError := ierrors.NewError().NotFound().Message("channel not found").Build()
+	newError := ierrors.
+		NewError().
+		NotFound().
+		Message(fmt.Sprintf("channel %s not found", chName)).
+		Build()
 	return nil, newError
 }
