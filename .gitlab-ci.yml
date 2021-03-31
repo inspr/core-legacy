@@ -1,14 +1,16 @@
 image: golang:latest
 services:
-  - docker:19.03.11-dind
+  - docker:19.03.13-dind
 
 variables:
-  DOCKER_HOST: tcp://dind.dind.svc:2375
+  DOCKER_HOST: tcp://docker:2376
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: "/certs"
   DANGER_GITLAB_HOST: "https://gitlab.inspr.com"
   DANGER_GITLAB_API_BASE_URL: "https://gitlab.inspr.com/api/v4"
   REPO_NAME: gitlab.inspr.dev/inspr/core
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
 
 
 stages:
@@ -52,7 +54,7 @@ build-helm:
   extends: .base-build
   stage: build
   only:
-    - tags
+    - merge_requests
   script: 
     - skaffold build --file-output=tags.out
     - bash .gitlab/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
