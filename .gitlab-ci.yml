@@ -5,12 +5,10 @@ services:
 variables:
   DOCKER_HOST: tcp://docker:2376
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_TLS_CERTDIR: ""
   DANGER_GITLAB_HOST: "https://gitlab.inspr.com"
   DANGER_GITLAB_API_BASE_URL: "https://gitlab.inspr.com/api/v4"
   REPO_NAME: gitlab.inspr.dev/inspr/core
-  DOCKER_TLS_VERIFY: 1
-  DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
 
 
 stages:
