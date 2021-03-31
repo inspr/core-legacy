@@ -32,11 +32,13 @@ func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error
 
 	app, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
+		logger.Error("unable to get Alias")
 		return nil, err
 	}
 
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
+		logger.Error("alias doesn't exists")
 		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
 	}
 
@@ -60,6 +62,9 @@ func (amm *AliasMemoryManager) Create(context, targetBoundary string, alias *met
 	// check if targetBoundary exists in app
 	appBound := app.Spec.Boundary
 	if !appBound.Input.Contains(targetBoundary) && !appBound.Output.Contains(targetBoundary) {
+		logger.Error("invalid dApp boundary for Alias",
+			zap.Any("alias", alias),
+			zap.String("targeted boundary", targetBoundary))
 		return ierrors.NewError().BadRequest().Message("target boundary doesn't exist in %v", app.Meta.Name).Build()
 	}
 
@@ -72,6 +77,10 @@ func (amm *AliasMemoryManager) Create(context, targetBoundary string, alias *met
 	// check if targetChannel exists in channels or boundaries of parentApp
 	err = validTargetChannel(parentApp, targetChannel)
 	if err != nil {
+		logger.Error("unable to create Alias - invalid targeted channel or boundary in parent dApp",
+			zap.Any("alias", alias),
+			zap.String("parent dApp", parentApp.Meta.Name),
+			zap.String("targeted boundary", targetChannel))
 		return err
 	}
 
@@ -80,7 +89,8 @@ func (amm *AliasMemoryManager) Create(context, targetBoundary string, alias *met
 	logger.Debug("checking if Alias already exists")
 	// check if alias is already there
 	if _, ok := parentApp.Spec.Aliases[aliasKey]; ok {
-		return ierrors.NewError().BadRequest().Message("alias already exists in parent app").Build()
+		logger.Error("alias already exists")
+		return ierrors.NewError().BadRequest().Message("alias already exists in parent dApp").Build()
 	}
 
 	logger.Debug("adding Alias to dApp",
@@ -110,6 +120,9 @@ func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alia
 	logger.Debug("checking if Alias to be updated exists in given context")
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
+		logger.Error("unable to find Alias to be updated in given dApp",
+			zap.String("alias key", aliasKey),
+			zap.String("dApp", app.Meta.Name))
 		return ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
 	}
 
@@ -117,6 +130,10 @@ func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alia
 	// valid target channel
 	err = validTargetChannel(app, alias.Target)
 	if err != nil {
+		logger.Error("unable to update Alias - invalid targeted channel or boundary in parent dApp",
+			zap.Any("alias", alias),
+			zap.String("parent dApp", app.Meta.Name),
+			zap.String("targeted boundary", alias.Target))
 		return err
 	}
 
@@ -146,6 +163,9 @@ func (amm *AliasMemoryManager) Delete(context, aliasKey string) error {
 	logger.Debug("checking if Alias to be deleted exists in given context")
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
+		logger.Error("unable to find Alias to be deleted in given dApp",
+			zap.String("alias key", aliasKey),
+			zap.String("dApp", app.Meta.Name))
 		return ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
 	}
 
@@ -157,6 +177,7 @@ func (amm *AliasMemoryManager) Delete(context, aliasKey string) error {
 	if childApp, ok := app.Spec.Apps[childName]; ok {
 		childBound := childApp.Spec.Boundary
 		if childBound.Input.Contains(target) || childBound.Output.Contains(target) {
+			logger.Error("unable to delete Alias that is being used by a dApp")
 			return ierrors.NewError().BadRequest().Message("can't delete the alias since it's being used by a child app").Build()
 		}
 	}
@@ -187,11 +208,13 @@ func (amm *AliasRootGetter) Get(context, aliasKey string) (*meta.Alias, error) {
 	// get app from context
 	app, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
+		logger.Error("unable to get Alias (Root Getter)")
 		return nil, err
 	}
 
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
+		logger.Error("alias doesn't exists (Root Getter)")
 		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
 	}
 
@@ -203,6 +226,7 @@ func validTargetChannel(app *meta.App, targetChannel string) error {
 	logger.Debug("validating if Alias targets a valid Channel")
 	parentBound := app.Spec.Boundary
 	if _, ok := app.Spec.Channels[targetChannel]; !ok && !parentBound.Input.Contains(targetChannel) && !parentBound.Output.Contains(targetChannel) {
+		logger.Error("alias targets an invalid Channel")
 		return ierrors.NewError().BadRequest().Message("channel doesn't exist in app").Build()
 	}
 

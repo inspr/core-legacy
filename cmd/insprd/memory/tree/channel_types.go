@@ -32,11 +32,18 @@ func (ctm *ChannelTypeMemoryManager) Create(context string, ct *meta.ChannelType
 	logger.Debug("validating Channel Type structure")
 	nameErr := utils.StructureNameIsValid(ct.Meta.Name)
 	if nameErr != nil {
+		logger.Error("invalid Channel Type name",
+			zap.String("ctype", ct.Meta.Name))
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
+	logger.Debug("checking if Channel Type already exists",
+		zap.String("channel", ct.Meta.Name),
+		zap.String("context", context))
+
 	_, err := ctm.Get(context, ct.Meta.Name)
 	if err == nil {
+		logger.Error("channel Type already exists")
 		return ierrors.NewError().AlreadyExists().
 			Message("target app already has a '" + ct.Meta.Name + "' ChannelType").Build()
 	}
@@ -72,8 +79,7 @@ func (ctm *ChannelTypeMemoryManager) Get(context string, ctName string) (*meta.C
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
 		return nil, ierrors.NewError().BadRequest().InnerError(err).
-			Message("target app doesn't exist").Build()
-
+			Message("target dApp doesn't exist").Build()
 	}
 
 	if parentApp.Spec.ChannelTypes != nil {
@@ -82,8 +88,13 @@ func (ctm *ChannelTypeMemoryManager) Get(context string, ctName string) (*meta.C
 		}
 	}
 
-	err = ierrors.NewError().NotFound().Message("no ChannelType found for query.").Build()
-	return nil, err
+	logger.Error("unable to get Channel Type in given context",
+		zap.String("ctype", ctName),
+		zap.String("context", context))
+
+	return nil, ierrors.NewError().NotFound().
+		Message("channelType not found for given query").
+		Build()
 }
 
 // Delete deletes, if it exists, a Channel Type from a given app.
@@ -102,6 +113,9 @@ func (ctm *ChannelTypeMemoryManager) Delete(context string, ctName string) error
 
 	logger.Debug("checking if Channel Type can be deleted")
 	if len(curCt.ConnectedChannels) > 0 {
+		logger.Error("unable to delete Channel Type for it's being used",
+			zap.Any("connected channels", curCt.ConnectedChannels))
+
 		return ierrors.NewError().
 			BadRequest().
 			Message("channelType cannot be deleted as it is being used by other channels").
@@ -169,8 +183,8 @@ func (amm *ChannelTypeRootGetter) Get(context string, ctName string) (*meta.Chan
 
 	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("ChannelType was not found because the app context has an error").Build()
-		return nil, newError
+		return nil, ierrors.NewError().BadRequest().InnerError(err).
+			Message("target dApp doesn't exist (Root Getter)").Build()
 	}
 
 	if parentApp.Spec.ChannelTypes != nil {
@@ -179,6 +193,11 @@ func (amm *ChannelTypeRootGetter) Get(context string, ctName string) (*meta.Chan
 		}
 	}
 
-	newError := ierrors.NewError().NotFound().Message("ChannelType not found").Build()
-	return nil, newError
+	logger.Error("unable to get Channel Type in given context (Root Getter)",
+		zap.String("ctype", ctName),
+		zap.String("context", context))
+
+	return nil, ierrors.NewError().NotFound().
+		Message("channelType not found for given query (Root Getter)").
+		Build()
 }
