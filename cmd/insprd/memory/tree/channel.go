@@ -98,6 +98,9 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 	if parentApp.Spec.Channels == nil {
 		parentApp.Spec.Channels = map[string]*meta.Channel{}
 	}
+
+	ch.Meta = metautils.InjectUUID(ch.Meta)
+
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
 	return nil

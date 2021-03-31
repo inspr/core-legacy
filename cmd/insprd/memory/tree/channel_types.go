@@ -56,7 +56,7 @@ func (ctm *ChannelTypeMemoryManager) CreateChannelType(context string, ct *meta.
 	if parentApp.Spec.ChannelTypes == nil {
 		parentApp.Spec.ChannelTypes = map[string]*meta.ChannelType{}
 	}
-
+	ct.Meta = utils.InjectUUID(ct.Meta)
 	parentApp.Spec.ChannelTypes[ct.Meta.Name] = ct
 	return nil
 }

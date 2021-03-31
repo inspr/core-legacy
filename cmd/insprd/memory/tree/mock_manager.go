@@ -64,3 +64,9 @@ func (tmm *MockManager) Cancel() {}
 func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
 	return diff.Changelog{}, nil
 }
+
+func (tmm *MockManager) Root() memory.GetInterface {
+	return &RootGetter{
+		tmm.root,
+	}
+}

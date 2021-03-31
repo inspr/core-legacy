@@ -65,6 +65,50 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 	parentStr := getParentString(app, parentApp)
 
 	app.Meta.Parent = parentStr
+	query, _ := metautils.JoinScopes(parentStr, app.Meta.Name)
+	oldApp, err := amm.Root().Apps().Get(query)
+	if err == nil {
+		app.Meta.UUID = oldApp.Meta.UUID
+		for cName, ch := range app.Spec.Channels {
+			if oldApp.Spec.Channels != nil {
+				if oldCh, ok := oldApp.Spec.Channels[cName]; ok {
+					ch.Meta.UUID = oldCh.Meta.UUID
+				} else {
+					ch.Meta = metautils.InjectUUID(ch.Meta)
+				}
+			}
+		}
+		for ctName, ct := range app.Spec.ChannelTypes {
+			if oldApp.Spec.ChannelTypes != nil {
+				if oldCh, ok := oldApp.Spec.ChannelTypes[ctName]; ok {
+					ct.Meta.UUID = oldCh.Meta.UUID
+				} else {
+					ct.Meta = metautils.InjectUUID(ct.Meta)
+				}
+			}
+		}
+		for alName, al := range app.Spec.Aliases {
+			if oldApp.Spec.Aliases != nil {
+				if oldCh, ok := oldApp.Spec.Aliases[alName]; ok {
+					al.Meta.UUID = oldCh.Meta.UUID
+				} else {
+					al.Meta = metautils.InjectUUID(al.Meta)
+				}
+			}
+		}
+	} else {
+		app.Meta = metautils.InjectUUID(app.Meta)
+		for _, ch := range app.Spec.Channels {
+			ch.Meta = metautils.InjectUUID(ch.Meta)
+		}
+		for _, ct := range app.Spec.ChannelTypes {
+			ct.Meta = metautils.InjectUUID(ct.Meta)
+		}
+		for _, al := range app.Spec.Aliases {
+			al.Meta = metautils.InjectUUID(al.Meta)
+		}
+	}
+
 	parentApp.Spec.Apps[app.Meta.Name] = app
 	for _, child := range app.Spec.Apps {
 		amm.addAppInTree(child, app)

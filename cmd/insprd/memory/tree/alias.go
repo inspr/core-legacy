@@ -6,6 +6,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
 // AliasMemoryManager implements the Alias interface
@@ -73,6 +74,7 @@ func (amm *AliasMemoryManager) CreateAlias(query, targetBoundary string, alias *
 		return ierrors.NewError().BadRequest().Message("alias already exists in parent app").Build()
 	}
 
+	alias.Meta = utils.InjectUUID(alias.Meta)
 	// add new alias to Aliases list in parentApp
 	parentApp.Spec.Aliases[aliasKey] = alias
 

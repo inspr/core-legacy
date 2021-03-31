@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"reflect"
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -27,7 +26,7 @@ func Test_validAppStructure(t *testing.T) {
 						Reference:   "app2.app5",
 						Annotations: map[string]string{},
 						Parent:      "app2",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -36,7 +35,7 @@ func Test_validAppStructure(t *testing.T) {
 								Reference:   "app5.nodeApp5",
 								Annotations: map[string]string{},
 								Parent:      "app2",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeApp5",
@@ -64,7 +63,7 @@ func Test_validAppStructure(t *testing.T) {
 						Reference:   "app2.app4",
 						Annotations: map[string]string{},
 						Parent:      "app2",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -73,7 +72,7 @@ func Test_validAppStructure(t *testing.T) {
 								Reference:   "app4.nodeApp4",
 								Annotations: map[string]string{},
 								Parent:      "app3",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeApp3",
@@ -101,7 +100,7 @@ func Test_validAppStructure(t *testing.T) {
 						Reference:   "app2.app5",
 						Annotations: map[string]string{},
 						Parent:      "app2",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -110,7 +109,7 @@ func Test_validAppStructure(t *testing.T) {
 								Reference:   "app5.nodeApp5",
 								Annotations: map[string]string{},
 								Parent:      "app5",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeApp5",
@@ -140,7 +139,7 @@ func Test_validAppStructure(t *testing.T) {
 						Reference:   "app2.app4",
 						Annotations: map[string]string{},
 						Parent:      "app2",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -149,7 +148,7 @@ func Test_validAppStructure(t *testing.T) {
 								Reference:   "app4.nodeApp4",
 								Annotations: map[string]string{},
 								Parent:      "app3",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeApp3",
@@ -203,7 +202,7 @@ func Test_nodeIsEmpty(t *testing.T) {
 						Reference:   "app1.nodeApp1",
 						Annotations: map[string]string{},
 						Parent:      "app1",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.NodeSpec{
 						Image: "imageNodeApp1",
@@ -360,7 +359,7 @@ func Test_getParentApp(t *testing.T) {
 				t.Errorf("getParentApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !CompareWithoutUUID(got, tt.want) {
 				t.Errorf("getParentApp() = %v, want %v", got, tt.want)
 			}
 		})
@@ -386,7 +385,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -397,7 +396,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},
@@ -436,7 +435,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 									Reference:   "app1.newChannelType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 							},
 						},
@@ -459,7 +458,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -470,7 +469,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},
@@ -509,7 +508,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 									Reference:   "app1.newChannelType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 							},
 						},
@@ -532,7 +531,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -543,7 +542,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},
@@ -582,7 +581,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 									Reference:   "app1.newChannelType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 							},
 						},
@@ -605,7 +604,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -616,7 +615,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},
@@ -655,7 +654,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 									Reference:   "app1.newChannelType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 							},
 						},
@@ -881,6 +880,66 @@ func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 			if err := amm.connectAppsBoundaries(tt.args.app); (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.connectAppsBoundaries() error = %v, wantErr %v", err, tt.wantErr)
 			}
+		})
+	}
+}
+
+func TestAppMemoryManager_addAppInTree(t *testing.T) {
+	type fields struct {
+		MemoryManager *MemoryManager
+		root          *meta.App
+		appErr        error
+		mockA         bool
+		mockC         bool
+		mockCT        bool
+	}
+	type args struct {
+		app       *meta.App
+		parentApp string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *meta.App
+	}{
+		{
+			name: "single level injection",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:   "singleLevelInjection",
+						Parent: "",
+					},
+				},
+				parentApp: "",
+			},
+			fields: fields{
+				root: getMockApp(),
+			},
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:   "singleLevelInjection",
+					Parent: "",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			setTree(&MockManager{
+				MemoryManager: &MemoryManager{
+					root: tt.fields.root,
+					tree: tt.fields.root,
+				},
+				appErr: tt.fields.appErr,
+				mockC:  tt.fields.mockC,
+				mockA:  tt.fields.mockA,
+				mockCT: tt.fields.mockCT,
+			})
+			amm := GetTreeMemory().Apps().(*AppMemoryManager)
+			parentApp, _ := amm.Get(tt.args.parentApp)
+			amm.addAppInTree(tt.args.app, parentApp)
 		})
 	}
 }
