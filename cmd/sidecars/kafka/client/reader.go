@@ -24,19 +24,18 @@ type Consumer interface {
 type Reader struct {
 	consumers   map[string]Consumer
 	lastMessage *kafka.Message
-	logger      *zap.Logger
 }
 
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
 	var reader Reader
 	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannels())
+
 	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannels())
-	logger, _ := zap.NewDevelopment(zap.Fields(zap.String("section", "kafka sidecar")))
 	if len(resolvedChList) == 0 {
 		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
-	reader.logger = logger
+
 	reader.consumers = make(map[string]Consumer)
 
 	for idx, ch := range channelsList {
@@ -53,22 +52,23 @@ the message and an error if any occurred.
 */
 func (reader *Reader) ReadMessage(channel string) (models.BrokerData, error) {
 	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannels(), "")
-	reader.logger.Info("trying to read message from topic",
+
+	logger.Info("trying to read message from topic",
 		zap.String("channel", channel),
-		zap.String("resolved channel", resolved),
-	)
+		zap.String("resolved channel", resolved))
+
 	for {
 		event := reader.consumers[channel].Poll(pollTimeout)
 		switch ev := event.(type) {
 		case *kafka.Message:
 			topic := *ev.TopicPartition.Topic
-			reader.logger.Info("reading message from topic", zap.String("topic", topic))
+			logger.Info("reading message from topic", zap.String("topic", topic))
 			channel := fromTopic(topic)
 
 			// Decoding Message
 			message, errDecode := channel.decode(ev.Value)
 			if errDecode != nil {
-				reader.logger.Error("error in decoding message", zap.Any("error", errDecode))
+				logger.Error("error in decoding message", zap.Any("error", errDecode))
 				return models.BrokerData{}, errDecode
 			}
 
@@ -95,6 +95,7 @@ func (reader *Reader) ReadMessage(channel string) (models.BrokerData, error) {
 
 // CommitMessage commits the last message read by Reader
 func (reader *Reader) CommitMessage(channel string) error {
+	logger.Info("commiting to channel", zap.String("channel", channel))
 	_, errCommit := reader.consumers[channel].Commit()
 	if errCommit != nil {
 		return ierrors.
@@ -107,8 +108,9 @@ func (reader *Reader) CommitMessage(channel string) error {
 	return nil
 }
 
-// Close close the reader consumer
+// Close closes the reader consumers
 func (reader *Reader) Close() error {
+	logger.Debug("closing Kafka readers consumers")
 	for _, consumer := range reader.consumers {
 		err := consumer.Close()
 		if err != nil {
