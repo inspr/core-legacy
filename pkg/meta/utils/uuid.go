@@ -1,11 +1,11 @@
 package utils
 
 import (
+	"github.com/google/uuid"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
 func InjectUUID(m meta.Metadata) meta.Metadata {
-	m.UUID = utils.NewUUID()
+	m.UUID = uuid.New().String()
 	return m
 }
