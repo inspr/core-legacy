@@ -76,26 +76,25 @@ func (s *Server) Run(ctx context.Context) {
 	}()
 
 	log.Printf("sideCar listener is up...")
-	select {
-	case <-ctx.Done():
-		log.Println("gracefully shutting down...")
 
-		ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
-		defer cancel()
+	<-ctx.Done()
 
-		if err = server.Shutdown(ctxShutdown); err != nil {
-			log.Fatal("error shutting down server")
-		}
+	log.Println("gracefully shutting down...")
 
-		err = os.RemoveAll(s.addr)
-		if err != nil {
-			log.Fatal(err)
-		}
+	ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
+	defer cancel()
 
-		log.Println("server shutdown complete")
-		if err == http.ErrServerClosed {
-			err = nil
-		}
-		return
+	if err = server.Shutdown(ctxShutdown); err != nil {
+		log.Fatal("error shutting down server")
+	}
+
+	err = os.RemoveAll(s.addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("server shutdown complete")
+	if err == http.ErrServerClosed {
+		err = nil
 	}
 }
