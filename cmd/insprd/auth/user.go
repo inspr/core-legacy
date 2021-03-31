@@ -6,8 +6,8 @@ type User struct {
 	Pwd    string   `json:"pwd"`
 	Role   int      `json:"role"`
 	Scopes []string `json:"scopes"`
-	Token  string
-	UID    string
+	Token  string   `json:"token"`
+	UUID   string   `json:"uuid"`
 }
 
 //Builder interface for building an User
@@ -45,13 +45,13 @@ func (bd *builder) SetPassword(pwd string) Builder {
 	return bd
 }
 
-//SetScopes defines witch scopes the user is allowed access to
+//SetScopes defines which scopes the user is allowed access to
 func (bd *builder) SetScope(scope ...string) Builder {
 	bd.usr.Scopes = scope
 	return bd
 }
 
-//AsAdmin congires de user being built as an Admin
+//AsAdmin congires the user as an Admin
 func (bd *builder) AsAdmin() Builder {
 	bd.usr.Role = 1
 	return bd
