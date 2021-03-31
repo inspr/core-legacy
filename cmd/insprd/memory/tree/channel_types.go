@@ -152,7 +152,15 @@ type ChannelTypeRootGetter struct {
 func (amm *ChannelTypeRootGetter) Get(context string, name string) (*meta.ChannelType, error) {
 	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("ChannelType was not found because the app context has an error").Build()
+		newError := ierrors.
+			NewError().
+			InnerError(err).
+			NotFound().
+			Message(
+				"ChannelType not found, the context '%v' is invalid",
+				context,
+			).
+			Build()
 		return nil, newError
 	}
 
@@ -162,6 +170,10 @@ func (amm *ChannelTypeRootGetter) Get(context string, name string) (*meta.Channe
 		}
 	}
 
-	newError := ierrors.NewError().NotFound().Message("ChannelType not found").Build()
+	newError := ierrors.
+		NewError().
+		NotFound().
+		Message("channelType '%v' not found", name).
+		Build()
 	return nil, newError
 }

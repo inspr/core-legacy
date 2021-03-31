@@ -34,17 +34,21 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
+	err := ierrors.
+		NewError().
+		NotFound().
+		Message("dApp not found for given query: %s", query).
+		Build()
 
-	nxtApp := amm.root
-	if nxtApp != nil {
+	nextApp := amm.root
+	if nextApp != nil {
 		for _, element := range reference {
-			nxtApp = nxtApp.Spec.Apps[element]
-			if nxtApp == nil {
+			nextApp = nextApp.Spec.Apps[element]
+			if nextApp == nil {
 				return nil, err
 			}
 		}
-		return nxtApp, nil
+		return nextApp, nil
 	}
 
 	return nil, err
@@ -155,15 +159,15 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	reference := strings.Split(query, ".")
 	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
 
-	nxtApp := amm.tree
-	if nxtApp != nil {
+	nextApp := amm.tree
+	if nextApp != nil {
 		for _, element := range reference {
-			nxtApp = nxtApp.Spec.Apps[element]
-			if nxtApp == nil {
+			nextApp = nextApp.Spec.Apps[element]
+			if nextApp == nil {
 				return nil, err
 			}
 		}
-		return nxtApp, nil
+		return nextApp, nil
 	}
 
 	return nil, err

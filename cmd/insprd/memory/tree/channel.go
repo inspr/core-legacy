@@ -1,8 +1,6 @@
 package tree
 
 import (
-	"fmt"
-
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
@@ -37,7 +35,10 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 			NewError().
 			InnerError(err).
 			NotFound().
-			Message("channel was not found because the app context has an error").
+			Message(
+				"channel not found the context '%v' is invalid",
+				context,
+			).
 			Build()
 		return nil, newError
 	}
@@ -51,7 +52,7 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 	newError := ierrors.
 		NewError().
 		NotFound().
-		Message(fmt.Sprintf("channel %s not found", chName)).
+		Message("channel %s not found", chName).
 		Build()
 	return nil, newError
 }
@@ -110,7 +111,7 @@ func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 			NewError().
 			InnerError(err).
 			NotFound().
-			Message(fmt.Sprintf("channel %s not found", chName)).
+			Message("channel %s not found", chName).
 			Build()
 		return newError
 	}
@@ -145,7 +146,7 @@ func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error 
 			NewError().
 			InnerError(err).
 			NotFound().
-			Message(fmt.Sprintf("channel %s not found", ch.Meta.Name)).
+			Message("channel %s not found", ch.Meta.Name).
 			Build()
 		return newError
 	}
@@ -175,7 +176,11 @@ type ChannelRootGetter struct {
 func (amm *ChannelRootGetter) Get(context string, chName string) (*meta.Channel, error) {
 	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel was not found because the app context has an error").Build()
+		newError := ierrors.
+			NewError().
+			InnerError(err).
+			NotFound().
+			Message("the '%v' context is invalid", context).Build()
 		return nil, newError
 	}
 
@@ -188,7 +193,7 @@ func (amm *ChannelRootGetter) Get(context string, chName string) (*meta.Channel,
 	newError := ierrors.
 		NewError().
 		NotFound().
-		Message(fmt.Sprintf("channel %s not found", chName)).
+		Message("channel %s not found", chName).
 		Build()
 	return nil, newError
 }

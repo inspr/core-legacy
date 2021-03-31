@@ -26,7 +26,11 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 			config.numberOfPartitions = 1
 			return config, ierrors.NewError().
 				InvalidChannel().
-				Message(fmt.Sprintf("invalid partition configuration %s", ch.Meta.Annotations["kafka.partition.number"])).Build()
+				Message(
+					"invalid partition configuration %s",
+					ch.Meta.Annotations["kafka.partition.number"],
+				).
+				Build()
 		}
 	}
 
@@ -37,7 +41,11 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 			config.replicationFactor = 1
 			return config, ierrors.NewError().
 				InvalidChannel().
-				Message(fmt.Sprintf("invalid replication configuration %s", ch.Meta.Annotations["kafka.replication.factor"])).Build()
+				Message(
+					"invalid replication configuration %s",
+					ch.Meta.Annotations["kafka.replication.factor"],
+				).
+				Build()
 		}
 	}
 

@@ -2,7 +2,6 @@ package sidecarserv
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -57,9 +56,10 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 		insprError := ierrors.
 			NewError().
 			BadRequest().
-			Message(fmt.Sprintf("channel %s not found",
+			Message(
+				"channel %s not found",
 				utils.CheckEmptyChannel(body.Channel),
-			))
+			)
 
 		rest.ERROR(w, insprError.Build())
 		return
@@ -90,9 +90,10 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 		insprError := ierrors.
 			NewError().
 			BadRequest().
-			Message(fmt.Sprintf("channel %s not found",
+			Message(
+				"channel %s not found",
 				utils.CheckEmptyChannel(body.Channel),
-			))
+			)
 
 		rest.ERROR(w, insprError.Build())
 		return
@@ -125,9 +126,10 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		insprError := ierrors.
 			NewError().
 			BadRequest().
-			Message(fmt.Sprintf("channel %s not found",
+			Message(
+				"channel %s not found",
 				utils.CheckEmptyChannel(body.Channel),
-			))
+			)
 
 		rest.ERROR(w, insprError.Build())
 		return

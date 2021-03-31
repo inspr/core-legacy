@@ -2,7 +2,6 @@ package fake
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
@@ -47,7 +46,7 @@ func (o ChannelOperator) Get(ctx context.Context, context string, name string) (
 		return nil, ierrors.
 			NewError().
 			NotFound().
-			Message(fmt.Sprintf("channel %s not found", channelKey)).
+			Message("channel %s not found", channelKey).
 			Build()
 	}
 	return ch, nil
@@ -64,7 +63,7 @@ func (o ChannelOperator) Update(ctx context.Context, context string, ch *meta.Ch
 		return ierrors.
 			NewError().
 			NotFound().
-			Message(fmt.Sprintf("channel %s not found", channelKey)).
+			Message("channel %s not found", channelKey).
 			Build()
 	}
 	o.channels[channelKey] = ch
@@ -83,7 +82,7 @@ func (o ChannelOperator) Delete(ctx context.Context, context string, name string
 		return ierrors.
 			NewError().
 			NotFound().
-			Message(fmt.Sprintf("channel %s not found", channelKey)).
+			Message("channel %s not found", channelKey).
 			Build()
 	}
 	delete(o.channels, channelKey)

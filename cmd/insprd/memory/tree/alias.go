@@ -35,7 +35,11 @@ func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error
 
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
+		return nil, ierrors.
+			NewError().
+			BadRequest().
+			Message("alias not found for the given key %v", aliasKey).
+			Build()
 	}
 
 	//return alias
@@ -103,7 +107,11 @@ func (amm *AliasRootGetter) Get(context, aliasKey string) (*meta.Alias, error) {
 
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
+		return nil, ierrors.
+			NewError().
+			BadRequest().
+			Message("alias not found for the given key %v", aliasKey).
+			Build()
 	}
 
 	//return alias
@@ -125,7 +133,11 @@ func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alia
 
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		return ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
+		return ierrors.
+			NewError().
+			BadRequest().
+			Message("alias not found for the given key %v", aliasKey).
+			Build()
 	}
 
 	// valid target channel
@@ -156,7 +168,11 @@ func (amm *AliasMemoryManager) Delete(context, aliasKey string) error {
 
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		return ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
+		return ierrors.
+			NewError().
+			BadRequest().
+			Message("alias not found for the given key %v", aliasKey).
+			Build()
 	}
 
 	childName := strings.Split(aliasKey, ".")[0]
