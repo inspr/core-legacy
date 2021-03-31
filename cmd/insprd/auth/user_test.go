@@ -174,7 +174,7 @@ func Test_builder_AsAdmin(t *testing.T) {
 	}{
 
 		{
-			name: "SetScope test",
+			name: "AsAdmin test",
 			fields: fields{
 				usr: User{
 					Scopes: make([]string, 0),
