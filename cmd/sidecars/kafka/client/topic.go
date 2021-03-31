@@ -1,57 +1,84 @@
 package kafkasc
 
 import (
-	"fmt"
-	"strings"
+	"errors"
 
+	"github.com/linkedin/goavro"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
 )
 
-type messageChannel struct {
-	channel string
-	appCtx  string
-	prefix  string
+type kafkaTopic string
+
+// creates Avro codec based on given schema
+func getCodec(schema string) (*goavro.Codec, error) {
+	codec, errCreateCodec := goavro.NewCodec(schema)
+	if errCreateCodec != nil {
+		return nil, errors.New("[KAFKA_PRODUCE_CODEC] " + errCreateCodec.Error())
+	}
+
+	return codec, nil
 }
 
-func fromResolvedChannel(channel string) (messageChannel, error) {
-	ctx, name, err := utils.RemoveLastPartInScope(channel)
+// returns the channel's channel type schema
+func (ch kafkaTopic) getSchema() (string, error) {
+
+	schema, err := environment.GetSchema(string(ch))
 	if err != nil {
-		return messageChannel{}, err
+		return "", ierrors.NewError().InnerError(err).Message(err.Error()).Build()
 	}
-	return messageChannel{
-		appCtx:  ctx,
-		channel: name,
-	}, nil
+
+	return schema, nil
 }
 
-// returns specified topic's channel
-func fromTopic(topic string) messageChannel {
-	msgChan := messageChannel{
-		prefix: environment.GetInsprEnvironment(),
-		appCtx: environment.GetInsprAppContext(),
+func (ch kafkaTopic) decode(messageEncoded []byte) (interface{}, error) {
+
+	schema, errGetSchema := ch.getSchema()
+	if errGetSchema != nil {
+		return nil, errGetSchema
 	}
-	splitTopic := strings.Split(topic, "-")
-	msgChan.channel = splitTopic[len(splitTopic)-1]
-	msgChan.appCtx = splitTopic[len(splitTopic)-2]
-	return msgChan
+
+	codec, errCreateCodec := getCodec(schema)
+	if errCreateCodec != nil {
+		return nil, errCreateCodec
+	}
+	message, _, errDecoding := codec.NativeFromBinary(messageEncoded)
+	if errDecoding != nil {
+		return nil, errors.New("[DECODE] " + errDecoding.Error())
+	}
+
+	return message, nil
 }
 
-// returns a topic name based on a message channel
-func (ch messageChannel) toTopic() string {
-	var topic string
-	ctx, name := ch.appCtx, ch.channel
-
-	if environment.GetInsprEnvironment() == "" {
-		topic = fmt.Sprintf("inspr-%s-%s", ctx, name)
-	} else {
-		topic = fmt.Sprintf(
-			"inspr-%s-%s-%s",
-			environment.GetInsprEnvironment(),
-			ctx,
-			name,
-		)
+func (ch kafkaTopic) encode(message interface{}) ([]byte, error) {
+	schema, errGetSchema := ch.getSchema()
+	if errGetSchema != nil {
+		return nil, errGetSchema
 	}
 
-	return topic
+	codec, errCreateCodec := getCodec(schema)
+	if errCreateCodec != nil {
+		return nil, errCreateCodec
+	}
+
+	messageEncoded, errParseAvro := codec.BinaryFromNative(nil, message)
+	if errParseAvro != nil {
+		return nil, errors.New("[ENCODE] " + errParseAvro.Error())
+	}
+
+	return messageEncoded, nil
+}
+
+func (ch kafkaTopic) readMessage(value []byte) (models.BrokerData, error) {
+
+	// Decoding Message
+	message, errDecode := ch.decode(value)
+	if errDecode != nil {
+		return models.BrokerData{}, errDecode
+	}
+
+	channelName := ch
+
+	return models.BrokerData{Message: models.Message{Data: message}, Channel: string(channelName)}, nil
 }
