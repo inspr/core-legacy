@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"go.uber.org/zap"
@@ -15,6 +16,7 @@ import (
 type ChannelOperator struct {
 	k      *kafka.AdminClient
 	logger *zap.Logger
+	mem    memory.Manager
 }
 
 type kafkaEnv struct {
@@ -28,7 +30,7 @@ func getEnv() (env kafkaEnv) {
 }
 
 // NewOperator returns an initialized operator from the environment variables
-func NewOperator() (*ChannelOperator, error) {
+func NewOperator(mem memory.Manager) (*ChannelOperator, error) {
 	logConf := zap.NewDevelopmentConfig()
 	logger, _ := logConf.Build(zap.Fields(zap.String("section", "kafka-operator")))
 
@@ -55,12 +57,15 @@ func NewOperator() (*ChannelOperator, error) {
 	return &ChannelOperator{
 		k:      adminClient,
 		logger: logger,
+		mem:    mem,
 	}, err
 }
 
 // Get gets a channel from kafka
 func (c *ChannelOperator) Get(ctx context.Context, context string, name string) (*meta.Channel, error) {
-	topic := toTopic(context, name)
+	channel, _ := c.mem.Channels().Get(context, name)
+
+	topic := toTopic(channel)
 	meta, err := c.k.GetMetadata(&topic, false, 1000)
 	if err != nil {
 		log.Println(err)
@@ -92,9 +97,10 @@ func (c *ChannelOperator) Create(ctx context.Context, context string, channel *m
 		log.Println(err)
 		return err
 	}
+
 	configs := []kafka.TopicSpecification{
 		{
-			Topic:             toTopic(channel.Meta.Name, context),
+			Topic:             toTopic(channel),
 			NumPartitions:     config.numberOfPartitions,
 			ReplicationFactor: config.replicationFactor,
 		},
@@ -115,7 +121,8 @@ func (c *ChannelOperator) Update(ctx context.Context, context string, channel *m
 
 // Delete deletes a channel from kafka
 func (c *ChannelOperator) Delete(ctx context.Context, context string, name string) error {
-	topics := []string{toTopic(context, name)}
+	channel, _ := c.mem.Root().Channels().Get(context, name)
+	topics := []string{toTopic(channel)}
 	_, err := c.k.DeleteTopics(ctx, topics)
 	if err != nil {
 		log.Println(err)
