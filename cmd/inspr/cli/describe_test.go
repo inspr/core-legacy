@@ -30,7 +30,7 @@ func getMockApp() *meta.App {
 			Reference:   "appParent",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -41,7 +41,7 @@ func getMockApp() *meta.App {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -52,7 +52,7 @@ func getMockApp() *meta.App {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -61,7 +61,7 @@ func getMockApp() *meta.App {
 											Reference:   "app1.thenewapp",
 											Annotations: map[string]string{},
 											Parent:      "app1",
-											SHA256:      "",
+											UUID:        "",
 										},
 									},
 									Apps:         map[string]*meta.App{},
@@ -110,7 +110,7 @@ func getMockApp() *meta.App {
 						Reference:   "root.ct1",
 						Annotations: map[string]string{},
 						Parent:      "root",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},

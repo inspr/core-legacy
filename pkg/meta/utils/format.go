@@ -88,7 +88,7 @@ func populateMeta(metaTree gotree.Tree, meta *meta.Metadata) {
 	metaTree.Add("Name: " + meta.Name)
 	metaTree.Add("Parent: " + meta.Parent)
 	metaTree.Add("Reference: " + meta.Reference)
-	metaTree.Add("SHA256: " + meta.SHA256)
+	metaTree.Add("UUID: " + meta.UUID)
 	annotations := metaTree.Add("Annotations")
 	for noteName, note := range meta.Annotations {
 		annotations.Add(noteName + ": " + note)

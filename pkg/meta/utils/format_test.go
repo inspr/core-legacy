@@ -205,12 +205,12 @@ func Test_populateMeta(t *testing.T) {
 			"mock_key": "mock_value",
 		},
 		Parent: "mock_parent",
-		SHA256: "mock_SHA256",
+		UUID:   "mock_SHA256",
 	}
 	wantTree.Add("Name: " + metaArg.Name)
 	wantTree.Add("Parent: " + metaArg.Parent)
 	wantTree.Add("Reference: " + metaArg.Reference)
-	wantTree.Add("SHA256: " + metaArg.SHA256)
+	wantTree.Add("SHA256: " + metaArg.UUID)
 	annotations := wantTree.Add("Annotations")
 	for noteName, note := range metaArg.Annotations {
 		annotations.Add(noteName + ": " + note)
