@@ -22,7 +22,7 @@ func (tmm *MemoryManager) Alias() memory.AliasMemory {
 	}
 }
 
-// Get receives a context and a alias key. The context defines
+// Get receives a context and an alias key. The context defines
 // the path to a dApp. If this dApp has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
 func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error) {
@@ -44,8 +44,8 @@ func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error
 	return app.Spec.Aliases[aliasKey], nil
 }
 
-// CreateAlias receives a context that defines a path to the dApp in
-// which we want to add an alias in his parent
+// Create receives a context that defines a path to the dApp.
+// The new alias will be created inside this dApp's parent.
 func (amm *AliasMemoryManager) Create(context, targetBoundary string, alias *meta.Alias) error {
 	logger.Info("trying to create an Alias",
 		zap.Any("alias", alias),
@@ -93,8 +93,8 @@ func (amm *AliasMemoryManager) Create(context, targetBoundary string, alias *met
 
 }
 
-// UpdateAlias receives a context a alias key and a alias. The context
-// defines the path to the App that will have the Update. If the App has
+// Update receives a context a alias key and a alias. The context
+// defines the path to the dApp that contains the Alias. If the dApp has
 // a alias that has the given alias key passed as an argument,
 // that alias will be replaced by the new alias
 func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alias) error {
@@ -129,11 +129,10 @@ func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alia
 	return nil
 }
 
-// DeleteAlias receives a context and a alias key. The context
-// defines the path to the App that will have the Delete. If the App
-// has an alias that has the same key as the key passed
-// as an argument, that alias is removed from the list of App Aliases only
-// if the alias it's not being used
+// Delete receives a context and a alias key. The context
+// defines the path to the dApp that cointains the Alias to be deleted. If the dApp
+// has an alias that has the same key as the key passed as an argument, that alias
+// is removed from the dApp Aliases only if it's not being used
 func (amm *AliasMemoryManager) Delete(context, aliasKey string) error {
 	logger.Info("trying to delete an Alias",
 		zap.Any("alias", aliasKey),
@@ -180,6 +179,7 @@ type AliasRootGetter struct {
 // Get receives a context and a alias key. The context defines
 // the path to an App. If this App has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
+// This method is used to get the structure as it is in the cluster, before any modifications.
 func (amm *AliasRootGetter) Get(context, aliasKey string) (*meta.Alias, error) {
 	logger.Info("trying to get an Alias (Root Getter)",
 		zap.String("alias", aliasKey),

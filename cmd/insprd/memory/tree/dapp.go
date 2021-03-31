@@ -27,7 +27,7 @@ func (tmm *MemoryManager) Apps() memory.AppMemory {
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the dApp which name is equal to the last query element.
-// The tree app is returned if the query string is an empty string.
+// The root dApp is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	logger.Info("trying to get a dApp", zap.String("dApp", query))
@@ -202,7 +202,7 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	return nil, err
 }
 
-//ResolveBoundary recursive method that resolves connections for app boundaries
+//ResolveBoundary is the recursive method that resolves connections for dApp boundaries
 func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
 	logger.Debug("resolving dApp boundary",
 		zap.String("dApp", app.Meta.Name))

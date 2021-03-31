@@ -9,10 +9,8 @@ import (
 	"go.uber.org/zap"
 )
 
-/*
-ChannelMemoryManager implements the channel interface and
-provides methods for operating on Channels
-*/
+// ChannelMemoryManager implements the channel interface and
+// provides methods for operating on Channels
 type ChannelMemoryManager struct {
 	*MemoryManager
 }
@@ -24,11 +22,9 @@ func (tmm *MemoryManager) Channels() memory.ChannelMemory {
 	}
 }
 
-/*
-Get receives a context and a channel name. The context defines
-the path to an App. If this App has a pointer to a channel that has the
-same name as the name passed as an argument, the pointer to that channel is returned
-*/
+// Get receives a context and a channel name. The context defines
+// the path to an App. If this App has a pointer to a channel that has the
+// same name as the name passed as an argument, the pointer to that channel is returned
 func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Channel, error) {
 	logger.Info("trying to get a Channel",
 		zap.String("channel", chName),
@@ -50,10 +46,8 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 	return nil, newError
 }
 
-/*
-Create receives a context that defines a path to the App
-in which to add a pointer to the channel passed as an argument
-*/
+// Create receives a context that defines a path to the App
+// in which to add a pointer to the channel passed as an argument
 func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error {
 	logger.Info("trying to create a Channel",
 		zap.String("channel", ch.Meta.Name),
@@ -103,12 +97,10 @@ func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error 
 	return nil
 }
 
-/*
-Delete receives a context and a channel name. The context
-defines the path to the App that will have the Delete. If the App
-has a pointer to a channel that has the same name as the name passed
-as an argument, that pointer is removed from the list of App channels
-*/
+// Delete receives a context and a channel name. The context
+// defines the path to the App that will have the Delete. If the App
+// has a pointer to a channel that has the same name as the name passed
+// as an argument, that pointer is removed from the list of App channels
 func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 	logger.Info("trying to delete a Channel",
 		zap.String("channel", chName),
@@ -148,13 +140,10 @@ func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 	return nil
 }
 
-/*
-Update receives a context and a channel pointer. The context
-defines the path to the App that will have the Update. If the App has
-a channel pointer that has the same name as that passed as an argument,
-this pointer will be replaced by the new one
-*/
-
+// Update receives a context and a channel pointer. The context
+// defines the path to the App that will have the Update. If the App has
+// a channel pointer that has the same name as that passed as an argument,
+// this pointer will be replaced by the new one
 func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error {
 	logger.Info("trying to update a Channel",
 		zap.String("channel", ch.Meta.Name),

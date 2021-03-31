@@ -21,7 +21,7 @@ func (tmm *MemoryManager) ChannelTypes() memory.ChannelTypeMemory {
 	}
 }
 
-// CreateChannelType creates, if it doesn't already exist, a new ChannellType for a given app.
+// Create creates, if it doesn't already exist, a new Channel Type for a given app.
 // ct: ChannetType to be created.
 // context: Path to reference app (x.y.z...)
 func (ctm *ChannelTypeMemoryManager) Create(context string, ct *meta.ChannelType) error {
@@ -61,7 +61,7 @@ func (ctm *ChannelTypeMemoryManager) Create(context string, ct *meta.ChannelType
 	return nil
 }
 
-// Get returns, if it exists, a specific ChannellType from a given app.
+// Get returns, if it exists, a specific Channel Type from a given app.
 // ctName: Name of desired Channel Type.
 // context: Path to reference app (x.y.z...)
 func (ctm *ChannelTypeMemoryManager) Get(context string, ctName string) (*meta.ChannelType, error) {
@@ -86,7 +86,7 @@ func (ctm *ChannelTypeMemoryManager) Get(context string, ctName string) (*meta.C
 	return nil, err
 }
 
-// DeleteChannelType deletes, if it exists, a ChannellType from a given app.
+// Delete deletes, if it exists, a Channel Type from a given app.
 // ctName: Name of desired Channel Type.
 // context: Path to reference app (x.y.z...)
 func (ctm *ChannelTypeMemoryManager) Delete(context string, ctName string) error {
@@ -123,7 +123,7 @@ func (ctm *ChannelTypeMemoryManager) Delete(context string, ctName string) error
 	return nil
 }
 
-// UpdateChannelType updates, if it exists, a ChannellType of a given app.
+// Update updates, if it exists, a Channel Type of a given app.
 // ct: Updated ChannetType to be updated on app
 // context: Path to reference app (x.y.z...)
 func (ctm *ChannelTypeMemoryManager) Update(context string, ct *meta.ChannelType) error {
@@ -159,9 +159,9 @@ type ChannelTypeRootGetter struct {
 }
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
-// memory tree until it finds the dChannelType which name is equal to the last query element.
-// The tree ChannelType is returned if the query string is an empty string.
-// If the specified dChannelType is found, it is returned. Otherwise, returns an error.
+// memory tree until it finds the Channel Type which name is equal to the last query element.
+// If the specified Channel Type is found, it is returned. Otherwise, returns an error.
+// This method is used to get the structure as it is in the cluster, before any modifications.
 func (amm *ChannelTypeRootGetter) Get(context string, ctName string) (*meta.ChannelType, error) {
 	logger.Info("trying to get a Channel Type (Root Getter)",
 		zap.String("channelType", ctName),
