@@ -100,9 +100,9 @@ func Test_builder_SetPassword(t *testing.T) {
 			},
 			want: &builder{
 				usr: User{
-					Pwd:    "pass",
-					Scopes: make([]string, 0),
-					Role:   0,
+					Password: "pass",
+					Scopes:   make([]string, 0),
+					Role:     0,
 				},
 			},
 		},
