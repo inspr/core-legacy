@@ -1,13 +1,18 @@
 package auth
 
+const ( // User roles
+	standard = 0
+	admin    = 1
+)
+
 //User is an object containing all info about an Inspr user
 type User struct {
-	Name   string   `json:"name"`
-	Pwd    string   `json:"pwd"`
-	Role   int      `json:"role"`
-	Scopes []string `json:"scopes"`
-	Token  string   `json:"token"`
-	UUID   string   `json:"uuid"`
+	Name     string   `json:"name"`
+	Password string   `json:"password"`
+	Role     int      `json:"role"`
+	Scopes   []string `json:"scopes"`
+	Token    string   `json:"token"`
+	UID      string   `json:"uid"`
 }
 
 //Builder interface for building an User
@@ -28,7 +33,7 @@ func NewUser() Builder {
 	return &builder{
 		usr: User{
 			Scopes: make([]string, 0),
-			Role:   0,
+			Role:   standard,
 		},
 	}
 }
@@ -41,7 +46,7 @@ func (bd *builder) SetName(name string) Builder {
 
 //SetPassword configures the user's password
 func (bd *builder) SetPassword(pwd string) Builder {
-	bd.usr.Pwd = pwd
+	bd.usr.Password = pwd
 	return bd
 }
 
@@ -53,6 +58,6 @@ func (bd *builder) SetScope(scope ...string) Builder {
 
 //AsAdmin configures the user as an Admin
 func (bd *builder) AsAdmin() Builder {
-	bd.usr.Role = 1
+	bd.usr.Role = admin
 	return bd
 }
