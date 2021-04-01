@@ -24,9 +24,12 @@ insprdRepository: gcr.io/red-inspr/insprd
 
 service:
   type: ClusterIP
+  authName: auth-svc
   insprdName: insprd-svc
   insprdPort: 80
   insprdTargetport: 8080
+  authPort: 81
+  authTargetPort: 8081
 
 ingress:
   enabled: false
