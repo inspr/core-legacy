@@ -59,7 +59,7 @@ func setTree(tmm memory.Manager) {
 //InitTransaction copies and reserves the current tree structure so that changes can be reversed
 func (mm *MemoryManager) InitTransaction() {
 	mm.Lock()
-	mm.root = utils.DeepCopy(mm.tree)
+	utils.DeepCopy(mm.tree, &mm.root)
 }
 
 //Commit applies changes from a transaction in to the tree structure
