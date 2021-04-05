@@ -147,7 +147,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 // toDeployment - creates the kubernetes deployment name from the app
 func toDeploymentName(app *meta.App) string {
 
-	return app.Meta.UUID
+	return "node-" + app.Meta.UUID
 }
 
 // toAppID - creates the kubernetes deployment name from the app

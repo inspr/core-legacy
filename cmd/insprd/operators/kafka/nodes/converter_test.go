@@ -191,7 +191,7 @@ func Test_toDeploymentName(t *testing.T) {
 			args: args{
 				app: &testApp,
 			},
-			want: "APP-UUID",
+			want: "node-APP-UUID",
 		},
 		{
 			name: "complex parent",
@@ -202,7 +202,7 @@ func Test_toDeploymentName(t *testing.T) {
 					UUID:   "APP-UUID",
 				},
 			}},
-			want: "APP-UUID",
+			want: "node-APP-UUID",
 		},
 	}
 	for _, tt := range tests {
