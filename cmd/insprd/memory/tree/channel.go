@@ -51,14 +51,10 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 }
 
 /*
-CreateChannel receives a context that defines a path to the App
+Create receives a context that defines a path to the App
 in which to add a pointer to the channel passed as an argument
 */
-func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel) error {
-	logger.Info("trying to create a Channel",
-		zap.String("channel", ch.Meta.Name),
-		zap.String("context", context))
-
+func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error {
 	nameErr := metautils.StructureNameIsValid(ch.Meta.Name)
 	if nameErr != nil {
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
@@ -107,16 +103,12 @@ func (chh *ChannelMemoryManager) CreateChannel(context string, ch *meta.Channel)
 }
 
 /*
-DeleteChannel receives a context and a channel name. The context
+Delete receives a context and a channel name. The context
 defines the path to the App that will have the Delete. If the App
 has a pointer to a channel that has the same name as the name passed
 as an argument, that pointer is removed from the list of App channels
 */
-func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) error {
-	logger.Info("trying to delete a Channel",
-		zap.String("channel", chName),
-		zap.String("context", context))
-
+func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 	channel, err := chh.Get(context, chName)
 
 	if err != nil {
@@ -152,16 +144,12 @@ func (chh *ChannelMemoryManager) DeleteChannel(context string, chName string) er
 }
 
 /*
-UpdateChannel receives a context and a channel pointer. The context
+Update receives a context and a channel pointer. The context
 defines the path to the App that will have the Update. If the App has
 a channel pointer that has the same name as that passed as an argument,
 this pointer will be replaced by the new one
 */
-func (chh *ChannelMemoryManager) UpdateChannel(context string, ch *meta.Channel) error {
-	logger.Info("trying to update a Channel",
-		zap.String("channel", ch.Meta.Name),
-		zap.String("context", context))
-
+func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error {
 	oldCh, err := chh.Get(context, ch.Meta.Name)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()

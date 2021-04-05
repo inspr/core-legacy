@@ -41,9 +41,11 @@ func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error
 	return app.Spec.Aliases[aliasKey], nil
 }
 
-// CreateAlias receives a query that defines a path to the App in
-// which we want to add an alias in his parent
-func (amm *AliasMemoryManager) CreateAlias(query, targetBoundary string, alias *meta.Alias) error {
+/*
+Create receives a query that defines a path to the App in
+which we want to add an alias in his parent
+*/
+func (amm *AliasMemoryManager) Create(query, targetBoundary string, alias *meta.Alias) error {
 	// get app from query
 	app, err := GetTreeMemory().Apps().Get(query)
 	if err != nil {
@@ -106,11 +108,13 @@ func (amm *AliasRootGetter) Get(context, aliasKey string) (*meta.Alias, error) {
 	return app.Spec.Aliases[aliasKey], nil
 }
 
-// UpdateAlias receives a context a alias key and a alias. The context
-// defines the path to the App that will have the Update. If the App has
-// a alias that has the given alias key passed as an argument,
-// that alias will be replaced by the new alias
-func (amm *AliasMemoryManager) UpdateAlias(context, aliasKey string, alias *meta.Alias) error {
+/*
+Update receives a context a alias key and a alias. The context
+defines the path to the App that will have the Update. If the App has
+a alias that has the given alias key passed as an argument,
+that alias will be replaced by the new alias
+*/
+func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alias) error {
 	// get app from context
 	app, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
@@ -134,12 +138,14 @@ func (amm *AliasMemoryManager) UpdateAlias(context, aliasKey string, alias *meta
 	return nil
 }
 
-// DeleteAlias receives a context and a alias key. The context
-// defines the path to the App that will have the Delete. If the App
-// has an alias that has the same key as the key passed
-// as an argument, that alias is removed from the list of App Aliases only
-// if the alias it's not being used
-func (amm *AliasMemoryManager) DeleteAlias(context, aliasKey string) error {
+/*
+Delete receives a context and a alias key. The context
+defines the path to the App that will have the Delete. If the App
+has an alias that has the same key as the key passed
+as an argument, that alias is removed from the list of App Aliases only
+if the alias it's not being used
+*/
+func (amm *AliasMemoryManager) Delete(context, aliasKey string) error {
 	// get app from context
 	app, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {

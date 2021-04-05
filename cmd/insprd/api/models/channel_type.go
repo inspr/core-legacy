@@ -6,7 +6,6 @@ import "gitlab.inspr.dev/inspr/core/pkg/meta"
 type ChannelTypeDI struct {
 	ChannelType meta.ChannelType `json:"channeltype"`
 	Ctx         string           `json:"ctx"`
-	Valid       bool             `json:"valid"`
 	DryRun      bool             `json:"dry"`
 }
 
@@ -14,6 +13,5 @@ type ChannelTypeDI struct {
 type ChannelTypeQueryDI struct {
 	Ctx    string `json:"ctx"`
 	CtName string `json:"ctname"`
-	Valid  bool   `json:"valid"`
 	DryRun bool   `json:"dry"`
 }

@@ -366,7 +366,7 @@ func Test_getParentApp(t *testing.T) {
 	}
 }
 
-func Test_checkAndUpdateChannels(t *testing.T) {
+func Test_checkAndUpdates(t *testing.T) {
 	type args struct {
 		app *meta.App
 	}
@@ -671,7 +671,7 @@ func Test_checkAndUpdateChannels(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := checkAndUpdateChannels(tt.args.app)
+			got, got1 := checkAndUpdates(tt.args.app)
 			if got != tt.want {
 				t.Errorf("checkChannels() got = %v, want %v", got, tt.want)
 			}

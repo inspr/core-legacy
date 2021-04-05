@@ -143,7 +143,7 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 	}
 }
 
-func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
+func TestChannelTypeMemoryManager_Create(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -294,9 +294,9 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			ctm := GetTreeMemory().ChannelTypes()
-			err := ctm.CreateChannelType(tt.args.context, tt.args.ct)
+			err := ctm.Create(tt.args.context, tt.args.ct)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.CreateChannelType() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ChannelTypeMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {
@@ -314,7 +314,7 @@ func TestChannelTypeMemoryManager_CreateChannelType(t *testing.T) {
 	}
 }
 
-func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
+func TestChannelTypeMemoryManager_Delete(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -420,8 +420,8 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			ctm := GetTreeMemory().ChannelTypes()
-			if err := ctm.DeleteChannelType(tt.args.context, tt.args.ctName); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.DeleteChannelType() error = %v, wantErr %v", err, tt.wantErr)
+			if err := ctm.Delete(tt.args.context, tt.args.ctName); (err != nil) != tt.wantErr {
+				t.Errorf("ChannelTypeMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			got, _ := ctm.Get(tt.args.context, tt.args.ctName)
@@ -432,7 +432,7 @@ func TestChannelTypeMemoryManager_DeleteChannelType(t *testing.T) {
 	}
 }
 
-func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
+func TestChannelTypeMemoryManager_Update(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -548,8 +548,8 @@ func TestChannelTypeMemoryManager_UpdateChannelType(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			ctm := GetTreeMemory().ChannelTypes()
-			if err := ctm.UpdateChannelType(tt.args.context, tt.args.ct); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.UpdateChannelType() error = %v, wantErr %v", err, tt.wantErr)
+			if err := ctm.Update(tt.args.context, tt.args.ct); (err != nil) != tt.wantErr {
+				t.Errorf("ChannelTypeMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {

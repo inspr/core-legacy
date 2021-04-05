@@ -13,9 +13,9 @@ import (
 type ChannelMemory interface {
 	TransactionInterface
 	ChannelGetInterface
-	CreateChannel(context string, ch *meta.Channel) error
-	DeleteChannel(context string, chName string) error
-	UpdateChannel(context string, ch *meta.Channel) error
+	Create(context string, ch *meta.Channel) error
+	Delete(context string, chName string) error
+	Update(context string, ch *meta.Channel) error
 }
 
 // ChannelGetInterface is an interface to get channels from memory
@@ -29,9 +29,9 @@ type ChannelGetInterface interface {
 type AppMemory interface {
 	TransactionInterface
 	AppGetInterface
-	CreateApp(context string, app *meta.App) error
-	DeleteApp(query string) error
-	UpdateApp(query string, app *meta.App) error
+	Create(context string, app *meta.App) error
+	Delete(query string) error
+	Update(query string, app *meta.App) error
 	ResolveBoundary(app *meta.App) (map[string]string, error)
 }
 
@@ -46,9 +46,9 @@ type AppGetInterface interface {
 type ChannelTypeMemory interface {
 	TransactionInterface
 	ChannelTypeGetInterface
-	CreateChannelType(context string, ct *meta.ChannelType) error
-	DeleteChannelType(context string, ctName string) error
-	UpdateChannelType(context string, ct *meta.ChannelType) error
+	Create(context string, ct *meta.ChannelType) error
+	Delete(context string, ctName string) error
+	Update(context string, ct *meta.ChannelType) error
 }
 
 // ChannelTypeGetInterface is an interface to get channel types from memory
@@ -60,9 +60,9 @@ type ChannelTypeGetInterface interface {
 type AliasMemory interface {
 	TransactionInterface
 	AliasGetInterface
-	CreateAlias(query string, targetBoundary string, alias *meta.Alias) error
-	UpdateAlias(context string, aliasKey string, alias *meta.Alias) error
-	DeleteAlias(context string, aliasKey string) error
+	Create(query string, targetBoundary string, alias *meta.Alias) error
+	Update(context string, aliasKey string, alias *meta.Alias) error
+	Delete(context string, aliasKey string) error
 }
 
 // AliasGetInterface is an interface to get alias types from memory

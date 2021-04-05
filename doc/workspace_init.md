@@ -36,10 +36,16 @@ pingpong_demo
 ## Creating the applications
 
 In this part, we will implement Ping and Pong using Golang. Also, we will create their respective Dockerfiles, build the Docker Images and push them into the cluster.  
+To start off, inside of "/pingpong_demo", run the following command:
+```go
+go mod init pingpong
+```
+
+If you're not familiar with `go mod`, you can learn more about it [here](https://golang.org/ref/mod#go-mod-init)
 
 ### Ping and Pong implementation  
 
-From within "pingpong_demo", create a file called *ping.go* inside folder "ping":  
+From within "pingpong_demo", create a file called *ping.go* inside the folder "ping":  
 ```zsh
 touch ping/ping.go
 ```  
@@ -49,7 +55,74 @@ In *ping.go*, we will define a `main` function that does the following:
 1) Creates a new dApp Client, which is used to write and read messages in Channels through the Sidecar (check [dApp Architecture Overview](dapp-overview.md) for more details).
 2) Initiates an endless `for loop` in which the message "Ping!" is written in the Channel *pingoutput*, then the application proceeds to read a message from Channel *pinginput*. If there are any messages, they are read and displayed in the terminal.
 
-*ping.go* should look like this:
+To begin the implementation we first must declare a new structure type, here called `expectedDataType`, which contains a field called "Channel" that is a string, and another field called "Message" that is a struct:
+```go
+type expectedDataType struct {
+	Message struct {
+		Data string `json:"data"`
+	} `json:"message"`
+	Channel string `json:"channel"`
+}
+```
+
+**In Inspr, the user must define which type of message he expects to read from a Channel, so that unexpected messages of different types don't cause unexpected errors.**  
+So everytime one implements an application that reads messages, a structure such as the following should be created and passed as an argument for the `ReadMessage` method:
+```go
+type YOUR_STRUCTURE_NAME struct {
+	Message struct {
+		Data DESIRED_DATA_TYPE `json:"data"`
+	} `json:"message"`
+	OPTIONAL_FIELD_1 string `json:"OPTIONAL_FIELD_1_TAG"`
+	OPTIONAL_FIELD_2 int `json:"OPTIONAL_FIELD_2_TAG"`
+	OPTIONAL_FIELD_3 struct `json:"OPTIONAL_FIELD_3_TAG"`
+	...
+}
+```
+As seen above, the only mandatory fields inside of your custom structure are `Message` and `Data`, and their respective [JSON tags](https://medium.com/golangspec/tags-in-golang-3e5db0b8ef3e). `Data`'s field type is chosen by you, and can even be a new structure!  
+
+We then can proceed to create the `main` function itself. Before starting the `for loop` (referenced previously) a new dApp client must be instantiated to enable the Node-Sidecar communication:
+```go
+func main() {
+
+	client := dappclient.NewAppClient()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+}
+```
+
+Now the `for loop` must be created. Inside of it, the following steps must be implemented:  
+1) Define which message will be written by this application, which will be the string "Ping!":
+```go
+	sentMsg := models.Message{
+		Data: "Ping!",
+	}
+```  
+2) Send the message defined in step 1 to the Ping dApp's output Channel:
+```go
+	if err := client.WriteMessage(ctx, "pingoutput", sentMsg); err != nil {
+		fmt.Println(err)
+		continue
+	}
+```
+3) Use the structure `expectedDataType` created by us to read messages from Ping dApp's input Channel, and then print these messages:
+```go
+	var recMsg expectedDataType
+	err := client.ReadMessage(ctx, "pinginput", &recMsg)
+	if err != nil {
+		fmt.Println(err)
+		continue
+	}
+	fmt.Println("Read message: ")
+	fmt.Println(recMsg.Message.Data)
+```
+4) Send a commit to the Message Broker, which signs it that our application has finished processing the message (click [here](https://quarkus.io/blog/kafka-commit-strategies/) for more information about Commit in Kafka):  
+```go
+	if err := client.CommitMessage(ctx, "pinginput"); err != nil {
+		fmt.Println(err.Error())
+	}
+```
+
+When completed, your Ping implementation should look like this:
 ```go
 package main
 
@@ -100,24 +173,7 @@ func main() {
 }
 ```
 
-Notice that before the `main` function a new structure called `expectedDataType` is declared, which contains a field called "Channel" that is a string, and another field called "Message" as well.  
-**In Inspr, the user is encouraged to define which type of message he expects to read from a Channel, so that unexpected messages of different types don't cause unexpected errors.**  
-So everytime one implements an application that reads messages, a structure such as the following should be created and passed as an argument for the `ReadMessage` method:
-```go
-type YOUR_STRUCTURE_NAME struct {
-	Message struct {
-		Data DESIRED_DATA_TYPE `json:"data"`
-	} `json:"message"`
-	OPTIONAL_FIELD_1 string `json:"OPTIONAL_FIELD_1_TAG"`
-	OPTIONAL_FIELD_2 int `json:"OPTIONAL_FIELD_2_TAG"`
-	OPTIONAL_FIELD_3 struct `json:"OPTIONAL_FIELD_3_TAG"`
-	...
-}
-```
-As seen above, the only mandatory fields inside of your custom structure are `Message` and `Data`, and their respective [JSON tags](https://medium.com/golangspec/tags-in-golang-3e5db0b8ef3e). `Data`'s field type is chosen by you, and can even be a new structure!  
-
-
-Proceeding the tutorial, a similar folder/file structure and code must be done to implement Pong. So, from within "pingpong_demo", create *pong.go* in /pong folder:  
+A similar folder/file structure and code must be done to implement Pong. So, from within "pingpong_demo", create *pong.go* in /pong folder:  
 ```zsh
 touch pong/pong.go
 ```  
@@ -173,6 +229,11 @@ func main() {
 }
 ```
 
+To finish implementing the applications, we must assure that all dependencies are resolved. To do so, inside of "/pingpong_demo", run the following command:
+```go
+go mod tidy
+```
+
 ### Dockerfiles
 Now that we have Ping and Pong implemented and doing what they are supossed to do, we must create their Dockerfiles so a Docker Image for each of them can be generated, and make these images available in our cluster.  
 If you are not familiar with Docker, click on the following links for more information:
@@ -193,14 +254,15 @@ The Dockerfile structure will be created to do the following:
 
 Ping's Dockerfile should look like this:
 ```docker
-FROM golang:alpine
+FROM golang:alpine AS build
 WORKDIR /app
 COPY . .
-RUN go build examples/pingpong_demo/ping/ping.go
+RUN go build -o main ping/ping.go
 
 FROM alpine
 WORKDIR /app
-CMD ./ping
+COPY --from=build /app/main .
+CMD ./main
 ```
 
 Then, do the same steps for Pong:
@@ -210,14 +272,15 @@ touch pong/Dockerfile
 
 And Pong's Dockerfile content:
 ```docker
-FROM golang:alpine
+FROM golang:alpine AS build
 WORKDIR /app
 COPY . .
-RUN go build examples/pingpong_demo/pong/pong.go
+RUN go build -o main pong/pong.go
 
 FROM alpine
 WORKDIR /app
-CMD ./pong
+COPY --from=build /app/main .
+CMD ./main
 ```
 
 ### Docker Image deployment
@@ -230,9 +293,9 @@ cd ping
 
 In the next steps, it's important to have a [container registry](https://cloud.google.com/container-registry) up and running, so it's possible to store and use the images that will be built.
 
-Then we must build the Docker image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
+Then, from the "pingpong_demo" folder, we must build the Docker image by using the Dockerfile previously created. You can apply a tag to it by adding `:TAG_NAME`, if desired:
 ```zsh
-docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/ping:TAG_NAME
+docker build -f ping/Dockerfile -t CONTAINER_REGISTRY_REF/app/ping:TAG_NAME .
 ```
 
 Finally, we push the builded image into the cluster, where **CONTAINER_REGISTRY_REF is a reference to the container registry**:
@@ -246,9 +309,9 @@ cd ..
 cd pong
 ```
 
-Build the Docker image by using the Dockerfile previously created (and applying a tag to it, if desired):
+From "/pingpong_demo" folder, build the Docker image by using the Dockerfile previously created (and applying a tag to it, if desired):
 ```zsh
-docker build -f Dockerfile -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
+docker build -f pong/Dockerfile -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME .
 ```
 
 Push the builded image into the cluster:
@@ -264,9 +327,9 @@ touch Makefile
 The Makefile should contain the same Docker commands that you'd use to build and push Ping and Pong Docker images. The gain here is that instead of writing and executing four different commands, you just execute the Makefile. It should look like this:
 ```makefile
 build:
-	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f ping/Dockerfile
+	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f ping/Dockerfile .
 	docker push CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
-	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f pong/Dockerfile
+	docker build -t CONTAINER_REGISTRY_REF/app/pong:TAG_NAME -f pong/Dockerfile .
 	docker push CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
 ```
 
@@ -292,7 +355,7 @@ The first file to be created is *table.yaml*, which is the dApp that will contai
 touch table.yaml
 ```
 
-As it's described in Inspr YAMLs documentation, we must specify the kind, apiVersion and then the dApp information. This specific dApp will work as a link between Ping/Pong and the Channels which they'll communicate through. Basically, it will connect Ping and Poung's Boundaries to Channels defined in the root dApp through Aliases. You can read more about Aliases and this dApp structure [here](dapp-overview.md).  
+As it's described in Inspr YAMLs documentation, we must specify the kind, apiVersion and then the dApp information. This specific dApp will work as a link between Ping/Pong and the Channels which they'll communicate through. Basically, it will connect Ping and Pong's Boundaries to Channels defined in the root dApp through Aliases. You can read more about Aliases and this dApp structure [here](dapp_overview.md).  
 The YAML should be the following:  
 ```yaml
 kind: dapp

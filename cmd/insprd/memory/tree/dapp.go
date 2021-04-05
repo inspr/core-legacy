@@ -53,14 +53,10 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	return nil, err
 }
 
-// CreateApp instantiates a new dApp in the given context.
+// Create instantiates a new dApp in the given context.
 // If the dApp's information is invalid, returns an error. The same goes for an invalid context.
 // In case of context being an empty string, the dApp is created inside the root dApp.
-func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
-	logger.Info("trying to create a dApp",
-		zap.String("dApp", app.Meta.Name),
-		zap.String("in context", context))
-
+func (amm *AppMemoryManager) Create(context string, app *meta.App) error {
 	parentApp, err := amm.Get(context)
 	if err != nil {
 		return err
@@ -90,15 +86,13 @@ func (amm *AppMemoryManager) CreateApp(context string, app *meta.App) error {
 	return nil
 }
 
-// DeleteApp receives a query and searches for the specified dApp through the tree.
+// Delete receives a query and searches for the specified dApp through the tree.
 // If the dApp is found and it doesn't have any dApps insite of it, it's deleted.
 // If it has other dApps inside of itself, those dApps are deleted recursively.
 // Channels and Channel Types inside the dApps to be deleted are also deleted
 // dApp's reference inside of it's parent is also deleted.
 // In case of dApp not found an error is returned.
-func (amm *AppMemoryManager) DeleteApp(query string) error {
-	logger.Info("trying to delete a dApp", zap.String("dApp query", query))
-
+func (amm *AppMemoryManager) Delete(query string) error {
 	if query == "" {
 		return ierrors.NewError().BadRequest().Message("can't delete root dApp").Build()
 	}
@@ -124,15 +118,10 @@ func (amm *AppMemoryManager) DeleteApp(query string) error {
 	return nil
 }
 
-// UpdateApp receives a pointer to a dApp and the path to where this dApp is inside the memory tree.
+// Update receives a pointer to a dApp and the path to where this dApp is inside the memory tree.
 // If the current dApp is found and the new structure is valid, it's updated.
 // Otherwise, returns an error.
-func (amm *AppMemoryManager) UpdateApp(query string, app *meta.App) error {
-	logger.Info("trying to update a dApp",
-		zap.String("dApp", app.Meta.Name),
-		zap.String("in context", query))
-
-	logger.Debug("getting dApp to be updated")
+func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
 	currentApp, err := amm.Get(query)
 	if err != nil {
 		return err

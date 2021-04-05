@@ -143,7 +143,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 	}
 }
 
-func TestChannelMemoryManager_CreateChannel(t *testing.T) {
+func TestChannelMemoryManager_Create(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -336,9 +336,9 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			chh := GetTreeMemory().Channels()
-			err := chh.CreateChannel(tt.args.context, tt.args.ch)
+			err := chh.Create(tt.args.context, tt.args.ch)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelMemoryManager.CreateChannel() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ChannelMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {
@@ -362,7 +362,7 @@ func TestChannelMemoryManager_CreateChannel(t *testing.T) {
 	}
 }
 
-func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
+func TestChannelMemoryManager_Delete(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -467,8 +467,8 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			chh := GetTreeMemory().Channels()
-			if err := chh.DeleteChannel(tt.args.context, tt.args.chName); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelMemoryManager.DeleteChannel() error = %v, wantErr %v", err, tt.wantErr)
+			if err := chh.Delete(tt.args.context, tt.args.chName); (err != nil) != tt.wantErr {
+				t.Errorf("ChannelMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			got, _ := chh.Get(tt.args.context, tt.args.chName)
@@ -479,7 +479,7 @@ func TestChannelMemoryManager_DeleteChannel(t *testing.T) {
 	}
 }
 
-func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
+func TestChannelMemoryManager_Update(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -601,8 +601,8 @@ func TestChannelMemoryManager_UpdateChannel(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			chh := GetTreeMemory().Channels()
-			if err := chh.UpdateChannel(tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelMemoryManager.UpdateChannel() error = %v, wantErr %v", err, tt.wantErr)
+			if err := chh.Update(tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
+				t.Errorf("ChannelMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {

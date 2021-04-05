@@ -279,7 +279,7 @@ func Test_baseEnvironment(t *testing.T) {
 		},
 	}
 	mem.InitTransaction()
-	mem.Apps().CreateApp("", &meta.App{
+	mem.Apps().Create("", &meta.App{
 		Meta: meta.Metadata{
 			Name: "parent",
 		},

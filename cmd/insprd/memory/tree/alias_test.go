@@ -42,7 +42,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 	}
 }
 
-func TestAliasMemoryManager_CreateAlias(t *testing.T) {
+func TestAliasMemoryManager_Create(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -141,8 +141,8 @@ func TestAliasMemoryManager_CreateAlias(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			amm := GetTreeMemory().Alias()
-			if err := amm.CreateAlias(tt.args.query, tt.args.targetBoundary, tt.args.alias); (err != nil) != tt.wantErr {
-				t.Errorf("AliasMemoryManager.CreateAlias() error = %v, wantErr %v", err, tt.wantErr)
+			if err := amm.Create(tt.args.query, tt.args.targetBoundary, tt.args.alias); (err != nil) != tt.wantErr {
+				t.Errorf("AliasMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -230,7 +230,7 @@ func TestAliasMemoryManager_Get(t *testing.T) {
 	}
 }
 
-func TestAliasMemoryManager_UpdateAlias(t *testing.T) {
+func TestAliasMemoryManager_Update(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -316,14 +316,14 @@ func TestAliasMemoryManager_UpdateAlias(t *testing.T) {
 			})
 			amm := GetTreeMemory().Alias()
 
-			if err := amm.UpdateAlias(tt.args.context, tt.args.aliasKey, tt.args.alias); (err != nil) != tt.wantErr {
-				t.Errorf("AliasMemoryManager.UpdateAlias() error = %v, wantErr %v", err, tt.wantErr)
+			if err := amm.Update(tt.args.context, tt.args.aliasKey, tt.args.alias); (err != nil) != tt.wantErr {
+				t.Errorf("AliasMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestAliasMemoryManager_DeleteAlias(t *testing.T) {
+func TestAliasMemoryManager_Delete(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -400,8 +400,8 @@ func TestAliasMemoryManager_DeleteAlias(t *testing.T) {
 			})
 
 			amm := GetTreeMemory().Alias()
-			if err := amm.DeleteAlias(tt.args.context, tt.args.aliasKey); (err != nil) != tt.wantErr {
-				t.Errorf("AliasMemoryManager.DeleteAlias() error = %v, wantErr %v", err, tt.wantErr)
+			if err := amm.Delete(tt.args.context, tt.args.aliasKey); (err != nil) != tt.wantErr {
+				t.Errorf("AliasMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
