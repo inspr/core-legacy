@@ -12,6 +12,10 @@ build:
     context: .
     docker:
       dockerfile: cmd/sidecars/kafka/Dockerfile
+  - image: gcr.io/red-inspr/authsvc
+    context: .
+    docker:
+      dockerfile: cmd/insprd/auth/Dockerfile
 deploy:
   helm:
     releases:
@@ -19,4 +23,5 @@ deploy:
       artifactOverrides:
         insprdRepository: gcr.io/red-inspr/insprd
         kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
+        authRepository: gcr.io/red-inspr/authsvc
       chartPath: build/helm

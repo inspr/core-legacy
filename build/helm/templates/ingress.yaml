@@ -27,5 +27,5 @@ spec:
           servicePort: {{ .Values.service.insprdPort }}
       - path: /auth
         backend:
-          serviceName: {{ .Values.service.authName }}
-          servicePort: {{ .Values.service.authPort }}
+          serviceName: {{ .Values.service.insprdName }}
+          servicePort: {{ .Values.service.insprdPort }}
