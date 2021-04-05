@@ -6,7 +6,6 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/kafka/nodes"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
@@ -78,7 +77,7 @@ func main() {
 		app,
 	)
 	if err != nil {
-		log.Fatalf("%#v", err.(*ierrors.InsprError).Err.Error())
+		log.Fatalf("%#v", err.Error())
 	}
 
 }
