@@ -1,43 +1,11 @@
 package utils
 
 import (
-	"encoding/json"
 	"reflect"
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
-
-func TestDCopy(t *testing.T) {
-	type args struct {
-		root *meta.App
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *meta.App
-		wantErr bool
-	}{
-		{
-			name: "Deep copy test",
-			args: args{
-				root: getMockedTree(),
-			},
-			want:    getMockedTree(),
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := DeepCopy(tt.args.root)
-			jsgot, _ := json.MarshalIndent(*got, "", "	")
-			jswant, _ := json.MarshalIndent(*tt.want, "", "	")
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("DeepCopy() = %v, want %v", string(jsgot), string(jswant))
-			}
-		})
-	}
-}
 
 func getMockedTree() *meta.App {
 	root := meta.App{
@@ -71,4 +39,89 @@ func getMockedTree() *meta.App {
 		},
 	}
 	return &root
+}
+
+func TestDeepCopy(t *testing.T) {
+
+	var metaApp *meta.App
+	var stringArr []string
+	var integer int
+
+	type args struct {
+		orig interface{}
+		dest interface{}
+	}
+	tests := []struct {
+		name          string
+		args          args
+		wantErr       bool
+		checkFunction func(t *testing.T)
+	}{
+		{
+			name: "Deep Copy: meta.App",
+			args: args{
+				orig: getMockedTree(),
+				dest: &metaApp,
+			},
+			wantErr: false,
+			checkFunction: func(t *testing.T) {
+				if !reflect.DeepEqual(getMockedTree(), metaApp) {
+					t.Errorf("DeepCopy() got = %v, wantErr %v", metaApp, getMockedTree())
+				}
+			},
+		},
+		{
+			name: "Deep Copy: string array",
+			args: args{
+				orig: []string{"A", "B", "C"},
+				dest: &stringArr,
+			},
+			wantErr: false,
+			checkFunction: func(t *testing.T) {
+				if !reflect.DeepEqual([]string{"A", "B", "C"}, stringArr) {
+					t.Errorf("DeepCopy() got = %v, wantErr %v", stringArr, []string{"A", "B", "C"})
+				}
+			},
+		},
+		{
+			name: "Deep Copy: integer",
+			args: args{
+				orig: 11,
+				dest: &integer,
+			},
+			wantErr: false,
+			checkFunction: func(t *testing.T) {
+				if !reflect.DeepEqual(11, integer) {
+					t.Errorf("DeepCopy() got = %v, wantErr %v", integer, 11)
+				}
+			},
+		},
+		{
+			name: "Types dont match - it should return an error",
+			args: args{
+				orig: 11,
+				dest: &metaApp,
+			},
+			wantErr: true,
+		},
+		{
+			name: "dest its not a pointer - it should return an error",
+			args: args{
+				orig: 11,
+				dest: integer,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := DeepCopy(tt.args.orig, tt.args.dest); (err != nil) != tt.wantErr {
+				t.Errorf("DeepCopy() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if tt.checkFunction != nil {
+				tt.checkFunction(t)
+			}
+		})
+	}
 }
