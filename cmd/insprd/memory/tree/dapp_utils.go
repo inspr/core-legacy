@@ -80,8 +80,8 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 		}
 		for ctName, ct := range app.Spec.ChannelTypes {
 			if oldApp.Spec.ChannelTypes != nil {
-				if oldCh, ok := oldApp.Spec.ChannelTypes[ctName]; ok {
-					ct.Meta.UUID = oldCh.Meta.UUID
+				if oldCt, ok := oldApp.Spec.ChannelTypes[ctName]; ok {
+					ct.Meta.UUID = oldCt.Meta.UUID
 				} else {
 					ct.Meta = metautils.InjectUUID(ct.Meta)
 				}
@@ -89,8 +89,8 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 		}
 		for alName, al := range app.Spec.Aliases {
 			if oldApp.Spec.Aliases != nil {
-				if oldCh, ok := oldApp.Spec.Aliases[alName]; ok {
-					al.Meta.UUID = oldCh.Meta.UUID
+				if oldAl, ok := oldApp.Spec.Aliases[alName]; ok {
+					al.Meta.UUID = oldAl.Meta.UUID
 				} else {
 					al.Meta = metautils.InjectUUID(al.Meta)
 				}

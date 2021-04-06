@@ -1,4 +1,4 @@
-package tree
+package utils
 
 import (
 	"regexp"
@@ -15,17 +15,7 @@ func CompareWithoutUUID(first, second interface{}) bool {
 		b.UUID = ""
 		return cmp.Equal(a, b)
 	})
-	return cmp.Equal(first, second, opt, cmp.AllowUnexported(MemoryManager{}))
-}
-
-// Equals tests if a memory manager is equal to another
-func (m *MemoryManager) Equals(other *MemoryManager) bool {
-	return CompareWithUUID(m.root, other.root) && CompareWithUUID(m.tree, other.tree)
-}
-
-// Diff returns the differences between two memory managers
-func (m *MemoryManager) Diff(other *MemoryManager) string {
-	return cmp.Diff(m.root, other.root, cmp.AllowUnexported(MemoryManager{})) + "\n" + cmp.Diff(m.tree, other.tree, cmp.AllowUnexported(MemoryManager{}))
+	return cmp.Equal(first, second, opt)
 }
 
 // CompareWithUUID compares two components with their UUIDs
@@ -41,13 +31,13 @@ func ValidateUUID(uuid string) bool {
 }
 
 // recursiveValidateUUIDs validates UUIDs on a structure recursively
-func recursiveValidateUUIDS(name string, app *meta.App, t *testing.T) {
+func RecursiveValidateUUIDS(name string, app *meta.App, t *testing.T) {
 	if !ValidateUUID(app.Meta.UUID) {
 		t.Errorf("%s invalid UUID on %s, uuid=%v", name, app.Meta.Name, app.Meta.UUID)
 	}
 	for _, a := range app.Spec.Apps {
 
-		recursiveValidateUUIDS(name, a, t)
+		RecursiveValidateUUIDS(name, a, t)
 	}
 	for _, c := range app.Spec.Channels {
 		if !ValidateUUID(c.Meta.UUID) {

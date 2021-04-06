@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
 
@@ -359,7 +360,7 @@ func Test_getParentApp(t *testing.T) {
 				t.Errorf("getParentApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !CompareWithoutUUID(got, tt.want) {
+			if !metautils.CompareWithoutUUID(got, tt.want) {
 				t.Errorf("getParentApp() = %v, want %v", got, tt.want)
 			}
 		})

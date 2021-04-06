@@ -7,6 +7,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
 func TestMemoryManager_ChannelTypes(t *testing.T) {
@@ -302,11 +303,11 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 			if tt.want != nil {
 				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
 				if !tt.wantErr {
-					if !ValidateUUID(got.Meta.UUID) {
+					if !metautils.ValidateUUID(got.Meta.UUID) {
 						t.Errorf("ChannelTypeMemoryManager.Create() invalid UUID, uuid=%v", got.Meta.UUID)
 					}
 				}
-				if (err != nil) || !CompareWithoutUUID(got, tt.want) {
+				if (err != nil) || !metautils.CompareWithoutUUID(got, tt.want) {
 					t.Errorf("ChannelTypeMemoryManager.Create() = %v, want %v", got, tt.want)
 				}
 			}
@@ -554,7 +555,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 			}
 			if tt.want != nil {
 				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
-				if (err != nil) || !CompareWithUUID(got, tt.want) {
+				if (err != nil) || !metautils.CompareWithUUID(got, tt.want) {
 					t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
