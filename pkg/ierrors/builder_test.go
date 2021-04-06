@@ -10,7 +10,12 @@ func TestNewError(t *testing.T) {
 		name string
 		want *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should return a empty Inspr Err Build",
+			want: &ErrBuilder{
+				err: &InsprError{},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -26,8 +31,7 @@ func TestErrBuilder_Message(t *testing.T) {
 		err *InsprError
 	}
 	type args struct {
-		format string
-		values []interface{}
+		msg string
 	}
 	tests := []struct {
 		name   string
@@ -35,14 +39,28 @@ func TestErrBuilder_Message(t *testing.T) {
 		args   args
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add a message to the new Inspr Error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			args: args{
+				msg: "A brand new error message",
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Message: "A brand new error message",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &ErrBuilder{
 				err: tt.fields.err,
 			}
-			if got := b.Message(tt.args.format, tt.args.values...); !reflect.DeepEqual(got, tt.want) {
+			got := b.Message(tt.args.msg)
+			if !reflect.DeepEqual(got.Build().Message, tt.want.Build().Message) {
 				t.Errorf("ErrBuilder.Message() = %v, want %v", got, tt.want)
 			}
 		})
@@ -62,14 +80,33 @@ func TestErrBuilder_InnerError(t *testing.T) {
 		args   args
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add a inner error to the new Inspr Error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			args: args{
+				err: NewError().AlreadyExists().Message("Hello").Build(),
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Err: &InsprError{
+						Code:    AlreadyExists,
+						Message: "Hello",
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &ErrBuilder{
 				err: tt.fields.err,
 			}
-			if got := b.InnerError(tt.args.err); !reflect.DeepEqual(got, tt.want) {
+
+			got := b.InnerError(tt.args.err).Build().Err.Error()
+			want := tt.want.Build().Err.Error()
+			if got != want {
 				t.Errorf("ErrBuilder.InnerError() = %v, want %v", got, tt.want)
 			}
 		})
@@ -85,7 +122,19 @@ func TestErrBuilder_Build(t *testing.T) {
 		fields fields
 		want   *InsprError
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should return the created error",
+			fields: fields{
+				err: &InsprError{
+					Code:    NotFound,
+					Message: "A brand new error message",
+				},
+			},
+			want: &InsprError{
+				Code:    NotFound,
+				Message: "A brand new error message",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -94,72 +143,6 @@ func TestErrBuilder_Build(t *testing.T) {
 			}
 			if got := b.Build(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ErrBuilder.Build() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInsprError_Is(t *testing.T) {
-	type fields struct {
-		Message string
-		Err     error
-		Stack   string
-		Code    InsprErrorCode
-	}
-	type args struct {
-		target error
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := &InsprError{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Stack:   tt.fields.Stack,
-				Code:    tt.fields.Code,
-			}
-			if got := err.Is(tt.args.target); got != tt.want {
-				t.Errorf("InsprError.Is() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInsprError_HasCode(t *testing.T) {
-	type fields struct {
-		Message string
-		Err     error
-		Stack   string
-		Code    InsprErrorCode
-	}
-	type args struct {
-		code InsprErrorCode
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := &InsprError{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Stack:   tt.fields.Stack,
-				Code:    tt.fields.Code,
-			}
-			if got := err.HasCode(tt.args.code); got != tt.want {
-				t.Errorf("InsprError.HasCode() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -174,7 +157,17 @@ func TestErrBuilder_NotFound(t *testing.T) {
 		fields fields
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add the code Not Found to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: NotFound,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -197,7 +190,17 @@ func TestErrBuilder_AlreadyExists(t *testing.T) {
 		fields fields
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add the code Already Exists to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: AlreadyExists,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -220,7 +223,17 @@ func TestErrBuilder_BadRequest(t *testing.T) {
 		fields fields
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add the code Bad Request to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: BadRequest,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -243,7 +256,17 @@ func TestErrBuilder_InternalServer(t *testing.T) {
 		fields fields
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add the code Internal Server to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InternalServer,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -266,7 +289,17 @@ func TestErrBuilder_InvalidName(t *testing.T) {
 		fields fields
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add the code Invalid Name to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InvalidName,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -289,7 +322,17 @@ func TestErrBuilder_InvalidApp(t *testing.T) {
 		fields fields
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add the code Invalid App to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InvalidApp,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -312,7 +355,17 @@ func TestErrBuilder_InvalidChannel(t *testing.T) {
 		fields fields
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add the code Invalid Channel to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InvalidChannel,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -335,7 +388,17 @@ func TestErrBuilder_InvalidChannelType(t *testing.T) {
 		fields fields
 		want   *ErrBuilder
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should add the code Invalid Channel Type to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: InvalidChannelType,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
