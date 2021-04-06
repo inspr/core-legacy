@@ -1787,7 +1787,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			if tt.checkFunction != nil {
 				tt.checkFunction(t)
 			}
-			am.Commit()
+			am.Cancel()
 		})
 	}
 }

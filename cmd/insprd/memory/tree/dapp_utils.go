@@ -109,10 +109,10 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 		}
 	}
 
-	parentApp.Spec.Apps[app.Meta.Name] = app
 	for _, child := range app.Spec.Apps {
 		amm.addAppInTree(child, app)
 	}
+	parentApp.Spec.Apps[app.Meta.Name] = app
 	if !nodeIsEmpty(app.Spec.Node) {
 		app.Spec.Node.Meta.Parent = parentStr
 		app.Spec.Node.Meta.Name = app.Meta.Name
