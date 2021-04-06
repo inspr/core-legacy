@@ -6,6 +6,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	"go.uber.org/zap"
 )
 
 type messageChannel struct {
@@ -15,8 +16,12 @@ type messageChannel struct {
 }
 
 func fromResolvedChannel(channel string) (messageChannel, error) {
+	logger.Debug("getting Channel as a messageChannel structure")
+
 	ctx, name, err := utils.RemoveLastPartInScope(channel)
 	if err != nil {
+		logger.Error("unable to get Channel name an context",
+			zap.Any("error", err))
 		return messageChannel{}, err
 	}
 	return messageChannel{
@@ -27,6 +32,8 @@ func fromResolvedChannel(channel string) (messageChannel, error) {
 
 // returns specified topic's channel
 func fromTopic(topic string) messageChannel {
+	logger.Debug("getting Channel given a Kafka Topic")
+
 	msgChan := messageChannel{
 		prefix: environment.GetInsprEnvironment(),
 		appCtx: environment.GetInsprAppContext(),
@@ -39,6 +46,8 @@ func fromTopic(topic string) messageChannel {
 
 // returns a topic name based on a message channel
 func (ch messageChannel) toTopic() string {
+	logger.Debug("getting Kafka Topic name given a Channel name")
+
 	var topic string
 	ctx, name := ch.appCtx, ch.channel
 
