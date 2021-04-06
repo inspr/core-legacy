@@ -17,7 +17,16 @@ func TestInsprError_Error(t *testing.T) {
 		fields fields
 		want   string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "testing the error message of inspr error",
+			fields: fields{
+				Message: "mock_message",
+				Err:     nil,
+				Stack:   "no_stack",
+				Code:    0,
+			},
+			want: "mock_message",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -34,11 +43,11 @@ func TestInsprError_Error(t *testing.T) {
 	}
 }
 
+// TODO test for errors.Is
 func TestInsprError_Is(t *testing.T) {
 	type fields struct {
 		Message string
 		Err     error
-		Stack   string
 		Code    InsprErrorCode
 	}
 	type args struct {
@@ -50,14 +59,44 @@ func TestInsprError_Is(t *testing.T) {
 		args   args
 		want   bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should return true since the two Errors Codes are equal",
+			fields: fields{
+				Code:    BadRequest,
+				Err:     nil,
+				Message: "A new message",
+			},
+			args: args{
+				target: &InsprError{
+					Code:    BadRequest,
+					Message: "Another message",
+					Err:     nil,
+				},
+			},
+			want: true,
+		},
+		{
+			name: "It should return false since the two Errors Codes are different",
+			fields: fields{
+				Code:    BadRequest,
+				Err:     nil,
+				Message: "A new message",
+			},
+			args: args{
+				target: &InsprError{
+					Code:    InternalServer,
+					Message: "Another message",
+					Err:     nil,
+				},
+			},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := &InsprError{
 				Message: tt.fields.Message,
 				Err:     tt.fields.Err,
-				Stack:   tt.fields.Stack,
 				Code:    tt.fields.Code,
 			}
 			if got := err.Is(tt.args.target); got != tt.want {
@@ -71,7 +110,6 @@ func TestInsprError_HasCode(t *testing.T) {
 	type fields struct {
 		Message string
 		Err     error
-		Stack   string
 		Code    InsprErrorCode
 	}
 	type args struct {
@@ -83,14 +121,36 @@ func TestInsprError_HasCode(t *testing.T) {
 		args   args
 		want   bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "It should return true since the Error code and the code are equal",
+			fields: fields{
+				Code:    BadRequest,
+				Err:     nil,
+				Message: "A new message",
+			},
+			args: args{
+				code: BadRequest,
+			},
+			want: true,
+		},
+		{
+			name: "It should return false since the Error code and the code are different",
+			fields: fields{
+				Code:    BadRequest,
+				Err:     nil,
+				Message: "A new message",
+			},
+			args: args{
+				code: AlreadyExists,
+			},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := &InsprError{
 				Message: tt.fields.Message,
 				Err:     tt.fields.Err,
-				Stack:   tt.fields.Stack,
 				Code:    tt.fields.Code,
 			}
 			if got := err.HasCode(tt.args.code); got != tt.want {

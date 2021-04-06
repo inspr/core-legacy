@@ -24,10 +24,18 @@ func (err *InsprError) Error() string {
 
 // Is Compares errors
 func (err *InsprError) Is(target error) bool {
+
+	// check if is another type of error inside the error stack
+	if errors.Is(err.Err, target) {
+		return true
+	}
+
+	// is it is an InsprError it checks the code
 	t, ok := target.(*InsprError)
 	if !ok {
 		return false
 	}
+
 	return t.Code&err.Code > 0
 }
 
