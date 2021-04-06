@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/disiqueira/gotree"
 )
 
 // InsprError is an error that happened inside inspr
@@ -44,41 +42,61 @@ func (err *InsprError) HasCode(code InsprErrorCode) bool {
 	return code == err.Code
 }
 
-// TODO TESTS
 // Wrap adds a message to the ierror stack
 func (ierror *InsprError) Wrap(message string) {
-	ierror.Err = fmt.Errorf("%v: %w", message, ierror.Err)
+	if ierror.Err == nil {
+		ierror.Err = errors.New(message)
+	} else {
+		ierror.Err = fmt.Errorf("%v: %w", message, ierror.Err)
+	}
 	ierror.Stack = ierror.Err.Error()
 }
 
-// TODO TESTS
 // Wrapf adds the format with the values given to the ierror stack
 func (ierror *InsprError) Wrapf(format string, values ...interface{}) {
 	message := fmt.Sprintf(format, values...)
-	ierror.Err = fmt.Errorf("%v: %w", message, ierror.Err)
+	ierror.Wrap(message)
 }
 
 // TODO TESTS
 // MarshalJSON a struct function that allows for operations to be done
 // before or after the json.Marshal procedure
 func (ierror *InsprError) MarshalJSON() ([]byte, error) {
-	return json.Marshal(ierror)
+	return json.Marshal(*ierror)
 }
 
+// TODO TESTS
 // UnmarshalJSON a struct function that allows for operations to be done
 // before or after the json.Unmarshal procedure
 func (ierror *InsprError) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &ierror); err != nil {
+	t := struct {
+		Message string         `yaml:"message"  json:"message"`
+		Stack   string         `yaml:"stack" json:"stack"`
+		Code    InsprErrorCode `yaml:"code"  json:"code"`
+	}{}
+	if err := json.Unmarshal(data, &t); err != nil {
 		return err
 	}
+
+	// copies it to the insprErr
+	ierror.Message = t.Message
+	ierror.Stack = t.Stack
+	ierror.Code = t.Code
 	ierror.StackToError()
 	return nil
 }
 
+// TODO TESTS
 // StackToError converts the following structure of a error stack message
 // into an actual stack of errors using the fmt.Errorf
 func (ierror *InsprError) StackToError() {
 	messages := strings.Split(ierror.Stack, ":")
+
+	// reverses the stack to so they are inserted in the proper order
+	for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
+		messages[i], messages[j] = messages[j], messages[i]
+	}
+
 	for _, msg := range messages {
 		m := strings.TrimSpace(msg)
 		if ierror.Err == nil {
@@ -86,16 +104,5 @@ func (ierror *InsprError) StackToError() {
 		} else {
 			ierror.Err = fmt.Errorf("%v: %w", m, ierror.Err)
 		}
-	}
-}
-
-// FormatedError the main focus of this function is to allow for a more
-// readable error information, so it will be used mainly in debug sessions
-func (ierror *InsprError) FormatedError() {
-	tree := gotree.New("ErrorTree")
-	messages := strings.Split(ierror.Err.Error(), ":")
-	for _, msg := range messages {
-		m := strings.TrimSpace(msg)
-		tree.Add(m)
 	}
 }
