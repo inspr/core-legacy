@@ -9,6 +9,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"go.uber.org/zap"
 )
 
 type kafkaConfiguration struct {
@@ -17,6 +18,9 @@ type kafkaConfiguration struct {
 }
 
 func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
+	logger.Debug("trying to get Kafka configs from Channel annotations",
+		zap.String("channel", ch.Meta.Name),
+		zap.Any("annotations", ch.Meta.Annotations))
 
 	config := kafkaConfiguration{}
 	if nPart, ok := ch.Meta.Annotations["kafka.partition.number"]; ok {
@@ -24,6 +28,7 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 		config.numberOfPartitions, err = strconv.Atoi(nPart)
 		if err != nil {
 			config.numberOfPartitions = 1
+			logger.Error("invalid 'kafka.partition.number' in Channels annotations")
 			return config, ierrors.NewError().
 				InvalidChannel().
 				Message(fmt.Sprintf("invalid partition configuration %s", ch.Meta.Annotations["kafka.partition.number"])).Build()
@@ -35,6 +40,7 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 		config.replicationFactor, err = strconv.Atoi(nPart)
 		if err != nil {
 			config.replicationFactor = 1
+			logger.Error("invalid 'kafka.replication.factor' in Channels annotations")
 			return config, ierrors.NewError().
 				InvalidChannel().
 				Message(fmt.Sprintf("invalid replication configuration %s", ch.Meta.Annotations["kafka.replication.factor"])).Build()
@@ -45,6 +51,10 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 }
 
 func toTopic(ctx, name string) string {
+	logger.Debug("getting Kafka Topic name given a Channel name and context",
+		zap.String("context", ctx),
+		zap.String("channel", name))
+
 	insprEnvironment := environment.GetInsprEnvironment()
 	if insprEnvironment == "" {
 		return fmt.Sprintf("inspr-%s-%s", ctx, name)
@@ -53,6 +63,9 @@ func toTopic(ctx, name string) string {
 }
 
 func fromTopic(name string, meta *kafka.Metadata) (ch *meta.Channel) {
+	logger.Debug("getting Channel given a Kafka Topic name",
+		zap.String("topic", name))
+
 	ch.Meta.Annotations["kafka.partition.number"] = strconv.Itoa(len(meta.Topics[name].Partitions))
 	splitName := strings.Split(name, "-")
 	if len(splitName) == 4 {
