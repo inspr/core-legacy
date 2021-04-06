@@ -46,8 +46,8 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	nextApp := amm.root
 	if nextApp != nil {
 		for _, element := range reference {
-			nxtApp = nxtApp.Spec.Apps[element]
-			if nxtApp == nil {
+			nextApp = nextApp.Spec.Apps[element]
+			if nextApp == nil {
 				logger.Error("unable to find dApp for given query",
 					zap.String("query", query))
 				return nil, err
