@@ -37,6 +37,13 @@ type ChannelTypeInterface interface {
 	Update(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error)
 }
 
+type AliasInterface interface {
+	Get(ctx context.Context, context, key string) (*meta.Alias, error)
+	Create(ctx context.Context, context string, target string, alias *meta.Alias) (diff.Changelog, error)
+	Delete(ctx context.Context, context, key string) (diff.Changelog, error)
+	Update(ctx context.Context, context string, target string, alias *meta.Alias) (diff.Changelog, error)
+}
+
 // Interface is the interface that allows the management
 // of the current state of the cluster. Permiting the
 // modification of Channels, DApps and ChannelTypes
@@ -44,4 +51,5 @@ type Interface interface {
 	Channels() ChannelInterface
 	Apps() AppInterface
 	ChannelTypes() ChannelTypeInterface
+	Alias() AliasInterface
 }

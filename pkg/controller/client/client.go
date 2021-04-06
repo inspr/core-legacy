@@ -37,3 +37,8 @@ func (c *Client) ChannelTypes() controller.ChannelTypeInterface {
 		c: c.HTTPClient,
 	}
 }
+func (c *Client) Alias() controller.AliasInterface {
+	return &AliasClient{
+		c: c.HTTPClient,
+	}
+}

@@ -126,3 +126,29 @@ func deleteCTypes(_ context.Context, args []string) error {
 
 	return nil
 }
+
+func deleteAlias(_ context.Context, args []string) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+
+	scope, err := cliutils.GetScope()
+	if err != nil {
+		return err
+	}
+
+	for _, arg := range args {
+		path, aliasKey, err := cliutils.ProcessArg(arg, scope)
+		if err != nil {
+			return err
+		}
+
+		cl, err := client.Alias().Delete(context.Background(), path, aliasKey)
+		if err != nil {
+			fmt.Fprint(out, err.Error()+"\n")
+			return err
+		}
+		cl.Print(out)
+	}
+
+	return nil
+}
