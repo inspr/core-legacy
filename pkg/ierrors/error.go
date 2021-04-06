@@ -16,15 +16,15 @@ type InsprError struct {
 }
 
 // Error returns the InsprError Message
-func (err *InsprError) Error() string {
-	return err.Message
+func (ierror *InsprError) Error() string {
+	return ierror.Message
 }
 
 // Is Compares errors
-func (err *InsprError) Is(target error) bool {
+func (ierror *InsprError) Is(target error) bool {
 
 	// check if is another type of error inside the error stack
-	if errors.Is(err.Err, target) {
+	if errors.Is(ierror.Err, target) {
 		return true
 	}
 
@@ -34,12 +34,12 @@ func (err *InsprError) Is(target error) bool {
 		return false
 	}
 
-	return t.Code&err.Code > 0
+	return t.Code&ierror.Code > 0
 }
 
 // HasCode Compares error with error code
-func (err *InsprError) HasCode(code InsprErrorCode) bool {
-	return code == err.Code
+func (ierror *InsprError) HasCode(code InsprErrorCode) bool {
+	return code == ierror.Code
 }
 
 // Wrap adds a message to the ierror stack
@@ -58,14 +58,12 @@ func (ierror *InsprError) Wrapf(format string, values ...interface{}) {
 	ierror.Wrap(message)
 }
 
-// TODO TESTS
 // MarshalJSON a struct function that allows for operations to be done
 // before or after the json.Marshal procedure
 func (ierror *InsprError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(*ierror)
 }
 
-// TODO TESTS
 // UnmarshalJSON a struct function that allows for operations to be done
 // before or after the json.Unmarshal procedure
 func (ierror *InsprError) UnmarshalJSON(data []byte) error {
@@ -86,7 +84,6 @@ func (ierror *InsprError) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// TODO TESTS
 // StackToError converts the following structure of a error stack message
 // into an actual stack of errors using the fmt.Errorf
 func (ierror *InsprError) StackToError() {

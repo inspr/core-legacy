@@ -236,9 +236,6 @@ func TestHandler_Recover(t *testing.T) {
 	body := rr.Result().Body
 
 	var got *ierrors.InsprError
-	// TODO should it be like this?
-	// bytes, _ := ioutil.ReadAll(body)
-	// got.UnmarshalJSON(bytes)
 	json.NewDecoder(body).Decode(&got)
 
 	want := ierrors.NewError().InternalServer().Message("Panic Test").Build()
