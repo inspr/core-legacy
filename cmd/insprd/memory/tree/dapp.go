@@ -27,7 +27,7 @@ func (tmm *MemoryManager) Apps() memory.AppMemory {
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the dApp which name is equal to the last query element.
-// The tree app is returned if the query string is an empty string.
+// The root dApp is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	logger.Info("trying to get a dApp", zap.String("dApp", query))
@@ -44,12 +44,15 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 		for _, element := range reference {
 			nxtApp = nxtApp.Spec.Apps[element]
 			if nxtApp == nil {
+				logger.Error("unable to find dApp for given query",
+					zap.String("query", query))
 				return nil, err
 			}
 		}
 		return nxtApp, nil
 	}
 
+	logger.Error("root dApp is empty")
 	return nil, err
 }
 
@@ -57,18 +60,24 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 // If the dApp's information is invalid, returns an error. The same goes for an invalid context.
 // In case of context being an empty string, the dApp is created inside the root dApp.
 func (amm *AppMemoryManager) Create(context string, app *meta.App) error {
+	logger.Info("trying to create a dApp",
+		zap.String("dApp", app.Meta.Name),
+		zap.String("context", context))
+
 	parentApp, err := amm.Get(context)
 	if err != nil {
 		return err
 	}
 
 	if _, ok := parentApp.Spec.Apps[app.Meta.Name]; ok {
+		logger.Error("unable to create dApp for it already exists")
 		return ierrors.NewError().InvalidApp().Message("this app already exists in parentApp").Build()
 	}
 
 	logger.Debug("checking dApp structure")
 	appErr := amm.checkApp(app, parentApp)
 	if appErr != nil {
+		logger.Error("unable to create dApp - invalid structure")
 		return appErr
 	}
 
@@ -78,6 +87,7 @@ func (amm *AppMemoryManager) Create(context string, app *meta.App) error {
 	logger.Debug("trying to resolve dApp boundaries")
 	appErr = amm.recursiveBoundaryValidation(app)
 	if appErr != nil {
+		logger.Error("unable to resolve dApps boundaries")
 		return appErr
 	}
 
@@ -93,7 +103,10 @@ func (amm *AppMemoryManager) Create(context string, app *meta.App) error {
 // dApp's reference inside of it's parent is also deleted.
 // In case of dApp not found an error is returned.
 func (amm *AppMemoryManager) Delete(query string) error {
+	logger.Info("trying to delete a dApp", zap.String("dApp query", query))
+
 	if query == "" {
+		logger.Error("unable to delete root dApp")
 		return ierrors.NewError().BadRequest().Message("can't delete root dApp").Build()
 	}
 
@@ -108,11 +121,13 @@ func (amm *AppMemoryManager) Delete(query string) error {
 	}
 
 	logger.Debug("updating Channels to which the dApp was connected")
+
 	amm.removeFromParentBoundary(app, parent)
 
 	logger.Debug("removing dApp from its parents 'Apps' structure",
 		zap.String("dApp", app.Meta.Name),
 		zap.String("parent dApp", parent.Meta.Name))
+
 	delete(parent.Spec.Apps, app.Meta.Name)
 
 	return nil
@@ -122,6 +137,11 @@ func (amm *AppMemoryManager) Delete(query string) error {
 // If the current dApp is found and the new structure is valid, it's updated.
 // Otherwise, returns an error.
 func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
+	logger.Info("trying to update a dApp",
+		zap.String("dApp", app.Meta.Name),
+		zap.String("in context", query))
+
+	logger.Debug("getting dApp to be updated")
 	currentApp, err := amm.Get(query)
 	if err != nil {
 		return err
@@ -129,9 +149,11 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
 
 	logger.Debug("validating new dApp structure")
 	if currentApp.Meta.Name != app.Meta.Name {
+		logger.Error("unable to change a dApps name when updating it")
 		return ierrors.NewError().InvalidName().Message("dApp's name mustn't change when updating").Build()
 	}
 	if !nodeIsEmpty(app.Spec.Node) && !(len(app.Spec.Apps) == 0) {
+		logger.Error("a Node can't contain child dApps")
 		return ierrors.NewError().InvalidApp().Message("dApp mustn't have a Node and other dApps at the same time").Build()
 	}
 
@@ -142,6 +164,7 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
 
 	appErr := amm.checkApp(app, parent)
 	if appErr != nil {
+		logger.Error("unable to update dApp - invalid structure")
 		return appErr
 	}
 
@@ -182,16 +205,19 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 		for _, element := range reference {
 			nxtApp = nxtApp.Spec.Apps[element]
 			if nxtApp == nil {
+				logger.Error("unable to find dApp for given query (Root Getter)",
+					zap.String("query", query))
 				return nil, err
 			}
 		}
 		return nxtApp, nil
 	}
 
+	logger.Error("root dApp is empty (Root Getter)")
 	return nil, err
 }
 
-//ResolveBoundary recursive method that resolves connections for app boundaries
+//ResolveBoundary is the recursive method that resolves connections for dApp boundaries
 func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
 	logger.Debug("resolving dApp boundary",
 		zap.String("dApp", app.Meta.Name))
@@ -213,6 +239,10 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, 
 
 	err = amm.recursivelyResolve(parentApp, boundaries, unresolved)
 	if err != nil {
+		logger.Error("couldn't resolve boundaries for given dApp",
+			zap.String("dApp", app.Meta.Name),
+			zap.String("parent dApp", parentApp.Meta.Name),
+			zap.Any("boundaries", boundaries))
 		return nil, err
 	}
 	return boundaries, nil

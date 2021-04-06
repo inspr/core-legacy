@@ -9,10 +9,8 @@ import (
 	"go.uber.org/zap"
 )
 
-/*
-ChannelMemoryManager implements the channel interface and
-provides methods for operating on Channels
-*/
+// ChannelMemoryManager implements the channel interface and
+// provides methods for operating on Channels
 type ChannelMemoryManager struct {
 	*MemoryManager
 }
@@ -24,11 +22,9 @@ func (tmm *MemoryManager) Channels() memory.ChannelMemory {
 	}
 }
 
-/*
-Get receives a context and a channel name. The context defines
-the path to an App. If this App has a pointer to a channel that has the
-same name as the name passed as an argument, the pointer to that channel is returned
-*/
+// Get receives a context and a channel name. The context defines
+// the path to an App. If this App has a pointer to a channel that has the
+// same name as the name passed as an argument, the pointer to that channel is returned
 func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Channel, error) {
 	logger.Info("trying to get a Channel",
 		zap.String("channel", chName),
@@ -46,25 +42,35 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 		}
 	}
 
+	logger.Error("unable to get Channel in given context",
+		zap.String("ctype", chName),
+		zap.String("context", context))
+
 	newError := ierrors.NewError().NotFound().Message("channel not found").Build()
 	return nil, newError
 }
 
-/*
-Create receives a context that defines a path to the App
-in which to add a pointer to the channel passed as an argument
-*/
+// Create receives a context that defines a path to the App
+// in which to add a pointer to the channel passed as an argument
 func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error {
+	logger.Info("trying to create a Channel",
+		zap.String("channel", ch.Meta.Name),
+		zap.String("context", context))
+
 	nameErr := metautils.StructureNameIsValid(ch.Meta.Name)
 	if nameErr != nil {
+		logger.Error("invalid Channel name",
+			zap.String("ctype", ch.Meta.Name))
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
 	logger.Debug("checking if Channel already exists",
 		zap.String("channel", ch.Meta.Name),
 		zap.String("context", context))
+
 	chAlreadyExist, _ := chh.Get(context, ch.Meta.Name)
 	if chAlreadyExist != nil {
+		logger.Error("channel already exists")
 		return ierrors.NewError().AlreadyExists().Message("channel with name " + ch.Meta.Name + " already exists in the context " + context).Build()
 	}
 
@@ -79,6 +85,7 @@ func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error 
 
 	logger.Debug("checking if Channel's type is valid")
 	if _, ok := parentApp.Spec.ChannelTypes[ch.Spec.Type]; !ok {
+		logger.Error("channel's type is invalid")
 		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
 	}
 
@@ -102,13 +109,15 @@ func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error 
 	return nil
 }
 
-/*
-Delete receives a context and a channel name. The context
-defines the path to the App that will have the Delete. If the App
-has a pointer to a channel that has the same name as the name passed
-as an argument, that pointer is removed from the list of App channels
-*/
+// Delete receives a context and a channel name. The context
+// defines the path to the App that will have the Delete. If the App
+// has a pointer to a channel that has the same name as the name passed
+// as an argument, that pointer is removed from the list of App channels
 func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
+	logger.Info("trying to delete a Channel",
+		zap.String("channel", chName),
+		zap.String("context", context))
+
 	channel, err := chh.Get(context, chName)
 
 	if err != nil {
@@ -117,7 +126,11 @@ func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 	}
 
 	logger.Debug("checking if Channel can be deleted")
-	if len(channel.ConnectedApps) > 0 {
+	if len(channel.ConnectedApps) > 0 || len(channel.ConnectedAliases) > 0 {
+		logger.Error("unable to delete Channel for it's being used",
+			zap.Any("connected dApps", channel.ConnectedApps),
+			zap.Any("connected Aliases", channel.ConnectedAliases))
+
 		return ierrors.NewError().
 			BadRequest().
 			Message("channel cannot be deleted as it is being used by other apps").
@@ -143,13 +156,15 @@ func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 	return nil
 }
 
-/*
-Update receives a context and a channel pointer. The context
-defines the path to the App that will have the Update. If the App has
-a channel pointer that has the same name as that passed as an argument,
-this pointer will be replaced by the new one
-*/
+// Update receives a context and a channel pointer. The context
+// defines the path to the App that will have the Update. If the App has
+// a channel pointer that has the same name as that passed as an argument,
+// this pointer will be replaced by the new one
 func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error {
+	logger.Info("trying to update a Channel",
+		zap.String("channel", ch.Meta.Name),
+		zap.String("context", context))
+
 	oldCh, err := chh.Get(context, ch.Meta.Name)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
@@ -163,10 +178,13 @@ func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error 
 	logger.Debug("validating new Channel structure")
 
 	if _, ok := parentApp.Spec.ChannelTypes[ch.Spec.Type]; !ok {
+		logger.Error("unable to create Channel for it references an invalid Channel Type",
+			zap.String("invalid Channel Type", ch.Spec.Type))
+
 		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
 	}
 
-	logger.Debug("replacing old Channel with the new one in dApps 'Channels",
+	logger.Debug("replacing old Channel with the new one in dApps 'Channels'",
 		zap.String("channel", ch.Meta.Name),
 		zap.String("dApp", parentApp.Meta.Name))
 
@@ -201,6 +219,10 @@ func (amm *ChannelRootGetter) Get(context string, chName string) (*meta.Channel,
 		}
 	}
 
-	newError := ierrors.NewError().NotFound().Message("channel not found").Build()
+	logger.Error("unable to get Channel in given context (Root Getter)",
+		zap.String("ctype", chName),
+		zap.String("context", context))
+
+	newError := ierrors.NewError().NotFound().Message("channel not found (Root Getter)").Build()
 	return nil, newError
 }
