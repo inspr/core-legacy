@@ -8,7 +8,7 @@ COPY . .
 WORKDIR /inspr/cmd/authsvc
 RUN go build -tags musl
 
-FROM golang:alpine
+FROM alpine
 WORKDIR /deploy
 COPY --from=build /inspr/cmd/authsvc/authsvc authsvc
 ENTRYPOINT ./authsvc

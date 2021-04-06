@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 )
 
 // Server is a struct that contains the variables necessary
@@ -16,7 +13,7 @@ type Server struct {
 }
 
 // Init - configures the server
-func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface) {
+func (s *Server) Init() {
 	s.Mux = http.NewServeMux()
 	s.initRoutes()
 }

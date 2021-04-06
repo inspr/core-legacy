@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ .Values.service.authName }}
   labels:
-    {{- include "auth.labels" . | nindent 4 }}
+    {{- include "insprd.labels" . | nindent 4 }}
     app: {{ .Values.service.authName }}
 spec:
   type: {{ .Values.service.type }}
@@ -14,4 +14,4 @@ spec:
       name: http
   selector:
     app: {{ .Values.service.authName }}
-    {{- include "auth.selectorLabels" . | nindent 4 }}
+    {{- include "insprd.selectorLabels" . | nindent 4 }}

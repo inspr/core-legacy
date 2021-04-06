@@ -15,7 +15,11 @@ build:
   - image: gcr.io/red-inspr/authsvc
     context: .
     docker:
-      dockerfile: cmd/insprd/auth/Dockerfile
+      dockerfile: cmd/authsvc/Dockerfile
+  - image: gcr.io/red-inspr/secretgen
+    context: .
+    docker:
+      dockerfile: cmd/authsvc/secret/Dockerfile
 deploy:
   helm:
     releases:
@@ -24,4 +28,5 @@ deploy:
         insprdRepository: gcr.io/red-inspr/insprd
         kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
         authRepository: gcr.io/red-inspr/authsvc
+        secretRepository: gcr.io/red-inspr/secretgen
       chartPath: build/helm

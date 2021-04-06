@@ -46,6 +46,11 @@ spec:
               value: {{ .Values.insprAppsNamespace}}
             - name: "INSPR_ENV"
               value: {{ .Values.insprEnvironment}}
+            - name: JWT_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwtpublickey
+                  key: key
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
