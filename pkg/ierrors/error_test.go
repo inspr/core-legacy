@@ -3,6 +3,8 @@ package ierrors
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io/fs"
 	"reflect"
 	"testing"
 )
@@ -45,7 +47,6 @@ func TestInsprError_Error(t *testing.T) {
 	}
 }
 
-// TODO test for errors.Is
 func TestInsprError_Is(t *testing.T) {
 	type fields struct {
 		Message string
@@ -90,6 +91,38 @@ func TestInsprError_Is(t *testing.T) {
 					Message: "Another message",
 					Err:     nil,
 				},
+			},
+			want: false,
+		},
+		{
+			name: "The error given is in the error stack",
+			fields: fields{
+				Err: fmt.Errorf(
+					"layer2: %w",
+					fmt.Errorf(
+						"layer1: %w",
+						fs.ErrClosed,
+					),
+				),
+			},
+			args: args{
+				target: fs.ErrClosed,
+			},
+			want: true,
+		},
+		{
+			name: "The error given is NOT in the error stack",
+			fields: fields{
+				Err: fmt.Errorf(
+					"layer2: %w",
+					fmt.Errorf(
+						"layer1: %w",
+						fs.ErrClosed,
+					),
+				),
+			},
+			args: args{
+				target: fs.SkipDir,
 			},
 			want: false,
 		},
@@ -295,6 +328,15 @@ func TestInsprError_MarshalJSON(t *testing.T) {
 		Code    InsprErrorCode
 	}
 
+	// mocking the insprErr and getting it's bytes representation
+	ie := InsprError{
+		Message: "mock",
+		Err:     nil,
+		Stack:   "mock",
+		Code:    0,
+	}
+	bytes, _ := json.Marshal(ie)
+
 	tests := []struct {
 		name    string
 		fields  fields
@@ -302,15 +344,10 @@ func TestInsprError_MarshalJSON(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "simple_marshall",
-			fields: fields{
-				Message: "mock",
-				Err:     nil,
-				Stack:   "mock",
-				Code:    0,
-			},
+			name:   "simple_marshall",
+			fields: fields(ie),
 			// json.Marshal result of the above structure inside an IError
-			want:    []byte{123, 34, 109, 101, 115, 115, 97, 103, 101, 34, 58, 34, 109, 111, 99, 107, 34, 44, 34, 95, 34, 58, 110, 117, 108, 108, 44, 34, 115, 116, 97, 99, 107, 34, 58, 34, 109, 111, 99, 107, 34, 44, 34, 99, 111, 100, 101, 34, 58, 48, 125},
+			want:    bytes,
 			wantErr: false,
 		},
 	}
