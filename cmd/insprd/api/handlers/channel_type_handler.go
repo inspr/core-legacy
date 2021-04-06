@@ -6,6 +6,7 @@ import (
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
+	"go.uber.org/zap"
 )
 
 // ChannelTypeHandler - contains handlers that uses the
@@ -22,37 +23,49 @@ func (handler *Handler) NewChannelTypeHandler() *ChannelTypeHandler {
 	}
 }
 
-// HandleCreateChannelType - returns the handle function that
+// HandleCreate - returns the handle function that
 // manages the creation of a channelType
-func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
+func (cth *ChannelTypeHandler) HandleCreate() rest.Handler {
+	logger.Info("handling Channel Type create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeDI{}
-		decoder := json.NewDecoder(r.Body)
 
-		err := decoder.Decode(&data)
+		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
+			logger.Error("unable to decode Channel Type create request data",
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			return
 		}
 
+		logger.Debug("initiating Channel Type create transaction")
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.ChannelTypes().CreateChannelType(data.Ctx, &data.ChannelType)
+		err = cth.Memory.ChannelTypes().Create(data.Ctx, &data.ChannelType)
 		if err != nil {
+			logger.Error("unable to create Channel Type",
+				zap.String("ctype", data.ChannelType.Meta.Name),
+				zap.String("context", data.Ctx),
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
 			return
 		}
+
 		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
+			logger.Error("unable to get Channel Type create request changes",
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
 			return
 		}
 
 		if !data.DryRun {
+			logger.Info("commiting Channel Type create changes")
 			defer cth.Memory.Commit()
 		} else {
+			logger.Info("canceling Channel Type create changes")
 			defer cth.Memory.Cancel()
 		}
 
@@ -61,23 +74,30 @@ func (cth *ChannelTypeHandler) HandleCreateChannelType() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleGetChannelTypeByRef - return a handle function that obtains
+// HandleGet - return a handle function that obtains
 // a channelType by the reference given
-func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
+func (cth *ChannelTypeHandler) HandleGet() rest.Handler {
+	logger.Info("handling Channel Type get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
-		decoder := json.NewDecoder(r.Body)
 
-		err := decoder.Decode(&data)
+		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
+			logger.Error("unable to decode Channel Type get request data",
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			return
 		}
 
+		logger.Debug("initiating Channel Type get transaction")
 		cth.Memory.InitTransaction()
 
 		channelType, err := cth.Memory.Root().ChannelTypes().Get(data.Ctx, data.CtName)
 		if err != nil {
+			logger.Error("unable to get Channel Type",
+				zap.String("ctype", data.CtName),
+				zap.String("context", data.Ctx),
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
 			return
@@ -90,23 +110,30 @@ func (cth *ChannelTypeHandler) HandleGetChannelTypeByRef() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleUpdateChannelType - returns a handle function that
+// HandleUpdate - returns a handle function that
 // updates the channelType with the parameters given in the request
-func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
+func (cth *ChannelTypeHandler) HandleUpdate() rest.Handler {
+	logger.Info("handling Channel Type update request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeDI{}
-		decoder := json.NewDecoder(r.Body)
 
-		err := decoder.Decode(&data)
+		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
+			logger.Error("unable to decode Channel Type update request data",
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			return
 		}
 
+		logger.Debug("initiating Channel Type update transaction")
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.ChannelTypes().UpdateChannelType(data.Ctx, &data.ChannelType)
+		err = cth.Memory.ChannelTypes().Update(data.Ctx, &data.ChannelType)
 		if err != nil {
+			logger.Error("unable to update Channel Type",
+				zap.String("ctype", data.ChannelType.Meta.Name),
+				zap.String("context", data.Ctx),
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
 			return
@@ -114,23 +141,28 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 
 		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
+			logger.Error("unable to get Channel Type update request changes",
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
 			return
 		}
 
 		if !data.DryRun {
+			logger.Debug("applying Channel Type update changes in diff")
 			err = cth.applyChangesInDiff(diff)
 			if err != nil {
+				logger.Error("unable to apply Channel Type update changes in diff",
+					zap.Any("error", err))
 				rest.ERROR(w, err)
 				cth.Memory.Cancel()
 				return
 			}
-		}
 
-		if !data.DryRun {
+			logger.Info("commiting Channel Type update changes")
 			defer cth.Memory.Commit()
 		} else {
+			logger.Info("canceling Channel Type update changes")
 			defer cth.Memory.Cancel()
 		}
 
@@ -139,37 +171,49 @@ func (cth *ChannelTypeHandler) HandleUpdateChannelType() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandleDeleteChannelType - returns a handle function that
+// HandleDelete - returns a handle function that
 // deletes the channelType of the given path
-func (cth *ChannelTypeHandler) HandleDeleteChannelType() rest.Handler {
+func (cth *ChannelTypeHandler) HandleDelete() rest.Handler {
+	logger.Info("handling Channel Type delete request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
-		decoder := json.NewDecoder(r.Body)
 
-		err := decoder.Decode(&data)
+		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
+			logger.Error("unable to decode Channel Type delete request data",
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			return
 		}
 
+		logger.Debug("initiating Channel Type delete transaction")
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.ChannelTypes().DeleteChannelType(data.Ctx, data.CtName)
+		err = cth.Memory.ChannelTypes().Delete(data.Ctx, data.CtName)
 		if err != nil {
+			logger.Error("unable to delete Channel Type",
+				zap.String("ctype", data.CtName),
+				zap.String("context", data.Ctx),
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
 			return
 		}
+
 		diff, err := cth.Memory.GetTransactionChanges()
 		if err != nil {
+			logger.Error("unable to get Channel Type delete request changes",
+				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
 			return
 		}
 
 		if !data.DryRun {
+			logger.Info("commiting Channel Type delete changes")
 			defer cth.Memory.Commit()
 		} else {
+			logger.Info("canceling Channel Type delete changes")
 			defer cth.Memory.Cancel()
 		}
 

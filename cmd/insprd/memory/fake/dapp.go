@@ -26,8 +26,8 @@ func (a *Apps) Get(query string) (*meta.App, error) {
 	return ct, nil
 }
 
-// CreateApp - simple mock
-func (a *Apps) CreateApp(context string, ct *meta.App) error {
+// Create - simple mock
+func (a *Apps) Create(context string, ct *meta.App) error {
 	if a.fail != nil {
 		return a.fail
 	}
@@ -41,8 +41,8 @@ func (a *Apps) CreateApp(context string, ct *meta.App) error {
 	return nil
 }
 
-// DeleteApp - simple mock
-func (a *Apps) DeleteApp(query string) error {
+// Delete - simple mock
+func (a *Apps) Delete(query string) error {
 	if a.fail != nil {
 		return a.fail
 	}
@@ -55,8 +55,8 @@ func (a *Apps) DeleteApp(query string) error {
 	return nil
 }
 
-// UpdateApp - simple mock
-func (a *Apps) UpdateApp(context string, ct *meta.App) error {
+// Update - simple mock
+func (a *Apps) Update(context string, ct *meta.App) error {
 	if a.fail != nil {
 		return a.fail
 	}

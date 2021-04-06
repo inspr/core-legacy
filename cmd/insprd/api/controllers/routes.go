@@ -7,6 +7,7 @@ import (
 )
 
 func (s *Server) initRoutes() {
+	logger.Debug("initializing Insprd server routes")
 	h := handler.NewHandler(
 		s.MemoryManager, s.op,
 	)
@@ -16,16 +17,16 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			ahandler.HandleGetAppByRef().JSON().Recover()(w, r)
+			ahandler.HandleGet().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			ahandler.HandleCreateApp().JSON().Recover()(w, r)
+			ahandler.HandleCreate().JSON().Recover()(w, r)
 
 		case http.MethodPut:
-			ahandler.HandleUpdateApp().JSON().Recover()(w, r)
+			ahandler.HandleUpdate().JSON().Recover()(w, r)
 
 		case http.MethodDelete:
-			ahandler.HandleDeleteApp().JSON().Recover()(w, r)
+			ahandler.HandleDelete().JSON().Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
@@ -38,16 +39,16 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			chandler.HandleGetChannelByRef().JSON().Recover()(w, r)
+			chandler.HandleGet().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			chandler.HandleCreateChannel().JSON().Recover()(w, r)
+			chandler.HandleCreate().JSON().Recover()(w, r)
 
 		case http.MethodPut:
-			chandler.HandleUpdateChannel().JSON().Recover()(w, r)
+			chandler.HandleUpdate().JSON().Recover()(w, r)
 
 		case http.MethodDelete:
-			chandler.HandleDeleteChannel().JSON().Recover()(w, r)
+			chandler.HandleDelete().JSON().Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
@@ -60,16 +61,16 @@ func (s *Server) initRoutes() {
 		switch r.Method {
 
 		case http.MethodGet:
-			cthandler.HandleGetChannelTypeByRef().JSON().Recover()(w, r)
+			cthandler.HandleGet().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			cthandler.HandleCreateChannelType().JSON().Recover()(w, r)
+			cthandler.HandleCreate().JSON().Recover()(w, r)
 
 		case http.MethodPut:
-			cthandler.HandleUpdateChannelType().JSON().Recover()(w, r)
+			cthandler.HandleUpdate().JSON().Recover()(w, r)
 
 		case http.MethodDelete:
-			cthandler.HandleDeleteChannelType().JSON().Recover()(w, r)
+			cthandler.HandleDelete().JSON().Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
@@ -85,13 +86,13 @@ func (s *Server) initRoutes() {
 			aliasHandler.HandleGet().JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			aliasHandler.HandleCreateAlias().JSON().Recover()(w, r)
+			aliasHandler.HandleCreate().JSON().Recover()(w, r)
 
 		case http.MethodPut:
-			aliasHandler.HandleUpdateAlias().JSON().Recover()(w, r)
+			aliasHandler.HandleUpdate().JSON().Recover()(w, r)
 
 		case http.MethodDelete:
-			aliasHandler.HandleDeleteAlias().JSON().Recover()(w, r)
+			aliasHandler.HandleDelete().JSON().Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
