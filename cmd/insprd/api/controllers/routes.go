@@ -2,6 +2,7 @@ package controller
 
 import (
 	handler "gitlab.inspr.dev/inspr/core/cmd/insprd/api/handlers"
+	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 func (s *Server) initRoutes() {
@@ -10,14 +11,16 @@ func (s *Server) initRoutes() {
 	)
 
 	ahandler := h.NewAppHandler()
-	s.Mux.Handle("/apps", ahandler.Serve())
+	s.Mux.Handle("/apps", rest.HandleCRUD(ahandler))
 
 	chandler := h.NewChannelHandler()
-	s.Mux.Handle("/channels", chandler.Serve())
+	s.Mux.Handle("/channels", rest.HandleCRUD(chandler))
 
 	cthandler := h.NewChannelTypeHandler()
-	s.Mux.Handle("/channeltypes", cthandler.Serve())
+	s.Mux.Handle("/channeltypes", rest.HandleCRUD(cthandler))
 
 	aliasHandler := h.NewAliasHandler()
-	s.Mux.HandleFunc("/alias", aliasHandler.Serve())
+	s.Mux.Handle("/alias", rest.HandleCRUD(aliasHandler))
+
+	s.Mux.Handle("/auth", h.TokenHandler())
 }

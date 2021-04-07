@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -12,6 +13,7 @@ import (
 type Handler struct {
 	Memory          memory.Manager
 	Operator        operators.OperatorInterface
+	auth            auth.Auth
 	diffReactions   []diff.DifferenceReaction
 	changeReactions []diff.ChangeReaction
 }

@@ -22,29 +22,6 @@ func (handler *Handler) NewChannelTypeHandler() *ChannelTypeHandler {
 	}
 }
 
-func (cth *ChannelTypeHandler) Serve() rest.Handler {
-	return func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-
-		case http.MethodGet:
-			cth.HandleGet().JSON().Recover()(w, r)
-
-		case http.MethodPost:
-			cth.HandleCreate().JSON().Recover()(w, r)
-
-		case http.MethodPut:
-			cth.HandleUpdate().JSON().Recover()(w, r)
-
-		case http.MethodDelete:
-			cth.HandleDelete().JSON().Recover()(w, r)
-
-		default:
-			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-	}
-}
-
 // HandleCreate - returns the handle function that
 // manages the creation of a channelType
 func (cth *ChannelTypeHandler) HandleCreate() rest.Handler {
