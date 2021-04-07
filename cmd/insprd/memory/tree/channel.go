@@ -172,6 +172,8 @@ func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error 
 	}
 
 	ch.ConnectedApps = oldCh.ConnectedApps
+	ch.ConnectedAliases = oldCh.ConnectedAliases
+	ch.Meta.UUID = oldCh.Meta.UUID
 
 	parentApp, _ := GetTreeMemory().Apps().Get(context)
 
