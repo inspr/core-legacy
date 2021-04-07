@@ -30,7 +30,7 @@ func ValidateUUID(uuid string) bool {
 	return valRegex.MatchString(uuid)
 }
 
-// RecursiveValidateUUIDs validates UUIDs on a structure recursively
+// RecursiveValidateUUIDS validates UUIDs on a structure recursively
 func RecursiveValidateUUIDS(name string, app *meta.App, t *testing.T) {
 	if !ValidateUUID(app.Meta.UUID) {
 		t.Errorf("%s invalid UUID on %s, uuid=%v", name, app.Meta.Name, app.Meta.UUID)
