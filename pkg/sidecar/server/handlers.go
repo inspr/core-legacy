@@ -9,7 +9,6 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
 	"go.uber.org/zap"
 )
 
@@ -57,8 +56,8 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 			NewError().
 			BadRequest().
 			Message(
-				"channel %s not found",
-				utils.CheckEmptyChannel(body.Channel),
+				"channel '%s' not found",
+				body.Channel,
 			)
 
 		rest.ERROR(w, insprError.Build())
@@ -91,8 +90,8 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 			NewError().
 			BadRequest().
 			Message(
-				"channel %s not found",
-				utils.CheckEmptyChannel(body.Channel),
+				"channel '%s' not found",
+				body.Channel,
 			)
 
 		rest.ERROR(w, insprError.Build())
@@ -127,8 +126,8 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 			NewError().
 			BadRequest().
 			Message(
-				"channel %s not found",
-				utils.CheckEmptyChannel(body.Channel),
+				"channel '%s' not found",
+				body.Channel,
 			)
 
 		rest.ERROR(w, insprError.Build())
