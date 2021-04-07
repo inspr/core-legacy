@@ -19,6 +19,28 @@ func (handler *Handler) NewAliasHandler() *AliasHandler {
 		handler,
 	}
 }
+func (ah *AliasHandler) Serve() rest.Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+
+		case http.MethodGet:
+			ah.HandleGet().JSON().Recover()(w, r)
+
+		case http.MethodPost:
+			ah.HandleCreate().JSON().Recover()(w, r)
+
+		case http.MethodPut:
+			ah.HandleUpdate().JSON().Recover()(w, r)
+
+		case http.MethodDelete:
+			ah.HandleDelete().JSON().Recover()(w, r)
+
+		default:
+			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+	}
+}
 
 // HandleCreate - handler that generates the rest.Handle
 // func to manage the http request

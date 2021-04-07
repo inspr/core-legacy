@@ -24,6 +24,29 @@ func (handler *Handler) NewAppHandler() *AppHandler {
 	}
 }
 
+func (ahandler *AppHandler) Serve() rest.Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+
+		case http.MethodGet:
+			ahandler.HandleGet().JSON().Recover()(w, r)
+
+		case http.MethodPost:
+			ahandler.HandleCreate().JSON().Recover()(w, r)
+
+		case http.MethodPut:
+			ahandler.HandleUpdate().JSON().Recover()(w, r)
+
+		case http.MethodDelete:
+			ahandler.HandleDelete().JSON().Recover()(w, r)
+
+		default:
+			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+	}
+}
+
 // HandleCreate - handler that generates the rest.Handle
 // func to manage the http request
 func (ah *AppHandler) HandleCreate() rest.Handler {
