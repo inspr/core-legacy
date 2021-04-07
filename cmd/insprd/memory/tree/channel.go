@@ -101,6 +101,9 @@ func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error 
 	if parentApp.Spec.Channels == nil {
 		parentApp.Spec.Channels = map[string]*meta.Channel{}
 	}
+
+	ch.Meta = metautils.InjectUUID(ch.Meta)
+
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
 	return nil
@@ -169,6 +172,8 @@ func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error 
 	}
 
 	ch.ConnectedApps = oldCh.ConnectedApps
+	ch.ConnectedAliases = oldCh.ConnectedAliases
+	ch.Meta.UUID = oldCh.Meta.UUID
 
 	parentApp, _ := GetTreeMemory().Apps().Get(context)
 

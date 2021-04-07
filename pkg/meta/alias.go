@@ -4,5 +4,6 @@ package meta
 //
 // Target is the channel which is being referenced by the alias
 type Alias struct {
-	Target string `yaml:"target"  json:"target"`
+	Meta   Metadata `yaml:"meta" json:"meta"`
+	Target string   `yaml:"target"  json:"target"`
 }

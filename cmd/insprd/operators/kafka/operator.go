@@ -35,7 +35,7 @@ func (op *Operator) Channels() operators.ChannelOperatorInterface {
 func NewKafkaOperator(memory memory.Manager) (operators.OperatorInterface, error) {
 	var err error
 	var chOp operators.ChannelOperatorInterface
-	chOp, err = channels.NewOperator()
+	chOp, err = channels.NewOperator(memory)
 	if err != nil {
 		return nil, err
 	}
