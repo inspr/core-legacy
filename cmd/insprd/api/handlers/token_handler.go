@@ -8,6 +8,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
+// TokenHandler handles requests for token creation on Insprd
 func (h *Handler) TokenHandler() rest.Handler {
 	type TokenReturn struct {
 		Token string `json:"token"`

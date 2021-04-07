@@ -10,6 +10,7 @@ func (h Handler) JSON() Handler {
 	}
 }
 
+// CRUDHandler handles crud requests to a given resource
 type CRUDHandler interface {
 	HandleCreate() Handler
 	HandleDelete() Handler
@@ -17,6 +18,7 @@ type CRUDHandler interface {
 	HandleGet() Handler
 }
 
+// HandleCRUD uses a CRUDHandler to handle HTTP requests for a CRUD resource
 func HandleCRUD(handler CRUDHandler) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
