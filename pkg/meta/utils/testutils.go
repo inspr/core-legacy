@@ -24,10 +24,11 @@ func CompareWithUUID(first, second interface{}) bool {
 	return cmp.Equal(first, second)
 }
 
+var regexUUID = regexp.MustCompile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+
 // ValidateUUID validates the formatting of a string to check whether the string contains a proper UUID
 func ValidateUUID(uuid string) bool {
-	valRegex := regexp.MustCompile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
-	return valRegex.MatchString(uuid)
+	return regexUUID.MatchString(uuid)
 }
 
 // RecursiveValidateUUIDS validates UUIDs on a structure recursively
