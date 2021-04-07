@@ -5,9 +5,9 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"log"
 	"os"
 
+	"go.uber.org/zap"
 	"golang.org/x/crypto/ssh"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,6 +16,7 @@ import (
 )
 
 var clientSet kubernetes.Interface
+var logger *zap.Logger
 
 const bitSize = 256
 
@@ -48,7 +49,7 @@ func generatePrivateKey() (*rsa.PrivateKey, error) {
 		return nil, err
 	}
 
-	log.Println("Private Key generated")
+	logger.Info("Private Key generated")
 	return privateKey, nil
 }
 
@@ -72,19 +73,21 @@ func encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) []byte {
 
 // generatePublicKey take a rsa.PublicKey and return bytes suitable for writing to .pub file
 // returns in the format "ssh-rsa ..."
-func generatePublicKey(privatekey *rsa.PublicKey) ([]byte, error) {
-	publicRsaKey, err := ssh.NewPublicKey(privatekey)
+func generatePublicKey(publicKey *rsa.PublicKey) ([]byte, error) {
+	publicRsaKey, err := ssh.NewPublicKey(publicKey)
 	if err != nil {
 		return nil, err
 	}
 
 	pubKeyBytes := ssh.MarshalAuthorizedKey(publicRsaKey)
 
-	log.Println("Public key generated")
+	logger.Info("Public key generated")
 	return pubKeyBytes, nil
 }
 
 func main() {
+	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "Auth-provider")))
+
 	namespace := os.Getenv("CURR_NAMESPACE")
 
 	initKube()
@@ -103,12 +106,12 @@ func main() {
 
 		privateKey, err := generatePrivateKey()
 		if err != nil {
-			log.Fatal(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 		publicKeyBytes, err := generatePublicKey(&privateKey.PublicKey)
 		if err != nil {
-			log.Fatal(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 		privateKeyBytes := encodePrivateKeyToPEM(privateKey)
@@ -133,12 +136,12 @@ func main() {
 		}
 		_, err = clientSet.CoreV1().Secrets(namespace).Create(&privSec)
 		if err != nil {
-			log.Fatal(err.Error())
+			logger.Fatal(err.Error())
 		}
 		_, err = clientSet.CoreV1().Secrets(namespace).Create(&pubSec)
 		if err != nil {
-			log.Fatal(err.Error())
+			logger.Fatal(err.Error())
 		}
-		log.Println("New secrets generated.")
+		logger.Info("New secrets generated.")
 	}
 }
