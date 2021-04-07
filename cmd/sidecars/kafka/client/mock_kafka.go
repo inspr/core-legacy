@@ -31,7 +31,7 @@ func (mc *MockConsumer) Poll(timeout int) (event kafka.Event) {
 		return kafka.NewError(kafka.ErrAllBrokersDown, "", false)
 	}
 
-	ch, _ := fromResolvedChannel(mc.senderChannel)
+	ch := kafkaTopic(mc.senderChannel)
 	msg, _ := ch.encode(mc.pollMsg)
 	return &kafka.Message{
 		TopicPartition: kafka.TopicPartition{

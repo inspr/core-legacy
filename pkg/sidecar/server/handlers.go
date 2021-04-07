@@ -134,7 +134,7 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if err := ch.r.CommitMessage(body.Channel); err != nil {
+	if err := ch.r.Commit(body.Channel); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's commitMessage failed")
 		rest.ERROR(w, insprError.Build())
 	}
