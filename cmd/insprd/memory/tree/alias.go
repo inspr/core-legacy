@@ -114,37 +114,37 @@ func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alia
 	logger.Info("trying to update an Alias",
 		zap.Any("alias", alias),
 		zap.String("context", context))
-	// get app from context
-	app, err := GetTreeMemory().Apps().Get(context)
-	if err != nil {
-		return err
-	}
 
 	logger.Debug("checking if Alias to be updated exists in given context")
 	// check if alias key exist in context
-	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		logger.Error("unable to find Alias to be updated in given dApp",
-			zap.String("alias key", aliasKey),
-			zap.String("dApp", app.Meta.Name))
-		return ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
+	oldAlias, err := amm.Get(context, aliasKey)
+	if err != nil {
+		newError := ierrors.NewError().
+			InnerError(err).
+			NotFound().
+			Message("alias '%s' not found on context '%s'", aliasKey, context).
+			Build()
+		return newError
 	}
+	parentApp, _ := GetTreeMemory().Apps().Get(context)
 
 	logger.Debug("validating Alias")
 	// valid target channel
-	err = validTargetChannel(app, alias.Target)
+	err = validTargetChannel(parentApp, alias.Target)
 	if err != nil {
 		logger.Error("unable to update Alias - invalid targeted channel or boundary in parent dApp",
 			zap.Any("alias", alias),
-			zap.String("parent dApp", app.Meta.Name),
+			zap.String("parent dApp", parentApp.Meta.Name),
 			zap.String("targeted boundary", alias.Target))
 		return err
 	}
 
+	alias.Meta.UUID = oldAlias.Meta.UUID
 	logger.Debug("replacing old Alias with the new one in dApps 'Aliases'",
 		zap.Any("alias", alias),
-		zap.String("dApp", app.Meta.Name))
+		zap.String("dApp", parentApp.Meta.Name))
 	//update alias
-	app.Spec.Aliases[aliasKey] = alias
+	parentApp.Spec.Aliases[aliasKey] = alias
 
 	return nil
 }

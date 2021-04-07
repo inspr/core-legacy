@@ -152,6 +152,7 @@ func (ctm *ChannelTypeMemoryManager) Update(context string, ct *meta.ChannelType
 	}
 
 	ct.ConnectedChannels = oldChType.ConnectedChannels
+	ct.Meta.UUID = oldChType.Meta.UUID
 
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
