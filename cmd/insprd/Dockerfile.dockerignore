@@ -1,0 +1,4 @@
+**/*
+!cmd/insprd
+!pkg
+!go.mod
