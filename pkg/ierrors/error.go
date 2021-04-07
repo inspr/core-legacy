@@ -104,3 +104,11 @@ func (err *InsprError) Is(target error) bool {
 func (err *InsprError) HasCode(code InsprErrorCode) bool {
 	return code == err.Code
 }
+
+func HasCode(target error, code InsprErrorCode) bool {
+	t, ok := target.(*InsprError)
+	if !ok {
+		return false
+	}
+	return t.Code&code > 0
+}
