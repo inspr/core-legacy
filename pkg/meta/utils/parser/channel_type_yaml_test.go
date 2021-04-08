@@ -88,7 +88,7 @@ func createChannelTypeYaml() (string, meta.ChannelType) {
 			Reference:   "mock_reference",
 			Annotations: map[string]string{},
 			Parent:      "mock_parent",
-			SHA256:      "mock_sha256",
+			UUID:        "mock_sha256",
 		},
 		Schema:            "mock_schema",
 		ConnectedChannels: []string{"mock_chan1", "mock_chan2"},

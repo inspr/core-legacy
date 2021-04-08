@@ -6,6 +6,7 @@ import (
 )
 
 func (s *Server) initRoutes() {
+	logger.Debug("initializing Insprd server routes")
 	h := handler.NewHandler(
 		s.MemoryManager, s.op,
 	)
