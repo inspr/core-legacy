@@ -13,6 +13,8 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
+	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
 type Client struct {
@@ -242,8 +244,22 @@ func decrypt(encryptedString string) (User, error) {
 }
 
 func requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
-	return "", nil
-	// creates payload and sends it to insprd
-	// when creating the payload, generetes the Refresh Token (cryptografado)
-	// asks Insprd to generate token and saves it into file
+	url := os.Getenv("CLUSTER_ADDR")
+	if url == "" {
+		panic("[ENV VAR] CLUSTER_ADDR not found")
+	}
+
+	rc := request.NewClient().
+		BaseURL(url).
+		Encoder(json.Marshal).
+		Decoder(request.JSONDecoderGenerator).Build()
+
+	ncc := client.NewControllerClient(rc)
+
+	token, err := ncc.Authorization().GenerateToken(ctx, payload)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
