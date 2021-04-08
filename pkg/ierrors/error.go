@@ -103,11 +103,3 @@ func (ierror *InsprError) StackToError() {
 		}
 	}
 }
-
-func HasCode(target error, code InsprErrorCode) bool {
-	t, ok := target.(*InsprError)
-	if !ok {
-		return false
-	}
-	return t.Code&code > 0
-}

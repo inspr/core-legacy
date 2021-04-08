@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"errors"
 	"net/http"
 
 	authentication "gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
@@ -18,25 +17,62 @@ func (h Handler) JSON() Handler {
 
 func (h Handler) Valide(auth authentication.Auth) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		// could it be that the user will send many tokens and that one of them will be valid for the operation?
-		tokens := r.Header["authorization"]
-		for _, token := range tokens {
-			payload, err := auth.Validade(token)
-
-			if errors.Is(err, ierrors.ExpiredToken) {
-
-			}
+		// Authorization: Bearer <token>
+		headerContent := r.Header["Authorization"]
+		if len(headerContent) != 2 {
+			http.Error(
+				w,
+				"Missing token",
+				http.StatusBadRequest,
+			)
+			return
 		}
+
+		token := headerContent[1]
+		_, err := auth.Validade(token)
+
+		// error management
+		if err != nil {
+			// check for invalid error or non Existant
+			if ierrors.HasCode(err, ierrors.InvalidToken) {
+				http.Error(
+					w,
+					"Invalid Token",
+					http.StatusUnauthorized,
+				)
+				return
+			}
+
+			// token expired
+			if ierrors.HasCode(err, ierrors.ExpiredToken) {
+				http.Error(
+					w,
+					"Request is OK but the token is expired",
+					http.StatusOK,
+				)
+				return
+			}
+
+			// check for unauthorized error
+			if ierrors.HasCode(err, ierrors.Unauthorized) {
+				http.Error(
+					w,
+					"Unauthorized to do operations in this context",
+					http.StatusForbidden,
+				)
+				return
+			}
+
+			// default error message
+			http.Error(
+				w,
+				"Unknown error, please check token",
+				http.StatusBadRequest,
+			)
+			return
+		}
+
 		// token and context are valid
-
-		// token has expired
-
-		// token invalid or non existant
-
-		// valid token but not enough permissions
-
-		// default
-
+		h(w, r)
 	}
 }

@@ -3,7 +3,10 @@ package rest
 import (
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
+
+	authentication "gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
 )
 
 // emptyHandler - to be used in testing of the package
@@ -49,5 +52,26 @@ func TestHandler_JSON(t *testing.T) {
 		if ct := rr.Header().Get("Content-Type"); ct != tt.expected {
 			t.Errorf("Handler.JSON() = %v, want %v", ct, tt.expected)
 		}
+	}
+}
+
+func TestHandler_Valide(t *testing.T) {
+	type args struct {
+		auth authentication.Auth
+	}
+	tests := []struct {
+		name string
+		h    Handler
+		args args
+		want Handler
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.h.Valide(tt.args.auth); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Handler.Valide() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }

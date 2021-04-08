@@ -13,6 +13,7 @@ const (
 	InvalidChannel
 	InvalidChannelType
 	BadRequest
-	ExpiredToken
 	InvalidToken
+	ExpiredToken
+	Unauthorized
 )
