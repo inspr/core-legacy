@@ -187,7 +187,7 @@ func (amm *ChannelTypeRootGetter) Get(context string, ctName string) (*meta.Chan
 			NewError().
 			BadRequest().
 			InnerError(err).
-			Message("target dApp doesn't exist (Root Getter)").
+			Message("target dApp does not exist on root").
 			Build()
 	}
 
@@ -204,6 +204,6 @@ func (amm *ChannelTypeRootGetter) Get(context string, ctName string) (*meta.Chan
 	return nil, ierrors.
 		NewError().
 		NotFound().
-		Message("channelType not found for given query (Root Getter)").
+		Message("channelType not found for given query on root").
 		Build()
 }

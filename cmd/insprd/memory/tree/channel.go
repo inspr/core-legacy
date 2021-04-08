@@ -37,7 +37,7 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 			InnerError(err).
 			NotFound().
 			Message(
-				"channel not found the context '%v' is invalid",
+				"channel not found, the context '%v' is invalid",
 				context,
 			).
 			Build()
