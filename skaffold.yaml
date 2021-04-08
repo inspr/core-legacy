@@ -20,3 +20,19 @@ deploy:
         insprdRepository: gcr.io/red-inspr/insprd
         kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
       chartPath: build/helm
+
+profiles:
+  - name: uidp
+    build:
+      artifacts:
+      - image: gcr.io/red-inspr/uidp/redis/secret
+        context: .
+        docker:
+          dockerfile: cmd/uid_provider/secret/Dockerfile
+    deploy:
+      helm:
+        releases:
+        - name: uidp
+          artifactOverrides:
+            uidpSecret: gcr.io/red-inspr/uidp/redis/secret
+          chartPath: build/uidp_helm
