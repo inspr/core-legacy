@@ -18,7 +18,7 @@ import (
 var clientSet kubernetes.Interface
 var logger *zap.Logger
 
-const bitSize = 256
+const bitSize = 512 // min size for encoding your payload
 
 // initKube initializes a k8s operator with in cluster configuration
 func initKube() error {
