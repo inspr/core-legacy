@@ -15,7 +15,7 @@ func (h Handler) JSON() Handler {
 	}
 }
 
-func (h Handler) Valide(auth authentication.Auth) Handler {
+func (h Handler) Validate(auth authentication.Auth) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]

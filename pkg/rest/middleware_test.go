@@ -55,7 +55,7 @@ func TestHandler_JSON(t *testing.T) {
 	}
 }
 
-func TestHandler_Valide(t *testing.T) {
+func TestHandler_Validate(t *testing.T) {
 	type args struct {
 		auth authentication.Auth
 	}
@@ -69,8 +69,8 @@ func TestHandler_Valide(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.h.Valide(tt.args.auth); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Handler.Valide() = %v, want %v", got, tt.want)
+			if got := tt.h.Validate(tt.args.auth); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Handler.Validate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
