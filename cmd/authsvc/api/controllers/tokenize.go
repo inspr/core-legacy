@@ -13,6 +13,7 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 	"gitlab.inspr.dev/inspr/core/cmd/authsvc/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"go.uber.org/zap"
 )
@@ -23,6 +24,7 @@ func (server *Server) Tokenize() rest.Handler {
 		data := auth.Payload{}
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
+			err = ierrors.NewError().BadRequest().Message("invalid body").Build()
 			rest.ERROR(w, err)
 			return
 		}

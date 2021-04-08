@@ -4,15 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/auth"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 // TokenHandler handles requests for token creation on Insprd
 func (h *Handler) TokenHandler() rest.Handler {
-	type TokenReturn struct {
-		Token string `json:"token"`
-	}
+
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
 		var load auth.Payload
 		err := json.NewDecoder(r.Body).Decode(&load)
@@ -25,8 +23,8 @@ func (h *Handler) TokenHandler() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, TokenReturn{
-			token,
+		rest.JSON(w, http.StatusOK, auth.TokenDO{
+			Token: token,
 		})
 
 	}).Post().JSON()
