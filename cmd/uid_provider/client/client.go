@@ -206,8 +206,8 @@ func encrypt(user User) (auth.Payload, error) {
 }
 
 func decrypt(encryptedString string) (User, error) {
-	usr := User{}
 	keyString := "somehow get it from the cluster"
+	usr := User{}
 
 	key, _ := hex.DecodeString(keyString)
 	enc, _ := hex.DecodeString(encryptedString)
