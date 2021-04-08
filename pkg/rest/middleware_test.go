@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	authentication "gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
+	authMock "gitlab.inspr.dev/inspr/core/cmd/insprd/auth/mocks"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
 // emptyHandler - to be used in testing of the package
@@ -57,20 +59,64 @@ func TestHandler_JSON(t *testing.T) {
 
 func TestHandler_Validate(t *testing.T) {
 	type args struct {
-		auth authentication.Auth
+		auth        authentication.Auth
+		headerValue string
 	}
 	tests := []struct {
-		name string
-		h    Handler
-		args args
-		want Handler
+		name     string
+		args     args
+		wantErr  bool
+		wantCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "no_auth_header",
+			args: args{
+				auth: authMock.NewMockAuth(nil),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name: "no_auth_header",
+			args: args{
+				auth: authMock.NewMockAuth(
+					&ierrors.InsprError{Code: ierrors.InvalidToken},
+				),
+				headerValue: "mock_token",
+			},
+			wantErr:  true,
+			wantCode: http.StatusUnauthorized,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.h.Validate(tt.args.auth); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Handler.Validate() = %v, want %v", got, tt.want)
+			handlerFunc := emptyHandler.Validate(tt.args.auth)
+			ts := httptest.NewServer(handlerFunc)
+			defer ts.Close()
+			client := ts.Client()
+
+			req, err := http.NewRequest(http.MethodPost, ts.URL, nil)
+			if err != nil {
+				t.Error("error creating request")
+			}
+
+			// adds auth to request header
+			req.Header.Add("Authorization", tt.args.headerValue)
+			req.
+			// does request
+			res, err := client.Do(req)
+
+			if err != nil {
+				t.Error("couldn't receive response")
+			}
+
+			got := res.StatusCode
+			if !reflect.DeepEqual(got, tt.wantCode) {
+				t.Errorf(
+					"Handler.Validate() = %v, want %v",
+					got,
+					tt.wantCode,
+				)
 			}
 		})
 	}
