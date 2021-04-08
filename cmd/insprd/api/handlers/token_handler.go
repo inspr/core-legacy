@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gitlab.inspr.dev/inspr/core/pkg/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
@@ -12,7 +12,7 @@ import (
 func (h *Handler) TokenHandler() rest.Handler {
 
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		var load auth.Payload
+		var load models.Payload
 		err := json.NewDecoder(r.Body).Decode(&load)
 		if err != nil {
 			rest.ERROR(w, err)
@@ -23,7 +23,7 @@ func (h *Handler) TokenHandler() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		rest.JSON(w, http.StatusOK, auth.TokenDO{
+		rest.JSON(w, http.StatusOK, models.JwtDO{
 			Token: token,
 		})
 

@@ -86,12 +86,11 @@ func (h Handler) Recover() Handler {
 func (h Handler) Methods(methods ...string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		set, _ := utils.MakeStrSet(methods)
-		if ok := set[r.Method]; ok {
-			h(w, r)
-		} else {
+		if !set[r.Method] {
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
+		h(w, r)
 	}
 }

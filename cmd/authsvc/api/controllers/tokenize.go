@@ -11,8 +11,7 @@ import (
 
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
-	"gitlab.inspr.dev/inspr/core/cmd/authsvc/api/models"
-	"gitlab.inspr.dev/inspr/core/pkg/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 	"go.uber.org/zap"
@@ -21,7 +20,7 @@ import (
 // Tokenize receives a token's payload and encodes it in a jwt
 func (server *Server) Tokenize() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data := auth.Payload{}
+		data := models.Payload{}
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
 			err = ierrors.NewError().BadRequest().Message("invalid body").Build()

@@ -1,4 +1,4 @@
-package auth
+package models
 
 //Payload is information caried by a Inspr acceess token
 type Payload struct {

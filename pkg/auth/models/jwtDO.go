@@ -1,6 +1,6 @@
 package models
 
-// JwtDO is the data output type for jwt access token
+// JwtDO is a data output type for master's token handler
 type JwtDO struct {
 	Token []byte `json:"token"`
 }

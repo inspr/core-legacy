@@ -10,9 +10,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
 	"testing"
 
+	"github.com/lestrrat-go/jwx/jwt"
 	"gitlab.inspr.dev/inspr/core/pkg/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
 )
 
 const bitSize = 512
@@ -37,12 +40,12 @@ func TestServer_Tokenize(t *testing.T) {
 	tests := []struct {
 		name string
 		want int
-		body auth.Payload
+		body models.Payload
 	}{
 		{
 			name: "Tokenize_valid_payload",
 			want: http.StatusOK,
-			body: auth.Payload{
+			body: models.Payload{
 				UID:        "u000001",
 				Scope:      []string{""},
 				Role:       1,
@@ -90,6 +93,25 @@ func TestServer_Tokenize(t *testing.T) {
 
 			if res.StatusCode != tt.want {
 				t.Errorf("AuthHandlers_Tokenize() = %v, want %v", res.StatusCode, tt.want)
+				return
+			}
+
+			jwtdo := models.JwtDO{}
+			err = json.NewDecoder(res.Body).Decode(&jwtdo)
+			if err != nil {
+				t.Log("error making a POST in the httptest server")
+				return
+			}
+			token, err := jwt.Parse(jwtdo.Token)
+			load, ok := token.Get("payload")
+			if !ok {
+				t.Errorf("AuthHandlers_Tokenize() didn't return a payload on it's token")
+				return
+			}
+			payload := auth.Desserialize(load)
+			if !ok || !reflect.DeepEqual(payload, tt.body) {
+				t.Errorf("AuthHandlers_Tokenize() = %v, want %v", payload, tt.body)
+				return
 			}
 		})
 	}
