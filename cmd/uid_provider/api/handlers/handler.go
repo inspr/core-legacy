@@ -87,10 +87,13 @@ func (h *Handler) LoginHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.rdb.Login(h.ctx, data.UID, data.Pwd); err != nil {
+	token, err := h.rdb.Login(h.ctx, data.UID, data.Pwd)
+	if err != nil {
 		rest.ERROR(rw, err)
 		return
 	}
+
+	rest.JSON(rw, 200, token)
 }
 
 func (h *Handler) RefreshTokenHandler(rw http.ResponseWriter, r *http.Request) {

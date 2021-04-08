@@ -12,6 +12,7 @@ import (
 	"os"
 
 	"github.com/go-redis/redis/v8"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
 )
 
 type Client struct {
@@ -92,20 +93,20 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	return token, nil
 }
 
-func (c *Client) RefreshToken(ctx context.Context, refreshToken string) (Payload, error) {
+func (c *Client) RefreshToken(ctx context.Context, refreshToken string) (auth.Payload, error) {
 	oldUser, err := decrypt(refreshToken)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	newUser, err := get(ctx, c.rdb, oldUser.UID)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	updatedPayload, err := encrypt(newUser)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	return updatedPayload, nil
@@ -161,7 +162,7 @@ func isAdmin(ctx context.Context, rdb *redis.Client, uid string) bool {
 	return true
 }
 
-func encrypt(user User) (Payload, error) {
+func encrypt(user User) (auth.Payload, error) {
 	keyString := "somehow get it from the cluster"
 	stringToEncrypt := fmt.Sprintf("%s:%s", user.UID, user.Password)
 
@@ -172,27 +173,27 @@ func encrypt(user User) (Payload, error) {
 	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	//Create a new GCM - https://en.wikipedia.org/wiki/Galois/Counter_Mode
 	//https://golang.org/pkg/crypto/cipher/#NewGCM
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	//Create a nonce. Nonce should be from GCM
 	nonce := make([]byte, aesGCM.NonceSize())
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	//Encrypt the data using aesGCM.Seal
 	//Since we don't want to save the nonce somewhere else in this case, we add it as a prefix to the encrypted data. The first nonce argument in Seal is the prefix.
 	ciphertext := aesGCM.Seal(nonce, nonce, plaintext, nil)
 
-	payload := Payload{
+	payload := auth.Payload{
 		UID:     user.UID,
 		Role:    user.Role,
 		Scope:   user.Scope,
@@ -240,6 +241,9 @@ func decrypt(encryptedString string) (User, error) {
 	return usr, nil
 }
 
-func requestNewToken(ctx context.Context, payload Payload) (string, error) {
+func requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
 	return "", nil
+	// creates payload and sends it to insprd
+	// when creating the payload, generetes the Refresh Token (cryptografado)
+	// asks Insprd to generate token and saves it into file
 }
