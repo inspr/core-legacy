@@ -54,9 +54,7 @@ func (server *Server) Tokenize() rest.Handler {
 			}
 		}
 
-		var privateKey *rsa.PrivateKey
-		var ok bool
-		privateKey, ok = parsedKey.(*rsa.PrivateKey)
+		privateKey, ok := parsedKey.(*rsa.PrivateKey)
 		if !ok {
 			server.logger.Info("Unable to parse RSA private key")
 			rest.ERROR(w, err)
