@@ -9,17 +9,21 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
+// Handler is a structure which cointains methods to handle
+// requests received by the UID Provider API
 type Handler struct {
 	rdb client.RedisManager
 	ctx context.Context
 }
 
+// NewHandler instantiates a new Handler structure
 func NewHandler(rdb client.RedisManager) *Handler {
 	return &Handler{
 		rdb: rdb,
 	}
 }
 
+// CreateUserHandler handles user creation requests
 func (h *Handler) CreateUserHandler(rw http.ResponseWriter, r *http.Request) {
 	type ReceivedDataCreate struct {
 		UID string
@@ -38,6 +42,7 @@ func (h *Handler) CreateUserHandler(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteUserHandler handles user deletion requests
 func (h *Handler) DeleteUserHandler(rw http.ResponseWriter, r *http.Request) {
 	type ReceivedDataDelete struct {
 		UID            string
@@ -56,6 +61,7 @@ func (h *Handler) DeleteUserHandler(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UpdatePasswordHandler handles requests to update an user password
 func (h *Handler) UpdatePasswordHandler(rw http.ResponseWriter, r *http.Request) {
 	type ReceivedDataUpdate struct {
 		UID            string
@@ -75,6 +81,7 @@ func (h *Handler) UpdatePasswordHandler(rw http.ResponseWriter, r *http.Request)
 	}
 }
 
+// LoginHandler handles login requests
 func (h *Handler) LoginHandler(rw http.ResponseWriter, r *http.Request) {
 	type ReceivedDataLogin struct {
 		UID string
@@ -96,6 +103,7 @@ func (h *Handler) LoginHandler(rw http.ResponseWriter, r *http.Request) {
 	rest.JSON(rw, 200, token)
 }
 
+// RefreshTokenHandler handles token refresh requests
 func (h *Handler) RefreshTokenHandler(rw http.ResponseWriter, r *http.Request) {
 	type ReceivedDataRefresh struct {
 		RefreshToken string

@@ -17,10 +17,12 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
+// Client defines a Redis client, which has the interface methods
 type Client struct {
 	rdb *redis.Client
 }
 
+// NewRedisClient creates and returns a new Redis client
 func NewRedisClient() *Client {
 	host := os.Getenv("REDIS_HOST")
 	port := os.Getenv("REDIS_PORT")
@@ -35,6 +37,7 @@ func NewRedisClient() *Client {
 	}
 }
 
+// CreateUser inserts a new user into Redis
 func (c *Client) CreateUser(ctx context.Context, uid string, newUser User) error {
 	if isAdmin(ctx, c.rdb, uid) {
 		if err := set(ctx, c.rdb, newUser); err != nil {
@@ -45,6 +48,7 @@ func (c *Client) CreateUser(ctx context.Context, uid string, newUser User) error
 	return fmt.Errorf("current user doesn't have permission to create new users")
 }
 
+// DeleteUser deletes an user from Redis, if it exists
 func (c *Client) DeleteUser(ctx context.Context, uid, usrToBeDeleted string) error {
 	if isAdmin(ctx, c.rdb, uid) {
 		if err := delete(ctx, c.rdb, usrToBeDeleted); err != nil {
@@ -55,6 +59,7 @@ func (c *Client) DeleteUser(ctx context.Context, uid, usrToBeDeleted string) err
 	return fmt.Errorf("current user doesn't have permission to create new users")
 }
 
+// UpdatePassword changes an users password, if that user exists
 func (c *Client) UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd string) error {
 	if isAdmin(ctx, c.rdb, uid) {
 
@@ -73,6 +78,9 @@ func (c *Client) UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd
 	return fmt.Errorf("current user doesn't have permission to create new users")
 }
 
+// Login receives an user and a password, and checks if they exist and match.
+// If so, it sends a request to Insprd so it can generate a new token for the
+// given user, and returns the toker if it's creation was successful
 func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	user, err := get(ctx, c.rdb, uid)
 	if err != nil {
@@ -95,6 +103,9 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	return token, nil
 }
 
+// RefreshToken receives a refreshToken and checks if it's valid.
+// If so, it returns a payload containing the updated user info
+// (user which is associated with the given refreshToken)
 func (c *Client) RefreshToken(ctx context.Context, refreshToken string) (auth.Payload, error) {
 	oldUser, err := decrypt(refreshToken)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
 )
 
+// User defines the information a user contains
 type User struct {
 	UID      string
 	Role     int
@@ -13,6 +14,7 @@ type User struct {
 	Password string
 }
 
+// RedisManager defines methods to manage Redis in the cluster
 type RedisManager interface {
 	Login(ctx context.Context, uid, pwd string) (string, error)
 	CreateUser(ctx context.Context, uid string, newUser User) error

@@ -17,6 +17,7 @@ func NewAuthMock(err error) controller.AuthorizationInterface {
 	return &AuthMock{err: err}
 }
 
+// GenerateToken is the AuthMock GenerateToken method
 func (ac *AuthMock) GenerateToken(ctx context.Context, payload auth.Payload) (string, error) {
 	return "", nil
 }

@@ -12,6 +12,8 @@ type AuthClient struct {
 	c *request.Client
 }
 
+// GenerateToken sends a request containing a payload so Insprd
+// generates a new auth token based on the payload's info
 func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (string, error) {
 	type returnStructure struct {
 		Token string `json:"token"`

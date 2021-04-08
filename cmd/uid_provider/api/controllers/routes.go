@@ -2,6 +2,7 @@ package controller
 
 import handler "gitlab.inspr.dev/inspr/core/cmd/uid_provider/api/handlers"
 
+// initRoutes defines which routes the UID Provider API will have
 func (s *Server) initRoutes() {
 	h := handler.NewHandler(s.Rdb)
 
