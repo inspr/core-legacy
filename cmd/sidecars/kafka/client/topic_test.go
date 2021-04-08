@@ -5,153 +5,208 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/linkedin/goavro"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
 )
 
-func Test_fromTopicNonPRD(t *testing.T) {
-	createMockEnv()
-	defer deleteMockEnv()
-	os.Setenv("INSPR_ENV", "test")
-	os.Setenv("INSPR_APP_CTX", "random.app1")
-	environment.RefreshEnviromentVariables()
+var mockSchema = `{"type":"string"}`
+
+func mockNewCodec() *goavro.Codec {
+	codec, _ := goavro.NewCodec(mockSchema)
+	return codec
+}
+
+func returnEncodedMessage(msg string) []byte {
+	bMsg, _ := mockNewCodec().BinaryFromNative(nil, msg)
+	return bMsg
+}
+
+func Test_getCodec(t *testing.T) {
 	type args struct {
-		topic string
+		schema string
 	}
 	tests := []struct {
-		name string
-		args args
-		want messageChannel
+		name    string
+		args    args
+		want    *goavro.Codec
+		wantErr bool
 	}{
 		{
-			name: "Non-PRD Environment topic",
+			name: "Valid schema to generate new codec",
 			args: args{
-				topic: "inspr-test-random.app1-nonPrdChan",
+				schema: mockSchema,
 			},
-			want: messageChannel{
-				channel: "nonPrdChan",
-				prefix:  "test",
-				appCtx:  environment.GetInsprAppContext(),
-			},
+			want:    mockNewCodec(),
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := fromTopic(tt.args.topic); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("fromTopic() = %v, want %v", got, tt.want)
+			got, err := getCodec(tt.args.schema)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getCodec() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got.Schema() != tt.want.Schema() {
+				t.Errorf("getCodec() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_fromTopicPRD(t *testing.T) {
+func Test_getSchema(t *testing.T) {
 	createMockEnv()
-	os.Setenv("INSPR_ENV", "")
-	os.Setenv("INSPR_APP_CTX", "random.app1")
 	defer deleteMockEnv()
 	environment.RefreshEnviromentVariables()
 	type args struct {
-		topic string
+		channel kafkaTopic
 	}
 	tests := []struct {
-		name string
-		args args
-		want messageChannel
+		name    string
+		args    args
+		want    string
+		wantErr bool
 	}{
 		{
-			name: "PRD Environment topic",
+			name: "Invalid channel",
 			args: args{
-				topic: "inspr-random.app1-prdChan",
+				channel: "invalid",
 			},
-			want: messageChannel{
-				channel: "prdChan",
-				prefix:  "",
-				appCtx:  environment.GetInsprAppContext(),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name: "Valid channel with schema",
+			args: args{
+				channel: "ch2_resolved",
 			},
+			want:    "hellotest",
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := fromTopic(tt.args.topic); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("fromTopic() = %v, want %v", got, tt.want)
+			got, err := tt.args.channel.getSchema()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getSchema() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("getSchema() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_toTopicNonPRD(t *testing.T) {
+func Test_decode(t *testing.T) {
 	createMockEnv()
-	os.Setenv("INSPR_ENV", "test")
-	os.Setenv("INSPR_APP_CTX", "random.app1")
-	os.Setenv("nonPrdChan_RESOLVED", "random.app1.nonPrdChan")
-	defer os.Unsetenv("INSPR_ENV")
-	defer os.Unsetenv("INSPR_APP_CTX")
-	defer os.Unsetenv("nonPrdChan_RESOLVED")
-
-	defer deleteMockEnv()
+	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
+	defer deleteMockEnv()
 	type args struct {
-		channel messageChannel
-		isPrd   bool
+		messageEncoded []byte
+		channel        kafkaTopic
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		want    interface{}
+		wantErr bool
 	}{
 		{
-			name: "PRD Environment topic",
+			name: "Invalid channel",
 			args: args{
-				channel: messageChannel{channel: "nonPrdChan", appCtx: "random.app1"},
-				isPrd: func() bool {
-					os.Unsetenv("INSPR_ENV")
-					os.Setenv("INSPR_ENV", "test")
-					return false
-				}(),
+				channel:        "invalid",
+				messageEncoded: []byte{},
 			},
-			want: "inspr-test-random.app1-nonPrdChan",
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Invalid schema",
+			args: args{
+				channel:        "ch2_resolved",
+				messageEncoded: []byte{104, 101, 108, 108, 111, 116, 101, 115, 116},
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Valid schema",
+			args: args{
+				channel:        "ch1_resolved",
+				messageEncoded: returnEncodedMessage("testSchemaString"),
+			},
+			wantErr: false,
+			want:    "testSchemaString",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.args.channel.toTopic(); got != tt.want {
-				t.Errorf("toTopic() = %v, want %v", got, tt.want)
+			got, err := tt.args.channel.decode(tt.args.messageEncoded)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("decode() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("decode() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_toTopicPRD(t *testing.T) {
+func Test_encode(t *testing.T) {
 	createMockEnv()
-	os.Setenv("INSPR_ENV", "")
-	os.Setenv("INSPR_APP_CTX", "random.app1")
-	defer deleteMockEnv()
+	os.Setenv("INSPR_APP_CTX", "")
 	environment.RefreshEnviromentVariables()
+	defer deleteMockEnv()
 	type args struct {
-		channel messageChannel
-		isPrd   bool
+		message interface{}
+		channel kafkaTopic
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		want    []byte
+		wantErr bool
 	}{
 		{
-			name: "PRD Environment topic",
+			name: "Invalid channel",
 			args: args{
-				channel: messageChannel{channel: "prdChan", appCtx: "random.app1"},
-				isPrd: func() bool {
-					os.Unsetenv("INSPR_ENV")
-					os.Setenv("INSPR_ENV", "")
-					return true
-				}(),
+				channel: "invalid",
+				message: []byte{},
 			},
-			want: "inspr-random.app1-prdChan",
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Invalid schema",
+			args: args{
+				channel: "ch2_resolved",
+				message: []byte{104, 101, 108, 108, 111, 116, 101, 115, 116},
+			},
+			wantErr: true,
+			want:    nil,
+		},
+		{
+			name: "Valid encoding",
+			args: args{
+				channel: "ch1_resolved",
+				message: "testMessageEncodingString",
+			},
+			wantErr: false,
+			want:    returnEncodedMessage("testMessageEncodingString"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.args.channel.toTopic(); got != tt.want {
-				t.Errorf("toTopic() = %v, want %v", got, tt.want)
+			got, err := tt.args.channel.encode(tt.args.message)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("encode() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("encode() = %v, want %v", got, tt.want)
 			}
 		})
 	}

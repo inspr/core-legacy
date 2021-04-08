@@ -8,6 +8,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"go.uber.org/zap"
 
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
@@ -15,34 +16,40 @@ import (
 )
 
 func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
+	logger.Debug("getting necessary environment variables for Node structure deployment")
 	input := app.Spec.Boundary.Input
 	output := app.Spec.Boundary.Output
 	channels := input.Union(output)
 
 	// label name to be used in the service
-	appDeployName := toDeploymentName(app)
-
+	appID := toAppID(app)
 	inputEnv := input.Join(";")
 	outputEnv := output.Join(";")
 	env := utils.EnvironmentMap{
 		"INSPR_INPUT_CHANNELS":    inputEnv,
 		"INSPR_OUTPUT_CHANNELS":   outputEnv,
 		"INSPR_SIDECAR_IMAGE":     environment.GetSidecarImage(),
-		"INSPR_APP_ID":            appDeployName,
+		"INSPR_APP_ID":            appID,
 		"INSPR_APP_CTX":           app.Meta.Parent,
 		"INSPR_ENV":               environment.GetInsprEnvironment(),
 		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
 		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
 	}
+
 	resolves, err := no.memory.Apps().ResolveBoundary(app)
 	if err != nil {
+		logger.Error("unable to resolve Node boundaries",
+			zap.Any("boundaries", app.Spec.Boundary))
 		panic(err)
 	}
+
+	logger.Debug("resolving Node Boundary in the cluster")
 	channels.Map(func(boundary string) string {
 		resolved := resolves[boundary]
 		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 		ch, _ := no.memory.Channels().Get(parent, chName)
 		ct, _ := no.memory.ChannelTypes().Get(parent, ch.Spec.Type)
+		resolved = "INSPR_" + ch.Meta.UUID
 		env[resolved+"_SCHEMA"] = ct.Schema
 		env[boundary+"_RESOLVED"] = resolved
 		return boundary
@@ -52,9 +59,11 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 
 // dAppToDeployment translates the DApp
 func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
+	logger.Debug("converting a dApp structure to a k8s deployment")
 
 	sidecarEnvironment := no.baseEnvironment(app)
 
+	logger.Debug("defining Node's env vars")
 	nodeKubeEnv := append(app.Spec.Node.Spec.Environment.ParseToK8sArrEnv(), kubeCore.EnvVar{
 		Name: "INSPR_UNIX_SOCKET",
 		ValueFrom: &kubeCore.EnvVarSource{
@@ -64,7 +73,9 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	})
 
+	logger.Debug("defining Node's k8s container data")
 	appDeployName := toDeploymentName(app)
+	appID := toAppID(app)
 	nodeContainer := kubeCore.Container{
 		Name:  appDeployName,
 		Image: app.Spec.Node.Spec.Image,
@@ -78,6 +89,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		Env: nodeKubeEnv,
 	}
 
+	logger.Debug("defining Sidecars's k8s env vars")
 	sidecarKubeEnv := append(sidecarEnvironment.ParseToK8sArrEnv(), kubeCore.EnvVar{
 		Name: "INSPR_UNIX_SOCKET",
 		ValueFrom: &kubeCore.EnvVarSource{
@@ -87,6 +99,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	})
 
+	logger.Debug("defining Sidecar's k8s container data")
 	sidecarContainer := kubeCore.Container{
 		Name:  appDeployName + "-sidecar",
 		Image: environment.GetSidecarImage(),
@@ -108,7 +121,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	}
 
-	appLabels := map[string]string{"app": appDeployName}
+	appLabels := map[string]string{"app": appID}
 	replicas := new(int32)
 
 	if app.Spec.Node.Spec.Replicas == 0 {
@@ -117,6 +130,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 
 	*replicas = int32(app.Spec.Node.Spec.Replicas)
 
+	logger.Debug("building and returning the k8s complete deployment")
 	return &kubeApp.Deployment{
 		ObjectMeta: kubeMeta.ObjectMeta{
 			Name:   appDeployName,
@@ -145,6 +159,12 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 
 // toDeployment - creates the kubernetes deployment name from the app
 func toDeploymentName(app *meta.App) string {
+
+	return "node-" + app.Meta.UUID
+}
+
+// toAppID - creates the kubernetes deployment name from the app
+func toAppID(app *meta.App) string {
 	var depNames utils.StringArray
 	depNames = strings.Split(app.Meta.Parent, ".")
 	if depNames[0] == "" {
@@ -183,7 +203,6 @@ func toNodeName(deployName string) (string, error) {
 }
 
 func toNodeParent(deployName string) (string, error) {
-
 	strs := utils.StringArray(strings.Split(deployName, "-"))
 	return strs[:len(strs)-1].Join("."), nil
 }

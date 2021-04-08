@@ -7,7 +7,6 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"go.uber.org/zap"
 )
 
 func TestNewReader(t *testing.T) {
@@ -27,7 +26,7 @@ func TestNewReader(t *testing.T) {
 			name:    "It should return a new Reader",
 			wantErr: false,
 			checkFunction: func(t *testing.T, reader *Reader) {
-				if !(reader.consumers != nil && reader.lastMessage == nil && len(reader.consumers) > 0) {
+				if !(reader.consumers != nil && len(reader.consumers) > 0) {
 					t.Errorf("check function error = Reader not created successfully")
 				}
 			},
@@ -87,7 +86,7 @@ func TestReader_ReadMessage(t *testing.T) {
 					"ch1_resolved": &MockConsumer{
 						err:           false,
 						pollMsg:       "Hello World!",
-						topic:         messageChannel{channel: "ch1_resolved"}.toTopic(),
+						topic:         "ch1_resolved",
 						errCode:       0,
 						senderChannel: "ch1_resolved",
 					},
@@ -106,7 +105,7 @@ func TestReader_ReadMessage(t *testing.T) {
 					"ch1_resolved": &MockConsumer{
 						err:           true,
 						pollMsg:       "Hello World!",
-						topic:         messageChannel{channel: "ch1_resolved"}.toTopic(),
+						topic:         "ch1_resolved",
 						errCode:       0,
 						senderChannel: "ch1_resolved",
 					},
@@ -123,7 +122,7 @@ func TestReader_ReadMessage(t *testing.T) {
 					"ch1_resolved": &MockConsumer{
 						err:           false,
 						pollMsg:       "Hello World!",
-						topic:         messageChannel{channel: "ch1_resolved"}.toTopic(),
+						topic:         "ch1_resolved",
 						errCode:       0,
 						senderChannel: "ch2",
 					},
@@ -136,11 +135,8 @@ func TestReader_ReadMessage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			logger, _ := zap.NewDevelopment()
 			reader := &Reader{
-				consumers:   tt.fields.consumers,
-				lastMessage: tt.fields.lastMessage,
-				logger:      logger,
+				consumers: tt.fields.consumers,
 			}
 
 			bData, err := reader.ReadMessage(tt.uniqueChannel)
@@ -202,10 +198,9 @@ func TestReader_Commit(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			reader := &Reader{
-				consumers:   tt.fields.consumers,
-				lastMessage: tt.fields.lastMessage,
+				consumers: tt.fields.consumers,
 			}
-			if err := reader.CommitMessage(tt.uniqueChannel); (err != nil) != tt.wantErr {
+			if err := reader.Commit(tt.uniqueChannel); (err != nil) != tt.wantErr {
 				t.Errorf("Reader.Commit() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -251,8 +246,7 @@ func TestReader_Close(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			reader := &Reader{
-				consumers:   tt.fields.consumers,
-				lastMessage: tt.fields.lastMessage,
+				consumers: tt.fields.consumers,
 			}
 			if err := reader.Close(); (err != nil) != tt.wantErr {
 				t.Errorf("Reader.Close() error = %v, wantErr %v", err, tt.wantErr)

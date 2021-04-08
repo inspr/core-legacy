@@ -1,6 +1,10 @@
 package kafkasc
 
-import "os"
+import (
+	"os"
+
+	"go.uber.org/zap"
+)
 
 // Environment represents the current inspr environment
 type Environment struct {
@@ -9,6 +13,14 @@ type Environment struct {
 }
 
 var env *Environment
+var logger *zap.Logger
+
+// init is called after all the variable declarations in the package have evaluated
+// their initializers, and those are evaluated only after all the imported packages
+// have been initialized
+func init() {
+	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "kafka-sidecar")))
+}
 
 // GetEnvironment returns the current inspr environment
 func GetEnvironment() *Environment {
