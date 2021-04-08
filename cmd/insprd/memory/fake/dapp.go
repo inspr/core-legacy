@@ -21,7 +21,11 @@ func (a *Apps) Get(query string) (*meta.App, error) {
 	}
 	ct, ok := a.apps[query]
 	if !ok {
-		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("dapp %s not found", query)).Build()
+		return nil, ierrors.
+			NewError().
+			NotFound().
+			Message("dapp %s not found", query).
+			Build()
 	}
 	return ct, nil
 }
@@ -35,7 +39,11 @@ func (a *Apps) Create(context string, ct *meta.App) error {
 
 	_, ok := a.apps[query]
 	if ok {
-		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("dapp %s already exists", query)).Build()
+		return ierrors.
+			NewError().
+			AlreadyExists().
+			Message("dapp %s already exists", query).
+			Build()
 	}
 	a.apps[query] = ct
 	return nil
@@ -48,7 +56,11 @@ func (a *Apps) Delete(query string) error {
 	}
 	_, ok := a.apps[query]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("dapp %s not found", query)).Build()
+		return ierrors.
+			NewError().
+			NotFound().
+			Message("dapp %s not found", query).
+			Build()
 	}
 
 	delete(a.apps, query)
@@ -63,7 +75,11 @@ func (a *Apps) Update(context string, ct *meta.App) error {
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
 	_, ok := a.apps[query]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("dapp %s not found", query)).Build()
+		return ierrors.
+			NewError().
+			NotFound().
+			Message("dapp %s not found", query).
+			Build()
 	}
 	a.apps[query] = ct
 	return nil

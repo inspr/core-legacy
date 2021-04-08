@@ -184,8 +184,12 @@ func (amm *ChannelTypeRootGetter) Get(context string, ctName string) (*meta.Chan
 
 	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
 	if err != nil {
-		return nil, ierrors.NewError().BadRequest().InnerError(err).
-			Message("target dApp doesn't exist (Root Getter)").Build()
+		return nil, ierrors.
+			NewError().
+			BadRequest().
+			InnerError(err).
+			Message("target dApp does not exist on root").
+			Build()
 	}
 
 	if parentApp.Spec.ChannelTypes != nil {
@@ -198,7 +202,9 @@ func (amm *ChannelTypeRootGetter) Get(context string, ctName string) (*meta.Chan
 		zap.String("ctype", ctName),
 		zap.String("context", context))
 
-	return nil, ierrors.NewError().NotFound().
-		Message("channelType not found for given query (Root Getter)").
+	return nil, ierrors.
+		NewError().
+		NotFound().
+		Message("channelType not found for given query on root").
 		Build()
 }

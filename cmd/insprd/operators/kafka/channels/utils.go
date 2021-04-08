@@ -1,7 +1,6 @@
 package channels
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -33,7 +32,11 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 			logger.Error("invalid 'kafka.partition.number' in Channels annotations")
 			return config, ierrors.NewError().
 				InvalidChannel().
-				Message(fmt.Sprintf("invalid partition configuration %s", ch.Meta.Annotations["kafka.partition.number"])).Build()
+				Message(
+					"invalid partition configuration %s",
+					ch.Meta.Annotations["kafka.partition.number"],
+				).
+				Build()
 		}
 	}
 
@@ -45,7 +48,11 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 			logger.Error("invalid 'kafka.replication.factor' in Channels annotations")
 			return config, ierrors.NewError().
 				InvalidChannel().
-				Message(fmt.Sprintf("invalid replication configuration %s", ch.Meta.Annotations["kafka.replication.factor"])).Build()
+				Message(
+					"invalid replication configuration %s",
+					ch.Meta.Annotations["kafka.replication.factor"],
+				).
+				Build()
 		}
 	}
 

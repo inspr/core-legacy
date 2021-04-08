@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -186,9 +185,9 @@ func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[
 	return ""
 }
 
-func getParentApp(sonQuery string) (*meta.App, error) {
+func getParentApp(childQuery string) (*meta.App, error) {
 	var parentQuery string
-	sonRef := strings.Split(sonQuery, ".")
+	sonRef := strings.Split(childQuery, ".")
 	if len(sonRef) == 1 {
 		parentQuery = ""
 	} else {
@@ -199,9 +198,11 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, ok := parentApp.Spec.Apps[sonQuery]; parentQuery == "" && !ok {
-		return nil, ierrors.NewError().NotFound().
-			Message(fmt.Sprintf("dApp %s doesn't exist in root", sonQuery)).
+	if _, ok := parentApp.Spec.Apps[childQuery]; parentQuery == "" && !ok {
+		return nil, ierrors.
+			NewError().
+			NotFound().
+			Message("dApp %s doesn't exist in root", childQuery).
 			Build()
 	}
 

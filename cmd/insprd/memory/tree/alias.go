@@ -39,8 +39,11 @@ func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error
 
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		logger.Error("alias doesn't exists")
-		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
+		return nil, ierrors.
+			NewError().
+			BadRequest().
+			Message("alias not found for the given key %v", aliasKey).
+			Build()
 	}
 
 	//return alias
@@ -166,10 +169,11 @@ func (amm *AliasMemoryManager) Delete(context, aliasKey string) error {
 	logger.Debug("checking if Alias to be deleted exists in given context")
 	// check if alias key exist in context
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		logger.Error("unable to find Alias to be deleted in given dApp",
-			zap.String("alias key", aliasKey),
-			zap.String("dApp", app.Meta.Name))
-		return ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
+		return ierrors.
+			NewError().
+			BadRequest().
+			Message("alias not found for the given key %v", aliasKey).
+			Build()
 	}
 
 	childName := strings.Split(aliasKey, ".")[0]
