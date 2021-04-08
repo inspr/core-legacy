@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.authName }}
+  labels:
+    {{- include "insprd.labels" . | nindent 4 }}
+    app: {{ .Values.service.authName }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.authPort }}
+      targetPort: {{ .Values.service.authTargetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Values.service.authName }}
+    {{- include "insprd.selectorLabels" . | nindent 4 }}

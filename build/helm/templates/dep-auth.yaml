@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.deployment.insprdName }}
+  name: {{ .Values.deployment.authName }}
   labels:
     {{- include "insprd.labels" . | nindent 4 }}
-    app: {{ .Values.service.insprdName }}
+    app: {{ .Values.service.authName }}
 spec:
-  replicas: {{ .Values.replicas.insprdCount }}
+  replicas: {{ .Values.replicas.authCount }}
   selector:
     matchLabels:
       {{- include "insprd.selectorLabels" . | nindent 6 }}
-      app: {{ .Values.service.insprdName }}
+      app: {{ .Values.service.authName }}
   template:
     metadata:
       labels:
         {{- include "insprd.selectorLabels" . | nindent 8 }}
-        app: {{ .Values.service.insprdName }}
+        app: {{ .Values.service.authName }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -24,32 +24,22 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Values.deployment.insprdName }}
+        - name: {{ .Values.deployment.authName }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: {{ .Values.insprdRepository }}
-          imagePullPolicy: {{ .Values.image.insprdPullPolicy }}
+          image: {{ .Values.authRepository }}
+          imagePullPolicy: {{ .Values.image.authPullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.insprdTargetport }}
+              containerPort: {{ .Values.service.authTargetPort }}
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            - name: "INSPR_SIDECAR_IMAGE"
-              value: {{ .Values.kafkaSidecarImage}}
-            - name: "KAFKA_BOOTSTRAP_SERVERS"
-              value: {{ .Values.kafkaBootstrap}}
-            - name: "KAFKA_AUTO_OFFSET_RESET"
-              value: {{ .Values.kafkaAutoOffsetReset}}
-            - name: "NODES_APPS_NAMESPACE"
-              value: {{ .Values.insprAppsNamespace}}
-            - name: "INSPR_ENV"
-              value: {{ .Values.insprEnvironment}}
-            - name: JWT_PUBLIC_KEY
+            - name: JWT_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: jwtpublickey
+                  name: jwtprivatekey
                   key: key
       {{- with .Values.nodeSelector }}
       nodeSelector:
