@@ -7,6 +7,8 @@ package rest
 
 import (
 	"net/http"
+
+	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
 // Handler is an alias of the api router function.
@@ -77,5 +79,19 @@ func (h Handler) Recover() Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer RecoverFromPanic(w)
 		h(w, r)
+	}
+}
+
+// Methods allows for generic method definition
+func (h Handler) Methods(methods ...string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		set, _ := utils.MakeStrSet(methods)
+		if ok := set[r.Method]; ok {
+			h(w, r)
+		} else {
+			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
 	}
 }
