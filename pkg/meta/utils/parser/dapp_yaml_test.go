@@ -86,7 +86,7 @@ func createDAppYaml() (string, meta.App) {
 			Reference:   "mock_reference",
 			Annotations: map[string]string{},
 			Parent:      "mock_parent",
-			SHA256:      "mock_sha256",
+			UUID:        "mock_sha256",
 		},
 		Spec: meta.AppSpec{},
 	}

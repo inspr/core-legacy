@@ -26,7 +26,7 @@ func getMockAppWithoutApp1() *meta.App {
 			Reference:   "appParent",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -49,7 +49,7 @@ func getMockAppWithoutApp1() *meta.App {
 						Reference:   "root.ct1",
 						Annotations: map[string]string{},
 						Parent:      "root",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -70,7 +70,7 @@ func getMockAppWithoutCh1() *meta.App {
 			Reference:   "appParent",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -81,7 +81,7 @@ func getMockAppWithoutCh1() *meta.App {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -92,7 +92,7 @@ func getMockAppWithoutCh1() *meta.App {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},
@@ -142,7 +142,7 @@ func getMockAppWithoutCt1() *meta.App {
 			Reference:   "appParent",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -153,7 +153,7 @@ func getMockAppWithoutCt1() *meta.App {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -164,7 +164,7 @@ func getMockAppWithoutCt1() *meta.App {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},

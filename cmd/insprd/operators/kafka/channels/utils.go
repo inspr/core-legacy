@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"go.uber.org/zap"
@@ -22,7 +21,10 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 		zap.String("channel", ch.Meta.Name),
 		zap.Any("annotations", ch.Meta.Annotations))
 
-	config := kafkaConfiguration{}
+	config := kafkaConfiguration{
+		numberOfPartitions: 1,
+		replicationFactor:  1,
+	}
 	if nPart, ok := ch.Meta.Annotations["kafka.partition.number"]; ok {
 		var err error
 		config.numberOfPartitions, err = strconv.Atoi(nPart)
@@ -58,16 +60,12 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 	return config, nil
 }
 
-func toTopic(ctx, name string) string {
+func toTopic(ch *meta.Channel) string {
 	logger.Debug("getting Kafka Topic name given a Channel name and context",
-		zap.String("context", ctx),
-		zap.String("channel", name))
+		zap.String("context", ch.Meta.Parent),
+		zap.String("channel", ch.Meta.Name))
 
-	insprEnvironment := environment.GetInsprEnvironment()
-	if insprEnvironment == "" {
-		return fmt.Sprintf("inspr-%s-%s", ctx, name)
-	}
-	return fmt.Sprintf("inspr-%s-%s-%s", insprEnvironment, ctx, name)
+	return "INSPR_" + ch.Meta.UUID
 }
 
 func fromTopic(name string, meta *kafka.Metadata) (ch *meta.Channel) {
