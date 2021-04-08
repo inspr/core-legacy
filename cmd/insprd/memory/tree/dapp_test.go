@@ -3,11 +3,11 @@ package tree
 import (
 	"fmt"
 	"os"
-	"reflect"
 	"testing"
 
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 	"gitlab.inspr.dev/inspr/core/pkg/utils"
 )
@@ -19,7 +19,7 @@ func getMockApp() *meta.App {
 			Reference:   "",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -30,7 +30,7 @@ func getMockApp() *meta.App {
 						Reference:   "appNode",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -39,7 +39,7 @@ func getMockApp() *meta.App {
 								Reference:   "appNode.appNode",
 								Annotations: map[string]string{},
 								Parent:      "appNode",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeAppNode",
@@ -76,7 +76,7 @@ func getMockApp() *meta.App {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -87,7 +87,7 @@ func getMockApp() *meta.App {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},
@@ -130,7 +130,7 @@ func getMockApp() *meta.App {
 						Reference:   "app2",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -141,7 +141,7 @@ func getMockApp() *meta.App {
 									Reference:   "app2.app3",
 									Annotations: map[string]string{},
 									Parent:      "app2",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -150,7 +150,7 @@ func getMockApp() *meta.App {
 											Reference:   "app3.nodeApp2",
 											Annotations: map[string]string{},
 											Parent:      "app3",
-											SHA256:      "",
+											UUID:        "",
 										},
 										Spec: meta.NodeSpec{
 											Image: "imageNodeApp3",
@@ -171,7 +171,7 @@ func getMockApp() *meta.App {
 									Reference:   "app2.app4",
 									Annotations: map[string]string{},
 									Parent:      "app2",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -180,7 +180,7 @@ func getMockApp() *meta.App {
 											Reference:   "app4.nodeApp4",
 											Annotations: map[string]string{},
 											Parent:      "app2.app4",
-											SHA256:      "",
+											UUID:        "",
 										},
 										Spec: meta.NodeSpec{
 											Image: "imageNodeApp4",
@@ -212,7 +212,7 @@ func getMockApp() *meta.App {
 												Reference:   "app1.ctUpdate1",
 												Annotations: map[string]string{},
 												Parent:      "app1",
-												SHA256:      "",
+												UUID:        "",
 											},
 										},
 									},
@@ -252,7 +252,7 @@ func getMockApp() *meta.App {
 						Reference:   "bound",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -261,7 +261,7 @@ func getMockApp() *meta.App {
 								Reference:   "bound.bound",
 								Annotations: map[string]string{},
 								Parent:      "",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeAppNode",
@@ -274,7 +274,7 @@ func getMockApp() *meta.App {
 									Reference:   "bound.bound2",
 									Annotations: map[string]string{},
 									Parent:      "bound",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -283,7 +283,7 @@ func getMockApp() *meta.App {
 											Reference:   "bound.bound2",
 											Annotations: map[string]string{},
 											Parent:      "bound",
-											SHA256:      "",
+											UUID:        "",
 										},
 										Spec: meta.NodeSpec{
 											Image: "imageNodeAppNode",
@@ -296,7 +296,7 @@ func getMockApp() *meta.App {
 												Reference:   "bound.bound2.bound3",
 												Annotations: map[string]string{},
 												Parent:      "bound.bound2",
-												SHA256:      "",
+												UUID:        "",
 											},
 											Spec: meta.AppSpec{
 												Node: meta.Node{
@@ -305,7 +305,7 @@ func getMockApp() *meta.App {
 														Reference:   "bound.bound2.bound3",
 														Annotations: map[string]string{},
 														Parent:      "bound.bound2",
-														SHA256:      "",
+														UUID:        "",
 													},
 													Spec: meta.NodeSpec{
 														Image: "imageNodeAppNode",
@@ -335,7 +335,7 @@ func getMockApp() *meta.App {
 									Reference:   "invalid.path",
 									Annotations: map[string]string{},
 									Parent:      "invalid.path",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -344,7 +344,7 @@ func getMockApp() *meta.App {
 											Reference:   "invalid.path",
 											Annotations: map[string]string{},
 											Parent:      "bound",
-											SHA256:      "",
+											UUID:        "",
 										},
 										Spec: meta.NodeSpec{
 											Image: "imageNodeAppNode",
@@ -357,7 +357,7 @@ func getMockApp() *meta.App {
 												Reference:   "bound.boundNP.boundNP2",
 												Annotations: map[string]string{},
 												Parent:      "bound.boundNP",
-												SHA256:      "",
+												UUID:        "",
 											},
 											Spec: meta.AppSpec{
 												Node: meta.Node{
@@ -366,7 +366,7 @@ func getMockApp() *meta.App {
 														Reference:   "bound.boundNP.boundNP2",
 														Annotations: map[string]string{},
 														Parent:      "bound.boundNP",
-														SHA256:      "",
+														UUID:        "",
 													},
 													Spec: meta.NodeSpec{
 														Image: "imageNodeAppNode",
@@ -396,7 +396,7 @@ func getMockApp() *meta.App {
 									Reference:   "bound.bound4",
 									Annotations: map[string]string{},
 									Parent:      "bound",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -405,7 +405,7 @@ func getMockApp() *meta.App {
 											Reference:   "bound.bound4",
 											Annotations: map[string]string{},
 											Parent:      "bound",
-											SHA256:      "",
+											UUID:        "",
 										},
 										Spec: meta.NodeSpec{
 											Image: "imageNodeAppNode",
@@ -426,7 +426,7 @@ func getMockApp() *meta.App {
 									Reference:   "bound.bound5",
 									Annotations: map[string]string{},
 									Parent:      "bound",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -435,7 +435,7 @@ func getMockApp() *meta.App {
 											Reference:   "bound.bound5",
 											Annotations: map[string]string{},
 											Parent:      "bound",
-											SHA256:      "",
+											UUID:        "",
 										},
 										Spec: meta.NodeSpec{
 											Image: "imageNodeAppNode",
@@ -456,7 +456,7 @@ func getMockApp() *meta.App {
 									Reference:   "bound.bound6",
 									Annotations: map[string]string{},
 									Parent:      "bound",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -465,7 +465,7 @@ func getMockApp() *meta.App {
 											Reference:   "bound.bound6",
 											Annotations: map[string]string{},
 											Parent:      "bound",
-											SHA256:      "",
+											UUID:        "",
 										},
 										Spec: meta.NodeSpec{
 											Image: "imageNodeAppNode",
@@ -478,7 +478,7 @@ func getMockApp() *meta.App {
 												Reference:   "bound.bound6",
 												Annotations: map[string]string{},
 												Parent:      "bound.bound6",
-												SHA256:      "",
+												UUID:        "",
 											},
 											Spec: meta.AppSpec{
 												Node: meta.Node{
@@ -487,7 +487,7 @@ func getMockApp() *meta.App {
 														Reference:   "bound.bound6",
 														Annotations: map[string]string{},
 														Parent:      "bound",
-														SHA256:      "",
+														UUID:        "",
 													},
 													Spec: meta.NodeSpec{
 														Image: "imageNodeAppNode",
@@ -522,6 +522,7 @@ func getMockApp() *meta.App {
 								Meta: meta.Metadata{
 									Name:   "bdch1",
 									Parent: "",
+									UUID:   "uuid-bdch1",
 								},
 								ConnectedApps: []string{},
 								Spec:          meta.ChannelSpec{},
@@ -530,6 +531,7 @@ func getMockApp() *meta.App {
 								Meta: meta.Metadata{
 									Name:   "bdch2",
 									Parent: "",
+									UUID:   "uuid-bdch2",
 								},
 								Spec: meta.ChannelSpec{},
 							},
@@ -598,6 +600,7 @@ func getMockApp() *meta.App {
 							"channel1": {
 								Meta: meta.Metadata{
 									Name: "channel1",
+									UUID: "uuid-channel1",
 								},
 								ConnectedApps: utils.StringArray{
 									"noAliasSon",
@@ -606,6 +609,7 @@ func getMockApp() *meta.App {
 							"channel2": {
 								Meta: meta.Metadata{
 									Name: "channel2",
+									UUID: "uuid-channel2",
 								},
 								ConnectedApps: utils.StringArray{
 									"noAliasSon",
@@ -622,12 +626,21 @@ func getMockApp() *meta.App {
 						},
 					},
 				},
+				"appForParentInjection": {
+					Meta: meta.Metadata{
+						Name: "appForParentInjection",
+					},
+					Spec: meta.AppSpec{
+						Apps: make(map[string]*meta.App),
+					},
+				},
 			},
 			Channels: map[string]*meta.Channel{
 				"ch1": {
 					Meta: meta.Metadata{
 						Name:   "ch1",
 						Parent: "",
+						UUID:   "uuid-ch1",
 					},
 					Spec: meta.ChannelSpec{
 						Type: "ct1",
@@ -637,6 +650,7 @@ func getMockApp() *meta.App {
 					Meta: meta.Metadata{
 						Name:   "ch2",
 						Parent: "",
+						UUID:   "uuid-ch2",
 					},
 					Spec: meta.ChannelSpec{
 						Type: "ct2",
@@ -650,7 +664,7 @@ func getMockApp() *meta.App {
 						Reference:   "root.ct1",
 						Annotations: map[string]string{},
 						Parent:      "root",
-						SHA256:      "",
+						UUID:        "uuid-ct1",
 					},
 					Schema: "",
 				},
@@ -660,7 +674,7 @@ func getMockApp() *meta.App {
 						Reference:   "root.ct2",
 						Annotations: map[string]string{},
 						Parent:      "root",
-						SHA256:      "",
+						UUID:        "uuid-ct2",
 					},
 					Schema: "",
 				},
@@ -700,8 +714,8 @@ func TestMemoryManager_Apps(t *testing.T) {
 			tmm := &MemoryManager{
 				root: tt.fields.root,
 			}
-			if got := tmm.Apps(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MemoryManager.Apps() = %v, want %v", got, tt.want)
+			if got := tmm.Apps(); !metautils.CompareWithUUID(got.(*AppMemoryManager).root, tt.want.(*AppMemoryManager).root) {
+				t.Errorf("MemoryManager.Apps() = %v", got)
 			}
 		})
 	}
@@ -804,7 +818,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 				t.Errorf("AppMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !metautils.CompareWithoutUUID(got, tt.want) {
 				t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 			}
 		})
@@ -850,7 +864,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "appCr1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node:         meta.Node{},
@@ -871,7 +885,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Reference:   "appCr1",
 					Annotations: map[string]string{},
 					Parent:      "",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Spec: meta.AppSpec{
 					Node:         meta.Node{},
@@ -903,7 +917,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node:         meta.Node{},
@@ -924,7 +938,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Reference:   "",
 					Annotations: map[string]string{},
 					Parent:      "app2",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Spec: meta.AppSpec{
 					Node:         meta.Node{},
@@ -956,7 +970,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node:         meta.Node{},
@@ -991,7 +1005,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node:         meta.Node{},
@@ -1026,7 +1040,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node:         meta.Node{},
@@ -1061,7 +1075,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node:         meta.Node{},
@@ -1082,7 +1096,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Reference:   "",
 					Annotations: map[string]string{},
 					Parent:      "app2",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Spec: meta.AppSpec{
 					Node:         meta.Node{},
@@ -1114,7 +1128,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "app2.app2",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node:         meta.Node{},
@@ -1135,7 +1149,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Reference:   "app2.app2",
 					Annotations: map[string]string{},
 					Parent:      "app2",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Spec: meta.AppSpec{
 					Node:         meta.Node{},
@@ -1167,7 +1181,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "app2",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node:         meta.Node{},
@@ -1202,7 +1216,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -1211,7 +1225,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								Reference:   "",
 								Annotations: map[string]string{},
 								Parent:      "app2",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeAppTest",
@@ -1250,7 +1264,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -1259,7 +1273,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								Reference:   "",
 								Annotations: nil,
 								Parent:      "",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeAppTest",
@@ -1282,7 +1296,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Reference:   "",
 					Annotations: map[string]string{},
 					Parent:      "app2",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Spec: meta.AppSpec{
 					Node: meta.Node{
@@ -1291,7 +1305,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 							Reference:   "",
 							Annotations: map[string]string{},
 							Parent:      "app2",
-							SHA256:      "",
+							UUID:        "",
 						},
 						Spec: meta.NodeSpec{
 							Image: "imageNodeAppTest",
@@ -1324,10 +1338,9 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "app2.app7",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node: meta.Node{},
 						Apps: map[string]*meta.App{
 							"app8": {
 								Meta: meta.Metadata{
@@ -1335,7 +1348,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 									Reference:   "app2.app7.app8",
 									Annotations: map[string]string{},
 									Parent:      "app2.app7",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node:         meta.Node{},
@@ -1405,7 +1418,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -1455,7 +1468,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "app2.app2",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -1516,7 +1529,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "appCr1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node:         meta.Node{},
@@ -1551,7 +1564,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -1560,7 +1573,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								Reference:   "",
 								Annotations: nil,
 								Parent:      "",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeAppTest",
@@ -1583,7 +1596,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Reference:   "",
 					Annotations: map[string]string{},
 					Parent:      "app2",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Spec: meta.AppSpec{
 					Node: meta.Node{
@@ -1592,7 +1605,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 							Reference:   "",
 							Annotations: map[string]string{},
 							Parent:      "app2",
-							SHA256:      "",
+							UUID:        "",
 						},
 						Spec: meta.NodeSpec{
 							Image: "imageNodeAppTest",
@@ -1626,7 +1639,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -1635,7 +1648,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								Reference:   "",
 								Annotations: nil,
 								Parent:      "",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeAppTest",
@@ -1681,7 +1694,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Reference:   "",
 						Annotations: map[string]string{},
 						Parent:      "app2",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Aliases: map[string]*meta.Alias{
@@ -1696,7 +1709,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 									Reference:   "app2.app6",
 									Annotations: map[string]string{},
 									Parent:      "app2.app2",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -1705,7 +1718,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 											Reference:   "app6.nodeApp4",
 											Annotations: map[string]string{},
 											Parent:      "app4",
-											SHA256:      "",
+											UUID:        "",
 										},
 										Spec: meta.NodeSpec{
 											Image: "imageNodeApp4",
@@ -1753,14 +1766,20 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			am := GetTreeMemory().Apps()
+			am.InitTransaction()
 			err := am.Create(tt.args.context, tt.args.app)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+			if !tt.wantErr {
+				scope, _ := metautils.JoinScopes(tt.args.context, tt.args.app.Meta.Name)
+				got, _ := am.Get(scope)
+				metautils.RecursiveValidateUUIDS("AppMemoryManager.Create()", got, t)
+			}
 			if tt.want != nil {
 				got, err := am.Get(tt.args.searchQuery)
-				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+				if (err != nil) || !metautils.CompareWithoutUUID(got, tt.want) {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
@@ -1768,6 +1787,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			if tt.checkFunction != nil {
 				tt.checkFunction(t)
 			}
+			am.Cancel()
 		})
 	}
 }
@@ -1959,7 +1979,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -2008,7 +2028,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{
@@ -2017,7 +2037,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								Reference:   "app1.nodeApp1",
 								Annotations: map[string]string{},
 								Parent:      "app1",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.NodeSpec{
 								Image: "imageNodeApp1",
@@ -2070,7 +2090,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -2137,7 +2157,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -2148,7 +2168,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 									Reference:   "app1.appUpdate1",
 									Annotations: map[string]string{},
 									Parent:      "",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{},
 							},
@@ -2158,7 +2178,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 									Reference:   "app1.appUpdate2",
 									Annotations: map[string]string{},
 									Parent:      "",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{},
 							},
@@ -2188,7 +2208,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 									Reference:   "app1.ctUpdate1",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 							},
 						},
@@ -2206,7 +2226,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 					Reference:   "app1",
 					Annotations: map[string]string{},
 					Parent:      "",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Spec: meta.AppSpec{
 					Node: meta.Node{},
@@ -2217,7 +2237,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								Reference:   "app1.appUpdate1",
 								Annotations: map[string]string{},
 								Parent:      "app1",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.AppSpec{},
 						},
@@ -2227,7 +2247,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								Reference:   "app1.appUpdate2",
 								Annotations: map[string]string{},
 								Parent:      "app1",
-								SHA256:      "",
+								UUID:        "",
 							},
 							Spec: meta.AppSpec{},
 						},
@@ -2257,7 +2277,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								Reference:   "app1.ctUpdate1",
 								Annotations: map[string]string{},
 								Parent:      "app1",
-								SHA256:      "",
+								UUID:        "",
 							},
 							ConnectedChannels: []string{"ch2app1Update"},
 						},
@@ -2286,7 +2306,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -2297,7 +2317,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},
@@ -2336,7 +2356,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 									Reference:   "app1.newChannelType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 							},
 						},
@@ -2388,7 +2408,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 					fmt.Println(derr.Error())
 				}
 				cl.Print(os.Stdout)
-				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+				if (err != nil) || !metautils.CompareWithoutUUID(got, tt.want) {
 					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
@@ -2551,7 +2571,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				t.Errorf("AppMemoryManager.ResolveBoundary() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !metautils.CompareWithoutUUID(got, tt.want) {
 				t.Errorf("AppMemoryManager.ResolveBoundary() = %v, want %v", got, tt.want)
 			}
 		})
@@ -2623,7 +2643,7 @@ func TestAppMemoryManager_removeFromParentBoundary(t *testing.T) {
 			})
 			amm := GetTreeMemory().Apps().(*AppMemoryManager)
 			amm.removeFromParentBoundary(tt.args.app, tt.args.parent)
-			if !reflect.DeepEqual(tt.args.parent.Spec.Channels, tt.want) {
+			if !metautils.CompareWithoutUUID(tt.args.parent.Spec.Channels, tt.want) {
 				t.Errorf("removeFromParentBoundary() result =\n%#v, want\n%#v", tt.args.parent.Spec.Channels, tt.want)
 			}
 

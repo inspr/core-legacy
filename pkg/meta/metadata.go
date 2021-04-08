@@ -10,5 +10,5 @@ type Metadata struct {
 	Reference   string            `yaml:"reference,omitempty" json:"reference"`
 	Annotations map[string]string `yaml:"annotations,omitempty" json:"annotations"`
 	Parent      string            `yaml:"parent,omitempty" json:"parent"`
-	SHA256      string            `yaml:"sha256,omitempty"`
+	UUID        string            `yaml:"uuid,omitempty"`
 }

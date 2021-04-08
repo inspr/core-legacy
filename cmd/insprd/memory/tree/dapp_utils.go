@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"fmt"
 	"strings"
 
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
@@ -65,10 +64,54 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 	parentStr := getParentString(app, parentApp)
 
 	app.Meta.Parent = parentStr
-	parentApp.Spec.Apps[app.Meta.Name] = app
+	query, _ := metautils.JoinScopes(parentStr, app.Meta.Name)
+	oldApp, err := amm.Root().Apps().Get(query)
+	if err == nil {
+		app.Meta.UUID = oldApp.Meta.UUID
+		for cName, ch := range app.Spec.Channels {
+			if oldApp.Spec.Channels != nil {
+				if oldCh, ok := oldApp.Spec.Channels[cName]; ok {
+					ch.Meta.UUID = oldCh.Meta.UUID
+				} else {
+					ch.Meta = metautils.InjectUUID(ch.Meta)
+				}
+			}
+		}
+		for ctName, ct := range app.Spec.ChannelTypes {
+			if oldApp.Spec.ChannelTypes != nil {
+				if oldCt, ok := oldApp.Spec.ChannelTypes[ctName]; ok {
+					ct.Meta.UUID = oldCt.Meta.UUID
+				} else {
+					ct.Meta = metautils.InjectUUID(ct.Meta)
+				}
+			}
+		}
+		for alName, al := range app.Spec.Aliases {
+			if oldApp.Spec.Aliases != nil {
+				if oldAl, ok := oldApp.Spec.Aliases[alName]; ok {
+					al.Meta.UUID = oldAl.Meta.UUID
+				} else {
+					al.Meta = metautils.InjectUUID(al.Meta)
+				}
+			}
+		}
+	} else {
+		app.Meta = metautils.InjectUUID(app.Meta)
+		for _, ch := range app.Spec.Channels {
+			ch.Meta = metautils.InjectUUID(ch.Meta)
+		}
+		for _, ct := range app.Spec.ChannelTypes {
+			ct.Meta = metautils.InjectUUID(ct.Meta)
+		}
+		for _, al := range app.Spec.Aliases {
+			al.Meta = metautils.InjectUUID(al.Meta)
+		}
+	}
+
 	for _, child := range app.Spec.Apps {
 		amm.addAppInTree(child, app)
 	}
+	parentApp.Spec.Apps[app.Meta.Name] = app
 	if !nodeIsEmpty(app.Spec.Node) {
 		app.Spec.Node.Meta.Parent = parentStr
 		app.Spec.Node.Meta.Name = app.Meta.Name
@@ -142,9 +185,9 @@ func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[
 	return ""
 }
 
-func getParentApp(sonQuery string) (*meta.App, error) {
+func getParentApp(childQuery string) (*meta.App, error) {
 	var parentQuery string
-	sonRef := strings.Split(sonQuery, ".")
+	sonRef := strings.Split(childQuery, ".")
 	if len(sonRef) == 1 {
 		parentQuery = ""
 	} else {
@@ -155,9 +198,11 @@ func getParentApp(sonQuery string) (*meta.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, ok := parentApp.Spec.Apps[sonQuery]; parentQuery == "" && !ok {
-		return nil, ierrors.NewError().NotFound().
-			Message(fmt.Sprintf("dApp %s doesn't exist in root", sonQuery)).
+	if _, ok := parentApp.Spec.Apps[childQuery]; parentQuery == "" && !ok {
+		return nil, ierrors.
+			NewError().
+			NotFound().
+			Message("dApp %s doesn't exist in root", childQuery).
 			Build()
 	}
 

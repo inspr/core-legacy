@@ -5,6 +5,7 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"gitlab.inspr.dev/inspr/core/pkg/environment"
+	"go.uber.org/zap"
 )
 
 const flushTimeout = 15 * 1000
@@ -39,14 +40,16 @@ func NewWriter(mock bool) (*Writer, error) {
 func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	outputChan := environment.GetOutputChannels()
 
-	resolvedChannel, _ := environment.GetResolvedChannel(channel, "", outputChan)
-	resolvedCh, err := fromResolvedChannel(resolvedChannel)
-	if err != nil {
-		return err
-	}
+	resolvedCh, _ := environment.GetResolvedChannel(channel, "", outputChan)
+
+	logger.Info("trying to write message in topic",
+		zap.String("channel", channel),
+		zap.String("resolved channel", resolvedCh))
 	go deliveryReport(writer.producer)
 
-	if errProduceMessage := writer.produceMessage(message, resolvedCh); errProduceMessage != nil {
+	if errProduceMessage := writer.produceMessage(message, kafkaTopic(resolvedCh)); errProduceMessage != nil {
+		logger.Error("error while producing message",
+			zap.Any("error", errProduceMessage))
 		return errProduceMessage
 	}
 
@@ -73,17 +76,18 @@ func deliveryReport(producer *kafka.Producer) {
 }
 
 // creates a Kafka message and sends it through the ProduceChannel
-func (writer *Writer) produceMessage(message interface{}, resolvedChannel messageChannel) error {
+func (writer *Writer) produceMessage(message interface{}, resolvedChannel kafkaTopic) error {
 	messageEncoded, errorEncode := resolvedChannel.encode(message)
 	if errorEncode != nil {
 		return errorEncode
 	}
 
-	topic := resolvedChannel.toTopic()
+	logger.Debug("writing message into Kafka Topic",
+		zap.String("topic", string(resolvedChannel)))
 
 	writer.producer.ProduceChannel() <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{
-			Topic:     &topic,
+			Topic:     (*string)(&resolvedChannel),
 			Partition: kafka.PartitionAny,
 		},
 		Value: messageEncoded,
@@ -94,5 +98,6 @@ func (writer *Writer) produceMessage(message interface{}, resolvedChannel messag
 
 // Close closes the kafka producer
 func (writer *Writer) Close() {
+	logger.Debug("closing Kafka producer")
 	writer.producer.Close()
 }

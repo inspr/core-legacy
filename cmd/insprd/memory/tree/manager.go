@@ -7,7 +7,17 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
+	"go.uber.org/zap"
 )
+
+var logger *zap.Logger
+
+// init is called after all the variable declarations in the package have evaluated
+// their initializers, and those are evaluated only after all the imported packages
+// have been initialized
+func init() {
+	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "memory-tree")))
+}
 
 // MemoryManager defines a memory manager interface
 type MemoryManager struct {
@@ -49,7 +59,7 @@ func setTree(tmm memory.Manager) {
 //InitTransaction copies and reserves the current tree structure so that changes can be reversed
 func (mm *MemoryManager) InitTransaction() {
 	mm.Lock()
-	mm.root = utils.DeepCopy(mm.tree)
+	utils.DeepCopy(mm.tree, &mm.root)
 }
 
 //Commit applies changes from a transaction in to the tree structure

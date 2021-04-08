@@ -1,3 +1,9 @@
+// Package utils has a number of useful operations that are used
+// in multiple places of the inspr packages, contains operations
+// such as:
+//
+// 	- go-cmp: "comparators and evaluator for slices and maps"
+// 	- string_slice: "set of operations of custom string slice"
 package utils
 
 import (

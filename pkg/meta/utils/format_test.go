@@ -16,14 +16,9 @@ var (
 		"\n│   ├── Name: mock_app" +
 		"\n│   ├── Parent: mock_parent" +
 		"\n│   ├── Reference: mock_ref" +
-		"\n│   ├── SHA256: " +
 		"\n│   ├── Annotations" +
 		"\n│       └── mock_key: mock_val" +
 		"\n└── Spec" +
-		"\n    └── Apps" +
-		"\n    └── Channels" +
-		"\n    └── ChannelTypes" +
-		"\n    └── Node: " +
 		"\n    └── Boundary" +
 		"\n        └── Input" +
 		"\n        │   ├── input1" +
@@ -36,10 +31,6 @@ var (
 	channelTree = "channel_name" +
 		"\n└── Meta" +
 		"\n│   ├── Name: channel_name" +
-		"\n│   ├── Parent: " +
-		"\n│   ├── Reference: " +
-		"\n│   ├── SHA256: " +
-		"\n│   ├── Annotations" +
 		"\n└── Spec" +
 		"\n│   ├── Type: ct_meta" +
 		"\n└── ConnectedApps" +
@@ -51,13 +42,8 @@ var (
 	channelTypeTree = "ct_meta" +
 		"\n└── Meta" +
 		"\n│   ├── Name: ct_meta" +
-		"\n│   ├── Parent: " +
-		"\n│   ├── Reference: " +
-		"\n│   ├── SHA256: " +
-		"\n│   ├── Annotations" +
 		"\n└── Spec" +
-		"\n│   ├── Schema: {\"type\":\"int\"}" +
-		"\n└── ConnectedChannels" +
+		"\n    └── Schema: {\"type\":\"int\"}" +
 		"\n\n"
 )
 
@@ -205,12 +191,12 @@ func Test_populateMeta(t *testing.T) {
 			"mock_key": "mock_value",
 		},
 		Parent: "mock_parent",
-		SHA256: "mock_SHA256",
+		UUID:   "mock_SHA256",
 	}
 	wantTree.Add("Name: " + metaArg.Name)
 	wantTree.Add("Parent: " + metaArg.Parent)
 	wantTree.Add("Reference: " + metaArg.Reference)
-	wantTree.Add("SHA256: " + metaArg.SHA256)
+	wantTree.Add("UUID: " + metaArg.UUID)
 	annotations := wantTree.Add("Annotations")
 	for noteName, note := range metaArg.Annotations {
 		annotations.Add(noteName + ": " + note)

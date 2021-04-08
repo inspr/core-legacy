@@ -64,3 +64,10 @@ func (tmm *MockManager) Cancel() {}
 func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
 	return diff.Changelog{}, nil
 }
+
+// Root mock interface structure
+func (tmm *MockManager) Root() memory.GetInterface {
+	return &RootGetter{
+		tmm.root,
+	}
+}
