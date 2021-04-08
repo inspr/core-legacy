@@ -63,7 +63,7 @@ func TestServer_Init(t *testing.T) {
 		s.Init(test.args.r, test.args.w)
 
 		// checking reader methods
-		if got := s.Reader.CommitMessage(test.channel); got != nil {
+		if got := s.Reader.Commit(test.channel); got != nil {
 			t.Errorf("expected CommitMessage() == nil, received %v", got)
 		}
 		if _, got := s.Reader.ReadMessage(test.channel); got != nil {

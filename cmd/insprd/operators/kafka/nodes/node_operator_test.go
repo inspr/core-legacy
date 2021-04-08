@@ -77,7 +77,7 @@ func TestNodeOperator_GetNode(t *testing.T) {
 					Name:      "name",
 					Reference: "",
 					Parent:    "name.name",
-					SHA256:    "",
+					UUID:      "",
 				},
 				Spec: meta.NodeSpec{
 					Image:       "image",
@@ -169,7 +169,7 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 					Name:      "name",
 					Reference: "",
 					Parent:    "name.name",
-					SHA256:    "",
+					UUID:      "",
 				},
 				Spec: meta.NodeSpec{
 					Image:       "image",
@@ -227,7 +227,7 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 					Name:      "name",
 					Reference: "",
 					Parent:    "name.name",
-					SHA256:    "",
+					UUID:      "",
 				},
 				Spec: meta.NodeSpec{
 					Image:       "image",
@@ -336,7 +336,7 @@ func TestNodeOperator_GetAllNodes(t *testing.T) {
 						Name:      "name",
 						Reference: "",
 						Parent:    "",
-						SHA256:    "",
+						UUID:      "",
 					},
 					Spec: meta.NodeSpec{
 						Image:       "image",
@@ -349,7 +349,7 @@ func TestNodeOperator_GetAllNodes(t *testing.T) {
 						Name:      "name",
 						Reference: "",
 						Parent:    "",
-						SHA256:    "",
+						UUID:      "",
 					},
 					Spec: meta.NodeSpec{
 						Image:       "image",
@@ -362,7 +362,7 @@ func TestNodeOperator_GetAllNodes(t *testing.T) {
 						Name:      "name",
 						Reference: "",
 						Parent:    "",
-						SHA256:    "",
+						UUID:      "",
 					},
 					Spec: meta.NodeSpec{
 						Image:       "image",

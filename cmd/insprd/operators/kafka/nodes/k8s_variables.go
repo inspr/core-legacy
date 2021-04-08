@@ -1,12 +1,17 @@
 package nodes
 
-import "os"
+import (
+	"os"
+
+	"go.uber.org/zap"
+)
 
 type k8sVariables struct {
 	AppsNamespace string
 }
 
 var variables *k8sVariables
+var logger *zap.Logger
 
 func getK8SVariables() *k8sVariables {
 	if variables == nil {
@@ -22,4 +27,11 @@ func getFromEnv(name string) string {
 		return value
 	}
 	panic("[ENV VAR] " + name + " not found")
+}
+
+// init is called after all the variable declarations in the package have evaluated
+// their initializers, and those are evaluated only after all the imported packages
+// have been initialized
+func init() {
+	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "kafka-channel-operator")))
 }

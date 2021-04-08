@@ -16,7 +16,11 @@ func GetScope() (string, error) {
 		if utils.IsValidScope(cmd.InsprOptions.Scope) {
 			scope = cmd.InsprOptions.Scope
 		} else {
-			return "", ierrors.NewError().BadRequest().Message("invalid scope").Build()
+			return "", ierrors.
+				NewError().
+				BadRequest().
+				Message("'%v' is an invalid scope", cmd.InsprOptions.Scope).
+				Build()
 		}
 	}
 

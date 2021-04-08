@@ -52,7 +52,14 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	if !environment.IsInChannelBoundary(body.Channel, ch.OutputChannels) {
-		insprError := ierrors.NewError().BadRequest().Message("channel not found")
+		insprError := ierrors.
+			NewError().
+			BadRequest().
+			Message(
+				"channel '%s' not found",
+				body.Channel,
+			)
+
 		rest.ERROR(w, insprError.Build())
 		return
 	}
@@ -79,7 +86,14 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	if !environment.IsInChannelBoundary(body.Channel, ch.InputChannels) {
-		insprError := ierrors.NewError().BadRequest().Message("channel not found")
+		insprError := ierrors.
+			NewError().
+			BadRequest().
+			Message(
+				"channel '%s' not found",
+				body.Channel,
+			)
+
 		rest.ERROR(w, insprError.Build())
 		return
 	}
@@ -108,14 +122,20 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	if !environment.IsInChannelBoundary(body.Channel, ch.InputChannels) {
-		insprError := ierrors.NewError().BadRequest().Message("channel not found")
+		insprError := ierrors.
+			NewError().
+			BadRequest().
+			Message(
+				"channel '%s' not found",
+				body.Channel,
+			)
+
 		rest.ERROR(w, insprError.Build())
 		return
 	}
 
-	if err := ch.r.CommitMessage(body.Channel); err != nil {
+	if err := ch.r.Commit(body.Channel); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's commitMessage failed")
 		rest.ERROR(w, insprError.Build())
 	}
-
 }

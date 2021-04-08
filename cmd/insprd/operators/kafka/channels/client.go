@@ -2,19 +2,29 @@ package channels
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"go.uber.org/zap"
 )
 
+var logger *zap.Logger
+
+// init is called after all the variable declarations in the package have evaluated
+// their initializers, and those are evaluated only after all the imported packages
+// have been initialized
+func init() {
+	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "kafka-channel-operator")))
+}
+
 // ChannelOperator is a client for channel operations on kafka
 type ChannelOperator struct {
 	k      *kafka.AdminClient
 	logger *zap.Logger
+	mem    memory.Manager
 }
 
 type kafkaEnv struct {
@@ -28,9 +38,7 @@ func getEnv() (env kafkaEnv) {
 }
 
 // NewOperator returns an initialized operator from the environment variables
-func NewOperator() (*ChannelOperator, error) {
-	logConf := zap.NewDevelopmentConfig()
-	logger, _ := logConf.Build(zap.Fields(zap.String("section", "kafka-operator")))
+func NewOperator(mem memory.Manager) (*ChannelOperator, error) {
 
 	var config *kafka.ConfigMap
 
@@ -41,7 +49,8 @@ func NewOperator() (*ChannelOperator, error) {
 			"test.mock.num.brokers": "3",
 		}
 	} else {
-		logger.Info("initializing kafka admin with production configs", zap.String("kafka bootstrap servers", getEnv().kafkaBootstrapServers))
+		logger.Info("initializing kafka admin with production configs",
+			zap.String("kafka bootstrap servers", getEnv().kafkaBootstrapServers))
 		config = &kafka.ConfigMap{
 			"bootstrap.servers": getEnv().kafkaBootstrapServers,
 		}
@@ -55,15 +64,21 @@ func NewOperator() (*ChannelOperator, error) {
 	return &ChannelOperator{
 		k:      adminClient,
 		logger: logger,
+		mem:    mem,
 	}, err
 }
 
 // Get gets a channel from kafka
 func (c *ChannelOperator) Get(ctx context.Context, context string, name string) (*meta.Channel, error) {
-	topic := toTopic(context, name)
+	channel, _ := c.mem.Root().Channels().Get(context, name)
+	logger.Info("trying to get Channel from Kafka Topic",
+		zap.String("channel", name),
+		zap.String("context", context))
+
+	topic := toTopic(channel)
 	meta, err := c.k.GetMetadata(&topic, false, 1000)
 	if err != nil {
-		log.Println(err)
+		logger.Error("unable to get Kafka Topic", zap.Any("error", err))
 		return nil, ierrors.NewError().InnerError(err).InternalServer().Message("unable to get topic from kafka").Build()
 	}
 
@@ -73,9 +88,12 @@ func (c *ChannelOperator) Get(ctx context.Context, context string, name string) 
 
 // GetAll gets all channels from kafka
 func (c *ChannelOperator) GetAll(ctx context.Context, context string) (ret []*meta.Channel, err error) {
+	logger.Info("trying to get all Channels from Kafka Topics",
+		zap.String("context", context))
+
 	metas, err := c.k.GetMetadata(nil, true, 1000)
 	if err != nil {
-		log.Println(err)
+		logger.Error("unable to get all Kafka Topics", zap.Any("error", err))
 		return nil, ierrors.NewError().InnerError(err).InternalServer().Message("unable to get topics from kafka").Build()
 	}
 	for _, topic := range metas.Topics {
@@ -87,21 +105,27 @@ func (c *ChannelOperator) GetAll(ctx context.Context, context string) (ret []*me
 
 // Create creates a channel in kafka
 func (c *ChannelOperator) Create(ctx context.Context, context string, channel *meta.Channel) error {
+	logger.Info("trying to create a Channel in Kafka",
+		zap.String("channel", channel.Meta.Name),
+		zap.String("context", context))
+
 	config, err := configFromChannel(channel)
 	if err != nil {
-		log.Println(err)
+		logger.Error("unable to extract Kafka config from given Channel",
+			zap.Any("error", err))
 		return err
 	}
+
 	configs := []kafka.TopicSpecification{
 		{
-			Topic:             toTopic(channel.Meta.Name, context),
+			Topic:             toTopic(channel),
 			NumPartitions:     config.numberOfPartitions,
 			ReplicationFactor: config.replicationFactor,
 		},
 	}
 	_, err = c.k.CreateTopics(ctx, configs)
 	if err != nil {
-		c.logger.Error("error creating kafka topic", zap.Any("error", err))
+		logger.Error("error creating Kafka Topic", zap.Any("error", err))
 		return ierrors.NewError().InnerError(err).InternalServer().Message("unable to create kafka topic").Build()
 	}
 	return nil
@@ -109,16 +133,24 @@ func (c *ChannelOperator) Create(ctx context.Context, context string, channel *m
 
 // Update updates a channel in kafka
 func (c *ChannelOperator) Update(ctx context.Context, context string, channel *meta.Channel) error {
+	logger.Info("trying to update a Channels in Kafka",
+		zap.String("channel", channel.Meta.Name),
+		zap.String("context", context))
 	// updating and creating a new topic is the same thing on kafka
 	return c.Create(ctx, context, channel)
 }
 
 // Delete deletes a channel from kafka
 func (c *ChannelOperator) Delete(ctx context.Context, context string, name string) error {
-	topics := []string{toTopic(context, name)}
+	channel, _ := c.mem.Root().Channels().Get(context, name)
+	topics := []string{toTopic(channel)}
+	logger.Info("trying to delete a Channel from Kafka Topics",
+		zap.String("channel", name),
+		zap.String("context", context))
+
 	_, err := c.k.DeleteTopics(ctx, topics)
 	if err != nil {
-		log.Println(err)
+		logger.Error("error deleting Kafka Topic", zap.Any("error", err))
 		return ierrors.NewError().InternalServer().InnerError(err).Message("unable to delete kafka topic").Build()
 	}
 	return nil

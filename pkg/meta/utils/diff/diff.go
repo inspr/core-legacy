@@ -550,19 +550,6 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 		change.Operation |= Update
 	}
 
-	if from.SHA256 != to.SHA256 {
-		change.Diff = append(change.Diff, Difference{
-			Field:     ctx + "Meta.SHA256",
-			From:      from.SHA256,
-			To:        to.SHA256,
-			Kind:      MetaKind | parentKind,
-			Operation: Update,
-			Name:      parentElement,
-		})
-		change.Operation |= Update
-		change.Kind |= MetaKind | parentKind
-	}
-
 	fromSet, _ := metautils.MakeStrSet(from.Annotations)
 	toSet, _ := metautils.MakeStrSet(to.Annotations)
 

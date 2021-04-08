@@ -29,7 +29,7 @@ func (mr *mockReader) ReadMessage(channel string) (models.BrokerData, error) {
 	return models.BrokerData{Message: models.Message{Data: "mock_data"}, Channel: ""}, nil
 }
 
-func (mr *mockReader) CommitMessage(channel string) error {
+func (mr *mockReader) Commit(channel string) error {
 	if mr.err != nil {
 		return mr.err
 	}

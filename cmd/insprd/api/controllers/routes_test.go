@@ -95,7 +95,7 @@ func TestServer_initRoutes(t *testing.T) {
 					t.Error("error creating request")
 				}
 
-				res, err := client.Do(req)
+				res, _ := client.Do(req)
 				if res.StatusCode != statusCodeResult {
 					t.Errorf("Method %v in url %v => got %v, wanted %v",
 						defaultMethods[i],

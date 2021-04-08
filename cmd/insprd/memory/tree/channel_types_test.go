@@ -7,6 +7,7 @@ import (
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
 )
 
 func TestMemoryManager_ChannelTypes(t *testing.T) {
@@ -81,7 +82,7 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 					Reference:   "ct1",
 					Annotations: map[string]string{},
 					Parent:      "",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Schema: "",
 			},
@@ -178,7 +179,7 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 						Reference:   "ct1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -191,7 +192,7 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 					Reference:   "ct1",
 					Annotations: map[string]string{},
 					Parent:      "",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Schema: "",
 			},
@@ -212,7 +213,7 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 						Reference:   "ct1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -225,7 +226,7 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 					Reference:   "ct1",
 					Annotations: map[string]string{},
 					Parent:      "",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Schema: "",
 			},
@@ -246,7 +247,7 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 						Reference:   "ct1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -271,7 +272,7 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 						Reference:   "ct1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -301,8 +302,13 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 			}
 			if tt.want != nil {
 				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
-				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
+				if !tt.wantErr {
+					if !metautils.ValidateUUID(got.Meta.UUID) {
+						t.Errorf("ChannelTypeMemoryManager.Create() invalid UUID, uuid=%v", got.Meta.UUID)
+					}
+				}
+				if (err != nil) || !metautils.CompareWithoutUUID(got, tt.want) {
+					t.Errorf("ChannelTypeMemoryManager.Create() = %v, want %v", got, tt.want)
 				}
 			}
 		})
@@ -396,7 +402,7 @@ func TestChannelTypeMemoryManager_Delete(t *testing.T) {
 					Reference:   "ct3",
 					Annotations: map[string]string{},
 					Parent:      "",
-					SHA256:      "",
+					UUID:        "",
 				},
 				ConnectedChannels: []string{"channel1"},
 				Schema:            "",
@@ -462,7 +468,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 						Reference:   "ct1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: string([]byte{0, 1, 0, 1}),
 				},
@@ -475,7 +481,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 					Reference:   "ct1",
 					Annotations: map[string]string{},
 					Parent:      "",
-					SHA256:      "",
+					UUID:        "",
 				},
 				Schema: string([]byte{0, 1, 0, 1}),
 			},
@@ -496,7 +502,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 						Reference:   "ct42",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -521,7 +527,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 						Reference:   "ct1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -549,7 +555,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 			}
 			if tt.want != nil {
 				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
-				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+				if (err != nil) || !metautils.CompareWithUUID(got, tt.want) {
 					t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
@@ -564,7 +570,7 @@ func getMockChannelTypes() *meta.App {
 			Reference:   "",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -590,7 +596,7 @@ func getMockChannelTypes() *meta.App {
 						Reference:   "ct1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -600,7 +606,7 @@ func getMockChannelTypes() *meta.App {
 						Reference:   "ct2",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -610,7 +616,7 @@ func getMockChannelTypes() *meta.App {
 						Reference:   "ct3",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					ConnectedChannels: []string{"channel1"},
 					Schema:            "",

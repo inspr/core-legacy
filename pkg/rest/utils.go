@@ -13,7 +13,7 @@ import (
 // RecoverFromPanic will handle panic
 func RecoverFromPanic(w http.ResponseWriter) {
 	if recoveryMessage := recover(); recoveryMessage != nil {
-		ERROR(w, ierrors.NewError().InternalServer().Message(recoveryMessage.(string)).Build())
+		ERROR(w, ierrors.NewError().InternalServer().Message("%s", recoveryMessage).Build())
 	}
 }
 
