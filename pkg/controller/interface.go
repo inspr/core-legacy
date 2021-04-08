@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 )
@@ -37,6 +38,13 @@ type ChannelTypeInterface interface {
 	Update(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error)
 }
 
+// AuthorizationInterface is the interface that allows to
+// obtain information related to the authorization necessary
+// to make changes in structures inside of the cluster
+type AuthorizationInterface interface {
+	GenerateToken(ctx context.Context, payload auth.Payload) (string, error)
+}
+
 // Interface is the interface that allows the management
 // of the current state of the cluster. Permiting the
 // modification of Channels, DApps and ChannelTypes
@@ -44,4 +52,5 @@ type Interface interface {
 	Channels() ChannelInterface
 	Apps() AppInterface
 	ChannelTypes() ChannelTypeInterface
+	Authorization() AuthorizationInterface
 }

@@ -37,3 +37,10 @@ func (c *Client) ChannelTypes() controller.ChannelTypeInterface {
 		c: c.HTTPClient,
 	}
 }
+
+// Authorization interacts with Insprd's auth
+func (c *Client) Authorization() controller.AuthorizationInterface {
+	return &AuthClient{
+		c: c.HTTPClient,
+	}
+}
