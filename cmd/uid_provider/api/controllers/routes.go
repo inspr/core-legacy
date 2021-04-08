@@ -7,11 +7,11 @@ func (s *Server) initRoutes() {
 
 	s.Mux.HandleFunc("/newuser", h.CreateUserHandler)
 
-	s.Mux.HandleFunc("/deleteuser", h.CreateUserHandler)
+	s.Mux.HandleFunc("/deleteuser", h.DeleteUserHandler)
 
-	s.Mux.HandleFunc("/updatepwd", h.CreateUserHandler)
+	s.Mux.HandleFunc("/updatepwd", h.UpdatePasswordHandler)
 
-	s.Mux.HandleFunc("/login", h.CreateUserHandler)
+	s.Mux.HandleFunc("/login", h.LoginHandler)
 
-	s.Mux.HandleFunc("/refreshtoken", h.CreateUserHandler)
+	s.Mux.HandleFunc("/refreshtoken", h.RefreshTokenHandler)
 }

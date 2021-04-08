@@ -21,12 +21,12 @@ func NewHandler(rdb client.RedisManager) *Handler {
 }
 
 func (h *Handler) CreateUserHandler(rw http.ResponseWriter, r *http.Request) {
-	type receivedData struct {
+	type ReceivedDataCreate struct {
 		uid string
 		usr client.User
 	}
 
-	data := receivedData{}
+	data := ReceivedDataCreate{}
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		rest.ERROR(rw, err)
 		return
@@ -39,11 +39,12 @@ func (h *Handler) CreateUserHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeleteUserHandler(rw http.ResponseWriter, r *http.Request) {
-	type receivedData struct {
+	type ReceivedDataDelete struct {
 		uid            string
 		usrToBeDeleted string
 	}
-	data := receivedData{}
+
+	data := ReceivedDataDelete{}
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		rest.ERROR(rw, err)
 		return
@@ -56,12 +57,13 @@ func (h *Handler) DeleteUserHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) UpdatePasswordHandler(rw http.ResponseWriter, r *http.Request) {
-	type receivedData struct {
+	type ReceivedDataUpdate struct {
 		uid            string
 		usrToBeUpdated string
 		newPwd         string
 	}
-	data := receivedData{}
+
+	data := ReceivedDataUpdate{}
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		rest.ERROR(rw, err)
 		return
@@ -74,11 +76,12 @@ func (h *Handler) UpdatePasswordHandler(rw http.ResponseWriter, r *http.Request)
 }
 
 func (h *Handler) LoginHandler(rw http.ResponseWriter, r *http.Request) {
-	type receivedData struct {
+	type ReceivedDataLogin struct {
 		uid string
 		pwd string
 	}
-	data := receivedData{}
+
+	data := ReceivedDataLogin{}
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		rest.ERROR(rw, err)
 		return
@@ -91,10 +94,11 @@ func (h *Handler) LoginHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) RefreshTokenHandler(rw http.ResponseWriter, r *http.Request) {
-	type receivedData struct {
+	type ReceivedDataRefresh struct {
 		refreshToken string
 	}
-	data := receivedData{}
+
+	data := ReceivedDataRefresh{}
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		rest.ERROR(rw, err)
 		return
