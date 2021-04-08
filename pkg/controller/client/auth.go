@@ -13,12 +13,15 @@ type AuthClient struct {
 }
 
 func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (string, error) {
-	var resp string
+	type returnStructure struct {
+		Token string `json:"token"`
+	}
+	var resp returnStructure
 
 	err := ac.c.Send(ctx, "/auth", "POST", payload, &resp)
 	if err != nil {
 		return "", err
 	}
 
-	return resp, nil
+	return resp.Token, nil
 }
