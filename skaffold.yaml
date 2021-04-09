@@ -25,6 +25,10 @@ profiles:
   - name: uidp
     build:
       artifacts:
+      - image: gcr.io/red-inspr/uidp/redis/api
+        context: .
+        docker:
+          dockerfile: cmd/uid_provider/Dockerfile
       - image: gcr.io/red-inspr/uidp/redis/secret
         context: .
         docker:
@@ -34,5 +38,6 @@ profiles:
         releases:
         - name: uidp
           artifactOverrides:
+            uidpApi: gcr.io/red-inspr/uidp/redis/api
             uidpSecret: gcr.io/red-inspr/uidp/redis/secret
           chartPath: build/uidp_helm

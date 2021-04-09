@@ -10,11 +10,11 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
 	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
 	ofake "gitlab.inspr.dev/inspr/core/cmd/insprd/operators/fake"
+	"gitlab.inspr.dev/inspr/core/pkg/api/models"
 	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 )
