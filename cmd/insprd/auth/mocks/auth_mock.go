@@ -1,4 +1,4 @@
-package authMock
+package authmock
 
 import "gitlab.inspr.dev/inspr/core/pkg/auth/models"
 
