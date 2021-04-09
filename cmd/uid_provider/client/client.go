@@ -217,8 +217,11 @@ func encrypt(user User) (auth.Payload, error) {
 }
 
 func decrypt(encryptedString string) (User, error) {
-	keyString := "somehow get it from the cluster"
 	usr := User{}
+	keyString := os.Getenv("REFRESH_KEY")
+	if keyString == "" {
+		return User{}, fmt.Errorf("decryption key is empty")
+	}
 
 	key, _ := hex.DecodeString(keyString)
 	enc, _ := hex.DecodeString(encryptedString)
@@ -255,15 +258,16 @@ func decrypt(encryptedString string) (User, error) {
 }
 
 func requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
-	url := os.Getenv("CLUSTER_ADDR")
+	url := os.Getenv("INSPR_CLUSTER_ADDR")
 	if url == "" {
-		panic("[ENV VAR] CLUSTER_ADDR not found")
+		panic("[ENV VAR] INSPR_CLUSTER_ADDR not found")
 	}
 
 	rc := request.NewClient().
 		BaseURL(url).
 		Encoder(json.Marshal).
-		Decoder(request.JSONDecoderGenerator).Build()
+		Decoder(request.JSONDecoderGenerator).
+		Build()
 
 	ncc := client.NewControllerClient(rc)
 

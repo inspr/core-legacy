@@ -36,7 +36,10 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+secretRepository: gcr.io/red-inspr/uidp/redis/secret
+
 statefulset:
+  insprdAddr: "http://inspr.com"
   uidpName: uidp-stset
 
 configmap:
@@ -51,6 +54,9 @@ service:
 ingress:
   name: uidp-ingress
   host: "inspr.com"
+
+redis:
+  password: ""
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

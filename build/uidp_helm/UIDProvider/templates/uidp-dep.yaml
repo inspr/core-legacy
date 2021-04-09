@@ -42,6 +42,19 @@ spec:
           name: gossip
         command: ["/conf/update-node.sh", "redis-server", "/conf/redis.conf"]
         env:
+        - name: INSPR_CLUSTER_ADDR
+          value: {{ .Values.statefulset.insprdAddr }}
+        - name: REDIS_HOST
+          value: {{ .Values.ingress.host }}
+        - name: REDIS_PORT
+          value: {{ .Values.service.portOuter }}
+        - name: REDIS_PASSWORD
+          value: {{ .Values.redis.password }}
+        - name: REFRESH_KEY
+          valueFrom:
+            secretKeyRef:
+              name: redisprivatekey
+              key: key
         - name: POD_IP
           valueFrom:
             fieldRef:
