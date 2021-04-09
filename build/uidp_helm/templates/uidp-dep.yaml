@@ -4,11 +4,20 @@ metadata:
   name: {{ .Values.deployment.uidpName }}
 spec:
   replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      {{- include "UIDProvider.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         {{- include "UIDProvider.selectorLabels" . | nindent 8 }}
     spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Values.deployment.uidpName }}
           image: {{ .Values.deployment.image }}
@@ -21,18 +30,18 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             - name: INSPR_CLUSTER_ADDR
-                value: {{ .Values.deployment.insprdAddr }}
+              value: {{ .Values.deployment.insprdAddr }}
             - name: REDIS_HOST
-                value: {{ .Values.redis.host }}
+              value: {{ .Values.redis.host }}
             - name: REDIS_PORT
-                value: {{ .Values.redis.port }}
+              value: {{ .Values.redis.port | quote }}
             - name: REDIS_PASSWORD
-                value: {{ .Values.redis.password }}
+              value: {{ .Values.redis.password }}
             - name: REFRESH_KEY
-                valueFrom:
-                    secretKeyRef:
-                        name: redisprivatekey
-                        key: key
+              valueFrom:
+                secretKeyRef:
+                  name: redisprivatekey
+                  key: key
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

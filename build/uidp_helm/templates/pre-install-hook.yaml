@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: pre-install-job
+  name: pre-install-job-uidp
   labels:
     {{- include "UIDProvider.labels" . | nindent 4 }}
   annotations:
@@ -12,7 +12,7 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-      - name: pre-install-job
+      - name: pre-install-job-uidp
         image: {{ .Values.secretRepository}}
         imagePullPolicy: IfNotPresent
         env:
