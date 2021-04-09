@@ -12,12 +12,17 @@ import (
 	"os"
 
 	"github.com/go-redis/redis/v8"
+	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
+	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
+// Client defines a Redis client, which has the interface methods
 type Client struct {
 	rdb *redis.Client
 }
 
+// NewRedisClient creates and returns a new Redis client
 func NewRedisClient() *Client {
 	host := os.Getenv("REDIS_HOST")
 	port := os.Getenv("REDIS_PORT")
@@ -32,6 +37,7 @@ func NewRedisClient() *Client {
 	}
 }
 
+// CreateUser inserts a new user into Redis
 func (c *Client) CreateUser(ctx context.Context, uid string, newUser User) error {
 	if isAdmin(ctx, c.rdb, uid) {
 		if err := set(ctx, c.rdb, newUser); err != nil {
@@ -42,6 +48,7 @@ func (c *Client) CreateUser(ctx context.Context, uid string, newUser User) error
 	return fmt.Errorf("current user doesn't have permission to create new users")
 }
 
+// DeleteUser deletes an user from Redis, if it exists
 func (c *Client) DeleteUser(ctx context.Context, uid, usrToBeDeleted string) error {
 	if isAdmin(ctx, c.rdb, uid) {
 		if err := delete(ctx, c.rdb, usrToBeDeleted); err != nil {
@@ -52,6 +59,7 @@ func (c *Client) DeleteUser(ctx context.Context, uid, usrToBeDeleted string) err
 	return fmt.Errorf("current user doesn't have permission to create new users")
 }
 
+// UpdatePassword changes an users password, if that user exists
 func (c *Client) UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd string) error {
 	if isAdmin(ctx, c.rdb, uid) {
 
@@ -70,6 +78,9 @@ func (c *Client) UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd
 	return fmt.Errorf("current user doesn't have permission to create new users")
 }
 
+// Login receives an user and a password, and checks if they exist and match.
+// If so, it sends a request to Insprd so it can generate a new token for the
+// given user, and returns the toker if it's creation was successful
 func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	user, err := get(ctx, c.rdb, uid)
 	if err != nil {
@@ -92,20 +103,23 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	return token, nil
 }
 
-func (c *Client) RefreshToken(ctx context.Context, refreshToken string) (Payload, error) {
+// RefreshToken receives a refreshToken and checks if it's valid.
+// If so, it returns a payload containing the updated user info
+// (user which is associated with the given refreshToken)
+func (c *Client) RefreshToken(ctx context.Context, refreshToken string) (auth.Payload, error) {
 	oldUser, err := decrypt(refreshToken)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	newUser, err := get(ctx, c.rdb, oldUser.UID)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	updatedPayload, err := encrypt(newUser)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	return updatedPayload, nil
@@ -161,7 +175,7 @@ func isAdmin(ctx context.Context, rdb *redis.Client, uid string) bool {
 	return true
 }
 
-func encrypt(user User) (Payload, error) {
+func encrypt(user User) (auth.Payload, error) {
 	keyString := "somehow get it from the cluster"
 	stringToEncrypt := fmt.Sprintf("%s:%s", user.UID, user.Password)
 
@@ -172,27 +186,27 @@ func encrypt(user User) (Payload, error) {
 	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	//Create a new GCM - https://en.wikipedia.org/wiki/Galois/Counter_Mode
 	//https://golang.org/pkg/crypto/cipher/#NewGCM
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	//Create a nonce. Nonce should be from GCM
 	nonce := make([]byte, aesGCM.NonceSize())
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
-		return Payload{}, err
+		return auth.Payload{}, err
 	}
 
 	//Encrypt the data using aesGCM.Seal
 	//Since we don't want to save the nonce somewhere else in this case, we add it as a prefix to the encrypted data. The first nonce argument in Seal is the prefix.
 	ciphertext := aesGCM.Seal(nonce, nonce, plaintext, nil)
 
-	payload := Payload{
+	payload := auth.Payload{
 		UID:     user.UID,
 		Role:    user.Role,
 		Scope:   user.Scope,
@@ -203,8 +217,8 @@ func encrypt(user User) (Payload, error) {
 }
 
 func decrypt(encryptedString string) (User, error) {
-	usr := User{}
 	keyString := "somehow get it from the cluster"
+	usr := User{}
 
 	key, _ := hex.DecodeString(keyString)
 	enc, _ := hex.DecodeString(encryptedString)
@@ -240,6 +254,23 @@ func decrypt(encryptedString string) (User, error) {
 	return usr, nil
 }
 
-func requestNewToken(ctx context.Context, payload Payload) (string, error) {
-	return "", nil
+func requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
+	url := os.Getenv("CLUSTER_ADDR")
+	if url == "" {
+		panic("[ENV VAR] CLUSTER_ADDR not found")
+	}
+
+	rc := request.NewClient().
+		BaseURL(url).
+		Encoder(json.Marshal).
+		Decoder(request.JSONDecoderGenerator).Build()
+
+	ncc := client.NewControllerClient(rc)
+
+	token, err := ncc.Authorization().GenerateToken(ctx, payload)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }

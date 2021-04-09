@@ -1,15 +1,10 @@
 package client
 
-import "context"
+import (
+	"context"
+)
 
-type Payload struct {
-	UID        string
-	Role       int
-	Scope      []string
-	Refresh    string
-	RefreshURL string
-}
-
+// User defines the information a user contains
 type User struct {
 	UID      string
 	Role     int
@@ -17,6 +12,7 @@ type User struct {
 	Password string
 }
 
+// RedisManager defines methods to manage Redis in the cluster
 type RedisManager interface {
 	UIDClient
 	RefreshToken(ctx context.Context, refreshToken string) (Payload, error)
