@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/api/auth"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 

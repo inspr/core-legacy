@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/api/auth"
 	"gitlab.inspr.dev/inspr/core/pkg/meta"
 	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
 )

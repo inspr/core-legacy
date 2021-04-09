@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/go-redis/redis/v8"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
+	"gitlab.inspr.dev/inspr/core/pkg/api/auth"
 	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
