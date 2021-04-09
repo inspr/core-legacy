@@ -1,7 +1,9 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -21,16 +23,16 @@ func (h Handler) Validate(auth authentication.Auth) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]
-		if len(headerContent) != 2 {
+		if len(headerContent) != 1 || headerContent[0] == "" {
 			http.Error(
 				w,
-				"Bad Request, expected: Authorization: Bearer <token>",
+				"Bad Request, expected: Authorization: <token>",
 				http.StatusBadRequest,
 			)
 			return
 		}
 
-		token := headerContent[1]
+		token := headerContent[0]
 		payload, _, err := auth.Validade([]byte(token))
 
 		// error management
@@ -65,16 +67,23 @@ func (h Handler) Validate(auth authentication.Auth) Handler {
 		}
 
 		// request scope
-		data := struct {
+		scopeData := struct {
 			Scope string `json:"scope"`
 		}{}
 
-		body, _ := r.GetBody()
-		json.NewDecoder(body).Decode(&data)
+		// Read the content
+		if r.Body != nil {
+			// reads body
+			bodyBytes, _ := ioutil.ReadAll(r.Body)
+			// unmarshal into scope Data
+			json.Unmarshal(bodyBytes, &scopeData)
+			// Restore the r.Body to its original state
+			r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+		}
 
 		valid := false
 		for _, scope := range payload.Scope {
-			if strings.Contains(scope, data.Scope) {
+			if strings.Compare(scope, scopeData.Scope) == 0 {
 				// scope found
 				valid = true
 			}

@@ -1,6 +1,10 @@
 package rest
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -61,6 +65,7 @@ func TestHandler_Validate(t *testing.T) {
 	type args struct {
 		auth        authentication.Auth
 		headerValue string
+		scope       string
 	}
 	tests := []struct {
 		name     string
@@ -77,7 +82,7 @@ func TestHandler_Validate(t *testing.T) {
 			wantCode: http.StatusBadRequest,
 		},
 		{
-			name: "no_auth_header",
+			name: "invalid_token",
 			args: args{
 				auth: authMock.NewMockAuth(
 					&ierrors.InsprError{Code: ierrors.InvalidToken},
@@ -86,6 +91,48 @@ func TestHandler_Validate(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
+		},
+		{
+			name: "expired_token",
+			args: args{
+				auth: authMock.NewMockAuth(
+					&ierrors.InsprError{Code: ierrors.ExpiredToken},
+				),
+				headerValue: "mock_token",
+			},
+			wantErr:  true,
+			wantCode: http.StatusOK,
+		},
+		{
+			name: "unknown_error",
+			args: args{
+				auth: authMock.NewMockAuth(
+					errors.New("mock_error"),
+				),
+				headerValue: "mock_token",
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name: "scope_error",
+			args: args{
+				auth:        authMock.NewMockAuth(nil),
+				headerValue: "mock_token",
+				scope:       "no_valid_scope",
+			},
+			wantErr:  true,
+			wantCode: http.StatusForbidden,
+		},
+		{
+			name: "working",
+			args: args{
+				auth:        authMock.NewMockAuth(nil),
+				headerValue: "mock_token",
+				scope:       "scope_1",
+			},
+			wantErr:  false,
+			wantCode: http.StatusOK,
 		},
 	}
 	for _, tt := range tests {
@@ -102,7 +149,16 @@ func TestHandler_Validate(t *testing.T) {
 
 			// adds auth to request header
 			req.Header.Add("Authorization", tt.args.headerValue)
-			req.
+
+			// scope to body
+			scopeData := struct {
+				Scope string `json:"scope"`
+			}{
+				Scope: tt.args.scope,
+			}
+			scopeBytes, _ := json.Marshal(scopeData)
+			req.Body = ioutil.NopCloser(bytes.NewBuffer(scopeBytes))
+
 			// does request
 			res, err := client.Do(req)
 
