@@ -39,7 +39,6 @@ securityContext: {}
 secretRepository: gcr.io/red-inspr/uidp/redis/secret
 
 statefulset:
-  insprdAddr: "http://inspr.com"
   uidpName: uidp-stset
 
 configmap:
@@ -48,8 +47,13 @@ configmap:
 service:
   type: ClusterIP
   uidpName: uidp-svc
-  portInner: 16379
-  portOuter: 6379
+  portOuter: 80
+
+deployment:
+  insprdAddr: "http://insprd-svc.default.svc"
+  replicas: 1
+  uidpName: uidp-dep
+  image: gcr.io/red-inspr/uidp/redis/api
 
 ingress:
   name: uidp-ingress
@@ -57,6 +61,8 @@ ingress:
 
 redis:
   password: ""
+  host: redis-cluster.default.svc
+  port: 6379
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

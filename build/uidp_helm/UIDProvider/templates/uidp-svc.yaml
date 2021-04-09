@@ -5,11 +5,8 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.portOuter }}
-      targetPort: {{ .Values.service.portOuter }}
+    - port: 80
+      targetPort: 9001
       name: client
-    - port: {{ .Values.service.portInner }}
-      targetPort: {{ .Values.service.portInner }}
-      name: gossip
   selector:
     {{- include "UIDProvider.selectorLabels" . | nindent 4 }}
