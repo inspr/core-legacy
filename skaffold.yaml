@@ -24,15 +24,17 @@ deploy:
 profiles:
   - name: uidp
     build:
+      tagPolicy:
+        sha256: {}
       artifacts:
-      - image: gcr.io/red-inspr/uidp/redis/api
-        context: .
-        docker:
-          dockerfile: cmd/uid_provider/Dockerfile
       - image: gcr.io/red-inspr/uidp/redis/secret
         context: .
         docker:
           dockerfile: cmd/uid_provider/secret/Dockerfile
+      - image: gcr.io/red-inspr/uidp/redis/api
+        context: .
+        docker:
+          dockerfile: cmd/uid_provider/Dockerfile
     deploy:
       helm:
         releases:
