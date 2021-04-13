@@ -161,7 +161,7 @@ func displayAlias(_ context.Context, args []string) error {
 		return err
 	}
 
-	fmt.Fprintln(out, alias)
+	utils.PrintAliasTree(alias, out)
 
 	return nil
 }
