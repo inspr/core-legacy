@@ -1,7 +1,7 @@
 package main
 
 import (
-	controller "gitlab.inspr.dev/inspr/core/examples/pubsub/api/controller"
+	controller "github.com/inspr/inspr/examples/pubsub/api/controller"
 )
 
 var server controller.Server

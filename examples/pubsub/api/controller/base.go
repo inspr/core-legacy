@@ -7,9 +7,9 @@ import (
 	"log"
 	"net/http"
 
-	dappclient "gitlab.inspr.dev/inspr/core/pkg/client"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
-	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
+	dappclient "github.com/inspr/inspr/pkg/client"
+	"github.com/inspr/inspr/pkg/rest"
+	"github.com/inspr/inspr/pkg/sidecar/models"
 )
 
 // Server is a struct that contains the variables necessary

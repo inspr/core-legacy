@@ -1,9 +1,9 @@
 package api
 
 import (
-	ctrl "gitlab.inspr.dev/inspr/core/cmd/insprd/api/controllers"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
+	ctrl "github.com/inspr/inspr/cmd/insprd/api/controllers"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/insprd/operators"
 )
 
 var server ctrl.Server

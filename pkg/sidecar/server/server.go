@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/sidecar/models"
 )
 
 // Server is a struct that contains the variables necessary

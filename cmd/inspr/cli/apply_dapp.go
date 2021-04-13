@@ -4,12 +4,12 @@ import (
 	"context"
 	"io"
 
-	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/cmd"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
-	utils "gitlab.inspr.dev/inspr/core/pkg/meta/utils/parser"
+	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
+	"github.com/inspr/inspr/pkg/cmd"
+	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
 )
 
 // NewApplyApp receives a controller AppInterface and calls it's methods

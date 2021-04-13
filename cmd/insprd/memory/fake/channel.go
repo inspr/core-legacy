@@ -3,8 +3,8 @@ package fake
 import (
 	"fmt"
 
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 // Channels - mocks the implementation of the ChannelMemory interface methods

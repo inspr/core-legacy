@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/controller"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/mocks"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/controller"
+	"github.com/inspr/inspr/pkg/controller/mocks"
+	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 func TestNewControllerClient(t *testing.T) {
