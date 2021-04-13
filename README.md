@@ -1,5 +1,7 @@
 # ![logo](./docs/img/inspr_logo.png)Inspr
 
+[![codecov](https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG)](https://codecov.io/gh/inspr/inspr)
+
 Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
 
 - :muscle: Robust: built on top of golang, kubernetes and other state of the art technologies
