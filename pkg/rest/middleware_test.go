@@ -87,7 +87,7 @@ func TestHandler_Validate(t *testing.T) {
 				auth: authMock.NewMockAuth(
 					&ierrors.InsprError{Code: ierrors.InvalidToken},
 				),
-				headerValue: "mock_token",
+				headerValue: "Bearer mock_token",
 			},
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
@@ -98,7 +98,7 @@ func TestHandler_Validate(t *testing.T) {
 				auth: authMock.NewMockAuth(
 					&ierrors.InsprError{Code: ierrors.ExpiredToken},
 				),
-				headerValue: "mock_token",
+				headerValue: "Bearer mock_token",
 			},
 			wantErr:  true,
 			wantCode: http.StatusOK,
@@ -109,7 +109,7 @@ func TestHandler_Validate(t *testing.T) {
 				auth: authMock.NewMockAuth(
 					errors.New("mock_error"),
 				),
-				headerValue: "mock_token",
+				headerValue: "Bearer mock_token",
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
@@ -118,7 +118,7 @@ func TestHandler_Validate(t *testing.T) {
 			name: "scope_error",
 			args: args{
 				auth:        authMock.NewMockAuth(nil),
-				headerValue: "mock_token",
+				headerValue: "Bearer mock_token",
 				scope:       "no_valid_scope",
 			},
 			wantErr:  true,
@@ -128,7 +128,7 @@ func TestHandler_Validate(t *testing.T) {
 			name: "working",
 			args: args{
 				auth:        authMock.NewMockAuth(nil),
-				headerValue: "mock_token",
+				headerValue: "Bearer mock_token",
 				scope:       "scope_1",
 			},
 			wantErr:  false,

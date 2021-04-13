@@ -24,7 +24,9 @@ func (h Handler) Validate(auth authentication.Auth) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]
-		if len(headerContent) != 1 || headerContent[0] == "" {
+
+		if len(headerContent) != 1 ||
+			!strings.HasPrefix(headerContent[0], "Bearer ") {
 			http.Error(
 				w,
 				"Bad Request, expected: Authorization: <token>",
@@ -33,7 +35,7 @@ func (h Handler) Validate(auth authentication.Auth) Handler {
 			return
 		}
 
-		token := headerContent[0]
+		token := strings.TrimPrefix(headerContent[0], "Bearer ")
 		payload, _, err := auth.Validade([]byte(token))
 
 		// error management
