@@ -7,10 +7,10 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/cmd/insprd/memory/tree"
+	"github.com/inspr/inspr/cmd/insprd/operators"
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"k8s.io/client-go/kubernetes"
@@ -77,7 +77,7 @@ func TestNodeOperator_GetNode(t *testing.T) {
 					Name:      "name",
 					Reference: "",
 					Parent:    "name.name",
-					SHA256:    "",
+					UUID:      "",
 				},
 				Spec: meta.NodeSpec{
 					Image:       "image",
@@ -169,7 +169,7 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 					Name:      "name",
 					Reference: "",
 					Parent:    "name.name",
-					SHA256:    "",
+					UUID:      "",
 				},
 				Spec: meta.NodeSpec{
 					Image:       "image",
@@ -227,7 +227,7 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 					Name:      "name",
 					Reference: "",
 					Parent:    "name.name",
-					SHA256:    "",
+					UUID:      "",
 				},
 				Spec: meta.NodeSpec{
 					Image:       "image",
@@ -336,7 +336,7 @@ func TestNodeOperator_GetAllNodes(t *testing.T) {
 						Name:      "name",
 						Reference: "",
 						Parent:    "",
-						SHA256:    "",
+						UUID:      "",
 					},
 					Spec: meta.NodeSpec{
 						Image:       "image",
@@ -349,7 +349,7 @@ func TestNodeOperator_GetAllNodes(t *testing.T) {
 						Name:      "name",
 						Reference: "",
 						Parent:    "",
-						SHA256:    "",
+						UUID:      "",
 					},
 					Spec: meta.NodeSpec{
 						Image:       "image",
@@ -362,7 +362,7 @@ func TestNodeOperator_GetAllNodes(t *testing.T) {
 						Name:      "name",
 						Reference: "",
 						Parent:    "",
-						SHA256:    "",
+						UUID:      "",
 					},
 					Spec: meta.NodeSpec{
 						Image:       "image",

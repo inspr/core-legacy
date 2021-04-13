@@ -1,6 +1,6 @@
-module gitlab.inspr.dev/inspr/core
+module github.com/inspr/inspr
 
-go 1.13
+go 1.16
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.5.2
@@ -9,6 +9,7 @@ require (
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/google/go-cmp v0.5.5
 	github.com/google/gofuzz v1.2.0 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/json-iterator/go v1.1.8 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/linkedin/goavro v2.1.0+incompatible

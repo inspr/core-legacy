@@ -7,13 +7,13 @@ import (
 	"io"
 	"net/http"
 
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/ierrors"
 )
 
 // RecoverFromPanic will handle panic
 func RecoverFromPanic(w http.ResponseWriter) {
 	if recoveryMessage := recover(); recoveryMessage != nil {
-		ERROR(w, ierrors.NewError().InternalServer().Message(recoveryMessage.(string)).Build())
+		ERROR(w, ierrors.NewError().InternalServer().Message("%s", recoveryMessage).Build())
 	}
 }
 

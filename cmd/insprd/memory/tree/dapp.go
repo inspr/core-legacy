@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
 )
 
@@ -37,19 +37,23 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
+	err := ierrors.
+		NewError().
+		NotFound().
+		Message("dApp not found for given query: %s", query).
+		Build()
 
-	nxtApp := amm.root
-	if nxtApp != nil {
+	nextApp := amm.root
+	if nextApp != nil {
 		for _, element := range reference {
-			nxtApp = nxtApp.Spec.Apps[element]
-			if nxtApp == nil {
+			nextApp = nextApp.Spec.Apps[element]
+			if nextApp == nil {
 				logger.Error("unable to find dApp for given query",
 					zap.String("query", query))
 				return nil, err
 			}
 		}
-		return nxtApp, nil
+		return nextApp, nil
 	}
 
 	logger.Error("root dApp is empty")
@@ -200,17 +204,17 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	reference := strings.Split(query, ".")
 	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
 
-	nxtApp := amm.tree
-	if nxtApp != nil {
+	nextApp := amm.tree
+	if nextApp != nil {
 		for _, element := range reference {
-			nxtApp = nxtApp.Spec.Apps[element]
-			if nxtApp == nil {
+			nextApp = nextApp.Spec.Apps[element]
+			if nextApp == nil {
 				logger.Error("unable to find dApp for given query (Root Getter)",
 					zap.String("query", query))
 				return nil, err
 			}
 		}
-		return nxtApp, nil
+		return nextApp, nil
 	}
 
 	logger.Error("root dApp is empty (Root Getter)")

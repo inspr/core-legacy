@@ -1,11 +1,11 @@
 package tree
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
 )
 
@@ -32,7 +32,15 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel was not found because the app context has an error").Build()
+		newError := ierrors.
+			NewError().
+			InnerError(err).
+			NotFound().
+			Message(
+				"channel not found, the context '%v' is invalid",
+				context,
+			).
+			Build()
 		return nil, newError
 	}
 
@@ -46,7 +54,11 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 		zap.String("ctype", chName),
 		zap.String("context", context))
 
-	newError := ierrors.NewError().NotFound().Message("channel not found").Build()
+	newError := ierrors.
+		NewError().
+		NotFound().
+		Message("channel not found").
+		Build()
 	return nil, newError
 }
 
@@ -101,6 +113,9 @@ func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error 
 	if parentApp.Spec.Channels == nil {
 		parentApp.Spec.Channels = map[string]*meta.Channel{}
 	}
+
+	ch.Meta = metautils.InjectUUID(ch.Meta)
+
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
 	return nil
@@ -118,7 +133,12 @@ func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 	channel, err := chh.Get(context, chName)
 
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
+		newError := ierrors.
+			NewError().
+			InnerError(err).
+			NotFound().
+			Message("channel %s not found", chName).
+			Build()
 		return newError
 	}
 
@@ -164,11 +184,18 @@ func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error 
 
 	oldCh, err := chh.Get(context, ch.Meta.Name)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel not found").Build()
+		newError := ierrors.
+			NewError().
+			InnerError(err).
+			NotFound().
+			Message("channel %s not found", ch.Meta.Name).
+			Build()
 		return newError
 	}
 
 	ch.ConnectedApps = oldCh.ConnectedApps
+	ch.ConnectedAliases = oldCh.ConnectedAliases
+	ch.Meta.UUID = oldCh.Meta.UUID
 
 	parentApp, _ := GetTreeMemory().Apps().Get(context)
 
@@ -206,7 +233,11 @@ func (amm *ChannelRootGetter) Get(context string, chName string) (*meta.Channel,
 
 	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).NotFound().Message("channel was not found because the app context has an error").Build()
+		newError := ierrors.
+			NewError().
+			InnerError(err).
+			NotFound().
+			Message("the '%v' context is invalid", context).Build()
 		return nil, newError
 	}
 
@@ -220,6 +251,10 @@ func (amm *ChannelRootGetter) Get(context string, chName string) (*meta.Channel,
 		zap.String("ctype", chName),
 		zap.String("context", context))
 
-	newError := ierrors.NewError().NotFound().Message("channel not found (Root Getter)").Build()
+	newError := ierrors.
+		NewError().
+		NotFound().
+		Message("channel not found (Root Getter)").
+		Build()
 	return nil, newError
 }

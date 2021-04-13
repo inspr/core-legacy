@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -86,7 +86,7 @@ func createYaml() (string, meta.Channel) {
 			Reference:   "mock_reference",
 			Annotations: map[string]string{},
 			Parent:      "mock_parent",
-			SHA256:      "mock_sha256",
+			UUID:        "mock_sha256",
 		},
 		Spec:          meta.ChannelSpec{Type: "mock_type"},
 		ConnectedApps: []string{"a", "b", "c"},

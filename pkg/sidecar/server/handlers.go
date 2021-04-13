@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"sync"
 
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
-	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/rest"
+	"github.com/inspr/inspr/pkg/sidecar/models"
 	"go.uber.org/zap"
 )
 
@@ -52,7 +52,14 @@ func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	if !environment.IsInChannelBoundary(body.Channel, ch.OutputChannels) {
-		insprError := ierrors.NewError().BadRequest().Message("channel not found")
+		insprError := ierrors.
+			NewError().
+			BadRequest().
+			Message(
+				"channel '%s' not found",
+				body.Channel,
+			)
+
 		rest.ERROR(w, insprError.Build())
 		return
 	}
@@ -79,7 +86,14 @@ func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	if !environment.IsInChannelBoundary(body.Channel, ch.InputChannels) {
-		insprError := ierrors.NewError().BadRequest().Message("channel not found")
+		insprError := ierrors.
+			NewError().
+			BadRequest().
+			Message(
+				"channel '%s' not found",
+				body.Channel,
+			)
+
 		rest.ERROR(w, insprError.Build())
 		return
 	}
@@ -108,14 +122,20 @@ func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	if !environment.IsInChannelBoundary(body.Channel, ch.InputChannels) {
-		insprError := ierrors.NewError().BadRequest().Message("channel not found")
+		insprError := ierrors.
+			NewError().
+			BadRequest().
+			Message(
+				"channel '%s' not found",
+				body.Channel,
+			)
+
 		rest.ERROR(w, insprError.Build())
 		return
 	}
 
-	if err := ch.r.CommitMessage(body.Channel); err != nil {
+	if err := ch.r.Commit(body.Channel); err != nil {
 		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's commitMessage failed")
 		rest.ERROR(w, insprError.Build())
 	}
-
 }

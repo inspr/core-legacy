@@ -2,11 +2,10 @@ package fake
 
 import (
 	"context"
-	"fmt"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/cmd/insprd/operators"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 // NodeOperator mock
@@ -41,9 +40,15 @@ func (o *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, 
 	if o.err != nil {
 		return nil, o.err
 	}
-	node, ok := o.nodes[app.Meta.Parent+app.Meta.Name]
+
+	nodeKey := app.Meta.Parent + app.Meta.Name
+	node, ok := o.nodes[nodeKey]
 	if !ok {
-		return nil, ierrors.NewError().NotFound().Message("node not found").Build()
+		return nil, ierrors.
+			NewError().
+			NotFound().
+			Message("node not found, searched for: %s", nodeKey).
+			Build()
 	}
 	return &node.Spec.Node, nil
 }
@@ -53,8 +58,14 @@ func (o *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Nod
 	if o.err != nil {
 		return nil, o.err
 	}
-	if _, ok := o.nodes[app.Meta.Parent+app.Meta.Name]; !ok {
-		return nil, ierrors.NewError().NotFound().Message("node not found").Build()
+
+	nodeKey := app.Meta.Parent + app.Meta.Name
+	if _, ok := o.nodes[nodeKey]; !ok {
+		return nil, ierrors.
+			NewError().
+			NotFound().
+			Message("node not found, searched for: %s", nodeKey).
+			Build()
 	}
 	o.nodes[app.Meta.Parent+app.Meta.Name] = app
 	return &app.Spec.Node, nil
@@ -65,11 +76,18 @@ func (o *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeN
 	if o.err != nil {
 		return o.err
 	}
-	_, ok := o.nodes[nodeContext+nodeName]
+
+	nodeKey := nodeContext + nodeName
+	_, ok := o.nodes[nodeKey]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("node %s not found", nodeContext+nodeName)).Build()
+		return ierrors.
+			NewError().
+			NotFound().
+			Message("node not found, searched for: %s", nodeKey).
+			Build()
 	}
-	delete(o.nodes, nodeContext+nodeName)
+
+	delete(o.nodes, nodeKey)
 	return nil
 }
 

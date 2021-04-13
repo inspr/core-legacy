@@ -10,13 +10,13 @@ import (
 	"reflect"
 	"testing"
 
+	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
+	"github.com/inspr/inspr/cmd/insprd/api/models"
+	"github.com/inspr/inspr/pkg/cmd"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/spf13/cobra"
-	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/api/models"
-	"gitlab.inspr.dev/inspr/core/pkg/cmd"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 func restartScopeFlag() {
@@ -30,7 +30,7 @@ func getMockApp() *meta.App {
 			Reference:   "appParent",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -41,7 +41,7 @@ func getMockApp() *meta.App {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -52,7 +52,7 @@ func getMockApp() *meta.App {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Node: meta.Node{
@@ -61,7 +61,7 @@ func getMockApp() *meta.App {
 											Reference:   "app1.thenewapp",
 											Annotations: map[string]string{},
 											Parent:      "app1",
-											SHA256:      "",
+											UUID:        "",
 										},
 									},
 									Apps:         map[string]*meta.App{},
@@ -110,7 +110,7 @@ func getMockApp() *meta.App {
 						Reference:   "root.ct1",
 						Annotations: map[string]string{},
 						Parent:      "root",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},

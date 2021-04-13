@@ -1,10 +1,8 @@
 package fake
 
 import (
-	"fmt"
-
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 // Alias - mocks the implementation of the AppMemory interface methods
@@ -22,7 +20,11 @@ func (a *Alias) Get(context string, aliasKey string) (*meta.Alias, error) {
 
 	alias, ok := a.alias[context]
 	if !ok {
-		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("alias %s not found", context)).Build()
+		return nil, ierrors.
+			NewError().
+			NotFound().
+			Message("alias %s not found", context).
+			Build()
 	}
 
 	return alias, nil
@@ -36,7 +38,11 @@ func (a *Alias) Create(query string, targetBoundary string, alias *meta.Alias) e
 
 	_, ok := a.alias[query]
 	if ok {
-		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("alias %s already exists", query)).Build()
+		return ierrors.
+			NewError().
+			AlreadyExists().
+			Message("alias %s already exists", query).
+			Build()
 	}
 	a.alias[query] = alias
 	return nil
@@ -50,7 +56,11 @@ func (a *Alias) Delete(context string, aliasKey string) error {
 
 	_, ok := a.alias[context]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", context)).Build()
+		return ierrors.
+			NewError().
+			NotFound().
+			Message("channel type %s not found", context).
+			Build()
 	}
 
 	delete(a.alias, context)
@@ -64,7 +74,11 @@ func (a *Alias) Update(context string, aliasKey string, alias *meta.Alias) error
 	}
 	_, ok := a.alias[context]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel type %s not found", context)).Build()
+		return ierrors.
+			NewError().
+			NotFound().
+			Message("channel type %s not found", context).
+			Build()
 	}
 	a.alias[context] = alias
 	return nil

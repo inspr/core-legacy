@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
+	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
 
 	"github.com/spf13/cobra"
 )
