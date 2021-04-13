@@ -1,0 +1,8 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto  # auto compares coverage to the previous base commit
+
+comment:
+  layout: "reach, diff, flags, files"  # Remove items here to change the format
