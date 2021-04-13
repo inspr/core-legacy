@@ -106,7 +106,7 @@ func (h *Handler) LoginHandler(rw http.ResponseWriter, r *http.Request) {
 // RefreshTokenHandler handles token refresh requests
 func (h *Handler) RefreshTokenHandler(rw http.ResponseWriter, r *http.Request) {
 	type ReceivedDataRefresh struct {
-		RefreshToken string
+		RefreshToken string `json:"refreshtoken"`
 	}
 
 	data := ReceivedDataRefresh{}

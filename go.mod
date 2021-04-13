@@ -3,10 +3,13 @@ module gitlab.inspr.dev/inspr/core
 go 1.13
 
 require (
+	github.com/alicebob/miniredis v2.5.0+incompatible
 	github.com/confluentinc/confluent-kafka-go v1.5.2
 	github.com/disiqueira/gotree v1.0.0
+	github.com/elliotchance/redismock/v8 v8.6.2
 	github.com/go-redis/redis/v8 v8.8.0
 	github.com/golang/snappy v0.0.2 // indirect
+	github.com/gomodule/redigo v1.8.4 // indirect
 	github.com/google/go-cmp v0.5.5
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/json-iterator/go v1.1.8 // indirect
