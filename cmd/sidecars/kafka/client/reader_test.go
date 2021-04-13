@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
+	"github.com/inspr/inspr/pkg/environment"
 )
 
 func TestNewReader(t *testing.T) {

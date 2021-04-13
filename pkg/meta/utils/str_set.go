@@ -3,9 +3,9 @@ package utils
 import (
 	"reflect"
 
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 const exists = true

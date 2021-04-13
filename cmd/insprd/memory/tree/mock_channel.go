@@ -1,7 +1,7 @@
 package tree
 
 import (
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 // ChannelMockManager mocks a channel interface for testing

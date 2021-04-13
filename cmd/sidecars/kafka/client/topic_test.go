@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/inspr/inspr/pkg/environment"
 	"github.com/linkedin/goavro"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
 )
 
 var mockSchema = `{"type":"string"}`

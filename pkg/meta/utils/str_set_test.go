@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 func TestArrMakeSet(t *testing.T) {
