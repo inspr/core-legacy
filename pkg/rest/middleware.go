@@ -84,7 +84,7 @@ func (h Handler) Validate(auth authentication.Auth) Handler {
 
 		valid := false
 		for _, scope := range payload.Scope {
-			if strings.Compare(scope, scopeData.Scope) == 0 {
+			if strings.Contains(scope, scopeData.Scope) {
 				// scope found
 				valid = true
 			}
