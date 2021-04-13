@@ -34,6 +34,3 @@ To install the CLI get the latest release for your architecture from the [`relea
 
 You can check the documentation on the [Confluence page for Inspr](https://inspr.atlassian.net/wiki/spaces/INX/overview)
 
-## License
-
-> TODO
