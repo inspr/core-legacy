@@ -26,7 +26,7 @@ func (server *Server) Refresh() rest.Handler {
 		}
 		reqBytes, err := json.Marshal(reqBody)
 		if err != nil {
-			err = ierrors.NewError().BadRequest().Message("invalid request body").Build()
+			err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 			rest.ERROR(w, err)
 			return
 		}
@@ -34,6 +34,7 @@ func (server *Server) Refresh() rest.Handler {
 		c := &http.Client{}
 		resp, err := c.Post(data.RefreshURL, "application/json", bytes.NewBuffer(reqBytes))
 		if err != nil || resp.StatusCode != http.StatusOK {
+			err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 			rest.ERROR(w, err)
 			return
 		}
