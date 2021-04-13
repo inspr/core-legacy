@@ -1,10 +1,21 @@
-<p align="center"><img src="./docs/img/inspr_logo.png" width="175" title="Inspr Logo"></p>
+<p align="center">
+    <img 
+        srcset="./docs/img/logo.png, ./docs/img/logo@2x.png, ./docs/img/logo@3x.png "
+        src="./docs/img/logo.png" 
+        width="128" 
+        title="Inspr Logo">
+</p>
 
 <p align="center">
-</a>
-<a href="https://godoc.org/github.com/inspr/inspr"><img src="https://godoc.org/github.com/inspr/inspr?status.svg"></a>
-<a href="https://goreportcard.com/badge/github.com/inspr/inspr"><img src="https://goreportcard.com/badge/github.com/inspr/inspr"></a>
-<a href="https://codecov.io/gh/inspr/inspr"><img src="https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG"></a>
+    <a href="https://godoc.org/github.com/inspr/inspr">
+        <img src="https://godoc.org/github.com/inspr/inspr?status.svg">
+    </a>
+    <a href="https://goreportcard.com/badge/github.com/inspr/inspr">
+        <img src="https://goreportcard.com/badge/github.com/inspr/inspr">
+    </a>
+    <a href="https://codecov.io/gh/inspr/inspr">
+        <img src="https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG">
+    </a>
 </p>
 
 Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
