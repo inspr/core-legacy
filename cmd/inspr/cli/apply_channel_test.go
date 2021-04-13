@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
 	"gopkg.in/yaml.v2"
 )
 

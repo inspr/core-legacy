@@ -13,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/ierrors"
 )
 
 func TestJSON(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
+	"github.com/inspr/inspr/cmd/insprd/memory/fake"
 )
 
 // TestServer_initRoutes - this test is a bit different than the one automatically

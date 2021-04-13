@@ -2,9 +2,9 @@ package kafkasc
 
 import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	globalEnv "gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
+	globalEnv "github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/sidecar/models"
 	"go.uber.org/zap"
 )
 

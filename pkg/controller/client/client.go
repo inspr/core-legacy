@@ -1,8 +1,8 @@
 package client
 
 import (
-	"gitlab.inspr.dev/inspr/core/pkg/controller"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/controller"
+	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 // Client implements communication with the Insprd

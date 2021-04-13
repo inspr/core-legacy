@@ -4,11 +4,11 @@ Inspr is an engine for running distributed applications, using multiple communic
 
 - :muscle: Robust: built on top of golang, kubernetes and other state of the art technologies
 
-- :sparkles:   Distributed: created to allow complex and hierarchical distributed design patterns
+- :sparkles: Distributed: created to allow complex and hierarchical distributed design patterns
 
-- :cloud:  Cloud native: lightweight and modular, built with interchangeable pieces
+- :cloud: Cloud native: lightweight and modular, built with interchangeable pieces
 
-- :hammer_and_wrench:   Versatile: can adapt to any cloud environment
+- :hammer_and_wrench: Versatile: can adapt to any cloud environment
 
 ## Installation
 
@@ -26,7 +26,7 @@ The default values file is included in the `build/helm` folder.
 
 ### CLI
 
-To install the CLI get the latest release for your architecture from the [`releases`](https://gitlab.inspr.dev/inspr/core/-/releases) page and add it to your PATH.
+To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/-/releases) page and add it to your PATH.
 
 ## Documentation
 
