@@ -27,6 +27,7 @@ func NewHandler(rdb client.RedisManager) *Handler {
 func (h *Handler) CreateUserHandler(rw http.ResponseWriter, r *http.Request) {
 	type ReceivedDataCreate struct {
 		UID string
+		Pwd string
 		Usr client.User
 	}
 
@@ -36,7 +37,7 @@ func (h *Handler) CreateUserHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.rdb.CreateUser(h.ctx, data.UID, data.Usr); err != nil {
+	if err := h.rdb.CreateUser(h.ctx, data.UID, data.Pwd, data.Usr); err != nil {
 		rest.ERROR(rw, err)
 		return
 	}
@@ -46,6 +47,7 @@ func (h *Handler) CreateUserHandler(rw http.ResponseWriter, r *http.Request) {
 func (h *Handler) DeleteUserHandler(rw http.ResponseWriter, r *http.Request) {
 	type ReceivedDataDelete struct {
 		UID            string
+		Pwd            string
 		UsrToBeDeleted string
 	}
 
@@ -55,7 +57,7 @@ func (h *Handler) DeleteUserHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.rdb.DeleteUser(h.ctx, data.UID, data.UsrToBeDeleted); err != nil {
+	if err := h.rdb.DeleteUser(h.ctx, data.UID, data.Pwd, data.UsrToBeDeleted); err != nil {
 		rest.ERROR(rw, err)
 		return
 	}
@@ -65,6 +67,7 @@ func (h *Handler) DeleteUserHandler(rw http.ResponseWriter, r *http.Request) {
 func (h *Handler) UpdatePasswordHandler(rw http.ResponseWriter, r *http.Request) {
 	type ReceivedDataUpdate struct {
 		UID            string
+		Pwd            string
 		UsrToBeUpdated string
 		NewPwd         string
 	}
@@ -75,7 +78,7 @@ func (h *Handler) UpdatePasswordHandler(rw http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := h.rdb.UpdatePassword(h.ctx, data.UID, data.UsrToBeUpdated, data.NewPwd); err != nil {
+	if err := h.rdb.UpdatePassword(h.ctx, data.UID, data.Pwd, data.UsrToBeUpdated, data.NewPwd); err != nil {
 		rest.ERROR(rw, err)
 		return
 	}

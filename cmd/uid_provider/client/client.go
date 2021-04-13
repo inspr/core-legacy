@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/go-redis/redis/v8"
 	"gitlab.inspr.dev/inspr/core/pkg/api/auth"
@@ -38,31 +39,36 @@ func NewRedisClient() *Client {
 }
 
 // CreateUser inserts a new user into Redis
-func (c *Client) CreateUser(ctx context.Context, uid string, newUser User) error {
-	if isAdmin(ctx, c.rdb, uid) {
+func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) error {
+	usrAuthorized, err := havePermission(ctx, c.rdb, uid, pwd)
+
+	if usrAuthorized {
 		if err := set(ctx, c.rdb, newUser); err != nil {
 			return err
 		}
 		return nil
 	}
-	return fmt.Errorf("current user doesn't have permission to create new users")
+	return err
 }
 
 // DeleteUser deletes an user from Redis, if it exists
-func (c *Client) DeleteUser(ctx context.Context, uid, usrToBeDeleted string) error {
-	if isAdmin(ctx, c.rdb, uid) {
+func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error {
+	usrAuthorized, err := havePermission(ctx, c.rdb, uid, pwd)
+
+	if usrAuthorized {
 		if err := delete(ctx, c.rdb, usrToBeDeleted); err != nil {
 			return err
 		}
 		return nil
 	}
-	return fmt.Errorf("current user doesn't have permission to create new users")
+	return err
 }
 
 // UpdatePassword changes an users password, if that user exists
-func (c *Client) UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd string) error {
-	if isAdmin(ctx, c.rdb, uid) {
+func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, newPwd string) error {
+	usrAuthorized, err := havePermission(ctx, c.rdb, uid, pwd)
 
+	if usrAuthorized {
 		user, err := get(ctx, c.rdb, usrToBeUpdated)
 		if err != nil {
 			return err
@@ -75,7 +81,7 @@ func (c *Client) UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd
 		}
 		return nil
 	}
-	return fmt.Errorf("current user doesn't have permission to create new users")
+	return err
 }
 
 // Login receives an user and a password, and checks if they exist and match.
@@ -156,31 +162,45 @@ func get(ctx context.Context, rdb *redis.Client, key string) (User, error) {
 }
 
 func delete(ctx context.Context, rdb *redis.Client, key string) error {
-
-	err := rdb.Del(ctx, key).Err()
+	numDeleted, err := rdb.Del(ctx, key).Result()
 	if err != nil {
 		return err
+	} else if numDeleted == 0 {
+		return fmt.Errorf("no items were deleted for key %v", key)
 	}
 	return nil
 }
 
-func isAdmin(ctx context.Context, rdb *redis.Client, uid string) bool {
+func havePermission(ctx context.Context, rdb *redis.Client, uid, pwd string) (bool, error) {
 	requestor, err := get(ctx, rdb, uid)
 	if err != nil {
-		return false
+		return false, err
+	}
+	if requestor.Password != pwd {
+		return false, fmt.Errorf("invalid password for user %v", uid)
 	}
 	if requestor.Role != 1 {
-		return false
+		return false, fmt.Errorf("user %v doesn't have admin permission", uid)
 	}
-	return true
+	return true, nil
 }
 
 func encrypt(user User) (auth.Payload, error) {
-	keyString := "somehow get it from the cluster"
+	refreshURL := os.Getenv("REFRESH_URL")
+	if refreshURL == "" {
+		panic("[ENV VAR] REFRESH_URL not found")
+	}
+	keyString := os.Getenv("REFRESH_KEY")
+	if keyString == "" {
+		panic("[ENV VAR] REFRESH_KEY not found")
+	}
 	stringToEncrypt := fmt.Sprintf("%s:%s", user.UID, user.Password)
 
 	//Since the key is in string, we need to convert decode it to bytes
-	key, _ := hex.DecodeString(keyString)
+	key, err := hex.DecodeString(keyString)
+	if err != nil {
+		return auth.Payload{}, err
+	}
 	plaintext := []byte(stringToEncrypt)
 
 	//Create a new Cipher Block from the key
@@ -207,24 +227,28 @@ func encrypt(user User) (auth.Payload, error) {
 	ciphertext := aesGCM.Seal(nonce, nonce, plaintext, nil)
 
 	payload := auth.Payload{
-		UID:     user.UID,
-		Role:    user.Role,
-		Scope:   user.Scope,
-		Refresh: string(ciphertext),
+		UID:        user.UID,
+		Role:       user.Role,
+		Scope:      user.Scope,
+		Refresh:    string(ciphertext),
+		RefreshURL: refreshURL,
 	}
 
 	return payload, nil
 }
 
 func decrypt(encryptedString string) (User, error) {
-	usr := User{}
 	keyString := os.Getenv("REFRESH_KEY")
 	if keyString == "" {
-		return User{}, fmt.Errorf("decryption key is empty")
+		panic("[ENV VAR] REFRESH_KEY not found")
 	}
 
-	key, _ := hex.DecodeString(keyString)
-	enc, _ := hex.DecodeString(encryptedString)
+	key, err := hex.DecodeString(keyString)
+	if err != nil {
+		return User{}, err
+	}
+
+	enc := []byte(encryptedString)
 
 	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(key)
@@ -245,16 +269,18 @@ func decrypt(encryptedString string) (User, error) {
 	nonce, ciphertext := enc[:nonceSize], enc[nonceSize:]
 
 	//Decrypt the data
-	plaintext, err := aesGCM.Open(nil, nonce, ciphertext, nil)
+	bytetext, err := aesGCM.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
 		return User{}, err
 	}
 
-	if err := json.Unmarshal(plaintext, &usr); err != nil {
-		return User{}, err
+	plaintext := string(bytetext)
+	usrData := strings.Split(plaintext, ":")
+	if len(usrData) != 2 {
+		return User{}, fmt.Errorf("invalid refresh token")
 	}
 
-	return usr, nil
+	return User{UID: usrData[0], Password: usrData[1]}, nil
 }
 
 func requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
