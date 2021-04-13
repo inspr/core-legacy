@@ -1,14 +1,27 @@
 documentation:
   - doc/*
+  - "*.md"
 
 cmd@insprd:
   - cmd/insprd/*
 
 pkg@insprd:
   - pkg/insprd/*
-  
+
 cmd@sidecar:
   - cmd/sidecar/*
 
 pkg@sidecar:
   - pkg/sidecar/*
+
+api:
+  - "**/*api*"
+
+build:
+  - skaffold.yaml
+  - build/*
+  - "**/Dockerfile"
+
+devOps:
+  - .github/*
+
