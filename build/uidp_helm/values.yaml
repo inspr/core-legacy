@@ -54,6 +54,7 @@ deployment:
   replicas: 1
   uidpName: uidp-dep
   image: gcr.io/red-inspr/uidp/redis/api
+  uidpUrl: "http://inspr.com/refreshtoken"
 
 ingress:
   name: uidp-ingress

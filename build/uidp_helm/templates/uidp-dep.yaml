@@ -37,6 +37,8 @@ spec:
               value: {{ .Values.redis.port | quote }}
             - name: REDIS_PASSWORD
               value: {{ .Values.redis.password }}
+            - name: REFRESH_URL
+              value: {{ .Values.deployment.uidpUrl }}
             - name: REFRESH_KEY
               valueFrom:
                 secretKeyRef:
