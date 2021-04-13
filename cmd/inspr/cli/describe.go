@@ -48,7 +48,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given alias by the path", "describe alias app1.app2.myalias").
 		WithAliases([]string{"al"}).
 		WithCommonFlags().
-		ExactArgs(1, displayChannelTypeState)
+		ExactArgs(1, displayAlias)
 
 	describeCmd := cmd.NewCmd("describe").
 		WithDescription("Retrieves the full state of a component from a given namespace").

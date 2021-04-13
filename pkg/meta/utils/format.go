@@ -34,6 +34,12 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 			channelTypes.Add(ctName)
 		}
 	}
+	if len(app.Spec.Aliases) > 0 {
+		aliases := spec.Add("Aliases")
+		for aliasKey := range app.Spec.Aliases {
+			aliases.Add(aliasKey)
+		}
+	}
 	if app.Spec.Node.Spec.Image != "" {
 		node := spec.Add("Node")
 		nodeSpec := node.Add("Spec")
@@ -105,6 +111,18 @@ func PrintChannelTypeTree(ct *meta.ChannelType, out io.Writer) {
 	}
 
 	fmt.Fprintln(out, channelType.Print())
+}
+
+// PrintAliasTree prints the alias structure
+func PrintAliasTree(al *meta.Alias, out io.Writer) {
+	alias := gotree.New(al.Meta.Name)
+	meta := alias.Add("Meta")
+
+	populateMeta(meta, &al.Meta)
+
+	alias.Add("Target: " + al.Target)
+
+	fmt.Fprintln(out, alias.Print())
 }
 
 func populateMeta(metaTree gotree.Tree, meta *meta.Metadata) {
