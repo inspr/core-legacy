@@ -1,6 +1,6 @@
 # ![logo](./docs/img/inspr_logo.png)Inspr
 
-[![codecov](https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG)](https://codecov.io/gh/inspr/inspr)
+[![codecov](https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG)](https://codecov.io/gh/inspr/inspr)[![Go Report Card](https://goreportcard.com/badge/github.com/inspr/inspr)](https://goreportcard.com/report/github.com/inspr/inspr)
 
 Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
 
