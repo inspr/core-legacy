@@ -28,7 +28,7 @@ The default values file is included in the `build/helm` folder.
 
 ### CLI
 
-To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/-/releases) page and add it to your PATH.
+To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.
 
 ## Documentation
 
