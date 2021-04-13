@@ -1,0 +1,14 @@
+documentation:
+  - doc/*
+
+cmd@insprd:
+  - cmd/insprd/*
+
+pkg@insprd:
+  - pkg/insprd/*
+  
+cmd@sidecar:
+  - cmd/sidecar/*
+
+pkg@sidecar:
+  - pkg/sidecar/*

@@ -1,0 +1,18 @@
+name: Test and coverage
+
+on: [push, pull_request]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-go@v2
+      - name: Run coverage
+        run: go test -v -coverprofile=profile.cov.tmp -coverpkg=./... ./... || exit 1 
+      - name: Filter files
+        run: cat profile.cov.tmp | grep -v 'fake\|mock\|doc\|examples\|main.go' > profile.cov
+      - name: Upload coverage to Codecov
+        run: bash <(curl -s https://codecov.io/bash)
