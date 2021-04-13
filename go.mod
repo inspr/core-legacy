@@ -1,4 +1,4 @@
-module gitlab.inspr.dev/inspr/core
+module github.com/inspr/inspr
 
 go 1.13
 

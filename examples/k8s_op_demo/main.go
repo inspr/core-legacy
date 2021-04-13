@@ -4,10 +4,10 @@ import (
 	"context"
 	"log"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/kafka/nodes"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"github.com/inspr/inspr/cmd/insprd/memory/tree"
+	"github.com/inspr/inspr/cmd/insprd/operators/kafka/nodes"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 func main() {
