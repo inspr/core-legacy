@@ -1,8 +1,8 @@
 <p align="center">
-    <img 
+    <img
         srcset="./docs/img/logo.png 1x, ./docs/img/logo@2x.png 2x, ./docs/img/logo@3x.png 3x"
-        src="./docs/img/logo@3x.png" 
-        width="128" 
+        src="./docs/img/logo@3x.png"
+        width="128"
         title="Inspr Logo">
 </p>
 
@@ -49,4 +49,3 @@ To install the CLI get the latest release for your architecture from the [`relea
 ## Documentation
 
 You can check the documentation on the [Confluence page for Inspr](https://inspr.atlassian.net/wiki/spaces/INX/overview)
-
