@@ -1,14 +1,14 @@
-# ![logo](./doc/img/inspr_logo.png)Inspr
+# ![logo](./docs/img/inspr_logo.png)Inspr
 
 Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
 
 - :muscle: Robust: built on top of golang, kubernetes and other state of the art technologies
 
-- :sparkles:   Distributed: created to allow complex and hierarchical distributed design patterns
+- :sparkles: Distributed: created to allow complex and hierarchical distributed design patterns
 
-- :cloud:  Cloud native: lightweight and modular, built with interchangeable pieces
+- :cloud: Cloud native: lightweight and modular, built with interchangeable pieces
 
-- :hammer_and_wrench:   Versatile: can adapt to any cloud environment
+- :hammer_and_wrench: Versatile: can adapt to any cloud environment
 
 ## Installation
 
