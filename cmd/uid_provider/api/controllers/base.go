@@ -15,6 +15,7 @@ type Server struct {
 	Rdb client.RedisManager
 }
 
+// NewServer returns a new server object
 func NewServer() Server {
 	return Server{}
 }
