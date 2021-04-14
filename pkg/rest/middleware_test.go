@@ -125,6 +125,16 @@ func TestHandler_Validate(t *testing.T) {
 			wantCode: http.StatusForbidden,
 		},
 		{
+			name: "scope_error_doesnt_have_prefix",
+			args: args{
+				auth:        authMock.NewMockAuth(nil),
+				headerValue: "Bearer mock_token",
+				scope:       "wrongScope.scope_1",
+			},
+			wantErr:  true,
+			wantCode: http.StatusForbidden,
+		},
+		{
 			name: "working",
 			args: args{
 				auth:        authMock.NewMockAuth(nil),

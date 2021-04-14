@@ -36,7 +36,10 @@ func (h Handler) Validate(auth authentication.Auth) Handler {
 		}
 
 		token := strings.TrimPrefix(headerContent[0], "Bearer ")
-		payload, _, err := auth.Validade([]byte(token))
+		payload, new_token, err := auth.Validade([]byte(token))
+
+		// returns the same token or a refreshed one in the header of the response
+		w.Header().Add("Authorization", "Bearer "+string(new_token))
 
 		// error management
 		if err != nil {
@@ -70,7 +73,7 @@ func (h Handler) Validate(auth authentication.Auth) Handler {
 		}
 
 		// request scope
-		scopeData := struct {
+		requestData := struct {
 			Scope string `json:"scope"`
 		}{}
 
@@ -79,14 +82,14 @@ func (h Handler) Validate(auth authentication.Auth) Handler {
 			// reads body
 			bodyBytes, _ := ioutil.ReadAll(r.Body)
 			// unmarshal into scope Data
-			json.Unmarshal(bodyBytes, &scopeData)
+			json.Unmarshal(bodyBytes, &requestData)
 			// Restore the r.Body to its original state
 			r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 		}
 
 		valid := false
 		for _, scope := range payload.Scope {
-			if strings.Contains(scope, scopeData.Scope) {
+			if strings.HasPrefix(requestData.Scope, scope) {
 				// scope found
 				valid = true
 			}
