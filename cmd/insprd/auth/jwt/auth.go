@@ -3,22 +3,36 @@
 package jwtauth
 
 import (
+	"crypto/rsa"
+	"encoding/json"
 	"errors"
 	"time"
 
+	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
 	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
 )
 
-type JWTauth struct{}
-
-func NewJWTauth() *JWTauth {
-	return &JWTauth{}
+type JWTauth struct {
+	rsaKey *rsa.PrivateKey
 }
 
-// receives the
+func NewJWTauth(privateKey *rsa.PrivateKey) *JWTauth {
+	return &JWTauth{
+		rsaKey: privateKey,
+	}
+}
+
+// Validade is a wrapper that checks the token of the http request and if it's
+// valid, proceeds to execute the request and if it isn't valid returns an error
 func (JA *JWTauth) Validade(token []byte) (models.Payload, []byte, error) {
-	jwtToken, err := jwt.Parse(token, jwt.WithValidate(true))
+
+	jwtToken, err := jwt.Parse(
+		token,
+		jwt.WithValidate(true),
+		jwt.WithVerify(jwa.RS256, &JA.rsaKey.PublicKey),
+	)
+
 	// not valid token
 	if err != nil {
 		return models.Payload{}, token, err
@@ -28,7 +42,7 @@ func (JA *JWTauth) Validade(token []byte) (models.Payload, []byte, error) {
 	now := time.Now()
 
 	// expired
-	if now.After(expiration.(time.Time)) || !found {
+	if !found || now.After(expiration.(time.Time)) {
 		newToken, err := JA.Refresh(token)
 		if err != nil {
 			return models.Payload{},
@@ -39,14 +53,22 @@ func (JA *JWTauth) Validade(token []byte) (models.Payload, []byte, error) {
 	}
 
 	// gets payload from token
-	payload, found := jwtToken.Get("payload")
+	payloadData, found := jwtToken.Get("payload")
 	if !found {
 		return models.Payload{},
 			token,
 			errors.New("payload not found")
 	}
 
-	return payload.(models.Payload), token, nil
+	// gets the string in the payload and converts it to bytes
+	payloadString := payloadData.(string)
+	payloadBytes := []byte(payloadString)
+
+	// unmarshal of the bytes
+	var payload models.Payload
+	json.Unmarshal(payloadBytes, &payload)
+
+	return payload, token, nil
 }
 
 func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {

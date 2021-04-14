@@ -3,6 +3,9 @@
 package jwtauth
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"encoding/json"
 	"reflect"
 	"testing"
 	"time"
@@ -13,18 +16,21 @@ import (
 )
 
 func TestNewJWTauth(t *testing.T) {
+	privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
 	tests := []struct {
 		name string
 		want *JWTauth
 	}{
 		{
 			name: "returns_JWT_auth",
-			want: &JWTauth{},
+			want: &JWTauth{
+				rsaKey: privKey,
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewJWTauth(); !reflect.DeepEqual(got, tt.want) {
+			if got := NewJWTauth(privKey); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewJWTauth() = %v, want %v", got, tt.want)
 			}
 		})
@@ -32,43 +38,48 @@ func TestNewJWTauth(t *testing.T) {
 }
 
 func TestJWTauth_Validade(t *testing.T) {
+	privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+	const aLongLongTimeAgo = 233431200
+
 	invalidToken := func() []byte {
 		token := jwt.New()
-		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
-		signed, _ := jwt.Sign(token, jwa.RS256, "privateKey")
+		token.Set(`foo`, `bar`)
+		signed, _ := jwt.Sign(token, jwa.RS256, "differentkey")
 		return signed
 	}
 	expiredToken := func() []byte {
 		token := jwt.New()
-		token.Set(jwt.ExpirationKey, time.Now())
-		token.Set("payload", models.Payload{
-			UID:        "mock_UID",
-			Role:       0,
-			Scope:      []string{"mock"},
-			Refresh:    "mock_refresh",
-			RefreshURL: "mock_refresh_url",
-		})
-		signed, _ := jwt.Sign(token, jwa.RS256, "privateKey")
+		token.Set(jwt.ExpirationKey, time.Unix(aLongLongTimeAgo, 0))
+		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
 		return signed
 	}
+	nilExpiredToken := func() []byte {
+		token := jwt.New()
+		token.Set(jwt.ExpirationKey, nil)
+		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
+		return signed
+	}
+
 	noPayloadToken := func() []byte {
 		token := jwt.New()
 		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
-		token.Set("payload", nil)
-		signed, _ := jwt.Sign(token, jwa.RS256, "privateKey")
+		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
 		return signed
 	}
 	fineToken := func() []byte {
 		token := jwt.New()
 		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
-		token.Set("payload", models.Payload{
+
+		payload := models.Payload{
 			UID:        "mock_UID",
 			Role:       0,
 			Scope:      []string{"mock"},
 			Refresh:    "mock_refresh",
 			RefreshURL: "mock_refresh_url",
-		})
-		signed, _ := jwt.Sign(token, jwa.RS256, "privateKey")
+		}
+		payloadBytes, _ := json.Marshal(payload)
+		token.Set("payload", payloadBytes)
+		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
 		return signed
 	}
 
@@ -85,7 +96,7 @@ func TestJWTauth_Validade(t *testing.T) {
 	}{
 		{
 			name: "Invalid_token",
-			JA:   NewJWTauth(),
+			JA:   NewJWTauth(privKey),
 			args: args{
 				token: invalidToken(),
 			},
@@ -95,7 +106,7 @@ func TestJWTauth_Validade(t *testing.T) {
 		},
 		{
 			name: "Expired_token",
-			JA:   NewJWTauth(),
+			JA:   NewJWTauth(privKey),
 			args: args{
 				token: expiredToken(),
 			},
@@ -104,8 +115,18 @@ func TestJWTauth_Validade(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "nil_Expired_token",
+			JA:   NewJWTauth(privKey),
+			args: args{
+				token: nilExpiredToken(),
+			},
+			want:    models.Payload{},
+			want1:   []byte{},
+			wantErr: true,
+		},
+		{
 			name: "Payload_notFound",
-			JA:   NewJWTauth(),
+			JA:   NewJWTauth(privKey),
 			args: args{
 				token: noPayloadToken(),
 			},
@@ -115,21 +136,24 @@ func TestJWTauth_Validade(t *testing.T) {
 		},
 		{
 			name: "Worked",
-			JA:   NewJWTauth(),
+			JA:   NewJWTauth(privKey),
 			args: args{
 				token: fineToken(),
 			},
 			want:    models.Payload{},
 			want1:   fineToken(),
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			JA := &JWTauth{}
-			got, got1, err := JA.Validade(tt.args.token)
+			got, got1, err := tt.JA.Validade(tt.args.token)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("JWTauth.Validade() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"JWTauth.Validade() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
