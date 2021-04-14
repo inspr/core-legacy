@@ -7,13 +7,13 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	mfake "gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/tree"
-	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	mfake "github.com/inspr/inspr/cmd/insprd/memory/fake"
+	"github.com/inspr/inspr/cmd/insprd/memory/tree"
+	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/utils"
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,7 +30,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 			Name:      "mock_app",
 			Reference: "ref",
 			Parent:    "parent",
-			SHA256:    "sha256",
+			UUID:      "parent-UUID",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{
@@ -38,7 +38,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 					Name:      "mock_node",
 					Reference: "ref",
 					Parent:    "mock_app",
-					SHA256:    "sha256",
+					UUID:      "parent-UUID",
 				},
 				Spec: meta.NodeSpec{
 					Image:    "nodeImage",
@@ -60,13 +60,12 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 		"INSPR_INPUT_CHANNELS":  inputChannels,
 		"INSPR_CHANNEL_SIDECAR": environment.GetSidecarImage(),
 		"INSPR_APPS_TLS":        "true",
-
 		"INSPR_OUTPUT_CHANNELS": outputChannels,
 		"INSPR_APP_ID":          appID,
 	}
 
 	appDeployName := toDeploymentName(&testApp)
-
+	appID = toAppID(&testApp)
 	type args struct {
 		app *meta.App
 	}
@@ -84,12 +83,12 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 			want: &kubeApp.Deployment{
 				ObjectMeta: kubeMeta.ObjectMeta{
 					Name:   appDeployName,
-					Labels: map[string]string{"app": appDeployName},
+					Labels: map[string]string{"app": appID},
 				},
 				Spec: kubeApp.DeploymentSpec{
 					Selector: &kubeMeta.LabelSelector{
 						MatchLabels: map[string]string{
-							"app": appDeployName,
+							"app": appID,
 						},
 					},
 					Replicas: &replicasHelper,
@@ -97,7 +96,7 @@ func TestInsprDAppToK8sDeployment(t *testing.T) {
 
 						ObjectMeta: kubeMeta.ObjectMeta{
 							Labels: map[string]string{
-								"app": appDeployName,
+								"app": appID,
 							},
 						},
 						Spec: kubeCore.PodSpec{
@@ -176,6 +175,7 @@ func Test_toDeploymentName(t *testing.T) {
 		Meta: meta.Metadata{
 			Name:   "app1",
 			Parent: "parent",
+			UUID:   "APP-UUID",
 		},
 	}
 	type args struct {
@@ -191,7 +191,7 @@ func Test_toDeploymentName(t *testing.T) {
 			args: args{
 				app: &testApp,
 			},
-			want: "parent-app1",
+			want: "node-APP-UUID",
 		},
 		{
 			name: "complex parent",
@@ -199,9 +199,10 @@ func Test_toDeploymentName(t *testing.T) {
 				Meta: meta.Metadata{
 					Name:   "app1",
 					Parent: "ggp.gp.p",
+					UUID:   "APP-UUID",
 				},
 			}},
-			want: "ggp-gp-p-app1",
+			want: "node-APP-UUID",
 		},
 	}
 	for _, tt := range tests {
@@ -255,33 +256,36 @@ func Test_baseEnvironment(t *testing.T) {
 	defer os.Unsetenv("INSPR_ENV")
 	kafkasc.RefreshEnviromentVariables()
 	mem := tree.GetTreeMemory()
+	chs := map[string]*meta.Channel{
+		"channel1": {
+			Meta: meta.Metadata{
+				Name:   "channel1",
+				Parent: "parent",
+				UUID:   "uuid-channel1",
+			},
+			Spec: meta.ChannelSpec{
+				Type: "channelType1",
+			},
+		},
+		"channel2": {
+			Meta: meta.Metadata{
+				Name:   "channel2",
+				Parent: "parent",
+				UUID:   "uuid-channel2",
+			},
+			Spec: meta.ChannelSpec{
+				Type: "channelType2",
+			},
+		},
+	}
 	mem.InitTransaction()
 	mem.Apps().Create("", &meta.App{
 		Meta: meta.Metadata{
 			Name: "parent",
 		},
 		Spec: meta.AppSpec{
-			Channels: map[string]*meta.Channel{
-				"channel1": {
-					Meta: meta.Metadata{
-						Name:   "channel1",
-						Parent: "parent",
-					},
-					Spec: meta.ChannelSpec{
-						Type: "channelType1",
-					},
-				},
-				"channel2": {
-					Meta: meta.Metadata{
-						Name:   "channel2",
-						Parent: "parent",
-					},
-					Spec: meta.ChannelSpec{
-						Type: "channelType2",
-					},
-				},
-			},
-			Aliases: map[string]*meta.Alias{},
+			Channels: chs,
+			Aliases:  map[string]*meta.Alias{},
 			ChannelTypes: map[string]*meta.ChannelType{
 				"channelType1": {
 					Meta: meta.Metadata{
@@ -360,10 +364,10 @@ func Test_baseEnvironment(t *testing.T) {
 				"INSPR_ENV":               "environment",
 				"KAFKA_BOOTSTRAP_SERVERS": "bootstrap",
 				"KAFKA_AUTO_OFFSET_RESET": "earliest",
-				"parent.channel1_SCHEMA":  "schema1",
-				"parent.channel2_SCHEMA":  "schema2",
-				"channel1_RESOLVED":       "parent.channel1",
-				"channel2_RESOLVED":       "parent.channel2",
+				"INSPR_" + chs["channel1"].Meta.UUID + "_SCHEMA": "schema1",
+				"INSPR_" + chs["channel2"].Meta.UUID + "_SCHEMA": "schema2",
+				"channel1_RESOLVED": "INSPR_" + chs["channel1"].Meta.UUID,
+				"channel2_RESOLVED": "INSPR_" + chs["channel2"].Meta.UUID,
 			},
 		},
 	}

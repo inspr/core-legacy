@@ -5,10 +5,11 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 func TestMemoryManager_Channels(t *testing.T) {
@@ -342,8 +343,14 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 				return
 			}
 			if tt.want != nil {
+
 				got, err := chh.Get(tt.args.context, tt.want.Meta.Name)
-				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+				if !tt.wantErr {
+					if !metautils.ValidateUUID(got.Meta.UUID) {
+						t.Errorf("ChannelMemoryManager.Create() invalid UUID, uuid=%v", got.Meta.UUID)
+					}
+				}
+				if (err != nil) || !metautils.CompareWithoutUUID(got, tt.want) {
 					t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
@@ -601,7 +608,8 @@ func TestChannelMemoryManager_Update(t *testing.T) {
 			}
 			if tt.want != nil {
 				got, err := chh.Get(tt.args.context, tt.want.Meta.Name)
-				if (err != nil) || !reflect.DeepEqual(got, tt.want) {
+
+				if (err != nil) || !metautils.CompareWithUUID(got, tt.want) {
 					t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
@@ -616,7 +624,7 @@ func getMockChannels() *meta.App {
 			Reference:   "",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -627,7 +635,7 @@ func getMockChannels() *meta.App {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -662,7 +670,7 @@ func getMockChannels() *meta.App {
 									Reference:   "app1.ctUpdate1",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								ConnectedChannels: []string{"ch2app1Update", "ch1app1"},
 							},

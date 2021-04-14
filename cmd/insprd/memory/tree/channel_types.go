@@ -1,10 +1,10 @@
 package tree
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/utils"
 	"go.uber.org/zap"
 )
 
@@ -63,7 +63,7 @@ func (ctm *ChannelTypeMemoryManager) Create(context string, ct *meta.ChannelType
 	if parentApp.Spec.ChannelTypes == nil {
 		parentApp.Spec.ChannelTypes = map[string]*meta.ChannelType{}
 	}
-
+	ct.Meta = utils.InjectUUID(ct.Meta)
 	parentApp.Spec.ChannelTypes[ct.Meta.Name] = ct
 	return nil
 }
@@ -152,6 +152,7 @@ func (ctm *ChannelTypeMemoryManager) Update(context string, ct *meta.ChannelType
 	}
 
 	ct.ConnectedChannels = oldChType.ConnectedChannels
+	ct.Meta.UUID = oldChType.Meta.UUID
 
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
@@ -183,8 +184,12 @@ func (amm *ChannelTypeRootGetter) Get(context string, ctName string) (*meta.Chan
 
 	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
 	if err != nil {
-		return nil, ierrors.NewError().BadRequest().InnerError(err).
-			Message("target dApp doesn't exist (Root Getter)").Build()
+		return nil, ierrors.
+			NewError().
+			BadRequest().
+			InnerError(err).
+			Message("target dApp does not exist on root").
+			Build()
 	}
 
 	if parentApp.Spec.ChannelTypes != nil {
@@ -197,7 +202,9 @@ func (amm *ChannelTypeRootGetter) Get(context string, ctName string) (*meta.Chan
 		zap.String("ctype", ctName),
 		zap.String("context", context))
 
-	return nil, ierrors.NewError().NotFound().
-		Message("channelType not found for given query (Root Getter)").
+	return nil, ierrors.
+		NewError().
+		NotFound().
+		Message("channelType not found for given query on root").
 		Build()
 }

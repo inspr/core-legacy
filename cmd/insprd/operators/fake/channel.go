@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/cmd/insprd/operators"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 // ChannelOperator mock
@@ -40,9 +40,14 @@ func (o ChannelOperator) Get(ctx context.Context, context string, name string) (
 	if o.err != nil {
 		return nil, o.err
 	}
-	ch, ok := o.channels[context+name]
+	channelKey := context + name
+	ch, ok := o.channels[channelKey]
 	if !ok {
-		return nil, ierrors.NewError().NotFound().Message("channel not found").Build()
+		return nil, ierrors.
+			NewError().
+			NotFound().
+			Message("channel %s not found", channelKey).
+			Build()
 	}
 	return ch, nil
 }
@@ -52,10 +57,16 @@ func (o ChannelOperator) Update(ctx context.Context, context string, ch *meta.Ch
 	if o.err != nil {
 		return o.err
 	}
-	if _, ok := o.channels[context+ch.Meta.Name]; !ok {
-		return ierrors.NewError().NotFound().Message("channel not found").Build()
+
+	channelKey := context + ch.Meta.Name
+	if _, ok := o.channels[channelKey]; !ok {
+		return ierrors.
+			NewError().
+			NotFound().
+			Message("channel %s not found", channelKey).
+			Build()
 	}
-	o.channels[context+ch.Meta.Name] = ch
+	o.channels[channelKey] = ch
 	return nil
 }
 
@@ -64,11 +75,17 @@ func (o ChannelOperator) Delete(ctx context.Context, context string, name string
 	if o.err != nil {
 		return o.err
 	}
-	_, ok := o.channels[context+name]
+
+	channelKey := context + name
+	_, ok := o.channels[channelKey]
 	if !ok {
-		return ierrors.NewError().NotFound().Message("channel not found").Build()
+		return ierrors.
+			NewError().
+			NotFound().
+			Message("channel %s not found", channelKey).
+			Build()
 	}
-	delete(o.channels, context+name)
+	delete(o.channels, channelKey)
 	return nil
 }
 

@@ -1,10 +1,10 @@
 package kafka
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/kafka/channels"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators/kafka/nodes"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/insprd/operators"
+	"github.com/inspr/inspr/cmd/insprd/operators/kafka/channels"
+	"github.com/inspr/inspr/cmd/insprd/operators/kafka/nodes"
 )
 
 // Operator is an operator for creating channels and nodes inside kubernetes
@@ -35,7 +35,7 @@ func (op *Operator) Channels() operators.ChannelOperatorInterface {
 func NewKafkaOperator(memory memory.Manager) (operators.OperatorInterface, error) {
 	var err error
 	var chOp operators.ChannelOperatorInterface
-	chOp, err = channels.NewOperator()
+	chOp, err = channels.NewOperator(memory)
 	if err != nil {
 		return nil, err
 	}

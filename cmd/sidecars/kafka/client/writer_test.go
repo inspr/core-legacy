@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
+	"github.com/inspr/inspr/pkg/environment"
 )
 
 func TestNewWriter(t *testing.T) {
@@ -151,7 +151,7 @@ func TestWriter_produceMessage(t *testing.T) {
 	}
 	type args struct {
 		message interface{}
-		channel messageChannel
+		channel kafkaTopic
 	}
 	tests := []struct {
 		name    string
@@ -166,7 +166,7 @@ func TestWriter_produceMessage(t *testing.T) {
 			},
 			args: args{
 				message: "testProducingMessage",
-				channel: messageChannel{channel: "ch1_resolved"},
+				channel: "ch1_resolved",
 			},
 			wantErr: false,
 		},
@@ -177,7 +177,7 @@ func TestWriter_produceMessage(t *testing.T) {
 			},
 			args: args{
 				message: "testProducingMessage",
-				channel: messageChannel{channel: "invalid"},
+				channel: "invalid",
 			},
 			wantErr: true,
 		},

@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 func TestMemoryManager_Alias(t *testing.T) {
@@ -458,7 +458,7 @@ func getMockAlias() *meta.App {
 			Reference:   "",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -469,7 +469,7 @@ func getMockAlias() *meta.App {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -504,7 +504,7 @@ func getMockAlias() *meta.App {
 									Reference:   "app1.ctUpdate1",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								ConnectedChannels: []string{"ch2app1Update", "ch1app1"},
 							},

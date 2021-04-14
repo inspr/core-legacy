@@ -8,7 +8,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   DANGER_GITLAB_HOST: "https://gitlab.inspr.com"
   DANGER_GITLAB_API_BASE_URL: "https://gitlab.inspr.com/api/v4"
-  REPO_NAME: gitlab.inspr.dev/inspr/core
+  REPO_NAME: github.com/inspr/inspr
 
 
 stages:
@@ -48,14 +48,14 @@ build-cli:
       - version
     expire_in: 30 days
 
-build-helm:
-  extends: .base-build
-  stage: build
-  only:
-    - tags
-  script: 
-    - skaffold build --file-output=tags.out
-    - bash .gitlab/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
+# build-helm:
+#   extends: .base-build
+#   stage: build
+#   only:
+#     - tags
+#   script: 
+#     - skaffold build --file-output=tags.out
+#     - bash .gitlab/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
 
 unit-tests:
   stage: test

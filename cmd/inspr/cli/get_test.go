@@ -12,12 +12,12 @@ import (
 	"testing"
 	"text/tabwriter"
 
+	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
+	"github.com/inspr/inspr/pkg/api/models"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/spf13/cobra"
-	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/api/models"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 func TestNewGetCmd(t *testing.T) {

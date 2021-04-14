@@ -1,0 +1,4 @@
+**/*
+!go.mod
+!cmd/authsvc
+!pkg

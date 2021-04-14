@@ -3,11 +3,11 @@ package nodes
 import (
 	"strings"
 
-	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
 
 	kubeApp "k8s.io/api/apps/v1"
@@ -22,15 +22,14 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 	channels := input.Union(output)
 
 	// label name to be used in the service
-	appDeployName := toDeploymentName(app)
-
+	appID := toAppID(app)
 	inputEnv := input.Join(";")
 	outputEnv := output.Join(";")
 	env := utils.EnvironmentMap{
 		"INSPR_INPUT_CHANNELS":    inputEnv,
 		"INSPR_OUTPUT_CHANNELS":   outputEnv,
 		"INSPR_SIDECAR_IMAGE":     environment.GetSidecarImage(),
-		"INSPR_APP_ID":            appDeployName,
+		"INSPR_APP_ID":            appID,
 		"INSPR_APP_CTX":           app.Meta.Parent,
 		"INSPR_ENV":               environment.GetInsprEnvironment(),
 		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
@@ -50,6 +49,7 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 		ch, _ := no.memory.Channels().Get(parent, chName)
 		ct, _ := no.memory.ChannelTypes().Get(parent, ch.Spec.Type)
+		resolved = "INSPR_" + ch.Meta.UUID
 		env[resolved+"_SCHEMA"] = ct.Schema
 		env[boundary+"_RESOLVED"] = resolved
 		return boundary
@@ -75,6 +75,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 
 	logger.Debug("defining Node's k8s container data")
 	appDeployName := toDeploymentName(app)
+	appID := toAppID(app)
 	nodeContainer := kubeCore.Container{
 		Name:  appDeployName,
 		Image: app.Spec.Node.Spec.Image,
@@ -120,7 +121,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		},
 	}
 
-	appLabels := map[string]string{"app": appDeployName}
+	appLabels := map[string]string{"app": appID}
 	replicas := new(int32)
 
 	if app.Spec.Node.Spec.Replicas == 0 {
@@ -158,6 +159,12 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 
 // toDeployment - creates the kubernetes deployment name from the app
 func toDeploymentName(app *meta.App) string {
+
+	return "node-" + app.Meta.UUID
+}
+
+// toAppID - creates the kubernetes deployment name from the app
+func toAppID(app *meta.App) string {
 	var depNames utils.StringArray
 	depNames = strings.Split(app.Meta.Parent, ".")
 	if depNames[0] == "" {

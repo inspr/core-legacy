@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 func getMockedTree() *meta.App {
@@ -14,7 +14,7 @@ func getMockedTree() *meta.App {
 			Reference:   "",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node:     meta.Node{},
@@ -27,7 +27,7 @@ func getMockedTree() *meta.App {
 						Reference:   "ct1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},

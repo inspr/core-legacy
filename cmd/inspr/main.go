@@ -3,12 +3,18 @@ package main
 import (
 	"os"
 
-	cli "gitlab.inspr.dev/inspr/core/cmd/inspr/cli"
+	cli "github.com/inspr/inspr/cmd/inspr/cli"
 
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 var version string
+
+func init() {
+	if version == "" {
+		version = "not given"
+	}
+}
 
 func main() {
 	cli.GetFactory().Subscribe(meta.Component{

@@ -5,9 +5,9 @@ import (
 	"io"
 	"text/tabwriter"
 
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 // Kind represents a kind of difference between two structures
@@ -548,19 +548,6 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 		})
 		change.Kind |= MetaKind | parentKind
 		change.Operation |= Update
-	}
-
-	if from.SHA256 != to.SHA256 {
-		change.Diff = append(change.Diff, Difference{
-			Field:     ctx + "Meta.SHA256",
-			From:      from.SHA256,
-			To:        to.SHA256,
-			Kind:      MetaKind | parentKind,
-			Operation: Update,
-			Name:      parentElement,
-		})
-		change.Operation |= Update
-		change.Kind |= MetaKind | parentKind
 	}
 
 	fromSet, _ := metautils.MakeStrSet(from.Annotations)

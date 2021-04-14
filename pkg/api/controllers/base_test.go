@@ -4,10 +4,10 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory/fake"
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/operators"
-	ofake "gitlab.inspr.dev/inspr/core/cmd/insprd/operators/fake"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/insprd/memory/fake"
+	"github.com/inspr/inspr/cmd/insprd/operators"
+	ofake "github.com/inspr/inspr/cmd/insprd/operators/fake"
 )
 
 func TestServer_Init(t *testing.T) {

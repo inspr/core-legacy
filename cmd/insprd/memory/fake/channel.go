@@ -3,8 +3,8 @@ package fake
 import (
 	"fmt"
 
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 // Channels - mocks the implementation of the ChannelMemory interface methods
@@ -22,7 +22,11 @@ func (ch *Channels) Get(context string, name string) (*meta.Channel, error) {
 	query := fmt.Sprintf("%s.%s", context, name)
 	ct, ok := ch.channels[query]
 	if !ok {
-		return nil, ierrors.NewError().NotFound().Message(fmt.Sprintf("channel %s not found", query)).Build()
+		return nil, ierrors.
+			NewError().
+			NotFound().
+			Message("channel %s not found", query).
+			Build()
 	}
 	return ct, nil
 }
@@ -35,7 +39,11 @@ func (ch *Channels) Create(context string, ct *meta.Channel) error {
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
 	_, ok := ch.channels[query]
 	if ok {
-		return ierrors.NewError().AlreadyExists().Message(fmt.Sprintf("channel %s already exists", query)).Build()
+		return ierrors.
+			NewError().
+			AlreadyExists().
+			Message("channel %s already exists", query).
+			Build()
 	}
 	ch.channels[query] = ct
 	return nil
@@ -49,7 +57,11 @@ func (ch *Channels) Delete(context string, name string) error {
 	query := fmt.Sprintf("%s.%s", context, name)
 	_, ok := ch.channels[query]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel %s not found", query)).Build()
+		return ierrors.
+			NewError().
+			NotFound().
+			Message("channel %s not found", query).
+			Build()
 	}
 
 	delete(ch.channels, query)
@@ -64,7 +76,11 @@ func (ch *Channels) Update(context string, ct *meta.Channel) error {
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
 	_, ok := ch.channels[query]
 	if !ok {
-		return ierrors.NewError().NotFound().Message(fmt.Sprintf("channel %s not found", query)).Build()
+		return ierrors.
+			NewError().
+			NotFound().
+			Message("channel %s not found", query).
+			Build()
 	}
 	ch.channels[query] = ct
 	return nil

@@ -3,10 +3,10 @@ package client
 import (
 	"context"
 
-	"gitlab.inspr.dev/inspr/core/pkg/api/models"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/api/models"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 // ChannelClient interacts with channels on the Insprd

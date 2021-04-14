@@ -1,6 +1,6 @@
-module gitlab.inspr.dev/inspr/core
+module github.com/inspr/inspr
 
-go 1.13
+go 1.16
 
 require (
 	github.com/alicebob/miniredis v2.5.0+incompatible
@@ -12,6 +12,7 @@ require (
 	github.com/gomodule/redigo v1.8.4 // indirect
 	github.com/google/go-cmp v0.5.5
 	github.com/google/gofuzz v1.2.0 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/json-iterator/go v1.1.8 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/linkedin/goavro v2.1.0+incompatible

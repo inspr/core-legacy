@@ -10,13 +10,13 @@ import (
 	"reflect"
 	"testing"
 
+	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
+	"github.com/inspr/inspr/pkg/api/models"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/spf13/cobra"
-	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/api/models"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 func getMockAppWithoutApp1() *meta.App {
@@ -26,7 +26,7 @@ func getMockAppWithoutApp1() *meta.App {
 			Reference:   "appParent",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -49,7 +49,7 @@ func getMockAppWithoutApp1() *meta.App {
 						Reference:   "root.ct1",
 						Annotations: map[string]string{},
 						Parent:      "root",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Schema: "",
 				},
@@ -70,7 +70,7 @@ func getMockAppWithoutCh1() *meta.App {
 			Reference:   "appParent",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -81,7 +81,7 @@ func getMockAppWithoutCh1() *meta.App {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -92,7 +92,7 @@ func getMockAppWithoutCh1() *meta.App {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},
@@ -142,7 +142,7 @@ func getMockAppWithoutCt1() *meta.App {
 			Reference:   "appParent",
 			Annotations: map[string]string{},
 			Parent:      "",
-			SHA256:      "",
+			UUID:        "",
 		},
 		Spec: meta.AppSpec{
 			Node: meta.Node{},
@@ -153,7 +153,7 @@ func getMockAppWithoutCt1() *meta.App {
 						Reference:   "app1",
 						Annotations: map[string]string{},
 						Parent:      "",
-						SHA256:      "",
+						UUID:        "",
 					},
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
@@ -164,7 +164,7 @@ func getMockAppWithoutCt1() *meta.App {
 									Reference:   "app1.thenewapp",
 									Annotations: map[string]string{},
 									Parent:      "app1",
-									SHA256:      "",
+									UUID:        "",
 								},
 								Spec: meta.AppSpec{
 									Apps:         map[string]*meta.App{},
