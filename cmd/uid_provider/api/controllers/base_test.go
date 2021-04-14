@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -17,6 +18,8 @@ var insprServer *httptest.Server
 func TestServer_Init(t *testing.T) {
 	setup()
 	defer teardown()
+	auxCtx := context.Background()
+
 	type args struct {
 		rdb client.RedisManager
 	}
@@ -35,7 +38,7 @@ func TestServer_Init(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.s.Init(tt.args.rdb)
+			tt.s.Init(tt.args.rdb, auxCtx)
 		})
 	}
 }
