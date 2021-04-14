@@ -1,4 +1,4 @@
-// package jwtauth is responsible for implementing the auth
+// Package jwtauth is responsible for implementing the auth
 // methods specified in the auth folder of the inspr pkg.
 package jwtauth
 
@@ -13,10 +13,14 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
 )
 
+// JWTauth structure containing the private key of in the service side,
+// this key is used to parse the user keys given in the requests.
 type JWTauth struct {
 	rsaKey *rsa.PrivateKey
 }
 
+// NewJWTauth takes an *rsa.PrivateKey and returns an
+// structure that implements the auth interface
 func NewJWTauth(privateKey *rsa.PrivateKey) *JWTauth {
 	return &JWTauth{
 		rsaKey: privateKey,
@@ -71,9 +75,12 @@ func (JA *JWTauth) Validade(token []byte) (models.Payload, []byte, error) {
 	return payload, token, nil
 }
 
+// Tokenize - will be implemented in another ticket/task
 func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
 	return []byte{}, nil
 }
+
+// Refresh - will be implemented in another ticket/task
 func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 	return []byte{}, nil
 }
