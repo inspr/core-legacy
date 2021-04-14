@@ -27,7 +27,7 @@ func (server *Server) Refresh() rest.Handler {
 			return
 		}
 
-		signed, err := server.tokenize(payload)
+		signed, err := server.tokenize(*payload)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -40,27 +40,27 @@ func (server *Server) Refresh() rest.Handler {
 	}
 }
 
-func refreshPayload(data models.ResfreshDI) (models.Payload, error) {
+func refreshPayload(data models.ResfreshDI) (*models.Payload, error) {
 	reqBody := models.ResfreshDO{
 		RefreshToken: data.RefreshToken,
 	}
 	reqBytes, err := json.Marshal(reqBody)
 	if err != nil {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
-		return models.Payload{}, err
+		return nil, err
 	}
 
 	c := &http.Client{}
 	resp, err := c.Post(data.RefreshURL, "application/json", bytes.NewBuffer(reqBytes))
 	if err != nil || resp.StatusCode != http.StatusOK {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
-		return models.Payload{}, err
+		return nil, err
 	}
 
 	payload := models.Payload{}
 	err = json.NewDecoder(resp.Body).Decode(&payload)
 	if err != nil {
-		return models.Payload{}, err
+		return nil, err
 	}
-	return payload, nil
+	return &payload, nil
 }
