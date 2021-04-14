@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/api/models"
 	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/client"
 	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
@@ -24,105 +25,89 @@ func NewHandler(rdb client.RedisManager) *Handler {
 }
 
 // CreateUserHandler handles user creation requests
-func (h *Handler) CreateUserHandler(rw http.ResponseWriter, r *http.Request) {
-	type ReceivedDataCreate struct {
-		UID string
-		Pwd string
-		Usr client.User
-	}
+func (h *Handler) CreateUserHandler() rest.Handler {
+	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
+		data := models.ReceivedDataCreate{}
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			rest.ERROR(w, err)
+			return
+		}
 
-	data := ReceivedDataCreate{}
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
-
-	if err := h.rdb.CreateUser(h.ctx, data.UID, data.Pwd, data.Usr); err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
+		if err := h.rdb.CreateUser(h.ctx, data.UID, data.Password, data.User); err != nil {
+			rest.ERROR(w, err)
+			return
+		}
+	}).Post().JSON().Recover()
 }
 
 // DeleteUserHandler handles user deletion requests
-func (h *Handler) DeleteUserHandler(rw http.ResponseWriter, r *http.Request) {
-	type ReceivedDataDelete struct {
-		UID            string
-		Pwd            string
-		UsrToBeDeleted string
-	}
+func (h *Handler) DeleteUserHandler() rest.Handler {
+	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
+		data := models.ReceivedDataDelete{}
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			rest.ERROR(w, err)
+			return
+		}
 
-	data := ReceivedDataDelete{}
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
-
-	if err := h.rdb.DeleteUser(h.ctx, data.UID, data.Pwd, data.UsrToBeDeleted); err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
+		if err := h.rdb.DeleteUser(h.ctx, data.UID, data.Password, data.UserToBeDeleted); err != nil {
+			rest.ERROR(w, err)
+			return
+		}
+	}).Post().JSON().Recover()
 }
 
 // UpdatePasswordHandler handles requests to update an user password
-func (h *Handler) UpdatePasswordHandler(rw http.ResponseWriter, r *http.Request) {
-	type ReceivedDataUpdate struct {
-		UID            string
-		Pwd            string
-		UsrToBeUpdated string
-		NewPwd         string
-	}
+func (h *Handler) UpdatePasswordHandler() rest.Handler {
+	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
+		data := models.ReceivedDataUpdate{}
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			rest.ERROR(w, err)
+			return
+		}
 
-	data := ReceivedDataUpdate{}
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
+		if err := h.rdb.UpdatePassword(h.ctx, data.UID, data.Password,
+			data.UserToBeUpdated, data.NewPassword); err != nil {
 
-	if err := h.rdb.UpdatePassword(h.ctx, data.UID, data.Pwd, data.UsrToBeUpdated, data.NewPwd); err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
+			rest.ERROR(w, err)
+			return
+		}
+	}).Put().JSON().Recover()
 }
 
 // LoginHandler handles login requests
-func (h *Handler) LoginHandler(rw http.ResponseWriter, r *http.Request) {
-	type ReceivedDataLogin struct {
-		UID string
-		Pwd string
-	}
+func (h *Handler) LoginHandler() rest.Handler {
+	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
+		data := models.ReceivedDataLogin{}
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			rest.ERROR(w, err)
+			return
+		}
 
-	data := ReceivedDataLogin{}
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
+		token, err := h.rdb.Login(h.ctx, data.UID, data.Password)
+		if err != nil {
+			rest.ERROR(w, err)
+			return
+		}
 
-	token, err := h.rdb.Login(h.ctx, data.UID, data.Pwd)
-	if err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
-
-	rest.JSON(rw, 200, token)
+		rest.JSON(w, 200, token)
+	}).Post().JSON().Recover()
 }
 
 // RefreshTokenHandler handles token refresh requests
-func (h *Handler) RefreshTokenHandler(rw http.ResponseWriter, r *http.Request) {
-	type ReceivedDataRefresh struct {
-		RefreshToken string `json:"refreshtoken"`
-	}
+func (h *Handler) RefreshTokenHandler() rest.Handler {
+	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
+		data := models.ReceivedDataRefresh{}
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			rest.ERROR(w, err)
+			return
+		}
 
-	data := ReceivedDataRefresh{}
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
+		payload, err := h.rdb.RefreshToken(h.ctx, data.RefreshToken)
+		if err != nil {
+			rest.ERROR(w, err)
+			return
+		}
 
-	payload, err := h.rdb.RefreshToken(h.ctx, data.RefreshToken)
-	if err != nil {
-		rest.ERROR(rw, err)
-		return
-	}
-
-	rest.JSON(rw, 200, payload)
+		rest.JSON(w, 200, payload)
+	}).Post().JSON().Recover()
 }
