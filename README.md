@@ -45,12 +45,12 @@ Inspr is an engine for running distributed applications, using multiple communic
 # Table of Contents
 
 - [Getting Started](#getting-started)
-- [Documentation](#documentation)
-- [License](#license)
-- [Contributing](#contributing)
-- [Contact](#contact)
+- [Documentation](#-documentation)
+- [License](#-license)
+- [Contributing](#-contributing)
+- [Contact](#-contact)
 
-# Getting Started
+# 🎉 Getting Started
 
 ## Cluster
 
@@ -78,19 +78,19 @@ They are included in the `build/helm` folder and can be edited for further refin
 To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.
 TODO: Add link to the install script for the CLI.
 
-# Documentation
+# 📁 Documentation
 
 You can check the documentation on the [Confluence page for Inspr](https://inspr.atlassian.net/wiki/spaces/INX/overview)
 TODO: Migrate to website
 
-# License
+# 📄 License
 
 Inspr is licenced under MIT [license](LICENSE.md).
 
-# Contributing
+# 👏 Contributing
 
 Please check out our [guide](CONTRIBUTING.md).
 
-# Contact
+# 📣 Contact
 
 To contact us, please join our [Discord community](https://discord.gg/tmp2564a54).
