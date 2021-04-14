@@ -8,26 +8,20 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Client is the client for communicating with the in-cluster uidp
 type Client struct {
 	rc *request.Client
 }
 
-type UIDClient interface {
-	// creates payload and sends it to insprd
-	// when creating the payload, generetes the Refresh Token (cryptografado)
-	Login(ctx context.Context, uid, pwd string) (string, error) // asks Insprd to generate token and saves it into file
-
-	CreateUser(ctx context.Context, uid string, newUser client.User) error
-	DeleteUser(ctx context.Context, uid, usrToBeDeleted string) error
-	UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd string) error
-}
-
+// NewClient creates a new client for communicating with inspr's UID provider.
 func NewClient() *Client {
 	return &Client{
 		rc: request.NewJSONClient(viper.GetString("url")),
 	}
 }
 
+// Login creates a request to log in to a uid provider. It returns a signed token for
+// communicating with the insprd cluster in question.
 func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	type ReceivedDataLogin struct {
 		UID string
@@ -41,6 +35,7 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	return resp, nil
 }
 
+// CreateUser creates a user in inspr's UID provider.
 func (c *Client) CreateUser(ctx context.Context, uid string, newUser client.User) error {
 	type ReceivedDataCreate struct {
 		UID string
@@ -52,6 +47,7 @@ func (c *Client) CreateUser(ctx context.Context, uid string, newUser client.User
 	return err
 }
 
+// DeleteUser deletes a user in inspr's UID provider
 func (c *Client) DeleteUser(ctx context.Context, uid, usrToBeDeleted string) error {
 	type ReceivedDataDelete struct {
 		UID            string
@@ -63,6 +59,7 @@ func (c *Client) DeleteUser(ctx context.Context, uid, usrToBeDeleted string) err
 	return err
 }
 
+// UpdatePassword updates a user's password on inspr's uid provider.
 func (c *Client) UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd string) error {
 	type ReceivedDataUpdate struct {
 		UID            string

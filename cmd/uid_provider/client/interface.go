@@ -20,6 +20,7 @@ type RedisManager interface {
 	RefreshToken(ctx context.Context, refreshToken string) (auth.Payload, error)
 }
 
+// UIDClient is a client for communicating with inspr's uid provider
 type UIDClient interface {
 	// creates payload and sends it to insprd
 	// when creating the payload, generetes the Refresh Token (cryptografado)
