@@ -103,6 +103,10 @@ func TestServer_Tokenize(t *testing.T) {
 				return
 			}
 			token, err := jwt.Parse(jwtdo.Token)
+			if err != nil {
+				t.Errorf("AuthHandlers_Tokenize() didn't return a token")
+				return
+			}
 			load, ok := token.Get("payload")
 			if !ok {
 				t.Errorf("AuthHandlers_Tokenize() didn't return a payload on it's token")
