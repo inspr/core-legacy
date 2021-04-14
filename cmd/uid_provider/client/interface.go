@@ -17,8 +17,8 @@ type User struct {
 // RedisManager defines methods to manage Redis in the cluster
 type RedisManager interface {
 	Login(ctx context.Context, uid, pwd string) (string, error)
-	CreateUser(ctx context.Context, uid string, newUser User) error
-	DeleteUser(ctx context.Context, uid, usrToBeDeleted string) error
-	UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd string) error
-	RefreshToken(ctx context.Context, refreshToken string) (auth.Payload, error)
+	CreateUser(ctx context.Context, uid, pwd string, newUser User) error
+	DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error
+	UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, newPwd string) error
+	RefreshToken(ctx context.Context, refreshToken []byte) (*auth.Payload, error)
 }

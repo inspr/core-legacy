@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,24 +12,21 @@ import (
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
-	Mux *http.ServeMux
-	Rdb client.RedisManager
-}
-
-// NewServer returns a new server object
-func NewServer() Server {
-	return Server{}
+	mux *http.ServeMux
+	rdb client.RedisManager
+	ctx context.Context
 }
 
 // Init - configures the server
-func (s *Server) Init(rdb client.RedisManager) {
-	s.Mux = http.NewServeMux()
-	s.Rdb = rdb
+func (s *Server) Init(rdb client.RedisManager, ctx context.Context) {
+	s.mux = http.NewServeMux()
+	s.rdb = rdb
+	s.ctx = ctx
 	s.initRoutes()
 }
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
 	fmt.Printf("insprd rest api is up! Listening on port: %s\n", addr)
-	log.Fatal(http.ListenAndServe(addr, s.Mux))
+	log.Fatal(http.ListenAndServe(addr, s.mux))
 }

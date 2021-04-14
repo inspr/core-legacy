@@ -5,6 +5,6 @@ type Payload struct {
 	UID        string
 	Role       int
 	Scope      []string
-	Refresh    string
+	Refresh    []byte
 	RefreshURL string
 }

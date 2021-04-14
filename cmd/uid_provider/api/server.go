@@ -1,14 +1,16 @@
 package api
 
 import (
-	ctrl "github.com/inspr/inspr/cmd/uid_provider/api/controllers"
+	"context"
+
+	"github.com/inspr/inspr/cmd/uid_provider/api/controller"
 	"github.com/inspr/inspr/cmd/uid_provider/client"
 )
 
-var server ctrl.Server
+var server controller.Server
 
 // Run runs the UID Provider API server
-func Run(rdb client.RedisManager) {
-	server.Init(rdb)
+func Run(rdb client.RedisManager, ctx context.Context) {
+	server.Init(rdb, ctx)
 	server.Run(":9001")
 }

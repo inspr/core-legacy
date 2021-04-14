@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
-              containerPort: 9001
+              containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -37,10 +37,12 @@ spec:
               value: {{ .Values.redis.port | quote }}
             - name: REDIS_PASSWORD
               value: {{ .Values.redis.password }}
+            - name: REFRESH_URL
+              value: {{ .Values.deployment.uidpUrl }}
             - name: REFRESH_KEY
               valueFrom:
                 secretKeyRef:
-                  name: redisprivatekey
+                  name: {{ .Values.privateKeyName }}
                   key: key
       {{- with .Values.nodeSelector }}
       nodeSelector:

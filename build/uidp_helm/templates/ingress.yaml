@@ -12,20 +12,20 @@ spec:
       - path: /newuser
         backend:
           serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.portOuter }}
+          servicePort: {{ .Values.service.port }}
       - path: /deleteuser
         backend:
           serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.portOuter }}
+          servicePort: {{ .Values.service.port }}
       - path: /updatepwd
         backend:
           serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.portOuter }}
+          servicePort: {{ .Values.service.port }}
       - path: /login
         backend:
           serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.portOuter }}
+          servicePort: {{ .Values.service.port }}
       - path: /refreshtoken
         backend:
           serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.portOuter }}
+          servicePort: {{ .Values.service.port }}

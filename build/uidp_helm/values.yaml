@@ -37,6 +37,7 @@ securityContext: {}
   # runAsUser: 1000
 
 secretRepository: gcr.io/red-inspr/uidp/redis/secret
+privateKeyName: redisprivatekey
 
 statefulset:
   uidpName: uidp-stset
@@ -47,13 +48,15 @@ configmap:
 service:
   type: ClusterIP
   uidpName: uidp-svc
-  portOuter: 80
+  port: 80
+  targetPort: 9001
 
 deployment:
   insprdAddr: "http://insprd-svc.default.svc"
   replicas: 1
   uidpName: uidp-dep
   image: gcr.io/red-inspr/uidp/redis/api
+  uidpUrl: "http://inspr.com/refreshtoken"
 
 ingress:
   name: uidp-ingress
