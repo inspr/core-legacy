@@ -86,11 +86,11 @@ TODO: Migrate to website
 
 # License
 
-Inspr is licenced under MIT [licese](docs/CONTRIBUTING.md).
+Inspr is licenced under MIT [licese](CONTRIBUTING.md).
 
 # Contributing
 
-Please check out our [guide](docs/LICENCE.md).
+Please check out our [guide](LICENCE.md).
 
 # Contact
 
