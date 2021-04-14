@@ -46,7 +46,9 @@ Inspr is an engine for running distributed applications, using multiple communic
 
 - [Getting Started](#getting-started)
 - [Documentation](#documentation)
-
+- [License](#license)
+- [Contributing](#contributing)
+- [Contact](#contact)
 
 # Getting Started
 
@@ -80,3 +82,15 @@ TODO: Add link to the install script for the CLI.
 
 You can check the documentation on the [Confluence page for Inspr](https://inspr.atlassian.net/wiki/spaces/INX/overview)
 TODO: Migrate to website
+
+# License
+
+Inspr is licenced under MIT [licese](docs/CONTRIBUTING.md).
+
+# Contributing
+
+Please check out our [guide](docs/LICENCE.md).
+
+# Contact
+
+To contact us, please join our [Discord community](https://discord.gg/tmp2564a54).
