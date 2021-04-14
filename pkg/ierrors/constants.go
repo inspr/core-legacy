@@ -13,4 +13,6 @@ const (
 	InvalidChannel
 	InvalidChannelType
 	BadRequest
+	Unauthorized
+	Forbidden
 )

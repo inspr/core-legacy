@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	"github.com/inspr/inspr/cmd/insprd/auth"
+	"github.com/inspr/inspr/pkg/api/auth"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 )

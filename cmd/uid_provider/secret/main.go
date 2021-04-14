@@ -33,6 +33,10 @@ func initKube() error {
 func main() {
 
 	namespace := os.Getenv("K8S_NAMESPACE")
+	pvtKeyName := os.Getenv("PVT_KEY_NAME")
+	if pvtKeyName == "" {
+		panic("[ENV VAR] PVT_KEY_NAME not found")
+	}
 
 	initKube()
 
@@ -50,7 +54,7 @@ func main() {
 		privSec := corev1.Secret{
 			Type: corev1.SecretTypeOpaque,
 			ObjectMeta: v1.ObjectMeta{
-				Name: "redisprivatekey",
+				Name: pvtKeyName,
 			},
 			Data: map[string][]byte{
 				"key": privateKeyBytes,

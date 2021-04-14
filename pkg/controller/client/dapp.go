@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	"github.com/inspr/inspr/cmd/insprd/api/models"
+	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 	"github.com/inspr/inspr/pkg/rest/request"
