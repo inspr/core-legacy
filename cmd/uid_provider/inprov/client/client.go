@@ -3,9 +3,9 @@ package client
 import (
 	"context"
 
-	"github.com/spf13/viper"
 	"github.com/inspr/inspr/cmd/uid_provider/client"
 	"github.com/inspr/inspr/pkg/rest/request"
+	"github.com/spf13/viper"
 )
 
 type Client struct {
@@ -33,13 +33,14 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 		UID string
 		Pwd string
 	}
-	var resp *string
-	err := c.rc.Send(ctx, "/login", "POST", ReceivedDataLogin{uid, pwd}, resp)
+	var resp string
+	err := c.rc.Send(ctx, "/login", "POST", ReceivedDataLogin{uid, pwd}, &resp)
 	if err != nil {
 		return "", err
 	}
-	return *resp, nil
+	return resp, nil
 }
+
 func (c *Client) CreateUser(ctx context.Context, uid string, newUser client.User) error {
 	type ReceivedDataCreate struct {
 		UID string
@@ -50,6 +51,7 @@ func (c *Client) CreateUser(ctx context.Context, uid string, newUser client.User
 	err := c.rc.Send(ctx, "/newusr", "POST", ReceivedDataCreate{uid, newUser}, resp)
 	return err
 }
+
 func (c *Client) DeleteUser(ctx context.Context, uid, usrToBeDeleted string) error {
 	type ReceivedDataDelete struct {
 		UID            string

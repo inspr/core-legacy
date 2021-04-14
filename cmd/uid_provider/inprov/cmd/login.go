@@ -11,13 +11,12 @@ import (
 
 var cl client.UIDClient
 
-var loginOptions struct {
+type loginOptionsDT struct {
 	output string
 	stdout bool
-} = struct {
-	output string
-	stdout bool
-}{}
+}
+
+var loginOptions = loginOptionsDT{}
 
 var loginCmd = build.NewCmd("login").WithDescription(
 	"Log in to the Inspr UID provider and get a token.",
@@ -38,24 +37,30 @@ var loginCmd = build.NewCmd("login").WithDescription(
 		Value:    &loginOptions.stdout,
 		DefValue: false,
 	},
-}).ExactArgs(2, func(c context.Context, s []string) error {
+}).ExactArgs(2, login)
+
+func login(c context.Context, s []string) error {
 
 	var err error
 	var output io.Writer
+
 	if loginOptions.stdout {
 		output = os.Stdout
 	} else {
-		output, err = os.OpenFile(loginOptions.output, os.O_CREATE|os.O_WRONLY, 0755)
+		output, err = os.OpenFile(loginOptions.output, os.O_CREATE|os.O_WRONLY, os.ModePerm)
 		if err != nil {
 			return err
 		}
 	}
+	return doStuff(c, s[0], s[1], output)
+}
 
-	token, err := cl.Login(c, s[0], s[1])
+func doStuff(ctx context.Context, login, password string, output io.Writer) error {
+	token, err := cl.Login(ctx, login, password)
 	if err != nil {
 		return err
 	}
 
-	_, err = output.Write([]byte(token))
-	return err
-})
+	output.Write([]byte(token))
+	return nil
+}

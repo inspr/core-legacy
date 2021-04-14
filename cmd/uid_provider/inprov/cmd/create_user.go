@@ -11,21 +11,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var createUsrOptions struct {
+type createUserOptionsDT struct {
 	username string
 	password string
 	scopes   []string
 	yaml     string
 	json     string
 	role     int
-} = struct {
-	username string
-	password string
-	scopes   []string
-	yaml     string
-	json     string
-	role     int
-}{}
+}
+
+var createUsrOptions = createUserOptionsDT{}
 
 var createUserCmd = build.NewCmd(
 	"create { -yaml || -json || -u USR | -p PWD | -s SCOPES } <username> <password>",
@@ -75,8 +70,9 @@ var createUserCmd = build.NewCmd(
 		Value:    &createUsrOptions.json,
 		DefValue: "",
 	},
-}).ExactArgs(2, func(c context.Context, s []string) error {
+}).ExactArgs(2, createUser)
 
+func createUser(c context.Context, s []string) error {
 	var err error
 	var usr client.User
 	if createUsrOptions.yaml != "" {
@@ -90,7 +86,7 @@ var createUserCmd = build.NewCmd(
 			return err
 		}
 	} else if createUsrOptions.json != "" {
-		file, err := os.Open(createUsrOptions.yaml)
+		file, err := os.Open(createUsrOptions.json)
 		if err != nil {
 			return err
 		}
@@ -100,20 +96,21 @@ var createUserCmd = build.NewCmd(
 			return err
 		}
 	} else {
-		if createUsrOptions.username == "" {
-			return errors.New("username not informed")
-		}
 		usr.UID = createUsrOptions.username
 
-		if createUsrOptions.password == "" {
-			return errors.New("password not informed")
-		}
 		usr.Password = createUsrOptions.password
 
 		usr.Role = createUsrOptions.role
 		usr.Scope = createUsrOptions.scopes
 	}
 
+	if usr.UID == "" {
+		return errors.New("username not informed")
+	}
+	if usr.Password == "" {
+		return errors.New("password not informed")
+	}
+
 	err = cl.CreateUser(c, s[0], usr)
 	return err
-})
+}
