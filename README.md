@@ -16,36 +16,49 @@
     <a href="https://codecov.io/gh/inspr/inspr">
         <img src="https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG">
     </a>
+    <a href="https://github.com/inspr/inspr/blob/develop/LICENSE.md">
+        <img src="https://img.shields.io/badge/license-MIT-blue.svg">
+    </a>
 </p>
+
+---
 
 Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
 
 - :muscle: Robust: built on top of golang, kubernetes and other state of the art technologies
-
 - :sparkles: Distributed: created to allow complex and hierarchical distributed design patterns
-
 - :cloud: Cloud native: lightweight and modular, built with interchangeable pieces
-
 - :hammer_and_wrench: Versatile: can adapt to any cloud environment
 
-## Installation
+## Getting Started
 
-### Insprd
+### Cluster
 
-To install Insprd, add the helm chart repository using the following command:
+The recommended way to install inspr in a kubernetes cluster is by using helm.
 
-`helm repo add inspr https://inspr-charts.storage.googleapis.com`
+the first step is add the helm chart repository to the cluster:
 
-Install the latest version with
+```bash
+helm repo add inspr https://inspr-charts.storage.googleapis.com
+```
 
-`helm install inspr_name inspr/insprd`
+Then install inspr with the command:
 
-The default values file is included in the `build/helm` folder.
+```bash
+helm install inspr_name inspr/insprd
+```
+
+replacing inspr_name by the desired inspr cluster name.
+
+Aditionaly you can check the default values file for the helm chart.
+They are included in the `build/helm` folder and can be edited for further refinement of the properties.
 
 ### CLI
 
 To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.
+TODO: Add link to the install script for the CLI.
 
 ## Documentation
 
 You can check the documentation on the [Confluence page for Inspr](https://inspr.atlassian.net/wiki/spaces/INX/overview)
+TODO: Migrate to website
