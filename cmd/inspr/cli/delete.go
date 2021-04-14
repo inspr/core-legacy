@@ -153,7 +153,7 @@ func deleteAlias(_ context.Context, args []string) error {
 			return err
 		}
 
-		cl, err := client.Alias().Delete(context.Background(), path, aliasKey)
+		cl, err := client.Alias().Delete(context.Background(), path, aliasKey, cmd.InsprOptions.DryRun)
 		if err != nil {
 			fmt.Fprint(out, err.Error()+"\n")
 			return err
