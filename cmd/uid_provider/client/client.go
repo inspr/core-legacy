@@ -199,6 +199,9 @@ func (c *Client) decrypt(encryptedString []byte) (*User, error) {
 
 	//Get the nonce size
 	nonceSize := aesGCM.NonceSize()
+	if len(encryptedString) < nonceSize {
+		return nil, fmt.Errorf("invalid refresh token")
+	}
 
 	//Extract the nonce from the encrypted data
 	nonce, ciphertext := encryptedString[:nonceSize], encryptedString[nonceSize:]

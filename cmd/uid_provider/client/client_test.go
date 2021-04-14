@@ -205,33 +205,96 @@ func TestClient_DeleteUser(t *testing.T) {
 	}
 }
 
-// func TestClient_UpdatePassword(t *testing.T) {
-// 	type args struct {
-// 		ctx            context.Context
-// 		uid            string
-// 		usrToBeUpdated string
-// 		newPwd         string
-// 	}
-// 	tests := []struct {
-// 		name    string
-// 		c       *Client
-// 		args    args
-// 		wantErr bool
-// 	}{
-// 		// TODO: Add test cases.
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if err := tt.c.UpdatePassword(tt.args.ctx, tt.args.uid, tt.args.usrToBeUpdated, tt.args.newPwd); (err != nil) != tt.wantErr {
-// 				t.Errorf("Client.UpdatePassword() error = %v, wantErr %v", err, tt.wantErr)
-// 			}
-// 		})
-// 	}
-// }
+func TestClient_UpdatePassword(t *testing.T) {
+	setup()
+	defer teardown()
+
+	auxCtx := context.Background()
+	auxUser := User{
+		UID:      "user1",
+		Role:     1,
+		Scope:    []string{"ascope"},
+		Password: "none",
+	}
+	auxUser2 := User{
+		UID:      "user2",
+		Role:     0,
+		Scope:    []string{"ascope"},
+		Password: "none",
+	}
+
+	strData, _ := json.Marshal(auxUser)
+	redisClient.rdb.Set(auxCtx, auxUser.UID, strData, 0)
+	strData2, _ := json.Marshal(auxUser2)
+	redisClient.rdb.Set(auxCtx, auxUser2.UID, strData2, 0)
+
+	type args struct {
+		uid            string
+		pwd            string
+		usrToBeUpdated string
+		newPwd         string
+	}
+	tests := []struct {
+		name    string
+		c       *Client
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Updated an user password",
+			c:    &redisClient,
+			args: args{
+				uid:            auxUser.UID,
+				pwd:            auxUser.Password,
+				usrToBeUpdated: auxUser2.UID,
+				newPwd:         "banana",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Invalid - requestor can't update users",
+			c:    &redisClient,
+			args: args{
+				uid:            auxUser2.UID,
+				pwd:            auxUser2.Password,
+				usrToBeUpdated: auxUser2.UID,
+				newPwd:         "banana",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.c.UpdatePassword(auxCtx, tt.args.uid, tt.args.pwd, tt.args.usrToBeUpdated, tt.args.newPwd)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.UpdatePassword() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			updatedUser, err := get(auxCtx, redisClient.rdb, tt.args.usrToBeUpdated)
+			if !tt.wantErr && (err != nil || updatedUser.Password != tt.args.newPwd) {
+				t.Errorf("Client.UpdatePassword() error = %v", err)
+			}
+		})
+	}
+}
 
 func TestClient_Login(t *testing.T) {
+	setup()
+	defer teardown()
+
+	auxCtx := context.Background()
+	auxUser := User{
+		UID:      "user1",
+		Role:     1,
+		Scope:    []string{"ascope"},
+		Password: "none",
+	}
+
+	strData, _ := json.Marshal(auxUser)
+	redisClient.rdb.Set(auxCtx, auxUser.UID, strData, 0)
+
 	type args struct {
-		ctx context.Context
 		uid string
 		pwd string
 	}
@@ -242,11 +305,38 @@ func TestClient_Login(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Login with a valid user",
+			c:    &redisClient,
+			args: args{
+				uid: auxUser.UID,
+				pwd: auxUser.Password,
+			},
+			want:    "user1-ascope",
+			wantErr: false,
+		},
+		{
+			name: "Invalid - non existent user",
+			c:    &redisClient,
+			args: args{
+				uid: "RANDOMUSER",
+				pwd: "RANDOMPWD",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Invalid - invalid password",
+			c:    &redisClient,
+			args: args{
+				uid: auxUser.UID,
+				pwd: "RANDOMPWD",
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.c.Login(tt.args.ctx, tt.args.uid, tt.args.pwd)
+			got, err := tt.c.Login(auxCtx, tt.args.uid, tt.args.pwd)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.Login() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -259,28 +349,73 @@ func TestClient_Login(t *testing.T) {
 }
 
 func TestClient_RefreshToken(t *testing.T) {
+	setup()
+	defer teardown()
+
+	auxCtx := context.Background()
+	auxUser := User{
+		UID:      "user1",
+		Role:     1,
+		Scope:    []string{"ascope"},
+		Password: "none",
+	}
+	auxUser2 := User{
+		UID:      "user2",
+		Role:     1,
+		Scope:    []string{"ascope"},
+		Password: "none",
+	}
+
+	strData, _ := json.Marshal(auxUser)
+	redisClient.rdb.Set(auxCtx, auxUser.UID, strData, 0)
+
+	payload, _ := redisClient.encrypt(auxUser)
+	payload2, _ := redisClient.encrypt(auxUser2)
+
 	type args struct {
-		ctx          context.Context
 		refreshToken []byte
 	}
 	tests := []struct {
 		name    string
 		c       *Client
 		args    args
-		want    auth.Payload
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Refreshing a valid token",
+			c:    &redisClient,
+			args: args{
+				payload.Refresh,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Invalid - invalid token",
+			c:    &redisClient,
+			args: args{
+				[]byte("invalid"),
+			},
+			wantErr: true,
+		},
+		{
+			name: "Invalid - user was deleted",
+			c:    &redisClient,
+			args: args{
+				payload2.Refresh,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.c.RefreshToken(tt.args.ctx, tt.args.refreshToken)
+			got, err := tt.c.RefreshToken(auxCtx, tt.args.refreshToken)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.RefreshToken() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.RefreshToken() = %v, want %v", got, tt.want)
+
+			if !tt.wantErr && got == nil {
+				t.Errorf("Client.RefreshToken() return is empty")
 			}
 		})
 	}
