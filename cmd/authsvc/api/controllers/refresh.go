@@ -56,6 +56,7 @@ func refreshPayload(data models.ResfreshDI) (*models.Payload, error) {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	payload := models.Payload{}
 	err = json.NewDecoder(resp.Body).Decode(&payload)
