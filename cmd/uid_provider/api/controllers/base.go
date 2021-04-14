@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,12 +14,14 @@ import (
 type Server struct {
 	mux *http.ServeMux
 	rdb client.RedisManager
+	ctx context.Context
 }
 
 // Init - configures the server
-func (s *Server) Init(rdb client.RedisManager) {
+func (s *Server) Init(rdb client.RedisManager, ctx context.Context) {
 	s.mux = http.NewServeMux()
 	s.rdb = rdb
+	s.ctx = ctx
 	s.initRoutes()
 }
 

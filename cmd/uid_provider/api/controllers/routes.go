@@ -6,7 +6,7 @@ import (
 
 // initRoutes defines which routes the UID Provider API will have
 func (s *Server) initRoutes() {
-	h := handler.NewHandler(s.rdb)
+	h := handler.NewHandler(s.rdb, s.ctx)
 
 	s.mux.HandleFunc("/newuser", h.CreateUserHandler())
 

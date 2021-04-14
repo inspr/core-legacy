@@ -18,9 +18,10 @@ type Handler struct {
 }
 
 // NewHandler instantiates a new Handler structure
-func NewHandler(rdb client.RedisManager) *Handler {
+func NewHandler(rdb client.RedisManager, ctx context.Context) *Handler {
 	return &Handler{
 		rdb: rdb,
+		ctx: ctx,
 	}
 }
 
