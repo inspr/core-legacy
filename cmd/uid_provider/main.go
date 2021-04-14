@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/api"
-	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/client"
+	"github.com/inspr/inspr/cmd/uid_provider/api"
+	"github.com/inspr/inspr/cmd/uid_provider/client"
 )
 
 func main() {

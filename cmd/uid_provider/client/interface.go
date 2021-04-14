@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	"gitlab.inspr.dev/inspr/core/pkg/api/auth"
+	"github.com/inspr/inspr/pkg/api/auth"
 )
 
 // User defines the information a user contains

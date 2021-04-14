@@ -8,7 +8,7 @@ import (
 
 	"github.com/alicebob/miniredis"
 	"github.com/go-redis/redis/v8"
-	"gitlab.inspr.dev/inspr/core/pkg/api/auth"
+	"github.com/inspr/inspr/pkg/api/auth"
 )
 
 var redisServer *miniredis.Miniredis

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/client"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
+	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"github.com/inspr/inspr/pkg/rest"
 )
 
 // Handler is a structure which cointains methods to handle

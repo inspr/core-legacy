@@ -12,9 +12,9 @@ import (
 	"os"
 
 	"github.com/go-redis/redis/v8"
-	"gitlab.inspr.dev/inspr/core/pkg/api/auth"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/api/auth"
+	"github.com/inspr/inspr/pkg/controller/client"
+	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 // Client defines a Redis client, which has the interface methods

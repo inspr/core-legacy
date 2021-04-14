@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/client"
+	"github.com/inspr/inspr/cmd/uid_provider/client"
 )
 
 // Server is a struct that contains the variables necessary

@@ -8,10 +8,10 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/api/auth"
-	"gitlab.inspr.dev/inspr/core/pkg/api/models"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/api/auth"
+	"github.com/inspr/inspr/pkg/api/models"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 func TestAuthClient_GenerateToken(t *testing.T) {

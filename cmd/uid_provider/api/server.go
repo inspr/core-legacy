@@ -1,8 +1,8 @@
 package api
 
 import (
-	ctrl "gitlab.inspr.dev/inspr/core/cmd/uid_provider/api/controllers"
-	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/client"
+	ctrl "github.com/inspr/inspr/cmd/uid_provider/api/controllers"
+	"github.com/inspr/inspr/cmd/uid_provider/client"
 )
 
 var server ctrl.Server
