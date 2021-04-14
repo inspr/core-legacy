@@ -76,7 +76,7 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting dApp create changes")
+			logger.Info("committing dApp create changes")
 			defer ah.Memory.Commit()
 		} else {
 			logger.Info("cancelling dApp create changes")
@@ -173,7 +173,7 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting dApp update changes")
+			logger.Info("committing dApp update changes")
 			defer ah.Memory.Commit()
 		} else {
 			logger.Info("cancelling dApp update changes")
@@ -233,7 +233,7 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting Channel create changes")
+			logger.Info("committing Channel create changes")
 			defer ah.Memory.Commit()
 		} else {
 			logger.Info("cancelling Channel create changes")

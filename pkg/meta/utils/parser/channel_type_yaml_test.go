@@ -71,7 +71,7 @@ func TestIncorrectCTypeYaml(t *testing.T) {
 	})
 }
 
-func TestNonExistantCTypeFile(t *testing.T) {
+func TestNonExistentCTypeFile(t *testing.T) {
 	// reads file created
 	bytes := []byte{1}
 	_, err := YamlToChannelType(bytes)

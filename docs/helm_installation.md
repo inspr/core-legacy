@@ -30,7 +30,7 @@ The following table lists the configurable parameters of the Inspr Ingress contr
 | replicaCount | Number of replicas of the Inspr Ingress controller deployment. | 1 |
 | insprIngress.host | Main route for the Inspr Ingress Controller | inspr.com |
 | deployment.insprdName | Name of the Ingress Inspr deployment  | insprd-deployment|
-| insprEnvironment | Inspr Sevice Environment.  | test |
+| insprEnvironment | Inspr Service Environment.  | test |
 | service.type | Insprd Kubernetes Service type | ClusterIP |
 | service.insprdName | Insprd Kubernetes Service name | insprd-svc |
 | service.insprdPort | HTTP port of the Inspr controller service.  | 80 |
@@ -49,7 +49,7 @@ Inspr Controller will be exposed via NGINX by default, so you just need to have 
 
 To properly access the cluster via the Inspr CLI it is necessary to configure the hostname in your machine to comport the Ingress host.
 
-This can be done in unix machines editting the file `etc/hosts` and adding `<cluster_IP> <insprIngress.host>`. For futher understanding of what is happening access this [link](https://debian-handbook.info/browse/stable/sect.hostname-name-service.html)
+This can be done in unix machines editting the file `etc/hosts` and adding `<cluster_IP> <insprIngress.host>`. For further understanding of what is happening access this [link](https://debian-handbook.info/browse/stable/sect.hostname-name-service.html)
 
 For Windows is recommended to follow the steps in [here](https://docs.microsoft.com/en-us/windows-server/networking/technologies/ipam/add-a-dns-resource-record).
 
