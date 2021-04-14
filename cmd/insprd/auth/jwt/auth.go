@@ -3,11 +3,17 @@
 package jwtauth
 
 import (
+	"context"
 	"errors"
+	"net/http"
+	"os"
 	"time"
 
 	"github.com/lestrrat-go/jwx/jwt"
+	"gitlab.inspr.dev/inspr/core/pkg/auth"
 	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
+	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
 type JWTauth struct{}
@@ -50,8 +56,41 @@ func (JA *JWTauth) Validade(token []byte) (models.Payload, []byte, error) {
 }
 
 func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
-	return []byte{}, nil
+
+	URL := os.Getenv("AUTH_PATH")
+	client := request.NewJSONClient(URL)
+
+	data := models.JwtDO{}
+	err := client.Send(context.Background(), "/token", http.MethodPost, load, &data)
+	if err != nil {
+		err = ierrors.NewError().InternalServer().InnerError(err).Build()
+		return nil, err
+	}
+
+	return data.Token, nil
 }
+
 func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
-	return []byte{}, nil
+	URL := os.Getenv("AUTH_PATH")
+	client := request.NewJSONClient(URL)
+
+	load, err := auth.Desserialize(token)
+	if err != nil {
+		return nil, err
+	}
+
+	body := models.ResfreshDI{
+		RefreshToken: load.Refresh,
+		RefreshURL:   load.RefreshURL,
+	}
+
+	data := models.JwtDO{}
+	err = client.Send(context.Background(), "/refresh", http.MethodPost, body, &data)
+
+	if err != nil {
+		err = ierrors.NewError().InternalServer().InnerError(err).Build()
+		return nil, err
+	}
+
+	return data.Token, nil
 }
