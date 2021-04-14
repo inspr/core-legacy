@@ -74,13 +74,13 @@ func (b *ErrBuilder) InvalidChannelType() *ErrBuilder {
 	return b
 }
 
-// Unauthorized adds Invalid Channel Type code to Inspr Error
+// Unauthorized adds Unauthorized code to Inspr Error
 func (b *ErrBuilder) Unauthorized() *ErrBuilder {
 	b.err.Code = Unauthorized
 	return b
 }
 
-// Forbidden adds Invalid Channel Type code to Inspr Error
+// Forbidden adds Forbidden code to Inspr Error
 func (b *ErrBuilder) Forbidden() *ErrBuilder {
 	b.err.Code = Forbidden
 	return b
