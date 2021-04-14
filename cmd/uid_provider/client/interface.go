@@ -20,5 +20,5 @@ type RedisManager interface {
 	CreateUser(ctx context.Context, uid, pwd string, newUser User) error
 	DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error
 	UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, newPwd string) error
-	RefreshToken(ctx context.Context, refreshToken string) (auth.Payload, error)
+	RefreshToken(ctx context.Context, refreshToken []byte) (*auth.Payload, error)
 }

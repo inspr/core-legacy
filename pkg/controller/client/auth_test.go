@@ -33,7 +33,7 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 					UID:        "test123",
 					Role:       1,
 					Scope:      []string{"app1", "app2"},
-					Refresh:    "refreshtoken1234",
+					Refresh:    []byte("refreshtoken1234"),
 					RefreshURL: "http://URLToUIDProvider.valid",
 				},
 			},
