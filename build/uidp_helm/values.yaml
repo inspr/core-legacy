@@ -37,6 +37,7 @@ securityContext: {}
   # runAsUser: 1000
 
 secretRepository: gcr.io/red-inspr/uidp/redis/secret
+privateKeyName: redisprivatekey
 
 statefulset:
   uidpName: uidp-stset
