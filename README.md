@@ -42,7 +42,7 @@ Inspr is an engine for running distributed applications, using multiple communic
 - :cloud: Cloud native: lightweight and modular, built with interchangeable pieces
 - :hammer_and_wrench: Versatile: can adapt to any cloud environment
 
-# Table of Contents
+## Table of Contents
 
 - [Getting Started](#getting-started)
 - [Documentation](#-documentation)
@@ -50,9 +50,9 @@ Inspr is an engine for running distributed applications, using multiple communic
 - [Contributing](#-contributing)
 - [Contact](#-contact)
 
-# 🎉 Getting Started
+## 🎉 Getting Started
 
-## Cluster
+### Cluster
 
 The recommended way to install inspr in a kubernetes cluster is by using helm.
 
@@ -73,24 +73,24 @@ replacing inspr_name by the desired inspr cluster name.
 Aditionaly you can check the default values file for the helm chart.
 They are included in the `build/helm` folder and can be edited for further refinement of the properties.
 
-## CLI
+### CLI
 
 To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.
 TODO: Add link to the install script for the CLI.
 
-# 📁 Documentation
+## 📁 Documentation
 
 You can check the documentation on the [Confluence page for Inspr](https://inspr.atlassian.net/wiki/spaces/INX/overview)
 TODO: Migrate to website
 
-# 📄 License
+## 📄 License
 
 Inspr is licenced under MIT [license](LICENSE.md).
 
-# 👏 Contributing
+## 👏 Contributing
 
 Please check out our [guide](CONTRIBUTING.md).
 
-# 📣 Contact
+## 📣 Contact
 
 To contact us, please join our [Discord community](https://discord.gg/tmp2564a54).
