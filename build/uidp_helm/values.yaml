@@ -47,7 +47,8 @@ configmap:
 service:
   type: ClusterIP
   uidpName: uidp-svc
-  portOuter: 80
+  port: 80
+  targetPort: 9001
 
 deployment:
   insprdAddr: "http://insprd-svc.default.svc"

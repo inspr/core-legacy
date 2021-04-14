@@ -5,8 +5,8 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: 80
-      targetPort: 9001
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
       name: client
   selector:
     {{- include "UIDProvider.selectorLabels" . | nindent 4 }}
