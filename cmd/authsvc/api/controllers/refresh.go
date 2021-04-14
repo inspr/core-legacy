@@ -21,26 +21,7 @@ func (server *Server) Refresh() rest.Handler {
 			return
 		}
 
-		reqBody := models.ResfreshDO{
-			RefreshToken: data.RefreshToken,
-		}
-		reqBytes, err := json.Marshal(reqBody)
-		if err != nil {
-			err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
-			rest.ERROR(w, err)
-			return
-		}
-
-		c := &http.Client{}
-		resp, err := c.Post(data.RefreshURL, "application/json", bytes.NewBuffer(reqBytes))
-		if err != nil || resp.StatusCode != http.StatusOK {
-			err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
-			rest.ERROR(w, err)
-			return
-		}
-
-		payload := models.Payload{}
-		err = json.NewDecoder(resp.Body).Decode(&payload)
+		payload, err := refreshPayload(data)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -57,4 +38,29 @@ func (server *Server) Refresh() rest.Handler {
 		}
 		rest.JSON(w, http.StatusOK, body)
 	}
+}
+
+func refreshPayload(data models.ResfreshDI) (models.Payload, error) {
+	reqBody := models.ResfreshDO{
+		RefreshToken: data.RefreshToken,
+	}
+	reqBytes, err := json.Marshal(reqBody)
+	if err != nil {
+		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return models.Payload{}, err
+	}
+
+	c := &http.Client{}
+	resp, err := c.Post(data.RefreshURL, "application/json", bytes.NewBuffer(reqBytes))
+	if err != nil || resp.StatusCode != http.StatusOK {
+		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return models.Payload{}, err
+	}
+
+	payload := models.Payload{}
+	err = json.NewDecoder(resp.Body).Decode(&payload)
+	if err != nil {
+		return models.Payload{}, err
+	}
+	return payload, nil
 }
