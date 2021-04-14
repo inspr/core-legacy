@@ -45,11 +45,11 @@ Inspr is an engine for running distributed applications, using multiple communic
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-- [Documentation](#-documentation)
-- [License](#-license)
+- [Documentation](#documentation)
+- [Architecture](#architecture)
 - [Contributing](#-contributing)
+- [License](#-license)
 - [Contact](#-contact)
-
 
 ## 🎉 Getting Started
 
@@ -79,19 +79,26 @@ They are included in the `build/helm` folder and can be edited for further refin
 To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.
 TODO: Add link to the install script for the CLI.
 
-## 📁 Documentation
 
-You can check the documentation on the [Confluence page for Inspr](https://inspr.atlassian.net/wiki/spaces/INX/overview)
-TODO: Migrate to website
+## Documentation
 
-## 📄 License
+The full documentation for Inspr can be found on our [website](https://inspr.com/docs).
+The source for the Inspr documentation and website is hosted on a separate repo, @inspr/docs.
 
-Inspr is licenced under MIT [license](LICENSE.md).
+## Architecture
+- TBD
 
 ## 👏 Contributing
 
-Please check out our [guide](CONTRIBUTING.md).
+The main purpose of this repository is to continue evolving Inspr core. We want to make contributing to this project as easy and transparent as possible, and we are grateful to the community for contributing bug fixes and improvements.
+To contribute, please check out our [guide](CONTRIBUTING.md).
+
+## 📄 License
+
+- Inspr is licenced under MIT [license](LICENSE.md).
+- Inspr documentation is Creative Commons licensed, as found in the [license-docs](LICENSE-docs) file.
 
 ## 📣 Contact
 
 To contact us, please join our [Discord community](https://discord.gg/tmp2564a54).
+
