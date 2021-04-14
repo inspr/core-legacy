@@ -13,23 +13,23 @@ import (
 )
 
 type mockCl struct {
-	createUser     func(context.Context, string, client.User) error
-	deleteUser     func(context.Context, string, string) error
+	createUser     func(context.Context, string, string, client.User) error
+	deleteUser     func(context.Context, string, string, string) error
 	login          func(context.Context, string, string) (string, error)
-	updatePassword func(context.Context, string, string, string) error
+	updatePassword func(context.Context, string, string, string, string) error
 }
 
-func (cl mockCl) CreateUser(ctx context.Context, uid string, newUsr client.User) error {
-	return cl.createUser(ctx, uid, newUsr)
+func (cl mockCl) CreateUser(ctx context.Context, uid, pwd string, newUsr client.User) error {
+	return cl.createUser(ctx, uid, pwd, newUsr)
 }
-func (cl mockCl) DeleteUser(ctx context.Context, uid string, tbd string) error {
-	return cl.deleteUser(ctx, uid, tbd)
+func (cl mockCl) DeleteUser(ctx context.Context, uid, pwd string, tbd string) error {
+	return cl.deleteUser(ctx, uid, pwd, tbd)
 }
 func (cl mockCl) Login(ctx context.Context, uid string, password string) (string, error) {
 	return cl.login(ctx, uid, password)
 }
-func (cl mockCl) UpdatePassword(c context.Context, uid string, tobeUpdated string, newPwd string) error {
-	return cl.updatePassword(c, uid, tobeUpdated, newPwd)
+func (cl mockCl) UpdatePassword(c context.Context, uid, pwd string, tobeUpdated string, newPwd string) error {
+	return cl.updatePassword(c, uid, pwd, tobeUpdated, newPwd)
 }
 
 func Test_createUser(t *testing.T) {
@@ -260,12 +260,16 @@ func Test_createUser(t *testing.T) {
 			}
 			createUsrOptions = tt.options
 			cl = mockCl{
-				createUser: func(c context.Context, s string, u client.User) error {
+				createUser: func(c context.Context, uid, pwd string, u client.User) error {
 					if !reflect.DeepEqual(tt.usr, u) {
 						t.Errorf("user is different than intended. %v\n!=\n%v", tt.usr, u)
 					}
-					if s != tt.args.s[0] {
-						t.Errorf("uid informed is different than intended %v\n!=\n%v", s, tt.args.s[0])
+					if uid != tt.args.s[0] {
+						t.Errorf("uid informed is different than intended %v\n!=\n%v", uid, tt.args.s[0])
+					}
+
+					if pwd != tt.args.s[1] {
+						t.Errorf("password informed is different than intended %v\n!=\n%v", pwd, tt.args.s[1])
 					}
 					return nil
 				},

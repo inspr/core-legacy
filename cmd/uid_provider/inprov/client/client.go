@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 
+	"github.com/inspr/inspr/cmd/uid_provider/api/models"
 	"github.com/inspr/inspr/cmd/uid_provider/client"
 	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/spf13/viper"
@@ -36,38 +37,25 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 }
 
 // CreateUser creates a user in inspr's UID provider.
-func (c *Client) CreateUser(ctx context.Context, uid string, newUser client.User) error {
-	type ReceivedDataCreate struct {
-		UID string
-		Usr client.User
-	}
+func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser client.User) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/newusr", "POST", ReceivedDataCreate{uid, newUser}, resp)
+	err := c.rc.Send(ctx, "/newusr", "POST", models.ReceivedDataCreate{UID: uid, Password: pwd, User: newUser}, resp)
 	return err
 }
 
 // DeleteUser deletes a user in inspr's UID provider
-func (c *Client) DeleteUser(ctx context.Context, uid, usrToBeDeleted string) error {
-	type ReceivedDataDelete struct {
-		UID            string
-		UsrToBeDeleted string
-	}
+func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/deleteuser", "POST", ReceivedDataDelete{uid, usrToBeDeleted}, resp)
+	err := c.rc.Send(ctx, "/deleteuser", "POST", models.ReceivedDataDelete{UID: uid, Password: pwd, UserToBeDeleted: usrToBeDeleted}, resp)
 	return err
 }
 
 // UpdatePassword updates a user's password on inspr's uid provider.
-func (c *Client) UpdatePassword(ctx context.Context, uid, usrToBeUpdated, newPwd string) error {
-	type ReceivedDataUpdate struct {
-		UID            string
-		UsrToBeUpdated string
-		NewPwd         string
-	}
+func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, newPwd string) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/updatepwd", "POST", ReceivedDataUpdate{uid, usrToBeUpdated, newPwd}, resp)
+	err := c.rc.Send(ctx, "/updatepwd", "POST", models.ReceivedDataUpdate{UID: uid, Password: pwd, UserToBeUpdated: usrToBeUpdated, NewPassword: newPwd}, resp)
 	return err
 }

@@ -111,6 +111,6 @@ func createUser(c context.Context, s []string) error {
 		return errors.New("password not informed")
 	}
 
-	err = cl.CreateUser(c, s[0], usr)
+	err = cl.CreateUser(c, s[0], s[1], usr)
 	return err
 }
