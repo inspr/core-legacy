@@ -31,7 +31,7 @@ type Client struct {
 func NewRedisClient() *Client {
 	return &Client{
 		rdb: redis.NewClient(&redis.Options{
-			Addr:     getEnv("REDIS_HOST") + ":" + getEnv("REDIS_PORT"),
+			Addr:     fmt.Sprintf("%s:%s", getEnv("REDIS_HOST"), getEnv("REDIS_PORT")),
 			Password: getEnv("REDIS_PASSWORD"),
 			DB:       0, // use default DB
 		}),
