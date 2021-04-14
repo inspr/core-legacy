@@ -14,7 +14,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:           "inspr",
 		Short:         "main command of the inspr cli",
-		Long:          `main command of the inspr cli, to see the full list of subcommands existant please use 'inspr help'`,
+		Long:          `main command of the inspr cli, to see the full list of subcommands existent please use 'inspr help'`,
 		Version:       version,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {

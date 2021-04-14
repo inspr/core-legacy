@@ -69,7 +69,7 @@ func schemaNeedsInjection(schema string) bool {
 	_, err := os.Stat(schema)
 	if !os.IsNotExist(err) &&
 		(filepath.Ext(schema) == ".schema" || filepath.Ext(schema) == ".avsc") {
-		// file exists and has the right extention
+		// file exists and has the right extension
 		return true
 	}
 	return false
