@@ -74,6 +74,18 @@ func (b *ErrBuilder) InvalidChannelType() *ErrBuilder {
 	return b
 }
 
+// Unauthorized adds Invalid Channel Type code to Inspr Error
+func (b *ErrBuilder) Unauthorized() *ErrBuilder {
+	b.err.Code = Unauthorized
+	return b
+}
+
+// Forbidden adds Invalid Channel Type code to Inspr Error
+func (b *ErrBuilder) Forbidden() *ErrBuilder {
+	b.err.Code = Forbidden
+	return b
+}
+
 // Message adds a message to the error
 func (b *ErrBuilder) Message(format string, values ...interface{}) *ErrBuilder {
 	b.err.Message = fmt.Sprintf(format, values...)
