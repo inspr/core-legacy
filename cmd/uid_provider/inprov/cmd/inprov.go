@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/inprov/client"
-	build "gitlab.inspr.dev/inspr/core/pkg/cmd"
+	"github.com/inspr/inspr/cmd/uid_provider/inprov/client"
+	build "github.com/inspr/inspr/pkg/cmd"
 )
 
 var MainCommand = build.NewCmd("inprov <subcommand>").AddSubCommand(

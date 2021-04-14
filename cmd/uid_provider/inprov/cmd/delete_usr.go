@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 
-	build "gitlab.inspr.dev/inspr/core/pkg/cmd"
+	build "github.com/inspr/inspr/pkg/cmd"
 )
 
 var deleteUsrOptions struct {

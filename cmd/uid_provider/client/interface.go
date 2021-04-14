@@ -2,6 +2,8 @@ package client
 
 import (
 	"context"
+
+	"github.com/inspr/inspr/cmd/insprd/auth"
 )
 
 // User defines the information a user contains
@@ -15,7 +17,7 @@ type User struct {
 // RedisManager defines methods to manage Redis in the cluster
 type RedisManager interface {
 	UIDClient
-	RefreshToken(ctx context.Context, refreshToken string) (Payload, error)
+	RefreshToken(ctx context.Context, refreshToken string) (auth.Payload, error)
 }
 
 type UIDClient interface {

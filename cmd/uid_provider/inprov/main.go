@@ -1,6 +1,6 @@
 package main
 
-import "gitlab.inspr.dev/inspr/core/cmd/uid_provider/inprov/cmd"
+import "github.com/inspr/inspr/cmd/uid_provider/inprov/cmd"
 
 func main() {
 	cmd.MainCommand.Execute()

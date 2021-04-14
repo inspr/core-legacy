@@ -3,8 +3,8 @@ package client
 import (
 	"context"
 
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"github.com/inspr/inspr/cmd/insprd/auth"
+	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 // AuthClient is a client for getting auth information from Insprd

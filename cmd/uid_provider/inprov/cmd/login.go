@@ -5,8 +5,8 @@ import (
 	"io"
 	"os"
 
-	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/client"
-	build "gitlab.inspr.dev/inspr/core/pkg/cmd"
+	"github.com/inspr/inspr/cmd/uid_provider/client"
+	build "github.com/inspr/inspr/pkg/cmd"
 )
 
 var cl client.UIDClient

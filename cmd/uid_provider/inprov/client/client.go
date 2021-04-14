@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/spf13/viper"
-	"gitlab.inspr.dev/inspr/core/cmd/uid_provider/client"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 type Client struct {
