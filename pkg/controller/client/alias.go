@@ -47,11 +47,12 @@ func (ac *AliasClient) Get(ctx context.Context, context, key string) (*meta.Alia
 //
 // So to create a channel type inside app1 with the name channeltype1 you
 // would call ctc.Create(context.Background(), "app1", &meta.ChannelType{...})
-func (ac *AliasClient) Create(ctx context.Context, context string, target string, alias *meta.Alias) (diff.Changelog, error) {
+func (ac *AliasClient) Create(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasDI{
 		Ctx:    context,
 		Target: target,
 		Alias:  *alias,
+		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
@@ -72,10 +73,11 @@ func (ac *AliasClient) Create(ctx context.Context, context string, target string
 //
 // So to delete a alias inside app1 with the key alias1 you
 // would call ac.Delete(context.Background(), "app1", "alias1")
-func (ac *AliasClient) Delete(ctx context.Context, context, key string) (diff.Changelog, error) {
+func (ac *AliasClient) Delete(ctx context.Context, context, key string, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasQueryDI{
-		Ctx: context,
-		Key: key,
+		Ctx:    context,
+		Key:    key,
+		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
@@ -96,11 +98,12 @@ func (ac *AliasClient) Delete(ctx context.Context, context, key string) (diff.Ch
 //
 // So to update a alias inside app1 with the key myalias you
 // would call ac.Create(context.Background(), "app1", &meta.Alias{...})
-func (ac *AliasClient) Update(ctx context.Context, context string, target string, alias *meta.Alias) (diff.Changelog, error) {
+func (ac *AliasClient) Update(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasDI{
 		Ctx:    context,
 		Target: target,
 		Alias:  *alias,
+		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
