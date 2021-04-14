@@ -800,6 +800,7 @@ func teardown() {
 	os.Unsetenv("REDIS_PASSWORD")
 	os.Unsetenv("INSPR_CLUSTER_ADDR")
 	redisServer.Close()
+	insprServer.Close()
 }
 
 func mockRedis() *miniredis.Miniredis {
