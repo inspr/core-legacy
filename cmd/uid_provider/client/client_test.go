@@ -20,8 +20,11 @@ import (
 
 var redisServer *miniredis.Miniredis
 var redisClient Client
+var insprServer *httptest.Server
 
 func TestNewRedisClient(t *testing.T) {
+	setup()
+	defer teardown()
 	tests := []struct {
 		name string
 		want *Client
@@ -195,7 +198,7 @@ func TestClient_DeleteUser(t *testing.T) {
 			}
 
 			createdUser, err := get(auxCtx, redisClient.rdb, tt.args.usrToBeDeleted)
-			if err == nil || !reflect.DeepEqual(createdUser, User{}) {
+			if !tt.wantErr && (err == nil || createdUser != nil) {
 				t.Errorf("Client.DeleteUser() error = %v", err)
 			}
 		})
@@ -258,7 +261,7 @@ func TestClient_Login(t *testing.T) {
 func TestClient_RefreshToken(t *testing.T) {
 	type args struct {
 		ctx          context.Context
-		refreshToken string
+		refreshToken []byte
 	}
 	tests := []struct {
 		name    string
@@ -348,7 +351,7 @@ func Test_get(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    User
+		want    *User
 		wantErr bool
 	}{
 		{
@@ -356,7 +359,7 @@ func Test_get(t *testing.T) {
 			args: args{
 				key: "user1",
 			},
-			want: User{
+			want: &User{
 				UID:      "user1",
 				Role:     1,
 				Scope:    []string{"ascope"},
@@ -369,7 +372,7 @@ func Test_get(t *testing.T) {
 			args: args{
 				key: "RANDOMKEY",
 			},
-			want:    User{},
+			want:    nil,
 			wantErr: true,
 		},
 	}
@@ -443,7 +446,7 @@ func Test_delete(t *testing.T) {
 	}
 }
 
-func Test_havePermission(t *testing.T) {
+func Test_hasPermission(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -512,24 +515,19 @@ func Test_havePermission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := havePermission(auxCtx, redisClient.rdb, tt.args.uid, tt.args.pwd)
+			err := hasPermission(auxCtx, redisClient.rdb, tt.args.uid, tt.args.pwd)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if got != tt.want {
-				t.Errorf("havePermission() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func Test_encrypt(t *testing.T) {
-	os.Setenv("REFRESH_URL", "randomurl")
-	os.Setenv("REFRESH_KEY", "61626364616263646162636461626364")
-	defer os.Unsetenv("REFRESH_KEY")
-	defer os.Unsetenv("REFRESH_URL")
+	setup()
+	defer teardown()
 
 	type args struct {
 		user User
@@ -552,13 +550,13 @@ func Test_encrypt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := encrypt(tt.args.user)
+			got, err := redisClient.encrypt(tt.args.user)
 			if err != nil {
 				t.Errorf("encrypt() return an error: %v", err)
 				return
 			}
 
-			if got.Refresh == "" {
+			if string(got.Refresh) == "" {
 				t.Errorf("error while creating the refresh token")
 				return
 			}
@@ -567,25 +565,23 @@ func Test_encrypt(t *testing.T) {
 }
 
 func Test_decrypt(t *testing.T) {
-	os.Setenv("REFRESH_URL", "randomurl")
-	os.Setenv("REFRESH_KEY", "61626364616263646162636461626364")
-	defer os.Unsetenv("REFRESH_KEY")
-	defer os.Unsetenv("REFRESH_URL")
+	setup()
+	defer teardown()
 
 	auxUser := User{
 		UID:      "user1",
 		Password: "strongpwd",
 	}
 
-	payload, _ := encrypt(auxUser)
+	payload, _ := redisClient.encrypt(auxUser)
 
 	tests := []struct {
 		name string
-		want User
+		want *User
 	}{
 		{
 			name: "Decrypts valid user refresh token",
-			want: User{
+			want: &User{
 				UID:      "user1",
 				Password: "strongpwd",
 			},
@@ -593,7 +589,7 @@ func Test_decrypt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := decrypt(payload.Refresh)
+			got, err := redisClient.decrypt(payload.Refresh)
 			if err != nil {
 				t.Errorf("unable to decrypt, error: %v", err)
 			}
@@ -605,6 +601,9 @@ func Test_decrypt(t *testing.T) {
 }
 
 func Test_requestNewToken(t *testing.T) {
+	setup()
+	defer teardown()
+
 	type args struct {
 		ctx     context.Context
 		payload auth.Payload
@@ -614,10 +613,9 @@ func Test_requestNewToken(t *testing.T) {
 		args    args
 		want    string
 		wantErr bool
-		hand    func(w http.ResponseWriter, r *http.Request)
 	}{
 		{
-			name: "",
+			name: "Sends request for new token",
 			args: args{
 				ctx: context.Background(),
 				payload: auth.Payload{
@@ -627,32 +625,11 @@ func Test_requestNewToken(t *testing.T) {
 			},
 			want:    "user1-app1-app2",
 			wantErr: false,
-			hand: func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != "POST" {
-					rest.ERROR(w, fmt.Errorf("method should be POST"))
-				}
-				data := auth.Payload{}
-				if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-					rest.ERROR(w, err)
-					return
-				}
-				strScope := strings.Join(data.Scope, "-")
-				token := fmt.Sprintf("%s-%s", data.UID, strScope)
-				val := models.AuthDI{
-					Token: token,
-				}
-				rest.JSON(w, 200, val)
-			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := httptest.NewServer(http.HandlerFunc(tt.hand))
-			defer server.Close()
-			os.Setenv("INSPR_CLUSTER_ADDR", server.URL)
-			defer os.Unsetenv("INSPR_CLUSTER_ADDR")
-
-			got, err := requestNewToken(tt.args.ctx, tt.args.payload)
+			got, err := redisClient.requestNewToken(tt.args.ctx, tt.args.payload)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("requestNewToken() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -668,12 +645,25 @@ func Test_requestNewToken(t *testing.T) {
 
 func setup() {
 	redisServer = mockRedis()
-	redisClient.rdb = redis.NewClient(&redis.Options{
-		Addr: redisServer.Addr(),
-	})
+	insprServer = httptest.NewServer(http.HandlerFunc(insprServerHandler))
+
+	os.Setenv("INSPR_CLUSTER_ADDR", insprServer.URL)
+	os.Setenv("REFRESH_URL", "randomurl")
+	os.Setenv("REFRESH_KEY", "61626364616263646162636461626364")
+	os.Setenv("REDIS_HOST", redisServer.Host())
+	os.Setenv("REDIS_PORT", redisServer.Port())
+	os.Setenv("REDIS_PASSWORD", "")
+
+	redisClient = *NewRedisClient()
 }
 
 func teardown() {
+	os.Unsetenv("REFRESH_KEY")
+	os.Unsetenv("REFRESH_URL")
+	os.Unsetenv("REDIS_HOST")
+	os.Unsetenv("REDIS_PORT")
+	os.Unsetenv("REDIS_PASSWORD")
+	os.Unsetenv("INSPR_CLUSTER_ADDR")
 	redisServer.Close()
 }
 
@@ -684,4 +674,21 @@ func mockRedis() *miniredis.Miniredis {
 	}
 
 	return s
+}
+
+func insprServerHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		rest.ERROR(w, fmt.Errorf("method should be POST"))
+	}
+	data := auth.Payload{}
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		rest.ERROR(w, err)
+		return
+	}
+	strScope := strings.Join(data.Scope, "-")
+	token := fmt.Sprintf("%s-%s", data.UID, strScope)
+	val := models.AuthDI{
+		Token: token,
+	}
+	rest.JSON(w, 200, val)
 }
