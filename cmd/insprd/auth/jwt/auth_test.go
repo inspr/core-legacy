@@ -134,7 +134,7 @@ func TestJWTauth_Validade(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			JA := &JWTauth{}
-			got, got1, err := JA.Validade(tt.args.token)
+			got, got1, err := JA.Validate(tt.args.token)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("JWTauth.Validade() error = %v, wantErr %v", err, tt.wantErr)
 				return

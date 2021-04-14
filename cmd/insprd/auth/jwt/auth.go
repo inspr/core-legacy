@@ -1,4 +1,4 @@
-// package jwtauth is responsible for implementing the auth
+// Package jwtauth is responsible for implementing the auth
 // methods specified in the auth folder of the inspr pkg.
 package jwtauth
 
@@ -16,14 +16,16 @@ import (
 	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
+// JWTauth implements the Auth interface for jwt authetication provider
 type JWTauth struct{}
 
+// NewJWTauth returns a JWTAuth object
 func NewJWTauth() *JWTauth {
 	return &JWTauth{}
 }
 
-// receives the
-func (JA *JWTauth) Validade(token []byte) (models.Payload, []byte, error) {
+//Validate receives the
+func (JA *JWTauth) Validate(token []byte) (models.Payload, []byte, error) {
 	jwtToken, err := jwt.Parse(token, jwt.WithValidate(true))
 	// not valid token
 	if err != nil {
@@ -55,6 +57,7 @@ func (JA *JWTauth) Validade(token []byte) (models.Payload, []byte, error) {
 	return payload.(models.Payload), token, nil
 }
 
+// Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
 
 	URL := os.Getenv("AUTH_PATH")
@@ -70,6 +73,7 @@ func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
 	return data.Token, nil
 }
 
+// Refresh refreshes a jwt token. Uses JWT authentication provider
 func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 	URL := os.Getenv("AUTH_PATH")
 	client := request.NewJSONClient(URL)
