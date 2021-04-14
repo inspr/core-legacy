@@ -1,6 +1,22 @@
-# ![logo](./docs/img/inspr_logo.png)Inspr
+<p align="center">
+    <img 
+        srcset="./docs/img/logo.png 1x, ./docs/img/logo@2x.png 2x, ./docs/img/logo@3x.png 3x"
+        src="./docs/img/logo@3x.png" 
+        width="128" 
+        title="Inspr Logo">
+</p>
 
-[![codecov](https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG)](https://codecov.io/gh/inspr/inspr) [![Go Report Card](https://goreportcard.com/badge/github.com/inspr/inspr)](https://goreportcard.com/report/github.com/inspr/inspr)
+<p align="center">
+    <a href="https://godoc.org/github.com/inspr/inspr">
+        <img src="https://godoc.org/github.com/inspr/inspr?status.svg">
+    </a>
+    <a href="https://goreportcard.com/badge/github.com/inspr/inspr">
+        <img src="https://goreportcard.com/badge/github.com/inspr/inspr">
+    </a>
+    <a href="https://codecov.io/gh/inspr/inspr">
+        <img src="https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG">
+    </a>
+</p>
 
 Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
 
