@@ -35,7 +35,7 @@ func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
 
 // Validade is a wrapper that checks the token of the http request and if it's
 // valid, proceeds to execute the request and if it isn't valid returns an error
-func (JA *JWTauth) Validate(token []byte) (models.Payload, []byte, error) {
+func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 
 	jwtToken, err := jwt.Parse(
 		token,
@@ -45,7 +45,7 @@ func (JA *JWTauth) Validate(token []byte) (models.Payload, []byte, error) {
 
 	// not valid token
 	if err != nil {
-		return models.Payload{}, token, err
+		return &models.Payload{}, token, err
 	}
 
 	expiration, found := jwtToken.Get(jwt.ExpirationKey)
@@ -55,9 +55,13 @@ func (JA *JWTauth) Validate(token []byte) (models.Payload, []byte, error) {
 	if !found || now.After(expiration.(time.Time)) {
 		newToken, err := JA.Refresh(token)
 		if err != nil {
-			return models.Payload{},
+			return &models.Payload{},
 				token,
-				errors.New("error refreshing token")
+				ierrors.
+					NewError().
+					InternalServer().
+					Message("error refreshing token").
+					Build()
 		}
 		token = newToken
 	}
@@ -65,20 +69,23 @@ func (JA *JWTauth) Validate(token []byte) (models.Payload, []byte, error) {
 	// gets payload from token
 	payloadData, found := jwtToken.Get("payload")
 	if !found {
-		return models.Payload{},
+		return &models.Payload{},
 			token,
 			errors.New("payload not found")
 	}
 
-	// gets the string in the payload and converts it to bytes
-	payloadString := payloadData.(string)
-	payloadBytes := []byte(payloadString)
+	jwtJSON, err := json.Marshal(payloadData)
+	if err != nil {
+		return &models.Payload{}, token, err
+	}
 
-	// unmarshal of the bytes
 	var payload models.Payload
-	json.Unmarshal(payloadBytes, &payload)
+	err = json.Unmarshal(jwtJSON, &payload)
+	if err != nil {
+		return &models.Payload{}, token, err
+	}
 
-	return payload, token, nil
+	return &payload, token, nil
 }
 
 // Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider

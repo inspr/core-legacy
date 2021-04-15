@@ -5,7 +5,6 @@ package jwtauth
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -64,7 +63,6 @@ func TestJWTauth_Validate(t *testing.T) {
 		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
 		return signed
 	}
-
 	noPayloadToken := func() []byte {
 		token := jwt.New()
 		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
@@ -82,8 +80,7 @@ func TestJWTauth_Validate(t *testing.T) {
 			Refresh:    []byte("mock_refresh"),
 			RefreshURL: "mock_refresh_url",
 		}
-		payloadBytes, _ := json.Marshal(payload)
-		token.Set("payload", payloadBytes)
+		token.Set("payload", payload)
 		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
 		return signed
 	}
@@ -126,7 +123,7 @@ func TestJWTauth_Validate(t *testing.T) {
 				token: nilExpiredToken(),
 			},
 			want:    models.Payload{},
-			want1:   []byte{},
+			want1:   nilExpiredToken(),
 			wantErr: true,
 		},
 		{
@@ -145,7 +142,13 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: fineToken(),
 			},
-			want:    models.Payload{},
+			want: models.Payload{
+				UID:        "mock_UID",
+				Role:       0,
+				Scope:      []string{"mock"},
+				Refresh:    []byte("mock_refresh"),
+				RefreshURL: "mock_refresh_url",
+			},
 			want1:   fineToken(),
 			wantErr: false,
 		},
@@ -161,11 +164,19 @@ func TestJWTauth_Validate(t *testing.T) {
 				)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("JWTauth.Validade() got = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(*got, tt.want) {
+				t.Errorf(
+					"JWTauth.Validade() got = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 			if !reflect.DeepEqual(got1, tt.want1) {
-				t.Errorf("JWTauth.Validade() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf(
+					"JWTauth.Validade() got1 = %v, want %v",
+					got1,
+					tt.want1,
+				)
 			}
 		})
 	}
