@@ -27,7 +27,7 @@ func TestNewJWTauth(t *testing.T) {
 		{
 			name: "returns_JWT_auth",
 			want: &JWTauth{
-				AuthURL: "mock_url",
+				authURL: "mock_url",
 			},
 		},
 	}

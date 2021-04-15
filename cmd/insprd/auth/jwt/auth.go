@@ -18,7 +18,7 @@ import (
 
 // JWTauth implements the Auth interface for jwt authetication provider
 type JWTauth struct {
-	AuthURL string
+	authURL string
 }
 
 // NewJWTauth returns a JWTAuth object
@@ -28,7 +28,7 @@ func NewJWTauth() *JWTauth {
 		panic("AUTH_PATH not found")
 	}
 	return &JWTauth{
-		AuthURL: url,
+		authURL: url,
 	}
 }
 
@@ -68,7 +68,7 @@ func (JA *JWTauth) Validate(token []byte) (models.Payload, []byte, error) {
 // Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
 
-	client := request.NewJSONClient(JA.AuthURL)
+	client := request.NewJSONClient(JA.authURL)
 
 	data := models.JwtDO{}
 	err := client.Send(context.Background(), "/token", http.MethodPost, load, &data)
@@ -82,7 +82,7 @@ func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
 
 // Refresh refreshes a jwt token. Uses JWT authentication provider
 func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
-	client := request.NewJSONClient(JA.AuthURL)
+	client := request.NewJSONClient(JA.authURL)
 
 	load, err := auth.Desserialize(token)
 	if err != nil {
