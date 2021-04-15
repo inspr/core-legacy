@@ -101,3 +101,4 @@ To contribute, please check out our [guide](CONTRIBUTING.md).
 ## 📣 Contact
 
 To contact us, please join our [Discord community](https://discord.gg/tmp2564a54).
+Aditionally we are at [Reddit](https://reddit.com/r/inspr)
