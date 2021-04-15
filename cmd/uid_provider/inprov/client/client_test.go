@@ -53,19 +53,15 @@ func TestClient_Login(t *testing.T) {
 					t.Errorf("path is not login, is %v", r.URL.Path)
 				}
 
-				type ReceivedDataLogin struct {
-					UID string
-					Pwd string
-				}
-				receiver := ReceivedDataLogin{}
+				receiver := models.ReceivedDataLogin{}
 				decoder := json.NewDecoder(r.Body)
 				err := decoder.Decode(&receiver)
 				if err != nil {
 					t.Errorf("error in decoding body: %v", err)
 				}
 
-				if receiver.Pwd != tt.args.pwd {
-					t.Errorf("password does not match parameter: %v != %v", receiver.Pwd, tt.args.pwd)
+				if receiver.Password != tt.args.pwd {
+					t.Errorf("password does not match parameter: %v != %v", receiver.Password, tt.args.pwd)
 				}
 				if receiver.UID != tt.args.uid {
 					t.Errorf("UID does not match parameter: %v != %v", receiver.UID, tt.args.uid)
