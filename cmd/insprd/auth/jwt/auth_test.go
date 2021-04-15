@@ -24,20 +24,20 @@ func TestNewJWTauth(t *testing.T) {
 		{
 			name: "returns_JWT_auth",
 			want: &JWTauth{
-				rsaKey: privKey,
+				PublicKey: &privKey.PublicKey,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewJWTauth(privKey); !reflect.DeepEqual(got, tt.want) {
+			if got := NewJWTauth(&privKey.PublicKey); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewJWTauth() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestJWTauth_Validade(t *testing.T) {
+func TestJWTauth_Validate(t *testing.T) {
 	privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
 	const aLongLongTimeAgo = 233431200
 
@@ -96,7 +96,7 @@ func TestJWTauth_Validade(t *testing.T) {
 	}{
 		{
 			name: "Invalid_token",
-			JA:   NewJWTauth(privKey),
+			JA:   NewJWTauth(&privKey.PublicKey),
 			args: args{
 				token: invalidToken(),
 			},
@@ -106,7 +106,7 @@ func TestJWTauth_Validade(t *testing.T) {
 		},
 		{
 			name: "Expired_token",
-			JA:   NewJWTauth(privKey),
+			JA:   NewJWTauth(&privKey.PublicKey),
 			args: args{
 				token: expiredToken(),
 			},
@@ -116,7 +116,7 @@ func TestJWTauth_Validade(t *testing.T) {
 		},
 		{
 			name: "nil_Expired_token",
-			JA:   NewJWTauth(privKey),
+			JA:   NewJWTauth(&privKey.PublicKey),
 			args: args{
 				token: nilExpiredToken(),
 			},
@@ -126,7 +126,7 @@ func TestJWTauth_Validade(t *testing.T) {
 		},
 		{
 			name: "Payload_notFound",
-			JA:   NewJWTauth(privKey),
+			JA:   NewJWTauth(&privKey.PublicKey),
 			args: args{
 				token: noPayloadToken(),
 			},
@@ -136,7 +136,7 @@ func TestJWTauth_Validade(t *testing.T) {
 		},
 		{
 			name: "Worked",
-			JA:   NewJWTauth(privKey),
+			JA:   NewJWTauth(&privKey.PublicKey),
 			args: args{
 				token: fineToken(),
 			},
@@ -147,7 +147,7 @@ func TestJWTauth_Validade(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, err := tt.JA.Validade(tt.args.token)
+			got, got1, err := tt.JA.Validate(tt.args.token)
 			if (err != nil) != tt.wantErr {
 				t.Errorf(
 					"JWTauth.Validade() error = %v, wantErr %v",

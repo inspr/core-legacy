@@ -16,25 +16,25 @@ import (
 // JWTauth structure containing the private key of in the service side,
 // this key is used to parse the user keys given in the requests.
 type JWTauth struct {
-	rsaKey *rsa.PrivateKey
+	PublicKey *rsa.PublicKey
 }
 
 // NewJWTauth takes an *rsa.PrivateKey and returns an
 // structure that implements the auth interface
-func NewJWTauth(privateKey *rsa.PrivateKey) *JWTauth {
+func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
 	return &JWTauth{
-		rsaKey: privateKey,
+		PublicKey: rsaPublicKey,
 	}
 }
 
 // Validade is a wrapper that checks the token of the http request and if it's
 // valid, proceeds to execute the request and if it isn't valid returns an error
-func (JA *JWTauth) Validade(token []byte) (models.Payload, []byte, error) {
+func (JA *JWTauth) Validate(token []byte) (models.Payload, []byte, error) {
 
 	jwtToken, err := jwt.Parse(
 		token,
 		jwt.WithValidate(true),
-		jwt.WithVerify(jwa.RS256, &JA.rsaKey.PublicKey),
+		jwt.WithVerify(jwa.RS256, JA.PublicKey),
 	)
 
 	// not valid token
