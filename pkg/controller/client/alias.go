@@ -37,7 +37,6 @@ func (ac *AliasClient) Get(ctx context.Context, context, key string) (*meta.Alia
 	return &resp, nil
 }
 
-///////////////// UPDATE THIS DOC //////////////////////////////
 // Create creates a alias inside the Insprd
 //
 // The context refers to the parent app of the given alias, represented with a dot separated query
@@ -45,8 +44,8 @@ func (ac *AliasClient) Get(ctx context.Context, context, key string) (*meta.Alia
 //
 // The alias information such as name and etc will be inferred from the given alias metadata.
 //
-// So to create a channel type inside app1 with the name channeltype1 you
-// would call ctc.Create(context.Background(), "app1", &meta.ChannelType{...})
+// So to create a alias inside app1 with the name aliasOne you
+// would call ctc.Create(context.Background(), "app1", &meta.Alias{...})
 func (ac *AliasClient) Create(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasDI{
 		Ctx:    context,

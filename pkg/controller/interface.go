@@ -37,6 +37,9 @@ type ChannelTypeInterface interface {
 	Update(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error)
 }
 
+// AliasInterface is the interface that allows to
+// obtain or change information related to the current
+// state of the Alias in the cluster
 type AliasInterface interface {
 	Get(ctx context.Context, context, key string) (*meta.Alias, error)
 	Create(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
