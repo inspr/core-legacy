@@ -1,6 +1,6 @@
-module gitlab.inspr.dev/inspr/core
+module github.com/inspr/inspr
 
-go 1.13
+go 1.16
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.5.2

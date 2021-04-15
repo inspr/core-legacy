@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 func TestGetFactory(t *testing.T) {

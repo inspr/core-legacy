@@ -3,8 +3,8 @@ package controller
 import (
 	"context"
 
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/utils/diff"
 )
 
 // ChannelInterface is the interface that allows to obtain

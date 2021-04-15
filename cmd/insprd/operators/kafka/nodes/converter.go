@@ -3,11 +3,11 @@ package nodes
 import (
 	"strings"
 
-	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	metautils "gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
 
 	kubeApp "k8s.io/api/apps/v1"

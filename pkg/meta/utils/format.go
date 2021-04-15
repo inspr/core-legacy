@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/disiqueira/gotree"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 // PrintAppTree prints the app tree
