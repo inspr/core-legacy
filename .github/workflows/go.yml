@@ -1,0 +1,34 @@
+name: Test and coverage
+
+on: [push, pull_request]
+
+jobs:
+  buid-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16.0"
+      - name: Build CLI
+        run: bash .github/scripts/buildcli.sh
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16.0"
+      - name: Run coverage
+        run: go test -coverprofile=profile.cov.tmp -coverpkg=./... ./... || exit 1 
+      - name: Filter files
+        run: cat profile.cov.tmp | grep -v 'fake\|mock\|doc\|examples\|main.go' > coverage.out
+      - name: Upload coverage to Codecov
+        run: bash <(curl -s https://codecov.io/bash) -f 
+  
+  

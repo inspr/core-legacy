@@ -5,10 +5,10 @@ import (
 	"io"
 	"os"
 
-	"gitlab.inspr.dev/inspr/core/pkg/controller"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
-	"gitlab.inspr.dev/inspr/core/pkg/controller/mocks"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/controller"
+	"github.com/inspr/inspr/pkg/controller/client"
+	"github.com/inspr/inspr/pkg/controller/mocks"
+	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 type cliGlobalStructure struct {

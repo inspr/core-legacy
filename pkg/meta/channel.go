@@ -1,6 +1,6 @@
 package meta
 
-import "gitlab.inspr.dev/inspr/core/pkg/utils"
+import "github.com/inspr/inspr/pkg/utils"
 
 // Channel is an Inspr component that represents a Channel.
 type Channel struct {

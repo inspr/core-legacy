@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/authsvc/api"
+	"github.com/inspr/inspr/cmd/authsvc/api"
 )
 
 func main() {

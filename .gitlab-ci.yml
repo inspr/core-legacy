@@ -8,7 +8,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   DANGER_GITLAB_HOST: "https://gitlab.inspr.com"
   DANGER_GITLAB_API_BASE_URL: "https://gitlab.inspr.com/api/v4"
-  REPO_NAME: gitlab.inspr.dev/inspr/core
+  REPO_NAME: github.com/inspr/inspr
 
 
 stages:
