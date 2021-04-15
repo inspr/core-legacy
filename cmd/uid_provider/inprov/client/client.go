@@ -53,6 +53,6 @@ func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string
 func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, newPwd string) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/updatepwd", "POST", models.ReceivedDataUpdate{UID: uid, Password: pwd, UserToBeUpdated: usrToBeUpdated, NewPassword: newPwd}, resp)
+	err := c.rc.Send(ctx, "/updatepwd", "PUT", models.ReceivedDataUpdate{UID: uid, Password: pwd, UserToBeUpdated: usrToBeUpdated, NewPassword: newPwd}, resp)
 	return err
 }

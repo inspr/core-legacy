@@ -251,8 +251,8 @@ func TestClient_UpdatePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != "POST" {
-					t.Errorf("method is not POST")
+				if r.Method != "PUT" {
+					t.Errorf("method is not PUT")
 				}
 
 				if r.URL.Path != "/updatepwd" {
@@ -282,7 +282,7 @@ func TestClient_UpdatePassword(t *testing.T) {
 					t.Errorf("password is not the same %v != %v", receiver.Password, tt.args.pwd)
 				}
 
-			}).JSON().Post())
+			}).JSON().Put())
 
 			c := &Client{
 				rc: request.NewJSONClient(server.URL),
