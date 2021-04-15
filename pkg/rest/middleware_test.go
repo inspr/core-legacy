@@ -10,9 +10,9 @@ import (
 	"reflect"
 	"testing"
 
-	authentication "gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
-	authMock "gitlab.inspr.dev/inspr/core/cmd/insprd/auth/mocks"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	authentication "github.com/inspr/inspr/cmd/insprd/auth"
+	authMock "github.com/inspr/inspr/cmd/insprd/auth/mocks"
+	"github.com/inspr/inspr/pkg/ierrors"
 )
 
 // emptyHandler - to be used in testing of the package

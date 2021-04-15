@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	authentication "gitlab.inspr.dev/inspr/core/cmd/insprd/auth"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	authentication "github.com/inspr/inspr/cmd/insprd/auth"
+	"github.com/inspr/inspr/pkg/ierrors"
 )
 
 // JSON specifies in the header that the response content is a json

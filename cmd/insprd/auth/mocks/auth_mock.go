@@ -1,6 +1,6 @@
 package authmock
 
-import "gitlab.inspr.dev/inspr/core/pkg/auth/models"
+import "github.com/inspr/inspr/pkg/auth/models"
 
 // MockAuth is the structure to mock the auth interface
 type MockAuth struct {
