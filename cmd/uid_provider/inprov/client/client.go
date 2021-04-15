@@ -37,7 +37,7 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser client.User) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/newusr", "POST", models.ReceivedDataCreate{UID: uid, Password: pwd, User: newUser}, resp)
+	err := c.rc.Send(ctx, "/newuser", "POST", models.ReceivedDataCreate{UID: uid, Password: pwd, User: newUser}, resp)
 	return err
 }
 

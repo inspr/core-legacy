@@ -125,8 +125,8 @@ func TestClient_CreateUser(t *testing.T) {
 					t.Errorf("method is not POST")
 				}
 
-				if r.URL.Path != "/newusr" {
-					t.Errorf("path is not newusr, is %v", r.URL.Path)
+				if r.URL.Path != "/newuser" {
+					t.Errorf("path is not newuser, is %v", r.URL.Path)
 				}
 
 				receiver := models.ReceivedDataCreate{}
