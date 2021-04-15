@@ -19,13 +19,13 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
-// JWTauth structure containing the private key of in the service side,
+// JWTauth structure containing the public key of the service side,
 // this key is used to parse the user keys given in the requests.
 type JWTauth struct {
 	PublicKey *rsa.PublicKey
 }
 
-// NewJWTauth takes an *rsa.PrivateKey and returns an
+// NewJWTauth takes an *rsa.PublicKey and returns an
 // structure that implements the auth interface
 func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
 	return &JWTauth{
