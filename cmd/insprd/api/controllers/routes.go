@@ -1,8 +1,8 @@
 package controller
 
 import (
-	handler "gitlab.inspr.dev/inspr/core/cmd/insprd/api/handlers"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
+	handler "github.com/inspr/inspr/cmd/insprd/api/handlers"
+	"github.com/inspr/inspr/pkg/rest"
 )
 
 func (s *Server) initRoutes() {

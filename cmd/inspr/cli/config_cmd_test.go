@@ -8,9 +8,9 @@ import (
 	"reflect"
 	"testing"
 
+	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	cliutils "gitlab.inspr.dev/inspr/core/cmd/inspr/cli/utils"
 )
 
 func TestNewConfigChangeCmd(t *testing.T) {
