@@ -13,7 +13,7 @@ func NewMockAuth(err error) *MockAuth {
 }
 
 // Validade - mock of the validate function
-func (ma *MockAuth) Validade(token []byte) (models.Payload, []byte, error) {
+func (ma *MockAuth) Validate(token []byte) (models.Payload, []byte, error) {
 	if ma.Err != nil {
 		return models.Payload{}, []byte{}, ma.Err
 	}
@@ -21,7 +21,7 @@ func (ma *MockAuth) Validade(token []byte) (models.Payload, []byte, error) {
 		UID:        "uid",
 		Role:       0,
 		Scope:      []string{"scope_1", "scope_2"},
-		Refresh:    "refresh",
+		Refresh:    []byte("refresh"),
 		RefreshURL: "refresh_url",
 	}, []byte("mock"), nil
 }
