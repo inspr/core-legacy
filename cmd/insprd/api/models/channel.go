@@ -1,6 +1,6 @@
 package models
 
-import "gitlab.inspr.dev/inspr/core/pkg/meta"
+import "github.com/inspr/inspr/pkg/meta"
 
 // ChannelDI - Data Input format for requests that pass the channel data
 type ChannelDI struct {

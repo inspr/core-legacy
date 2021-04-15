@@ -1,8 +1,8 @@
 package tree
 
 import (
-	"gitlab.inspr.dev/inspr/core/cmd/insprd/memory"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/pkg/meta/utils/diff"
 )
 
 // MockManager mocks a tree structure for testing

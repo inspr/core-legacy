@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 
-	dappclient "gitlab.inspr.dev/inspr/core/pkg/client"
+	dappclient "github.com/inspr/inspr/pkg/client"
 )
 
 type discordMessage struct {

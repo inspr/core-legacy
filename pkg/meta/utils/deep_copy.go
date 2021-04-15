@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/ierrors"
 )
 
 //DeepCopy is a copy method for dapps tree structures

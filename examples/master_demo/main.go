@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.inspr.dev/inspr/core/pkg/controller/client"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/controller/client"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 func main() {

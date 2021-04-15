@@ -1,13 +1,12 @@
 # Description
 
-Kind: 
+Kind:
 
-Section: 
+Section:
 
-Summary: 
+Summary:
 
 Issue link:
-
 
 ## Changelog
 
@@ -16,5 +15,3 @@ Issue link:
 ## Pay attention to
 
 > Important parts of the code that require special attention
-
-

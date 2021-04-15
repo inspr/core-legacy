@@ -1,6 +1,6 @@
 package meta
 
-import "gitlab.inspr.dev/inspr/core/pkg/utils"
+import "github.com/inspr/inspr/pkg/utils"
 
 // Node represents an inspr component that is a node.
 type Node struct {

@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/ierrors"
 )
 
 func TestClient_Send(t *testing.T) {

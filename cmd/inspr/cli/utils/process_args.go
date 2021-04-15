@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta/utils"
 )
 
 //ProcessArg is responsible for separating a path into an component name and it's parent's path.

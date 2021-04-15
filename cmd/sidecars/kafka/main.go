@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	kafkasc "gitlab.inspr.dev/inspr/core/cmd/sidecars/kafka/client"
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
-	sidecarserv "gitlab.inspr.dev/inspr/core/pkg/sidecar/server"
+	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/sidecar/models"
+	sidecarserv "github.com/inspr/inspr/pkg/sidecar/server"
 	"go.uber.org/zap"
 )
 

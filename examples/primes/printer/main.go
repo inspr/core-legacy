@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	dappclient "gitlab.inspr.dev/inspr/core/pkg/client"
+	dappclient "github.com/inspr/inspr/pkg/client"
 )
 
 func main() {
