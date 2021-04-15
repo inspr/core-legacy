@@ -2,7 +2,14 @@ coverage:
   status:
     project:
       default:
-        target: auto  # auto compares coverage to the previous base commit
+        target: auto
+        # adjust accordingly based on how flaky your tests are
+        # this allows a 10% drop from the previous base commit coverage
+        threshold: 3%
+ignore:
+  - "examples"  # ignore folders and all its contents
+  - "**/*mock*"    # wildcards accepted
+  - "**/mock/*"
+  - "**/fake/*"
+  - "**/main.go"    
 
-comment:
-  layout: "reach, diff, flags, files"  # Remove items here to change the format
