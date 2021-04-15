@@ -5,6 +5,6 @@ type Payload struct {
 	UID        string   `json:"uid"`
 	Role       int      `json:"role"`
 	Scope      []string `json:"scope"`
-	Refresh    string   `json:"refresh"`
+	Refresh    []byte   `json:"refresh"`
 	RefreshURL string   `json:"refreshurl"`
 }

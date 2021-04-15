@@ -35,8 +35,8 @@ service:
   secretgenName: secretgen-svc
   insprdPort: 80
   insprdTargetport: 8080
-  authPort: 81
-  authTargetPort: 8081
+  authPort: 80
+  authTargetPort: 8080
 
 ingress:
   enabled: false
