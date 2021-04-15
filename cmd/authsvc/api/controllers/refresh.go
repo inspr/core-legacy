@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
+	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/rest"
 )
 
 // Refresh returns the refreshing endpoint. This entpoint receives a refresh token and a refresh url, it returns a refreshed token.
@@ -56,6 +56,7 @@ func refreshPayload(data models.ResfreshDI) (*models.Payload, error) {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	payload := models.Payload{}
 	err = json.NewDecoder(resp.Body).Decode(&payload)

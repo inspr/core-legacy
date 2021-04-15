@@ -11,10 +11,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/lestrrat-go/jwx/jwt"
-	"gitlab.inspr.dev/inspr/core/pkg/auth"
-	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
+	"github.com/inspr/inspr/pkg/auth"
+	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/rest"
 )
 
 func TestServer_Refresh(t *testing.T) {
@@ -32,12 +31,12 @@ func TestServer_Refresh(t *testing.T) {
 				UID:        "u000001",
 				Scope:      []string{""},
 				Role:       1,
-				Refresh:    "refreshtk",
+				Refresh:    []byte("refreshtk"),
 				RefreshURL: "http://refresh.token",
 			},
 			body: func(s string) interface{} {
 				return models.ResfreshDI{
-					RefreshToken: "mock_token",
+					RefreshToken: []byte("mock_token"),
 					RefreshURL:   s,
 				}
 			},
@@ -61,7 +60,7 @@ func TestServer_Refresh(t *testing.T) {
 			want: http.StatusInternalServerError,
 			body: func(s string) interface{} {
 				return models.ResfreshDI{
-					RefreshToken: "mock_token",
+					RefreshToken: []byte("mock_token"),
 					RefreshURL:   s,
 				}
 			},
@@ -126,18 +125,14 @@ func TestServer_Refresh(t *testing.T) {
 					t.Log("error making a POST in the httptest server")
 					return
 				}
-				token, err := jwt.Parse(jwtdo.Token)
+
+				payload, err := auth.Desserialize(jwtdo.Token)
 				if err != nil {
-					t.Errorf("AuthHandlers_Tokenize() didn't return a token")
+					t.Errorf("AuthHandlers_Tokenize(), %v", err.Error())
 					return
 				}
-				load, ok := token.Get("payload")
-				if !ok {
-					t.Errorf("AuthHandlers_Tokenize() didn't return a payload on it's token")
-					return
-				}
-				payload := auth.Desserialize(load)
-				if !ok || !reflect.DeepEqual(payload, tt.payload) {
+
+				if !reflect.DeepEqual(payload, tt.payload) {
 					t.Errorf("AuthHandlers_Tokenize() = %v, want %v", payload, tt.payload)
 					return
 				}

@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	env "gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
-	"gitlab.inspr.dev/inspr/core/pkg/sidecar/transports"
+	env "github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar/transports"
 )
 
 func TestNewServer(t *testing.T) {

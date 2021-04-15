@@ -3,7 +3,7 @@ package environment
 import (
 	"os"
 
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/ierrors"
 )
 
 // InsprEnvVars represents the current inspr environment

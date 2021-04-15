@@ -3,14 +3,20 @@
 package jwtauth
 
 import (
+	"context"
 	"crypto/rsa"
 	"encoding/json"
 	"errors"
+	"net/http"
+	"os"
 	"time"
 
+	"github.com/inspr/inspr/pkg/auth"
+	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
-	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
 )
 
 // JWTauth structure containing the private key of in the service side,
@@ -75,12 +81,44 @@ func (JA *JWTauth) Validate(token []byte) (models.Payload, []byte, error) {
 	return payload, token, nil
 }
 
-// Tokenize - will be implemented in another ticket/task
+// Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
-	return []byte{}, nil
+
+	URL := os.Getenv("AUTH_PATH")
+	client := request.NewJSONClient(URL)
+
+	data := models.JwtDO{}
+	err := client.Send(context.Background(), "/token", http.MethodPost, load, &data)
+	if err != nil {
+		err = ierrors.NewError().InternalServer().InnerError(err).Build()
+		return nil, err
+	}
+
+	return data.Token, nil
 }
 
-// Refresh - will be implemented in another ticket/task
+// Refresh refreshes a jwt token. Uses JWT authentication provider
 func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
-	return []byte{}, nil
+	URL := os.Getenv("AUTH_PATH")
+	client := request.NewJSONClient(URL)
+
+	load, err := auth.Desserialize(token)
+	if err != nil {
+		return nil, err
+	}
+
+	body := models.ResfreshDI{
+		RefreshToken: load.Refresh,
+		RefreshURL:   load.RefreshURL,
+	}
+
+	data := models.JwtDO{}
+	err = client.Send(context.Background(), "/refresh", http.MethodPost, body, &data)
+
+	if err != nil {
+		err = ierrors.NewError().InternalServer().InnerError(err).Build()
+		return nil, err
+	}
+
+	return data.Token, nil
 }

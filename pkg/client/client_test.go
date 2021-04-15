@@ -11,11 +11,11 @@ import (
 	"testing"
 	"time"
 
-	"gitlab.inspr.dev/inspr/core/pkg/environment"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
-	"gitlab.inspr.dev/inspr/core/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/rest"
+	"github.com/inspr/inspr/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/sidecar/models"
 )
 
 func mockHTTPClient(addr string) *http.Client {

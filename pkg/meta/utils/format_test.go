@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/disiqueira/gotree"
-	"gitlab.inspr.dev/inspr/core/pkg/meta"
-	"gitlab.inspr.dev/inspr/core/pkg/utils"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 var (
