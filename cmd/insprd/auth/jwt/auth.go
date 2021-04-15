@@ -9,11 +9,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/inspr/inspr/pkg/auth"
+	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/lestrrat-go/jwx/jwt"
-	"gitlab.inspr.dev/inspr/core/pkg/auth"
-	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/rest/request"
 )
 
 // JWTauth implements the Auth interface for jwt authetication provider

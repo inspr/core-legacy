@@ -3,9 +3,9 @@ package auth
 import (
 	"encoding/json"
 
+	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/lestrrat-go/jwx/jwt"
-	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
 )
 
 // Desserialize converts a interface to a Payload model

@@ -13,8 +13,8 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/auth"
-	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/auth"
+	"github.com/inspr/inspr/pkg/auth/models"
 )
 
 const bitSize = 512

@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
-	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
-	"gitlab.inspr.dev/inspr/core/pkg/ierrors"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
 )
 
 func TestNewJWTauth(t *testing.T) {

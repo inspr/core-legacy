@@ -1,6 +1,6 @@
 package auth
 
-import "gitlab.inspr.dev/inspr/core/pkg/auth/models"
+import "github.com/inspr/inspr/pkg/auth/models"
 
 //Auth is the inteface for interacting with the Authentication service
 type Auth interface {

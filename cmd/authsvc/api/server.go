@@ -1,6 +1,6 @@
 package api
 
-import ctrl "gitlab.inspr.dev/inspr/core/cmd/authsvc/api/controllers"
+import ctrl "github.com/inspr/inspr/cmd/authsvc/api/controllers"
 
 var server ctrl.Server
 

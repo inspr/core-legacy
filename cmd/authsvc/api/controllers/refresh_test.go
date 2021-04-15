@@ -11,9 +11,9 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.inspr.dev/inspr/core/pkg/auth"
-	"gitlab.inspr.dev/inspr/core/pkg/auth/models"
-	"gitlab.inspr.dev/inspr/core/pkg/rest"
+	"github.com/inspr/inspr/pkg/auth"
+	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/rest"
 )
 
 func TestServer_Refresh(t *testing.T) {

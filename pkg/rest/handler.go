@@ -8,7 +8,7 @@ package rest
 import (
 	"net/http"
 
-	"gitlab.inspr.dev/inspr/core/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/meta/utils"
 )
 
 // Handler is an alias of the api router function.
