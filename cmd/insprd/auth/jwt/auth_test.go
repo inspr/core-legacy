@@ -20,7 +20,11 @@ import (
 )
 
 func TestNewJWTauth(t *testing.T) {
+	os.Setenv("AUTH_PATH", "mock_url")
+	defer func() { os.Remove("AUTH_PATH") }()
+
 	privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+
 	tests := []struct {
 		name string
 		want *JWTauth
@@ -29,12 +33,14 @@ func TestNewJWTauth(t *testing.T) {
 			name: "returns_JWT_auth",
 			want: &JWTauth{
 				PublicKey: &privKey.PublicKey,
+				authURL:   "mock_url",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewJWTauth(&privKey.PublicKey); !reflect.DeepEqual(got, tt.want) {
+			got := NewJWTauth(&privKey.PublicKey)
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewJWTauth() = %v, want %v", got, tt.want)
 			}
 		})
@@ -42,6 +48,9 @@ func TestNewJWTauth(t *testing.T) {
 }
 
 func TestJWTauth_Validate(t *testing.T) {
+	os.Setenv("AUTH_PATH", "mock_url")
+	defer func() { os.Remove("AUTH_PATH") }()
+
 	privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
 	const aLongLongTimeAgo = 233431200
 
@@ -183,6 +192,8 @@ func TestJWTauth_Validate(t *testing.T) {
 }
 
 func TestJWTauth_Tokenize(t *testing.T) {
+	privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+
 	type args struct {
 		load models.Payload
 	}
@@ -262,7 +273,7 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			os.Setenv("AUTH_PATH", ts.URL)
 			defer ts.Close()
 
-			JA := &JWTauth{}
+			JA := NewJWTauth(&privKey.PublicKey)
 			got, err := JA.Tokenize(tt.args.load)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("JWTauth.Tokenize() error = %v, wantErr %v", err, tt.wantErr)
@@ -276,6 +287,8 @@ func TestJWTauth_Tokenize(t *testing.T) {
 }
 
 func TestJWTauth_Refresh(t *testing.T) {
+	privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+
 	type args struct {
 		token []byte
 	}
@@ -364,7 +377,7 @@ func TestJWTauth_Refresh(t *testing.T) {
 			os.Setenv("AUTH_PATH", ts.URL)
 			defer ts.Close()
 
-			JA := &JWTauth{}
+			JA := NewJWTauth(&privKey.PublicKey)
 			got, err := JA.Refresh(tt.args.token)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("JWTauth.Tokenize() error = %v, wantErr %v", err, tt.wantErr)

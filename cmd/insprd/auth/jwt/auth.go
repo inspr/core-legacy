@@ -19,17 +19,22 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
-// JWTauth structure containing the public key of the service side,
-// this key is used to parse the user keys given in the requests.
+// JWTauth implements the Auth interface for jwt authetication provider
 type JWTauth struct {
 	PublicKey *rsa.PublicKey
+	authURL   string
 }
 
 // NewJWTauth takes an *rsa.PublicKey and returns an
 // structure that implements the auth interface
 func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
+	url, ok := os.LookupEnv("AUTH_PATH")
+	if !ok {
+		panic("AUTH_PATH not found")
+	}
 	return &JWTauth{
 		PublicKey: rsaPublicKey,
+		authURL:   url,
 	}
 }
 
@@ -91,8 +96,7 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 // Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
 
-	URL := os.Getenv("AUTH_PATH")
-	client := request.NewJSONClient(URL)
+	client := request.NewJSONClient(JA.authURL)
 
 	data := models.JwtDO{}
 	err := client.Send(context.Background(), "/token", http.MethodPost, load, &data)
@@ -106,8 +110,7 @@ func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
 
 // Refresh refreshes a jwt token. Uses JWT authentication provider
 func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
-	URL := os.Getenv("AUTH_PATH")
-	client := request.NewJSONClient(URL)
+	client := request.NewJSONClient(JA.authURL)
 
 	load, err := auth.Desserialize(token)
 	if err != nil {
