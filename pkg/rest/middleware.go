@@ -36,7 +36,7 @@ func (h Handler) Validate(auth authentication.Auth) Handler {
 		}
 
 		token := strings.TrimPrefix(headerContent[0], "Bearer ")
-		payload, newToken, err := auth.Validade([]byte(token))
+		payload, newToken, err := auth.Validate([]byte(token))
 
 		// returns the same token or a refreshed one in the header of the response
 		w.Header().Add("Authorization", "Bearer "+string(newToken))
