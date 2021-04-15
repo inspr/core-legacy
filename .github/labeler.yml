@@ -5,17 +5,20 @@ documentation:
 cmd@insprd:
   - cmd/insprd/*
 
-pkg@insprd:
+pkg:
   - pkg/insprd/*
 
 cmd@sidecar:
   - cmd/sidecar/*
 
+cmd@uidp:
+  - cmd/uid_provider/*
+
 pkg@sidecar:
   - pkg/sidecar/*
 
 api:
-  - "**/*api*"
+  - "**/api/*"
 
 build:
   - skaffold.yaml
