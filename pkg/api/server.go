@@ -1,9 +1,9 @@
 package api
 
 import (
-	ctrl "github.com/inspr/inspr/cmd/insprd/api/controllers"
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/operators"
+	ctrl "github.com/inspr/inspr/pkg/api/controllers"
 )
 
 var server ctrl.Server

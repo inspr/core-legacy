@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
-	"github.com/inspr/inspr/cmd/insprd/api/models"
+	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/cmd"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils"

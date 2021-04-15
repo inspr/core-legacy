@@ -28,3 +28,8 @@ func (cm *ClientMock) Channels() controller.ChannelInterface {
 func (cm *ClientMock) ChannelTypes() controller.ChannelTypeInterface {
 	return NewChannelTypeMock(cm.err)
 }
+
+//Authorization mocks a app controller
+func (cm *ClientMock) Authorization() controller.AuthorizationInterface {
+	return NewAuthMock(cm.err)
+}

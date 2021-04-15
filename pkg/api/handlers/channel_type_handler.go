@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/cmd/insprd/api/models"
+	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
 )

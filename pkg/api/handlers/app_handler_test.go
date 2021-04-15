@@ -9,10 +9,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/api/models"
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/memory/fake"
 	ofake "github.com/inspr/inspr/cmd/insprd/operators/fake"
+	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 )
