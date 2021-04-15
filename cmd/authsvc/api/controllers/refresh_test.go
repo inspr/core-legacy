@@ -132,7 +132,7 @@ func TestServer_Refresh(t *testing.T) {
 					return
 				}
 
-				if !reflect.DeepEqual(payload, tt.payload) {
+				if !reflect.DeepEqual(*payload, tt.payload) {
 					t.Errorf("AuthHandlers_Tokenize() = %v, want %v", payload, tt.payload)
 					return
 				}

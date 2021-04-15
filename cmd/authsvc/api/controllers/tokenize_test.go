@@ -106,7 +106,7 @@ func TestServer_Tokenize(t *testing.T) {
 				t.Errorf("AuthHandlers_Tokenize(), %v", err.Error())
 				return
 			}
-			if !reflect.DeepEqual(payload, tt.body) {
+			if !reflect.DeepEqual(*payload, tt.body) {
 				t.Errorf("AuthHandlers_Tokenize() = %v, want %v", payload, tt.body)
 				return
 			}

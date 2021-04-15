@@ -53,7 +53,7 @@ func refreshPayload(data models.ResfreshDI) (*models.Payload, error) {
 	c := &http.Client{}
 	resp, err := c.Post(data.RefreshURL, "application/json", bytes.NewBuffer(reqBytes))
 	if err != nil || resp.StatusCode != http.StatusOK {
-		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		err = ierrors.NewError().InternalServer().InnerError(err).Build()
 		return nil, err
 	}
 	defer resp.Body.Close()
