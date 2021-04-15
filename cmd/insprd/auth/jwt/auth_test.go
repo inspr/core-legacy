@@ -26,11 +26,14 @@ func TestNewJWTauth(t *testing.T) {
 	}{
 		{
 			name: "returns_JWT_auth",
-			want: &JWTauth{},
+			want: &JWTauth{
+				AuthURL: "mock_url",
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			os.Setenv("AUTH_PATH", "mock_url")
 			if got := NewJWTauth(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewJWTauth() = %v, want %v", got, tt.want)
 			}
@@ -39,6 +42,7 @@ func TestNewJWTauth(t *testing.T) {
 }
 
 func TestJWTauth_Validade(t *testing.T) {
+	os.Setenv("AUTH_PATH", "mock_url")
 	invalidToken := func() []byte {
 		token := jwt.New()
 		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
@@ -229,7 +233,7 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			os.Setenv("AUTH_PATH", ts.URL)
 			defer ts.Close()
 
-			JA := &JWTauth{}
+			JA := NewJWTauth()
 			got, err := JA.Tokenize(tt.args.load)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("JWTauth.Tokenize() error = %v, wantErr %v", err, tt.wantErr)
@@ -331,7 +335,7 @@ func TestJWTauth_Refresh(t *testing.T) {
 			os.Setenv("AUTH_PATH", ts.URL)
 			defer ts.Close()
 
-			JA := &JWTauth{}
+			JA := NewJWTauth()
 			got, err := JA.Refresh(tt.args.token)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("JWTauth.Tokenize() error = %v, wantErr %v", err, tt.wantErr)
