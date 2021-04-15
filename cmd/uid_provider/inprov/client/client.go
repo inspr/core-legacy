@@ -24,12 +24,9 @@ func NewClient() *Client {
 // Login creates a request to log in to a uid provider. It returns a signed token for
 // communicating with the insprd cluster in question.
 func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
-	type ReceivedDataLogin struct {
-		UID string
-		Pwd string
-	}
+
 	var resp string
-	err := c.rc.Send(ctx, "/login", "POST", ReceivedDataLogin{uid, pwd}, &resp)
+	err := c.rc.Send(ctx, "/login", "POST", models.ReceivedDataLogin{UID: uid, Password: pwd}, &resp)
 	if err != nil {
 		return "", err
 	}
