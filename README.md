@@ -8,7 +8,7 @@
         title="Inspr Logo"></img>
 </div>
 
-<h4 align="center">A Cloud Native Application Mesh. </h4>
+<h2 align="center">A Cloud Native Application Mesh. </h2>
 <p align="center">Describe, connect, secure, test and deploy distributed applications with little effort.</p>
 
 <br>
