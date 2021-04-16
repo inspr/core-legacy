@@ -48,7 +48,7 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 
 	// not valid token
 	if err != nil {
-		return &models.Payload{}, token, err
+		return nil, token, err
 	}
 
 	expiration, found := jwtToken.Get(jwt.ExpirationKey)
@@ -58,7 +58,7 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 	if !found || now.After(expiration.(time.Time)) {
 		newToken, err := JA.Refresh(token)
 		if err != nil {
-			return &models.Payload{},
+			return nil,
 				token,
 				ierrors.
 					NewError().
@@ -72,7 +72,7 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 	// gets payload from token
 	payload, err := auth.Desserialize(token)
 	if err != nil {
-		return &models.Payload{},
+		return nil,
 			token,
 			ierrors.
 				NewError().

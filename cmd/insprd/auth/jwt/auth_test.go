@@ -101,7 +101,7 @@ func TestJWTauth_Validate(t *testing.T) {
 		name    string
 		JA      *JWTauth
 		args    args
-		want    models.Payload
+		want    *models.Payload
 		want1   []byte
 		wantErr bool
 	}{
@@ -111,7 +111,7 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: invalidToken(),
 			},
-			want:    models.Payload{},
+			want:    nil,
 			want1:   invalidToken(),
 			wantErr: true,
 		},
@@ -121,7 +121,7 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: expiredToken(),
 			},
-			want:    models.Payload{},
+			want:    nil,
 			want1:   expiredToken(),
 			wantErr: true,
 		},
@@ -131,7 +131,7 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: nilExpiredToken(),
 			},
-			want:    models.Payload{},
+			want:    nil,
 			want1:   nilExpiredToken(),
 			wantErr: true,
 		},
@@ -141,7 +141,7 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: noPayloadToken(),
 			},
-			want:    models.Payload{},
+			want:    nil,
 			want1:   noPayloadToken(),
 			wantErr: true,
 		},
@@ -151,7 +151,7 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: fineToken(),
 			},
-			want: models.Payload{
+			want: &models.Payload{
 				UID:        "mock_UID",
 				Role:       0,
 				Scope:      []string{"mock"},
@@ -173,13 +173,25 @@ func TestJWTauth_Validate(t *testing.T) {
 				)
 				return
 			}
-			if !reflect.DeepEqual(*got, tt.want) {
-				t.Errorf(
-					"JWTauth.Validade() got = %v, want %v",
-					got,
-					tt.want,
-				)
+
+			if got == nil {
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Errorf(
+						"JWTauth.Validade() got = %v, want %v",
+						got,
+						tt.want,
+					)
+				}
+			} else {
+				if !reflect.DeepEqual(*got, *tt.want) {
+					t.Errorf(
+						"JWTauth.Validade() got = %v, want %v",
+						got,
+						tt.want,
+					)
+				}
 			}
+
 			if !reflect.DeepEqual(got1, tt.want1) {
 				t.Errorf(
 					"JWTauth.Validade() got1 = %v, want %v",
