@@ -6,11 +6,11 @@ import (
 	build "github.com/inspr/inspr/pkg/cmd"
 )
 
-var deleteUsrOptions struct {
+type deleteUsrOptionsDT struct {
 	username string
-} = struct {
-	username string
-}{}
+}
+
+var deleteUsrOptions = deleteUsrOptionsDT{}
 
 var deleteUserCmd = build.NewCmd("delete").WithDescription(
 	"Delete a user from the Inspr UID provider",
@@ -24,7 +24,9 @@ var deleteUserCmd = build.NewCmd("delete").WithDescription(
 		Value:    &deleteUsrOptions.username,
 		DefValue: "",
 	},
-}).ExactArgs(2, func(c context.Context, s []string) error {
+}).ExactArgs(2, deleteAction)
+
+func deleteAction(c context.Context, s []string) error {
 
 	return cl.DeleteUser(c, s[0], s[1], deleteUsrOptions.username)
-})
+}
