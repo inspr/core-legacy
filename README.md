@@ -1,10 +1,15 @@
-<p align="center">
+<div align="center">
     <img 
         srcset="https://storage.googleapis.com/inspr/logo.png 1x, https://storage.googleapis.com/inspr/logo%402x.png 2x, https://storage.googleapis.com/inspr/logo%403x.png 3x"
         src="https://storage.googleapis.com/inspr/logo%403x.png" 
         width="128" 
-        title="Inspr Logo">
-</p>
+        title="Inspr Logo"></img>
+</div>
+
+<h2 align="center">A Cloud Native Application Mesh. </h3>
+<h4 align="center">Describe, connect, secure, test and deploy distributed applications with little effort.</h4>
+
+<br>
 
 <p align="center">
     <a href="https://godoc.org/github.com/inspr/inspr">
@@ -12,6 +17,9 @@
     </a>
     <a href="https://goreportcard.com/badge/github.com/inspr/inspr">
         <img src="https://goreportcard.com/badge/github.com/inspr/inspr">
+    </a>
+    <a href="https://pkg.go.dev/github.com/inspr/inspr">
+        <img src="https://img.shields.io/static/v1?label=godoc&message=reference&color=blue">
     </a>
     <a href="https://codecov.io/gh/inspr/inspr">
         <img src="https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG&">
@@ -25,6 +33,9 @@
     <a href="https://discord.gg/tmp2564a54">
         <img src="https://img.shields.io/discord/449569975888248832.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2">
     </a>
+    
+
+    https://pkg.go.dev/github.com/inspr/inspr
 </p>
 
 <!-- <p align="center">
@@ -33,8 +44,10 @@
     </a>
 </p> -->
 
+
 ---
 
+<br>
 Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
 
 - :muscle: Robust: built on top of golang, kubernetes and other state of the art technologies
