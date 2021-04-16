@@ -118,6 +118,7 @@ func TestServer_Run(t *testing.T) {
 
 func TestServer_Cancel(t *testing.T) {
 	env.SetMockEnv()
+	defer env.UnsetMockEnv()
 
 	t.Run("run_test/timeout", func(t *testing.T) {
 		// SERVER
@@ -148,5 +149,4 @@ func TestServer_Cancel(t *testing.T) {
 			}
 		}()
 	})
-	env.UnsetMockEnv()
 }

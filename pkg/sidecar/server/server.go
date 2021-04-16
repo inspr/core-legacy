@@ -81,12 +81,11 @@ func (s *Server) Run(ctx context.Context) {
 
 	log.Println("gracefully shutting down...")
 
-	ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
+	ctxShutdown, cancel := context.WithDeadline(
+		context.Background(),
+		time.Now().Add(time.Second*10),
+	)
 	defer cancel()
-
-	if err = server.Shutdown(ctxShutdown); err != nil {
-		log.Fatal("error shutting down server")
-	}
 
 	err = os.RemoveAll(s.addr)
 	if err != nil {
@@ -94,7 +93,7 @@ func (s *Server) Run(ctx context.Context) {
 	}
 
 	log.Println("server shutdown complete")
-	if err == http.ErrServerClosed {
-		err = nil
+	if err = server.Shutdown(ctxShutdown); err != nil {
+		log.Fatal("error shutting down server")
 	}
 }
