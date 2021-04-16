@@ -18,7 +18,7 @@ func (h *Handler) TokenHandler() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		token, err := h.auth.Tokenize(load)
+		token, err := h.Auth.Tokenize(load)
 		if err != nil {
 			rest.ERROR(w, err)
 			return
