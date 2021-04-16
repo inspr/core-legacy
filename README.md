@@ -1,3 +1,5 @@
+<br>
+<br>
 <div align="center">
     <img 
         srcset="https://storage.googleapis.com/inspr/logo.png 1x, https://storage.googleapis.com/inspr/logo%402x.png 2x, https://storage.googleapis.com/inspr/logo%403x.png 3x"
@@ -6,8 +8,8 @@
         title="Inspr Logo"></img>
 </div>
 
-<h3 align="center">A Cloud Native Application Mesh. </h3>
-<h4 align="center">Describe, connect, secure, test and deploy distributed applications with little effort.</h4>
+<h4 align="center">A Cloud Native Application Mesh. </h4>
+<p align="center">Describe, connect, secure, test and deploy distributed applications with little effort.</p>
 
 <br>
 
