@@ -10,8 +10,8 @@ import (
 	"reflect"
 	"testing"
 
-	authentication "github.com/inspr/inspr/cmd/insprd/auth"
-	authMock "github.com/inspr/inspr/cmd/insprd/auth/mocks"
+	"github.com/inspr/inspr/pkg/auth"
+	authMock "github.com/inspr/inspr/pkg/auth/mocks"
 	"github.com/inspr/inspr/pkg/ierrors"
 )
 
@@ -63,7 +63,7 @@ func TestHandler_JSON(t *testing.T) {
 
 func TestHandler_Validate(t *testing.T) {
 	type args struct {
-		auth        authentication.Auth
+		auth        auth.Auth
 		headerValue string
 		scope       string
 	}

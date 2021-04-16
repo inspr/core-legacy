@@ -1,4 +1,4 @@
 **/*
-!cmd/insprd
+!cmd
 !pkg
 !go.mod

@@ -36,7 +36,7 @@ func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
 	}
 }
 
-// Validade is a wrapper that checks the token of the http request and if it's
+// Validate is a wrapper that checks the token of the http request and if it's
 // valid, proceeds to execute the request and if it isn't valid returns an error
 func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 
