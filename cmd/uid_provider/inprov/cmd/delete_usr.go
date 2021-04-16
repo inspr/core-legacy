@@ -16,7 +16,7 @@ var deleteUserCmd = build.NewCmd("delete").WithDescription(
 	"Delete a user from the Inspr UID provider",
 ).WithExample(
 	"delete a user given credentials",
-	"inprov login --username userToBeDeleted username password",
+	"inprov delete --username userToBeDeleted username password",
 ).WithFlags([]*build.Flag{
 	{
 		Name:     "username",
