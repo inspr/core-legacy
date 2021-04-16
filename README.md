@@ -11,7 +11,6 @@
 <h2 align="center">A Cloud Native Application Mesh. </h2>
 <p align="center">Describe, connect, secure, test and deploy distributed applications with little effort.</p>
 
-<br>
 
 <p align="center">
     <a href="https://godoc.org/github.com/inspr/inspr">
