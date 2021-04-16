@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/inspr/inspr/cmd/insprd/api/models"
+	"github.com/inspr/inspr/cmd/insprd/auth"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils"
@@ -272,4 +273,9 @@ func (handler *Handler) deleteApp(app *meta.App) error {
 		return &errs
 	}
 	return nil
+}
+
+// GetAuth returns the handler's Auth interface
+func (handler *Handler) GetAuth() auth.Auth {
+	return handler.Auth
 }
