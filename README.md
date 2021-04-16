@@ -1,7 +1,7 @@
 <p align="center">
     <img 
-        srcset="./docs/img/logo.png 1x, ./docs/img/logo@2x.png 2x, ./docs/img/logo@3x.png 3x"
-        src="./docs/img/logo@3x.png" 
+        srcset="https://storage.googleapis.com/inspr/logo.png 1x, https://storage.googleapis.com/inspr/logo%402x.png 2x, https://storage.googleapis.com/inspr/logo%403x.png 3x"
+        src="https://storage.googleapis.com/inspr/logo%403x.png" 
         width="128" 
         title="Inspr Logo">
 </p>
