@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/cmd/insprd/api/models"
+	authmock "github.com/inspr/inspr/cmd/insprd/auth/mocks"
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/memory/fake"
 	"github.com/inspr/inspr/cmd/insprd/operators"
@@ -39,67 +40,67 @@ func channelTypeDICases(funcName string) []channelTypeAPITest {
 	return []channelTypeAPITest{
 		{
 			name: "successful_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(errors.New("test_error")), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(errors.New("test_error")), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "not_found_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().NotFound().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().NotFound().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusNotFound},
 		},
 		{
 			name: "already_exists_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().AlreadyExists().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().AlreadyExists().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusConflict},
 		},
 		{
 			name: "internal_server_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InternalServer().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InternalServer().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "invalid_name_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidName().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidName().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_app_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidApp().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidApp().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannel().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannel().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_type_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "bad_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().BadRequest().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().BadRequest().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTDI},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -120,67 +121,67 @@ func channelTypeQueryDICases(funcName string) []channelTypeAPITest {
 	return []channelTypeAPITest{
 		{
 			name: "successful_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(errors.New("test_error")), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(errors.New("test_error")), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "not_found_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().NotFound().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().NotFound().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusNotFound},
 		},
 		{
 			name: "already_exists_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().AlreadyExists().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().AlreadyExists().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusConflict},
 		},
 		{
 			name: "internal_server_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InternalServer().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InternalServer().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "invalid_name_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidName().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidName().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_app_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidApp().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidApp().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannel().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannel().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_type_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "bad_request_" + funcName,
-			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().BadRequest().Build()), ofake.NewFakeOperator()).NewChannelTypeHandler(),
+			cth:  NewHandler(fake.MockMemoryManager(ierrors.NewError().BadRequest().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewChannelTypeHandler(),
 			send: sendInRequest{body: parsedCTQDI},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -191,6 +192,7 @@ func TestNewChannelTypeHandler(t *testing.T) {
 	h := NewHandler(
 		fake.MockMemoryManager(nil),
 		ofake.NewFakeOperator(),
+		authmock.NewMockAuth(nil),
 	)
 	type args struct {
 		memManager memory.Manager
