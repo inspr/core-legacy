@@ -37,9 +37,9 @@ var loginCmd = build.NewCmd("login").WithDescription(
 		Value:    &loginOptions.stdout,
 		DefValue: false,
 	},
-}).ExactArgs(2, login)
+}).ExactArgs(2, loginAction)
 
-func login(c context.Context, s []string) error {
+func loginAction(c context.Context, s []string) error {
 
 	var err error
 	var output io.Writer
@@ -52,10 +52,10 @@ func login(c context.Context, s []string) error {
 			return err
 		}
 	}
-	return doStuff(c, s[0], s[1], output)
+	return login(c, s[0], s[1], output)
 }
 
-func doStuff(ctx context.Context, login, password string, output io.Writer) error {
+func login(ctx context.Context, login, password string, output io.Writer) error {
 	token, err := cl.Login(ctx, login, password)
 	if err != nil {
 		return err

@@ -60,7 +60,7 @@ func Test_doStuff(t *testing.T) {
 				},
 			}
 			output := &bytes.Buffer{}
-			if err := doStuff(tt.args.ctx, tt.args.login, tt.args.password, output); (err != nil) != tt.wantErr {
+			if err := login(tt.args.ctx, tt.args.login, tt.args.password, output); (err != nil) != tt.wantErr {
 				t.Errorf("doStuff() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
