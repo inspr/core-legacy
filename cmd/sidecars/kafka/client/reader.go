@@ -86,7 +86,7 @@ func (reader *Reader) ReadMessage(channel string) (models.BrokerData, error) {
 
 // Commit commits the last message read by Reader
 func (reader *Reader) Commit(channel string) error {
-	logger.Info("commiting to channel", zap.String("channel", channel))
+	logger.Info("committing to channel", zap.String("channel", channel))
 	_, errCommit := reader.consumers[channel].Commit()
 	if errCommit != nil {
 		return ierrors.

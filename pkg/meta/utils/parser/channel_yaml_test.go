@@ -69,7 +69,7 @@ func TestIncorrectChannelYaml(t *testing.T) {
 	})
 }
 
-func TestNonExistantChannelFile(t *testing.T) {
+func TestNonExistentChannelFile(t *testing.T) {
 	// reads file created
 	bytes := []byte{1}
 	_, err := YamlToChannel(bytes)

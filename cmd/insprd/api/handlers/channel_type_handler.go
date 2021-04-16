@@ -62,7 +62,7 @@ func (cth *ChannelTypeHandler) HandleCreate() rest.Handler {
 		}
 
 		if !data.DryRun {
-			logger.Info("commiting Channel Type create changes")
+			logger.Info("committing Channel Type create changes")
 			defer cth.Memory.Commit()
 		} else {
 			logger.Info("canceling Channel Type create changes")
@@ -159,7 +159,7 @@ func (cth *ChannelTypeHandler) HandleUpdate() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting Channel Type update changes")
+			logger.Info("committing Channel Type update changes")
 			defer cth.Memory.Commit()
 		} else {
 			logger.Info("canceling Channel Type update changes")
@@ -210,7 +210,7 @@ func (cth *ChannelTypeHandler) HandleDelete() rest.Handler {
 		}
 
 		if !data.DryRun {
-			logger.Info("commiting Channel Type delete changes")
+			logger.Info("committing Channel Type delete changes")
 			defer cth.Memory.Commit()
 		} else {
 			logger.Info("canceling Channel Type delete changes")

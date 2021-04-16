@@ -19,7 +19,7 @@ This section will cover the basic structure for the application. Divided in laye
 ![Pub/Sub](./img/pubsub.jpg)
 
 1. Publish:
-   This layer is responsible for receiving messages from the user, these will be sent to the final clients. This is acheived by the endpoint `/publish`, served by a very simple REST API. Messages received via the endpoint are configured and sent, using the Channel we will be creating for the application, to the subscribers through the broker.
+   This layer is responsible for receiving messages from the user, these will be sent to the final clients. This is achieved by the endpoint `/publish`, served by a very simple REST API. Messages received via the endpoint are configured and sent, using the Channel we will be creating for the application, to the subscribers through the broker.
 
 2. Broker:
    This layer is handled for us by inspr! Basically it receives messages on a Channel, stores them in a queue, and makes a copy of each message available for every reader of said Channel.
@@ -174,7 +174,7 @@ These examples were implemented using webhooks that receive JSON objects with sp
        AvatarURL string `json:"avatar_url"`
        TTS       bool   `json:"tts"`
        File      []byte `json:"file"`
-       Embeded   []byte `json:"embeds"`
+       Embedded   []byte `json:"embeds"`
    }
 
    var webhook = <your webhook link>
@@ -219,7 +219,7 @@ These examples were implemented using webhooks that receive JSON objects with sp
 
 ## Connection
 
-Hosting a server with an entry point on your cluster doesn't make it so that you can access it remotely, to do so you must create a kubernetes ingress point and a service. Luckily these are easy to make and there is an example right here! To connect your application to these entrypoints you sould remember that on the cluster an app's name is the full path to the app, separated by hyphens.
+Hosting a server with an entry point on your cluster doesn't make it so that you can access it remotely, to do so you must create a kubernetes ingress point and a service. Luckily these are easy to make and there is an example right here! To connect your application to these entrypoints you could remember that on the cluster an app's name is the full path to the app, separated by hyphens.
 
 SVC:
 
