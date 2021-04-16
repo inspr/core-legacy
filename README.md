@@ -6,7 +6,7 @@
         title="Inspr Logo"></img>
 </div>
 
-<h2 align="center">A Cloud Native Application Mesh. </h3>
+<h3 align="center">A Cloud Native Application Mesh. </h3>
 <h4 align="center">Describe, connect, secure, test and deploy distributed applications with little effort.</h4>
 
 <br>
@@ -33,9 +33,6 @@
     <a href="https://discord.gg/tmp2564a54">
         <img src="https://img.shields.io/discord/449569975888248832.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2">
     </a>
-    
-
-    https://pkg.go.dev/github.com/inspr/inspr
 </p>
 
 <!-- <p align="center">
