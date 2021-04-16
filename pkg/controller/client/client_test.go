@@ -156,3 +156,40 @@ func TestClient_ChannelTypes(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_Alias(t *testing.T) {
+	check := func(x interface{}) bool {
+		// Declare a type object representing ChannelInterface
+		ct := reflect.TypeOf((*controller.AliasInterface)(nil)).Elem()
+		// see if implements the channelInterface
+		return reflect.PtrTo(reflect.TypeOf(x)).Implements(ct)
+	}
+	type fields struct {
+		rc *request.Client
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   controller.AliasInterface
+	}{
+		{
+			name:   "alias_creation",
+			fields: fields{rc: request.NewJSONClient("mock")},
+			want:   mocks.NewAliasMock(nil),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := NewControllerClient(tt.fields.rc)
+			got := c.Alias()
+
+			if check(got) != check(tt.want) {
+				t.Errorf(
+					"Client.Alias() = %v, want %v",
+					check(got),
+					check(tt.want),
+				)
+			}
+		})
+	}
+}
