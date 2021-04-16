@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/inspr/inspr/cmd/insprd/auth"
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/operators"
 	"go.uber.org/zap"
@@ -25,6 +26,7 @@ type Server struct {
 	Mux           *http.ServeMux
 	MemoryManager memory.Manager
 	op            operators.OperatorInterface
+	auth          auth.Auth
 }
 
 // Init - configures the server

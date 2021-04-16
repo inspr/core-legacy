@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	authmock "github.com/inspr/inspr/cmd/insprd/auth/mocks"
 	"github.com/inspr/inspr/cmd/insprd/memory/fake"
 )
 
@@ -18,6 +19,7 @@ func TestServer_initRoutes(t *testing.T) {
 	testServer := &Server{
 		Mux:           http.NewServeMux(),
 		MemoryManager: fake.MockMemoryManager(nil),
+		auth:          authmock.NewMockAuth(nil),
 	}
 	testServer.initRoutes()
 	defaultMethods := [...]string{
@@ -34,40 +36,40 @@ func TestServer_initRoutes(t *testing.T) {
 		{
 			name: "apps",
 			want: [...]int{
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
+				http.StatusForbidden,
+				http.StatusForbidden,
+				http.StatusForbidden,
+				http.StatusForbidden,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channels",
 			want: [...]int{
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
+				http.StatusForbidden,
+				http.StatusForbidden,
+				http.StatusForbidden,
+				http.StatusForbidden,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channeltypes",
 			want: [...]int{
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
+				http.StatusForbidden,
+				http.StatusForbidden,
+				http.StatusForbidden,
+				http.StatusForbidden,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "alias",
 			want: [...]int{
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
-				http.StatusInternalServerError,
+				http.StatusForbidden,
+				http.StatusForbidden,
+				http.StatusForbidden,
+				http.StatusForbidden,
 				http.StatusMethodNotAllowed,
 			},
 		},
@@ -89,12 +91,13 @@ func TestServer_initRoutes(t *testing.T) {
 			client := ts.Client()
 			for i, statusCodeResult := range tt.want {
 				reqURL := ts.URL + "/" + tt.name
-
+				// text := "{\"scope\":\"scope_1\"}"
+				// bytes.NewBuffer([]byte(text))
 				req, err := http.NewRequest(defaultMethods[i], reqURL, nil)
 				if err != nil {
 					t.Error("error creating request")
 				}
-
+				req.Header.Add("Authorization", "Bearer mock_tonken")
 				res, _ := client.Do(req)
 				if res.StatusCode != statusCodeResult {
 					t.Errorf("Method %v in url %v => got %v, wanted %v",
