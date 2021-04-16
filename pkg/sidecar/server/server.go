@@ -83,7 +83,7 @@ func (s *Server) Run(ctx context.Context) {
 
 	ctxShutdown, cancel := context.WithDeadline(
 		context.Background(),
-		time.Now().Add(time.Second*10),
+		time.Now().Add(time.Second*5),
 	)
 	defer cancel()
 
