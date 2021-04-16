@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
