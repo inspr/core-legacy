@@ -5,8 +5,6 @@ package jwtauth
 import (
 	"context"
 	"crypto/rsa"
-	"encoding/json"
-	"errors"
 	"net/http"
 	"os"
 	"time"
@@ -72,25 +70,18 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 	}
 
 	// gets payload from token
-	payloadData, found := jwtToken.Get("payload")
-	if !found {
+	payload, err := auth.Desserialize(token)
+	if err != nil {
 		return &models.Payload{},
 			token,
-			errors.New("payload not found")
+			ierrors.
+				NewError().
+				InternalServer().
+				Message("error desserializing the payload").
+				Build()
 	}
 
-	jwtJSON, err := json.Marshal(payloadData)
-	if err != nil {
-		return &models.Payload{}, token, err
-	}
-
-	var payload models.Payload
-	err = json.Unmarshal(jwtJSON, &payload)
-	if err != nil {
-		return &models.Payload{}, token, err
-	}
-
-	return &payload, token, nil
+	return payload, token, nil
 }
 
 // Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider
