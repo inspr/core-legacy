@@ -15,7 +15,7 @@ func NewMockAuth(err error) *MockAuth {
 // Validade - mock of the validate function
 func (ma *MockAuth) Validate(token []byte) (*models.Payload, []byte, error) {
 	if ma.Err != nil {
-		return &models.Payload{}, []byte{}, ma.Err
+		return nil, []byte{}, ma.Err
 	}
 	return &models.Payload{
 		UID:        "uid",
