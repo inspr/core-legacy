@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/inspr/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/environment"
 	"go.uber.org/zap"
 )
 

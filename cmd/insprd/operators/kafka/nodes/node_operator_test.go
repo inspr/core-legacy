@@ -7,10 +7,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"k8s.io/client-go/kubernetes"

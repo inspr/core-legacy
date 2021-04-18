@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
 	"go.uber.org/zap"
 )
 

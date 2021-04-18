@@ -5,11 +5,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/meta"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/pkg/meta"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func getMockApp() *meta.App {

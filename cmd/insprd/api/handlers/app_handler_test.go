@@ -9,12 +9,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/api/models"
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/fake"
-	ofake "github.com/inspr/inspr/cmd/insprd/operators/fake"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/api/models"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	ofake "inspr.dev/inspr/cmd/insprd/operators/fake"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // sendInRequest is a struct used for all the testing files in this package

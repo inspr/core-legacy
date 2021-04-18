@@ -3,10 +3,10 @@ package tree
 import (
 	"sync"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 	"go.uber.org/zap"
 )
 

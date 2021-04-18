@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 
-	handler "github.com/inspr/inspr/cmd/insprd/api/handlers"
+	handler "inspr.dev/inspr/cmd/insprd/api/handlers"
 )
 
 func (s *Server) initRoutes() {

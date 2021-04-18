@@ -3,7 +3,7 @@ package sidecarserv
 import (
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"inspr.dev/inspr/pkg/sidecar/models"
 )
 
 // MockServer returns a mocked server to do tests

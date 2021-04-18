@@ -10,9 +10,9 @@ import (
 	"reflect"
 	"testing"
 
-	env "github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	env "inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/sidecar/models"
 )
 
 // sendInRequest is a struct used for all the testing files in this package

@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 func TestMemoryManager_Alias(t *testing.T) {

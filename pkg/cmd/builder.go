@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

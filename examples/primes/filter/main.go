@@ -7,8 +7,8 @@ import (
 	"math/rand"
 	"time"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecar/models"
 )
 
 func main() {

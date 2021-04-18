@@ -1,10 +1,10 @@
 package kafka
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	"github.com/inspr/inspr/cmd/insprd/operators/kafka/channels"
-	"github.com/inspr/inspr/cmd/insprd/operators/kafka/nodes"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/cmd/insprd/operators/kafka/channels"
+	"inspr.dev/inspr/cmd/insprd/operators/kafka/nodes"
 )
 
 // Operator is an operator for creating channels and nodes inside kubernetes

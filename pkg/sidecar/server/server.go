@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/sidecar/models"
 )
 
 // Server is a struct that contains the variables necessary

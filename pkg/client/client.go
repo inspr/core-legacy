@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecar/models"
-	"github.com/inspr/inspr/pkg/sidecar/transports"
+	"inspr.dev/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/sidecar/models"
+	"inspr.dev/inspr/pkg/sidecar/transports"
 )
 
 // Client is the struct which implements the methods of AppClient interface

@@ -7,11 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
-	"github.com/inspr/inspr/pkg/cmd"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
+	cliutils "inspr.dev/inspr/cmd/inspr/cli/utils"
+	"inspr.dev/inspr/pkg/cmd"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	utils "inspr.dev/inspr/pkg/meta/utils/parser"
 )
 
 // NewApplyChannelType receives a controller ChannelTypeInterface and calls it's methods

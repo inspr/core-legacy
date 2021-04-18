@@ -3,9 +3,9 @@ package mocks
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/controller"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 // ChannelTypeMock mock structure for the operations of the controller.ChannelTypes()

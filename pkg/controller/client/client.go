@@ -1,8 +1,8 @@
 package client
 
 import (
-	"github.com/inspr/inspr/pkg/controller"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // Client implements communication with the Insprd

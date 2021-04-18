@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // Send sends a request to the url specified in instantiation, with the given route and method, using

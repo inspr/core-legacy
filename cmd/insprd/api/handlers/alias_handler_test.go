@@ -9,13 +9,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/api/models"
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/fake"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	ofake "github.com/inspr/inspr/cmd/insprd/operators/fake"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/api/models"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	ofake "inspr.dev/inspr/cmd/insprd/operators/fake"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 type AliasAPITest struct {

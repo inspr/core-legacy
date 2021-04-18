@@ -6,11 +6,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
+	cliutils "inspr.dev/inspr/cmd/inspr/cli/utils"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/utils"
 )
 
 // NewDeleteCmd creates delete command for Inspr CLI

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestIsInChannelBoundary(t *testing.T) {

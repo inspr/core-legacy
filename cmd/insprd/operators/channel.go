@@ -3,7 +3,7 @@ package operators
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // ChannelOperatorInterface is responsible for handling the following methods

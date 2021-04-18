@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/environment"
 	"github.com/linkedin/goavro"
 )
 

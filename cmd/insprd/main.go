@@ -3,11 +3,11 @@ package main
 import (
 	"os"
 
-	"github.com/inspr/inspr/cmd/insprd/api"
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	kafka "github.com/inspr/inspr/cmd/insprd/operators/kafka"
+	"inspr.dev/inspr/cmd/insprd/api"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	kafka "inspr.dev/inspr/cmd/insprd/operators/kafka"
 )
 
 func main() {

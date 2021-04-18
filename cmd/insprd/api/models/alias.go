@@ -1,6 +1,6 @@
 package models
 
-import "github.com/inspr/inspr/pkg/meta"
+import "inspr.dev/inspr/pkg/meta"
 
 // AliasDI - Data Input(DI) format for requests that pass the alias data
 type AliasDI struct {

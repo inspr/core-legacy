@@ -3,7 +3,7 @@ package dappclient
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"inspr.dev/inspr/pkg/sidecar/models"
 )
 
 // AppClient defines an interface and its methods for an dApp Client

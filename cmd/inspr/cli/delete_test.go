@@ -10,12 +10,12 @@ import (
 	"reflect"
 	"testing"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
-	"github.com/inspr/inspr/cmd/insprd/api/models"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/rest"
+	cliutils "inspr.dev/inspr/cmd/inspr/cli/utils"
+	"inspr.dev/inspr/cmd/insprd/api/models"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/rest"
 	"github.com/spf13/cobra"
 )
 

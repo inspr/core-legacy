@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
 	yaml "gopkg.in/yaml.v2"
 )
 

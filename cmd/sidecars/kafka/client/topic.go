@@ -3,9 +3,9 @@ package kafkasc
 import (
 	"errors"
 
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/sidecar/models"
 	"github.com/linkedin/goavro"
 	"go.uber.org/zap"
 )

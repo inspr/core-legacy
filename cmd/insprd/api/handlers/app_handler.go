@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/cmd/insprd/api/models"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/rest"
+	"inspr.dev/inspr/cmd/insprd/api/models"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/rest"
 	"go.uber.org/zap"
 )
 

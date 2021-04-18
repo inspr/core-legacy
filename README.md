@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-    <a href="https://godoc.org/github.com/inspr/inspr">
-        <img src="https://godoc.org/github.com/inspr/inspr?status.svg">
+    <a href="https://godoc.org/inspr.dev/inspr">
+        <img src="https://godoc.org/inspr.dev/inspr?status.svg">
     </a>
-    <a href="https://goreportcard.com/badge/github.com/inspr/inspr">
-        <img src="https://goreportcard.com/badge/github.com/inspr/inspr">
+    <a href="https://goreportcard.com/badge/inspr.dev/inspr">
+        <img src="https://goreportcard.com/badge/inspr.dev/inspr">
     </a>
     <a href="https://codecov.io/gh/inspr/inspr">
         <img src="https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG&">
@@ -76,7 +76,7 @@ They are included in the `build/helm` folder and can be edited for further refin
 
 ### CLI
 
-To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.
+To install the CLI get the latest release for your architecture from the [`releases`](https://inspr.dev/inspr/releases) page and add it to your PATH.
 TODO: Add link to the install script for the CLI.
 
 

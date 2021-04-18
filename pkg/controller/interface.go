@@ -3,8 +3,8 @@ package controller
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 // ChannelInterface is the interface that allows to obtain

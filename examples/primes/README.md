@@ -13,7 +13,7 @@ This folder contains the files necessary to run the primes example in your clust
 Make sure the latest Inspr CLI version is installed.
 
 - To get the latest version, run the following command:  
-  `go install github.com/inspr/inspr/cmd/inspr`
+  `go install inspr.dev/inspr/cmd/inspr`
 
 Before running the inspr command to create the app in your cluster be sure to set the configuration beforehand.
 

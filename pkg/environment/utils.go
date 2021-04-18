@@ -4,8 +4,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // IsInChannelBoundary - checks if given channel exists in given boundary

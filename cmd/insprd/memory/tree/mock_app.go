@@ -1,6 +1,6 @@
 package tree
 
-import "github.com/inspr/inspr/pkg/meta"
+import "inspr.dev/inspr/pkg/meta"
 
 // MockAppManager to Mock App Manager
 type MockAppManager struct {

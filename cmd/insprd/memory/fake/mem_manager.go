@@ -1,10 +1,10 @@
 package fake
 
 import (
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // MemManager is the api struct with the necessary implementations

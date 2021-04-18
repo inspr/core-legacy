@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/operators"
 	"go.uber.org/zap"
 )
 
