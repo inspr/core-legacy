@@ -5,7 +5,7 @@ This document gives a brief introduction to Inspr's main structures, on how they
 A dApp is the base without which none of the other structures would exist, it contains all other structures inside of it. That is to say, a dApp is the base structure of Inspr, and inside of it there can be created Channels, Channel Types and even other dApps!  
 A dApp can also be a Node, which is basically the same as a normal dApp but has slightly different functionalities, which will be discussed ahead.
 
-![dapp](img/dapp-struct.jpg)  
+![dapp](img/dapp-struct.png)
 
 ### It is relevant to point out that:
 - All structures created by the user are (directly or not) inside of a **root dApp**.  
@@ -13,7 +13,7 @@ A dApp can also be a Node, which is basically the same as a normal dApp but has 
 - Boundary defines by which Channels a dApp exchanges information with it's parent dApp.
 - The global dApps organization is a tree-like structure:  
 
-![tree](img/dapp-tree.jpg)  
+![tree](img/dapp-tree.png)  
 
 ## What are Nodes?
 Nodes are central control structures that have unique characteristics and generate/process the information that is used throughout the Inspr environment.  
@@ -33,7 +33,7 @@ As described previously in "What are dApps?", a dApp that is a Node can't have c
 Channels are the structures that allow dApps and Nodes to exchange information between each other.  
 A dApp/Node inputs and outputs are defined by it's Boundary. The Boundary, on the other hand, references a parent dApp's Channel (or Alias, which will be described ahead).
 
-![channel](img/chan-func.jpg)  
+![channel](img/chan-func.png)  
 
 Channels are created to receive and send a specific kind of information. This specification is defined by a **Channel's Type**, which is a reference to a Channel Type structure defined in the same context (in the same dApp) as the Channel. In other words:
 - A Channel only carries a specific kind of data (such as *int*, *string*, or an object defined by the user).
@@ -62,7 +62,7 @@ In Inspr, each Node has a **Sidecar** attached to it. A Sidecar is the structure
 
 ![sidecar](img/sidecar.jpg)  
 
-As it's shown above, dApp/Node1 uses the Message Broker X, so the Sidecar attached to the Node is the Sidecar for Broker X. If the user decides to change the Broker to Message Broker Y, all that's needed to be done is replace the Sidecar X for Broker's Y Sidecar.  
+As it's shown above, dApp/Node1 uses the Message Broker X, so the Sidecar attached to the Node is the Sidecar for Broker X. If the user decides to change the Broker to Message Broker Y, all that's needed to be done is replace the Sidecar X for Broker's Y Sidecar.
 
 The overall communication in between Nodes can be seen as going up or down the tree of dApps:
 
