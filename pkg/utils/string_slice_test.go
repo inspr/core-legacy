@@ -47,7 +47,7 @@ func TestIndex(t *testing.T) {
 			name: "It should return -1",
 			args: args{
 				vs: []string{"a", "b", "c"},
-				t:  "non_existant",
+				t:  "non_existent",
 			},
 			want: -1,
 		},
@@ -279,7 +279,7 @@ func TestStringArray_Contains(t *testing.T) {
 			name: "check_if_stringArray_contain_item_expect_false",
 			c:    StringArray{"hello", "world", "mock"},
 			args: args{
-				item: "non_existant",
+				item: "non_existent",
 			},
 			want: false,
 		},

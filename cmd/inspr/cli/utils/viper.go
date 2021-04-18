@@ -110,7 +110,7 @@ func ExistsKey(key string) bool {
 	return viper.IsSet(key)
 }
 
-// ExistingKeys - returns to the user all availible keys in viper's configs.
+// ExistingKeys - returns to the user all available keys in viper's configs.
 func ExistingKeys() []string {
 	return viper.GetViper().AllKeys()
 }

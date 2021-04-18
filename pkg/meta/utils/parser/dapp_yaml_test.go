@@ -69,7 +69,7 @@ func TestIncorrectDAppYaml(t *testing.T) {
 	})
 }
 
-func TestNonExistantDAppFile(t *testing.T) {
+func TestNonExistentDAppFile(t *testing.T) {
 	// reads file created
 	bytes := []byte{1}
 	_, err := YamlToApp(bytes)

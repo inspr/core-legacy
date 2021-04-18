@@ -71,7 +71,7 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting Channel create changes")
+			logger.Info("committing Channel create changes")
 			defer ch.Memory.Commit()
 		} else {
 			logger.Info("cancelling Channel create changes")
@@ -168,7 +168,7 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting Channel update changes")
+			logger.Info("committing Channel update changes")
 			defer ch.Memory.Commit()
 		} else {
 			logger.Info("cancelling Channel update changes")
@@ -229,7 +229,7 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting Channel create changes")
+			logger.Info("committing Channel create changes")
 			defer ch.Memory.Commit()
 		} else {
 			logger.Info("cancelling Channel create changes")

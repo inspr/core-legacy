@@ -33,7 +33,7 @@ func (b *ErrBuilder) Build() *InsprError {
 }
 
 /*
-From this point foward are the functions that uses the constants ierror values, these are merely functions that simplyfy the process of specifying the current
+From this point forward are the functions that uses the constants ierror values, these are merely functions that simplyfy the process of specifying the current
 type of error.
 
 Instead of using builder.SetErrorCode(ierrors.NotFound), one could simply use

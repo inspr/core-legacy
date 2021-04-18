@@ -17,7 +17,7 @@ type discordMessage struct {
 	AvatarURL string `json:"avatar_url"`
 	TTS       bool   `json:"tts"`
 	File      []byte `json:"file"`
-	Embeded   []byte `json:"embeds"`
+	Embedded   []byte `json:"embeds"`
 }
 
 var webhook = "https://discord.com/api/webhooks/823903452475162666/o9aKLMVOb9-ZhfDD7RJ84OCW6WgU2PQnsEj0CzPgFzKC1icqgqWqF8LZxHSFXEzH1NED"

@@ -69,7 +69,7 @@ The overall communication in between Nodes can be seen as going up or down the t
 ![node-communication](img/node-comm.jpg)
 
 ## What are Aliases?
-As shown in the image above, Nodes communicate with each other throught it's parent dApp Channels. This implies that the communication is one-layered only, because the parent dApp, by definition, isn't a Node and therefore isn't able to send or receive messages (it only defines where it's child Nodes can read and write from):
+As shown in the image above, Nodes communicate with each other through its parent dApp Channels. This implies that the communication is one-layered only, because the parent dApp, by definition, isn't a Node and therefore isn't able to send or receive messages (it only defines where it's child Nodes can read and write from):
 
 ![without-alias](img/no-alias.jpg)  
 

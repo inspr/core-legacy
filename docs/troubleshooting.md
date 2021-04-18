@@ -8,7 +8,7 @@
 ## My dApp only reads one message from a Channel
 
 - Check if there is no type conflict between the dApp and the Channel
-- Check if you are commiting the message after reading it
+- Check if you are committing the message after reading it
 - Check if your dApp is reading messages continuously
 
 ## I can't apply a folder because the CLI complains that there is no Channel named X, when it is defined inside the folder

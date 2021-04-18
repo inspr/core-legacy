@@ -108,7 +108,7 @@ func Test_isYaml(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "Given file is another extention",
+			name: "Given file is another extension",
 			args: args{
 				file: "itsNotAYaml.txt",
 			},
