@@ -1,7 +1,7 @@
 <p align="center">
     <img 
-        srcset="./docs/img/logo.png 1x, ./docs/img/logo@2x.png 2x, ./docs/img/logo@3x.png 3x"
-        src="./docs/img/logo@3x.png" 
+        srcset="https://storage.googleapis.com/inspr/logo.png 1x, https://storage.googleapis.com/inspr/logo%402x.png 2x, https://storage.googleapis.com/inspr/logo%403x.png 3x"
+        src="https://storage.googleapis.com/inspr/logo%403x.png" 
         width="128" 
         title="Inspr Logo">
 </p>
@@ -22,7 +22,7 @@
     <a href="http://makeapullrequest.com">
         <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
     </a>
-    <a href="https://discord.gg/tmp2564a54">
+    <a href="https://discord.gg/RZmZG4auJy">
         <img src="https://img.shields.io/discord/449569975888248832.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2">
     </a>
 </p>
@@ -95,10 +95,11 @@ To contribute, please check out our [guide](CONTRIBUTING.md).
 
 ## 📄 License
 
-- Inspr is licenced under MIT [license](LICENSE.md).
+- Inspr is licenced under MIT [license](LICENSE).
 - Inspr documentation is Creative Commons licensed, as found in the [license-docs](LICENSE-docs) file.
 
 ## 📣 Contact
 
 To contact us, please join our [Discord community](https://discord.gg/tmp2564a54).
+Aditionally we are at [Reddit](https://reddit.com/r/inspr)
 

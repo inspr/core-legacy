@@ -22,7 +22,7 @@ func NewConfigChangeCmd() *cobra.Command {
 		ExactArgs(2, doConfigChange)
 }
 
-// NewListConfig - config subcommand that shows all existant variables in the config
+// NewListConfig - config subcommand that shows all existent variables in the config
 func NewListConfig() *cobra.Command {
 	return cmd.NewCmd("list").
 		WithDescription("See the list of configuration variables and their current values").

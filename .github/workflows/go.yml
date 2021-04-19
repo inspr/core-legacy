@@ -3,7 +3,7 @@ name: Test and coverage
 on: [push, pull_request]
 
 jobs:
-  buid-cli:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -12,8 +12,12 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: "^1.16.0"
-      - name: Build CLI
-        run: bash .github/scripts/buildcli.sh
+      - name: Download golint
+        run: go get -u golang.org/x/lint/golint
+      - name: Lint packages
+        run: golint -set_exit_status ./... 
+      
+
 
   coverage:
     runs-on: ubuntu-latest

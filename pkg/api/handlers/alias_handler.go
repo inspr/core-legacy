@@ -73,7 +73,7 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting Alias create changes")
+			logger.Info("committing Alias create changes")
 			defer ah.Memory.Commit()
 		} else {
 			logger.Info("cancelling Alias create changes")
@@ -172,7 +172,7 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting Alias update changes")
+			logger.Info("committing Alias update changes")
 			defer ah.Memory.Commit()
 		} else {
 			logger.Info("cancelling Alias update changes")
@@ -233,7 +233,7 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 				return
 			}
 
-			logger.Info("commiting Alias create changes")
+			logger.Info("committing Alias create changes")
 			defer ah.Memory.Commit()
 		} else {
 			logger.Info("cancelling Alias create changes")
