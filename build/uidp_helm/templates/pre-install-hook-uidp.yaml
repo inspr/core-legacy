@@ -2,8 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: pre-install-job-uidp
-  labels:
-    {{- include "UIDProvider.labels" . | nindent 4 }}
+  labels: {{- include "UIDProvider.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-install
     "helm.sh/hook-delete-policy": hook-succeeded
@@ -12,11 +11,13 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-      - name: pre-install-job-uidp
-        image: {{ .Values.secretRepository}}
-        imagePullPolicy: IfNotPresent
-        env:
-          - name: K8S_NAMESPACE
-            value: {{ .Release.Namespace }}
-          - name: PVT_KEY_NAME
-            value: {{ .Values.privateKeyName }}
+        - name: pre-install-job-uidp
+          image: {{ .Values.secretRepository }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: K8S_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: PVT_KEY_NAME
+              value: {{ .Values.secret.privateKeyName }}
+            - name: ADMIN_PASSWORD
+              value: "{{ .Values.secret.adminPassword }}"

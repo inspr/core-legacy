@@ -34,12 +34,13 @@ func main() {
 
 	namespace := os.Getenv("K8S_NAMESPACE")
 	pvtKeyName := os.Getenv("PVT_KEY_NAME")
+	password := os.Getenv("ADMIN_PASSWORD")
+	defer os.Unsetenv("ADMIN_PASSWORD")
 	if pvtKeyName == "" {
 		panic("[ENV VAR] PVT_KEY_NAME not found")
 	}
 
 	initKube()
-
 	_, err := clientSet.CoreV1().Secrets(namespace).Get("redisprivatekey", v1.GetOptions{})
 
 	if err != nil {
@@ -57,7 +58,8 @@ func main() {
 				Name: pvtKeyName,
 			},
 			Data: map[string][]byte{
-				"key": privateKeyBytes,
+				"key":      privateKeyBytes,
+				"password": []byte(password),
 			},
 		}
 

@@ -20,7 +20,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Values.deployment.uidpName }}
-          image: {{ .Values.deployment.image }}
+          image: {{ .Values.uidpRepository }}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -42,8 +42,13 @@ spec:
             - name: REFRESH_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.privateKeyName }}
+                  name: {{ .Values.secret.privateKeyName }}
                   key: key
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.privateKeyName }}
+                  key: password
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
