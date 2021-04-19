@@ -4,7 +4,7 @@ import handler "github.com/inspr/inspr/cmd/uid_provider/api/handlers"
 
 // initRoutes defines which routes the UID Provider API will have
 func (s *Server) initRoutes() {
-	h := handler.NewHandler(s.rdb, s.ctx)
+	h := handler.NewHandler(s.ctx, s.rdb)
 
 	s.mux.HandleFunc("/newuser", h.CreateUserHandler())
 

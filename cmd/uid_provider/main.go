@@ -10,5 +10,5 @@ import (
 func main() {
 	ctx := context.Background()
 	redisClient := client.NewRedisClient()
-	api.Run(redisClient, ctx)
+	api.Run(ctx, redisClient)
 }

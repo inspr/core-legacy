@@ -18,7 +18,7 @@ type Server struct {
 }
 
 // Init - configures the server
-func (s *Server) Init(rdb client.RedisManager, ctx context.Context) {
+func (s *Server) Init(ctx context.Context, rdb client.RedisManager) {
 	s.mux = http.NewServeMux()
 	s.rdb = rdb
 	s.ctx = ctx

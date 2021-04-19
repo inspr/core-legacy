@@ -13,12 +13,12 @@ import (
 // Handler is a structure which cointains methods to handle
 // requests received by the UID Provider API
 type Handler struct {
-	rdb client.RedisManager
 	ctx context.Context
+	rdb client.RedisManager
 }
 
 // NewHandler instantiates a new Handler structure
-func NewHandler(rdb client.RedisManager, ctx context.Context) *Handler {
+func NewHandler(ctx context.Context, rdb client.RedisManager) *Handler {
 	return &Handler{
 		rdb: rdb,
 		ctx: ctx,

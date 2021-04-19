@@ -39,7 +39,7 @@ func TestNewHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewHandler(tt.args.rdb, auxCtx)
+			got := NewHandler(auxCtx, tt.args.rdb)
 			if got == nil {
 				t.Errorf("NewHandler() error: %v", got)
 			}
@@ -60,7 +60,7 @@ func TestHandler_CreateUserHandler(t *testing.T) {
 	}{
 		{
 			name: "Send request to CreateUserHandler",
-			h:    NewHandler(&redisClient, auxCtx),
+			h:    NewHandler(auxCtx, &redisClient),
 			body: models.ReceivedDataCreate{
 				UID:      "rand",
 				Password: "123",
@@ -107,7 +107,7 @@ func TestHandler_DeleteUserHandler(t *testing.T) {
 	}{
 		{
 			name: "Send request to DeleteUserHandler",
-			h:    NewHandler(&redisClient, auxCtx),
+			h:    NewHandler(auxCtx, &redisClient),
 			body: models.ReceivedDataDelete{
 				UID:             "rand",
 				Password:        "123",
@@ -154,7 +154,7 @@ func TestHandler_UpdatePasswordHandler(t *testing.T) {
 	}{
 		{
 			name: "Send request to UpdatePasswordHandler",
-			h:    NewHandler(&redisClient, auxCtx),
+			h:    NewHandler(auxCtx, &redisClient),
 			body: models.ReceivedDataUpdate{
 				UID:             "rand",
 				Password:        "123",
@@ -203,7 +203,7 @@ func TestHandler_LoginHandler(t *testing.T) {
 	}{
 		{
 			name: "Send request to LoginHandler",
-			h:    NewHandler(&redisClient, auxCtx),
+			h:    NewHandler(auxCtx, &redisClient),
 			body: models.ReceivedDataLogin{
 				UID:      "rand",
 				Password: "123",
@@ -249,7 +249,7 @@ func TestHandler_RefreshTokenHandler(t *testing.T) {
 	}{
 		{
 			name: "Send request to RefreshTokenHandler",
-			h:    NewHandler(&redisClient, auxCtx),
+			h:    NewHandler(auxCtx, &redisClient),
 			body: models.ReceivedDataRefresh{
 				RefreshToken: []byte("rand"),
 			},

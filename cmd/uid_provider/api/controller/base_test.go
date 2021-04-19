@@ -38,7 +38,7 @@ func TestServer_Init(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.s.Init(tt.args.rdb, auxCtx)
+			tt.s.Init(auxCtx, tt.args.rdb)
 		})
 	}
 }
