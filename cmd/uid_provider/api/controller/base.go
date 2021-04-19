@@ -27,6 +27,6 @@ func (s *Server) Init(ctx context.Context, rdb client.RedisManager) {
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
-	fmt.Printf("insprd rest api is up! Listening on port: %s\n", addr)
+	fmt.Printf("uidp rest api is up! listening on port: %s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, s.mux))
 }
