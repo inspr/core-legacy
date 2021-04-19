@@ -3,13 +3,13 @@ package main
 import (
 	"os"
 
-	jwtauth "github.co/m/inspr/inspr/pkg/auth/jwt"
 	"github.com/inspr/inspr/cmd/insprd/api"
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/memory/tree"
 	"github.com/inspr/inspr/cmd/insprd/operators"
 	kafka "github.com/inspr/inspr/cmd/insprd/operators/kafka"
 	"github.com/inspr/inspr/pkg/auth"
+	jwtauth "github.com/inspr/inspr/pkg/auth/jwt"
 )
 
 func main() {
