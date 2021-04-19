@@ -378,3 +378,77 @@ func Test_displayChannelTypeState(t *testing.T) {
 		})
 	}
 }
+
+func Test_displayAlias(t *testing.T) {
+	defer restartScopeFlag()
+	bufResp := bytes.NewBufferString("")
+	utils.PrintAliasTree(getMockApp().Spec.Aliases["alias_name"], bufResp)
+	outResp, _ := ioutil.ReadAll(bufResp)
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		data := models.AliasQueryDI{}
+		decoder := json.NewDecoder(r.Body)
+
+		err := decoder.Decode(&data)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		al := getMockApp().Spec.Aliases[data.Key]
+
+		rest.JSON(w, http.StatusOK, al)
+	}
+
+	tests := []struct {
+		name           string
+		flagsAndArgs   []string
+		handlerFunc    func(w http.ResponseWriter, r *http.Request)
+		expectedOutput []byte
+	}{
+		{
+			name:           "Should describe the alias state",
+			flagsAndArgs:   []string{"al", "appParent.alias_name"},
+			handlerFunc:    handler,
+			expectedOutput: outResp,
+		},
+		{
+			name:           "Invalid scope flag, should not print",
+			flagsAndArgs:   []string{"al", "alias_name", "--scope", "invalid..scope"},
+			handlerFunc:    handler,
+			expectedOutput: []byte(""),
+		},
+		{
+			name:           "Valid scope flag",
+			flagsAndArgs:   []string{"al", "alias_name", "--scope", "appParent"},
+			handlerFunc:    handler,
+			expectedOutput: outResp,
+		},
+		{
+			name:           "Invalid arg",
+			flagsAndArgs:   []string{"al", "invalid..args", "--scope", "appParent"},
+			handlerFunc:    handler,
+			expectedOutput: []byte(""),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := NewDescribeCmd()
+			buf := bytes.NewBufferString("")
+
+			cliutils.SetOutput(buf)
+			cmd.SetArgs(tt.flagsAndArgs)
+
+			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
+			cliutils.SetClient(server.URL)
+
+			defer server.Close()
+
+			cmd.Execute()
+			got, _ := ioutil.ReadAll(buf)
+
+			if !reflect.DeepEqual(got, tt.expectedOutput) {
+				t.Errorf("displayAliasState() = %v, want %v", string(got), string(tt.expectedOutput))
+			}
+		})
+	}
+}
