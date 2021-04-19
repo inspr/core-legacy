@@ -2,6 +2,7 @@ package request
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -20,6 +21,10 @@ func (cb *ClientBuilder) BaseURL(url string) *ClientBuilder {
 func (cb *ClientBuilder) Encoder(encoder Encoder) *ClientBuilder {
 	cb.c.encoder = encoder
 	return cb
+}
+
+func (cb *ClientBuilder) Token(token []byte) *ClientBuilder {
+	return cb.Header("Authentication", fmt.Sprintf("Bearer %s", token))
 }
 
 // Decoder sets the decoder for the client that is being built
@@ -53,4 +58,12 @@ func NewJSONClient(baseURL string) *Client {
 		Encoder(json.Marshal).
 		Decoder(JSONDecoderGenerator).
 		Build()
+}
+
+func (cb *ClientBuilder) Header(key, value string) *ClientBuilder {
+	if cb.c.headers == nil {
+		cb.c.headers = make(map[string]string)
+	}
+	cb.c.headers[key] = value
+	return cb
 }
