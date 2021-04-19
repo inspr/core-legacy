@@ -11,7 +11,7 @@ func YamlToAlias(bytes []byte) (*meta.Alias, error) {
 	var alias *meta.Alias
 
 	if err := yaml.Unmarshal(bytes, &alias); err != nil {
-		return nil, ierrors.NewError().Message("Error parsing the file").Build()
+		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
 
 	if alias.Meta.Name == "" {
