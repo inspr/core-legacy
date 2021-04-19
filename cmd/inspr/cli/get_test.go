@@ -591,3 +591,32 @@ func Test_printTab(t *testing.T) {
 		})
 	}
 }
+
+func Test_printAliases(t *testing.T) {
+	type args struct {
+		app   *meta.App
+		lines *[]string
+	}
+	tests := []struct {
+		name  string
+		args  args
+		lines *[]string
+	}{
+		{
+			name: "printAlias test",
+			args: args{
+				app:   getMockApp(),
+				lines: &[]string{},
+			},
+			lines: &[]string{"alias_name\n"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			printAliases(tt.args.app, tt.args.lines)
+			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
+				t.Errorf("printAliases() error = %v, want %v", tt.args.lines, tt.lines)
+			}
+		})
+	}
+}
