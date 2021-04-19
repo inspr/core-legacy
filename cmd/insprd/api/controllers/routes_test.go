@@ -91,8 +91,6 @@ func TestServer_initRoutes(t *testing.T) {
 			client := ts.Client()
 			for i, statusCodeResult := range tt.want {
 				reqURL := ts.URL + "/" + tt.name
-				// text := "{\"scope\":\"scope_1\"}"
-				// bytes.NewBuffer([]byte(text))
 				req, err := http.NewRequest(defaultMethods[i], reqURL, nil)
 				if err != nil {
 					t.Error("error creating request")

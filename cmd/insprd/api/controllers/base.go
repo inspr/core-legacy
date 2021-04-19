@@ -30,12 +30,13 @@ type Server struct {
 }
 
 // Init - configures the server
-func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface) {
+func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface, auth auth.Auth) {
 	logger.Info("initializing Insprd server")
 
 	s.Mux = http.NewServeMux()
 	s.MemoryManager = mm
 	s.op = op
+	s.auth = auth
 	s.initRoutes()
 }
 
