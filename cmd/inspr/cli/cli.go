@@ -19,17 +19,13 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 
 	rootCmd.PersistentPreRunE = func(cm *cobra.Command, args []string) error {
 		cm.Root().SilenceUsage = true
-		if cmd.InsprOptions.ConfigFile == "" {
-			// viper defaults values or reads from the config location
-			cliutils.InitViperConfig()
+		// viper defaults values or reads from the config location
+		cliutils.InitViperConfig()
 
-			homeDir, _ := os.UserHomeDir()
+		homeDir, _ := os.UserHomeDir()
 
-			if err := cliutils.ReadViperConfig(homeDir); err != nil {
-				return err
-			}
-		} else {
-			return cliutils.ReadConfigFile(cmd.InsprOptions.ConfigFile)
+		if err := cliutils.ReadViperConfig(homeDir); err != nil {
+			return err
 		}
 
 		return nil
