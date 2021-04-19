@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alicebob/miniredis"
+	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
 	"github.com/inspr/inspr/pkg/api/auth"
 	"github.com/inspr/inspr/pkg/api/models"
