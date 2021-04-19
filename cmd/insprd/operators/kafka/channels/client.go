@@ -22,7 +22,7 @@ func init() {
 
 // ChannelOperator is a client for channel operations on kafka
 type ChannelOperator struct {
-	k      *kafka.AdminClient
+	k      kafkaAdminClient
 	logger *zap.Logger
 	mem    memory.Manager
 }
@@ -41,26 +41,25 @@ func getEnv() (env kafkaEnv) {
 func NewOperator(mem memory.Manager) (*ChannelOperator, error) {
 
 	var config *kafka.ConfigMap
-
+	var err error
+	var adminClient kafkaAdminClient
 	if _, exists := os.LookupEnv("DEBUG"); exists {
 		logger.Info("initializing kafka admin with debug configs")
-		config = &kafka.ConfigMap{
-			"bootstrap.servers":     getEnv().kafkaBootstrapServers,
-			"test.mock.num.brokers": "3",
-		}
+		adminClient = &mockAdminClient{}
 	} else {
 		logger.Info("initializing kafka admin with production configs",
 			zap.String("kafka bootstrap servers", getEnv().kafkaBootstrapServers))
 		config = &kafka.ConfigMap{
 			"bootstrap.servers": getEnv().kafkaBootstrapServers,
 		}
+
+		adminClient, err = kafka.NewAdminClient(config)
+		if err != nil {
+			logger.Error("unable to create kafka admin client", zap.Any("error", err))
+			return nil, err
+		}
 	}
 
-	adminClient, err := kafka.NewAdminClient(config)
-	if err != nil {
-		logger.Error("unable to create kafka admin client", zap.Any("error", err))
-		return nil, err
-	}
 	return &ChannelOperator{
 		k:      adminClient,
 		logger: logger,
@@ -154,4 +153,24 @@ func (c *ChannelOperator) Delete(ctx context.Context, context string, name strin
 		return ierrors.NewError().InternalServer().InnerError(err).Message("unable to delete kafka topic").Build()
 	}
 	return nil
+}
+
+type kafkaAdminClient interface {
+	DeleteTopics(ctx context.Context, topics []string, options ...kafka.DeleteTopicsAdminOption) (result []kafka.TopicResult, err error)
+	CreateTopics(ctx context.Context, topics []kafka.TopicSpecification, options ...kafka.CreateTopicsAdminOption) (result []kafka.TopicResult, err error)
+	GetMetadata(topic *string, allTopics bool, timeoutMs int) (*kafka.Metadata, error)
+}
+
+type mockAdminClient struct {
+}
+
+func (*mockAdminClient) DeleteTopics(ctx context.Context, topics []string, options ...kafka.DeleteTopicsAdminOption) (result []kafka.TopicResult, err error) {
+	return nil, nil
+}
+
+func (*mockAdminClient) CreateTopics(ctx context.Context, topics []kafka.TopicSpecification, options ...kafka.CreateTopicsAdminOption) (result []kafka.TopicResult, err error) {
+	return nil, nil
+}
+func (*mockAdminClient) GetMetadata(topic *string, allTopics bool, timeoutMs int) (*kafka.Metadata, error) {
+	return nil, nil
 }

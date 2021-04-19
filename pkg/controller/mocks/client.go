@@ -28,3 +28,8 @@ func (cm *ClientMock) Channels() controller.ChannelInterface {
 func (cm *ClientMock) ChannelTypes() controller.ChannelTypeInterface {
 	return NewChannelTypeMock(cm.err)
 }
+
+//Alias mocks a alias controller
+func (cm *ClientMock) Alias() controller.AliasInterface {
+	return NewAliasMock(cm.err)
+}
