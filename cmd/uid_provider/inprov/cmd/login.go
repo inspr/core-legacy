@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/inspr/inspr/cmd/uid_provider/client"
 	build "github.com/inspr/inspr/pkg/cmd"
@@ -43,11 +44,19 @@ func loginAction(c context.Context, s []string) error {
 
 	var err error
 	var output io.Writer
+	var outputPath string
+	if loginOptions.output == "" {
+		f, _ := os.UserHomeDir()
+		outputPath = filepath.Join(f, ".inspr", "token")
+
+	} else {
+		outputPath = loginOptions.output
+	}
 
 	if loginOptions.stdout {
 		output = os.Stdout
 	} else {
-		output, err = os.OpenFile(loginOptions.output, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+		output, err = os.Create(outputPath)
 		if err != nil {
 			return err
 		}
