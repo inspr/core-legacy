@@ -44,3 +44,10 @@ func (c *Client) Authorization() controller.AuthorizationInterface {
 		c: c.HTTPClient,
 	}
 }
+
+// Alias interacts with alias on the Insprd
+func (c *Client) Alias() controller.AliasInterface {
+	return &AliasClient{
+		c: c.HTTPClient,
+	}
+}

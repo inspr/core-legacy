@@ -216,6 +216,108 @@ func getMockAppWithoutCt1() *meta.App {
 	return &root
 }
 
+func getMockAppWithoutAlias() *meta.App {
+	root := meta.App{
+		Meta: meta.Metadata{
+			Name:        "appParent",
+			Reference:   "appParent",
+			Annotations: map[string]string{},
+			Parent:      "",
+			UUID:        "",
+		},
+		Spec: meta.AppSpec{
+			Node: meta.Node{},
+			Apps: map[string]*meta.App{
+				"app1": {
+					Meta: meta.Metadata{
+						Name:        "app1",
+						Reference:   "app1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						UUID:        "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{
+							"thenewapp": {
+								Meta: meta.Metadata{
+									Name:        "thenewapp",
+									Reference:   "app1.thenewapp",
+									Annotations: map[string]string{},
+									Parent:      "app1",
+									UUID:        "",
+								},
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											Name:        "thenewapp",
+											Reference:   "app1.thenewapp",
+											Annotations: map[string]string{},
+											Parent:      "app1",
+											UUID:        "",
+										},
+									},
+									Apps:         map[string]*meta.App{},
+									Channels:     map[string]*meta.Channel{},
+									ChannelTypes: map[string]*meta.ChannelType{},
+									Boundary: meta.AppBoundary{
+										Input:  []string{"ch1app1"},
+										Output: []string{},
+									},
+								},
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"ch1app1": {
+								Meta: meta.Metadata{
+									Name:   "ch1app1",
+									Parent: "",
+								},
+								ConnectedApps: []string{"thenewapp"},
+								Spec:          meta.ChannelSpec{},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{"ch1"},
+							Output: []string{"ch1"},
+						},
+					},
+				},
+			},
+			Channels: map[string]*meta.Channel{
+				"ch1": {
+					Meta: meta.Metadata{
+						Name:   "ch1",
+						Parent: "",
+					},
+					Spec: meta.ChannelSpec{
+						Type: "ct1",
+					},
+				},
+			},
+			ChannelTypes: map[string]*meta.ChannelType{
+				"ct1": {
+					Meta: meta.Metadata{
+						Name:        "ct1",
+						Reference:   "root.ct1",
+						Annotations: map[string]string{},
+						Parent:      "root",
+						UUID:        "",
+					},
+					Schema: "",
+				},
+			},
+			Boundary: meta.AppBoundary{
+				Input:  []string{},
+				Output: []string{},
+			},
+			Aliases: map[string]*meta.Alias{},
+		},
+	}
+	return &root
+}
+
 func TestNewDeleteCmd(t *testing.T) {
 	defer restartScopeFlag()
 	tests := []struct {
@@ -473,6 +575,85 @@ func Test_deleteCTypes(t *testing.T) {
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
 				t.Errorf("deleteCtypes() = %v, want %v", string(got), string(tt.expectedOutput))
+			}
+		})
+	}
+}
+
+func Test_deleteAlias(t *testing.T) {
+	defer restartScopeFlag()
+	bufResp := bytes.NewBufferString("")
+	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutAlias())
+
+	changelog.Print(bufResp)
+	outResp, _ := ioutil.ReadAll(bufResp)
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		data := models.AliasQueryDI{}
+		decoder := json.NewDecoder(r.Body)
+
+		err := decoder.Decode(&data)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		if data.Ctx != "appParent" || data.Key != "alias_name" {
+			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
+			return
+		}
+
+		rest.JSON(w, http.StatusOK, changelog)
+	}
+
+	tests := []struct {
+		name           string
+		flagsAndArgs   []string
+		handlerFunc    func(w http.ResponseWriter, r *http.Request)
+		expectedOutput []byte
+	}{
+		{
+			name:           "Should delete the alias and return the diff",
+			flagsAndArgs:   []string{"al", "appParent.alias_name"},
+			handlerFunc:    handler,
+			expectedOutput: outResp,
+		},
+		{
+			name:           "Invalid scope flag, should not print",
+			flagsAndArgs:   []string{"al", "appParent.alias_name", "--scope", "invalid..scope"},
+			handlerFunc:    handler,
+			expectedOutput: []byte(""),
+		},
+		{
+			name:           "Valid scope flag",
+			flagsAndArgs:   []string{"al", "alias_name", "--scope", "appParent"},
+			handlerFunc:    handler,
+			expectedOutput: outResp,
+		},
+		{
+			name:           "Invalid arg",
+			flagsAndArgs:   []string{"al", "invalid..args", "--scope", "appParent.ct1"},
+			handlerFunc:    handler,
+			expectedOutput: []byte(""),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := NewDeleteCmd()
+			buf := bytes.NewBufferString("")
+
+			cliutils.SetOutput(buf)
+			cmd.SetArgs(tt.flagsAndArgs)
+
+			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
+			cliutils.SetClient(server.URL)
+
+			defer server.Close()
+
+			cmd.Execute()
+			got, _ := ioutil.ReadAll(buf)
+
+			if !reflect.DeepEqual(got, tt.expectedOutput) {
+				t.Errorf("deleteAlias() = %v, want %v", string(got), string(tt.expectedOutput))
 			}
 		})
 	}
