@@ -119,6 +119,14 @@ func getMockApp() *meta.App {
 				Input:  []string{},
 				Output: []string{},
 			},
+			Aliases: map[string]*meta.Alias{
+				"alias_name": {
+					Meta: meta.Metadata{
+						Name: "alias_name",
+					},
+					Target: "alias_target",
+				},
+			},
 		},
 	}
 	return &root
