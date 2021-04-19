@@ -7,8 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/inspr/inspr/cmd/insprd/auth"
-	authentication "github.com/inspr/inspr/cmd/insprd/auth"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/ierrors"
 )
 
@@ -21,7 +20,7 @@ func (h Handler) JSON() Handler {
 }
 
 // Validate handles the token validation of the http requests made, it receives an implementation of the auth interface as a parameter.
-func (h Handler) Validate(auth authentication.Auth) Handler {
+func (h Handler) Validate(auth auth.Auth) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]

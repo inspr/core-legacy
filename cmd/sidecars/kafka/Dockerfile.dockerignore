@@ -1,4 +1,4 @@
 **/*
-!cmd/sidecars/kafka
+!cmd
 !pkg
 !go.mod
