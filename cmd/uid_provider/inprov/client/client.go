@@ -2,11 +2,11 @@ package client
 
 import (
 	"context"
+	"os"
 
 	"github.com/inspr/inspr/cmd/uid_provider/api/models"
 	"github.com/inspr/inspr/cmd/uid_provider/client"
 	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/spf13/viper"
 )
 
 // Client is the client for communicating with the in-cluster uidp
@@ -17,7 +17,7 @@ type Client struct {
 // NewClient creates a new client for communicating with inspr's UID provider.
 func NewClient() *Client {
 	return &Client{
-		rc: request.NewJSONClient(viper.GetString("url")),
+		rc: request.NewJSONClient(os.Getenv("INPROV_PROVIDER_URL")),
 	}
 }
 
