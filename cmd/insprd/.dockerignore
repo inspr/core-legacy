@@ -2,3 +2,4 @@
 !cmd/insprd
 !pkg
 !go.mod
+!cmd/sidecars
