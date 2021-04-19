@@ -39,9 +39,9 @@ func NewApplyAlias() RunMethod {
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentPath, alias.Meta.Name, &alias, flagDryRun)
+			log, err = c.Update(context.Background(), parentPath, alias.Meta.Name, alias, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), parentPath, alias.Meta.Name, &alias, flagDryRun)
+			log, err = c.Create(context.Background(), parentPath, alias.Meta.Name, alias, flagDryRun)
 		}
 
 		if err != nil {
