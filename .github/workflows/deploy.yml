@@ -1,0 +1,16 @@
+name: CLI build
+
+on: [release]
+
+jobs:
+  buid-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16.0"
+      - name: Build CLI
+        run: bash .github/scripts/buildcli.sh
