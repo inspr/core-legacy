@@ -92,7 +92,7 @@ func (s *Server) Run(ctx context.Context) {
 		log.Fatal(err)
 	}
 
-	log.Println("server shutdown complete")
+	// has to be the last method called in the shutdown
 	if err = server.Shutdown(ctxShutdown); err != nil {
 		log.Fatal("error shutting down server")
 	}
