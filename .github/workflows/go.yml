@@ -6,11 +6,17 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - name: golangci-lint
-      uses: golangci/golangci-lint-action@v2
-      with:
-        # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-        version: v1.29
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16.0"
+      - name: Download golint
+        run: go get -u golang.org/x/lint/golint
+      - name: Lint packages
+        run: golint -set_exit_status ./... 
+      
 
 
   coverage:
