@@ -32,7 +32,7 @@ func TestNewRedisClient(t *testing.T) {
 		{
 			name: "client_creation",
 			want: &Client{
-				rdb: &redis.Client{},
+				rdb: &redis.ClusterClient{},
 			},
 		},
 	}

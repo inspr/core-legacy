@@ -21,24 +21,37 @@ import (
 
 // Client defines a Redis client, which has the interface methods
 type Client struct {
-	rdb           *redis.Client
+	rdb           *redis.ClusterClient
 	refreshURL    string
 	refreshKey    string
 	insprdAddress string
 }
 
+func (c *Client) initAdminUser() error {
+	return set(context.Background(), c.rdb, User{
+		UID:      "admin",
+		Role:     1,
+		Scope:    []string{""},
+		Password: os.Getenv("ADMIN_PASSWORD"),
+	})
+}
+
 // NewRedisClient creates and returns a new Redis client
 func NewRedisClient() *Client {
-	return &Client{
-		rdb: redis.NewClient(&redis.Options{
-			Addr:     fmt.Sprintf("%s:%s", getEnv("REDIS_HOST"), getEnv("REDIS_PORT")),
+	c := &Client{
+		rdb: redis.NewClusterClient(&redis.ClusterOptions{
+			Addrs:    []string{fmt.Sprintf("%s:%s", getEnv("REDIS_HOST"), getEnv("REDIS_PORT"))},
 			Password: getEnv("REDIS_PASSWORD"),
-			DB:       0, // use default DB
 		}),
 		refreshURL:    getEnv("REFRESH_URL"),
 		refreshKey:    getEnv("REFRESH_KEY"),
 		insprdAddress: getEnv("INSPR_CLUSTER_ADDR"),
 	}
+	err := c.initAdminUser()
+	if err != nil {
+		panic(err)
+	}
+	return c
 }
 
 // CreateUser inserts a new user into Redis
@@ -240,7 +253,7 @@ func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (str
 
 // Auxiliar methods
 
-func set(ctx context.Context, rdb *redis.Client, data User) error {
+func set(ctx context.Context, rdb *redis.ClusterClient, data User) error {
 	strData, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -253,7 +266,7 @@ func set(ctx context.Context, rdb *redis.Client, data User) error {
 	return nil
 }
 
-func get(ctx context.Context, rdb *redis.Client, key string) (*User, error) {
+func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, error) {
 	var parsedValue User
 	value, err := rdb.Get(ctx, key).Result()
 
@@ -268,7 +281,7 @@ func get(ctx context.Context, rdb *redis.Client, key string) (*User, error) {
 	return &parsedValue, nil
 }
 
-func delete(ctx context.Context, rdb *redis.Client, key string) error {
+func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
 	numDeleted, err := rdb.Del(ctx, key).Result()
 	if err != nil {
 		return err
@@ -278,7 +291,7 @@ func delete(ctx context.Context, rdb *redis.Client, key string) error {
 	return nil
 }
 
-func hasPermission(ctx context.Context, rdb *redis.Client, uid, pwd string) error {
+func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string) error {
 	requestor, err := get(ctx, rdb, uid)
 	if err != nil {
 		return err
