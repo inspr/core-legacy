@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/inspr/inspr/cmd/insprd/api/models"
-	"github.com/inspr/inspr/cmd/insprd/auth"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils"

@@ -10,10 +10,10 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/cmd/insprd/api/models"
-	authmock "github.com/inspr/inspr/cmd/insprd/auth/mocks"
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/memory/fake"
 	ofake "github.com/inspr/inspr/cmd/insprd/operators/fake"
+	authmock "github.com/inspr/inspr/pkg/auth/mocks"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 )

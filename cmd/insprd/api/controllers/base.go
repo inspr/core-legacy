@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/inspr/inspr/cmd/insprd/auth"
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/operators"
+	"github.com/inspr/inspr/pkg/auth"
 	"go.uber.org/zap"
 )
 

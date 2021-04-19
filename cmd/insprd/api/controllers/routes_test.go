@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	authmock "github.com/inspr/inspr/cmd/insprd/auth/mocks"
 	"github.com/inspr/inspr/cmd/insprd/memory/fake"
+	authmock "github.com/inspr/inspr/pkg/auth/mocks"
 )
 
 // TestServer_initRoutes - this test is a bit different than the one automatically
