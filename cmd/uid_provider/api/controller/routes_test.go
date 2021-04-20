@@ -37,9 +37,9 @@ func TestServer_initRoutes(t *testing.T) {
 			name: "deleteuser",
 			want: [...]int{
 				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
 				http.StatusInternalServerError,
-				http.StatusMethodNotAllowed,
-				http.StatusMethodNotAllowed,
 				http.StatusMethodNotAllowed,
 			},
 		},

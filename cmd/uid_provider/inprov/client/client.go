@@ -45,7 +45,7 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser client
 func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/deleteuser", "POST", models.ReceivedDataDelete{UID: uid, Password: pwd, UserToBeDeleted: usrToBeDeleted}, resp)
+	err := c.rc.Send(ctx, "/deleteuser", "DELETE", models.ReceivedDataDelete{UID: uid, Password: pwd, UserToBeDeleted: usrToBeDeleted}, resp)
 	return err
 }
 

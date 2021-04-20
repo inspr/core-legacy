@@ -54,7 +54,7 @@ func (h *Handler) DeleteUserHandler() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-	}).Post().JSON().Recover()
+	}).Delete().JSON().Recover()
 }
 
 // UpdatePasswordHandler handles requests to update an user password
