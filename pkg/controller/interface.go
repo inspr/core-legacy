@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 
+	"github.com/inspr/inspr/pkg/api/auth"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 )
@@ -37,6 +38,13 @@ type ChannelTypeInterface interface {
 	Update(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error)
 }
 
+// AuthorizationInterface is the interface that allows to
+// obtain information related to the authorization necessary
+// to make changes in structures inside of the cluster
+type AuthorizationInterface interface {
+	GenerateToken(ctx context.Context, payload auth.Payload) (string, error)
+}
+
 // AliasInterface is the interface that allows to
 // obtain or change information related to the current
 // state of the Alias in the cluster
@@ -54,5 +62,6 @@ type Interface interface {
 	Channels() ChannelInterface
 	Apps() AppInterface
 	ChannelTypes() ChannelTypeInterface
+	Authorization() AuthorizationInterface
 	Alias() AliasInterface
 }

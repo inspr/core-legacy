@@ -1,9 +1,11 @@
-name: CLI build
+name: "Build and deploy"
 
-on: [release]
+on:
+  release:
+    types: [published]
 
 jobs:
-  buid-cli:
+  buid-cli:    
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
