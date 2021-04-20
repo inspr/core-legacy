@@ -37,6 +37,16 @@ type ChannelTypeInterface interface {
 	Update(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error)
 }
 
+// AliasInterface is the interface that allows to
+// obtain or change information related to the current
+// state of the Alias in the cluster
+type AliasInterface interface {
+	Get(ctx context.Context, context, key string) (*meta.Alias, error)
+	Create(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
+	Delete(ctx context.Context, context, key string, dryRun bool) (diff.Changelog, error)
+	Update(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
+}
+
 // Interface is the interface that allows the management
 // of the current state of the cluster. Permiting the
 // modification of Channels, DApps and ChannelTypes
@@ -44,4 +54,5 @@ type Interface interface {
 	Channels() ChannelInterface
 	Apps() AppInterface
 	ChannelTypes() ChannelTypeInterface
+	Alias() AliasInterface
 }

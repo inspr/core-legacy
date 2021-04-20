@@ -95,7 +95,7 @@ To contribute, please check out our [guide](CONTRIBUTING.md).
 
 ## 📄 License
 
-- Inspr is licenced under MIT [license](LICENSE.md).
+- Inspr is licenced under MIT [license](LICENSE).
 - Inspr documentation is Creative Commons licensed, as found in the [license-docs](LICENSE-docs) file.
 
 ## 📣 Contact

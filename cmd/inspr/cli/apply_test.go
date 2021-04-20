@@ -45,6 +45,15 @@ func createChannelTypeYaml() string {
 	return string(data)
 }
 
+func createAliasYaml() string {
+	comp := meta.Component{
+		Kind:       "alias",
+		APIVersion: "v1",
+	}
+	data, _ := yaml.Marshal(&comp)
+	return string(data)
+}
+
 func createInvalidYaml() string {
 	comp := meta.Component{
 		Kind:       "none",
@@ -331,9 +340,10 @@ func Test_getOrderedFiles(t *testing.T) {
 	defer os.Remove("app.yml")
 	defer os.Remove("ch.yml")
 	defer os.Remove("ct.yml")
+	defer os.Remove("al.yml")
 	defer os.Remove("invalid.yml")
 	tempFiles := []string{"app.yml", "invalid.yml",
-		"ch.yml", "ct.yml"}
+		"ch.yml", "ct.yml", "al.yml"}
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
 		"app.yml",
@@ -348,6 +358,11 @@ func Test_getOrderedFiles(t *testing.T) {
 	ioutil.WriteFile(
 		"ct.yml",
 		[]byte(createChannelTypeYaml()),
+		os.ModePerm,
+	)
+	ioutil.WriteFile(
+		"al.yml",
+		[]byte(createAliasYaml()),
 		os.ModePerm,
 	)
 	ioutil.WriteFile(
@@ -408,6 +423,14 @@ func orderedContent() []applied {
 				APIVersion: "v1",
 			},
 			content: []byte(createChannelYaml()),
+		},
+		{
+			fileName: "al.yml",
+			component: meta.Component{
+				Kind:       "alias",
+				APIVersion: "v1",
+			},
+			content: []byte(createAliasYaml()),
 		},
 	}
 

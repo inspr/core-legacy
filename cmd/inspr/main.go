@@ -32,5 +32,10 @@ func main() {
 		Kind:       "dapp",
 	}, cli.NewApplyApp())
 
+	cli.GetFactory().Subscribe(meta.Component{
+		APIVersion: "v1",
+		Kind:       "alias",
+	}, cli.NewApplyAlias())
+
 	cli.NewInsprCommand(os.Stdout, os.Stderr, version).Execute()
 }

@@ -45,6 +45,12 @@ var (
 		"\n└── Spec" +
 		"\n    └── Schema: {\"type\":\"int\"}" +
 		"\n\n"
+
+	aliasTree = "alias_name" +
+		"\n└── Meta" +
+		"\n│   ├── Name: alias_name" +
+		"\n└── Target: alias_target" +
+		"\n\n"
 )
 
 func TestPrintAppTree(t *testing.T) {
@@ -213,4 +219,41 @@ func Test_populateMeta(t *testing.T) {
 			)
 		}
 	})
+}
+
+func TestPrintAliasTree(t *testing.T) {
+	type args struct {
+		al *meta.Alias
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantOut string
+	}{
+		{
+			name: "basic_alias_tree",
+			args: args{
+				al: &meta.Alias{
+					Meta: meta.Metadata{
+						Name: "alias_name",
+					},
+					Target: "alias_target",
+				},
+			},
+			wantOut: aliasTree,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out := &bytes.Buffer{}
+			PrintAliasTree(tt.args.al, out)
+			if gotOut := out.String(); gotOut != tt.wantOut {
+				t.Errorf(
+					"PrintAliasTree() = \n%v, want \n%v",
+					gotOut,
+					tt.wantOut,
+				)
+			}
+		})
+	}
 }
