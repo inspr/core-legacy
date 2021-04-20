@@ -5,6 +5,7 @@ import (
 
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
 	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/utils"
@@ -216,6 +217,9 @@ func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
 	node.Meta.Parent, err = toNodeParent(kdep.ObjectMeta.Name)
 	if err != nil {
 		return meta.Node{}, err
+	}
+	if len(kdep.Spec.Template.Spec.Containers) == 0 {
+		return meta.Node{}, ierrors.NewError().Message("node does not contain a container").InvalidApp().Build()
 	}
 	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
 	node.Spec.Environment = utils.ParseFromK8sEnvironment(kdep.Spec.Template.Spec.Containers[0].Env)

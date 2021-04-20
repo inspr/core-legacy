@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/operators"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils"
@@ -57,11 +56,6 @@ func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node,
 		return nil, err
 	}
 	return &node, nil
-}
-
-// Nodes is a NodeOperatorInterface that provides methods for node manipulation
-func (no *NodeOperator) Nodes() operators.NodeOperatorInterface {
-	return &NodeOperator{}
 }
 
 // CreateNode deploys a new node structure, if it's information is valid.
@@ -150,26 +144,18 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 	logger.Debug("deleting the k8s deployment",
 		zap.String("deployment", deployName))
 	err := kube.Delete(deployName, &metav1.DeleteOptions{})
-
 	if err != nil {
 		logger.Error("unable to delete the k8s deployment")
 		return ierrors.NewError().Message(err.Error()).Build()
 	}
-	return nil
-}
+	svcs := no.services()
+	err = svcs.Delete(deployName, &metav1.DeleteOptions{})
 
-// GetAllNodes returns a list of all the active nodes in the deployment, if there are any
-func (no *NodeOperator) GetAllNodes() []meta.Node {
-	logger.Info("getting all Nodes in k8s deployments")
-
-	var nodes []meta.Node
-	kube := no.retrieveKube()
-	list, _ := kube.List(metav1.ListOptions{})
-	for _, item := range list.Items {
-		node, _ := toNode(&item)
-		nodes = append(nodes, node)
+	if err != nil {
+		logger.Error("unable to delete the k8s service")
+		return ierrors.NewError().Message(err.Error()).Build()
 	}
-	return nodes
+	return nil
 }
 
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration
