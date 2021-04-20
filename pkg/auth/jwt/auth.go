@@ -5,6 +5,8 @@ package jwtauth
 import (
 	"context"
 	"crypto/rsa"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -101,23 +103,25 @@ func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
 
 // Refresh refreshes a jwt token. Uses JWT authentication provider
 func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
-	client := request.NewJSONClient(JA.authURL)
+	client := http.Client{}
 
-	load, err := auth.Desserialize(token)
+	data := models.JwtDO{}
+
+	req, _ := http.NewRequest(http.MethodGet, JA.authURL+"/refresh", nil)
+
+	head := http.Header{}
+	head.Add("Authorization", fmt.Sprintf("Bearer %v", string(token)))
+	req.Header = head
+
+	resp, err := client.Do(req)
 	if err != nil {
+		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
 	}
 
-	body := models.ResfreshDI{
-		RefreshToken: load.Refresh,
-		RefreshURL:   load.RefreshURL,
-	}
-
-	data := models.JwtDO{}
-	err = client.Send(context.Background(), "/refresh", http.MethodPost, body, &data)
-
+	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
-		err = ierrors.NewError().InternalServer().InnerError(err).Build()
+		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
 	}
 

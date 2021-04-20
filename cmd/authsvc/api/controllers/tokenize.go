@@ -1,12 +1,8 @@
 package controllers
 
 import (
-	"crypto/rsa"
-	"crypto/x509"
 	"encoding/json"
-	"encoding/pem"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/inspr/inspr/pkg/auth/models"
@@ -47,42 +43,7 @@ func (server *Server) tokenize(payload models.Payload) ([]byte, error) {
 	token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
 	token.Set("payload", payload)
 
-	keyPem := []byte(os.Getenv("JWT_PRIVATE_KEY"))
-	privKey, _ := pem.Decode(keyPem)
-
-	var privPemBytes []byte
-	if privKey.Type != "RSA PRIVATE KEY" {
-		server.logger.Error("RSA private key is of the wrong type")
-		err := ierrors.NewError().InternalServer().Message("RSA private key is of the wrong type").Build()
-		return nil, err
-	}
-
-	privPemBytes = privKey.Bytes
-
-	var parsedKey interface{}
-	if parsedKey, err = x509.ParsePKCS1PrivateKey(privPemBytes); err != nil {
-		if parsedKey, err = x509.ParsePKCS8PrivateKey(privPemBytes); err != nil { // note this returns type `interface{}`
-			server.logger.Error("Unable to parse RSA private key")
-			err := ierrors.NewError().InternalServer().Message("Unable to parse RSA private key").Build()
-			return nil, err
-		}
-	}
-
-	privateKey, ok := parsedKey.(*rsa.PrivateKey)
-	if !ok {
-		server.logger.Error("Unable to parse RSA private key")
-		err := ierrors.NewError().InternalServer().Message("Unable to parse RSA private key").Build()
-		return nil, err
-	}
-
-	err = privateKey.Validate()
-	if err != nil {
-		server.logger.Error("Unable to validate private key", zap.Any("error", err))
-		err := ierrors.NewError().InternalServer().Message("Unable to validate private key").Build()
-		return nil, err
-	}
-
-	signed, err := jwt.Sign(token, jwa.RS256, privateKey)
+	signed, err := jwt.Sign(token, jwa.RS256, server.privKey)
 	if err != nil {
 		server.logger.Error("Unable to sign JWT with provided RSA private key", zap.Any("error", err))
 		err := ierrors.NewError().InternalServer().Message("Unable to sign JWT with provided RSA private key").Build()

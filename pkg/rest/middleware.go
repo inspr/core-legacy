@@ -30,7 +30,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			http.Error(
 				w,
 				"Bad Request, expected: Authorization: Bearer <token>",
-				http.StatusBadRequest,
+				http.StatusUnauthorized,
 			)
 			return
 		}

@@ -4,9 +4,3 @@ package models
 type ResfreshDO struct {
 	RefreshToken []byte `json:"refreshtoken"`
 }
-
-// ResfreshDI is a data input type, expected format for Refresh's enpoint body
-type ResfreshDI struct {
-	RefreshToken []byte `json:"refreshtoken"`
-	RefreshURL   string `json:"refreshurl"`
-}

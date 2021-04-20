@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"bytes"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -14,15 +14,21 @@ import (
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/auth/models"
 	"github.com/inspr/inspr/pkg/rest"
+	"github.com/lestrrat-go/jwx/jwa"
+	"github.com/lestrrat-go/jwx/jwt"
 )
+
+var server Server
 
 func TestServer_Refresh(t *testing.T) {
 	tests := []struct {
-		name    string
-		want    int
-		payload models.Payload
-		body    func(string) interface{}
-		status  int
+		name      string
+		want      int
+		payload   models.Payload
+		importURL bool
+		headToken bool
+		token     func(models.Payload) []byte
+		status    int
 	}{
 		{
 			name: "Valid refresh",
@@ -34,37 +40,42 @@ func TestServer_Refresh(t *testing.T) {
 				Refresh:    []byte("refreshtk"),
 				RefreshURL: "http://refresh.token",
 			},
-			body: func(s string) interface{} {
-				return models.ResfreshDI{
-					RefreshToken: []byte("mock_token"),
-					RefreshURL:   s,
-				}
-			},
-			status: 200,
+			token:     getToken,
+			headToken: true,
+			importURL: true,
+			status:    200,
 		},
 		{
-			name: "Invalid refresh, bad request",
-			want: http.StatusBadRequest,
-			body: func(s string) interface{} {
-				return struct {
-					RefreshURL string `json:"refreshtoken"`
-					Data       int    `json:"refreshurl"`
+			name: "Invalid refresh, header missing 'Authentication'",
+			want: http.StatusUnauthorized,
+			token: func(models.Payload) []byte {
+				return nil
+			},
+			headToken: false,
+		},
+		{
+			name: "Invalid refresh, invalid token signature",
+			want: http.StatusForbidden,
+			token: func(models.Payload) []byte {
+				return []byte("cicada")
+			},
+			headToken: true,
+		},
+		{
+			name: "Invalid refresh, invalid token payload",
+			want: http.StatusForbidden,
+			token: func(models.Payload) []byte {
+				token := jwt.New()
+				payload := struct {
+					UID int
 				}{
-					Data:       0,
-					RefreshURL: s,
+					UID: 3301,
 				}
+				token.Set("payload", payload)
+				signed, _ := jwt.Sign(token, jwa.RS256, server.privKey)
+				return signed
 			},
-		},
-		{
-			name: "Invalid refresh, UID refresh fail",
-			want: http.StatusInternalServerError,
-			body: func(s string) interface{} {
-				return models.ResfreshDI{
-					RefreshToken: []byte("mock_token"),
-					RefreshURL:   s,
-				}
-			},
-			status: http.StatusInternalServerError,
+			headToken: true,
 		},
 	}
 
@@ -82,33 +93,40 @@ func TestServer_Refresh(t *testing.T) {
 	// Configuring enviroment for tests
 	os.Setenv("JWT_PRIVATE_KEY", string(privPEM))
 
-	var server Server
 	server.Init()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := server.Refresh().HTTPHandlerFunc()
-			ts := httptest.NewServer(handlerFunc)
+			// Test server for refresh handler
+			ts := httptest.NewServer(server.Mux)
 			defer ts.Close()
 
-			auxHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Test server for mocking UID server
+			mockUIDHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				rest.JSON(w, tt.status, tt.payload)
 			})
-			auxServer := httptest.NewServer(auxHandler)
-			defer auxServer.Close()
+			mockUIDServer := httptest.NewServer(mockUIDHandler)
+			defer mockUIDServer.Close()
 
-			client := ts.Client()
-
-			body, err := json.Marshal(tt.body(auxServer.URL))
-
-			if err != nil {
-				t.Log("error decoding payload into bytes")
-				return
+			// Token for request header
+			if tt.importURL {
+				tt.payload.RefreshURL = mockUIDServer.URL
 			}
+			signed := tt.token(tt.payload)
 
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(body))
+			// Request assembly
+			req, _ := http.NewRequest(http.MethodGet, ts.URL+"/refresh", nil)
+			head := http.Header{}
+			if tt.headToken {
+				head.Add("Authorization", fmt.Sprintf("Bearer %v", string(signed)))
+			}
+			req.Header = head
+
+			testClient := ts.Client()
+
+			res, err := testClient.Do(req)
 			if err != nil {
-				t.Log("error making a POST in the httptest server")
+				t.Errorf("error making a GET in the httptest server, error: %s", err.Error())
 				return
 			}
 			defer res.Body.Close()
@@ -139,4 +157,11 @@ func TestServer_Refresh(t *testing.T) {
 			}
 		})
 	}
+}
+
+func getToken(payload models.Payload) []byte {
+	token := jwt.New()
+	token.Set("payload", payload)
+	signed, _ := jwt.Sign(token, jwa.RS256, server.privKey)
+	return signed
 }
