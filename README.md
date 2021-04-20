@@ -45,13 +45,31 @@
 ---
 
 <br>
-Inspr is an engine for running distributed applications, using multiple communication patterns such as pub sub and more, focused on type consistency and development simplicity.
+Inspr is an agnostic application mesh for simpler, faster, and securer development of distributed applications (dApps). With it you can coordinate the application lifecycle and how the subparts of a dApp interconnect themselves.
 
-- :muscle: Robust: built on top of golang, kubernetes and other state of the art technologies
-- :sparkles: Distributed: created to allow complex and hierarchical distributed design patterns
-- :cloud: Cloud native: lightweight and modular, built with interchangeable pieces
-- :hammer_and_wrench: Versatile: can adapt to any cloud environment
+For Inspr’s point of view, a dApp is defined as an abstraction on top of the concept of a microservice. We extend the model by adding patterns of composition, communication, security, and adaptability to the application during runtime.
 
+## 🎛 Compose
+<div align="center">
+<img src="./docs/img/dapp-compose.png" width="640px">
+</div>
+
+With Inspr one dApp can be connected to another and those two will become a new application. Consider as an example where we’re creating a online shop called “Sammyfy”. To build this product we’ll need a few services such as payment, catalog, and delivery.
+
+Of course, we could create those three services and interconnect them by using Rest API or even something more robust like brokers. But it would still be hard and painful to manage all the dApps together. That’s why Inspr exists, so you can manage all three applications as one. 
+
+## 📡 Comunicate
+
+<div align="center">
+<img src="./docs/img/dapp-comunication.png" width="640px">
+</div>
+
+## 🔐 Secure
+
+## 🎮 Adapt
+
+
+---
 ## Table of Contents
 
 - [Getting Started](#getting-started)
