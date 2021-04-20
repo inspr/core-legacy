@@ -8,9 +8,10 @@ type Node struct {
 	Spec NodeSpec `yaml:"spec,omitempty"  json:"spec"`
 }
 
+// NodePort represents a connection for a node
 type NodePort struct {
-	Port       int
-	TargetPort int
+	Port       int `yaml:"port" json:"port"`
+	TargetPort int `yaml:"node_port" json:"node_port"`
 }
 
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.
