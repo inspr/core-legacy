@@ -182,7 +182,7 @@ func TestClient_Alias(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewControllerClient(tt.fields.rc)
+			c := NewControllerClient("mock", nil)
 			got := c.Alias()
 
 			if check(got) != check(tt.want) {

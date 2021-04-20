@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	cli "github.com/inspr/inspr/cmd/inspr/cli"
+	"github.com/inspr/inspr/cmd/inspr/cli"
 
 	"github.com/inspr/inspr/pkg/meta"
 )
