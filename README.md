@@ -64,31 +64,47 @@ Inspr is an engine for running distributed applications, using multiple communic
 ## 🎉 Getting Started
 
 ### Cluster
+First of all, it's important to have access to a Kubernetes cluster that is up and running. The cluster can be hosted on a local machine, or via a cloud service like GCloud or AWS (more info about cluster creation [here](https://kubernetes.io/docs/tutorials/kubernetes-basics/create-cluster/)).
 
-The recommended way to install inspr in a kubernetes cluster is by using helm.
+The recommended way to install Inspr in a Kubernetes cluster is by using Helm.  
+Helm is a package manager for Kubernetes, and by using it the installation process is much simpler. Read more about Helm and how to install it [here](https://helm.sh/).
 
-the first step is add the helm chart repository to the cluster:
+After downloading Helm, the first step is to add the Helm chart repository to the cluster:
 
 ```bash
 helm repo add inspr https://inspr-charts.storage.googleapis.com
 ```
 
-Then install inspr with the command:
+Then install Insprd with the following command, replacing inspr_name by the desired Inspr cluster name.:
 
 ```bash
 helm install inspr_name inspr/insprd
 ```
 
-replacing inspr_name by the desired inspr cluster name.
-
-Aditionaly you can check the default values file for the helm chart. 
-They are included in the `build/helm` folder and can be edited for further refinement of the properties.
+Additionaly you can check the default values file for the Helm chart. 
+They are included in the `build/helm` folder and can be edited for further refinement and customization of it's properties.
 
 ### CLI
+After installing Insprd in the cluster, the Inspr CLI must be installed so that it is possible to create and manage Inspr structures in the cluster. 
 
-To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.
-TODO: Add link to the install script for the CLI.
+To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.  
+For **Linux/Mac** you can install the latest version by running the following command on the terminal:
+```bash
+curl -s https://storage.googleapis.com/inspr-cli/install_cli.sh | bash
+```  
 
+You can check if the installation was successful by typing `inspr -h` on your terminal.  
+Before starting to use the CLI, be sure to check that it is referencing your cluster. First check the current config using: 
+```bash
+inspr config list
+```
+And if the `serverip` is not the hostname currently being used to access the cluster IP, it must be modified:
+```bash
+inspr config serverip http://<your_domain>.com
+```
+
+And now you're good to go!  
+To follow a step-by-step tutorial on how to implement your first Inspr application, [click here!](https://github.com/inspr/inspr/blob/develop/docs/workspace_init.md)
 
 ## Documentation
 
