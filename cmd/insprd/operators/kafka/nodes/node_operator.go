@@ -13,16 +13,23 @@ import (
 	"k8s.io/client-go/rest"
 
 	kubeApp "k8s.io/api/apps/v1"
+	kubeCore "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 	v1 "k8s.io/client-go/kubernetes/typed/apps/v1"
+	cv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 //NodeOperator defines a node operations interface.
 type NodeOperator struct {
 	clientSet kubernetes.Interface
 	memory    memory.Manager
+}
+
+func (no *NodeOperator) services() cv1.ServiceInterface {
+	appsNamespace := getK8SVariables().AppsNamespace
+	return no.clientSet.CoreV1().Services(appsNamespace)
 }
 
 func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
@@ -42,12 +49,12 @@ func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node,
 	dep, err := kube.Get(deployName, metav1.GetOptions{})
 	if err != nil {
 		logger.Error("unable to find k8s deployment")
-		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
 
 	node, err := toNode(dep)
 	if err != nil {
-		return &meta.Node{}, err
+		return nil, err
 	}
 	return &node, nil
 }
@@ -65,19 +72,28 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 
 	logger.Debug("converting dApp to the k8s deployment to be created")
 	var deploy *kubeApp.Deployment
-	kube := no.retrieveKube()
-	deploy = no.dAppToDeployment(app)
+	var svc *kubeCore.Service
 
+	kube := no.retrieveKube()
+	services := no.services()
+
+	deploy = no.dAppToDeployment(app)
+	svc = dappToService(app)
 	logger.Debug("creating the k8s deployment")
 	dep, err := kube.Create(deploy)
 	if err != nil {
 		logger.Error("unable to create the k8s deployment")
-		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
 
+	_, err = services.Create(svc)
+	if err != nil {
+		logger.Error("unable to create the k8s service")
+		return nil, ierrors.NewError().InnerError(err).Message("unable to create kubernetes service").Build()
+	}
 	node, err := toNode(dep)
 	if err != nil {
-		return &meta.Node{}, err
+		return nil, err
 	}
 	return &node, nil
 }
@@ -90,19 +106,29 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 
 	logger.Debug("converting dApp to the k8s deployment to be updated")
 	var deploy *kubeApp.Deployment
+	var svc *kubeCore.Service
+
 	kube := no.retrieveKube()
+	services := no.services()
+
 	deploy = no.dAppToDeployment(app)
+	svc = dappToService(app)
 
 	logger.Debug("updating the k8s deployment")
 	dep, err := kube.Update(deploy)
 	if err != nil {
 		logger.Error("unable to update the k8s deployment")
-		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.NewError().Message(err.Error()).Build()
+	}
+	_, err = services.Update(svc)
+	if err != nil {
+		logger.Error("unable to update the k8s service")
+		return nil, ierrors.NewError().InnerError(err).Message("unable to update kubernetes service").Build()
 	}
 
 	node, err := toNode(dep)
 	if err != nil {
-		return &meta.Node{}, err
+		return nil, err
 	}
 	return &node, nil
 }

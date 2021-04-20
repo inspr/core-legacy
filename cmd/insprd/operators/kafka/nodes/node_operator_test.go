@@ -96,7 +96,6 @@ func TestNodeOperator_GetNode(t *testing.T) {
 				ctx: context.Background(),
 				app: &meta.App{},
 			},
-			want:    &meta.Node{},
 			wantErr: true,
 		},
 	}

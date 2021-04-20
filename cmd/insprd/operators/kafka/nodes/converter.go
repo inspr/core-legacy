@@ -13,6 +13,7 @@ import (
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
@@ -155,6 +156,31 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 			Replicas: replicas,
 		},
 	}
+}
+
+func dappToService(app *meta.App) *kubeCore.Service {
+	appID := toAppID(app)
+	appDeployName := toDeploymentName(app)
+	appLabels := map[string]string{"app": appID}
+
+	svc := &kubeCore.Service{
+		ObjectMeta: kubeMeta.ObjectMeta{
+			Name: appDeployName,
+		},
+		Spec: kubeCore.ServiceSpec{
+			Ports: func() (ports []kubeCore.ServicePort) {
+				for _, port := range app.Spec.Node.Spec.Ports {
+					ports = append(ports, kubeCore.ServicePort{
+						Port:       int32(port.Port),
+						TargetPort: intstr.FromInt(port.TargetPort),
+					})
+				}
+				return
+			}(),
+			Selector: appLabels,
+		},
+	}
+	return svc
 }
 
 // toDeployment - creates the kubernetes deployment name from the app
