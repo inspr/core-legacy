@@ -90,12 +90,10 @@ Helm is a package manager for Kubernetes, and by using it the installation proce
 After downloading Helm, the first step is to add the Helm chart repository to the cluster:
 
 ```bash
+# add the helm chart repository to the cluster:
 helm repo add inspr https://inspr-charts.storage.googleapis.com
-```
 
-Then install Insprd with the following command, replacing inspr_name by the desired Inspr cluster name.:
-
-```bash
+# replace inspr_name by the cluster's desired name and install insprd
 helm install inspr_name inspr/insprd
 ```
 
@@ -106,7 +104,7 @@ They are included in the `build/helm` folder and can be edited for further refin
 After installing Insprd in the cluster, the Inspr CLI must be installed so that it is possible to create and manage Inspr structures in the cluster. 
 
 To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.  
-For **Linux/Mac** you can install the latest version by running the following command on the terminal:
+For **Linux / Mac** you can install the latest version by running the following command on the terminal:
 ```bash
 curl -s https://storage.googleapis.com/inspr-cli/install_cli.sh | bash
 ```  
