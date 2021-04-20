@@ -53,11 +53,14 @@ func generatePrivateKey() (*rsa.PrivateKey, error) {
 	return privateKey, nil
 }
 
-// encodePrivateKeyToPEM encodes Private Key from RSA to PEM format
-func encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) []byte {
+func encodeKeysToPEM(privateKey *rsa.PrivateKey) (pubKey []byte, privKey []byte, err error) {
 	// Get ASN.1 DER format
 	privDER := x509.MarshalPKCS1PrivateKey(privateKey)
-
+	publicKeyBytes, err := generatePublicKey(&privateKey.PublicKey)
+	if err != nil {
+		logger.Fatal(err.Error())
+		return nil, nil, err
+	}
 	// pem.Block
 	privBlock := pem.Block{
 		Type:    "RSA PRIVATE KEY",
@@ -65,10 +68,16 @@ func encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) []byte {
 		Bytes:   privDER,
 	}
 
+	pubBlock := pem.Block{
+		Type:    "RSA PUBLIC KEY",
+		Headers: nil,
+		Bytes:   publicKeyBytes,
+	}
+
 	// Private key in PEM format
 	privatePEM := pem.EncodeToMemory(&privBlock)
-
-	return privatePEM
+	publicPEM := pem.EncodeToMemory(&pubBlock)
+	return privatePEM, publicPEM, nil
 }
 
 // generatePublicKey take a rsa.PublicKey and return bytes suitable for writing to .pub file
@@ -109,12 +118,10 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
-		publicKeyBytes, err := generatePublicKey(&privateKey.PublicKey)
+		privateKeyBytes, publicKeyBytes, err := encodeKeysToPEM(privateKey)
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
-
-		privateKeyBytes := encodePrivateKeyToPEM(privateKey)
 
 		privSec := corev1.Secret{
 			Type: corev1.SecretTypeOpaque,

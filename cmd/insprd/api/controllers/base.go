@@ -7,6 +7,7 @@ import (
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/operators"
+	"github.com/inspr/inspr/pkg/auth"
 	"go.uber.org/zap"
 )
 
@@ -25,15 +26,17 @@ type Server struct {
 	Mux           *http.ServeMux
 	MemoryManager memory.Manager
 	op            operators.OperatorInterface
+	auth          auth.Auth
 }
 
 // Init - configures the server
-func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface) {
+func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface, auth auth.Auth) {
 	logger.Info("initializing Insprd server")
 
 	s.Mux = http.NewServeMux()
 	s.MemoryManager = mm
 	s.op = op
+	s.auth = auth
 	s.initRoutes()
 }
 

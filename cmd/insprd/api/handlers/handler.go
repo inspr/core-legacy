@@ -23,18 +23,19 @@ func init() {
 type Handler struct {
 	Memory          memory.Manager
 	Operator        operators.OperatorInterface
-	auth            auth.Auth
+	Auth            auth.Auth
 	diffReactions   []diff.DifferenceReaction
 	changeReactions []diff.ChangeReaction
 }
 
 // NewHandler creates a handler from a memory manager and an operator. It also initializes the reactors for
 // changes on the cluster.
-func NewHandler(memory memory.Manager, operator operators.OperatorInterface) *Handler {
+func NewHandler(memory memory.Manager, operator operators.OperatorInterface, auth auth.Auth) *Handler {
 	logger.Info("creating new Insprd API handler")
 	h := Handler{
 		Memory:          memory,
 		Operator:        operator,
+		Auth:            auth,
 		diffReactions:   []diff.DifferenceReaction{},
 		changeReactions: []diff.ChangeReaction{},
 	}

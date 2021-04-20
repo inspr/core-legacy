@@ -29,7 +29,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			!strings.HasPrefix(headerContent[0], "Bearer ") {
 			http.Error(
 				w,
-				"Bad Request, expected: Authorization: <token>",
+				"Bad Request, expected: Authorization: Bearer <token>",
 				http.StatusBadRequest,
 			)
 			return
@@ -116,6 +116,7 @@ type CRUDHandler interface {
 	HandleDelete() Handler
 	HandleUpdate() Handler
 	HandleGet() Handler
+	GetAuth() auth.Auth
 }
 
 // HandleCRUD uses a CRUDHandler to handle HTTP requests for a CRUD resource
@@ -124,16 +125,16 @@ func HandleCRUD(handler CRUDHandler) Handler {
 		switch r.Method {
 
 		case http.MethodGet:
-			handler.HandleGet().JSON().Recover()(w, r)
+			handler.HandleGet().Validate(handler.GetAuth()).JSON().Recover()(w, r)
 
 		case http.MethodPost:
-			handler.HandleCreate().JSON().Recover()(w, r)
+			handler.HandleCreate().Validate(handler.GetAuth()).JSON().Recover()(w, r)
 
 		case http.MethodPut:
-			handler.HandleUpdate().JSON().Recover()(w, r)
+			handler.HandleUpdate().Validate(handler.GetAuth()).JSON().Recover()(w, r)
 
 		case http.MethodDelete:
-			handler.HandleDelete().JSON().Recover()(w, r)
+			handler.HandleDelete().Validate(handler.GetAuth()).JSON().Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)

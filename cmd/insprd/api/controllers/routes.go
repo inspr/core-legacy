@@ -8,7 +8,7 @@ import (
 func (s *Server) initRoutes() {
 	logger.Debug("initializing Insprd server routes")
 	h := handler.NewHandler(
-		s.MemoryManager, s.op,
+		s.MemoryManager, s.op, s.auth,
 	)
 
 	ahandler := h.NewAppHandler()
@@ -23,5 +23,5 @@ func (s *Server) initRoutes() {
 	aliasHandler := h.NewAliasHandler()
 	s.Mux.Handle("/alias", rest.HandleCRUD(aliasHandler))
 
-	s.Mux.Handle("/auth", h.TokenHandler())
+	s.Mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
 }
