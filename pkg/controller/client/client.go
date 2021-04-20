@@ -1,6 +1,8 @@
 package client
 
 import (
+	"encoding/json"
+
 	"github.com/inspr/inspr/pkg/controller"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
@@ -11,9 +13,10 @@ type Client struct {
 }
 
 // NewControllerClient return a new Client
-func NewControllerClient(rc *request.Client) controller.Interface {
+func NewControllerClient(url string, token []byte) controller.Interface {
+	client := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Token(token).Build()
 	return &Client{
-		HTTPClient: rc,
+		HTTPClient: client,
 	}
 }
 

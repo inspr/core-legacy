@@ -51,12 +51,11 @@ var flagRegistry = []Flag{
 		DefinedOn:     []string{"apply"},
 	},
 	{
-		Name:          "specificTag",
-		Usage:         "tag used only by hidden subcommand",
-		Value:         &InsprOptions.SampleFlagValue,
-		DefValue:      "",
-		FlagAddMethod: "",
-		DefinedOn:     []string{"hidden"},
+		Name:      "token",
+		Shorthand: "t",
+		Usage:     "set the token for the command",
+		Value:     &InsprOptions.Token,
+		DefValue:  "$HOME/.inspr/token",
 	},
 }
 

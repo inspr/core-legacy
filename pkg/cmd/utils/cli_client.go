@@ -1,14 +1,13 @@
 package utils
 
 import (
-	"encoding/json"
 	"io"
 	"os"
 
+	"github.com/inspr/inspr/pkg/cmd"
 	"github.com/inspr/inspr/pkg/controller"
 	"github.com/inspr/inspr/pkg/controller/client"
 	"github.com/inspr/inspr/pkg/controller/mocks"
-	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 type cliGlobalStructure struct {
@@ -37,9 +36,7 @@ func GetCliOutput() io.Writer {
 //SetDefaultClient creates cli's controller client from viper's configured serverIp
 func setGlobalClient() {
 	url := GetConfiguredServerIP()
-	rc := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
-
-	defaults.client = client.NewControllerClient(rc)
+	SetClient(url)
 }
 
 func setGlobalOutput() {
@@ -53,8 +50,7 @@ func SetOutput(out io.Writer) {
 
 // SetClient sets the default server IP of CLI
 func SetClient(url string) {
-	rc := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build()
-	defaults.client = client.NewControllerClient(rc)
+	defaults.client = client.NewControllerClient(url, GetToken(cmd.InsprOptions.Token))
 }
 
 //SetMockedClient configures singleton's client as a mocked client given a error

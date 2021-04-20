@@ -13,4 +13,6 @@ var InsprOptions struct {
 	DryRun bool
 	// Update defines if Apply is going to create a new app or update an existing one
 	Update bool
+
+	Token string
 }
