@@ -149,6 +149,7 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 
 		apply, err := GetFactory().GetRunMethod(file.component)
 		if err != nil {
+			cliutils.RequestErrorMessage(err, out)
 			continue
 		}
 
