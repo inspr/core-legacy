@@ -64,18 +64,6 @@ func (ierror *InsprError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(*ierror)
 }
 
-// Unauthorized adds Unauthorized code to Inspr Error
-func (b *ErrBuilder) Unauthorized() *ErrBuilder {
-	b.err.Code = Unauthorized
-	return b
-}
-
-// Forbidden adds Forbidden code to Inspr Error
-func (b *ErrBuilder) Forbidden() *ErrBuilder {
-	b.err.Code = Forbidden
-	return b
-}
-
 // UnmarshalJSON a struct function that allows for operations to be done
 // before or after the json.Unmarshal procedure
 func (ierror *InsprError) UnmarshalJSON(data []byte) error {
