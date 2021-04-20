@@ -51,7 +51,7 @@ For Inspr’s point of view, a dApp is defined as an abstraction on top of the c
 
 ## 🎛 Compose
 <div align="center">
-<img src="./docs/img/dapp-compose.png" width="640px">
+<img src="./docs/img/dapp-compose.png" width="800px">
 </div>
 
 With Inspr one dApp can be connected to another and those two will become a new application. Consider as an example where we’re creating a online shop called “Sammyfy”. To build this product we’ll need a few services such as payment, catalog, and delivery.
@@ -61,7 +61,7 @@ Of course, we could create those three services and interconnect them by using R
 ## 📡 Comunicate
 
 <div align="center">
-<img src="./docs/img/dapp-comunication.png" width="640px">
+<img src="./docs/img/dapp-comunication.png" width="800px">
 </div>
 
 ## 🔐 Secure
