@@ -35,10 +35,17 @@ type AppBoundary struct {
 //
 // The boundary represent the possible connections to other apps, and the fields that can be overriten when instantiating the app.
 type AppSpec struct {
-	Node         Node                    `yaml:"node,omitempty" json:"node"`
-	Apps         map[string]*App         `yaml:"apps,omitempty" json:"apps"`
-	Channels     map[string]*Channel     `yaml:"channels,omitempty" json:"channels"`
-	ChannelTypes map[string]*ChannelType `yaml:"channeltypes,omitempty" json:"channeltypes"`
-	Aliases      map[string]*Alias       `yaml:"aliases" json:"aliases"`
-	Boundary     AppBoundary             `yaml:"boundary,omitempty" json:"boundary"`
+	Node         Node                    `yaml:"node,omitempty"   json:"node"`
+	Apps         map[string]*App         `yaml:"apps,omitempty"   json:"apps"`
+	Channels     map[string]*Channel     `yaml:"channels,omitempty"   json:"channels"`
+	ChannelTypes map[string]*ChannelType `yaml:"channeltypes,omitempty"   json:"channel_types"`
+	Aliases      map[string]*Alias       `yaml:"aliases"   json:"aliases"`
+	Boundary     AppBoundary             `yaml:"boundary,omitempty"   json:"boundary"`
+	Auth         AppAuth                 `yaml:"auth"  json:"auth"`
+}
+
+// AppAuth represents the permissions that a dApp (and its sons) contains
+type AppAuth struct {
+	Scope       string            `yaml:"scope"  json:"scope"`
+	Permissions utils.StringArray `yaml:"permissions"  json:"permissions"`
 }
