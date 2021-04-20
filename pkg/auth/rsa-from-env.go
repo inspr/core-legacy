@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// GetPublicKey resolves the rssa public key from the enviroment variable.
 func GetPublicKey() (*rsa.PublicKey, error) {
 	pubBytes, ok := os.LookupEnv("AUTH_PATH")
 	if !ok {
@@ -17,16 +18,17 @@ func GetPublicKey() (*rsa.PublicKey, error) {
 	}
 
 	pubBlock, _ := pem.Decode([]byte(pubBytes))
-	if pubBlock.Type != "RSA PRIVATE KEY" {
+	if pubBlock.Type != "RSA PUBLIC KEY" {
 		err := ierrors.NewError().InternalServer().Message("RSA public key is of the wrong type").Build()
 		return nil, err
 	}
 
 	parsed, _, _, _, err := ssh.ParseAuthorizedKey(pubBlock.Bytes)
-	parsedCryptoKey := parsed.(ssh.CryptoPublicKey)
 	if err != nil {
 		return nil, err
 	}
+
+	parsedCryptoKey := parsed.(ssh.CryptoPublicKey)
 
 	// Then, we can call CryptoPublicKey() to get the actual crypto.PublicKey
 	pubCrypto := parsedCryptoKey.CryptoPublicKey()

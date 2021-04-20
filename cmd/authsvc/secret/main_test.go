@@ -24,16 +24,16 @@ func Test_KeyGen(t *testing.T) {
 		logger.Fatal(err.Error())
 	}
 
-	if ok := verifyKeyPair(string(privateKeyBytes), string(publicKeyBytes)); !ok {
+	if ok := verifyKeyPair(privateKeyBytes, publicKeyBytes); !ok {
 		t.Errorf("alalala")
 	}
 
 }
 
-func verifyKeyPair(private, public string) bool {
-	block, _ := pem.Decode([]byte(private))
+func verifyKeyPair(private, public []byte) bool {
+	block, _ := pem.Decode(private)
 	key, _ := x509.ParsePKCS1PrivateKey(block.Bytes)
-	pubBlock, _ := pem.Decode([]byte(public))
+	pubBlock, _ := pem.Decode(public)
 	parsed, _, _, _, err := ssh.ParseAuthorizedKey(pubBlock.Bytes)
 	parsedCryptoKey := parsed.(ssh.CryptoPublicKey)
 	if err != nil {

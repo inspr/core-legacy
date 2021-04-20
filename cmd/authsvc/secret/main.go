@@ -53,7 +53,7 @@ func generatePrivateKey() (*rsa.PrivateKey, error) {
 	return privateKey, nil
 }
 
-func encodeKeysToPEM(privateKey *rsa.PrivateKey) ([]byte, []byte, error) {
+func encodeKeysToPEM(privateKey *rsa.PrivateKey) (pubKey []byte, privKey []byte, err error) {
 	// Get ASN.1 DER format
 	privDER := x509.MarshalPKCS1PrivateKey(privateKey)
 	publicKeyBytes, err := generatePublicKey(&privateKey.PublicKey)
