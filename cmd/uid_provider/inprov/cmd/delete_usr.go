@@ -26,7 +26,7 @@ var deleteUserCmd = build.NewCmd("delete").WithDescription(
 	},
 }).ExactArgs(2, deleteAction)
 
-func deleteAction(c context.Context, s []string) error {
+func deleteAction(ctx context.Context, inputArgs []string) error {
 
-	return cl.DeleteUser(c, s[0], s[1], deleteUsrOptions.username)
+	return cl.DeleteUser(ctx, inputArgs[0], inputArgs[1], deleteUsrOptions.username)
 }

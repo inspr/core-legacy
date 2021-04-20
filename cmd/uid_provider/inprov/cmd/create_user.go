@@ -72,7 +72,7 @@ var createUserCmd = build.NewCmd(
 	},
 }).ExactArgs(2, createUser)
 
-func createUser(c context.Context, s []string) error {
+func createUser(ctx context.Context, inputArgs []string) error {
 	var err error
 	var usr client.User
 	if createUsrOptions.yaml != "" {
@@ -111,6 +111,6 @@ func createUser(c context.Context, s []string) error {
 		return errors.New("password not informed")
 	}
 
-	err = cl.CreateUser(c, s[0], s[1], usr)
+	err = cl.CreateUser(ctx, inputArgs[0], inputArgs[1], usr)
 	return err
 }
