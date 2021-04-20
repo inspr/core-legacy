@@ -193,3 +193,40 @@ func TestClient_Alias(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_Auth(t *testing.T) {
+	check := func(x interface{}) bool {
+		// Declare a type object representing AuthorizationInterface
+		authI := reflect.TypeOf((*controller.AuthorizationInterface)(nil)).Elem()
+		// see if implements the AuthorizationInterface
+		return reflect.PtrTo(reflect.TypeOf(x)).Implements(authI)
+	}
+	type fields struct {
+		rc *request.Client
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   controller.AuthorizationInterface
+	}{
+		{
+			name:   "auth_creation",
+			fields: fields{rc: request.NewJSONClient("mock")},
+			want:   mocks.NewAuthMock(nil),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := NewControllerClient(tt.fields.rc)
+			got := c.Authorization()
+
+			if check(got) != check(tt.want) {
+				t.Errorf(
+					"Client.Authorization() = %v, want %v",
+					check(got),
+					check(tt.want),
+				)
+			}
+		})
+	}
+}
