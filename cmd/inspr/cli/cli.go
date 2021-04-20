@@ -17,19 +17,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 		WithLongDescription("main command of the inspr cli, to see the full list of subcommands existent please use 'inspr help'").
 		Super()
 
-	rootCmd.PersistentPreRunE = func(cm *cobra.Command, args []string) error {
-		cm.Root().SilenceUsage = true
-		// viper defaults values or reads from the config location
-		cliutils.InitViperConfig()
-
-		homeDir, _ := os.UserHomeDir()
-
-		if err := cliutils.ReadViperConfig(homeDir); err != nil {
-			return err
-		}
-
-		return nil
-	}
+	rootCmd.PersistentPreRunE = mainCmdPreRun
 	rootCmd.Version = version
 
 	// other commmands
@@ -42,4 +30,18 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 	rootCmd.AddCommand(NewConfigChangeCmd())
 	// root persistentFlags
 	return rootCmd
+}
+
+func mainCmdPreRun(cm *cobra.Command, args []string) error {
+	cm.Root().SilenceUsage = true
+	// viper defaults values or reads from the config location
+	cliutils.InitViperConfig()
+
+	homeDir, _ := os.UserHomeDir()
+
+	if err := cliutils.ReadViperConfig(homeDir); err != nil {
+		return err
+	}
+
+	return nil
 }

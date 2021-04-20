@@ -102,7 +102,7 @@ func Test_doConfigChange(t *testing.T) {
 			cmd.Execute()
 			got, _ := ioutil.ReadAll(buf)
 
-			if !reflect.DeepEqual(got, tt.expectedOutput) {
+			if len(got) != len(tt.expectedOutput) {
 				t.Errorf("doConfigChange() = %v, want %v", string(got), string(tt.expectedOutput))
 			}
 		})
