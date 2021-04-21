@@ -19,7 +19,7 @@ func Desserialize(tokenBytes []byte) (*models.Payload, error) {
 
 	load, ok := token.Get("payload")
 	if !ok {
-		err = ierrors.NewError().InternalServer().Message("error: jwt token didn't carry a payload").Build()
+		err = ierrors.NewError().InternalServer().Message("jwt token didn't carry a payload").Build()
 		return nil, err
 	}
 
