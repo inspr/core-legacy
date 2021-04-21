@@ -21,11 +21,8 @@ func (server *Server) Refresh() rest.Handler {
 
 		if len(headerContent) != 1 ||
 			!strings.HasPrefix(headerContent[0], "Bearer ") {
-			http.Error(
-				w,
-				"Bad Request, expected: Authorization: Bearer <token>",
-				http.StatusUnauthorized,
-			)
+			err := ierrors.NewError().Unauthorized().Message("Bad Request, expected: Authorization: Bearer <token>").Build()
+			rest.ERROR(w, err)
 			return
 		}
 
@@ -37,32 +34,28 @@ func (server *Server) Refresh() rest.Handler {
 			jwt.WithVerify(jwa.RS256, server.privKey.PublicKey),
 		)
 		if err != nil {
-			http.Error(
-				w,
-				"Invalid token",
-				http.StatusForbidden,
-			)
+			err := ierrors.NewError().Forbidden().Message("Invalid token").Build()
+			rest.ERROR(w, err)
 			return
 		}
 
 		load, err := auth.Desserialize(token)
 		if err != nil {
-			http.Error(
-				w,
-				"Invalid token",
-				http.StatusForbidden,
-			)
+			err := ierrors.NewError().Forbidden().Message("Invalid token, error: %s", err.Error()).Build()
+			rest.ERROR(w, err)
 			return
 		}
 
 		payload, err := refreshPayload(load.Refresh, load.RefreshURL)
 		if err != nil {
+			err := ierrors.NewError().InternalServer().Message("Invalid token").Build()
 			rest.ERROR(w, err)
 			return
 		}
 
 		signed, err := server.tokenize(*payload)
 		if err != nil {
+			err := ierrors.NewError().InternalServer().Message(err.Error()).Build()
 			rest.ERROR(w, err)
 			return
 		}
@@ -70,6 +63,7 @@ func (server *Server) Refresh() rest.Handler {
 		respBody := models.JwtDO{
 			Token: signed,
 		}
+
 		rest.JSON(w, http.StatusOK, respBody)
 	}
 }
