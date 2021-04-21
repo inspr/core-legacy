@@ -27,5 +27,5 @@ func (h *Handler) TokenHandler() rest.Handler {
 			Token: token,
 		})
 
-	}).Post().JSON()
+	}).Recover().Post().JSON()
 }
