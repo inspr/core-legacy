@@ -58,7 +58,7 @@ touch ping/ping.go
 
 In _ping.go_, we will define a `main` function that does the following:
 
-1. Creates a new dApp Client, which is used to write and read messages in Channels through the Sidecar (check [dApp Architecture Overview](dapp-overview.md) for more details).
+1. Creates a new dApp Client, which is used to write and read messages in Channels through the Sidecar (check [dApp Architecture Overview](dapp_overview.md) for more details).
 2. Initiates an endless `for loop` in which the message "Ping!" is written in the Channel _pingoutput_, then the application proceeds to read a message from Channel _pinginput_. If there are any messages, they are read and displayed in the terminal.
 
 To begin the implementation we first must declare a new structure type, here called `expectedDataType`, which contains a field called "Channel" that is a string, and another field called "Message" that is a struct:
@@ -391,7 +391,7 @@ First of all, from "/pingpong_demo" we access the folder "/yamls" created previo
 cd yamls
 ```
 
-And within this folder we will create the _.yaml_ files which describe each of the Inspr structures that will be built inside the cluster. This part of the tutorial wont take a closer look at every minimum detail on how to write the YAML files, but you can find more information about it [here](yamls.md).
+And within this folder we will create the _.yaml_ files which describe each of the Inspr structures that will be built inside the cluster. This part of the tutorial wont take a closer look at every minimum detail on how to write the YAML files, but you can find more information about it [here](./yamls/index.md).
 
 **1) dApp YAMLs**  
 The first file to be created is _table.yaml_, which is the dApp that will contain Ping and Pong Nodes:
@@ -636,7 +636,7 @@ inspr apply -f yamls/table.yaml
 inspr apply -k yamls/nodes
 ```
 
-To learn more about Inspr CLI, check [this](cli_commands.md) documentation.
+To learn more about Inspr CLI, check [this](cli/inspr.md) documentation.
 
 If everything worked fine, the Inspr deamon will have printed a changelog similar to the following for each command written in your terminal:
 
