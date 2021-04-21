@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	cli "github.com/inspr/inspr/cmd/inspr/cli"
+	"github.com/inspr/inspr/cmd/inspr/cli"
 
 	"github.com/inspr/inspr/pkg/meta"
 )
@@ -31,6 +31,11 @@ func main() {
 		APIVersion: "v1",
 		Kind:       "dapp",
 	}, cli.NewApplyApp())
+
+	cli.GetFactory().Subscribe(meta.Component{
+		APIVersion: "v1",
+		Kind:       "alias",
+	}, cli.NewApplyAlias())
 
 	cli.NewInsprCommand(os.Stdout, os.Stderr, version).Execute()
 }

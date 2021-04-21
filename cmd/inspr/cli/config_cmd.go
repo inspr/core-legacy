@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -22,7 +22,7 @@ func NewConfigChangeCmd() *cobra.Command {
 		ExactArgs(2, doConfigChange)
 }
 
-// NewListConfig - config subcommand that shows all existant variables in the config
+// NewListConfig - config subcommand that shows all existent variables in the config
 func NewListConfig() *cobra.Command {
 	return cmd.NewCmd("list").
 		WithDescription("See the list of configuration variables and their current values").

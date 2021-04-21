@@ -26,7 +26,7 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 	}
 }
 
-// ERROR reports the error back to the user withing a JSON format
+// ERROR reports the error back to the user within a JSON format
 func ERROR(w http.ResponseWriter, err error) {
 	switch e := err.(type) {
 	case *ierrors.InsprError:
@@ -47,10 +47,10 @@ func ERROR(w http.ResponseWriter, err error) {
 			JSON(w, http.StatusForbidden, e)
 		case ierrors.BadRequest:
 			JSON(w, http.StatusBadRequest, e)
-		case ierrors.Forbidden:
-			JSON(w, http.StatusForbidden, e)
 		case ierrors.Unauthorized:
 			JSON(w, http.StatusUnauthorized, e)
+		case ierrors.Forbidden:
+			JSON(w, http.StatusForbidden, e)
 		default:
 			JSON(w, http.StatusInternalServerError, e)
 		}

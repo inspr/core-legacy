@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
 	"github.com/inspr/inspr/pkg/cmd"
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
@@ -69,7 +69,7 @@ func schemaNeedsInjection(schema string) bool {
 	_, err := os.Stat(schema)
 	if !os.IsNotExist(err) &&
 		(filepath.Ext(schema) == ".schema" || filepath.Ext(schema) == ".avsc") {
-		// file exists and has the right extention
+		// file exists and has the right extension
 		return true
 	}
 	return false

@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
 	"github.com/inspr/inspr/pkg/cmd"
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta/utils"
 )
@@ -41,15 +41,26 @@ func NewDescribeCmd() *cobra.Command {
 		WithCommonFlags().
 		ExactArgs(1, displayChannelTypeState)
 
+	describeAlias := cmd.NewCmd("alias <alias_key | alais_path>").
+		WithDescription("Retrieves the full state of the alias from a given namespace").
+		WithExample("Display the state of the given alias on the default scope", "describe alias myalias").
+		WithExample("Display the state of the given alias on a custom scope", "describe alias --scope app1.app2 myalias").
+		WithExample("Display the state of the given alias by the path", "describe alias app1.app2.myalias").
+		WithAliases([]string{"al"}).
+		WithCommonFlags().
+		ExactArgs(1, displayAlias)
+
 	describeCmd := cmd.NewCmd("describe").
 		WithDescription("Retrieves the full state of a component from a given namespace").
 		WithExample("Describes the app component type", "describe apps <namespace>").
 		WithExample("Describes the app component type", "describe a <namespace> --scope <specific-scope>").
 		WithExample("Describes the channel component type", "describe ch <namespace>").
-		WithLongDescription("describe takes a component type (apps | channels | ctypes) plus the name of the component, and displays the state tree)").
+		WithExample("Describes the alias component type", "describe al <namespace>").
+		WithLongDescription("describe takes a component type (apps | channels | ctypes | alias) plus the name of the component, and displays the state tree)").
 		AddSubCommand(describeApp).
 		AddSubCommand(describeChannel).
 		AddSubCommand(describeChannelType).
+		AddSubCommand(describeAlias).
 		Super()
 
 	return describeCmd
@@ -126,6 +137,31 @@ func displayChannelTypeState(_ context.Context, args []string) error {
 		return err
 	}
 	utils.PrintChannelTypeTree(channelType, out)
+
+	return nil
+}
+
+func displayAlias(_ context.Context, args []string) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+
+	scope, err := cliutils.GetScope()
+	if err != nil {
+		return err
+	}
+
+	path, aliasKey, err := cliutils.ProcessArg(args[0], scope)
+	if err != nil {
+		return err
+	}
+
+	alias, err := client.Alias().Get(context.Background(), path, aliasKey)
+	if err != nil {
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
+	}
+
+	utils.PrintAliasTree(alias, out)
 
 	return nil
 }

@@ -4,7 +4,7 @@ main command of the inspr cli
 
 ### Synopsis
 
-main command of the inspr cli, to see the full list of subcommands existant please use 'inspr help'
+main command of the inspr cli, to see the full list of subcommands existent please use 'inspr help'
 
 ```
 inspr [flags]

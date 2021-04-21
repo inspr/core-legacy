@@ -12,8 +12,8 @@ import (
 	"testing"
 	"text/tabwriter"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
-	"github.com/inspr/inspr/cmd/insprd/api/models"
+	"github.com/inspr/inspr/pkg/api/models"
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/rest"
@@ -587,6 +587,103 @@ func Test_printTab(t *testing.T) {
 
 			if !reflect.DeepEqual(got, tt.tab) {
 				t.Errorf("printTab() error = %v, want %v", string(got), string(tt.tab))
+			}
+		})
+	}
+}
+
+func Test_printAliases(t *testing.T) {
+	type args struct {
+		app   *meta.App
+		lines *[]string
+	}
+	tests := []struct {
+		name  string
+		args  args
+		lines *[]string
+	}{
+		{
+			name: "printAlias test",
+			args: args{
+				app:   getMockApp(),
+				lines: &[]string{},
+			},
+			lines: &[]string{"alias_name\n"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			printAliases(tt.args.app, tt.args.lines)
+			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
+				t.Errorf("printAliases() error = %v, want %v", tt.args.lines, tt.lines)
+			}
+		})
+	}
+}
+
+func Test_getAlias(t *testing.T) {
+	bufResp := bytes.NewBufferString("")
+	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	fmt.Fprint(tabWriter, "NAME\n")
+	fmt.Fprint(tabWriter, "alias_name\n")
+	tabWriter.Flush()
+	outResp, _ := ioutil.ReadAll(bufResp)
+	type args struct {
+		in0 context.Context
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+		tab     []byte
+		handler func(w http.ResponseWriter, r *http.Request)
+	}{
+		{
+			name: "getAlias valid test",
+			args: args{
+				in0: context.Background(),
+			},
+			wantErr: false,
+			tab:     outResp,
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				data := models.AppQueryDI{}
+				decoder := json.NewDecoder(r.Body)
+
+				err := decoder.Decode(&data)
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				app := getMockApp()
+
+				rest.JSON(w, http.StatusOK, app)
+			},
+		},
+		{
+			name: "getAlias invalid test, HTTP error",
+			args: args{
+				in0: context.Background(),
+			},
+			wantErr: true,
+			tab:     outResp,
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(tt.handler))
+			cliutils.SetClient(server.URL)
+			buf := bytes.NewBufferString("")
+			cliutils.SetOutput(buf)
+			err := getAlias(tt.args.in0)
+			got, _ := ioutil.ReadAll(buf)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getAlias() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && !reflect.DeepEqual(got, tt.tab) {
+				t.Errorf("getAlias() error = %v, want %v", string(got), string(tt.tab))
 			}
 		})
 	}

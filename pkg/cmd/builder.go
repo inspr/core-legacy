@@ -74,7 +74,7 @@ func (b *builder) WithCommonFlags() Builder {
 }
 
 // WithFlagAdder - allows the person to set completely different flags,
-// throught the function
+// through the function
 //
 // WithFlagAdder(func(f *pflag.FlagSet) {
 //
@@ -166,7 +166,7 @@ func handleWellKnownErrors(err error) error {
 	}
 
 	return ierrors.NewError().
-		Message("error with the cli").
+		Message(err.Error()).
 		Build()
 }
 

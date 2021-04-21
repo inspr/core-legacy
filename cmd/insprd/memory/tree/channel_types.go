@@ -88,7 +88,7 @@ func (ctm *ChannelTypeMemoryManager) Get(context string, ctName string) (*meta.C
 		}
 	}
 
-	logger.Error("unable to get Channel Type in given context",
+	logger.Debug("unable to get Channel Type in given context",
 		zap.String("ctype", ctName),
 		zap.String("context", context))
 

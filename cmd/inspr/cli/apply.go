@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
 	"github.com/inspr/inspr/pkg/cmd"
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/inspr/inspr/pkg/ierrors"
 
 	"github.com/inspr/inspr/pkg/meta"
@@ -170,7 +170,7 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 }
 
 func getOrderedFiles(path string, files []string) []applied {
-	var apps, channels, ctypes []applied
+	var apps, channels, ctypes, aliases []applied
 	for _, file := range files {
 		if isYaml(file) {
 			comp := meta.Component{}
@@ -191,10 +191,13 @@ func getOrderedFiles(path string, files []string) []applied {
 				channels = append(channels, applied{component: comp, fileName: file, content: f})
 			} else if comp.Kind == "channeltype" {
 				ctypes = append(ctypes, applied{component: comp, fileName: file, content: f})
+			} else if comp.Kind == "alias" {
+				aliases = append(aliases, applied{component: comp, fileName: file, content: f})
 			}
 		}
 	}
 	ordered := append(apps, ctypes...)
 	ordered = append(ordered, channels...)
+	ordered = append(ordered, aliases...)
 	return ordered
 }

@@ -3,10 +3,12 @@ module github.com/inspr/inspr
 go 1.16
 
 require (
+	github.com/alicebob/miniredis/v2 v2.14.3
 	github.com/confluentinc/confluent-kafka-go v1.5.2
 	github.com/disiqueira/gotree v1.0.0
+	github.com/go-redis/redis/v8 v8.8.0
 	github.com/golang/snappy v0.0.2 // indirect
-	github.com/google/go-cmp v0.5.2
+	github.com/google/go-cmp v0.5.5
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/json-iterator/go v1.1.8 // indirect
@@ -23,6 +25,8 @@ require (
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b
 	golang.org/x/sys v0.0.0-20210412220455-f1c623a9e750 // indirect
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
+	golang.org/x/sys v0.0.0-20210220050731-9a76102bfb43 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	golang.org/x/tools v0.1.0 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect

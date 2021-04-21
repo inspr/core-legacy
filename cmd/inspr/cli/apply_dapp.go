@@ -4,8 +4,8 @@ import (
 	"context"
 	"io"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
 	"github.com/inspr/inspr/pkg/cmd"
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"

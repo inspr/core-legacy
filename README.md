@@ -1,8 +1,8 @@
 <p align="center">
-    <img 
-        srcset="./docs/img/logo.png 1x, ./docs/img/logo@2x.png 2x, ./docs/img/logo@3x.png 3x"
-        src="./docs/img/logo@3x.png" 
-        width="128" 
+    <img
+        srcset="https://storage.googleapis.com/inspr/logo.png 1x, https://storage.googleapis.com/inspr/logo%402x.png 2x, https://storage.googleapis.com/inspr/logo%403x.png 3x"
+        src="https://storage.googleapis.com/inspr/logo%403x.png"
+        width="128"
         title="Inspr Logo">
 </p>
 
@@ -71,7 +71,7 @@ helm install inspr_name inspr/insprd
 
 replacing inspr_name by the desired inspr cluster name.
 
-Aditionaly you can check the default values file for the helm chart. 
+Aditionaly you can check the default values file for the helm chart.
 They are included in the `build/helm` folder and can be edited for further refinement of the properties.
 
 ### CLI
@@ -79,13 +79,13 @@ They are included in the `build/helm` folder and can be edited for further refin
 To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.
 TODO: Add link to the install script for the CLI.
 
-
 ## Documentation
 
 The full documentation for Inspr can be found on our [website](https://inspr.com/docs).
 The source for the Inspr documentation and website is hosted on a separate repo, @inspr/docs.
 
 ## Architecture
+
 - TBD
 
 ## 👏 Contributing
@@ -95,11 +95,10 @@ To contribute, please check out our [guide](CONTRIBUTING.md).
 
 ## 📄 License
 
-- Inspr is licenced under MIT [license](LICENSE.md).
+- Inspr is licenced under MIT [license](LICENSE).
 - Inspr documentation is Creative Commons licensed, as found in the [license-docs](LICENSE-docs) file.
 
 ## 📣 Contact
 
 To contact us, please join our [Discord community](https://discord.gg/tmp2564a54).
 Aditionally we are at [Reddit](https://reddit.com/r/inspr)
-
