@@ -51,7 +51,10 @@ For Inspr’s point of view, a dApp is defined as an abstraction on top of the c
 
 ## 🎛 Compose
 <div align="center">
-<img src="./docs/img/dapp-compose.png" width="800px">
+<img 
+    src="./docs/img/dapp-compose.png" 
+    width="800px" 
+    title="Inspr composition example">
 </div>
 
 With Inspr one dApp can be connected to another and those two will become a new application. Consider as an example where we’re creating a online shop called “Sammyfy”. To build this product we’ll need a few services such as payment, catalog, and delivery.
@@ -61,7 +64,10 @@ Of course, we could create those three services and interconnect them by using R
 ## 📡 Comunicate
 
 <div align="center">
-<img src="./docs/img/dapp-comunication.png" width="800px">
+<img 
+    src="./docs/img/dapp-comunication.png" 
+    width="800px" 
+    title="Inspr communication example">
 </div>
 
 ## 🔐 Secure
@@ -97,7 +103,7 @@ helm repo add inspr https://inspr-charts.storage.googleapis.com
 helm install inspr_name inspr/insprd
 ```
 
-Additionaly you can check the default values file for the Helm chart. 
+Additionally you can check the default values file for the Helm chart. 
 They are included in the `build/helm` folder and can be edited for further refinement and customization of it's properties.
 
 ### CLI
