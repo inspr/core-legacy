@@ -81,20 +81,19 @@ func (s *Server) Run(ctx context.Context) {
 
 	log.Println("gracefully shutting down...")
 
-	ctxShutdown, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*5))
+	ctxShutdown, cancel := context.WithDeadline(
+		context.Background(),
+		time.Now().Add(time.Second*5),
+	)
 	defer cancel()
-
-	if err = server.Shutdown(ctxShutdown); err != nil {
-		log.Fatal("error shutting down server")
-	}
 
 	err = os.RemoveAll(s.addr)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("server shutdown complete")
-	if err == http.ErrServerClosed {
-		err = nil
+	// has to be the last method called in the shutdown
+	if err = server.Shutdown(ctxShutdown); err != nil {
+		log.Fatal("error shutting down server")
 	}
 }

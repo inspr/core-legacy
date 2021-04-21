@@ -50,7 +50,7 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 		}
 	}
 
-	logger.Error("unable to get Channel in given context",
+	logger.Debug("unable to get Channel in given context",
 		zap.String("ctype", chName),
 		zap.String("context", context))
 

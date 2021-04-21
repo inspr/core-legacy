@@ -1,0 +1,6 @@
+kind: alias
+apiVersion: v1
+meta:
+  name: aliasOne
+  parent: chcheck
+target: testch0

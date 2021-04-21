@@ -32,19 +32,30 @@ func NewDeleteCmd() *cobra.Command {
 	deleteTypes := cmd.NewCmd("ctypes").
 		WithDescription("Delete channel types from context").
 		WithExample("Delete channel type from the default scope", "delete ctypes <ctypename>").
-		WithExample("Delete channel type from a custom scope", "delete ctypes <ctypename> --scope app1.app2 ").
+		WithExample("Delete channel type from a custom scope", "delete ctypes <ctypename> --scope app1.app2").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		MinimumArgs(1, deleteCTypes)
+
+	deleteAlias := cmd.NewCmd("alias").
+		WithDescription("Delete alias from context").
+		WithExample("Delete alias from default scope", "delete alias <aliaskey>").
+		WithExample("Delete alias from a custom scope", "delete alias <aliaskey> --scope app1.app2").
+		WithAliases([]string{"al"}).
+		WithCommonFlags().
+		MinimumArgs(1, deleteAlias)
+
 	return cmd.NewCmd("delete").
 		WithDescription("Delete component of object type").
-		WithLongDescription("Delete takes a component type (apps | channels | ctypes) its scope and name, and deletes it from the cluster").
+		WithLongDescription("Delete takes a component type (apps | channels | ctypes | alias) its scope and name, and deletes it from the cluster").
 		WithExample("deletes app", "delete apps <app_name>").
 		WithExample("deletes channel", "delete ch <channel_name>").
 		WithExample("deletes channel_type", "delete ct <channel_type_name>").
+		WithExample("deletes alias", "delete al <alias_key>").
 		AddSubCommand(deleteApps).
 		AddSubCommand(deleteChannels).
 		AddSubCommand(deleteTypes).
+		AddSubCommand(deleteAlias).
 		Super()
 
 }
@@ -117,6 +128,32 @@ func deleteCTypes(_ context.Context, args []string) error {
 		}
 
 		cl, err := client.ChannelTypes().Delete(context.Background(), path, ctName, cmd.InsprOptions.DryRun)
+		if err != nil {
+			fmt.Fprint(out, err.Error()+"\n")
+			return err
+		}
+		cl.Print(out)
+	}
+
+	return nil
+}
+
+func deleteAlias(_ context.Context, args []string) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+
+	scope, err := cliutils.GetScope()
+	if err != nil {
+		return err
+	}
+
+	for _, arg := range args {
+		path, aliasKey, err := cliutils.ProcessArg(arg, scope)
+		if err != nil {
+			return err
+		}
+
+		cl, err := client.Alias().Delete(context.Background(), path, aliasKey, cmd.InsprOptions.DryRun)
 		if err != nil {
 			fmt.Fprint(out, err.Error()+"\n")
 			return err

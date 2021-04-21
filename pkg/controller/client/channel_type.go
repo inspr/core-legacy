@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	"github.com/inspr/inspr/cmd/insprd/api/models"
+	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 	"github.com/inspr/inspr/pkg/rest/request"
@@ -87,7 +87,7 @@ func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name s
 	return resp, nil
 }
 
-// Update creates a channel type inside the Insprd
+// Update updates a channel type inside the Insprd
 //
 // The context refers to the parent app of the given channel type, represented with a dot separated query
 // such as **app1.app2**

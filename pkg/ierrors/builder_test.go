@@ -411,3 +411,69 @@ func TestErrBuilder_InvalidChannelType(t *testing.T) {
 		})
 	}
 }
+
+func TestErrBuilder_Unauthorized(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *ErrBuilder
+	}{
+		{
+			name: "It should add the code Unauthorized to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: Unauthorized,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.Unauthorized(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.Unauthorized() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestErrBuilder_Forbidden(t *testing.T) {
+	type fields struct {
+		err *InsprError
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *ErrBuilder
+	}{
+		{
+			name: "It should add the code Forbidden to the new error",
+			fields: fields{
+				err: &InsprError{},
+			},
+			want: &ErrBuilder{
+				err: &InsprError{
+					Code: Forbidden,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ErrBuilder{
+				err: tt.fields.err,
+			}
+			if got := b.Forbidden(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.Forbidden() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

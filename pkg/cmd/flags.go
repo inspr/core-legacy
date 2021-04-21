@@ -11,10 +11,13 @@ import (
 // Flag defines a INSPR CLI flag which contains a list of
 // subcommands the flag belongs to in `DefinedOn` field.
 type Flag struct {
-	Name               string
-	Shorthand          string
-	Usage              string
-	Value              interface{}
+	Name      string
+	Shorthand string
+	Usage     string
+	// Pointer to where the value of the flag will be stored
+	Value interface{}
+
+	// Default value of the flag. Needs to be set and determines the type of the flag that will be created
 	DefValue           interface{}
 	DefValuePerCommand map[string]interface{}
 	FlagAddMethod      string

@@ -166,7 +166,7 @@ func handleWellKnownErrors(err error) error {
 	}
 
 	return ierrors.NewError().
-		Message("error with the cli").
+		Message(err.Error()).
 		Build()
 }
 
