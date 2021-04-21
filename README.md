@@ -45,7 +45,8 @@
 ---
 
 <br>
-Inspr is an agnostic application mesh for simpler, faster, and securer development of distributed applications (dApps). With it you can coordinate the application lifecycle and how the subparts of a dApp interconnect themselves.
+
+[Inspr](https://inspr.com) is an agnostic application mesh for simpler, faster, and securer development of distributed applications (dApps). With it you can coordinate the application lifecycle and how the subparts of a dApp interconnect themselves.
 
 For Inspr’s point of view, a dApp is defined as an abstraction on top of the concept of a microservice. We extend the model by adding patterns of composition, communication, security, and adaptability to the application during runtime.
 
