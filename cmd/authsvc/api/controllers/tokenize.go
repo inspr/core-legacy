@@ -19,7 +19,7 @@ func (server *Server) Tokenize() rest.Handler {
 		data := models.Payload{}
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
-			err = ierrors.NewError().BadRequest().Message("invalid body").Build()
+			err = ierrors.NewError().BadRequest().Message("invalid body, error: %s", err.Error()).Build()
 			rest.ERROR(w, err)
 			return
 		}
@@ -46,7 +46,7 @@ func (server *Server) tokenize(payload models.Payload) ([]byte, error) {
 	signed, err := jwt.Sign(token, jwa.RS256, server.privKey)
 	if err != nil {
 		server.logger.Error("Unable to sign JWT with provided RSA private key", zap.Any("error", err))
-		err := ierrors.NewError().InternalServer().Message("Unable to sign JWT with provided RSA private key").Build()
+		err := ierrors.NewError().InternalServer().Message("Unable to sign JWT with availible RSA private key").Build()
 		return nil, err
 	}
 	return signed, nil
