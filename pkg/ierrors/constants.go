@@ -16,4 +16,5 @@ const (
 	InvalidToken
 	ExpiredToken
 	Unauthorized
+	Forbidden
 )

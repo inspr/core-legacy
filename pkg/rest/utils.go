@@ -47,6 +47,10 @@ func ERROR(w http.ResponseWriter, err error) {
 			JSON(w, http.StatusForbidden, e)
 		case ierrors.BadRequest:
 			JSON(w, http.StatusBadRequest, e)
+		case ierrors.Forbidden:
+			JSON(w, http.StatusForbidden, e)
+		case ierrors.Unauthorized:
+			JSON(w, http.StatusUnauthorized, e)
 		default:
 			JSON(w, http.StatusInternalServerError, e)
 		}
