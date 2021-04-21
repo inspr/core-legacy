@@ -94,7 +94,7 @@ func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
 	data := models.JwtDO{}
 	err := client.Send(context.Background(), "/token", http.MethodPost, load, &data)
 	if err != nil {
-		err = ierrors.NewError().InternalServer().InnerError(err).Build()
+		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
 	}
 
