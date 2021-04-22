@@ -2,7 +2,10 @@ package cli
 
 import (
 	"bytes"
+	"os"
 	"testing"
+
+	"github.com/inspr/inspr/pkg/cmd/utils"
 )
 
 // TestNewInsprCommand is mainly for improving test coverage,
@@ -22,6 +25,34 @@ func TestNewInsprCommand(t *testing.T) {
 			got := NewInsprCommand(out, err, "")
 			if got == nil {
 				t.Errorf("NewInsprCommand() = %v", got)
+			}
+		})
+	}
+}
+
+func Test_mainCmdPreRun(t *testing.T) {
+	folder := t.TempDir()
+	prev := os.Getenv("HOME")
+	os.Setenv("HOME", folder)
+	defer os.Setenv("HOME", prev)
+	utils.InitViperConfig()
+	type args struct {
+		args []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "pre run test",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := bytes.NewBufferString("")
+			if err := mainCmdPreRun(NewInsprCommand(buf, buf, ""), tt.args.args); (err != nil) != tt.wantErr {
+				t.Errorf("mainCmdPreRun() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

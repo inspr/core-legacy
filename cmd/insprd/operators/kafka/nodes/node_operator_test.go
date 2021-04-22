@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	"github.com/inspr/inspr/cmd/insprd/operators"
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/meta"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -22,12 +21,44 @@ import (
 	k8stesting "k8s.io/client-go/testing"
 )
 
-func mockK8sClientset(verb string, dep kubeApp.Deployment, erro error) kubernetes.Interface {
+type k8sKind string
+
+const (
+	k8sService    k8sKind = "services"
+	k8sDeployment k8sKind = "deployments"
+)
+
+func mockK8sClientSet(verbsToDepAndErr map[k8sKind]map[string]struct {
+	runtime.Object
+	error
+}) kubernetes.Interface {
+	environment.SetMockEnv()
+	client := &fake.Clientset{}
+
+	os.Setenv("NODES_APPS_NAMESPACE", "default.node.opr")
+	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
+	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
+	for verb, res := range verbsToDepAndErr {
+		for resource, act := range res {
+			client.Fake.AddReactor(resource, string(verb), func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
+				mysar := act.Object
+				return true, mysar, act.error
+			})
+		}
+	}
+	return client
+}
+
+func mockK8sClientset(verb string, dep kubeApp.Deployment, svc kubeCore.Service, erro error, serviceErr error) kubernetes.Interface {
 	environment.SetMockEnv()
 	client := &fake.Clientset{}
 	client.Fake.AddReactor(verb, "deployments", func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
 		mysar := &dep
 		return true, mysar, erro
+	})
+	client.Fake.AddReactor(verb, "services", func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
+		mysar := &svc
+		return true, mysar, serviceErr
 	})
 	os.Setenv("NODES_APPS_NAMESPACE", "default.node.opr")
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
@@ -66,7 +97,25 @@ func TestNodeOperator_GetNode(t *testing.T) {
 		{
 			name: "K8s valid get",
 			fields: fields{
-				clientSet: mockK8sClientset("get", mockDeployment(), nil),
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"get": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"get": {
+								error:  nil,
+								Object: mockDeployment(),
+							},
+						},
+					},
+				),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -88,15 +137,63 @@ func TestNodeOperator_GetNode(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "K8s invalid get",
+			name: "K8s invalid return",
 			fields: fields{
-				clientSet: mockK8sClientset("get", mockDeployment(), errors.New("Expected error")),
-			},
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"get": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"get": {
+								error: nil,
+								Object: &kubeApp.Deployment{
+									ObjectMeta: kubeMeta.ObjectMeta{
+										Name: "@@@-------..sdsjasidas",
+									},
+								},
+							},
+						},
+					},
+				)},
 			args: args{
 				ctx: context.Background(),
 				app: &meta.App{},
 			},
-			want:    &meta.Node{},
+			wantErr: true,
+		},
+		{
+			name: "K8s invalid get",
+			fields: fields{
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"get": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"get": {
+								error:  errors.New("get error"),
+								Object: mockDeployment(),
+							},
+						},
+					},
+				)},
+			args: args{
+				ctx: context.Background(),
+				app: &meta.App{},
+			},
 			wantErr: true,
 		},
 	}
@@ -112,29 +209,6 @@ func TestNodeOperator_GetNode(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NodeOperator.GetNode() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestNodeOperator_Nodes(t *testing.T) {
-	type fields struct {
-		clientSet kubernetes.Interface
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   operators.NodeOperatorInterface
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			nop := &NodeOperator{
-				clientSet: tt.fields.clientSet,
-			}
-			if got := nop.Nodes(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NodeOperator.Nodes() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -158,7 +232,25 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 		{
 			name: "K8s valid create",
 			fields: fields{
-				clientSet: mockK8sClientset("create", mockDeployment(), nil),
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"create": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"create": {
+								error:  nil,
+								Object: mockDeployment(),
+							},
+						},
+					},
+				),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -178,6 +270,98 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 				},
 			},
 			wantErr: false,
+		},
+		{
+			name: "K8s failure in k8s create",
+			fields: fields{
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sDeployment: {
+							"create": {
+								error:  errors.New("error in createion"),
+								Object: nil,
+							},
+						},
+						k8sService: {
+							"create": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+					},
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				app: &meta.App{},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "K8s failure in k8s create service",
+			fields: fields{
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"create": {
+								error:  errors.New("this is a bad creation error"),
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"create": {
+								error:  nil,
+								Object: mockDeployment(),
+							},
+						},
+					},
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				app: &meta.App{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "K8s failure in k8s node translation",
+			fields: fields{
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"create": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"create": {
+								error: nil,
+								Object: &kubeApp.Deployment{
+									ObjectMeta: kubeMeta.ObjectMeta{
+										Name: "@@@-------..sdsjasidas",
+									},
+								},
+							},
+						},
+					},
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				app: &meta.App{},
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -216,7 +400,25 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 		{
 			name: "K8s valid update",
 			fields: fields{
-				clientSet: mockK8sClientset("update", mockDeployment(), nil),
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"update": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"update": {
+								error:  nil,
+								Object: mockDeployment(),
+							},
+						},
+					},
+				),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -236,6 +438,98 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 				},
 			},
 			wantErr: false,
+		},
+		{
+			name: "K8s failure in k8s update",
+			fields: fields{
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sDeployment: {
+							"update": {
+								error:  errors.New("error in createion"),
+								Object: nil,
+							},
+						},
+						k8sService: {
+							"update": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+					},
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				app: &meta.App{},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "K8s failure in k8s update service",
+			fields: fields{
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"update": {
+								error:  errors.New("this is a bad creation error"),
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"update": {
+								error:  nil,
+								Object: mockDeployment(),
+							},
+						},
+					},
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				app: &meta.App{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "K8s failure in k8s node translation",
+			fields: fields{
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"update": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"update": {
+								error: nil,
+								Object: &kubeApp.Deployment{
+									ObjectMeta: kubeMeta.ObjectMeta{
+										Name: "@@@-------..sdsjasidas",
+									},
+								},
+							},
+						},
+					},
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				app: &meta.App{},
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -277,7 +571,25 @@ func TestNodeOperator_DeleteNode(t *testing.T) {
 		{
 			name: "K8s valid delete",
 			fields: fields{
-				clientSet: mockK8sClientset("delete", kubeApp.Deployment{}, nil),
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"delete": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"delete": {
+								error:  nil,
+								Object: mockDeployment(),
+							},
+						},
+					},
+				),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -287,8 +599,52 @@ func TestNodeOperator_DeleteNode(t *testing.T) {
 		{
 			name: "K8s invalid delete",
 			fields: fields{
-				clientSet: mockK8sClientset("delete", kubeApp.Deployment{}, errors.New("Expected error")),
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"delete": {
+								error:  nil,
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"delete": {
+								error:  errors.New("error in deleting deployment"),
+								Object: mockDeployment(),
+							},
+						},
+					},
+				)},
+			args: args{
+				ctx: context.Background(),
 			},
+			wantErr: true,
+		},
+		{
+			name: "K8s invalid delete service",
+			fields: fields{
+				clientSet: mockK8sClientSet(
+					map[k8sKind]map[string]struct {
+						runtime.Object
+						error
+					}{
+						k8sService: {
+							"delete": {
+								error:  errors.New("error in deleting service"),
+								Object: mockService(),
+							},
+						},
+						k8sDeployment: {
+							"delete": {
+								error:  nil,
+								Object: mockDeployment(),
+							},
+						},
+					},
+				)},
 			args: args{
 				ctx: context.Background(),
 			},
@@ -309,84 +665,21 @@ func TestNodeOperator_DeleteNode(t *testing.T) {
 	mem.Cancel()
 }
 
-func TestNodeOperator_GetAllNodes(t *testing.T) {
-	t.Skip("not sure why not working, useless right now")
-	type fields struct {
-		clientSet kubernetes.Interface
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   []meta.Node
-	}{
-		{
-			name: "K8s valid list",
-			fields: fields{
-				clientSet: mockK8sList("list", kubeApp.DeploymentList{
-					Items: []kubeApp.Deployment{
-						mockDeployment(),
-						mockDeployment(),
-						mockDeployment(),
-					},
-				}, nil),
-			},
-			want: []meta.Node{
-				{
-					Meta: meta.Metadata{
-						Name:      "name",
-						Reference: "",
-						Parent:    "",
-						UUID:      "",
-					},
-					Spec: meta.NodeSpec{
-						Image:       "image",
-						Environment: make(map[string]string),
-						Replicas:    1,
-					},
-				},
-				{
-					Meta: meta.Metadata{
-						Name:      "name",
-						Reference: "",
-						Parent:    "",
-						UUID:      "",
-					},
-					Spec: meta.NodeSpec{
-						Image:       "image",
-						Environment: make(map[string]string),
-						Replicas:    1,
-					},
-				},
-				{
-					Meta: meta.Metadata{
-						Name:      "name",
-						Reference: "",
-						Parent:    "",
-						UUID:      "",
-					},
-					Spec: meta.NodeSpec{
-						Image:       "image",
-						Environment: make(map[string]string),
-						Replicas:    1,
-					},
-				},
+func mockService() *kubeCore.Service {
+	return &kubeCore.Service{
+		ObjectMeta: kubeMeta.ObjectMeta{
+			Name: "name-name-name",
+		},
+		Spec: kubeCore.ServiceSpec{
+			Selector: map[string]string{
+				"app": "name",
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			nop := &NodeOperator{
-				clientSet: tt.fields.clientSet,
-			}
-			if got := nop.GetAllNodes(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NodeOperator.GetAllNodes() = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }
 
-func mockDeployment() kubeApp.Deployment {
-	return kubeApp.Deployment{
+func mockDeployment() *kubeApp.Deployment {
+	return &kubeApp.Deployment{
 		ObjectMeta: kubeMeta.ObjectMeta{
 			Name:   "name-name-name",
 			Labels: map[string]string{"app": "name"},

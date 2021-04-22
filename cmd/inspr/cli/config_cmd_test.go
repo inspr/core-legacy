@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"reflect"
 	"testing"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -102,7 +101,7 @@ func Test_doConfigChange(t *testing.T) {
 			cmd.Execute()
 			got, _ := ioutil.ReadAll(buf)
 
-			if !reflect.DeepEqual(got, tt.expectedOutput) {
+			if len(got) != len(tt.expectedOutput) {
 				t.Errorf("doConfigChange() = %v, want %v", string(got), string(tt.expectedOutput))
 			}
 		})
@@ -137,9 +136,10 @@ func Test_doListConfig(t *testing.T) {
 			cmd.Execute()
 			got, _ := ioutil.ReadAll(buf)
 
-			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("doListConfig() = %v, want %v", string(got), string(tt.expectedOutput))
+			if len(got) != len(tt.expectedOutput) {
+				t.Errorf("doConfigChange() = %v, want %v", string(got), string(tt.expectedOutput))
 			}
+
 		})
 	}
 }

@@ -5,11 +5,11 @@ coverage:
         target: auto
         # adjust accordingly based on how flaky your tests are
         # this allows a 10% drop from the previous base commit coverage
-        threshold: 3%
+        threshold: 10%
+
 ignore:
-  - "examples"  # ignore folders and all its contents
-  - "**/*mock*"    # wildcards accepted
+  - "examples" # ignore folders and all its contents
+  - "**/*mock*" # wildcards accepted
   - "**/mock/*"
   - "**/fake/*"
-  - "**/main.go"    
-
+  - "**/main.go"

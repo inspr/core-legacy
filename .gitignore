@@ -1,6 +1,8 @@
 .vscode
 **/*.cov
 
+# Ignore .idea configs from JetBrains
+.idea
 
 ### macOS ###
 # General

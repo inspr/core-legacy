@@ -6,7 +6,7 @@ metadata:
     {{- include "insprd.labels" . | nindent 4 }}
     app: {{ .Values.service.insprdName }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicas.insprdCount }}
   selector:
     matchLabels:
       {{- include "insprd.selectorLabels" . | nindent 6 }}
@@ -36,6 +36,8 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            - name: AUTH_PATH
+              value: {{ .Values.service.authName }}.{{ .Release.Namespace }}.svc
             - name: "INSPR_SIDECAR_IMAGE"
               value: {{ .Values.kafkaSidecarImage}}
             - name: "KAFKA_BOOTSTRAP_SERVERS"
@@ -46,6 +48,11 @@ spec:
               value: {{ .Values.insprAppsNamespace}}
             - name: "INSPR_ENV"
               value: {{ .Values.insprEnvironment}}
+            - name: JWT_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwtpublickey
+                  key: key
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
