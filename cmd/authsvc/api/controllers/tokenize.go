@@ -45,8 +45,8 @@ func (server *Server) tokenize(payload models.Payload) ([]byte, error) {
 
 	signed, err := jwt.Sign(token, jwa.RS256, server.privKey)
 	if err != nil {
-		server.logger.Error("Unable to sign JWT with provided RSA private key", zap.Any("error", err))
-		err := ierrors.NewError().InternalServer().Message("Unable to sign JWT with availible RSA private key").Build()
+		server.logger.Error("unable to sign JWT with provided RSA private key", zap.Any("error", err))
+		err := ierrors.NewError().InternalServer().Message("unable to sign JWT with availible RSA private key").Build()
 		return nil, err
 	}
 	return signed, nil

@@ -24,8 +24,11 @@ type Server struct {
 func (s *Server) Init() {
 	var err error
 
-	keyPem := []byte(os.Getenv("JWT_PRIVATE_KEY"))
-	privKey, _ := pem.Decode(keyPem)
+	keyPem, ok := os.LookupEnv("JWT_PRIVATE_KEY")
+	if !ok {
+		panic("[ENV VAR] JWT_PRIVATE_KEY not found")
+	}
+	privKey, _ := pem.Decode([]byte(keyPem))
 
 	var privPemBytes []byte
 	if privKey.Type != "RSA PRIVATE KEY" {
@@ -67,6 +70,6 @@ func (s *Server) Init() {
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
-	fmt.Printf("insprd rest api is up! Listening on port: %s\n", addr)
+	fmt.Printf("authsvc rest api is up! Listening on port: %s\n", addr)
 	s.logger.Fatal("Authsvc crashed: ", zap.Any("error", http.ListenAndServe(addr, s.Mux)))
 }

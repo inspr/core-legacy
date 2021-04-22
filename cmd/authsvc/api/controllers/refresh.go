@@ -21,7 +21,7 @@ func (server *Server) Refresh() rest.Handler {
 
 		if len(headerContent) != 1 ||
 			!strings.HasPrefix(headerContent[0], "Bearer ") {
-			err := ierrors.NewError().Unauthorized().Message("Bad Request, expected: Authorization: Bearer <token>").Build()
+			err := ierrors.NewError().Unauthorized().Message("bad Request, expected: Authorization: Bearer <token>").Build()
 			rest.ERROR(w, err)
 			return
 		}
@@ -34,21 +34,21 @@ func (server *Server) Refresh() rest.Handler {
 			jwt.WithVerify(jwa.RS256, server.privKey.PublicKey),
 		)
 		if err != nil {
-			err := ierrors.NewError().Forbidden().Message("Invalid token").Build()
+			err := ierrors.NewError().Forbidden().Message("invalid token").Build()
 			rest.ERROR(w, err)
 			return
 		}
 
 		load, err := auth.Desserialize(token)
 		if err != nil {
-			err := ierrors.NewError().Forbidden().Message("Invalid token, error: %s", err.Error()).Build()
+			err := ierrors.NewError().Forbidden().Message("invalid token, error: %s", err.Error()).Build()
 			rest.ERROR(w, err)
 			return
 		}
 
 		payload, err := refreshPayload(load.Refresh, load.RefreshURL)
 		if err != nil {
-			err := ierrors.NewError().InternalServer().Message("Invalid token").Build()
+			err := ierrors.NewError().InternalServer().Message("invalid token").Build()
 			rest.ERROR(w, err)
 			return
 		}
@@ -68,9 +68,9 @@ func (server *Server) Refresh() rest.Handler {
 	}
 }
 
-func refreshPayload(refresToken []byte, refreshURL string) (*models.Payload, error) {
+func refreshPayload(refreshToken []byte, refreshURL string) (*models.Payload, error) {
 	reqBody := models.ResfreshDO{
-		RefreshToken: refresToken,
+		RefreshToken: refreshToken,
 	}
 	reqBytes, err := json.Marshal(reqBody)
 	if err != nil {

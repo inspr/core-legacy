@@ -21,7 +21,7 @@ import (
 
 // JWTauth implements the Auth interface for jwt authetication provider
 type JWTauth struct {
-	PublicKey *rsa.PublicKey
+	publicKey *rsa.PublicKey
 	authURL   string
 }
 
@@ -30,10 +30,10 @@ type JWTauth struct {
 func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
 	url, ok := os.LookupEnv("AUTH_PATH")
 	if !ok {
-		panic("AUTH_PATH not found")
+		panic("[ENV VAR] AUTH_PATH not found")
 	}
 	return &JWTauth{
-		PublicKey: rsaPublicKey,
+		publicKey: rsaPublicKey,
 		authURL:   url,
 	}
 }
@@ -45,7 +45,7 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 	jwtToken, err := jwt.Parse(
 		token,
 		jwt.WithValidate(true),
-		jwt.WithVerify(jwa.RS256, JA.PublicKey),
+		jwt.WithVerify(jwa.RS256, JA.publicKey),
 	)
 
 	// not valid token

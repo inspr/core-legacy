@@ -32,7 +32,7 @@ func TestNewJWTauth(t *testing.T) {
 		{
 			name: "returns_JWT_auth",
 			want: &JWTauth{
-				PublicKey: &privKey.PublicKey,
+				publicKey: &privKey.PublicKey,
 				authURL:   "mock_url",
 			},
 		},
