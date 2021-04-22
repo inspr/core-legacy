@@ -2,7 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+replicas:
+  insprdCount: 1
+  authCount: 1
 
 imagePullSecrets: []
 nameOverride: ""
@@ -13,20 +15,28 @@ insprIngress:
 
 image:
   insprdPullPolicy: IfNotPresent
+  authPullPolicy: IfNotPresent
 
 securityContext: {}
 
 insprEnvironment: test
 deployment:
   insprdName: insprd-deployment
+  authName: auth-deployment
 
 insprdRepository: gcr.io/red-inspr/insprd
+authRepository: gcr.io/red-inspr/authsvc
+secretRepository: gcr.io/red-inspr/secretgen
 
 service:
   type: ClusterIP
+  authName: auth-svc
   insprdName: insprd-svc
+  secretgenName: secretgen-svc
   insprdPort: 80
   insprdTargetport: 8080
+  authPort: 80
+  authTargetPort: 8080
 
 ingress:
   enabled: false

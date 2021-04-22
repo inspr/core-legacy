@@ -135,6 +135,7 @@ The full documentation for Inspr can be found on our [website](https://inspr.com
 The source for the Inspr documentation and website is hosted on a separate repo, @inspr/docs.
 
 ## Architecture
+
 - TBD
 
 ## 👏 Contributing
@@ -151,4 +152,3 @@ To contribute, please check out our [guide](CONTRIBUTING.md).
 
 To contact us, please join our [Discord community](https://discord.gg/RZmZG4auJy).
 Aditionally we are at [Reddit](https://reddit.com/r/inspr)
-

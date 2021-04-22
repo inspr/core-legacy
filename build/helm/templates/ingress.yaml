@@ -21,3 +21,11 @@ spec:
         backend:
           serviceName: {{ .Values.service.insprdName }}
           servicePort: {{ .Values.service.insprdPort }}
+      - path: /alias
+        backend:
+          serviceName: {{ .Values.service.insprdName }}
+          servicePort: {{ .Values.service.insprdPort }}
+      - path: /auth
+        backend:
+          serviceName: {{ .Values.service.insprdName }}
+          servicePort: {{ .Values.service.insprdPort }}

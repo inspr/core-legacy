@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.authName }}
+  labels:
+    {{- include "insprd.labels" . | nindent 4 }}
+    app: {{ .Values.service.authName }}
+spec:
+  replicas: {{ .Values.replicas.authCount }}
+  selector:
+    matchLabels:
+      {{- include "insprd.selectorLabels" . | nindent 6 }}
+      app: {{ .Values.service.authName }}
+  template:
+    metadata:
+      labels:
+        {{- include "insprd.selectorLabels" . | nindent 8 }}
+        app: {{ .Values.service.authName }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Values.deployment.authName }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ .Values.authRepository }}
+          imagePullPolicy: {{ .Values.image.authPullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.authTargetPort }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: JWT_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwtprivatekey
+                  key: key
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+
