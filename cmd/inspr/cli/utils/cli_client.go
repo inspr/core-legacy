@@ -70,14 +70,15 @@ func SetMockedClient(err error) {
 func RequestErrorMessage(err error, w io.Writer) {
 	ierr, ok := err.(*ierrors.InsprError)
 	if ok {
-		if ierr.HasCode(ierrors.Unauthorized) {
-			fmt.Fprintf(w, "Did you login ?")
-		}
-
-		if ierr.HasCode(ierrors.Forbidden) {
-			fmt.Fprintf(w, "Forbidden operation, please check for the scope.")
+		switch ierr.Code {
+		case ierrors.Unauthorized:
+			fmt.Fprintf(w, "Did you login ?\n")
+		case ierrors.Forbidden:
+			fmt.Fprintf(w, "Forbidden operation, please check for the scope.\n")
+		default:
+			fmt.Fprintf(w, "unexpected inspr error, the message is: %v\n", err.Error())
 		}
 	} else {
-		fmt.Fprintf(w, "Non inspr error, the message is: %v", err.Error())
+		fmt.Fprintf(w, "Non inspr error, the message is: %v\n", err.Error())
 	}
 }

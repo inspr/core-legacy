@@ -98,14 +98,14 @@ func (c *Client) handleResponseErr(resp *http.Response) error {
 	case http.StatusUnauthorized:
 		decoder.Decode(&err)
 		if err != nil {
-			err.Wrap("request unauthorized") // todo review
+			err.Wrap("request unauthorized")
 			return err
 		}
 		return defaultErr
 	case http.StatusForbidden:
 		decoder.Decode(&err)
 		if err != nil {
-			err.Wrap("status forbidden") // todo review
+			err.Wrap("status forbidden")
 			return err
 		}
 		return defaultErr
