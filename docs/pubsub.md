@@ -42,7 +42,7 @@ meta:
   name: pubsub
 ```
 
-Note that this dApp isn't a [Node](./dapp_overview.md), that's because it serves as a workspace definition, it doesn't run any code.
+Note that this dApp isn't a [Node](dapp_overview.md), that's because it serves as a workspace definition, it doesn't run any code.
 
 Next we have to create a Channel the publisher can write text to and the subscribers can read from. Doing so is as simple as defining the following:
 

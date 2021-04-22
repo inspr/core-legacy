@@ -391,7 +391,7 @@ First of all, from "/pingpong_demo" we access the folder "/yamls" created previo
 cd yamls
 ```
 
-And within this folder we will create the _.yaml_ files which describe each of the Inspr structures that will be built inside the cluster. This part of the tutorial wont take a closer look at every minimum detail on how to write the YAML files, but you can find more information about it [here](./yamls/index.md).
+And within this folder we will create the _.yaml_ files which describe each of the Inspr structures that will be built inside the cluster. This part of the tutorial wont take a closer look at every minimum detail on how to write the YAML files, but you can find more information about it [here](yamls/index.md).
 
 **1) dApp YAMLs**  
 The first file to be created is _table.yaml_, which is the dApp that will contain Ping and Pong Nodes:
