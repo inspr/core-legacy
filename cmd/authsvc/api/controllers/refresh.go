@@ -29,7 +29,7 @@ func (server *Server) Refresh() rest.Handler {
 		token := []byte(strings.TrimPrefix(headerContent[0], "Bearer "))
 
 		_, err := jwt.Parse(
-			[]byte(token),
+			token,
 			jwt.WithValidate(true),
 			jwt.WithVerify(jwa.RS256, server.privKey.PublicKey),
 		)
