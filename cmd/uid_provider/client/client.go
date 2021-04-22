@@ -16,7 +16,6 @@ import (
 	"github.com/inspr/inspr/pkg/api/auth"
 	"github.com/inspr/inspr/pkg/controller/client"
 	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 // Client defines a Redis client, which has the interface methods
@@ -235,13 +234,8 @@ func (c *Client) decrypt(encryptedString []byte) (*User, error) {
 }
 
 func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
-	rc := request.NewClient().
-		BaseURL(c.insprdAddress).
-		Encoder(json.Marshal).
-		Decoder(request.JSONDecoderGenerator).
-		Build()
 
-	ncc := client.NewControllerClient(rc)
+	ncc := client.NewControllerClient(c.insprdAddress, nil)
 
 	token, err := ncc.Authorization().GenerateToken(ctx, payload)
 	if err != nil {

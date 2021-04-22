@@ -30,6 +30,10 @@ func (c *Client) Send(
 		return ierrors.NewError().BadRequest().Message("error creating request").InnerError(err).Build()
 	}
 
+	for key, value := range c.headers {
+		req.Header.Add(key, value)
+	}
+
 	resp, err := c.c.Do(req)
 	if err != nil {
 		return ierrors.NewError().BadRequest().InnerError(err).Message("unable to send request to insprd").Build()
@@ -76,6 +80,7 @@ type Client struct {
 	baseURL          string
 	encoder          Encoder
 	decoderGenerator DecoderGenerator
+	headers          map[string]string
 }
 
 func (c *Client) handleResponseErr(resp *http.Response) error {

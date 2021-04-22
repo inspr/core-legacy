@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	cliutils "github.com/inspr/inspr/cmd/inspr/cli/utils"
 	"github.com/inspr/inspr/pkg/cmd"
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 	utils "github.com/inspr/inspr/pkg/meta/utils/parser"

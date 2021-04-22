@@ -1,8 +1,8 @@
 <p align="center">
-    <img 
+    <img
         srcset="https://storage.googleapis.com/inspr/logo.png 1x, https://storage.googleapis.com/inspr/logo%402x.png 2x, https://storage.googleapis.com/inspr/logo%403x.png 3x"
-        src="https://storage.googleapis.com/inspr/logo%403x.png" 
-        width="128" 
+        src="https://storage.googleapis.com/inspr/logo%403x.png"
+        width="128"
         title="Inspr Logo">
 </p>
 
@@ -22,7 +22,7 @@
     <a href="http://makeapullrequest.com">
         <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
     </a>
-    <a href="https://discord.gg/RZmZG4auJy">
+    <a href="https://discord.gg/tmp2564a54">
         <img src="https://img.shields.io/discord/449569975888248832.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2">
     </a>
 </p>
@@ -71,7 +71,7 @@ helm install inspr_name inspr/insprd
 
 replacing inspr_name by the desired inspr cluster name.
 
-Aditionaly you can check the default values file for the helm chart. 
+Aditionaly you can check the default values file for the helm chart.
 They are included in the `build/helm` folder and can be edited for further refinement of the properties.
 
 ### CLI
@@ -79,13 +79,13 @@ They are included in the `build/helm` folder and can be edited for further refin
 To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.
 TODO: Add link to the install script for the CLI.
 
-
 ## Documentation
 
 The full documentation for Inspr can be found on our [website](https://inspr.com/docs).
 The source for the Inspr documentation and website is hosted on a separate repo, @inspr/docs.
 
 ## Architecture
+
 - TBD
 
 ## 👏 Contributing
@@ -102,4 +102,3 @@ To contribute, please check out our [guide](CONTRIBUTING.md).
 
 To contact us, please join our [Discord community](https://discord.gg/tmp2564a54).
 Aditionally we are at [Reddit](https://reddit.com/r/inspr)
-
