@@ -256,7 +256,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 					}(),
 				},
 			},
-			wantMessage: "request unauthorized",
+			wantMessage: "status unauthorized",
 		},
 		{
 			name: "response with forbidden error",
