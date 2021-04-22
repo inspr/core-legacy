@@ -22,6 +22,7 @@ func createSchema() string {
 }
 
 func TestNewApplyChannelType(t *testing.T) {
+	prepareToken(t)
 	chanTypeWithoutNameBytes, _ := yaml.Marshal(meta.ChannelType{})
 	chanTypeDefaultBytes, _ := yaml.Marshal(meta.ChannelType{Meta: meta.Metadata{Name: "mock"}})
 	type args struct {
@@ -75,6 +76,7 @@ func TestNewApplyChannelType(t *testing.T) {
 }
 
 func Test_schemaNeedsInjection(t *testing.T) {
+	prepareToken(t)
 	yamlString := createSchema()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
@@ -117,6 +119,7 @@ func Test_schemaNeedsInjection(t *testing.T) {
 }
 
 func Test_injectSchema(t *testing.T) {
+	prepareToken(t)
 	yamlString := createSchema()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(

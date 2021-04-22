@@ -21,6 +21,7 @@ import (
 )
 
 func TestNewGetCmd(t *testing.T) {
+	prepareToken(t)
 	tests := []struct {
 		name          string
 		checkFunction func(t *testing.T, got *cobra.Command)
@@ -45,6 +46,7 @@ func TestNewGetCmd(t *testing.T) {
 }
 
 func Test_getApps(t *testing.T) {
+	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
 	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
 	fmt.Fprint(tabWriter, "NAME\n")
@@ -115,6 +117,7 @@ func Test_getApps(t *testing.T) {
 }
 
 func Test_getChannels(t *testing.T) {
+	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
 	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
 	fmt.Fprint(tabWriter, "NAME\n")
@@ -184,6 +187,7 @@ func Test_getChannels(t *testing.T) {
 }
 
 func Test_getCTypes(t *testing.T) {
+	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
 	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
 	fmt.Fprint(tabWriter, "NAME\n")
@@ -252,6 +256,7 @@ func Test_getCTypes(t *testing.T) {
 }
 
 func Test_getNodes(t *testing.T) {
+	prepareToken(t)
 
 	bufResp := bytes.NewBufferString("")
 	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
@@ -321,6 +326,7 @@ func Test_getNodes(t *testing.T) {
 }
 
 func Test_getObj(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		printObj func(*meta.App, *[]string)
 		lines    *[]string
@@ -382,6 +388,7 @@ func Test_getObj(t *testing.T) {
 }
 
 func Test_printApps(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		app   *meta.App
 		lines *[]string
@@ -411,6 +418,7 @@ func Test_printApps(t *testing.T) {
 }
 
 func Test_printChannels(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		app   *meta.App
 		lines *[]string
@@ -440,6 +448,7 @@ func Test_printChannels(t *testing.T) {
 }
 
 func Test_printCTypes(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		app   *meta.App
 		lines *[]string
@@ -469,6 +478,7 @@ func Test_printCTypes(t *testing.T) {
 }
 
 func Test_printNodes(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		app   *meta.App
 		lines *[]string
@@ -498,6 +508,7 @@ func Test_printNodes(t *testing.T) {
 }
 
 func Test_printLine(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		name  string
 		lines *[]string
@@ -527,6 +538,7 @@ func Test_printLine(t *testing.T) {
 }
 
 func Test_initTab(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		lines *[]string
 	}
@@ -554,6 +566,7 @@ func Test_initTab(t *testing.T) {
 }
 
 func Test_printTab(t *testing.T) {
+	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
 	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
 
@@ -593,6 +606,7 @@ func Test_printTab(t *testing.T) {
 }
 
 func Test_printAliases(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		app   *meta.App
 		lines *[]string
@@ -622,6 +636,7 @@ func Test_printAliases(t *testing.T) {
 }
 
 func Test_getAlias(t *testing.T) {
+	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
 	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
 	fmt.Fprint(tabWriter, "NAME\n")

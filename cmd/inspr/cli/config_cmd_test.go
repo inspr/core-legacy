@@ -13,6 +13,7 @@ import (
 )
 
 func TestNewConfigChangeCmd(t *testing.T) {
+	prepareToken(t)
 	tests := []struct {
 		name          string
 		checkFunction func(t *testing.T, got *cobra.Command)
@@ -37,6 +38,7 @@ func TestNewConfigChangeCmd(t *testing.T) {
 }
 
 func TestNewListConfig(t *testing.T) {
+	prepareToken(t)
 	tests := []struct {
 		name          string
 		checkFunction func(t *testing.T, got *cobra.Command)
@@ -61,6 +63,7 @@ func TestNewListConfig(t *testing.T) {
 }
 
 func Test_doConfigChange(t *testing.T) {
+	prepareToken(t)
 	defer deleteMockViper()
 	mockViper()
 
@@ -109,6 +112,7 @@ func Test_doConfigChange(t *testing.T) {
 }
 
 func Test_doListConfig(t *testing.T) {
+	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
 	cliutils.SetOutput(bufResp)
 	printExistingKeys()

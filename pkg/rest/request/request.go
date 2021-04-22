@@ -46,7 +46,8 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 		return err
 	}
 
-	if updatedToken := resp.Header.Get("Authorization"); c.auth != nil && updatedToken != "" {
+	updatedToken := resp.Header.Get("Authorization")
+	if c.auth != nil && updatedToken != "" {
 		err := c.auth.SetToken([]byte(updatedToken))
 		if err != nil {
 			return ierrors.NewError().BadRequest().Message("unable to update token").InnerError(err).Build()

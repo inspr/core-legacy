@@ -296,7 +296,10 @@ func TestClientBuilder_Authenticator(t *testing.T) {
 				c: &Client{},
 			},
 			args: args{
-				au: mockAuth{err: nil},
+				au: mockAuth{
+					errGet: nil,
+					errSet: nil,
+				},
 			},
 			wantNil: false,
 		},
