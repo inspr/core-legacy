@@ -3,7 +3,7 @@
 ## I can't connect to Insprd
 
 - Check if your CLI is correctly configured.
-- Repeat the steps in [the getting started tutorial](./Getting Started)
+- Repeat the steps in [the getting started tutorial](readme.md)
 
 ## My dApp only reads one message from a Channel
 
