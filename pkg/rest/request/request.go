@@ -103,7 +103,7 @@ func (c *Client) handleResponseErr(resp *http.Response) error {
 	case http.StatusUnauthorized:
 		decoder.Decode(&err)
 		if err != nil {
-			err.Wrap("request unauthorized")
+			err.Wrap("status unauthorized")
 			return err
 		}
 		return defaultErr
