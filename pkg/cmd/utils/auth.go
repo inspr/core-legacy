@@ -5,14 +5,18 @@ import (
 	"os"
 )
 
+// Authenticator is responsible for implementing the interface methods
+// defined in the rest/request pkg.
 type Authenticator struct {
-	tokenPath string
+	TokenPath string
 }
 
 var bearer = []byte("Bearer ")
 
+// GetToken read the token from the file specified in the struct
+// TokenPath and returns it's bytes
 func (a Authenticator) GetToken() ([]byte, error) {
-	token, err := ioutil.ReadFile(a.tokenPath)
+	token, err := ioutil.ReadFile(a.TokenPath)
 	if err != nil {
 		return nil, err
 	}
@@ -20,9 +24,11 @@ func (a Authenticator) GetToken() ([]byte, error) {
 	return token, nil
 }
 
+// SetToken receives a new token as a parameter and then writes it
+// in the file specified in the TokenPath
 func (a Authenticator) SetToken(token []byte) error {
 	token = token[len(bearer):]
-	err := ioutil.WriteFile(a.tokenPath, token, os.ModePerm)
+	err := ioutil.WriteFile(a.TokenPath, token, os.ModePerm)
 	if err != nil {
 		return err
 	}
