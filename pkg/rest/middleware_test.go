@@ -79,7 +79,7 @@ func TestHandler_Validate(t *testing.T) {
 				auth: authMock.NewMockAuth(nil),
 			},
 			wantErr:  true,
-			wantCode: http.StatusBadRequest,
+			wantCode: http.StatusUnauthorized,
 		},
 		{
 			name: "invalid_token",
