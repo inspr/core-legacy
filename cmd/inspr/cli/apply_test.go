@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,6 +11,7 @@ import (
 	"testing"
 
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"gopkg.in/yaml.v2"
 )
@@ -176,7 +178,7 @@ func Test_doApply(t *testing.T) {
 	yamlString := createDAppYaml()
 
 	bufResp := bytes.NewBufferString("")
-	fmt.Fprintf(bufResp, "filetest.yaml\n\nApplied:\nfiletest.yaml | dapp | v1\n")
+	fmt.Fprintf(bufResp, "\nApplied:\nfiletest.yaml | dapp | v1\n")
 	outResp, _ := ioutil.ReadAll(bufResp)
 
 	bufResp2 := bytes.NewBufferString("")
@@ -235,7 +237,11 @@ func Test_doApply(t *testing.T) {
 			got, _ := ioutil.ReadAll(buf)
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("doApply() = %v, want\n%v", string(got), string(tt.expectedOutput))
+				t.Errorf(
+					"doApply() = %v, want\n%v",
+					string(got),
+					string(tt.expectedOutput),
+				)
 			}
 		})
 	}
@@ -288,6 +294,7 @@ func Test_applyValidFiles(t *testing.T) {
 	defer os.Remove(filePath)
 	tempFiles := []string{filePath}
 	yamlString := createDAppYaml()
+
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
 		filePath,
@@ -300,9 +307,11 @@ func Test_applyValidFiles(t *testing.T) {
 		files []string
 	}
 	tests := []struct {
-		name string
-		args args
-		want []applied
+		name    string
+		args    args
+		want    []applied
+		funcErr error
+		errMsg  string
 	}{
 		{
 			name: "Get file from current folder",
@@ -318,25 +327,80 @@ func Test_applyValidFiles(t *testing.T) {
 				},
 				content: []byte(yamlString),
 			}},
+			funcErr: nil,
+			errMsg:  "",
+		},
+		{
+			name: "Unauthorized_error",
+			args: args{
+				path:  "",
+				files: tempFiles,
+			},
+			want:    nil,
+			funcErr: ierrors.NewError().Message("unauthorized").Unauthorized().Build(),
+			errMsg:  "did you login ?\n",
+		},
+		{
+			name: "forbidden_error",
+			args: args{
+				path:  "",
+				files: tempFiles,
+			},
+			want:    nil,
+			funcErr: ierrors.NewError().Message("forbidden").Forbidden().Build(),
+			errMsg:  "forbidden operation, please check for the scope.\n",
+		},
+		{
+			name: "default_ierror_message",
+			args: args{
+				path:  "",
+				files: tempFiles,
+			},
+			want:    nil,
+			funcErr: ierrors.NewError().Message("default_error").BadRequest().Build(),
+			errMsg:  "unexpected inspr error, the message is: default_error\n",
+		},
+		{
+			name: "Unknown_error",
+			args: args{
+				path:  "",
+				files: tempFiles,
+			},
+			want:    nil,
+			funcErr: errors.New("unknown_Error"),
+			errMsg:  "non inspr error, the message is: unknown_Error\n",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			out := &bytes.Buffer{}
-			GetFactory().Subscribe(meta.Component{
-				APIVersion: "v1",
-				Kind:       "dapp",
-			},
+			applyFactory = nil
+
+			GetFactory().Subscribe(
+				meta.Component{
+					Kind:       "dapp",
+					APIVersion: "v1",
+				},
 				func(b []byte, out io.Writer) error {
-					ch := meta.Channel{}
+					return tt.funcErr
+				},
+			)
 
-					yaml.Unmarshal(b, &ch)
-					fmt.Println(ch)
+			got := applyValidFiles(tt.args.path, tt.args.files, out)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf(
+					"applyValidFiles() = %v, want %v",
+					got,
+					tt.want,
+				)
+			}
 
-					return nil
-				})
-			if got := applyValidFiles(tt.args.path, tt.args.files, out); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("applyValidFiles() = %v, want %v", got, tt.want)
+			if tt.funcErr != nil && tt.errMsg != out.String() {
+				t.Errorf(
+					"error messages incompatible\n got => %v\n want => %v\n",
+					out.String(),
+					tt.errMsg,
+				)
 			}
 		})
 	}

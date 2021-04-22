@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -218,13 +219,13 @@ func TestClient_handleResponseErr(t *testing.T) {
 		resp *http.Response
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name        string
+		fields      fields
+		args        args
+		wantMessage string
 	}{
 		{
-			name: "response with error",
+			name: "default error message",
 			fields: fields{
 				decoderGenerator: JSONDecoderGenerator,
 			},
@@ -232,15 +233,47 @@ func TestClient_handleResponseErr(t *testing.T) {
 				&http.Response{
 					StatusCode: http.StatusBadRequest,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal(ierrors.NewError().Message("this is an error").Build())
+						b, _ := json.Marshal(nil)
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantErr: true,
+			wantMessage: "cannot retrieve error from server",
 		},
 		{
-			name: "response with other error",
+			name: "default_error_message_unauthorized_code",
+			fields: fields{
+				decoderGenerator: JSONDecoderGenerator,
+			},
+			args: args{
+				&http.Response{
+					StatusCode: http.StatusUnauthorized,
+					Body: func() io.ReadCloser {
+						b, _ := json.Marshal(nil)
+						return ioutil.NopCloser(bytes.NewReader(b))
+					}(),
+				},
+			},
+			wantMessage: "cannot retrieve error from server",
+		},
+		{
+			name: "default_error_message_forbidden_code",
+			fields: fields{
+				decoderGenerator: JSONDecoderGenerator,
+			},
+			args: args{
+				&http.Response{
+					StatusCode: http.StatusForbidden,
+					Body: func() io.ReadCloser {
+						b, _ := json.Marshal(nil)
+						return ioutil.NopCloser(bytes.NewReader(b))
+					}(),
+				},
+			},
+			wantMessage: "cannot retrieve error from server",
+		},
+		{
+			name: "response with custom error",
 			fields: fields{
 				decoderGenerator: JSONDecoderGenerator,
 			},
@@ -248,28 +281,57 @@ func TestClient_handleResponseErr(t *testing.T) {
 				&http.Response{
 					StatusCode: http.StatusBadRequest,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal(ierrors.NewError().Message("this is an error").Build())
+						b, _ := json.
+							Marshal(ierrors.NewError().
+								Message("this is an error").
+								Build(),
+							)
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantErr: true,
+			wantMessage: "this is an error",
 		},
 		{
-			name: "response without error",
+			name: "response with unauthorized error",
 			fields: fields{
 				decoderGenerator: JSONDecoderGenerator,
 			},
 			args: args{
 				&http.Response{
-					StatusCode: http.StatusOK,
+					StatusCode: http.StatusUnauthorized,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal("hello")
+						b, _ := json.Marshal(
+							ierrors.NewError().
+								InnerError(errors.New("mock_error")).
+								Unauthorized().
+								Build())
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantErr: false,
+			wantMessage: "status unauthorized",
+		},
+		{
+			name: "response with forbidden error",
+			fields: fields{
+				decoderGenerator: JSONDecoderGenerator,
+			},
+			args: args{
+				&http.Response{
+					StatusCode: http.StatusForbidden,
+					Body: func() io.ReadCloser {
+						b, _ := json.Marshal(
+							ierrors.NewError().
+								InnerError(errors.New("mock_error")).
+								Forbidden().
+								Build(),
+						)
+						return ioutil.NopCloser(bytes.NewReader(b))
+					}(),
+				},
+			},
+			wantMessage: "status forbidden",
 		},
 	}
 	for _, tt := range tests {
@@ -280,8 +342,24 @@ func TestClient_handleResponseErr(t *testing.T) {
 				encoder:          tt.fields.middleware,
 				decoderGenerator: tt.fields.decoderGenerator,
 			}
-			if err := c.handleResponseErr(tt.args.resp); (err != nil) != tt.wantErr {
-				t.Errorf("Client.handleResponseErr() error = %v, wantErr %v", err, tt.wantErr)
+			err := c.handleResponseErr(tt.args.resp)
+			var got string
+
+			// does it wrap?
+			wrapContent := errors.Unwrap(err)
+
+			if wrapContent == nil {
+				got = err.Error()
+			} else {
+				got = wrapContent.Error()
+			}
+
+			if strings.TrimSuffix(got, ": ") != tt.wantMessage {
+				t.Errorf(
+					"Client.handleResponseErr() error = %v, wantErr %v",
+					got,
+					tt.wantMessage,
+				)
 			}
 		})
 	}
