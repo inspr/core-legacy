@@ -76,9 +76,13 @@ func deleteApps(_ context.Context, args []string) error {
 		}
 		path, _ := utils.JoinScopes(scope, arg)
 
-		cl, err := client.Apps().Delete(context.Background(), path, cmd.InsprOptions.DryRun)
+		cl, err := client.Apps().Delete(
+			context.Background(),
+			path,
+			cmd.InsprOptions.DryRun,
+		)
 		if err != nil {
-			fmt.Fprint(out, err.Error()+"\n")
+			cliutils.RequestErrorMessage(err, out)
 			return err
 		}
 		cl.Print(out)
@@ -101,9 +105,14 @@ func deleteChannels(_ context.Context, args []string) error {
 			return err
 		}
 
-		cl, err := client.Channels().Delete(context.Background(), path, chName, cmd.InsprOptions.DryRun)
+		cl, err := client.Channels().Delete(
+			context.Background(),
+			path,
+			chName,
+			cmd.InsprOptions.DryRun,
+		)
 		if err != nil {
-			fmt.Fprint(out, err.Error()+"\n")
+			cliutils.RequestErrorMessage(err, out)
 			return err
 		}
 		cl.Print(out)
@@ -127,9 +136,14 @@ func deleteCTypes(_ context.Context, args []string) error {
 			return err
 		}
 
-		cl, err := client.ChannelTypes().Delete(context.Background(), path, ctName, cmd.InsprOptions.DryRun)
+		cl, err := client.ChannelTypes().Delete(
+			context.Background(),
+			path,
+			ctName,
+			cmd.InsprOptions.DryRun,
+		)
 		if err != nil {
-			fmt.Fprint(out, err.Error()+"\n")
+			cliutils.RequestErrorMessage(err, out)
 			return err
 		}
 		cl.Print(out)
@@ -153,9 +167,14 @@ func deleteAlias(_ context.Context, args []string) error {
 			return err
 		}
 
-		cl, err := client.Alias().Delete(context.Background(), path, aliasKey, cmd.InsprOptions.DryRun)
+		cl, err := client.Alias().Delete(
+			context.Background(),
+			path,
+			aliasKey,
+			cmd.InsprOptions.DryRun,
+		)
 		if err != nil {
-			fmt.Fprint(out, err.Error()+"\n")
+			cliutils.RequestErrorMessage(err, out)
 			return err
 		}
 		cl.Print(out)

@@ -201,21 +201,21 @@ func TestRequestErrorMessage(t *testing.T) {
 			args: args{
 				ierrors.NewError().Unauthorized().Build(),
 			},
-			wantW: "Did you login ?\n",
+			wantW: "did you login ?\n",
 		},
 		{
 			name: "ierror-forbidden",
 			args: args{
 				ierrors.NewError().Forbidden().Build(),
 			},
-			wantW: "Forbidden operation, please check for the scope.\n",
+			wantW: "forbidden operation, please check for the scope.\n",
 		},
 		{
 			name: "ierror-unauthorized",
 			args: args{
 				err: errors.New("mock-error"),
 			},
-			wantW: "Non inspr error, the message is: mock-error\n",
+			wantW: "non inspr error, the message is: mock-error\n",
 		},
 	}
 	for _, tt := range tests {

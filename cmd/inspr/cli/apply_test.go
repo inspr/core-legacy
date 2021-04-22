@@ -332,7 +332,7 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.NewError().Message("unauthorized").Unauthorized().Build(),
-			errMsg:  "Did you login ?\n",
+			errMsg:  "did you login ?\n",
 		},
 		{
 			name: "forbidden_error",
@@ -342,7 +342,7 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.NewError().Message("forbidden").Forbidden().Build(),
-			errMsg:  "Forbidden operation, please check for the scope.\n",
+			errMsg:  "forbidden operation, please check for the scope.\n",
 		},
 		{
 			name: "default_ierror_message",
@@ -362,7 +362,7 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: errors.New("unknown_Error"),
-			errMsg:  "Non inspr error, the message is: unknown_Error\n",
+			errMsg:  "non inspr error, the message is: unknown_Error\n",
 		},
 	}
 	for _, tt := range tests {

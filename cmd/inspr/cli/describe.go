@@ -84,7 +84,7 @@ func displayAppState(_ context.Context, args []string) error {
 
 	app, err := client.Apps().Get(context.Background(), path)
 	if err != nil {
-		fmt.Fprintln(out, err.Error())
+		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
 
@@ -109,7 +109,7 @@ func displayChannelState(_ context.Context, args []string) error {
 
 	channel, err := client.Channels().Get(context.Background(), path, chName)
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
 	utils.PrintChannelTree(channel, out)
@@ -133,7 +133,7 @@ func displayChannelTypeState(_ context.Context, args []string) error {
 
 	channelType, err := client.ChannelTypes().Get(context.Background(), path, ctName)
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
 	utils.PrintChannelTypeTree(channelType, out)
@@ -157,7 +157,7 @@ func displayAlias(_ context.Context, args []string) error {
 
 	alias, err := client.Alias().Get(context.Background(), path, aliasKey)
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
 

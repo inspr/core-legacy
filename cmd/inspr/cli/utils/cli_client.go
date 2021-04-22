@@ -72,13 +72,13 @@ func RequestErrorMessage(err error, w io.Writer) {
 	if ok {
 		switch ierr.Code {
 		case ierrors.Unauthorized:
-			fmt.Fprintf(w, "Did you login ?\n")
+			fmt.Fprintf(w, "did you login ?\n")
 		case ierrors.Forbidden:
-			fmt.Fprintf(w, "Forbidden operation, please check for the scope.\n")
+			fmt.Fprintf(w, "forbidden operation, please check for the scope.\n")
 		default:
 			fmt.Fprintf(w, "unexpected inspr error, the message is: %v\n", err.Error())
 		}
 	} else {
-		fmt.Fprintf(w, "Non inspr error, the message is: %v\n", err.Error())
+		fmt.Fprintf(w, "non inspr error, the message is: %v\n", err.Error())
 	}
 }
