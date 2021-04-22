@@ -5,6 +5,7 @@ import (
 
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
 	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/utils"
@@ -13,6 +14,7 @@ import (
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
@@ -157,6 +159,31 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	}
 }
 
+func dappToService(app *meta.App) *kubeCore.Service {
+	appID := toAppID(app)
+	appDeployName := toDeploymentName(app)
+	appLabels := map[string]string{"app": appID}
+
+	svc := &kubeCore.Service{
+		ObjectMeta: kubeMeta.ObjectMeta{
+			Name: appDeployName,
+		},
+		Spec: kubeCore.ServiceSpec{
+			Ports: func() (ports []kubeCore.ServicePort) {
+				for _, port := range app.Spec.Node.Spec.Ports {
+					ports = append(ports, kubeCore.ServicePort{
+						Port:       int32(port.Port),
+						TargetPort: intstr.FromInt(port.TargetPort),
+					})
+				}
+				return
+			}(),
+			Selector: appLabels,
+		},
+	}
+	return svc
+}
+
 // toDeployment - creates the kubernetes deployment name from the app
 func toDeploymentName(app *meta.App) string {
 
@@ -180,16 +207,19 @@ func intToint32(v int) *int32 {
 	return &t
 }
 
-func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
+func toNode(kdep *kubeApp.Deployment) (*meta.Node, error) {
 	var err error
-	node := meta.Node{}
+	node := &meta.Node{}
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
 	if err != nil {
-		return meta.Node{}, err
+		return nil, err
 	}
 	node.Meta.Parent, err = toNodeParent(kdep.ObjectMeta.Name)
 	if err != nil {
-		return meta.Node{}, err
+		return nil, err
+	}
+	if len(kdep.Spec.Template.Spec.Containers) == 0 {
+		return nil, ierrors.NewError().Message("node does not contain a container").InvalidApp().Build()
 	}
 	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
 	node.Spec.Environment = utils.ParseFromK8sEnvironment(kdep.Spec.Template.Spec.Containers[0].Env)

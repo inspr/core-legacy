@@ -17,6 +17,7 @@ import (
 	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
 	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -383,6 +384,73 @@ func Test_baseEnvironment(t *testing.T) {
 				t.Errorf("baseEnvironment() = \n%v, want \n%v", got, tt.want)
 			}
 			mem.Cancel()
+		})
+	}
+}
+
+func Test_dappToService(t *testing.T) {
+	m := metautils.InjectUUID(meta.Metadata{
+		Name:   "test-dapp",
+		Parent: "",
+	})
+	type args struct {
+		app *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+		want *kubeCore.Service
+	}{
+		{
+			name: "node with ports",
+			args: args{
+				app: &meta.App{
+					Meta: m,
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Spec: meta.NodeSpec{
+								Ports: []meta.NodePort{
+									{
+										Port:       80,
+										TargetPort: 80,
+									},
+									{
+										Port:       90,
+										TargetPort: 100,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &kubeCore.Service{
+				ObjectMeta: kubeMeta.ObjectMeta{
+					Name: "node-" + m.UUID,
+				},
+				Spec: kubeCore.ServiceSpec{
+					Ports: []kubeCore.ServicePort{
+						{
+							Port:       80,
+							TargetPort: intstr.FromInt(80),
+						},
+						{
+							Port:       90,
+							TargetPort: intstr.FromInt(100),
+						},
+					},
+					Selector: map[string]string{
+						"app": "test-dapp",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := dappToService(tt.args.app); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("dappToService() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }

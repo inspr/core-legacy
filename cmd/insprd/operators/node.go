@@ -13,5 +13,4 @@ type NodeOperatorInterface interface {
 	GetNode(ctx context.Context, app *meta.App) (*meta.Node, error)
 	UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error)
 	DeleteNode(ctx context.Context, nodeContext string, nodeName string) error
-	GetAllNodes() []meta.Node
 }
