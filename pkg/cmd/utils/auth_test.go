@@ -9,9 +9,7 @@ import (
 )
 
 func TestAuthenticator_GetToken(t *testing.T) {
-	os.Mkdir("./temp", os.ModePerm)
-	folder := "./temp"
-	defer os.RemoveAll("./temp")
+	folder := t.TempDir()
 
 	type fields struct {
 		TokenPath string
@@ -68,9 +66,7 @@ func TestAuthenticator_GetToken(t *testing.T) {
 }
 
 func TestAuthenticator_SetToken(t *testing.T) {
-	os.Mkdir("./temp", os.ModePerm)
-	folder := "./temp"
-	defer os.RemoveAll("./temp")
+	folder := t.TempDir()
 
 	type fields struct {
 		TokenPath string
