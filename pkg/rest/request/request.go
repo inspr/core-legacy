@@ -36,7 +36,12 @@ func (c *Client) Send(
 
 	resp, err := c.c.Do(req)
 	if err != nil {
-		return ierrors.NewError().BadRequest().InnerError(err).Message("unable to send request to insprd").Build()
+		return ierrors.
+			NewError().
+			BadRequest().
+			InnerError(err).
+			Message("unable to send request to insprd").
+			Build()
 	}
 
 	err = c.handleResponseErr(resp)
@@ -86,20 +91,34 @@ type Client struct {
 func (c *Client) handleResponseErr(resp *http.Response) error {
 	decoder := c.decoderGenerator(resp.Body)
 	var err *ierrors.InsprError
+	defaultErr := ierrors.
+		NewError().
+		InternalServer().
+		Message("cannot retrieve error from server").
+		Build()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
 		return nil
+	case http.StatusUnauthorized:
+		decoder.Decode(&err)
+		if err != nil {
+			err.Wrap("status unauthorized")
+			return err
+		}
+		return defaultErr
+	case http.StatusForbidden:
+		decoder.Decode(&err)
+		if err != nil {
+			err.Wrap("status forbidden")
+			return err
+		}
+		return defaultErr
 	default:
 		decoder.Decode(&err)
 		if err == nil {
-			return ierrors.
-				NewError().
-				InternalServer().
-				Message("cannot retrieve error from server").
-				Build()
+			return defaultErr
 		}
-
 		return err
 	}
 }
