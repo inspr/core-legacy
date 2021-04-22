@@ -1,9 +1,7 @@
 package controller
 
 import (
-	handler "github.com/inspr/inspr/cmd/insprd/api/handlers"
 	"github.com/inspr/inspr/pkg/rest"
-	"net/http"
 
 	handler "github.com/inspr/inspr/pkg/api/handlers"
 )
