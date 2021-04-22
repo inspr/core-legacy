@@ -50,7 +50,9 @@ func SetOutput(out io.Writer) {
 
 // SetClient sets the default server IP of CLI
 func SetClient(url string) {
-	defaults.client = client.NewControllerClient(url, GetToken(cmd.InsprOptions.Token))
+	defaults.client = client.NewControllerClient(url, Authenticator{
+		cmd.InsprOptions.Token,
+	})
 }
 
 //SetMockedClient configures singleton's client as a mocked client given a error

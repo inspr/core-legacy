@@ -69,3 +69,14 @@ func (cb *ClientBuilder) Header(key, value string) *ClientBuilder {
 	cb.c.headers[key] = value
 	return cb
 }
+
+// Authenticator is an interface to perform authentication via tokens
+type Authenticator interface {
+	GetToken() ([]byte, error)
+	SetToken([]byte) error
+}
+
+func (cb *ClientBuilder) Authenticator(au Authenticator) *ClientBuilder {
+	cb.c.auth = au
+	return cb
+}
