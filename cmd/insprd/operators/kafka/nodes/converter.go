@@ -207,19 +207,19 @@ func intToint32(v int) *int32 {
 	return &t
 }
 
-func toNode(kdep *kubeApp.Deployment) (meta.Node, error) {
+func toNode(kdep *kubeApp.Deployment) (*meta.Node, error) {
 	var err error
-	node := meta.Node{}
+	node := &meta.Node{}
 	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
 	if err != nil {
-		return meta.Node{}, err
+		return nil, err
 	}
 	node.Meta.Parent, err = toNodeParent(kdep.ObjectMeta.Name)
 	if err != nil {
-		return meta.Node{}, err
+		return nil, err
 	}
 	if len(kdep.Spec.Template.Spec.Containers) == 0 {
-		return meta.Node{}, ierrors.NewError().Message("node does not contain a container").InvalidApp().Build()
+		return nil, ierrors.NewError().Message("node does not contain a container").InvalidApp().Build()
 	}
 	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
 	node.Spec.Environment = utils.ParseFromK8sEnvironment(kdep.Spec.Template.Spec.Containers[0].Env)

@@ -55,7 +55,7 @@ func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node,
 	if err != nil {
 		return nil, err
 	}
-	return &node, nil
+	return node, nil
 }
 
 // CreateNode deploys a new node structure, if it's information is valid.
@@ -89,7 +89,7 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 	if err != nil {
 		return nil, err
 	}
-	return &node, nil
+	return node, nil
 }
 
 // UpdateNode updates a node that already exists, if the new structure is valid.
@@ -124,7 +124,7 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 	if err != nil {
 		return nil, err
 	}
-	return &node, nil
+	return node, nil
 }
 
 // DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
