@@ -1,26 +1,26 @@
-## inspr get nodes
+## inspr get alias
 
-Get nodes from context
+Get alias from context
 
 ```
-inspr get nodes [flags]
+inspr get alias [flags]
 ```
 
 ### Examples
 
 ```
-  # Get nodes from the default scope
- inspr get nodes 
+  # Get alias from the default scope
+ inspr get alias 
 
-  # Get nodes from a custom scope
- inspr get nodes --scope app1.app2
+  # Get alias from a custom scope
+ inspr get alias --scope app1.app2
 
 ```
 
 ### Options
 
 ```
-  -h, --help           help for nodes
+  -h, --help           help for alias
   -s, --scope string   inspr <command> --scope app1.app2
 ```
 

@@ -3,23 +3,23 @@
 
 .SH NAME
 .PP
-inspr\-get\-channels \- Get channels from context
+inspr\-delete\-alias \- Delete alias from context
 
 
 .SH SYNOPSIS
 .PP
-\fBinspr get channels [flags]\fP
+\fBinspr delete alias [flags]\fP
 
 
 .SH DESCRIPTION
 .PP
-Get channels from context
+Delete alias from context
 
 
 .SH OPTIONS
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
-	help for channels
+	help for alias
 
 .PP
 \fB\-s\fP, \fB\-\-scope\fP=""
@@ -31,11 +31,11 @@ Get channels from context
 .RS
 
 .nf
-  # Get channels from the default scope
- inspr get channels 
+  # Delete alias from default scope
+ inspr delete alias <aliaskey>
 
-  # Get channels from a custom scope
- inspr get channels \-\-scope app1.app2
+  # Delete alias from a custom scope
+ inspr delete alias <aliaskey> \-\-scope app1.app2
 
 
 .fi
@@ -44,7 +44,7 @@ Get channels from context
 
 .SH SEE ALSO
 .PP
-\fBinspr\-get(1)\fP
+\fBinspr\-delete(1)\fP
 
 
 .SH HISTORY
