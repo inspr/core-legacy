@@ -41,30 +41,19 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		if err != nil {
 			// check for invalid error or non Existant
 			if ierrors.HasCode(err, ierrors.InvalidToken) {
-				http.Error(
-					w,
-					"Invalid Token",
-					http.StatusUnauthorized,
-				)
+
+				ERROR(w, ierrors.NewError().Message("invalid token").Build())
 				return
 			}
 
 			// token expired
 			if ierrors.HasCode(err, ierrors.ExpiredToken) {
-				http.Error(
-					w,
-					"Request is OK but the token is expired",
-					http.StatusOK,
-				)
+				ERROR(w, ierrors.NewError().Message("token has expired").Build())
 				return
 			}
 
 			// default error message
-			http.Error(
-				w,
-				"Unknown error, please check token",
-				http.StatusBadRequest,
-			)
+			ERROR(w, ierrors.NewError().Message(err.Error()).Build())
 			return
 		}
 
@@ -93,12 +82,9 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 
 		// check for unauthorized error
 		if !valid {
-			http.Error(
-				w,
-				"Unauthorized to do operations in this context",
-				http.StatusForbidden,
-			)
+			ERROR(w, ierrors.NewError().Forbidden().Message("not enought permissions to perform request").Build())
 			return
+
 		}
 
 		// token and context are valid
