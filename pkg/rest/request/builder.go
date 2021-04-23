@@ -44,7 +44,7 @@ func (cb *ClientBuilder) Authenticator(au Authenticator) *ClientBuilder {
 
 // Token adds a token header with the format "Authentication: Bearer " + token on each request the client sends.
 func (cb *ClientBuilder) Token(token []byte) *ClientBuilder {
-	return cb.Header("Authentication", fmt.Sprintf("Bearer %s", token))
+	return cb.Header("Authorization", fmt.Sprintf("Bearer %s", token))
 }
 
 // HTTPClient sets the http client for the client that is being built

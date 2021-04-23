@@ -355,7 +355,7 @@ func TestClientBuilder_Token(t *testing.T) {
 				token: []byte("mock_token"),
 			},
 			want: map[string]string{
-				"Authentication": "Bearer mock_token",
+				"Authorization": "Bearer mock_token",
 			},
 		},
 	}
