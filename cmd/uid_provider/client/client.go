@@ -27,12 +27,19 @@ type Client struct {
 }
 
 func (c *Client) initAdminUser() error {
-	return set(context.Background(), c.rdb, User{
+	adminUser := User{
 		UID:      "admin",
 		Role:     1,
 		Scope:    []string{""},
 		Password: os.Getenv("ADMIN_PASSWORD"),
-	})
+	}
+	payload, _ := c.encrypt(adminUser)
+	token, err := c.requestNewToken(context.Background(), *payload)
+	if err != nil {
+		return err
+	}
+	os.Setenv("ADMIN_TOKEN", token)
+	return set(context.Background(), c.rdb, adminUser)
 }
 
 // NewRedisClient creates and returns a new Redis client
@@ -233,9 +240,19 @@ func (c *Client) decrypt(encryptedString []byte) (*User, error) {
 	return &User{UID: usrData[0], Password: usrData[1]}, nil
 }
 
+type authorizer struct{}
+
+func (authorizer) GetToken() ([]byte, error) {
+	return []byte(os.Getenv("ADMIN_TOKEN")), nil
+}
+func (authorizer) SetToken(token []byte) error {
+	os.Setenv("ADMIN_TOKEN", string(token))
+	return nil
+}
+
 func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
 
-	ncc := client.NewControllerClient(c.insprdAddress, nil)
+	ncc := client.NewControllerClient(c.insprdAddress, authorizer{})
 
 	token, err := ncc.Authorization().GenerateToken(ctx, payload)
 	if err != nil {
