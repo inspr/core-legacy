@@ -78,6 +78,7 @@ func getCurrentFilesInFolder() []string {
 // TestNewApplyCmd is mainly for improving test coverage,
 // it was really tested by instantiating Inspr's CLI
 func TestNewApplyCmd(t *testing.T) {
+	prepareToken(t)
 	tests := []struct {
 		name string
 	}{
@@ -96,6 +97,7 @@ func TestNewApplyCmd(t *testing.T) {
 }
 
 func Test_isYaml(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		file string
 	}
@@ -136,6 +138,7 @@ func Test_isYaml(t *testing.T) {
 }
 
 func Test_printAppliedFiles(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		appliedFiles []applied
 	}
@@ -170,6 +173,7 @@ func Test_printAppliedFiles(t *testing.T) {
 }
 
 func Test_doApply(t *testing.T) {
+	prepareToken(t)
 	defer os.Remove(filePath)
 	yamlString := createDAppYaml()
 
@@ -244,6 +248,7 @@ func Test_doApply(t *testing.T) {
 }
 
 func Test_getFilesFromFolder(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		path string
 	}
@@ -285,6 +290,7 @@ func Test_getFilesFromFolder(t *testing.T) {
 }
 
 func Test_applyValidFiles(t *testing.T) {
+	prepareToken(t)
 	defer os.Remove(filePath)
 	tempFiles := []string{filePath}
 	yamlString := createDAppYaml()
@@ -401,6 +407,7 @@ func Test_applyValidFiles(t *testing.T) {
 }
 
 func Test_getOrderedFiles(t *testing.T) {
+	prepareToken(t)
 	defer os.Remove("app.yml")
 	defer os.Remove("ch.yml")
 	defer os.Remove("ct.yml")

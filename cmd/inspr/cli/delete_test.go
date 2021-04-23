@@ -319,6 +319,7 @@ func getMockAppWithoutAlias() *meta.App {
 }
 
 func TestNewDeleteCmd(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	tests := []struct {
 		name          string
@@ -344,6 +345,7 @@ func TestNewDeleteCmd(t *testing.T) {
 }
 
 func Test_deleteApps(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutApp1())
@@ -423,6 +425,7 @@ func Test_deleteApps(t *testing.T) {
 }
 
 func Test_deleteChannels(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutCh1())
@@ -502,6 +505,7 @@ func Test_deleteChannels(t *testing.T) {
 }
 
 func Test_deleteCTypes(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutCt1())
@@ -581,6 +585,7 @@ func Test_deleteCTypes(t *testing.T) {
 }
 
 func Test_deleteAlias(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutAlias())

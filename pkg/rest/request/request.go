@@ -13,13 +13,7 @@ import (
 
 // Send sends a request to the url specified in instantiation, with the given route and method, using
 // the encoder to encode the body and the decoder to decode the response into the responsePtr
-func (c *Client) Send(
-	ctx context.Context,
-	route string,
-	method string,
-	body interface{},
-	responsePtr interface{},
-) (err error) {
+func (c *Client) Send(ctx context.Context, route string, method string, body interface{}, responsePtr interface{}) (err error) {
 	buf, err := c.encoder(body)
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message("error encoding body to json").InnerError(err).Build()
@@ -32,6 +26,14 @@ func (c *Client) Send(
 
 	for key, value := range c.headers {
 		req.Header.Add(key, value)
+	}
+
+	if c.auth != nil {
+		token, err := c.auth.GetToken()
+		if err != nil {
+			return ierrors.NewError().BadRequest().Message("unable to get token from configuration").InnerError(err).Build()
+		}
+		req.Header.Add("Authorizaion", string(token))
 	}
 
 	resp, err := c.c.Do(req)
@@ -47,6 +49,14 @@ func (c *Client) Send(
 	err = c.handleResponseErr(resp)
 	if err != nil {
 		return err
+	}
+
+	updatedToken := resp.Header.Get("Authorization")
+	if c.auth != nil && updatedToken != "" {
+		err := c.auth.SetToken([]byte(updatedToken))
+		if err != nil {
+			return ierrors.NewError().BadRequest().Message("unable to update token").InnerError(err).Build()
+		}
 	}
 
 	decoder := json.NewDecoder(resp.Body)
@@ -86,6 +96,7 @@ type Client struct {
 	encoder          Encoder
 	decoderGenerator DecoderGenerator
 	headers          map[string]string
+	auth             Authenticator
 }
 
 func (c *Client) handleResponseErr(resp *http.Response) error {
