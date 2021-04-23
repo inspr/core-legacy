@@ -159,6 +159,8 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	}
 }
 
+const sidecarPort int32 = 8888
+
 func dappToService(app *meta.App) *kubeCore.Service {
 	appID := toAppID(app)
 	appDeployName := toDeploymentName(app)
@@ -176,6 +178,11 @@ func dappToService(app *meta.App) *kubeCore.Service {
 						TargetPort: intstr.FromInt(port.TargetPort),
 					})
 				}
+				ports = append(ports, kubeCore.ServicePort{
+					Port:       sidecarPort,
+					TargetPort: intstr.FromInt(int(sidecarPort)),
+				})
+
 				return
 			}(),
 			Selector: appLabels,
