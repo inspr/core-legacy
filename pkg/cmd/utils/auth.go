@@ -3,6 +3,7 @@ package utils
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 // Authenticator is responsible for implementing the interface methods
@@ -20,6 +21,8 @@ func (a Authenticator) GetToken() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	token = []byte(strings.TrimSpace(string(token)))
 	token = append(bearer, token...)
 	return token, nil
 }
