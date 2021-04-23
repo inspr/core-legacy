@@ -43,6 +43,7 @@ type ChannelTypeInterface interface {
 // to make changes in structures inside of the cluster
 type AuthorizationInterface interface {
 	GenerateToken(ctx context.Context, payload auth.Payload) (string, error)
+	Init(ctx context.Context) (string, error)
 }
 
 // AliasInterface is the interface that allows to

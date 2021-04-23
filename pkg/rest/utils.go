@@ -33,8 +33,6 @@ func ERROR(w http.ResponseWriter, err error) {
 		switch e.Code {
 		case ierrors.NotFound:
 			JSON(w, http.StatusNotFound, e)
-		case ierrors.AlreadyExists:
-			JSON(w, http.StatusConflict, e)
 		case ierrors.InternalServer:
 			JSON(w, http.StatusInternalServerError, e)
 		case ierrors.InvalidName:

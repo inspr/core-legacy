@@ -7,6 +7,7 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -86,14 +87,37 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 	return payload, token, nil
 }
 
+// Init receives a payload and returns it in signed jwt format. Uses JWT authentication provider
+func (JA *JWTauth) Init(load models.Payload) ([]byte, error) {
+
+	log.Printf("load = %+v\n", load)
+	log.Printf("JA.authURL = %+v\n", JA.authURL)
+
+	client := request.NewJSONClient(JA.authURL)
+
+	data := models.JwtDO{}
+	err := client.Send(context.Background(), "/init", http.MethodPost, load, &data)
+	if err != nil {
+		log.Printf("err = %+v\n", err)
+		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return nil, err
+	}
+
+	return data.Token, nil
+}
+
 // Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
+
+	log.Printf("load = %+v\n", load)
+	log.Printf("JA.authURL = %+v\n", JA.authURL)
 
 	client := request.NewJSONClient(JA.authURL)
 
 	data := models.JwtDO{}
 	err := client.Send(context.Background(), "/token", http.MethodPost, load, &data)
 	if err != nil {
+		log.Printf("err = %+v\n", err)
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
 	}

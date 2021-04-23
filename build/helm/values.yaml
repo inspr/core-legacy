@@ -36,7 +36,7 @@ service:
   insprdPort: 80
   insprdTargetport: 8080
   authPort: 80
-  authTargetPort: 8080
+  authTargetPort: 8081
 
 ingress:
   enabled: false

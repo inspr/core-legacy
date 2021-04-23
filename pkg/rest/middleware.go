@@ -24,14 +24,10 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]
+		if (len(headerContent) == 0) ||
+			(len(headerContent) > 1 && !strings.HasPrefix(headerContent[0], "Bearer ")) {
 
-		if len(headerContent) != 1 ||
-			!strings.HasPrefix(headerContent[0], "Bearer ") {
-			http.Error(
-				w,
-				"Bad Request, expected: Authorization: Bearer <token>",
-				http.StatusUnauthorized,
-			)
+			ERROR(w, ierrors.NewError().Message("invalid token format").Build())
 			return
 		}
 

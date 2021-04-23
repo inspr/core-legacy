@@ -19,6 +19,7 @@ func (server *Server) Tokenize() rest.Handler {
 		data := models.Payload{}
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
+			server.logger.Error("unable to decode ")
 			err = ierrors.NewError().BadRequest().Message("invalid body, error: %s", err.Error()).Build()
 			rest.ERROR(w, err)
 			return
