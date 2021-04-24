@@ -241,7 +241,7 @@ SVC:
 Ingress:
 
 ```yaml
-   apiVersion: networking.k8s.io/v1beta1
+   apiVersion: networking.k8s.io/v1
    kind: Ingress
    metadata:
    name: pubsub-ingress
@@ -252,13 +252,15 @@ Ingress:
    spec:
    rules:
        - host: inspr.com
-
        http:
            paths:
-           - path: /publish
-               backend:
-               serviceName: pubsub-publish-front
-               servicePort: 80
+            - path: /publish
+              pathType: Prefix
+              backend:
+                service:
+                    name: pubsub-publish-front
+                    port:
+                        number: 80
 ```
 
 ## Publishing it

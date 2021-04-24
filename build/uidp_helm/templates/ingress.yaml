@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.ingress.name }}
@@ -11,21 +11,32 @@ spec:
       paths:
       - path: /newuser
         backend:
-          serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.port }}
+          service:
+            name: {{ .Values.service.uidpName }}
+            port:
+              number: {{ .Values.service.port }}
       - path: /deleteuser
         backend:
-          serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.port }}
+          service:
+            name: {{ .Values.service.uidpName }}
+            port:
+              number: {{ .Values.service.port }}
       - path: /updatepwd
         backend:
-          serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.port }}
+          service:
+            name: {{ .Values.service.uidpName }}
+            port:
+              number: {{ .Values.service.port }}
       - path: /login
         backend:
-          serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.port }}
+          service:
+            name: {{ .Values.service.uidpName }}
+            port:
+              number: {{ .Values.service.port }}
       - path: /refreshtoken
         backend:
-          serviceName: {{ .Values.service.uidpName }}
-          servicePort: {{ .Values.service.port }}
+          service:
+            name: {{ .Values.service.uidpName }}
+          service:
+            port:
+              number: {{ .Values.service.port }}
