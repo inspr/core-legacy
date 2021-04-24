@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -95,22 +96,23 @@ func generatePublicKey(publicKey *rsa.PublicKey) ([]byte, error) {
 }
 
 func main() {
+	ctx := context.Background()
 	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "Auth-provider")))
 
 	namespace := os.Getenv("K8S_NAMESPACE")
 
 	initKube()
 
-	_, errPriv := clientSet.CoreV1().Secrets(namespace).Get("jwtprivatekey", v1.GetOptions{})
-	_, errPub := clientSet.CoreV1().Secrets(namespace).Get("jwtpublickey", v1.GetOptions{})
+	_, errPriv := clientSet.CoreV1().Secrets(namespace).Get(ctx, "jwtprivatekey", v1.GetOptions{})
+	_, errPub := clientSet.CoreV1().Secrets(namespace).Get(ctx, "jwtpublickey", v1.GetOptions{})
 
 	if errPriv != nil || errPub != nil {
 		if errPriv == nil {
-			clientSet.CoreV1().Secrets(namespace).Delete("jwtprivatekey", &v1.DeleteOptions{})
+			clientSet.CoreV1().Secrets(namespace).Delete(ctx, "jwtprivatekey", v1.DeleteOptions{})
 		}
 
 		if errPub == nil {
-			clientSet.CoreV1().Secrets(namespace).Delete("jwtpublickey", &v1.DeleteOptions{})
+			clientSet.CoreV1().Secrets(namespace).Delete(ctx, "jwtpublickey", v1.DeleteOptions{})
 		}
 
 		privateKey, err := generatePrivateKey()
@@ -141,11 +143,11 @@ func main() {
 				"key": publicKeyBytes,
 			},
 		}
-		_, err = clientSet.CoreV1().Secrets(namespace).Create(&privSec)
+		_, err = clientSet.CoreV1().Secrets(namespace).Create(ctx, &privSec, v1.CreateOptions{})
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
-		_, err = clientSet.CoreV1().Secrets(namespace).Create(&pubSec)
+		_, err = clientSet.CoreV1().Secrets(namespace).Create(ctx, &pubSec, v1.CreateOptions{})
 		if err != nil {
 			logger.Fatal(err.Error())
 		}

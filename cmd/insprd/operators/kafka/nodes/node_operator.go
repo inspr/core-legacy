@@ -45,7 +45,7 @@ func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node,
 	logger.Info("getting Node from k8s deployment",
 		zap.String("deployment name", deployName))
 
-	dep, err := kube.Get(deployName, metav1.GetOptions{})
+	dep, err := kube.Get(ctx, deployName, metav1.GetOptions{})
 	if err != nil {
 		logger.Error("unable to find k8s deployment")
 		return nil, ierrors.NewError().Message(err.Error()).Build()
@@ -74,13 +74,13 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 	deploy = no.dAppToDeployment(app)
 	svc = dappToService(app)
 	logger.Debug("creating the k8s deployment")
-	dep, err := kube.Create(deploy)
+	dep, err := kube.Create(ctx, deploy, metav1.CreateOptions{})
 	if err != nil {
 		logger.Error("unable to create the k8s deployment")
 		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
 
-	_, err = services.Create(svc)
+	_, err = services.Create(ctx, svc, metav1.CreateOptions{})
 	if err != nil {
 		logger.Error("unable to create the k8s service")
 		return nil, ierrors.NewError().InnerError(err).Message("unable to create kubernetes service").Build()
@@ -109,12 +109,12 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 	svc = dappToService(app)
 
 	logger.Debug("updating the k8s deployment")
-	dep, err := kube.Update(deploy)
+	dep, err := kube.Update(ctx, deploy, metav1.UpdateOptions{})
 	if err != nil {
 		logger.Error("unable to update the k8s deployment")
 		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
-	_, err = services.Update(svc)
+	_, err = services.Update(ctx, svc, metav1.UpdateOptions{})
 	if err != nil {
 		logger.Error("unable to update the k8s service")
 		return nil, ierrors.NewError().InnerError(err).Message("unable to update kubernetes service").Build()
@@ -143,13 +143,13 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 
 	logger.Debug("deleting the k8s deployment",
 		zap.String("deployment", deployName))
-	err := kube.Delete(deployName, &metav1.DeleteOptions{})
+	err := kube.Delete(ctx, deployName, metav1.DeleteOptions{})
 	if err != nil {
 		logger.Error("unable to delete the k8s deployment")
 		return ierrors.NewError().Message(err.Error()).Build()
 	}
 	svcs := no.services()
-	err = svcs.Delete(deployName, &metav1.DeleteOptions{})
+	err = svcs.Delete(ctx, deployName, metav1.DeleteOptions{})
 
 	if err != nil {
 		logger.Error("unable to delete the k8s service")

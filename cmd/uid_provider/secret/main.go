@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"log"
@@ -31,7 +32,7 @@ func initKube() error {
 }
 
 func main() {
-
+	ctx := context.Background()
 	namespace := os.Getenv("K8S_NAMESPACE")
 	pvtKeyName := os.Getenv("PVT_KEY_NAME")
 	password := os.Getenv("ADMIN_PASSWORD")
@@ -41,7 +42,7 @@ func main() {
 	}
 
 	initKube()
-	_, err := clientSet.CoreV1().Secrets(namespace).Get("redisprivatekey", v1.GetOptions{})
+	_, err := clientSet.CoreV1().Secrets(namespace).Get(ctx, "redisprivatekey", v1.GetOptions{})
 
 	if err != nil {
 		bytes := make([]byte, 32) //generate a random 32 byte key for AES-256
@@ -63,7 +64,7 @@ func main() {
 			},
 		}
 
-		_, err = clientSet.CoreV1().Secrets(namespace).Create(&privSec)
+		_, err = clientSet.CoreV1().Secrets(namespace).Create(ctx, &privSec, v1.CreateOptions{})
 		if err != nil {
 			log.Fatal(err.Error())
 		}
