@@ -243,10 +243,10 @@ func (c *Client) decrypt(encryptedString []byte) (*User, error) {
 type authorizer struct{}
 
 func (authorizer) GetToken() ([]byte, error) {
-	return []byte(os.Getenv("ADMIN_TOKEN")), nil
+	return []byte("Bearer " + os.Getenv("ADMIN_TOKEN")), nil
 }
 func (authorizer) SetToken(token []byte) error {
-	os.Setenv("ADMIN_TOKEN", string(token))
+	os.Setenv("ADMIN_TOKEN", string(token)[len("Bearer "):])
 	return nil
 }
 
