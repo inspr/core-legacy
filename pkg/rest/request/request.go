@@ -33,7 +33,7 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 		if err != nil {
 			return ierrors.NewError().BadRequest().Message("unable to get token from configuration").InnerError(err).Build()
 		}
-		req.Header.Add("Authorizaion", string(token))
+		req.Header.Add("Authorization", string(token))
 	}
 
 	resp, err := c.c.Do(req)
