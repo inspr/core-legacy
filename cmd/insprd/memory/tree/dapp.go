@@ -210,7 +210,7 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 			nextApp = nextApp.Spec.Apps[element]
 			if nextApp == nil {
 				logger.Error("unable to find dApp for given query (Root Getter)",
-					zap.String("query", query))
+					zap.String("query", string(query)))
 				return nil, err
 			}
 		}
