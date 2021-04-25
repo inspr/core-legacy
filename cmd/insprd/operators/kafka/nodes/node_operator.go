@@ -80,12 +80,10 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
 
-	if len(app.Spec.Node.Spec.Ports) > 0 {
-		_, err = services.Create(svc)
-		if err != nil {
-			logger.Error("unable to create the k8s service", zap.Any("error", err))
-			return nil, ierrors.NewError().InnerError(err).Message("unable to create kubernetes service").Build()
-		}
+	_, err = services.Create(svc)
+	if err != nil {
+		logger.Error("unable to create the k8s service", zap.Any("error", err))
+		return nil, ierrors.NewError().InnerError(err).Message("unable to create kubernetes service").Build()
 	}
 	node, err := toNode(dep)
 	if err != nil {
