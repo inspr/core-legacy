@@ -25,9 +25,9 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]
 		if (len(headerContent) == 0) ||
-			(len(headerContent) > 1 && !strings.HasPrefix(headerContent[0], "Bearer ")) {
+			(!strings.HasPrefix(headerContent[0], "Bearer ")) {
 
-			ERROR(w, ierrors.NewError().Message("invalid token format").Build())
+			ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token format").Build())
 			return
 		}
 
@@ -42,13 +42,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			// check for invalid error or non Existant
 			if ierrors.HasCode(err, ierrors.InvalidToken) {
 
-				ERROR(w, ierrors.NewError().Message("invalid token").Build())
-				return
-			}
-
-			// token expired
-			if ierrors.HasCode(err, ierrors.ExpiredToken) {
-				ERROR(w, ierrors.NewError().Message("token has expired").Build())
+				ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token").Build())
 				return
 			}
 
