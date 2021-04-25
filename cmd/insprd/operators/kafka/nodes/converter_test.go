@@ -438,6 +438,10 @@ func Test_dappToService(t *testing.T) {
 							Port:       90,
 							TargetPort: intstr.FromInt(100),
 						},
+						{
+							Port:       sidecarPort,
+							TargetPort: intstr.FromInt(int(sidecarPort)),
+						},
 					},
 					Selector: map[string]string{
 						"app": "test-dapp",
