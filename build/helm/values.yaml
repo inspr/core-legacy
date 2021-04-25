@@ -23,6 +23,7 @@ insprEnvironment: test
 deployment:
   insprdName: insprd-deployment
   authName: auth-deployment
+  initKey: "1234567890"
 
 insprdRepository: gcr.io/red-inspr/insprd
 authRepository: gcr.io/red-inspr/authsvc

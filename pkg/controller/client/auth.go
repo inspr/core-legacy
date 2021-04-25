@@ -26,9 +26,11 @@ func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (
 	return string(authDI.Token), nil
 }
 
-func (ac *AuthClient) Init(ctx context.Context) (string, error) {
+func (ac *AuthClient) Init(ctx context.Context, key string) (string, error) {
+
+	authDO := struct{ Key string }{key}
 	authDI := models.JwtDO{}
-	err := ac.c.Send(ctx, "/init", "POST", nil, &authDI)
+	err := ac.c.Send(ctx, "/init", "POST", authDO, &authDI)
 	if err != nil {
 		return "", err
 	}

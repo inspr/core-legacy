@@ -8,10 +8,11 @@ import (
 	"github.com/inspr/inspr/pkg/cmd/utils"
 )
 
-var authCommand = cmd.NewCmd("auth").AddSubCommand(
-	cmd.NewCmd("init").WithCommonFlags().NoArgs(
-		func(c context.Context) error {
-			token, err := utils.GetCliClient().Authorization().Init(c)
+var authCommand = cmd.NewCmd("cluster").AddSubCommand(
+	cmd.NewCmd("init").
+		WithCommonFlags().ExactArgs(1,
+		func(c context.Context, args []string) error {
+			token, err := utils.GetCliClient().Authorization().Init(c, args[0])
 			if err != nil {
 				return err
 			}

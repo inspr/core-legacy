@@ -21,6 +21,6 @@ func NewAuthMock(err error) controller.AuthorizationInterface {
 func (ac *AuthMock) GenerateToken(ctx context.Context, payload auth.Payload) (string, error) {
 	return "", nil
 }
-func (ac *AuthMock) Init(ctx context.Context) (string, error) {
+func (ac *AuthMock) Init(ctx context.Context, key string) (string, error) {
 	return "", nil
 }

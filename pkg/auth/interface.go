@@ -6,6 +6,6 @@ import "github.com/inspr/inspr/pkg/auth/models"
 type Auth interface {
 	Validate(token []byte) (*models.Payload, []byte, error)
 	Tokenize(load models.Payload) ([]byte, error)
-	Init(load models.Payload) ([]byte, error)
+	Init(key string, load models.Payload) ([]byte, error)
 	Refresh(token []byte) ([]byte, error)
 }

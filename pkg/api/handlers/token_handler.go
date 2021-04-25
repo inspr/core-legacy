@@ -36,12 +36,15 @@ func (h *Handler) TokenHandler() rest.Handler {
 func (h *Handler) InitHandler() rest.Handler {
 
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
+		decoder := json.NewDecoder(r.Body)
+		res := struct{ Key string }{}
+		decoder.Decode(&res)
 		load := models.Payload{
 			RefreshURL: os.Getenv("REFRESH_URL"),
 			Scope:      []string{""},
 			Role:       1,
 		}
-		token, err := h.Auth.Init(load)
+		token, err := h.Auth.Init(res.Key, load)
 		if err != nil {
 
 			rest.ERROR(w, ierrors.NewError().InternalServer().Message("unable to authenticate token").Build())

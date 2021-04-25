@@ -27,7 +27,7 @@ func (ma *MockAuth) Validate(token []byte) (*models.Payload, []byte, error) {
 }
 
 // Init - mock of the tokenize function
-func (ma *MockAuth) Init(load models.Payload) ([]byte, error) {
+func (ma *MockAuth) Init(s string, load models.Payload) ([]byte, error) {
 	if ma.Err != nil {
 		return []byte{}, ma.Err
 	}
