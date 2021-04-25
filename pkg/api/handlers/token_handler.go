@@ -32,7 +32,7 @@ func (h *Handler) TokenHandler() rest.Handler {
 	}).Recover().Post().JSON()
 }
 
-// TokenHandler handles requests for token creation on Insprd
+// InitHandler handles requests for cluster auth initialization
 func (h *Handler) InitHandler() rest.Handler {
 
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {

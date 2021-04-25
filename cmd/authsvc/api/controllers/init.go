@@ -13,6 +13,7 @@ import (
 
 var initialized bool
 
+// HandleInit handles initialization on the server
 func (server *Server) HandleInit() rest.Handler {
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
 		var data struct {

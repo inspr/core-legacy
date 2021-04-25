@@ -26,6 +26,7 @@ func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (
 	return string(authDI.Token), nil
 }
 
+// Init function for initializing a cluster
 func (ac *AuthClient) Init(ctx context.Context, key string) (string, error) {
 
 	authDO := struct{ Key string }{key}

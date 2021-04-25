@@ -84,6 +84,7 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 	return payload, token, nil
 }
 
+// InitDO  structure for initialization requests
 type InitDO struct {
 	models.Payload
 	Key string
