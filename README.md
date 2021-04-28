@@ -41,7 +41,6 @@
     </a>
 </p> -->
 
-
 ---
 
 <br>
@@ -127,12 +126,12 @@ inspr config serverip http://<your_domain>.com
 ```
 
 And now you're good to go!  
-To follow a step-by-step tutorial on how to implement your first Inspr application, [click here!](https://github.com/inspr/inspr/blob/develop/docs/workspace_init.md)
+To follow a step-by-step tutorial on how to implement your first Inspr application, [click here!](https://github.com/inspr/docs/blob/main/workspace_init.md)
 
 ## Documentation
 
 The full documentation for Inspr can be found on our [website](https://inspr.com/docs).
-The source for the Inspr documentation and website is hosted on a separate repo, @inspr/docs.
+The source for the Inspr documentation and website is hosted on a separate [repo](https://github.com/inspr/docs).
 
 ## Architecture
 
