@@ -59,18 +59,22 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 		}
 	}
 
-	decoder := json.NewDecoder(resp.Body)
-	err = decoder.Decode(responsePtr)
+	if responsePtr != nil {
+		decoder := json.NewDecoder(resp.Body)
+		err = decoder.Decode(responsePtr)
 
-	if err == io.EOF {
-		return nil
+		if err == io.EOF {
+			return nil
+		}
+
+		return err
+
 	}
-
-	return err
+	return nil
 }
 
 func (c *Client) routeToURL(route string) string {
-	return fmt.Sprintf("%s%s", c.baseURL, route)
+	return fmt.Sprintf("%s/%s", c.baseURL, strings.TrimPrefix(route, "/"))
 }
 
 // Encoder encodes an interface into bytes
