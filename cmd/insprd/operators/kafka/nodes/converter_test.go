@@ -380,7 +380,7 @@ func Test_baseEnvironment(t *testing.T) {
 		}
 		t.Run(tt.name, func(t *testing.T) {
 			mem.InitTransaction()
-			if got := op.baseEnvironment(tt.args.app); !reflect.DeepEqual(got, tt.want) {
+			if got := op.sidecarEnvironment(tt.args.app); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("baseEnvironment() = \n%v, want \n%v", got, tt.want)
 			}
 			mem.Cancel()
