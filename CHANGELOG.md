@@ -1,11 +1,5 @@
 # Changelog
 
-
-
-## v0.1.0 - Name of the release
-
-
-
 ### #37 - Feature: reactive sidecar <!-- This is the title -->
 - fixes:
 	- lowers the timeout on kafka writer's flush
