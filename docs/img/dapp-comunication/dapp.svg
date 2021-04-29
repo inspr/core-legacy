@@ -21,8 +21,8 @@
         }
 
       </style>
-      <img id="light" src="./light.png"  width="100%"></img>
-      <img id="dark" src="./dark.png"  width="100%"></img>
+      <img id="light" src="https://storage.googleapis.com/inspr/light.png"  width="100%"></img>
+      <img id="dark" src="https://storage.googleapis.com/inspr/dark.png"  width="100%"></img>
     </div>
 </foreignObject>
 </svg>
