@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/inspr/inspr/pkg/ierrors"
 )
@@ -18,7 +19,6 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message("error encoding body to json").InnerError(err).Build()
 	}
-
 	req, err := http.NewRequestWithContext(ctx, method, c.routeToURL(route), bytes.NewBuffer(buf))
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message("error creating request").InnerError(err).Build()
@@ -42,7 +42,7 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 			NewError().
 			BadRequest().
 			InnerError(err).
-			Message("unable to send request to insprd").
+			Message(err.Error()).
 			Build()
 	}
 
