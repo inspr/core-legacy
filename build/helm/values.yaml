@@ -29,6 +29,7 @@ insprdRepository: gcr.io/red-inspr/insprd
 authRepository: gcr.io/red-inspr/authsvc
 secretRepository: gcr.io/red-inspr/secretgen
 
+
 service:
   type: ClusterIP
   authName: auth-svc
@@ -56,6 +57,8 @@ tolerations: []
 
 affinity: {}
 
+sidecar:
+    port: 3051
 kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
 kafkaBootstrap: kafka.default.svc:9092
 kafkaAutoOffsetReset: earliest

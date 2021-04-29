@@ -1,6 +1,8 @@
 package nodes
 
 import (
+	"os"
+	"strconv"
 	"strings"
 
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
@@ -159,7 +161,19 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	}
 }
 
-const sidecarPort int32 = 8888
+var sidecarPort int32
+
+func init() {
+	var err error
+	sidp, err := strconv.Atoi(os.Getenv("INSPR_SIDECAR_PORT"))
+	if err != nil {
+		if err != nil {
+			panic(err)
+		}
+
+	}
+	sidecarPort = int32(sidp)
+}
 
 func dappToService(app *meta.App) *kubeCore.Service {
 	appID := toAppID(app)
