@@ -66,8 +66,8 @@ Of course, we could create those three services and interconnect them by using R
 
 <div align="center">
 <img 
-    src="./docs/img/dapp-comunication.png" 
-    width="800px" 
+    src="./docs/img/dapp-comunication/dapp.svg" 
+    width="800px"
     title="Inspr communication example">
 </div>
 
