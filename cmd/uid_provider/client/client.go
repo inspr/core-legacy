@@ -49,7 +49,7 @@ func NewRedisClient() *Client {
 			Addrs:    []string{fmt.Sprintf("%s:%s", getEnv("REDIS_HOST"), getEnv("REDIS_PORT"))},
 			Password: getEnv("REDIS_PASSWORD"),
 		}),
-		refreshURL:    getEnv("REFRESH_URL"),
+		refreshURL:    fmt.Sprintf("%s/refreshtoken", getEnv("REFRESH_URL")),
 		refreshKey:    getEnv("REFRESH_KEY"),
 		insprdAddress: getEnv("INSPR_CLUSTER_ADDR"),
 	}
