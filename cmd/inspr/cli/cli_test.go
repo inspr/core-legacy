@@ -11,6 +11,7 @@ import (
 // TestNewInsprCommand is mainly for improving test coverage,
 // it was really tested by instantiating Inspr's CLI
 func TestNewInsprCommand(t *testing.T) {
+	prepareToken(t)
 	tests := []struct {
 		name string
 	}{
@@ -31,6 +32,7 @@ func TestNewInsprCommand(t *testing.T) {
 }
 
 func Test_mainCmdPreRun(t *testing.T) {
+	prepareToken(t)
 	folder := t.TempDir()
 	prev := os.Getenv("HOME")
 	os.Setenv("HOME", folder)

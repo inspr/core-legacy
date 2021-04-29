@@ -25,4 +25,5 @@ func (s *Server) initRoutes() {
 	s.Mux.Handle("/alias", rest.HandleCRUD(aliasHandler))
 
 	s.Mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
+	s.Mux.Handle("/init", h.InitHandler())
 }

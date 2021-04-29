@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
@@ -24,19 +25,19 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]
+		log.Println("validating")
+		log.Printf("headerContent = %+v\n", headerContent)
+		if (len(headerContent) == 0) ||
+			(!strings.HasPrefix(headerContent[0], "Bearer ")) {
 
-		if len(headerContent) != 1 ||
-			!strings.HasPrefix(headerContent[0], "Bearer ") {
-			http.Error(
-				w,
-				"Bad Request, expected: Authorization: Bearer <token>",
-				http.StatusUnauthorized,
-			)
+			ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token format").Build())
 			return
 		}
 
 		token := strings.TrimPrefix(headerContent[0], "Bearer ")
 		payload, newToken, err := auth.Validate([]byte(token))
+		log.Printf("payload = %+v\n", payload)
+		log.Printf("string(newToken) = %+v\n", string(newToken))
 
 		// returns the same token or a refreshed one in the header of the response
 		w.Header().Add("Authorization", "Bearer "+string(newToken))
@@ -45,30 +46,13 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		if err != nil {
 			// check for invalid error or non Existant
 			if ierrors.HasCode(err, ierrors.InvalidToken) {
-				http.Error(
-					w,
-					"Invalid Token",
-					http.StatusUnauthorized,
-				)
-				return
-			}
 
-			// token expired
-			if ierrors.HasCode(err, ierrors.ExpiredToken) {
-				http.Error(
-					w,
-					"Request is OK but the token is expired",
-					http.StatusOK,
-				)
+				ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token").Build())
 				return
 			}
 
 			// default error message
-			http.Error(
-				w,
-				"Unknown error, please check token",
-				http.StatusBadRequest,
-			)
+			ERROR(w, ierrors.NewError().Message(err.Error()).Build())
 			return
 		}
 
@@ -87,8 +71,10 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 		}
 
+		log.Printf("payload.Scope = %+v\n", payload.Scope)
 		valid := false
 		for _, scope := range payload.Scope {
+			log.Printf("scope = %+v\n", scope)
 			if strings.HasPrefix(requestData.Scope, scope) {
 				// scope found
 				valid = true
@@ -97,12 +83,9 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 
 		// check for unauthorized error
 		if !valid {
-			http.Error(
-				w,
-				"Unauthorized to do operations in this context",
-				http.StatusForbidden,
-			)
+			ERROR(w, ierrors.NewError().Forbidden().Message("not enought permissions to perform request").Build())
 			return
+
 		}
 
 		// token and context are valid

@@ -1,6 +1,8 @@
 package nodes
 
 import (
+	"os"
+	"strconv"
 	"strings"
 
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
@@ -159,6 +161,20 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	}
 }
 
+var sidecarPort int32
+
+func init() {
+	var err error
+	sidp, err := strconv.Atoi(os.Getenv("INSPR_SIDECAR_PORT"))
+	if err != nil {
+		if err != nil {
+			panic(err)
+		}
+
+	}
+	sidecarPort = int32(sidp)
+}
+
 func dappToService(app *meta.App) *kubeCore.Service {
 	appID := toAppID(app)
 	appDeployName := toDeploymentName(app)
@@ -176,6 +192,11 @@ func dappToService(app *meta.App) *kubeCore.Service {
 						TargetPort: intstr.FromInt(port.TargetPort),
 					})
 				}
+				ports = append(ports, kubeCore.ServicePort{
+					Port:       sidecarPort,
+					TargetPort: intstr.FromInt(int(sidecarPort)),
+				})
+
 				return
 			}(),
 			Selector: appLabels,

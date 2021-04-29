@@ -77,8 +77,8 @@ func TestAliasClient_Get(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 				if di.Key != tt.args.name {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.Key, tt.args.name)
@@ -164,8 +164,8 @@ func TestAliasClient_Create(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.Alias, *tt.args.ch) {
@@ -239,8 +239,8 @@ func TestAliasClient_Delete(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 				if di.Key != tt.args.name {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.Key, tt.args.name)
@@ -321,8 +321,8 @@ func TestAliasClient_Update(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.Alias, *tt.args.ch) {

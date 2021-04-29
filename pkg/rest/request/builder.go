@@ -6,6 +6,12 @@ import (
 	"net/http"
 )
 
+// Authenticator is an interface to perform authentication via tokens
+type Authenticator interface {
+	GetToken() ([]byte, error)
+	SetToken([]byte) error
+}
+
 // ClientBuilder builds a client with the given specifications
 type ClientBuilder struct {
 	c *Client
@@ -23,15 +29,22 @@ func (cb *ClientBuilder) Encoder(encoder Encoder) *ClientBuilder {
 	return cb
 }
 
-// Token adds a token header with the format "Authentication: Bearer " + token on each request the client sends.
-func (cb *ClientBuilder) Token(token []byte) *ClientBuilder {
-	return cb.Header("Authentication", fmt.Sprintf("Bearer %s", token))
-}
-
 // Decoder sets the decoder for the client that is being built
 func (cb *ClientBuilder) Decoder(decoder DecoderGenerator) *ClientBuilder {
 	cb.c.decoderGenerator = decoder
 	return cb
+}
+
+// Authenticator adds the authentication interface implementation to the
+// Client strucuture.
+func (cb *ClientBuilder) Authenticator(au Authenticator) *ClientBuilder {
+	cb.c.auth = au
+	return cb
+}
+
+// Token adds a token header with the format "Authentication: Bearer " + token on each request the client sends.
+func (cb *ClientBuilder) Token(token []byte) *ClientBuilder {
+	return cb.Header("Authorization", fmt.Sprintf("Bearer %s", token))
 }
 
 // HTTPClient sets the http client for the client that is being built

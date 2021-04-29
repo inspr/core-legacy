@@ -69,8 +69,8 @@ func TestAppClient_Delete(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
 				encoder.Encode(diff.Changelog{})
@@ -160,8 +160,8 @@ func TestAppClient_Get(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
 				encoder.Encode(tt.want)
@@ -255,8 +255,8 @@ func TestAppClient_Create(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {
@@ -348,8 +348,8 @@ func TestAppClient_Update(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {

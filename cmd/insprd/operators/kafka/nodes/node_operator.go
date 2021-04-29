@@ -82,7 +82,7 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 
 	_, err = services.Create(svc)
 	if err != nil {
-		logger.Error("unable to create the k8s service")
+		logger.Error("unable to create the k8s service", zap.Any("error", err))
 		return nil, ierrors.NewError().InnerError(err).Message("unable to create kubernetes service").Build()
 	}
 	node, err := toNode(dep)
