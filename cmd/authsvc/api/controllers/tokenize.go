@@ -25,7 +25,7 @@ func (server *Server) Tokenize() rest.Handler {
 			return
 		}
 
-		signed, err := server.tokenize(data)
+		signed, err := server.tokenize(data, time.Now().Add(time.Minute*1))
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -38,10 +38,10 @@ func (server *Server) Tokenize() rest.Handler {
 	}
 }
 
-func (server *Server) tokenize(payload models.Payload) ([]byte, error) {
+func (server *Server) tokenize(payload models.Payload, exp time.Time) ([]byte, error) {
 	var err error
 	token := jwt.New()
-	token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
+	token.Set(jwt.ExpirationKey, exp)
 	token.Set("payload", payload)
 
 	signed, err := jwt.Sign(token, jwa.RS256, server.privKey)
