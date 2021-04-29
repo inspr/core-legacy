@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/inspr/inspr/pkg/auth/models"
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -32,7 +33,7 @@ func (server *Server) HandleInit() rest.Handler {
 			return
 		}
 		initialized = true
-		token, err := server.tokenize(data.Payload)
+		token, err := server.tokenize(data.Payload, time.Now().Add(time.Minute*30))
 		if err != nil {
 			rest.ERROR(w, err)
 			return

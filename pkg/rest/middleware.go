@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
@@ -24,6 +25,8 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]
+		log.Println("validating")
+		log.Printf("headerContent = %+v\n", headerContent)
 		if (len(headerContent) == 0) ||
 			(!strings.HasPrefix(headerContent[0], "Bearer ")) {
 
@@ -33,6 +36,8 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 
 		token := strings.TrimPrefix(headerContent[0], "Bearer ")
 		payload, newToken, err := auth.Validate([]byte(token))
+		log.Printf("payload = %+v\n", payload)
+		log.Printf("string(newToken) = %+v\n", string(newToken))
 
 		// returns the same token or a refreshed one in the header of the response
 		w.Header().Add("Authorization", "Bearer "+string(newToken))
@@ -66,8 +71,10 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 		}
 
+		log.Printf("payload.Scope = %+v\n", payload.Scope)
 		valid := false
 		for _, scope := range payload.Scope {
+			log.Printf("scope = %+v\n", scope)
 			if strings.HasPrefix(requestData.Scope, scope) {
 				// scope found
 				valid = true

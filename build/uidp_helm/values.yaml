@@ -60,7 +60,7 @@ deployment:
   insprdAddr: "http://insprd-svc.default.svc"
   replicas: 1
   uidpName: uidp-dep
-  uidpUrl: "http://inspr.com/refreshtoken"
+  uidpUrl: "http://uidp-svc.default.svc"
 
 ingress:
   name: uidp-ingress

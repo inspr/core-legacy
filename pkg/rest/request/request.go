@@ -67,10 +67,9 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 			return nil
 		}
 
-		return err
-
 	}
-	return nil
+
+	return err
 }
 
 func (c *Client) routeToURL(route string) string {
