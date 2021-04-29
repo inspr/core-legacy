@@ -14,12 +14,18 @@ type NodePort struct {
 	TargetPort int `yaml:"node_port" json:"node_port"`
 }
 
+type SidecarPort struct {
+	Read  int `json:"read"`
+	Write int `json:"write"`
+}
+
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.
 type NodeSpec struct {
-	Ports       []NodePort
+	Ports       []NodePort           `json:"ports,omitempty"`
 	Image       string               `yaml:"image,omitempty"  json:"image"`
 	Replicas    int                  `yaml:"replicas,omitempty" json:"replicas"`
 	Environment utils.EnvironmentMap `yaml:"environment,omitempty" json:"environment"`
+	SidecarPort SidecarPort          `json:"sidecar_port" yaml:"sidecar_port,omitempty"`
 }
 
 // App is an inspr component that represents an App. An App can contain other apps, channels and other components.
