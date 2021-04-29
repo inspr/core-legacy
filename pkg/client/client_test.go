@@ -15,7 +15,6 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecar/models"
 )
 
 func mockHTTPClient(addr string) *http.Client {
@@ -28,10 +27,8 @@ func mockHTTPClient(addr string) *http.Client {
 	}
 }
 
-func mockMessage() models.Message {
-	return models.Message{
-		Data: nil,
-	}
+func mockMessage() interface{} {
+	return nil
 }
 
 func mockHandlerFunc(path string, expectedData interface{}) http.HandlerFunc {
@@ -128,7 +125,7 @@ func TestNewAppClient(t *testing.T) {
 func TestClient_WriteMessage(t *testing.T) {
 	type args struct {
 		channel string
-		msg     models.Message
+		msg     interface{}
 	}
 	tests := []struct {
 		name            string
@@ -149,7 +146,7 @@ func TestClient_WriteMessage(t *testing.T) {
 			name: "Invalid request - server died",
 			args: args{
 				channel: "chan1",
-				msg:     models.Message{},
+				msg:     nil,
 			},
 			wantErr:         true,
 			interruptServer: true,
@@ -158,7 +155,7 @@ func TestClient_WriteMessage(t *testing.T) {
 			name: "Invalid request - context canceled",
 			args: args{
 				channel: "chan1",
-				msg:     models.Message{},
+				msg:     nil,
 			},
 			wantErr:       true,
 			cancelContext: true,
@@ -172,7 +169,7 @@ func TestClient_WriteMessage(t *testing.T) {
 			if tt.cancelContext {
 				handler = mockHandlerFuncTimeout()
 			} else {
-				handler = mockHandlerFunc("/writeMessage", tt.args)
+				handler = mockHandlerFunc("/chan1", tt.args)
 			}
 
 			s := httptest.NewServer(http.HandlerFunc(handler))
@@ -199,128 +196,6 @@ func TestClient_WriteMessage(t *testing.T) {
 			err := c.WriteMessage(ctx, "chan1", mockMessage())
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.WriteMessage() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestClient_ReadMessage(t *testing.T) {
-	type args struct {
-		ctx     context.Context
-		channel string
-	}
-	tests := []struct {
-		name            string
-		args            args
-		want            models.Message
-		wantErr         bool
-		interruptServer bool
-	}{
-		{
-			name: "Valid request",
-			args: args{
-				ctx:     context.Background(),
-				channel: "chan1",
-			},
-			wantErr:         false,
-			interruptServer: false,
-			want:            mockMessage(),
-		},
-		{
-			name: "Invalid request",
-			args: args{
-				ctx:     context.Background(),
-				channel: "chan2",
-			},
-			wantErr:         true,
-			interruptServer: true,
-			want:            models.Message{},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			handler := mockHandlerFunc("/readMessage", tt.args)
-
-			s := httptest.NewServer(http.HandlerFunc(handler))
-			defer s.Close()
-			c := Client{
-				client: request.NewClient().
-					BaseURL(s.URL).
-					HTTPClient(*http.DefaultClient).
-					Encoder(json.Marshal).
-					Decoder(request.JSONDecoderGenerator).
-					Build(),
-			}
-
-			if tt.interruptServer {
-				s.Close()
-			}
-
-			var got models.Message
-			err := c.ReadMessage(context.Background(), "chan1", &got)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.ReadMessage() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.ReadMessage() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestClient_CommitMessage(t *testing.T) {
-	type args struct {
-		ctx     context.Context
-		channel string
-	}
-	tests := []struct {
-		name            string
-		args            args
-		wantErr         bool
-		interruptServer bool
-	}{
-		{
-			name: "Valid request",
-			args: args{
-				ctx:     context.Background(),
-				channel: "chan1",
-			},
-			wantErr:         false,
-			interruptServer: false,
-		},
-		{
-			name: "Invalid request",
-			args: args{
-				ctx:     nil,
-				channel: "chan1",
-			},
-			wantErr:         true,
-			interruptServer: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			handler := mockHandlerFunc("/commit", tt.args)
-
-			s := httptest.NewServer(http.HandlerFunc(handler))
-			defer s.Close()
-			c := Client{
-				client: request.NewClient().
-					BaseURL(s.URL).
-					HTTPClient(*http.DefaultClient).
-					Encoder(json.Marshal).
-					Decoder(request.JSONDecoderGenerator).
-					Build(),
-			}
-
-			if tt.interruptServer {
-				s.Close()
-			}
-
-			err := c.CommitMessage(context.Background(), "chan1")
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.CommitMessage() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
