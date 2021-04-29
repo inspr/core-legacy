@@ -34,6 +34,9 @@ func (mc *MockConsumer) Events() chan kafka.Event {
 func (mc *MockConsumer) CreateEvent(ev kafka.Event) {
 	mc.events <- ev
 }
+
+// CreateMessage creates a message on the mock consumer from the field defined
+// in the structure
 func (mc *MockConsumer) CreateMessage() {
 
 	if mc.err {

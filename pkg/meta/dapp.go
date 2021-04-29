@@ -14,6 +14,7 @@ type NodePort struct {
 	TargetPort int `yaml:"node_port" json:"node_port"`
 }
 
+// SidecarPort represents the port for communication between node and sidecar
 type SidecarPort struct {
 	Read  int `json:"read"`
 	Write int `json:"write"`
