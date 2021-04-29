@@ -45,7 +45,6 @@ func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	logger.Info("trying to write message in topic",
 		zap.String("channel", channel),
 		zap.String("resolved channel", resolvedCh))
-	go deliveryReport(writer.producer)
 
 	if errProduceMessage := writer.produceMessage(message, kafkaTopic(resolvedCh)); errProduceMessage != nil {
 		logger.Error("error while producing message",
@@ -53,8 +52,9 @@ func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 		return errProduceMessage
 	}
 
-	writer.producer.Flush(flushTimeout)
-
+	logger.Info("flusing the producer")
+	writer.producer.Flush(10)
+	logger.Info("flushed")
 	return nil
 }
 
@@ -85,13 +85,13 @@ func (writer *Writer) produceMessage(message interface{}, resolvedChannel kafkaT
 	logger.Debug("writing message into Kafka Topic",
 		zap.String("topic", string(resolvedChannel)))
 
-	writer.producer.ProduceChannel() <- &kafka.Message{
+	writer.producer.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic:     (*string)(&resolvedChannel),
 			Partition: kafka.PartitionAny,
 		},
 		Value: messageEncoded,
-	}
+	}, nil)
 
 	return nil
 }
