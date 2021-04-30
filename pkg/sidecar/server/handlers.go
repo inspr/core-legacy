@@ -20,6 +20,13 @@ func init() {
 	logger, _ = zap.NewProduction()
 }
 
+const maxBrokerRetries = 5
+
+var (
+	writeMessageErr = ierrors.NewError().InternalServer().Message("broker's writeMessage failed")
+	decodingErr     = ierrors.NewError().BadRequest().Message("couldn't parse body")
+)
+
 // handles the /message route in the server
 func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -29,8 +36,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		channel := strings.TrimPrefix(r.URL.Path, "/")
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
-			rest.ERROR(w, insprError.Build())
+			rest.ERROR(w, decodingErr.InnerError(err).Build())
 			return
 		}
 
@@ -49,69 +55,81 @@ func (s *Server) writeMessageHandler() rest.Handler {
 
 		logger.Info("writing message to broker", zap.String("channel", channel))
 		if err := s.Writer.WriteMessage(channel, body.Message); err != nil {
-			insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's writeMessage failed")
-			rest.ERROR(w, insprError.Build())
+			rest.ERROR(w, writeMessageErr.InnerError(err).Build())
 			return
 		}
 		rest.JSON(w, 200, struct{ Status string }{"OK"})
 	}
 }
 
-const maxBrokerRetries = 5
+func (s *Server) writeWithRetry(ctx context.Context, channel string, data interface{}) (resp response, err error) {
+	for i := 0; ; i++ {
+		err = s.client.Send(ctx, "/"+channel, http.MethodPost, data, &resp)
+		if err != nil {
+			if i == maxBrokerRetries {
+				return
+			}
+			continue
+		}
+		return
+	}
+}
+
+func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerResp models.BrokerData, err error) {
+	for i := 0; ; i++ {
+		brokerResp, err = s.Reader.ReadMessage(ctx, channel)
+		if err != nil {
+			if i == maxBrokerRetries {
+				return
+			}
+			continue
+		}
+		return
+	}
+}
+
+type response struct {
+	Status string
+}
+
+func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) error {
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			var err error
+			var brokerResp models.BrokerData
+
+			brokerResp, err = s.readWithRetry(ctx, channel)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("trying to send requess")
+
+			resp, err := s.writeWithRetry(ctx, channel, brokerResp)
+			if err != nil || resp.Status != "OK" {
+				return err
+			}
+			s.Reader.Commit(ctx, channel)
+		}
+	}
+}
 
 func (s *Server) readMessageRoutine(ctx context.Context) error {
+	s.runningRead = true
+	defer func() { s.runningRead = false }()
+
 	errch := make(chan error)
 	newCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	if s.Reader != nil {
-		for _, channel := range environment.InputChannelList() {
-			// this takes the channel as a parameter to create a new variable from the loop variable
-			go func(ctx context.Context, channel string) {
-				for {
-					select {
-					case <-ctx.Done():
-						return
-					default:
-						var err error
-						var brokerResp models.BrokerData
 
-						for i := 0; ; i++ {
-							fmt.Println(channel, ": reading message")
-							brokerResp, err = s.Reader.ReadMessage(ctx, channel)
-							fmt.Println(channel, ": message read")
-							insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's ReadMessage returned an error").Build()
-							if err != nil {
-								if i == maxBrokerRetries {
-									select {
-									case errch <- insprError:
-									case <-ctx.Done():
-									}
-									return
-								}
-								logger.Info("error reading message from broker", zap.Any("error", insprError))
-								continue
-							}
-							break
-						}
-
-						type response struct {
-							Status string
-						}
-						resp := response{}
-
-						fmt.Println("trying to send requess")
-
-						err = s.client.Send(ctx, "/"+channel, http.MethodPost, brokerResp, &resp)
-						if err != nil {
-							logger.Info("error sending message to dapp", zap.Any("error", err))
-						} else {
-							s.Reader.Commit(ctx, channel)
-						}
-					}
-				}
-			}(newCtx, channel)
-		}
+	for _, channel := range environment.InputChannelList() {
+		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel)
 	}
+
 	select {
 	case err := <-errch:
 		return err
