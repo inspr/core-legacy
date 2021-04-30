@@ -2,7 +2,9 @@ package nodes
 
 import (
 	"context"
+	"math"
 	"os"
+	"strconv"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -160,6 +162,14 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration
 func NewOperator(memory memory.Manager) (nop *NodeOperator, err error) {
+	sidp, err := strconv.Atoi(os.Getenv("INSPR_SIDECAR_PORT"))
+	if err != nil {
+		if err != nil {
+			panic(err)
+		}
+
+	}
+	sidecarPort = int32(math.Min(float64(sidp), math.MaxInt32))
 	nop = &NodeOperator{
 		memory: memory,
 	}

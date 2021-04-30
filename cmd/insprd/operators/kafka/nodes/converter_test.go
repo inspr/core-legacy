@@ -23,9 +23,12 @@ import (
 
 func TestInsprDAppToK8sDeployment(t *testing.T) {
 	environment.SetMockEnv()
+	defer environment.UnsetMockEnv()
 
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
+	defer os.Unsetenv("KAFKA_BOOTSTRAP_SERVERS")
+	defer os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
 	testApp := meta.App{
 		Meta: meta.Metadata{
 			Name:      "mock_app",
@@ -214,6 +217,7 @@ func Test_toDeploymentName(t *testing.T) {
 		})
 	}
 }
+
 func Test_intToint32(t *testing.T) {
 	var x int32 = 3
 	var pointer32int *int32 = &x
@@ -247,6 +251,8 @@ func Test_intToint32(t *testing.T) {
 }
 
 func Test_baseEnvironment(t *testing.T) {
+	environment.SetMockEnv()
+	defer environment.UnsetMockEnv()
 	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "bootstrap")
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
 	os.Setenv("INSPR_SIDECAR_IMAGE", "sidecar")
@@ -336,6 +342,8 @@ func Test_baseEnvironment(t *testing.T) {
 				"INSPR_ENV":               "environment",
 				"KAFKA_BOOTSTRAP_SERVERS": "bootstrap",
 				"KAFKA_AUTO_OFFSET_RESET": "earliest",
+				"INSPR_READ_PORT":         "3002",
+				"INSPR_WRITE_PORT":        "3001",
 			},
 		},
 		{
@@ -369,6 +377,8 @@ func Test_baseEnvironment(t *testing.T) {
 				"INSPR_" + chs["channel2"].Meta.UUID + "_SCHEMA": "schema2",
 				"channel1_RESOLVED": "INSPR_" + chs["channel1"].Meta.UUID,
 				"channel2_RESOLVED": "INSPR_" + chs["channel2"].Meta.UUID,
+				"INSPR_READ_PORT":   "3002",
+				"INSPR_WRITE_PORT":  "3001",
 			},
 		},
 	}
