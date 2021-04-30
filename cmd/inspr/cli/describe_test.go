@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -21,6 +23,16 @@ import (
 
 func restartScopeFlag() {
 	cmd.InsprOptions.Scope = ""
+}
+
+func prepareToken(t *testing.T) {
+	dir := t.TempDir()
+	ioutil.WriteFile(
+		filepath.Join(dir, "token"),
+		[]byte("Bearer mock_token"),
+		os.ModePerm,
+	)
+	cmd.InsprOptions.Token = filepath.Join(dir, "token")
 }
 
 func getMockApp() *meta.App {
@@ -133,6 +145,7 @@ func getMockApp() *meta.App {
 }
 
 func TestNewDescribeCmd(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	tests := []struct {
 		name          string
@@ -158,6 +171,7 @@ func TestNewDescribeCmd(t *testing.T) {
 }
 
 func Test_displayAppState(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	utils.PrintAppTree(getMockApp(), bufResp)
@@ -232,6 +246,7 @@ func Test_displayAppState(t *testing.T) {
 }
 
 func Test_displayChannelState(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	utils.PrintChannelTree(getMockApp().Spec.Channels["ch1"], bufResp)
@@ -306,10 +321,12 @@ func Test_displayChannelState(t *testing.T) {
 }
 
 func Test_displayChannelTypeState(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	utils.PrintChannelTypeTree(getMockApp().Spec.ChannelTypes["ct1"], bufResp)
 	outResp, _ := ioutil.ReadAll(bufResp)
+	prepareToken(t)
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
@@ -380,6 +397,7 @@ func Test_displayChannelTypeState(t *testing.T) {
 }
 
 func Test_displayAlias(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	utils.PrintAliasTree(getMockApp().Spec.Aliases["alias_name"], bufResp)

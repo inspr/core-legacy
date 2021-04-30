@@ -35,6 +35,8 @@ func main() {
 	ctx := context.Background()
 	namespace := os.Getenv("K8S_NAMESPACE")
 	pvtKeyName := os.Getenv("PVT_KEY_NAME")
+
+	token := os.Getenv("ADMIN_TOKEN")
 	password := os.Getenv("ADMIN_PASSWORD")
 	defer os.Unsetenv("ADMIN_PASSWORD")
 	if pvtKeyName == "" {
@@ -61,6 +63,7 @@ func main() {
 			Data: map[string][]byte{
 				"key":      privateKeyBytes,
 				"password": []byte(password),
+				"token":    []byte(token),
 			},
 		}
 

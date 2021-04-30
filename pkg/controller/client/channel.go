@@ -23,7 +23,7 @@ type ChannelClient struct {
 // would call cc.Get(context.Background(), "app1", "channel1")
 func (cc *ChannelClient) Get(ctx context.Context, context string, name string) (*meta.Channel, error) {
 	cdi := models.ChannelQueryDI{
-		Ctx:    context,
+		Scope:  context,
 		ChName: name,
 	}
 
@@ -48,7 +48,7 @@ func (cc *ChannelClient) Get(ctx context.Context, context string, name string) (
 // would call cc.Create(context.Background(), "app1", &meta.Channel{...})
 func (cc *ChannelClient) Create(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
 	cdi := models.ChannelDI{
-		Ctx:     context,
+		Scope:   context,
 		Channel: *ch,
 		DryRun:  dryRun,
 	}
@@ -73,7 +73,7 @@ func (cc *ChannelClient) Create(ctx context.Context, context string, ch *meta.Ch
 // would call cc.Delete(context.Background(), "app1", "channel1")
 func (cc *ChannelClient) Delete(ctx context.Context, context string, name string, dryRun bool) (diff.Changelog, error) {
 	cdi := models.ChannelQueryDI{
-		Ctx:    context,
+		Scope:  context,
 		ChName: name,
 		DryRun: dryRun,
 	}
@@ -98,7 +98,7 @@ func (cc *ChannelClient) Delete(ctx context.Context, context string, name string
 // would call cc.Update(context.Background(), "app1", &meta.Channel{...})
 func (cc *ChannelClient) Update(ctx context.Context, context string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
 	cdi := models.ChannelDI{
-		Ctx:     context,
+		Scope:   context,
 		Channel: *ch,
 		DryRun:  dryRun,
 	}

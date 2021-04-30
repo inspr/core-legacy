@@ -23,8 +23,8 @@ type AliasClient struct {
 // would call ac.Get(context.Background(), "app1", "aliasKey")
 func (ac *AliasClient) Get(ctx context.Context, context, key string) (*meta.Alias, error) {
 	aliasQuery := models.AliasQueryDI{
-		Ctx: context,
-		Key: key,
+		Scope: context,
+		Key:   key,
 	}
 
 	var resp meta.Alias
@@ -48,7 +48,7 @@ func (ac *AliasClient) Get(ctx context.Context, context, key string) (*meta.Alia
 // would call ctc.Create(context.Background(), "app1", &meta.Alias{...})
 func (ac *AliasClient) Create(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasDI{
-		Ctx:    context,
+		Scope:  context,
 		Target: target,
 		Alias:  *alias,
 		DryRun: dryRun,
@@ -74,7 +74,7 @@ func (ac *AliasClient) Create(ctx context.Context, context string, target string
 // would call ac.Delete(context.Background(), "app1", "alias1")
 func (ac *AliasClient) Delete(ctx context.Context, context, key string, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasQueryDI{
-		Ctx:    context,
+		Scope:  context,
 		Key:    key,
 		DryRun: dryRun,
 	}
@@ -99,7 +99,7 @@ func (ac *AliasClient) Delete(ctx context.Context, context, key string, dryRun b
 // would call ac.Create(context.Background(), "app1", &meta.Alias{...})
 func (ac *AliasClient) Update(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasDI{
-		Ctx:    context,
+		Scope:  context,
 		Target: target,
 		Alias:  *alias,
 		DryRun: dryRun,

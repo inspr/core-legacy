@@ -93,17 +93,6 @@ func TestHandler_Validate(t *testing.T) {
 			wantCode: http.StatusUnauthorized,
 		},
 		{
-			name: "expired_token",
-			args: args{
-				auth: authMock.NewMockAuth(
-					&ierrors.InsprError{Code: ierrors.ExpiredToken},
-				),
-				headerValue: "Bearer mock_token",
-			},
-			wantErr:  true,
-			wantCode: http.StatusOK,
-		},
-		{
 			name: "unknown_error",
 			args: args{
 				auth: authMock.NewMockAuth(
@@ -112,7 +101,7 @@ func TestHandler_Validate(t *testing.T) {
 				headerValue: "Bearer mock_token",
 			},
 			wantErr:  true,
-			wantCode: http.StatusBadRequest,
+			wantCode: http.StatusInternalServerError,
 		},
 		{
 			name: "scope_error",

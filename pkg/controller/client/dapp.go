@@ -23,7 +23,7 @@ type AppClient struct {
 // would call ac.Get(context.Background(), "app1.app2")
 func (ac *AppClient) Get(ctx context.Context, context string) (*meta.App, error) {
 	adi := models.AppQueryDI{
-		Ctx: context,
+		Scope: context,
 	}
 
 	var resp meta.App
@@ -48,7 +48,7 @@ func (ac *AppClient) Get(ctx context.Context, context string) (*meta.App, error)
 // would call ac.Create(context.Background(), "app1", &meta.App{...})
 func (ac *AppClient) Create(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppDI{
-		Ctx:    context,
+		Scope:  context,
 		App:    *app,
 		DryRun: dryRun,
 	}
@@ -70,7 +70,7 @@ func (ac *AppClient) Create(ctx context.Context, context string, app *meta.App, 
 // would call ac.Delete(context.Background(), "app1.app2")
 func (ac *AppClient) Delete(ctx context.Context, context string, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppQueryDI{
-		Ctx:    context,
+		Scope:  context,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
@@ -94,7 +94,7 @@ func (ac *AppClient) Delete(ctx context.Context, context string, dryRun bool) (d
 // would call ac.Update(context.Background(), "app1", &meta.App{...})
 func (ac *AppClient) Update(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
 	adi := models.AppDI{
-		Ctx:    context,
+		Scope:  context,
 		App:    *app,
 		DryRun: dryRun,
 	}

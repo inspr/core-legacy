@@ -14,20 +14,20 @@ import (
 func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 	rootCmd := cmd.NewCmd("inspr").
 		WithDescription("main command of the inspr cli").
+		WithCommonFlags().
+		AddSubCommand(NewGetCmd(),
+			NewDeleteCmd(),
+			NewApplyCmd(),
+			NewDescribeCmd(),
+			NewConfigChangeCmd(),
+			authCommand,
+		).
+		Version(version).
 		WithLongDescription("main command of the inspr cli, to see the full list of subcommands existent please use 'inspr help'").
 		Super()
 
 	rootCmd.PersistentPreRunE = mainCmdPreRun
-	rootCmd.Version = version
 
-	// other commmands
-	rootCmd.AddCommand(NewGetCmd())
-	rootCmd.AddCommand(NewDeleteCmd())
-
-	rootCmd.AddCommand(NewApplyCmd())
-	rootCmd.AddCommand(NewDescribeCmd())
-
-	rootCmd.AddCommand(NewConfigChangeCmd())
 	// root persistentFlags
 	return rootCmd
 }

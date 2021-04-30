@@ -44,3 +44,9 @@ spec:
             name: {{ .Values.service.insprdName }}
             port:
               number: {{ .Values.service.insprdPort }}
+      - path: /init
+        pathType: Prefix
+        backend:
+            name: {{ .Values.service.insprdName }}
+            port:
+              number: {{ .Values.service.insprdPort }}

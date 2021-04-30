@@ -6,10 +6,11 @@ import (
 	"context"
 	"crypto/rsa"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/auth/models"
@@ -42,34 +43,32 @@ func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
 // valid, proceeds to execute the request and if it isn't valid returns an error
 func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 
-	jwtToken, err := jwt.Parse(
+	_, err := jwt.Parse(
 		token,
 		jwt.WithValidate(true),
 		jwt.WithVerify(jwa.RS256, JA.publicKey),
 	)
-
-	// not valid token
 	if err != nil {
-		return nil, token, err
-	}
+		if err.Error() == errors.New(`exp not satisfied`).Error() {
 
-	expiration, found := jwtToken.Get(jwt.ExpirationKey)
-	now := time.Now()
+			newToken, err := JA.Refresh(token)
+			if err != nil {
+				return nil,
+					token,
+					ierrors.
+						NewError().
+						InternalServer().
+						InnerError(err).
+						Message("error refreshing token").
+						Build()
+			}
+			token = newToken
+		} else {
+			return nil, token, err
+		}
+	}
 
 	// expired
-	if !found || now.After(expiration.(time.Time)) {
-		newToken, err := JA.Refresh(token)
-		if err != nil {
-			return nil,
-				token,
-				ierrors.
-					NewError().
-					InternalServer().
-					Message("error refreshing token").
-					Build()
-		}
-		token = newToken
-	}
 
 	// gets payload from token
 	payload, err := auth.Desserialize(token)
@@ -84,6 +83,32 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 	}
 
 	return payload, token, nil
+}
+
+// InitDO  structure for initialization requests
+type InitDO struct {
+	models.Payload
+	Key string
+}
+
+// Init receives a payload and returns it in signed jwt format. Uses JWT authentication provider
+func (JA *JWTauth) Init(key string, load models.Payload) ([]byte, error) {
+	initDO := InitDO{
+		Key:     key,
+		Payload: load,
+	}
+
+	client := request.NewJSONClient(JA.authURL)
+
+	data := models.JwtDO{}
+	err := client.Send(context.Background(), "/init", http.MethodPost, initDO, &data)
+	if err != nil {
+		log.Printf("err = %+v\n", err)
+		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return nil, err
+	}
+
+	return data.Token, nil
 }
 
 // Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider
@@ -110,6 +135,7 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 		Header("Authorization", fmt.Sprintf("Bearer %v", string(token))).
 		Build()
 
+	log.Printf("string(token) = %+v\n", string(token))
 	data := models.JwtDO{}
 
 	err := client.Send(context.Background(), "/refresh", http.MethodGet, nil, &data)
@@ -117,6 +143,7 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
 	}
+	log.Printf("string(data.Token) = %+v\n", string(data.Token))
 
 	return data.Token, nil
 }

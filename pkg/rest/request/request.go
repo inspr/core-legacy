@@ -13,13 +13,7 @@ import (
 
 // Send sends a request to the url specified in instantiation, with the given route and method, using
 // the encoder to encode the body and the decoder to decode the response into the responsePtr
-func (c *Client) Send(
-	ctx context.Context,
-	route string,
-	method string,
-	body interface{},
-	responsePtr interface{},
-) (err error) {
+func (c *Client) Send(ctx context.Context, route string, method string, body interface{}, responsePtr interface{}) (err error) {
 	buf, err := c.encoder(body)
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message("error encoding body to json").InnerError(err).Build()
@@ -34,9 +28,22 @@ func (c *Client) Send(
 		req.Header.Add(key, value)
 	}
 
+	if c.auth != nil {
+		token, err := c.auth.GetToken()
+		if err != nil {
+			return ierrors.NewError().BadRequest().Message("unable to get token from configuration").InnerError(err).Build()
+		}
+		req.Header.Add("Authorization", string(token))
+	}
+
 	resp, err := c.c.Do(req)
 	if err != nil {
-		return ierrors.NewError().BadRequest().InnerError(err).Message("unable to send request to insprd").Build()
+		return ierrors.
+			NewError().
+			BadRequest().
+			InnerError(err).
+			Message("unable to send request to insprd").
+			Build()
 	}
 
 	err = c.handleResponseErr(resp)
@@ -44,11 +51,21 @@ func (c *Client) Send(
 		return err
 	}
 
-	decoder := json.NewDecoder(resp.Body)
-	err = decoder.Decode(responsePtr)
+	updatedToken := resp.Header.Get("Authorization")
+	if c.auth != nil && updatedToken != "" {
+		err := c.auth.SetToken([]byte(updatedToken))
+		if err != nil {
+			return ierrors.NewError().BadRequest().Message("unable to update token").InnerError(err).Build()
+		}
+	}
 
-	if err == io.EOF {
-		return nil
+	decoder := json.NewDecoder(resp.Body)
+	if responsePtr != nil {
+		err = decoder.Decode(responsePtr)
+
+		if err == io.EOF {
+			return nil
+		}
 	}
 
 	return err
@@ -81,25 +98,40 @@ type Client struct {
 	encoder          Encoder
 	decoderGenerator DecoderGenerator
 	headers          map[string]string
+	auth             Authenticator
 }
 
 func (c *Client) handleResponseErr(resp *http.Response) error {
 	decoder := c.decoderGenerator(resp.Body)
 	var err *ierrors.InsprError
+	defaultErr := ierrors.
+		NewError().
+		InternalServer().
+		Message("cannot retrieve error from server").
+		Build()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
 		return nil
+	case http.StatusUnauthorized:
+		decoder.Decode(&err)
+		if err != nil {
+			err.Wrap("status unauthorized")
+			return err
+		}
+		return defaultErr
+	case http.StatusForbidden:
+		decoder.Decode(&err)
+		if err != nil {
+			err.Wrap("status forbidden")
+			return err
+		}
+		return defaultErr
 	default:
 		decoder.Decode(&err)
 		if err == nil {
-			return ierrors.
-				NewError().
-				InternalServer().
-				Message("cannot retrieve error from server").
-				Build()
+			return defaultErr
 		}
-
 		return err
 	}
 }

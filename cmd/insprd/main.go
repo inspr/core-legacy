@@ -10,6 +10,7 @@ import (
 	"github.com/inspr/inspr/pkg/api"
 	"github.com/inspr/inspr/pkg/auth"
 	jwtauth "github.com/inspr/inspr/pkg/auth/jwt"
+	authmock "github.com/inspr/inspr/pkg/auth/mocks"
 )
 
 func main() {
@@ -18,19 +19,18 @@ func main() {
 	var authenticator auth.Auth
 	var err error
 
-	pubKey, err := auth.GetPublicKey()
-	if err != nil {
-		panic(err)
-	}
-
 	if _, ok := os.LookupEnv("DEBUG"); ok {
-		authenticator = jwtauth.NewJWTauth(pubKey)
+		authenticator = authmock.NewMockAuth(nil)
 		memoryManager = tree.GetTreeMemory()
 		operator, err = kafka.NewKafkaOperator(memoryManager)
 		if err != nil {
 			panic(err)
 		}
 	} else {
+		pubKey, err := auth.GetPublicKey()
+		if err != nil {
+			panic(err)
+		}
 		authenticator = jwtauth.NewJWTauth(pubKey)
 		memoryManager = tree.GetTreeMemory()
 		operator, err = kafka.NewKafkaOperator(memoryManager)

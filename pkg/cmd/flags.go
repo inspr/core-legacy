@@ -59,6 +59,7 @@ var flagRegistry = []Flag{
 		Usage:     "set the token for the command",
 		Value:     &InsprOptions.Token,
 		DefValue:  "$HOME/.inspr/token",
+		DefinedOn: []string{"all"},
 	},
 }
 

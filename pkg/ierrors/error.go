@@ -49,6 +49,7 @@ func (ierror *InsprError) Wrap(message string) {
 	} else {
 		ierror.Err = fmt.Errorf("%v: %w", message, ierror.Err)
 	}
+	ierror.Message = ierror.Err.Error()
 	ierror.Stack = ierror.Err.Error()
 }
 

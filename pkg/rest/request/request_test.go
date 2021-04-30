@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -19,6 +21,7 @@ func TestClient_Send(t *testing.T) {
 		c                http.Client
 		middleware       Encoder
 		decoderGenerator DecoderGenerator
+		auth             Authenticator
 	}
 	type args struct {
 		ctx    context.Context
@@ -27,12 +30,13 @@ func TestClient_Send(t *testing.T) {
 		body   interface{}
 	}
 	tests := []struct {
-		name     string
-		fields   fields
-		args     args
-		wantErr  bool
-		want     interface{}
-		response interface{}
+		name       string
+		fields     fields
+		args       args
+		wantErr    bool
+		wantErrReq bool
+		want       interface{}
+		response   interface{}
 	}{
 		{
 			name: "test post",
@@ -40,6 +44,7 @@ func TestClient_Send(t *testing.T) {
 				c:                http.Client{},
 				middleware:       json.Marshal,
 				decoderGenerator: JSONDecoderGenerator,
+				auth:             nil,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -56,6 +61,7 @@ func TestClient_Send(t *testing.T) {
 				c:                http.Client{},
 				middleware:       json.Marshal,
 				decoderGenerator: JSONDecoderGenerator,
+				auth:             nil,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -72,6 +78,25 @@ func TestClient_Send(t *testing.T) {
 				c:                http.Client{},
 				middleware:       json.Marshal,
 				decoderGenerator: JSONDecoderGenerator,
+				auth:             nil,
+			},
+			args: args{
+				ctx:    context.Background(),
+				route:  "/test",
+				method: "GET",
+				body:   "hello",
+			},
+			wantErr:    true,
+			wantErrReq: true,
+			want:       "hello",
+		},
+		{
+			name: "middleware error",
+			fields: fields{
+				c:                http.Client{},
+				middleware:       func(i interface{}) ([]byte, error) { return nil, ierrors.NewError().Build() },
+				decoderGenerator: JSONDecoderGenerator,
+				auth:             nil,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -83,16 +108,35 @@ func TestClient_Send(t *testing.T) {
 			want:    "hello",
 		},
 		{
-			name: "middleware error",
+			name: "test_auth_token_errorGet",
 			fields: fields{
 				c:                http.Client{},
-				middleware:       func(i interface{}) ([]byte, error) { return nil, ierrors.NewError().Build() },
+				middleware:       json.Marshal,
 				decoderGenerator: JSONDecoderGenerator,
+				auth:             mockAuth{errGet: errors.New("mock_err")},
 			},
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "GET",
+				method: "POST",
+				body:   "hello",
+			},
+			wantErr: true,
+
+			want: "hello",
+		},
+		{
+			name: "test_auth_token_errorSet",
+			fields: fields{
+				c:                http.Client{},
+				middleware:       json.Marshal,
+				decoderGenerator: JSONDecoderGenerator,
+				auth:             mockAuth{errSet: errors.New("mock_err")},
+			},
+			args: args{
+				ctx:    context.Background(),
+				route:  "/test",
+				method: "POST",
 				body:   "hello",
 			},
 			wantErr: true,
@@ -104,6 +148,7 @@ func TestClient_Send(t *testing.T) {
 			handler := func(w http.ResponseWriter, r *http.Request) {
 				decoder := json.NewDecoder(r.Body)
 				encoder := json.NewEncoder(w)
+
 				if r.Method != tt.args.method {
 					w.WriteHeader(http.StatusBadRequest)
 					encoder.Encode(ierrors.NewError().BadRequest().Message("methods are not equal").Build())
@@ -115,7 +160,10 @@ func TestClient_Send(t *testing.T) {
 					return
 				}
 
-				if tt.wantErr {
+				// adds token to response
+				w.Header().Add("Authorization", "Bearer mock_token")
+
+				if tt.wantErrReq {
 					w.WriteHeader(http.StatusBadRequest)
 					encoder.Encode(ierrors.NewError().BadRequest().Message("wants error").Build())
 					return
@@ -140,9 +188,17 @@ func TestClient_Send(t *testing.T) {
 				baseURL:          s.URL,
 				encoder:          tt.fields.middleware,
 				decoderGenerator: tt.fields.decoderGenerator,
+				auth:             tt.fields.auth,
 			}
 
-			if err := c.Send(tt.args.ctx, tt.args.route, tt.args.method, tt.args.body, &tt.response); (err != nil) != tt.wantErr {
+			err := c.Send(
+				tt.args.ctx,
+				tt.args.route,
+				tt.args.method,
+				tt.args.body,
+				&tt.response,
+			)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.SendRequest() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(tt.response, tt.want) {
@@ -163,13 +219,13 @@ func TestClient_handleResponseErr(t *testing.T) {
 		resp *http.Response
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name        string
+		fields      fields
+		args        args
+		wantMessage string
 	}{
 		{
-			name: "response with error",
+			name: "default error message",
 			fields: fields{
 				decoderGenerator: JSONDecoderGenerator,
 			},
@@ -177,15 +233,47 @@ func TestClient_handleResponseErr(t *testing.T) {
 				&http.Response{
 					StatusCode: http.StatusBadRequest,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal(ierrors.NewError().Message("this is an error").Build())
+						b, _ := json.Marshal(nil)
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantErr: true,
+			wantMessage: "cannot retrieve error from server",
 		},
 		{
-			name: "response with other error",
+			name: "default_error_message_unauthorized_code",
+			fields: fields{
+				decoderGenerator: JSONDecoderGenerator,
+			},
+			args: args{
+				&http.Response{
+					StatusCode: http.StatusUnauthorized,
+					Body: func() io.ReadCloser {
+						b, _ := json.Marshal(nil)
+						return ioutil.NopCloser(bytes.NewReader(b))
+					}(),
+				},
+			},
+			wantMessage: "cannot retrieve error from server",
+		},
+		{
+			name: "default_error_message_forbidden_code",
+			fields: fields{
+				decoderGenerator: JSONDecoderGenerator,
+			},
+			args: args{
+				&http.Response{
+					StatusCode: http.StatusForbidden,
+					Body: func() io.ReadCloser {
+						b, _ := json.Marshal(nil)
+						return ioutil.NopCloser(bytes.NewReader(b))
+					}(),
+				},
+			},
+			wantMessage: "cannot retrieve error from server",
+		},
+		{
+			name: "response with custom error",
 			fields: fields{
 				decoderGenerator: JSONDecoderGenerator,
 			},
@@ -193,28 +281,57 @@ func TestClient_handleResponseErr(t *testing.T) {
 				&http.Response{
 					StatusCode: http.StatusBadRequest,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal(ierrors.NewError().Message("this is an error").Build())
+						b, _ := json.
+							Marshal(ierrors.NewError().
+								Message("this is an error").
+								Build(),
+							)
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantErr: true,
+			wantMessage: "this is an error",
 		},
 		{
-			name: "response without error",
+			name: "response with unauthorized error",
 			fields: fields{
 				decoderGenerator: JSONDecoderGenerator,
 			},
 			args: args{
 				&http.Response{
-					StatusCode: http.StatusOK,
+					StatusCode: http.StatusUnauthorized,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal("hello")
+						b, _ := json.Marshal(
+							ierrors.NewError().
+								InnerError(errors.New("mock_error")).
+								Unauthorized().
+								Build())
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantErr: false,
+			wantMessage: "status unauthorized",
+		},
+		{
+			name: "response with forbidden error",
+			fields: fields{
+				decoderGenerator: JSONDecoderGenerator,
+			},
+			args: args{
+				&http.Response{
+					StatusCode: http.StatusForbidden,
+					Body: func() io.ReadCloser {
+						b, _ := json.Marshal(
+							ierrors.NewError().
+								InnerError(errors.New("mock_error")).
+								Forbidden().
+								Build(),
+						)
+						return ioutil.NopCloser(bytes.NewReader(b))
+					}(),
+				},
+			},
+			wantMessage: "status forbidden",
 		},
 	}
 	for _, tt := range tests {
@@ -225,8 +342,24 @@ func TestClient_handleResponseErr(t *testing.T) {
 				encoder:          tt.fields.middleware,
 				decoderGenerator: tt.fields.decoderGenerator,
 			}
-			if err := c.handleResponseErr(tt.args.resp); (err != nil) != tt.wantErr {
-				t.Errorf("Client.handleResponseErr() error = %v, wantErr %v", err, tt.wantErr)
+			err := c.handleResponseErr(tt.args.resp)
+			var got string
+
+			// does it wrap?
+			wrapContent := errors.Unwrap(err)
+
+			if wrapContent == nil {
+				got = err.Error()
+			} else {
+				got = wrapContent.Error()
+			}
+
+			if strings.TrimSuffix(got, ": ") != tt.wantMessage {
+				t.Errorf(
+					"Client.handleResponseErr() error = %v, wantErr %v",
+					got,
+					tt.wantMessage,
+				)
 			}
 		})
 	}

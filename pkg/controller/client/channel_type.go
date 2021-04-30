@@ -23,7 +23,7 @@ type ChannelTypeClient struct {
 // would call ctc.Get(context.Background(), "app1", "channeltype1")
 func (ctc *ChannelTypeClient) Get(ctx context.Context, context string, name string) (*meta.ChannelType, error) {
 	ctdi := models.ChannelTypeQueryDI{
-		Ctx:    context,
+		Scope:  context,
 		CtName: name,
 	}
 
@@ -48,7 +48,7 @@ func (ctc *ChannelTypeClient) Get(ctx context.Context, context string, name stri
 // would call ctc.Create(context.Background(), "app1", &meta.ChannelType{...})
 func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeDI{
-		Ctx:         context,
+		Scope:       context,
 		ChannelType: *ch,
 		DryRun:      dryRun,
 	}
@@ -73,7 +73,7 @@ func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *me
 // would call ctc.Delete(context.Background(), "app1", "channeltype1")
 func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name string, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeQueryDI{
-		Ctx:    context,
+		Scope:  context,
 		CtName: name,
 		DryRun: dryRun,
 	}
@@ -98,7 +98,7 @@ func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name s
 // would call ctc.Create(context.Background(), "app1", &meta.ChannelType{...})
 func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.ChannelTypeDI{
-		Ctx:         context,
+		Scope:       context,
 		ChannelType: *ch,
 		DryRun:      dryRun,
 	}

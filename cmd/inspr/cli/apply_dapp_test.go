@@ -12,6 +12,7 @@ import (
 )
 
 func TestNewApplyApp(t *testing.T) {
+	prepareToken(t)
 	appWithoutNameBytes, _ := yaml.Marshal(meta.App{})
 	appDefaultBytes, _ := yaml.Marshal(meta.App{Meta: meta.Metadata{Name: "mock"}})
 	type args struct {
@@ -65,6 +66,7 @@ func TestNewApplyApp(t *testing.T) {
 }
 
 func Test_schemaInjection(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		ctypes map[string]*meta.ChannelType
 	}
@@ -98,6 +100,7 @@ func Test_schemaInjection(t *testing.T) {
 }
 
 func Test_recursiveSchemaInjection(t *testing.T) {
+	prepareToken(t)
 	type args struct {
 		apps map[string]*meta.App
 	}

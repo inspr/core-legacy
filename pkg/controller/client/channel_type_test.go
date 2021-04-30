@@ -70,8 +70,8 @@ func TestChannelTypeClient_Delete(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 				if di.CtName != tt.args.name {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.CtName, tt.args.name)
@@ -154,8 +154,8 @@ func TestChannelTypeClient_Get(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 				if di.CtName != tt.args.name {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.CtName, tt.args.name)
@@ -242,8 +242,8 @@ func TestChannelTypeClient_Create(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.ChannelType, *tt.args.ch) {
@@ -325,8 +325,8 @@ func TestChannelTypeClient_Update(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Ctx != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Ctx, tt.args.context)
+				if di.Scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.ChannelType, *tt.args.ch) {

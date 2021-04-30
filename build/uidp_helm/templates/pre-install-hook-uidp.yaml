@@ -21,3 +21,6 @@ spec:
               value: {{ .Values.secret.privateKeyName }}
             - name: ADMIN_PASSWORD
               value: "{{ .Values.secret.adminPassword }}"
+            - name: ADMIN_TOKEN
+              value: "{{ .Values.secret.adminToken }}"
+
