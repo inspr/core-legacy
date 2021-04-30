@@ -106,6 +106,5 @@ func (c *Client) Run(ctx context.Context) error {
 	if err = server.Shutdown(ctxShutdown); err != nil {
 		return err
 	}
-	return nil
-
+	return ctx.Err()
 }

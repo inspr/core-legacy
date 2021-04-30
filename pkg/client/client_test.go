@@ -3,6 +3,8 @@ package dappclient
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -197,6 +199,172 @@ func TestClient_WriteMessage(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.WriteMessage() error = %v, wantErr %v", err, tt.wantErr)
 			}
+		})
+	}
+}
+
+func TestClient_HandleChannel(t *testing.T) {
+	type fields struct {
+		readAddr string
+	}
+	type args struct {
+		channel string
+		handler func(t *testing.T) func(ctx context.Context, body io.Reader) error
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+		message interface{}
+	}{
+		{
+			name:    "no error on handler",
+			message: "message",
+			args: args{
+				channel: "channel",
+				handler: func(t *testing.T) func(ctx context.Context, body io.Reader) error {
+					return func(ctx context.Context, body io.Reader) error {
+
+						message := struct {
+							Message string
+						}{}
+						decoder := json.NewDecoder(body)
+						err := decoder.Decode(&message)
+						if err != nil {
+							return err
+						}
+						if message.Message != "message" {
+							t.Errorf("Client_HandleChannel message = %v, want message", message.Message)
+						}
+
+						return nil
+					}
+				},
+			},
+		},
+		{
+			name:    "error on handler",
+			message: "message",
+			wantErr: true,
+			args: args{
+				channel: "channel",
+				handler: func(t *testing.T) func(ctx context.Context, body io.Reader) error {
+					return func(ctx context.Context, body io.Reader) error {
+
+						message := struct {
+							Message string
+						}{}
+						decoder := json.NewDecoder(body)
+						err := decoder.Decode(&message)
+						if err != nil {
+							return err
+						}
+						if message.Message != "message" {
+							t.Errorf("Client_HandleChannel message = %v, want message", message.Message)
+						}
+
+						return errors.New("Error")
+					}
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				mux: http.NewServeMux(),
+			}
+			c.HandleChannel(tt.args.channel, tt.args.handler(t))
+			s := httptest.NewServer(c.mux)
+			client := request.NewJSONClient(s.URL)
+			response := struct {
+				Status string `json:"status"`
+			}{}
+			err := client.Send(context.Background(), tt.args.channel, "POST", struct{ Message interface{} }{tt.message}, &response)
+			if (response.Status != "OK") != tt.wantErr {
+				t.Errorf("Client_HandleChannel response.Status = %v, wantErr = %v", response.Status, tt.wantErr)
+			}
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client_HandleChannel response.Status = %v, wantErr = %v", response.Status, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestClient_Run(t *testing.T) {
+	environment.SetMockEnv()
+	defer environment.UnsetMockEnv()
+	tests := []struct {
+		name    string
+		message interface{}
+		wantErr bool
+		handler func(t *testing.T) func(ctx context.Context, r io.Reader) error
+		channel string
+	}{
+		{
+			message: "this is a message",
+			name:    "correct functionality",
+			channel: "banana",
+		},
+
+		{
+			message: "this is a message",
+			name:    "incorrect functionality",
+			channel: "banana",
+			wantErr: true,
+			handler: func(t *testing.T) func(ctx context.Context, r io.Reader) error {
+				return func(ctx context.Context, r io.Reader) error {
+					return errors.New("this is an error")
+				}
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var handler func(context.Context, io.Reader) error
+			if tt.handler != nil {
+				handler = tt.handler(t)
+			} else {
+				handler = func(ctx context.Context, r io.Reader) error {
+					decoder := json.NewDecoder(r)
+					var response interface{}
+					err := decoder.Decode(&response)
+					if err != nil {
+						return err
+					}
+					if !reflect.DeepEqual(response, tt.message) {
+						t.Errorf("Client_Run response = %v, want %v", response, tt.message)
+					}
+					return nil
+				}
+			}
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			client := &Client{
+				mux:      http.NewServeMux(),
+				readAddr: ":3301",
+			}
+			client.HandleChannel(tt.channel, handler)
+			errch := make(chan error)
+			go func() {
+				errch <- client.Run(ctx)
+			}()
+
+			c := request.NewJSONClient("http://localhost:3301")
+			var response struct {
+				Status string `json:"status"`
+			}
+			err := c.Send(ctx, tt.channel, "POST", tt.message, &response)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client_Run err = %v, wantErr = %v", err, tt.wantErr)
+			}
+			cancel()
+			err = <-errch
+			if err != nil && err != context.Canceled {
+				t.Errorf("Client_Run error in server = %v, wantErr = %v", err, tt.wantErr)
+			}
+
 		})
 	}
 }
