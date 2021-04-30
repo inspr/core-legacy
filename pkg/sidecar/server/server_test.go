@@ -1,135 +1,122 @@
 package sidecarserv
 
-// func TestNewServer(t *testing.T) {
-// 	tests := []struct {
-// 		name string
-// 		want *Server
-// 	}{
-// 		{
-// 			name: "test_basic_server_creation",
-// 			want: &Server{},
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if got := NewServer(); !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("NewServer() = %v, want %v", got, tt.want)
-// 			}
-// 		})
-// 	}
-// }
+import (
+	"context"
+	"reflect"
+	"testing"
+	"time"
 
-// func TestServer_Init(t *testing.T) {
-// 	type args struct {
-// 		r models.Reader
-// 		w models.Writer
-// 	}
-// 	test := struct {
-// 		name    string
-// 		addr    string
-// 		channel string
-// 		args    args
-// 	}{
-// 		name: "basic init test",
-// 		addr: "localhost:8080",
-// 		args: args{
-// 			r: MockServer(nil).Reader,
-// 			w: &mockWriter{},
-// 		},
-// 		channel: "testing",
-// 	}
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/sidecar/models"
+)
 
-// 	createMockEnvVars() // creates mock values for test
-// 	defer deleteMockEnvVars()
+func TestNewServer(t *testing.T) {
+	tests := []struct {
+		name string
+		want *Server
+	}{
+		{
+			name: "test_basic_server_creation",
+			want: &Server{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewServer(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewServer() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 
-// 	t.Run("basic init test", func(t *testing.T) {
-// 		s := &Server{
-// 			writeAddr: test.addr,
-// 		}
-// 		s.Init(test.args.r, test.args.w)
+func TestServer_Init(t *testing.T) {
+	test := struct {
+		name    string
+		addr    string
+		channel string
+	}{
+		name:    "basic init test",
+		addr:    "localhost:8080",
+		channel: "testing",
+	}
 
-// 		// checking reader methods
-// 		if got := s.Reader.Commit(test.channel); got != nil {
-// 			t.Errorf("expected CommitMessage() == nil, received %v", got)
-// 		}
-// 		if _, got := s.Reader.ReadMessage(test.channel); got != nil {
-// 			t.Errorf("expected CommitMessage() == nil, received %v", got)
-// 		}
-// 		if got := s.Writer.WriteMessage("channel", "msg"); got != nil {
-// 			t.Errorf("expected CommitMessage() == nil, received %v", got)
-// 		}
-// 	})
-// }
+	createMockEnvVars() // creates mock values for test
+	defer deleteMockEnvVars()
 
-// func TestServer_Run(t *testing.T) {
-// 	routes := []string{"/commit", "/writeMessage", "/readMessage"}
-// 	env.SetMockEnv()
-// 	defer env.UnsetMockEnv()
+	t.Run("basic init test", func(t *testing.T) {
+		s := &Server{
+			writeAddr: test.addr,
+		}
+		r := mockReader{
+			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
+				return models.BrokerData{}, nil
+			},
+			commit: func(ctx context.Context, channel string) error {
+				return nil
+			},
+		}
+		w := mockWriter{
+			writeMessage: func(channel string, message interface{}) error {
+				return nil
+			},
+		}
+		s.Init(r, w)
 
-// 	// SERVER
-// 	s := MockServer(nil)
-// 	s.Init(s.Reader, s.Writer)
-// 	s.writeAddr = "./test.sock"
+		// checking reader methods
+		if got := s.Reader.Commit(context.Background(), test.channel); got != nil {
+			t.Errorf("expected CommitMessage() == nil, received %v", got)
+		}
+		if _, got := s.Reader.ReadMessage(context.Background(), test.channel); got != nil {
+			t.Errorf("expected CommitMessage() == nil, received %v", got)
+		}
+		if got := s.Writer.WriteMessage("channel", "msg"); got != nil {
+			t.Errorf("expected CommitMessage() == nil, received %v", got)
+		}
+	})
+}
 
-// 	// mock socket
-// 	c := transports.NewUnixSocketClient("./test.sock")
+func TestServer_Run(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	environment.SetMockEnv()
+	server := &Server{
+		writeAddr: ":3000",
+		Reader: mockReader{
+			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
+				<-ctx.Done()
+				return models.BrokerData{}, ctx.Err()
+			},
+			commit: func(ctx context.Context, channel string) error {
+				return nil
+			},
+		},
+	}
+	done := make(chan struct{})
+	go func() { server.Run(ctx); done <- struct{}{} }()
 
-// 	// starts server
-// 	go func() {
-// 		s.Run(context.Background())
-// 	}()
-// 	// gives time for the server to start up
-// 	time.Sleep(100 * time.Millisecond)
+	time.Sleep(time.Second)
+	if !server.runningRead {
+		t.Error("Server_Run read message not initialized")
+	}
+	if !server.runningWrite {
+		t.Error("Server_Run write message not initialized")
+	}
 
-// 	for _, r := range routes {
-// 		t.Run("run_test"+r, func(t *testing.T) {
-// 			resp, err := c.Post("http://unix"+r, "", nil)
-// 			if err != nil {
-// 				t.Errorf("Failed to make post to route '%v'", r)
-// 			}
-// 			if resp.StatusCode != http.StatusBadRequest {
-// 				t.Errorf(
-// 					"route '%v' = %v, want %v",
-// 					r,
-// 					resp.StatusCode,
-// 					http.StatusBadRequest,
-// 				)
-// 			}
-// 		})
-// 	}
-// }
+	deadContext, cancelDead := context.WithTimeout(context.Background(), time.Second)
+	defer cancelDead()
+	cancel()
+	select {
+	case <-done:
 
-// func TestServer_Cancel(t *testing.T) {
-// 	env.SetMockEnv()
-// 	defer env.UnsetMockEnv()
+		if server.runningRead {
+			t.Error("Server_Run read message not finalized")
 
-// 	t.Run("run_test/timeout", func(t *testing.T) {
-// 		// SERVER
-// 		var wg sync.WaitGroup
-// 		wg.Add(1)
-// 		defer wg.Wait()
+		}
+		if server.runningWrite {
+			t.Error("Server_Run write message not finalized")
+		}
+	case <-deadContext.Done():
+		t.Errorf("Server_Run timeout")
+	}
 
-// 		ctx, cancel := context.WithCancel(context.Background())
-
-// 		s := MockServer(nil)
-// 		s.Init(s.Reader, s.Writer)
-// 		s.writeAddr = "./test.sock"
-// 		go func() {
-// 			s.Run(ctx)
-// 		}()
-
-// 		go func() {
-// 			defer wg.Done()
-// 			time.Sleep(500 * time.Microsecond)
-// 			cancel()
-// 			time.Sleep(500 * time.Microsecond)
-
-// 			c := transports.NewUnixSocketClient(env.GetUnixSocketAddress())
-
-// 			_, err := c.Post("http://unix/commit", "", nil)
-// 			if err == nil {
-// 				t.Errorf("Server should be down")
-// 			}
-// 		}()
-// 	})
-// }
+}

@@ -15,11 +15,13 @@ import (
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
-	Reader    models.Reader
-	Writer    models.Writer
-	writeAddr string
-	client    *request.Client
-	cancel    context.CancelFunc
+	Reader       models.Reader
+	Writer       models.Writer
+	writeAddr    string
+	client       *request.Client
+	cancel       context.CancelFunc
+	runningRead  bool
+	runningWrite bool
 }
 
 // NewServer returns a new sidecar server
@@ -50,6 +52,8 @@ func (s *Server) Run(ctx context.Context) {
 
 	var err error
 	go func() {
+		s.runningWrite = true
+		defer func() { s.runningWrite = false }()
 		if err = server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen:%v", err)
 		}
