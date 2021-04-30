@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/api/auth"
 	"github.com/inspr/inspr/pkg/api/models"
+	auth "github.com/inspr/inspr/pkg/auth/models"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
@@ -31,7 +31,7 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 				ctx: context.Background(),
 				payload: auth.Payload{
 					UID:        "test123",
-					Role:       1,
+					Permission: nil,
 					Scope:      []string{"app1", "app2"},
 					Refresh:    []byte("refreshtoken1234"),
 					RefreshURL: "http://URLToUIDProvider.valid",
