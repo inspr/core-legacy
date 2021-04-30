@@ -10,12 +10,14 @@ spec:
     http:
       paths:
       - path: /newuser
+        pathType: Prefix
         backend:
           service:
             name: {{ .Values.service.uidpName }}
             port:
               number: {{ .Values.service.port }}
       - path: /deleteuser
+        pathType: Prefix
         backend:
           service:
             name: {{ .Values.service.uidpName }}
@@ -28,12 +30,14 @@ spec:
             port:
               number: {{ .Values.service.port }}
       - path: /login
+        pathType: Prefix
         backend:
           service:
             name: {{ .Values.service.uidpName }}
             port:
               number: {{ .Values.service.port }}
       - path: /refreshtoken
+        pathType: Prefix
         backend:
           service:
             name: {{ .Values.service.uidpName }}
