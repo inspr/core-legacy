@@ -51,6 +51,7 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface
 
 	var resp interface{}
 	log.Println("sending message to sidecar")
+	// sends a message to the corresponding channel route on the sidecar
 	err := c.client.Send(ctx, "/"+channel, http.MethodPost, data, &resp)
 	log.Println("message sent")
 	return err
@@ -59,6 +60,7 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface
 // HandleChannel handles messages received in a given channel.
 func (c *Client) HandleChannel(channel string, handler func(ctx context.Context, body io.Reader) error) {
 	c.mux.HandleFunc("/"+channel, func(w http.ResponseWriter, r *http.Request) {
+		// user defined handler. Returns error if the user wants to return it
 		err := handler(context.Background(), r.Body)
 		if err != nil {
 			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Build())
