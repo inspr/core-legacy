@@ -13,8 +13,8 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
-	"github.com/inspr/inspr/pkg/api/auth"
 	"github.com/inspr/inspr/pkg/api/models"
+	auth "github.com/inspr/inspr/pkg/auth/models"
 	"github.com/inspr/inspr/pkg/rest"
 )
 
@@ -55,16 +55,16 @@ func TestClient_CreateUser(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user1",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user2",
+		Permission: nil,
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -132,22 +132,22 @@ func TestClient_DeleteUser(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user1",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user2",
+		Permission: nil,
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 	auxUser3 := User{
-		UID:      "user3",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "1234",
+		UID:        "user3",
+		Permission: nil,
+		Scope:      []string{"ascope"},
+		Password:   "1234",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -211,16 +211,16 @@ func TestClient_UpdatePassword(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user1",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user2",
+		Permission: nil,
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -285,10 +285,10 @@ func TestClient_Login(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user1",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -354,16 +354,16 @@ func TestClient_RefreshToken(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user1",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user2",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -427,10 +427,10 @@ func Test_set(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user1",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 
 	type args struct {
@@ -471,10 +471,10 @@ func Test_get(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user1",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -495,10 +495,10 @@ func Test_get(t *testing.T) {
 				key: "user1",
 			},
 			want: &User{
-				UID:      "user1",
-				Role:     1,
-				Scope:    []string{"ascope"},
-				Password: "none",
+				UID:        "user1",
+				Permission: []string{auth.CreateToken},
+				Scope:      []string{"ascope"},
+				Password:   "none",
 			},
 			wantErr: false,
 		},
@@ -532,10 +532,10 @@ func Test_delete(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user1",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -587,16 +587,16 @@ func Test_hasPermission(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user1",
+		Permission: []string{auth.CreateToken},
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:        "user2",
+		Permission: nil,
+		Scope:      []string{"ascope"},
+		Password:   "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -675,10 +675,10 @@ func Test_encrypt(t *testing.T) {
 			name: "Returns payload with encrypted refresh token",
 			args: args{
 				user: User{
-					UID:      "user1",
-					Role:     1,
-					Scope:    []string{"ascope"},
-					Password: "none",
+					UID:        "user1",
+					Permission: []string{auth.CreateToken},
+					Scope:      []string{"ascope"},
+					Password:   "none",
 				},
 			},
 		},

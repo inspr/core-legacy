@@ -3,21 +3,21 @@ package client
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/api/auth"
+	"github.com/inspr/inspr/pkg/auth/models"
 )
 
 // User defines the information a user contains
 type User struct {
-	UID      string
-	Role     int
-	Scope    []string
-	Password string
+	UID        string
+	Permission []string
+	Scope      []string
+	Password   string
 }
 
 // RedisManager defines methods to manage Redis in the cluster
 type RedisManager interface {
 	UIDClient
-	RefreshToken(ctx context.Context, refreshToken []byte) (*auth.Payload, error)
+	RefreshToken(ctx context.Context, refreshToken []byte) (*models.Payload, error)
 }
 
 // UIDClient is a client for communicating with inspr's uid provider
