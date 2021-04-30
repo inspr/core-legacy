@@ -1,0 +1,4 @@
+uid: sallezin
+password: 1337
+scope: ["basicexample"]
+permission: ["create:token"]
