@@ -24,6 +24,7 @@ spec:
             port:
               number: {{ .Values.service.port }}
       - path: /updatepwd
+        pathType: Prefix
         backend:
           service:
             name: {{ .Values.service.uidpName }}
@@ -41,6 +42,5 @@ spec:
         backend:
           service:
             name: {{ .Values.service.uidpName }}
-          service:
             port:
               number: {{ .Values.service.port }}
