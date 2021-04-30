@@ -272,7 +272,7 @@ func TestServer_readMessageRoutine(t *testing.T) {
 			defer server.Close()
 
 			s.client = request.NewJSONClient(server.URL)
-			ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*200)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*300)
 			defer cancel()
 			go s.readMessageRoutine(ctx)
 
