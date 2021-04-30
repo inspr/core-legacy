@@ -9,6 +9,7 @@ type Payload struct {
 	RefreshURL string   `json:"refreshurl"`
 }
 
+// All Permission possible values
 const (
 	CreateDapp        string = "create:dapp"
 	CreateChannel     string = "create:channel"
