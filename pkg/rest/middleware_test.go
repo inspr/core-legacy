@@ -1,10 +1,9 @@
 package rest
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -62,6 +61,7 @@ func TestHandler_JSON(t *testing.T) {
 }
 
 func TestHandler_Validate(t *testing.T) {
+	log.SetOutput(ioutil.Discard)
 	type args struct {
 		auth        auth.Auth
 		headerValue string
@@ -148,15 +148,8 @@ func TestHandler_Validate(t *testing.T) {
 
 			// adds auth to request header
 			req.Header.Add("Authorization", tt.args.headerValue)
-
-			// scope to body
-			scopeData := struct {
-				Scope string `json:"scope"`
-			}{
-				Scope: tt.args.scope,
-			}
-			scopeBytes, _ := json.Marshal(scopeData)
-			req.Body = ioutil.NopCloser(bytes.NewBuffer(scopeBytes))
+			// adds the scope to request header
+			req.Header.Add("Scope", tt.args.scope)
 
 			// does request
 			res, err := client.Do(req)

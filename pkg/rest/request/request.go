@@ -11,6 +11,36 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 )
 
+// Decoder is an interface that decodes a reader into an struct
+type Decoder interface {
+	Decode(interface{}) error
+}
+
+// Client is a generic rest client
+type Client struct {
+	c                http.Client
+	baseURL          string
+	encoder          Encoder
+	decoderGenerator DecoderGenerator
+	headers          map[string]string
+	auth             Authenticator
+}
+
+func (c *Client) routeToURL(route string) string {
+	return fmt.Sprintf("%s%s", c.baseURL, route)
+}
+
+// Encoder encodes an interface into bytes
+type Encoder func(interface{}) ([]byte, error)
+
+// DecoderGenerator creates a decoder for a given request
+type DecoderGenerator func(r io.Reader) Decoder
+
+// JSONDecoderGenerator generates a decoder for json encoded requests
+func JSONDecoderGenerator(r io.Reader) Decoder {
+	return json.NewDecoder(r)
+}
+
 // Send sends a request to the url specified in instantiation, with the given route and method, using
 // the encoder to encode the body and the decoder to decode the response into the responsePtr
 func (c *Client) Send(ctx context.Context, route string, method string, body interface{}, responsePtr interface{}) (err error) {
@@ -69,36 +99,6 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 	}
 
 	return err
-}
-
-func (c *Client) routeToURL(route string) string {
-	return fmt.Sprintf("%s%s", c.baseURL, route)
-}
-
-// Encoder encodes an interface into bytes
-type Encoder func(interface{}) ([]byte, error)
-
-// DecoderGenerator creates a decoder for a given request
-type DecoderGenerator func(r io.Reader) Decoder
-
-// JSONDecoderGenerator generates a decoder for json encoded requests
-func JSONDecoderGenerator(r io.Reader) Decoder {
-	return json.NewDecoder(r)
-}
-
-// Decoder is an interface that decodes a reader into an struct
-type Decoder interface {
-	Decode(interface{}) error
-}
-
-// Client is a generic rest client
-type Client struct {
-	c                http.Client
-	baseURL          string
-	encoder          Encoder
-	decoderGenerator DecoderGenerator
-	headers          map[string]string
-	auth             Authenticator
 }
 
 func (c *Client) handleResponseErr(resp *http.Response) error {

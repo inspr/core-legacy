@@ -1,9 +1,6 @@
 package rest
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -56,28 +53,19 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			return
 		}
 
-		// request scope
-		requestData := struct {
-			Scope string `json:"scope"`
-		}{}
-
-		// Read the content
-		if r.Body != nil {
-			// reads body
-			bodyBytes, _ := ioutil.ReadAll(r.Body)
-			// unmarshal into scope Data
-			json.Unmarshal(bodyBytes, &requestData)
-			// Restore the r.Body to its original state
-			r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-		}
-
+		HeaderScopes := r.Header["Scope"]
+		// TODO: rename the variables to better fit this
 		log.Printf("payload.Scope = %+v\n", payload.Scope)
 		valid := false
-		for _, scope := range payload.Scope {
-			log.Printf("scope = %+v\n", scope)
-			if strings.HasPrefix(requestData.Scope, scope) {
-				// scope found
-				valid = true
+		for _, payloadScope := range payload.Scope {
+			log.Printf("scope = %+v\n", payloadScope)
+
+			// TODO: it will have only one scope, should i leave like this?
+			for _, headerScope := range HeaderScopes {
+				if strings.HasPrefix(headerScope, payloadScope) {
+					// scope found
+					valid = true
+				}
 			}
 		}
 
