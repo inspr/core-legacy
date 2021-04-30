@@ -42,7 +42,7 @@ func (h *Handler) InitHandler() rest.Handler {
 		load := models.Payload{
 			RefreshURL: os.Getenv("REFRESH_URL"),
 			Scope:      []string{""},
-			Role:       1,
+			Permission: nil,
 		}
 		token, err := h.Auth.Init(res.Key, load)
 		if err != nil {

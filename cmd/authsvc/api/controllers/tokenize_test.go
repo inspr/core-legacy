@@ -47,7 +47,7 @@ func TestServer_Tokenize(t *testing.T) {
 			body: models.Payload{
 				UID:        "u000001",
 				Scope:      []string{""},
-				Role:       1,
+				Permission: nil,
 				Refresh:    []byte("refreshtk"),
 				RefreshURL: "http://refresh.token",
 			},

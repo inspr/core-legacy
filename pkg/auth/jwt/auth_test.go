@@ -84,7 +84,7 @@ func TestJWTauth_Validate(t *testing.T) {
 
 		payload := models.Payload{
 			UID:        "mock_UID",
-			Role:       0,
+			Permission: nil,
 			Scope:      []string{"mock"},
 			Refresh:    []byte("mock_refresh"),
 			RefreshURL: "mock_refresh_url",
@@ -153,7 +153,7 @@ func TestJWTauth_Validate(t *testing.T) {
 			},
 			want: &models.Payload{
 				UID:        "mock_UID",
-				Role:       0,
+				Permission: nil,
 				Scope:      []string{"mock"},
 				Refresh:    []byte("mock_refresh"),
 				RefreshURL: "mock_refresh_url",
@@ -222,7 +222,7 @@ func TestJWTauth_Tokenize(t *testing.T) {
 				load: models.Payload{
 					UID:        "u000001",
 					Scope:      []string{""},
-					Role:       1,
+					Permission: nil,
 					Refresh:    []byte("refreshtk"),
 					RefreshURL: "http://refresh.token",
 				},
@@ -242,7 +242,7 @@ func TestJWTauth_Tokenize(t *testing.T) {
 				load: models.Payload{
 					UID:        "u000001",
 					Scope:      []string{""},
-					Role:       1,
+					Permission: nil,
 					Refresh:    []byte("refreshtk"),
 					RefreshURL: "http://refresh.token",
 				},
@@ -264,7 +264,7 @@ func TestJWTauth_Tokenize(t *testing.T) {
 				load: models.Payload{
 					UID:        "u000001",
 					Scope:      []string{""},
-					Role:       1,
+					Permission: nil,
 					Refresh:    []byte("refreshtk"),
 					RefreshURL: "http://refresh.token",
 				},
@@ -317,7 +317,7 @@ func TestJWTauth_Refresh(t *testing.T) {
 				token: mockenize(models.Payload{
 					UID:        "u000001",
 					Scope:      []string{""},
-					Role:       1,
+					Permission: nil,
 					Refresh:    []byte("refreshtk"),
 					RefreshURL: "http://refresh.token",
 				}),
@@ -346,7 +346,7 @@ func TestJWTauth_Refresh(t *testing.T) {
 				token: mockenize(models.Payload{
 					UID:        "u000001",
 					Scope:      []string{""},
-					Role:       1,
+					Permission: nil,
 					Refresh:    []byte("refreshtk"),
 					RefreshURL: "http://refresh.token",
 				}),
@@ -368,7 +368,7 @@ func TestJWTauth_Refresh(t *testing.T) {
 				token: mockenize(models.Payload{
 					UID:        "u000001",
 					Scope:      []string{""},
-					Role:       1,
+					Permission: nil,
 					Refresh:    []byte("refreshtk"),
 					RefreshURL: "http://refresh.token",
 				}),

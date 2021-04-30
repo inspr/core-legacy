@@ -36,7 +36,7 @@ func TestServer_Refresh(t *testing.T) {
 			payload: models.Payload{
 				UID:        "u000001",
 				Scope:      []string{""},
-				Role:       1,
+				Permission: nil,
 				Refresh:    []byte("refreshtk"),
 				RefreshURL: "http://refresh.token",
 			},
