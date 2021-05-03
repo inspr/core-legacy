@@ -14,10 +14,9 @@ import (
 type createUserOptionsDT struct {
 	username    string
 	password    string
-	scopes      []string
 	yaml        string
 	json        string
-	permissions []string
+	permissions map[string][]string
 }
 
 var createUsrOptions = createUserOptionsDT{}
@@ -49,13 +48,6 @@ var createUserCmd = build.NewCmd(
 		Usage:     "set the password of the user that will be created",
 		Value:     &createUsrOptions.password,
 		DefValue:  "",
-	},
-	{
-		Name:      "scopes",
-		Shorthand: "s",
-		Usage:     "add a scope to the user permissions",
-		Value:     &createUsrOptions.scopes,
-		DefValue:  []string{},
 	},
 	{
 		Name:     "yaml",
@@ -101,7 +93,6 @@ func createUser(ctx context.Context, inputArgs []string) error {
 		usr.Password = createUsrOptions.password
 
 		usr.Permissions = createUsrOptions.permissions
-		usr.Scope = createUsrOptions.scopes
 	}
 
 	if usr.UID == "" {

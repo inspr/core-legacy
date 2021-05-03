@@ -21,8 +21,7 @@ func (ma *MockAuth) Validate(token []byte) (*auth.Payload, []byte, error) {
 	}
 	return &auth.Payload{
 		UID:         "uid",
-		Permissions: nil,
-		Scope:       []string{"scope_1", "scope_2"},
+		Permissions: map[string][]string{"scope_1": {}, "scope_2": {}},
 		Refresh:     []byte("refresh"),
 		RefreshURL:  "refresh_url",
 	}, []byte("mock"), nil

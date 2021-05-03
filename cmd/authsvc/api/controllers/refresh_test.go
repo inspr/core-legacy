@@ -34,7 +34,6 @@ func TestServer_Refresh(t *testing.T) {
 			want: http.StatusOK,
 			payload: auth.Payload{
 				UID:         "u000001",
-				Scope:       []string{""},
 				Permissions: nil,
 				Refresh:     []byte("refreshtk"),
 				RefreshURL:  "http://refresh.token",

@@ -41,8 +41,7 @@ func (h *Handler) InitHandler() rest.Handler {
 		decoder.Decode(&res)
 		load := auth.Payload{
 			RefreshURL:  os.Getenv("REFRESH_URL"),
-			Scope:       []string{""},
-			Permissions: nil,
+			Permissions: map[string][]string{},
 		}
 		token, err := h.Auth.Init(res.Key, load)
 		if err != nil {

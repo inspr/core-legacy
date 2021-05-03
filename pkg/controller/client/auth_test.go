@@ -31,8 +31,7 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 				ctx: context.Background(),
 				payload: auth.Payload{
 					UID:         "test123",
-					Permissions: nil,
-					Scope:       []string{"app1", "app2"},
+					Permissions: map[string][]string{"": {"app1", "app2"}},
 					Refresh:     []byte("refreshtoken1234"),
 					RefreshURL:  "http://URLToUIDProvider.valid",
 				},

@@ -30,8 +30,7 @@ type Client struct {
 func (c *Client) initAdminUser() error {
 	adminUser := User{
 		UID:         "admin",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{""},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    os.Getenv("ADMIN_PASSWORD"),
 	}
 	payload, _ := c.encrypt(adminUser)
@@ -191,7 +190,6 @@ func (c *Client) encrypt(user User) (*auth.Payload, error) {
 	payload := auth.Payload{
 		UID:         user.UID,
 		Permissions: user.Permissions,
-		Scope:       user.Scope,
 		Refresh:     ciphertext,
 		RefreshURL:  c.refreshURL,
 	}
@@ -311,10 +309,13 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	if requestor.Password != pwd {
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
-	if !utils.Includes(requestor.Permissions, string(auth.CreateToken)) {
-		return fmt.Errorf("user %v doesn't have admin permission", uid)
+
+	if rootPerm, ok := requestor.Permissions[""]; ok {
+		if utils.Includes(rootPerm, string(auth.CreateToken)) {
+			return nil
+		}
 	}
-	return nil
+	return fmt.Errorf("user %v doesn't have admin permission", uid)
 }
 
 func getEnv(name string) string {

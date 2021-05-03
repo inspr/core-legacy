@@ -84,8 +84,7 @@ func TestJWTauth_Validate(t *testing.T) {
 
 		payload := auth.Payload{
 			UID:         "mock_UID",
-			Permissions: nil,
-			Scope:       []string{"mock"},
+			Permissions: map[string][]string{"": {"mock"}},
 			Refresh:     []byte("mock_refresh"),
 			RefreshURL:  "mock_refresh_url",
 		}
@@ -153,8 +152,7 @@ func TestJWTauth_Validate(t *testing.T) {
 			},
 			want: &auth.Payload{
 				UID:         "mock_UID",
-				Permissions: nil,
-				Scope:       []string{"mock"},
+				Permissions: map[string][]string{"": {"mock"}},
 				Refresh:     []byte("mock_refresh"),
 				RefreshURL:  "mock_refresh_url",
 			},
@@ -221,7 +219,6 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			args: args{
 				load: auth.Payload{
 					UID:         "u000001",
-					Scope:       []string{""},
 					Permissions: nil,
 					Refresh:     []byte("refreshtk"),
 					RefreshURL:  "http://refresh.token",
@@ -241,7 +238,6 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			args: args{
 				load: auth.Payload{
 					UID:         "u000001",
-					Scope:       []string{""},
 					Permissions: nil,
 					Refresh:     []byte("refreshtk"),
 					RefreshURL:  "http://refresh.token",
@@ -263,7 +259,6 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			args: args{
 				load: auth.Payload{
 					UID:         "u000001",
-					Scope:       []string{""},
 					Permissions: nil,
 					Refresh:     []byte("refreshtk"),
 					RefreshURL:  "http://refresh.token",
@@ -316,7 +311,6 @@ func TestJWTauth_Refresh(t *testing.T) {
 			args: args{
 				token: mockenize(auth.Payload{
 					UID:         "u000001",
-					Scope:       []string{""},
 					Permissions: nil,
 					Refresh:     []byte("refreshtk"),
 					RefreshURL:  "http://refresh.token",
@@ -345,7 +339,6 @@ func TestJWTauth_Refresh(t *testing.T) {
 			args: args{
 				token: mockenize(auth.Payload{
 					UID:         "u000001",
-					Scope:       []string{""},
 					Permissions: nil,
 					Refresh:     []byte("refreshtk"),
 					RefreshURL:  "http://refresh.token",
@@ -367,7 +360,6 @@ func TestJWTauth_Refresh(t *testing.T) {
 			args: args{
 				token: mockenize(auth.Payload{
 					UID:         "u000001",
-					Scope:       []string{""},
 					Permissions: nil,
 					Refresh:     []byte("refreshtk"),
 					RefreshURL:  "http://refresh.token",

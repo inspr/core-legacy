@@ -56,14 +56,12 @@ func TestClient_CreateUser(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    "none",
 	}
 	auxUser2 := User{
 		UID:         "user2",
-		Permissions: nil,
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
 		Password:    "none",
 	}
 
@@ -133,20 +131,17 @@ func TestClient_DeleteUser(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    "none",
 	}
 	auxUser2 := User{
 		UID:         "user2",
-		Permissions: nil,
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
 		Password:    "none",
 	}
 	auxUser3 := User{
 		UID:         "user3",
-		Permissions: nil,
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
 		Password:    "1234",
 	}
 
@@ -212,14 +207,12 @@ func TestClient_UpdatePassword(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    "none",
 	}
 	auxUser2 := User{
 		UID:         "user2",
-		Permissions: nil,
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
 		Password:    "none",
 	}
 
@@ -286,8 +279,7 @@ func TestClient_Login(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"ascope": {auth.CreateToken}},
 		Password:    "none",
 	}
 
@@ -355,14 +347,12 @@ func TestClient_RefreshToken(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    "none",
 	}
 	auxUser2 := User{
 		UID:         "user2",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    "none",
 	}
 
@@ -428,8 +418,7 @@ func Test_set(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    "none",
 	}
 
@@ -472,8 +461,7 @@ func Test_get(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    "none",
 	}
 
@@ -496,8 +484,7 @@ func Test_get(t *testing.T) {
 			},
 			want: &User{
 				UID:         "user1",
-				Permissions: []string{auth.CreateToken},
-				Scope:       []string{"ascope"},
+				Permissions: map[string][]string{"": {auth.CreateToken}},
 				Password:    "none",
 			},
 			wantErr: false,
@@ -533,8 +520,7 @@ func Test_delete(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    "none",
 	}
 
@@ -588,14 +574,12 @@ func Test_hasPermission(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: []string{auth.CreateToken},
-		Scope:       []string{"ascope"},
+		Permissions: map[string][]string{"": {auth.CreateToken}},
 		Password:    "none",
 	}
 	auxUser2 := User{
 		UID:         "user2",
 		Permissions: nil,
-		Scope:       []string{"ascope"},
 		Password:    "none",
 	}
 
@@ -676,8 +660,7 @@ func Test_encrypt(t *testing.T) {
 			args: args{
 				user: User{
 					UID:         "user1",
-					Permissions: []string{auth.CreateToken},
-					Scope:       []string{"ascope"},
+					Permissions: map[string][]string{"": {auth.CreateToken}},
 					Password:    "none",
 				},
 			},
@@ -754,8 +737,8 @@ func Test_requestNewToken(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				payload: auth.Payload{
-					UID:   "user1",
-					Scope: []string{"app1", "app2"},
+					UID:         "user1",
+					Permissions: map[string][]string{"app1": {}, "app2": {}},
 				},
 			},
 			want:    "user1-app1-app2",
@@ -821,7 +804,12 @@ func insprServerHandler(w http.ResponseWriter, r *http.Request) {
 		rest.ERROR(w, err)
 		return
 	}
-	strScope := strings.Join(data.Scope, "-")
+
+	var scopes []string
+	for k := range data.Permissions {
+		scopes = append(scopes, k)
+	}
+	strScope := strings.Join(scopes, "-")
 	token := fmt.Sprintf("%s-%s", data.UID, strScope)
 	val := models.AuthDI{
 		Token: []byte(token),

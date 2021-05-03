@@ -106,10 +106,6 @@ func TestClient_CreateUser(t *testing.T) {
 				newUser: client.User{
 					UID:         "this is a new UID",
 					Permissions: nil,
-					Scope: []string{
-						"scope.1",
-						"scope.2",
-					},
 				},
 			},
 		},

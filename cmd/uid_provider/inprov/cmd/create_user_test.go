@@ -22,8 +22,7 @@ type mockCl struct {
 
 type taglessUser struct {
 	UID         string
-	Permissions []string
-	Scope       []string
+	Permissions map[string][]string
 	Password    string
 }
 
@@ -57,8 +56,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{auth.CreateAlias},
-				Scope:       []string{"scope1", "scope2"},
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
 				Password:    "password",
 			},
 			name: "yaml user creation",
@@ -70,8 +68,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := client.User{
 					UID:         "this is a uid",
-					Permissions: []string{auth.CreateAlias},
-					Scope:       []string{"scope1", "scope2"},
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
 					Password:    "password",
 				}
 				buf, _ := yaml.Marshal(usr)
@@ -85,8 +82,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{auth.CreateAlias},
-				Scope:       []string{"scope1", "scope2"},
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
 				Password:    "password",
 			},
 			name: "yaml user creation -- invalid file name",
@@ -98,8 +94,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := client.User{
 					UID:         "this is a uid",
-					Permissions: []string{auth.CreateAlias},
-					Scope:       []string{"scope1", "scope2"},
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
 					Password:    "password",
 				}
 				buf, _ := yaml.Marshal(usr)
@@ -113,8 +108,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{auth.CreateAlias},
-				Scope:       []string{"scope1", "scope2"},
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
 				Password:    "password",
 			},
 			name: "yaml user creation -- invalid file format",
@@ -126,8 +120,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := taglessUser{
 					UID:         "this is a uid",
-					Permissions: []string{auth.CreateAlias},
-					Scope:       []string{"scope1", "scope2"},
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
 					Password:    "password",
 				}
 				buf, _ := json.Marshal(usr)
@@ -141,8 +134,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{auth.CreateAlias},
-				Scope:       []string{"scope1", "scope2"},
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
 				Password:    "password",
 			},
 			name: "json user creation",
@@ -154,8 +146,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := client.User{
 					UID:         "this is a uid",
-					Permissions: []string{auth.CreateAlias},
-					Scope:       []string{"scope1", "scope2"},
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
 					Password:    "password",
 				}
 				buf, _ := json.Marshal(usr)
@@ -169,8 +160,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{auth.CreateAlias},
-				Scope:       []string{"scope1", "scope2"},
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
 				Password:    "password",
 			},
 			name: "json user creation -- invalid file format",
@@ -182,8 +172,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := client.User{
 					UID:         "this is a uid",
-					Permissions: []string{auth.CreateAlias},
-					Scope:       []string{"scope1", "scope2"},
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
 					Password:    "password",
 				}
 				buf, _ := yaml.Marshal(usr)
@@ -198,8 +187,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{auth.CreateAlias},
-				Scope:       []string{"scope1", "scope2"},
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
 				Password:    "password",
 			},
 			name: "flag user creation",
@@ -210,8 +198,7 @@ func Test_createUser(t *testing.T) {
 			options: createUserOptionsDT{
 				username:    "this is a uid",
 				password:    "password",
-				scopes:      []string{"scope1", "scope2"},
-				permissions: []string{auth.CreateAlias},
+				permissions: map[string][]string{"": {auth.CreateAlias}},
 			},
 			wantErr: false,
 		},
@@ -219,8 +206,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{auth.CreateAlias},
-				Scope:       []string{"scope1", "scope2"},
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
 				Password:    "password",
 			},
 			name: "flag user creation -- bad uid",
@@ -231,8 +217,7 @@ func Test_createUser(t *testing.T) {
 			options: createUserOptionsDT{
 				username:    "",
 				password:    "password",
-				scopes:      []string{"scope1", "scope2"},
-				permissions: []string{auth.CreateAlias},
+				permissions: map[string][]string{"": {auth.CreateAlias}},
 			},
 			wantErr: true,
 		},
@@ -240,8 +225,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{auth.CreateAlias},
-				Scope:       []string{"scope1", "scope2"},
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
 				Password:    "password",
 			},
 			name: "flag user creation -- bad password",
@@ -252,8 +236,7 @@ func Test_createUser(t *testing.T) {
 			options: createUserOptionsDT{
 				username:    "this is a uid",
 				password:    "",
-				scopes:      []string{"scope1", "scope2"},
-				permissions: []string{auth.CreateAlias},
+				permissions: map[string][]string{"": {auth.CreateAlias}},
 			},
 			wantErr: true,
 		},
