@@ -164,10 +164,7 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 func NewOperator(memory memory.Manager) (nop *NodeOperator, err error) {
 	sidp, err := strconv.Atoi(os.Getenv("INSPR_SIDECAR_PORT"))
 	if err != nil {
-		if err != nil {
-			panic(err)
-		}
-
+		panic(err)
 	}
 	sidecarPort = int32(math.Min(float64(sidp), math.MaxInt32))
 	nop = &NodeOperator{
