@@ -43,7 +43,6 @@ func appDICases(funcName string) []appAPITest {
 				Name: "mock_app",
 			},
 		},
-		Scope: "",
 	})
 	wrongFormatData, _ := json.Marshal([]byte{1})
 	return []appAPITest{
@@ -120,9 +119,7 @@ func appDICases(funcName string) []appAPITest {
 // handle the use the appQueryDI struct of the models package.
 // For example, HandleGet and HandleDelete use these test cases
 func appQueryDICases(funcName string) []appAPITest {
-	parsedQueryAppDI, _ := json.Marshal(models.AppQueryDI{
-		Scope: ".mock_app",
-	})
+	parsedQueryAppDI, _ := json.Marshal(models.AppQueryDI{})
 	wrongFormatData, _ := json.Marshal([]byte{1})
 	return []appAPITest{
 		{

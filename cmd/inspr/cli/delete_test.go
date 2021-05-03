@@ -356,13 +356,14 @@ func Test_deleteApps(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
+		scope := r.Header.Get("Scope")
 
 		err := decoder.Decode(&data)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		if data.Scope != "appParent.app1" {
+		if scope != "appParent.app1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -517,13 +518,14 @@ func Test_deleteCTypes(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
 		decoder := json.NewDecoder(r.Body)
+		scope := r.Header.Get("Scope")
 
 		err := decoder.Decode(&data)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		if data.Scope != "appParent" || data.CtName != "ct1" {
+		if scope != "appParent" || data.CtName != "ct1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -597,13 +599,14 @@ func Test_deleteAlias(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasQueryDI{}
 		decoder := json.NewDecoder(r.Body)
+		scope := r.Header.Get("Scope")
 
 		err := decoder.Decode(&data)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		if data.Scope != "appParent" || data.Key != "alias_name" {
+		if scope != "appParent" || data.Key != "alias_name" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
