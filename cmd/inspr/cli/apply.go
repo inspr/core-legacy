@@ -145,8 +145,6 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 
 	for _, file := range filesToApply {
 
-		fmt.Fprintf(out, "%v\n", file.fileName)
-
 		apply, err := GetFactory().GetRunMethod(file.component)
 		if err != nil {
 			continue
@@ -154,12 +152,7 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 
 		err = apply(file.content, out)
 		if err != nil {
-			fmt.Fprintf(
-				out,
-				"error while applying file '%v':\n%v\n",
-				file.fileName,
-				err.Error(),
-			)
+			cliutils.RequestErrorMessage(err, out)
 			continue
 		}
 

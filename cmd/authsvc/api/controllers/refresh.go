@@ -3,8 +3,10 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/auth/models"
@@ -19,6 +21,7 @@ func (server *Server) Refresh() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		headerContent := r.Header["Authorization"]
 
+		log.Printf("headerContent = %+v\n", headerContent)
 		if len(headerContent) != 1 ||
 			!strings.HasPrefix(headerContent[0], "Bearer ") {
 			err := ierrors.NewError().Unauthorized().Message("bad Request, expected: Authorization: Bearer <token>").Build()
@@ -27,13 +30,14 @@ func (server *Server) Refresh() rest.Handler {
 		}
 
 		token := []byte(strings.TrimPrefix(headerContent[0], "Bearer "))
+		log.Printf("string(token) = %+v\n", string(token))
 
 		_, err := jwt.Parse(
 			token,
 			jwt.WithValidate(true),
 			jwt.WithVerify(jwa.RS256, server.privKey.PublicKey),
 		)
-		if err != nil {
+		if err != nil && err.Error() != `exp not satisfied` {
 			err := ierrors.NewError().Forbidden().Message("invalid token").Build()
 			rest.ERROR(w, err)
 			return
@@ -45,6 +49,7 @@ func (server *Server) Refresh() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
+		log.Printf("load = %+v\n", load)
 
 		payload, err := refreshPayload(load.Refresh, load.RefreshURL)
 		if err != nil {
@@ -52,13 +57,15 @@ func (server *Server) Refresh() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
+		log.Printf("payload = %+v\n", payload)
 
-		signed, err := server.tokenize(*payload)
+		signed, err := server.tokenize(*payload, time.Now().Add(time.Minute*30))
 		if err != nil {
 			err := ierrors.NewError().InternalServer().Message(err.Error()).Build()
 			rest.ERROR(w, err)
 			return
 		}
+		log.Printf("string(signed) = %+v\n", string(signed))
 
 		respBody := models.JwtDO{
 			Token: signed,

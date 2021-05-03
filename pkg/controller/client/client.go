@@ -13,8 +13,8 @@ type Client struct {
 }
 
 // NewControllerClient return a new Client
-func NewControllerClient(url string, token []byte) controller.Interface {
-	client := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Token(token).Build()
+func NewControllerClient(url string, auth request.Authenticator) controller.Interface {
+	client := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Authenticator(auth).Build()
 	return &Client{
 		HTTPClient: client,
 	}

@@ -136,7 +136,7 @@ func getObj(printObj func(*meta.App, *[]string), lines *[]string) error {
 
 	resp, err := client.Apps().Get(context.Background(), scope)
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
 

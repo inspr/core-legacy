@@ -61,7 +61,7 @@ func TestGetPublicKey(t *testing.T) {
 					Bytes:   tt.keyBytes,
 				}
 				publicPEM := pem.EncodeToMemory(&pubBlock)
-				os.Setenv("AUTH_PATH", string(publicPEM))
+				os.Setenv("JWT_PUBLIC_KEY", string(publicPEM))
 			}
 			got, err := GetPublicKey()
 			if (err != nil) != tt.wantErr {

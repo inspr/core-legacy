@@ -19,12 +19,13 @@ func (server *Server) Tokenize() rest.Handler {
 		data := models.Payload{}
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
+			server.logger.Error("unable to decode ")
 			err = ierrors.NewError().BadRequest().Message("invalid body, error: %s", err.Error()).Build()
 			rest.ERROR(w, err)
 			return
 		}
 
-		signed, err := server.tokenize(data)
+		signed, err := server.tokenize(data, time.Now().Add(time.Minute*1))
 		if err != nil {
 			rest.ERROR(w, err)
 			return
@@ -37,10 +38,10 @@ func (server *Server) Tokenize() rest.Handler {
 	}
 }
 
-func (server *Server) tokenize(payload models.Payload) ([]byte, error) {
+func (server *Server) tokenize(payload models.Payload, exp time.Time) ([]byte, error) {
 	var err error
 	token := jwt.New()
-	token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
+	token.Set(jwt.ExpirationKey, exp)
 	token.Set("payload", payload)
 
 	signed, err := jwt.Sign(token, jwa.RS256, server.privKey)

@@ -81,7 +81,7 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 				}
 
 				encoder.Encode(authDI)
-				tt.want = authDI.Token
+				tt.want = string(authDI.Token)
 			}
 
 			s := httptest.NewServer(http.HandlerFunc(handler))

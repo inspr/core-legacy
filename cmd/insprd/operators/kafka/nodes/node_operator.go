@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/operators"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils"
@@ -13,16 +12,23 @@ import (
 	"k8s.io/client-go/rest"
 
 	kubeApp "k8s.io/api/apps/v1"
+	kubeCore "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 	v1 "k8s.io/client-go/kubernetes/typed/apps/v1"
+	cv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 //NodeOperator defines a node operations interface.
 type NodeOperator struct {
 	clientSet kubernetes.Interface
 	memory    memory.Manager
+}
+
+func (no *NodeOperator) services() cv1.ServiceInterface {
+	appsNamespace := getK8SVariables().AppsNamespace
+	return no.clientSet.CoreV1().Services(appsNamespace)
 }
 
 func (no *NodeOperator) retrieveKube() v1.DeploymentInterface {
@@ -42,19 +48,14 @@ func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node,
 	dep, err := kube.Get(deployName, metav1.GetOptions{})
 	if err != nil {
 		logger.Error("unable to find k8s deployment")
-		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
 
 	node, err := toNode(dep)
 	if err != nil {
-		return &meta.Node{}, err
+		return nil, err
 	}
-	return &node, nil
-}
-
-// Nodes is a NodeOperatorInterface that provides methods for node manipulation
-func (no *NodeOperator) Nodes() operators.NodeOperatorInterface {
-	return &NodeOperator{}
+	return node, nil
 }
 
 // CreateNode deploys a new node structure, if it's information is valid.
@@ -65,21 +66,30 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 
 	logger.Debug("converting dApp to the k8s deployment to be created")
 	var deploy *kubeApp.Deployment
-	kube := no.retrieveKube()
-	deploy = no.dAppToDeployment(app)
+	var svc *kubeCore.Service
 
+	kube := no.retrieveKube()
+	services := no.services()
+
+	deploy = no.dAppToDeployment(app)
+	svc = dappToService(app)
 	logger.Debug("creating the k8s deployment")
 	dep, err := kube.Create(deploy)
 	if err != nil {
 		logger.Error("unable to create the k8s deployment")
-		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
 
+	_, err = services.Create(svc)
+	if err != nil {
+		logger.Error("unable to create the k8s service", zap.Any("error", err))
+		return nil, ierrors.NewError().InnerError(err).Message("unable to create kubernetes service").Build()
+	}
 	node, err := toNode(dep)
 	if err != nil {
-		return &meta.Node{}, err
+		return nil, err
 	}
-	return &node, nil
+	return node, nil
 }
 
 // UpdateNode updates a node that already exists, if the new structure is valid.
@@ -90,21 +100,31 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 
 	logger.Debug("converting dApp to the k8s deployment to be updated")
 	var deploy *kubeApp.Deployment
+	var svc *kubeCore.Service
+
 	kube := no.retrieveKube()
+	services := no.services()
+
 	deploy = no.dAppToDeployment(app)
+	svc = dappToService(app)
 
 	logger.Debug("updating the k8s deployment")
 	dep, err := kube.Update(deploy)
 	if err != nil {
 		logger.Error("unable to update the k8s deployment")
-		return &meta.Node{}, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.NewError().Message(err.Error()).Build()
+	}
+	_, err = services.Update(svc)
+	if err != nil {
+		logger.Error("unable to update the k8s service")
+		return nil, ierrors.NewError().InnerError(err).Message("unable to update kubernetes service").Build()
 	}
 
 	node, err := toNode(dep)
 	if err != nil {
-		return &meta.Node{}, err
+		return nil, err
 	}
-	return &node, nil
+	return node, nil
 }
 
 // DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
@@ -124,26 +144,18 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 	logger.Debug("deleting the k8s deployment",
 		zap.String("deployment", deployName))
 	err := kube.Delete(deployName, &metav1.DeleteOptions{})
-
 	if err != nil {
 		logger.Error("unable to delete the k8s deployment")
 		return ierrors.NewError().Message(err.Error()).Build()
 	}
-	return nil
-}
+	svcs := no.services()
+	err = svcs.Delete(deployName, &metav1.DeleteOptions{})
 
-// GetAllNodes returns a list of all the active nodes in the deployment, if there are any
-func (no *NodeOperator) GetAllNodes() []meta.Node {
-	logger.Info("getting all Nodes in k8s deployments")
-
-	var nodes []meta.Node
-	kube := no.retrieveKube()
-	list, _ := kube.List(metav1.ListOptions{})
-	for _, item := range list.Items {
-		node, _ := toNode(&item)
-		nodes = append(nodes, node)
+	if err != nil {
+		logger.Error("unable to delete the k8s service")
+		return ierrors.NewError().Message(err.Error()).Build()
 	}
-	return nodes
+	return nil
 }
 
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration

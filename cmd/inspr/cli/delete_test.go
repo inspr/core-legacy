@@ -319,6 +319,7 @@ func getMockAppWithoutAlias() *meta.App {
 }
 
 func TestNewDeleteCmd(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	tests := []struct {
 		name          string
@@ -344,6 +345,7 @@ func TestNewDeleteCmd(t *testing.T) {
 }
 
 func Test_deleteApps(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutApp1())
@@ -360,7 +362,7 @@ func Test_deleteApps(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		if data.Ctx != "appParent.app1" {
+		if data.Scope != "appParent.app1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -423,6 +425,7 @@ func Test_deleteApps(t *testing.T) {
 }
 
 func Test_deleteChannels(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutCh1())
@@ -439,7 +442,7 @@ func Test_deleteChannels(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		if data.Ctx != "appParent" || data.ChName != "ch1" {
+		if data.Scope != "appParent" || data.ChName != "ch1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -502,6 +505,7 @@ func Test_deleteChannels(t *testing.T) {
 }
 
 func Test_deleteCTypes(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutCt1())
@@ -518,7 +522,7 @@ func Test_deleteCTypes(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		if data.Ctx != "appParent" || data.CtName != "ct1" {
+		if data.Scope != "appParent" || data.CtName != "ct1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -581,6 +585,7 @@ func Test_deleteCTypes(t *testing.T) {
 }
 
 func Test_deleteAlias(t *testing.T) {
+	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutAlias())
@@ -597,7 +602,7 @@ func Test_deleteAlias(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		if data.Ctx != "appParent" || data.Key != "alias_name" {
+		if data.Scope != "appParent" || data.Key != "alias_name" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}

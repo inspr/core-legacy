@@ -20,7 +20,7 @@ sed -i 's/appVersion: .*/appVersion: '"$APP_VERSION"'/' build/helm/Chart.yaml
 
 
 VERSION=$(grep -Po "version: \K.*" build/helm/Chart.yaml)
-NEW_VERSION=$(VERSION=$VERSION KIND=patch python .gitlab/scripts/upgrade_version.py)
+NEW_VERSION=$(VERSION=$VERSION KIND=patch python .github/scripts/upgrade_version.py)
 
 echo "Updating chart version to $NEW_VERSION"
 sed -i 's/version: .*/version: '"$NEW_VERSION"'/' build/helm/Chart.yaml
