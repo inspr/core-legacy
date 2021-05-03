@@ -33,6 +33,7 @@ func NewServer() *Server {
 func (s *Server) Init(r models.Reader, w models.Writer) {
 	// server requests related
 	s.writeAddr = fmt.Sprintf(":%s", os.Getenv("INSPR_WRITE_PORT"))
+	s.client = request.NewJSONClient(fmt.Sprintf("http://localhost:%v", os.Getenv("INSPR_READ_PORT")))
 
 	// implementations of write and read for a specific sidecar
 	s.Reader = r
