@@ -30,6 +30,11 @@ func (mc *MockConsumer) Events() chan kafka.Event {
 	return mc.events
 }
 
+// Poll mocks event polling
+func (mc *MockConsumer) Poll(timeoutMs int) kafka.Event {
+	return <-mc.events
+}
+
 // CreateEvent creates an event on the mock channel of thre consumer
 func (mc *MockConsumer) CreateEvent(ev kafka.Event) {
 	mc.events <- ev

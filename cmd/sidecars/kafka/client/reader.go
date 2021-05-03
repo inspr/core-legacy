@@ -14,7 +14,7 @@ const pollTimeout = 100
 
 // Consumer interface
 type Consumer interface {
-	Events() chan kafka.Event
+	Poll(int) kafka.Event
 	Commit() ([]kafka.TopicPartition, error)
 	Close() (err error)
 }
@@ -61,7 +61,8 @@ func (reader *Reader) ReadMessage(ctx context.Context, channel string) (models.B
 		select {
 		case <-ctx.Done():
 			return models.BrokerData{}, ctx.Err()
-		case event := <-consumer.Events():
+		default:
+			event := consumer.Poll(pollTimeout)
 			switch ev := event.(type) {
 			case *kafka.Message:
 				topic := *ev.TopicPartition.Topic
