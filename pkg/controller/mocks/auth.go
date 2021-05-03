@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/controller"
 )
 
@@ -18,7 +18,7 @@ func NewAuthMock(err error) controller.AuthorizationInterface {
 }
 
 // GenerateToken is the AuthMock GenerateToken method
-func (ac *AuthMock) GenerateToken(ctx context.Context, payload models.Payload) (string, error) {
+func (ac *AuthMock) GenerateToken(ctx context.Context, payload auth.Payload) (string, error) {
 	return "", nil
 }
 

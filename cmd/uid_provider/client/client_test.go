@@ -14,7 +14,7 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
 	"github.com/inspr/inspr/pkg/api/models"
-	auth "github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/rest"
 )
 

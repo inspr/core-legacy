@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/cmd/uid_provider/client"
-	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/auth"
 	"gopkg.in/yaml.v2"
 )
 
@@ -57,7 +57,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{models.CreateAlias},
+				Permissions: []string{auth.CreateAlias},
 				Scope:       []string{"scope1", "scope2"},
 				Password:    "password",
 			},
@@ -70,7 +70,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := client.User{
 					UID:         "this is a uid",
-					Permissions: []string{models.CreateAlias},
+					Permissions: []string{auth.CreateAlias},
 					Scope:       []string{"scope1", "scope2"},
 					Password:    "password",
 				}
@@ -85,7 +85,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{models.CreateAlias},
+				Permissions: []string{auth.CreateAlias},
 				Scope:       []string{"scope1", "scope2"},
 				Password:    "password",
 			},
@@ -98,7 +98,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := client.User{
 					UID:         "this is a uid",
-					Permissions: []string{models.CreateAlias},
+					Permissions: []string{auth.CreateAlias},
 					Scope:       []string{"scope1", "scope2"},
 					Password:    "password",
 				}
@@ -113,7 +113,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{models.CreateAlias},
+				Permissions: []string{auth.CreateAlias},
 				Scope:       []string{"scope1", "scope2"},
 				Password:    "password",
 			},
@@ -126,7 +126,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := taglessUser{
 					UID:         "this is a uid",
-					Permissions: []string{models.CreateAlias},
+					Permissions: []string{auth.CreateAlias},
 					Scope:       []string{"scope1", "scope2"},
 					Password:    "password",
 				}
@@ -141,7 +141,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{models.CreateAlias},
+				Permissions: []string{auth.CreateAlias},
 				Scope:       []string{"scope1", "scope2"},
 				Password:    "password",
 			},
@@ -154,7 +154,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := client.User{
 					UID:         "this is a uid",
-					Permissions: []string{models.CreateAlias},
+					Permissions: []string{auth.CreateAlias},
 					Scope:       []string{"scope1", "scope2"},
 					Password:    "password",
 				}
@@ -169,7 +169,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{models.CreateAlias},
+				Permissions: []string{auth.CreateAlias},
 				Scope:       []string{"scope1", "scope2"},
 				Password:    "password",
 			},
@@ -182,7 +182,7 @@ func Test_createUser(t *testing.T) {
 			before: func() {
 				usr := client.User{
 					UID:         "this is a uid",
-					Permissions: []string{models.CreateAlias},
+					Permissions: []string{auth.CreateAlias},
 					Scope:       []string{"scope1", "scope2"},
 					Password:    "password",
 				}
@@ -198,7 +198,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{models.CreateAlias},
+				Permissions: []string{auth.CreateAlias},
 				Scope:       []string{"scope1", "scope2"},
 				Password:    "password",
 			},
@@ -211,7 +211,7 @@ func Test_createUser(t *testing.T) {
 				username:    "this is a uid",
 				password:    "password",
 				scopes:      []string{"scope1", "scope2"},
-				permissions: []string{models.CreateAlias},
+				permissions: []string{auth.CreateAlias},
 			},
 			wantErr: false,
 		},
@@ -219,7 +219,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{models.CreateAlias},
+				Permissions: []string{auth.CreateAlias},
 				Scope:       []string{"scope1", "scope2"},
 				Password:    "password",
 			},
@@ -232,7 +232,7 @@ func Test_createUser(t *testing.T) {
 				username:    "",
 				password:    "password",
 				scopes:      []string{"scope1", "scope2"},
-				permissions: []string{models.CreateAlias},
+				permissions: []string{auth.CreateAlias},
 			},
 			wantErr: true,
 		},
@@ -240,7 +240,7 @@ func Test_createUser(t *testing.T) {
 		{
 			usr: client.User{
 				UID:         "this is a uid",
-				Permissions: []string{models.CreateAlias},
+				Permissions: []string{auth.CreateAlias},
 				Scope:       []string{"scope1", "scope2"},
 				Password:    "password",
 			},
@@ -253,7 +253,7 @@ func Test_createUser(t *testing.T) {
 				username:    "this is a uid",
 				password:    "",
 				scopes:      []string{"scope1", "scope2"},
-				permissions: []string{models.CreateAlias},
+				permissions: []string{auth.CreateAlias},
 			},
 			wantErr: true,
 		},

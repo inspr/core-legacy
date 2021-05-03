@@ -1,6 +1,8 @@
 package authmock
 
-import "github.com/inspr/inspr/pkg/auth/models"
+import (
+	"github.com/inspr/inspr/pkg/auth"
+)
 
 // MockAuth is the structure to mock the auth interface
 type MockAuth struct {
@@ -13,11 +15,11 @@ func NewMockAuth(err error) *MockAuth {
 }
 
 // Validate - mock of the validate function
-func (ma *MockAuth) Validate(token []byte) (*models.Payload, []byte, error) {
+func (ma *MockAuth) Validate(token []byte) (*auth.Payload, []byte, error) {
 	if ma.Err != nil {
 		return nil, []byte{}, ma.Err
 	}
-	return &models.Payload{
+	return &auth.Payload{
 		UID:         "uid",
 		Permissions: nil,
 		Scope:       []string{"scope_1", "scope_2"},
@@ -27,7 +29,7 @@ func (ma *MockAuth) Validate(token []byte) (*models.Payload, []byte, error) {
 }
 
 // Init - mock of the tokenize function
-func (ma *MockAuth) Init(s string, load models.Payload) ([]byte, error) {
+func (ma *MockAuth) Init(s string, load auth.Payload) ([]byte, error) {
 	if ma.Err != nil {
 		return []byte{}, ma.Err
 	}
@@ -35,7 +37,7 @@ func (ma *MockAuth) Init(s string, load models.Payload) ([]byte, error) {
 }
 
 // Tokenize - mock of the tokenize function
-func (ma *MockAuth) Tokenize(load models.Payload) ([]byte, error) {
+func (ma *MockAuth) Tokenize(load auth.Payload) ([]byte, error) {
 	if ma.Err != nil {
 		return []byte{}, ma.Err
 	}

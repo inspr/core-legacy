@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/controller/client"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/utils"
@@ -30,7 +30,7 @@ type Client struct {
 func (c *Client) initAdminUser() error {
 	adminUser := User{
 		UID:         "admin",
-		Permissions: []string{models.CreateToken},
+		Permissions: []string{auth.CreateToken},
 		Scope:       []string{""},
 		Password:    os.Getenv("ADMIN_PASSWORD"),
 	}
@@ -136,7 +136,7 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 // RefreshToken receives a refreshToken and checks if it's valid.
 // If so, it returns a payload containing the updated user info
 // (user which is associated with the given refreshToken)
-func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*models.Payload, error) {
+func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.Payload, error) {
 	oldUser, err := c.decrypt(refreshToken)
 	if err != nil {
 		return nil, ierrors.NewError().BadRequest().Message(err.Error()).Build()
@@ -155,7 +155,7 @@ func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*models
 	return updatedPayload, nil
 }
 
-func (c *Client) encrypt(user User) (*models.Payload, error) {
+func (c *Client) encrypt(user User) (*auth.Payload, error) {
 	stringToEncrypt := fmt.Sprintf("%s:%s", user.UID, user.Password)
 
 	//Since the key is in string, we need to convert decode it to bytes
@@ -188,7 +188,7 @@ func (c *Client) encrypt(user User) (*models.Payload, error) {
 	//Since we don't want to save the nonce somewhere else in this case, we add it as a prefix to the encrypted data. The first nonce argument in Seal is the prefix.
 	ciphertext := aesGCM.Seal(nonce, nonce, plaintext, nil)
 
-	payload := models.Payload{
+	payload := auth.Payload{
 		UID:         user.UID,
 		Permissions: user.Permissions,
 		Scope:       user.Scope,
@@ -251,7 +251,7 @@ func (authorizer) SetToken(token []byte) error {
 	return nil
 }
 
-func (c *Client) requestNewToken(ctx context.Context, payload models.Payload) (string, error) {
+func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
 
 	ncc := client.NewControllerClient(c.insprdAddress, authorizer{})
 
@@ -311,7 +311,7 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	if requestor.Password != pwd {
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
-	if !utils.Includes(requestor.Permissions, string(models.CreateToken)) {
+	if !utils.Includes(requestor.Permissions, string(auth.CreateToken)) {
 		return fmt.Errorf("user %v doesn't have admin permission", uid)
 	}
 	return nil

@@ -13,7 +13,6 @@ import (
 	"os"
 
 	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/auth/models"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/lestrrat-go/jwx/jwa"
@@ -41,7 +40,7 @@ func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
 
 // Validate is a wrapper that checks the token of the http request and if it's
 // valid, proceeds to execute the request and if it isn't valid returns an error
-func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
+func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 
 	_, err := jwt.Parse(
 		token,
@@ -87,12 +86,12 @@ func (JA *JWTauth) Validate(token []byte) (*models.Payload, []byte, error) {
 
 // InitDO  structure for initialization requests
 type InitDO struct {
-	models.Payload
+	auth.Payload
 	Key string
 }
 
 // Init receives a payload and returns it in signed jwt format. Uses JWT authentication provider
-func (JA *JWTauth) Init(key string, load models.Payload) ([]byte, error) {
+func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
 	initDO := InitDO{
 		Key:     key,
 		Payload: load,
@@ -100,7 +99,7 @@ func (JA *JWTauth) Init(key string, load models.Payload) ([]byte, error) {
 
 	client := request.NewJSONClient(JA.authURL)
 
-	data := models.JwtDO{}
+	data := auth.JwtDO{}
 	err := client.Send(context.Background(), "/init", http.MethodPost, initDO, &data)
 	if err != nil {
 		log.Printf("err = %+v\n", err)
@@ -112,11 +111,11 @@ func (JA *JWTauth) Init(key string, load models.Payload) ([]byte, error) {
 }
 
 // Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider
-func (JA *JWTauth) Tokenize(load models.Payload) ([]byte, error) {
+func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
 
 	client := request.NewJSONClient(JA.authURL)
 
-	data := models.JwtDO{}
+	data := auth.JwtDO{}
 	err := client.Send(context.Background(), "/token", http.MethodPost, load, &data)
 	if err != nil {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
@@ -136,7 +135,7 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 		Build()
 
 	log.Printf("string(token) = %+v\n", string(token))
-	data := models.JwtDO{}
+	data := auth.JwtDO{}
 
 	err := client.Send(context.Background(), "/refresh", http.MethodGet, nil, &data)
 	if err != nil {

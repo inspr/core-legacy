@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 )
@@ -42,7 +42,7 @@ type ChannelTypeInterface interface {
 // obtain information related to the authorization necessary
 // to make changes in structures inside of the cluster
 type AuthorizationInterface interface {
-	GenerateToken(ctx context.Context, payload models.Payload) (string, error)
+	GenerateToken(ctx context.Context, payload auth.Payload) (string, error)
 	Init(ctx context.Context, key string) (string, error)
 }
 

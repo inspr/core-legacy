@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/pkg/api/models"
-	auth "github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
