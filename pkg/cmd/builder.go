@@ -24,6 +24,7 @@ type Builder interface {
 	MinimumArgs(argCount int, action func(context.Context, []string) error) *cobra.Command
 	NoArgs(action func(context.Context) error) *cobra.Command
 	AddSubCommand(cmds ...*cobra.Command) Builder
+	Version(version string) Builder
 	Super() *cobra.Command
 }
 
@@ -39,6 +40,11 @@ func NewCmd(use string) Builder {
 			Use: use,
 		},
 	}
+}
+
+func (b *builder) Version(v string) Builder {
+	b.cmd.Version = v
+	return b
 }
 
 // WithDescription - adds a short description to the command

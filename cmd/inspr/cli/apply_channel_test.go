@@ -11,6 +11,7 @@ import (
 )
 
 func TestNewApplyChannel(t *testing.T) {
+	prepareToken(t)
 	chanWithoutNameBytes, _ := yaml.Marshal(meta.Channel{})
 	chanDefaultBytes, _ := yaml.Marshal(meta.Channel{Meta: meta.Metadata{Name: "mock"}})
 	type args struct {

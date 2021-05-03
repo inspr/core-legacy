@@ -46,11 +46,11 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 		logger.Debug("initiating dApp create transaction")
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Apps().Create(data.Ctx, &data.App)
+		err = ah.Memory.Apps().Create(data.Scope, &data.App)
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("dApp", data.App.Meta.Name),
-				zap.String("context", data.Ctx),
+				zap.String("context", data.Scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -108,10 +108,10 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating dApp get transaction")
 		ah.Memory.InitTransaction()
 
-		app, err := ah.Memory.Root().Apps().Get(data.Ctx)
+		app, err := ah.Memory.Root().Apps().Get(data.Scope)
 		if err != nil {
 			logger.Error("unable to get dApp",
-				zap.String("dApp query", data.Ctx),
+				zap.String("dApp query", data.Scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -143,11 +143,11 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 		logger.Debug("initiating dApp update transaction")
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Apps().Update(data.Ctx, &data.App)
+		err = ah.Memory.Apps().Update(data.Scope, &data.App)
 		if err != nil {
 			logger.Error("unable to update dApp",
 				zap.String("dApp", data.App.Meta.Name),
-				zap.String("context", data.Ctx),
+				zap.String("context", data.Scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -204,10 +204,10 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 		logger.Debug("initiating dApp delete transaction")
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Apps().Delete(data.Ctx)
+		err = ah.Memory.Apps().Delete(data.Scope)
 		if err != nil {
 			logger.Error("unable to delete dApp",
-				zap.String("dApp query", data.Ctx),
+				zap.String("dApp query", data.Scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()

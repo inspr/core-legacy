@@ -36,6 +36,11 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            - name: INSPR_INIT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: inspr-init-key-secret
+                  key: key
             - name: JWT_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:

@@ -33,7 +33,7 @@ type channelTypeAPITest struct {
 func channelTypeDICases(funcName string) []channelTypeAPITest {
 	parsedCTDI, _ := json.Marshal(models.ChannelTypeDI{
 		ChannelType: meta.ChannelType{Meta: meta.Metadata{Name: "mock_channelType"}},
-		Ctx:         "",
+		Scope:       "",
 		DryRun:      false,
 	})
 	wrongFormatData := []byte{1}
@@ -113,7 +113,7 @@ func channelTypeDICases(funcName string) []channelTypeAPITest {
 // use these test cases
 func channelTypeQueryDICases(funcName string) []channelTypeAPITest {
 	parsedCTQDI, _ := json.Marshal(models.ChannelTypeQueryDI{
-		Ctx:    "",
+		Scope:  "",
 		CtName: "mock_channelType",
 		DryRun: false,
 	})

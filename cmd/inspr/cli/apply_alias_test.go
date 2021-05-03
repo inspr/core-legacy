@@ -11,6 +11,7 @@ import (
 )
 
 func TestNewApplyAlias(t *testing.T) {
+	prepareToken(t)
 	chanWithoutNameBytes, _ := yaml.Marshal(meta.Alias{})
 	chanDefaultBytes, _ := yaml.Marshal(meta.Alias{Meta: meta.Metadata{Name: "mock"}})
 	type args struct {

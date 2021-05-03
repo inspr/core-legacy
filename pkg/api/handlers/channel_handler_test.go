@@ -35,7 +35,7 @@ func channelDICases(funcName string) []channelAPITest {
 		Channel: meta.Channel{
 			Meta: meta.Metadata{Name: "mock_channel"},
 		},
-		Ctx: "",
+		Scope: "",
 	})
 	wrongFormatData := []byte{1}
 	return []channelAPITest{
@@ -113,7 +113,7 @@ func channelDICases(funcName string) []channelAPITest {
 // For example, HandleGet and HandleDelete use these test cases
 func channelQueryDICases(funcName string) []channelAPITest {
 	parsedChannelQueryDI, _ := json.Marshal(models.ChannelQueryDI{
-		Ctx:    "",
+		Scope:  "",
 		ChName: "mock_channel",
 		DryRun: false,
 	})

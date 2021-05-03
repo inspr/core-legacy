@@ -41,11 +41,11 @@ func (cth *ChannelTypeHandler) HandleCreate() rest.Handler {
 		logger.Debug("initiating Channel Type create transaction")
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.ChannelTypes().Create(data.Ctx, &data.ChannelType)
+		err = cth.Memory.ChannelTypes().Create(data.Scope, &data.ChannelType)
 		if err != nil {
 			logger.Error("unable to create Channel Type",
 				zap.String("ctype", data.ChannelType.Meta.Name),
-				zap.String("context", data.Ctx),
+				zap.String("context", data.Scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
@@ -92,11 +92,11 @@ func (cth *ChannelTypeHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Channel Type get transaction")
 		cth.Memory.InitTransaction()
 
-		channelType, err := cth.Memory.Root().ChannelTypes().Get(data.Ctx, data.CtName)
+		channelType, err := cth.Memory.Root().ChannelTypes().Get(data.Scope, data.CtName)
 		if err != nil {
 			logger.Error("unable to get Channel Type",
 				zap.String("ctype", data.CtName),
-				zap.String("context", data.Ctx),
+				zap.String("context", data.Scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
@@ -128,11 +128,11 @@ func (cth *ChannelTypeHandler) HandleUpdate() rest.Handler {
 		logger.Debug("initiating Channel Type update transaction")
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.ChannelTypes().Update(data.Ctx, &data.ChannelType)
+		err = cth.Memory.ChannelTypes().Update(data.Scope, &data.ChannelType)
 		if err != nil {
 			logger.Error("unable to update Channel Type",
 				zap.String("ctype", data.ChannelType.Meta.Name),
-				zap.String("context", data.Ctx),
+				zap.String("context", data.Scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()
@@ -189,11 +189,11 @@ func (cth *ChannelTypeHandler) HandleDelete() rest.Handler {
 		logger.Debug("initiating Channel Type delete transaction")
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.ChannelTypes().Delete(data.Ctx, data.CtName)
+		err = cth.Memory.ChannelTypes().Delete(data.Scope, data.CtName)
 		if err != nil {
 			logger.Error("unable to delete Channel Type",
 				zap.String("ctype", data.CtName),
-				zap.String("context", data.Ctx),
+				zap.String("context", data.Scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			cth.Memory.Cancel()

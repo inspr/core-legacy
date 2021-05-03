@@ -824,7 +824,7 @@ func insprServerHandler(w http.ResponseWriter, r *http.Request) {
 	strScope := strings.Join(data.Scope, "-")
 	token := fmt.Sprintf("%s-%s", data.UID, strScope)
 	val := models.AuthDI{
-		Token: token,
+		Token: []byte(token),
 	}
 	rest.JSON(w, 200, val)
 }
