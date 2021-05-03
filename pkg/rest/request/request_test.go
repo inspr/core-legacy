@@ -93,8 +93,10 @@ func TestClient_Send(t *testing.T) {
 		{
 			name: "middleware error",
 			fields: fields{
-				c:                http.Client{},
-				middleware:       func(i interface{}) ([]byte, error) { return nil, ierrors.NewError().Build() },
+				c: http.Client{},
+				middleware: func(i interface{}) ([]byte, error) {
+					return nil, ierrors.NewError().Build()
+				},
 				decoderGenerator: JSONDecoderGenerator,
 				auth:             nil,
 			},

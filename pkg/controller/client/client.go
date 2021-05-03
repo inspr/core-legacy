@@ -13,9 +13,14 @@ type Client struct {
 }
 
 // NewControllerClient return a new Client
-func NewControllerClient(url string, auth request.Authenticator) controller.Interface {
-	client := request.
-		NewClient().
+func NewControllerClient(
+	url string,
+	auth request.Authenticator,
+) controller.Interface {
+
+	rc := request.NewClient()
+
+	client := rc.
 		BaseURL(url).
 		Encoder(json.Marshal).
 		Decoder(request.JSONDecoderGenerator).
@@ -30,7 +35,7 @@ func NewControllerClient(url string, auth request.Authenticator) controller.Inte
 // Channels interacts with channels on the Insprd
 func (c *Client) Channels() controller.ChannelInterface {
 	return &ChannelClient{
-		c: c.HTTPClient,
+		rc: c.HTTPClient,
 	}
 }
 

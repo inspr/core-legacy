@@ -9,54 +9,73 @@ import (
 	"testing"
 )
 
-func TestClientBuilder_BaseURL(t *testing.T) {
-	type args struct {
-		url string
-	}
+func TestNewClient(t *testing.T) {
 	tests := []struct {
 		name string
-		cb   *ClientBuilder
-		args args
-		want *ClientBuilder
+		want *Client
 	}{
 		{
-			name: "base url setting",
-			cb: &ClientBuilder{
-				c: &Client{},
-			},
-			args: args{
-				url: "test",
-			},
-			want: &ClientBuilder{
-				c: &Client{
-					baseURL: "test",
-				},
-			},
+			name: "calling_NewClient",
+			want: &Client{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.cb.BaseURL(tt.args.url); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ClientBuilder.BaseURL() = %v, want %v", got, tt.want)
+			got := NewClient()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewClient() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestClientBuilder_Encoder(t *testing.T) {
+func TestClient_BaseURL(t *testing.T) {
+	type args struct {
+		url string
+	}
+	tests := []struct {
+		name string
+		c    *Client
+		args args
+		want *Client
+	}{
+		{
+			name: "base url setting",
+			c:    &Client{},
+			args: args{
+				url: "test",
+			},
+			want: &Client{
+				baseURL: "test",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.c.BaseURL(tt.args.url)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf(
+					"Client.BaseURL() = %v, want %v",
+					got,
+					tt.want,
+				)
+			}
+		})
+	}
+}
+
+func TestClient_Encoder(t *testing.T) {
 	type args struct {
 		encoder Encoder
 	}
 	tests := []struct {
 		name string
-		cb   *ClientBuilder
+		c    *Client
 		args args
 	}{
 		{
 			name: "encoder setting",
-			cb: &ClientBuilder{
-				c: &Client{},
-			},
+			c:    &Client{},
 			args: args{
 				encoder: json.Marshal,
 			},
@@ -64,31 +83,30 @@ func TestClientBuilder_Encoder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.cb.Encoder(tt.args.encoder)
-			got, _ := tt.cb.c.encoder("test")
+			tt.c.Encoder(tt.args.encoder)
+			got, _ := tt.c.encoder("test")
 			want, _ := tt.args.encoder("test")
+
 			if !reflect.DeepEqual(got, want) {
-				t.Errorf("ClientBuilder.Encoder() = %v, want %v", got, want)
+				t.Errorf("Client.Encoder() = %v, want %v", got, want)
 			}
 		})
 	}
 }
 
-func TestClientBuilder_Decoder(t *testing.T) {
+func TestClient_Decoder(t *testing.T) {
 	type args struct {
 		decoder DecoderGenerator
 	}
 	tests := []struct {
 		name    string
-		cb      *ClientBuilder
+		c       *Client
 		args    args
 		encoder Encoder
 	}{
 		{
-			name: "decoder setting",
-			cb: &ClientBuilder{
-				c: &Client{},
-			},
+			name:    "decoder setting",
+			c:       &Client{},
 			encoder: json.Marshal,
 			args: args{
 				decoder: JSONDecoderGenerator,
@@ -97,85 +115,65 @@ func TestClientBuilder_Decoder(t *testing.T) {
 	}
 	for _, tt := range tests {
 
-		tt.cb.Decoder(tt.args.decoder)
+		tt.c.Decoder(tt.args.decoder)
 
 		var want, got interface{}
 		encoded, _ := tt.encoder("test")
-		wantDecoder := tt.args.decoder(ioutil.NopCloser(bytes.NewBuffer(encoded)))
+		wantDecoder := tt.args.decoder(
+			ioutil.NopCloser(bytes.NewBuffer(encoded)),
+		)
 		wantDecoder.Decode(&want)
 
 		encoded, _ = tt.encoder("test")
-		gotDecoder := tt.cb.c.decoderGenerator(ioutil.NopCloser(bytes.NewBuffer(encoded)))
+		gotDecoder := tt.c.decoderGenerator(
+			ioutil.NopCloser(bytes.NewBuffer(encoded)),
+		)
 		gotDecoder.Decode(&got)
 
 		t.Run(tt.name, func(t *testing.T) {
 			if !reflect.DeepEqual(got, want) {
-				t.Errorf("ClientBuilder.Decoder() = %v, want %v", got, want)
+				t.Errorf("Client.Decoder() = %v, want %v", got, want)
 			}
 		})
 	}
 }
 
-func TestClientBuilder_HTTPClient(t *testing.T) {
+func TestClient_HTTPClient(t *testing.T) {
 	type args struct {
 		client http.Client
 	}
 	tests := []struct {
 		name string
-		cb   *ClientBuilder
+		c    *Client
 		args args
-		want *ClientBuilder
+		want *Client
 	}{
 		{
 			name: "http client setting",
-			cb: &ClientBuilder{
-				c: &Client{},
-			},
+			c:    &Client{},
 			args: args{
 				client: http.Client{
 					Timeout: 100,
 				},
 			},
-			want: &ClientBuilder{
-				c: &Client{
-					c: http.Client{
-						Timeout: 100,
-					},
+			want: &Client{
+				c: http.Client{
+					Timeout: 100,
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.cb.HTTPClient(tt.args.client); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ClientBuilder.HTTPClient() = %v, want %v", got, tt.want)
+			got := tt.c.HTTPClient(tt.args.client)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Client.HTTPClient() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestNewClient(t *testing.T) {
-	tests := []struct {
-		name string
-		want *ClientBuilder
-	}{
-		{
-			name: "basic new client builder",
-			want: &ClientBuilder{
-				c: &Client{},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewClient(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewClient() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestClientBuilder_Build(t *testing.T) {
+func TestClient_Build(t *testing.T) {
 	c := &Client{
 		c:       *http.DefaultClient,
 		baseURL: "this is an url",
@@ -198,11 +196,9 @@ func TestClientBuilder_Build(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cb := &ClientBuilder{
-				c: tt.fields.c,
-			}
-			if got := cb.Build(); !reflect.DeepEqual(*got, *tt.want) {
-				t.Errorf("ClientBuilder.Build() = %#v, want %#v", got, tt.want)
+			got := tt.fields.c.Build()
+			if !reflect.DeepEqual(*got, *tt.want) {
+				t.Errorf("Client.Build() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -277,7 +273,7 @@ func TestNewJSONClient(t *testing.T) {
 	}
 }
 
-func TestClientBuilder_Authenticator(t *testing.T) {
+func TestClient_Authenticator(t *testing.T) {
 	type fields struct {
 		c *Client
 	}
@@ -314,18 +310,15 @@ func TestClientBuilder_Authenticator(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cb := &ClientBuilder{
-				c: tt.fields.c,
-			}
 
-			got := cb.Authenticator(tt.args.au)
+			got := tt.fields.c.Authenticator(tt.args.au)
 
-			condition := (reflect.TypeOf(got.c.auth) == reflect.TypeOf(nil))
+			condition := (reflect.TypeOf(got.auth) == reflect.TypeOf(nil))
 
 			if condition != tt.wantNil {
 				t.Errorf(
-					"ClientBuilder.Authenticator() = %v, want nil => %v",
-					reflect.TypeOf(got.c.auth),
+					"Client.Authenticator() = %v, want nil => %v",
+					reflect.TypeOf(got.auth),
 					tt.wantNil,
 				)
 			}
@@ -333,7 +326,7 @@ func TestClientBuilder_Authenticator(t *testing.T) {
 	}
 }
 
-func TestClientBuilder_Token(t *testing.T) {
+func TestClient_Token(t *testing.T) {
 	type fields struct {
 		c *Client
 	}
@@ -361,14 +354,11 @@ func TestClientBuilder_Token(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cb := &ClientBuilder{
-				c: tt.fields.c,
-			}
-			got := cb.Token(tt.args.token)
-			if !reflect.DeepEqual(got.c.headers, tt.want) {
+			got := tt.fields.c.Token(tt.args.token)
+			if !reflect.DeepEqual(got.headers, tt.want) {
 				t.Errorf(
-					"ClientBuilder.Token() = %v, want %v",
-					got.c.headers,
+					"Client.Token() = %v, want %v",
+					got.headers,
 					tt.want,
 				)
 			}
@@ -376,7 +366,7 @@ func TestClientBuilder_Token(t *testing.T) {
 	}
 }
 
-func TestClientBuilder_Header(t *testing.T) {
+func TestClient_Header(t *testing.T) {
 	type fields struct {
 		c *Client
 	}
@@ -406,14 +396,11 @@ func TestClientBuilder_Header(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cb := &ClientBuilder{
-				c: tt.fields.c,
-			}
-			got := cb.Header(tt.args.key, tt.args.value)
-			if !reflect.DeepEqual(got.c.headers, tt.want) {
+			got := tt.fields.c.Header(tt.args.key, tt.args.value)
+			if !reflect.DeepEqual(got.headers, tt.want) {
 				t.Errorf(
-					"ClientBuilder.Header() = %v, want %v",
-					got.c.headers,
+					"Client.Header() = %v, want %v",
+					got.headers,
 					tt.want,
 				)
 			}
