@@ -42,7 +42,7 @@ func GetSchema(channel string) (string, error) {
 
 // OutputChannnelList returns a list of input channels
 func OutputChannnelList() utils.StringArray {
-	return GetChannelBoundaryList(GetInputChannels())
+	return GetChannelBoundaryList(GetOutputChannels())
 }
 
 // InputChannelList returns a list of input channels

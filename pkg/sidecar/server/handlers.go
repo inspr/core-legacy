@@ -40,7 +40,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		if !environment.InputChannelList().Contains(channel) {
+		if !environment.OutputChannnelList().Contains(channel) {
 			insprError := ierrors.
 				NewError().
 				BadRequest().
