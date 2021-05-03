@@ -40,9 +40,9 @@ func (h *Handler) InitHandler() rest.Handler {
 		res := struct{ Key string }{}
 		decoder.Decode(&res)
 		load := models.Payload{
-			RefreshURL: os.Getenv("REFRESH_URL"),
-			Scope:      []string{""},
-			Permission: nil,
+			RefreshURL:  os.Getenv("REFRESH_URL"),
+			Scope:       []string{""},
+			Permissions: nil,
 		}
 		token, err := h.Auth.Init(res.Key, load)
 		if err != nil {

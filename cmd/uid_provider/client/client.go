@@ -29,10 +29,10 @@ type Client struct {
 
 func (c *Client) initAdminUser() error {
 	adminUser := User{
-		UID:        "admin",
-		Permission: []string{models.CreateToken},
-		Scope:      []string{""},
-		Password:   os.Getenv("ADMIN_PASSWORD"),
+		UID:         "admin",
+		Permissions: []string{models.CreateToken},
+		Scope:       []string{""},
+		Password:    os.Getenv("ADMIN_PASSWORD"),
 	}
 	payload, _ := c.encrypt(adminUser)
 	token, err := c.requestNewToken(context.Background(), *payload)
@@ -189,11 +189,11 @@ func (c *Client) encrypt(user User) (*models.Payload, error) {
 	ciphertext := aesGCM.Seal(nonce, nonce, plaintext, nil)
 
 	payload := models.Payload{
-		UID:        user.UID,
-		Permission: user.Permission,
-		Scope:      user.Scope,
-		Refresh:    ciphertext,
-		RefreshURL: c.refreshURL,
+		UID:         user.UID,
+		Permissions: user.Permissions,
+		Scope:       user.Scope,
+		Refresh:     ciphertext,
+		RefreshURL:  c.refreshURL,
 	}
 
 	return &payload, nil
@@ -311,7 +311,7 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	if requestor.Password != pwd {
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
-	if !utils.Includes(requestor.Permission, string(models.CreateToken)) {
+	if !utils.Includes(requestor.Permissions, string(models.CreateToken)) {
 		return fmt.Errorf("user %v doesn't have admin permission", uid)
 	}
 	return nil

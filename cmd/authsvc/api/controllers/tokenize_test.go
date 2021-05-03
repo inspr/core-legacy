@@ -45,11 +45,11 @@ func TestServer_Tokenize(t *testing.T) {
 			name: "Tokenize_valid_payload",
 			want: http.StatusOK,
 			body: models.Payload{
-				UID:        "u000001",
-				Scope:      []string{""},
-				Permission: nil,
-				Refresh:    []byte("refreshtk"),
-				RefreshURL: "http://refresh.token",
+				UID:         "u000001",
+				Scope:       []string{""},
+				Permissions: nil,
+				Refresh:     []byte("refreshtk"),
+				RefreshURL:  "http://refresh.token",
 			},
 		},
 	}

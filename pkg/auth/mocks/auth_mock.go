@@ -18,11 +18,11 @@ func (ma *MockAuth) Validate(token []byte) (*models.Payload, []byte, error) {
 		return nil, []byte{}, ma.Err
 	}
 	return &models.Payload{
-		UID:        "uid",
-		Permission: nil,
-		Scope:      []string{"scope_1", "scope_2"},
-		Refresh:    []byte("refresh"),
-		RefreshURL: "refresh_url",
+		UID:         "uid",
+		Permissions: nil,
+		Scope:       []string{"scope_1", "scope_2"},
+		Refresh:     []byte("refresh"),
+		RefreshURL:  "refresh_url",
 	}, []byte("mock"), nil
 }
 

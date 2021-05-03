@@ -12,12 +12,12 @@ import (
 )
 
 type createUserOptionsDT struct {
-	username   string
-	password   string
-	scopes     []string
-	yaml       string
-	json       string
-	permission []string
+	username    string
+	password    string
+	scopes      []string
+	yaml        string
+	json        string
+	permissions []string
 }
 
 var createUsrOptions = createUserOptionsDT{}
@@ -100,7 +100,7 @@ func createUser(ctx context.Context, inputArgs []string) error {
 
 		usr.Password = createUsrOptions.password
 
-		usr.Permission = createUsrOptions.permission
+		usr.Permissions = createUsrOptions.permissions
 		usr.Scope = createUsrOptions.scopes
 	}
 

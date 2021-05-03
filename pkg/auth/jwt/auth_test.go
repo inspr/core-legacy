@@ -83,11 +83,11 @@ func TestJWTauth_Validate(t *testing.T) {
 		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
 
 		payload := models.Payload{
-			UID:        "mock_UID",
-			Permission: nil,
-			Scope:      []string{"mock"},
-			Refresh:    []byte("mock_refresh"),
-			RefreshURL: "mock_refresh_url",
+			UID:         "mock_UID",
+			Permissions: nil,
+			Scope:       []string{"mock"},
+			Refresh:     []byte("mock_refresh"),
+			RefreshURL:  "mock_refresh_url",
 		}
 		token.Set("payload", payload)
 		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
@@ -152,11 +152,11 @@ func TestJWTauth_Validate(t *testing.T) {
 				token: fineToken(),
 			},
 			want: &models.Payload{
-				UID:        "mock_UID",
-				Permission: nil,
-				Scope:      []string{"mock"},
-				Refresh:    []byte("mock_refresh"),
-				RefreshURL: "mock_refresh_url",
+				UID:         "mock_UID",
+				Permissions: nil,
+				Scope:       []string{"mock"},
+				Refresh:     []byte("mock_refresh"),
+				RefreshURL:  "mock_refresh_url",
 			},
 			want1:   fineToken(),
 			wantErr: false,
@@ -220,11 +220,11 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			name: "Tokenize valid",
 			args: args{
 				load: models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Permission: nil,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+					UID:         "u000001",
+					Scope:       []string{""},
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				},
 			},
 			want: []byte("mock_token"),
@@ -240,11 +240,11 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			name: "Tokenize invalid UIDP response",
 			args: args{
 				load: models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Permission: nil,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+					UID:         "u000001",
+					Scope:       []string{""},
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				},
 			},
 			want:    nil,
@@ -262,11 +262,11 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			name: "Tokenize invalid",
 			args: args{
 				load: models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Permission: nil,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+					UID:         "u000001",
+					Scope:       []string{""},
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				},
 			},
 			want: nil,
@@ -315,11 +315,11 @@ func TestJWTauth_Refresh(t *testing.T) {
 			name: "Tokenize valid",
 			args: args{
 				token: mockenize(models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Permission: nil,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+					UID:         "u000001",
+					Scope:       []string{""},
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				}),
 			},
 			want: []byte("mock_token"),
@@ -344,11 +344,11 @@ func TestJWTauth_Refresh(t *testing.T) {
 			name: "Tokenize invalid UID response",
 			args: args{
 				token: mockenize(models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Permission: nil,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+					UID:         "u000001",
+					Scope:       []string{""},
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				}),
 			},
 			want: nil,
@@ -366,11 +366,11 @@ func TestJWTauth_Refresh(t *testing.T) {
 			name: "Tokenize invalid UID refresh",
 			args: args{
 				token: mockenize(models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Permission: nil,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+					UID:         "u000001",
+					Scope:       []string{""},
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				}),
 			},
 			want: nil,

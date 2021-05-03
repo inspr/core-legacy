@@ -8,10 +8,10 @@ import (
 
 // User defines the information a user contains
 type User struct {
-	UID        string
-	Permission []string
-	Scope      []string
-	Password   string
+	UID         string   `json:"uid"`
+	Permissions []string `json:"permissions"`
+	Scope       []string `json:"scope"`
+	Password    string   `json:"password"`
 }
 
 // RedisManager defines methods to manage Redis in the cluster
