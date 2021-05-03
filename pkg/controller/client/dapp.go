@@ -25,8 +25,9 @@ func (ac *AppClient) Get(ctx context.Context, scope string) (*meta.App, error) {
 	adi := models.AppQueryDI{}
 	var resp meta.App
 
-	ac.rc.Header("Scope", scope)
-	err := ac.rc.Send(ctx, "/apps", "GET", adi, &resp)
+	err := ac.rc.
+		Header("Scope", scope).
+		Send(ctx, "/apps", "GET", adi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +52,9 @@ func (ac *AppClient) Create(ctx context.Context, scope string, app *meta.App, dr
 	}
 	var resp diff.Changelog
 
-	ac.rc.Header("Scope", scope)
-	err := ac.rc.Send(ctx, "/apps", "POST", adi, &resp)
+	err := ac.rc.
+		Header("Scope", scope).
+		Send(ctx, "/apps", "POST", adi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +75,9 @@ func (ac *AppClient) Delete(ctx context.Context, scope string, dryRun bool) (dif
 	}
 	var resp diff.Changelog
 
-	ac.rc.Header("Scope", scope)
-	err := ac.rc.Send(ctx, "/apps", "DELETE", adi, &resp)
+	err := ac.rc.
+		Header("Scope", scope).
+		Send(ctx, "/apps", "DELETE", adi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +102,9 @@ func (ac *AppClient) Update(ctx context.Context, scope string, app *meta.App, dr
 	}
 	var resp diff.Changelog
 
-	ac.rc.Header("Scope", scope)
-	err := ac.rc.Send(ctx, "/apps", "PUT", adi, &resp)
+	err := ac.rc.
+		Header("Scope", scope).
+		Send(ctx, "/apps", "PUT", adi, &resp)
 	if err != nil {
 		return nil, err
 	}

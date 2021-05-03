@@ -27,8 +27,9 @@ func (ctc *ChannelTypeClient) Get(ctx context.Context, scope string, name string
 	}
 	var resp meta.ChannelType
 
-	ctc.rc.Header("Scope", scope)
-	err := ctc.rc.Send(ctx, "/channeltypes", "GET", ctdi, &resp)
+	err := ctc.rc.
+		Header("Scope", scope).
+		Send(ctx, "/channeltypes", "GET", ctdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +53,9 @@ func (ctc *ChannelTypeClient) Create(ctx context.Context, scope string, ch *meta
 	}
 	var resp diff.Changelog
 
-	ctc.rc.Header("Scope", scope)
-	err := ctc.rc.Send(ctx, "/channeltypes", "POST", ctdi, &resp)
+	err := ctc.rc.
+		Header("Scope", scope).
+		Send(ctx, "/channeltypes", "POST", ctdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +79,9 @@ func (ctc *ChannelTypeClient) Delete(ctx context.Context, scope string, name str
 	}
 	var resp diff.Changelog
 
-	ctc.rc.Header("Scope", scope)
-	err := ctc.rc.Send(ctx, "/channeltypes", "DELETE", ctdi, &resp)
+	err := ctc.rc.
+		Header("Scope", scope).
+		Send(ctx, "/channeltypes", "DELETE", ctdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -102,8 +105,9 @@ func (ctc *ChannelTypeClient) Update(ctx context.Context, scope string, ch *meta
 	}
 	var resp diff.Changelog
 
-	ctc.rc.Header("Scope", scope)
-	err := ctc.rc.Send(ctx, "/channeltypes", "PUT", ctdi, &resp)
+	err := ctc.rc.
+		Header("Scope", scope).
+		Send(ctx, "/channeltypes", "PUT", ctdi, &resp)
 	if err != nil {
 		return nil, err
 	}

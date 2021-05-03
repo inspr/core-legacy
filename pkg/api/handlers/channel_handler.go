@@ -28,7 +28,7 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 	logger.Info("handling Channel create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -90,7 +90,7 @@ func (ch *ChannelHandler) HandleGet() rest.Handler {
 	logger.Info("handling Channel get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -127,7 +127,7 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 	logger.Info("handling Channel update request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -189,7 +189,7 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 	logger.Info("handling Channel delete request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {

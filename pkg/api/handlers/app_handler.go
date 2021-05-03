@@ -97,7 +97,7 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 	logger.Info("handling dApp get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -133,7 +133,7 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 	logger.Info("handling dApp update request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -195,7 +195,7 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 	logger.Info("handling dApp delete request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {

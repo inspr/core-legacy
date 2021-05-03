@@ -53,19 +53,16 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			return
 		}
 
-		HeaderScopes := r.Header["Scope"]
-		// TODO: rename the variables to better fit this
+		headerScope := r.Header.Get(HeaderScopeKey)
 		log.Printf("payload.Scope = %+v\n", payload.Scope)
 		valid := false
+
 		for _, payloadScope := range payload.Scope {
 			log.Printf("scope = %+v\n", payloadScope)
-
-			// TODO: it will have only one scope, should i leave like this?
-			for _, headerScope := range HeaderScopes {
-				if strings.HasPrefix(headerScope, payloadScope) {
-					// scope found
-					valid = true
-				}
+			if strings.HasPrefix(headerScope, payloadScope) {
+				// scope found
+				valid = true
+				break
 			}
 		}
 

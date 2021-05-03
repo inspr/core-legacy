@@ -28,8 +28,9 @@ func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias,
 
 	var resp meta.Alias
 
-	ac.rc.Header("Scope", scope)
-	err := ac.rc.Send(ctx, "/alias", "GET", aliasQuery, &resp)
+	err := ac.rc.
+		Header("Scope", scope).
+		Send(ctx, "/alias", "GET", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +55,9 @@ func (ac *AliasClient) Create(ctx context.Context, scope string, target string, 
 	}
 	var resp diff.Changelog
 
-	ac.rc.Header("Scope", scope)
-	err := ac.rc.Send(ctx, "/alias", "POST", aliasQuery, &resp)
+	err := ac.rc.
+		Header("Scope", scope).
+		Send(ctx, "/alias", "POST", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -79,8 +81,9 @@ func (ac *AliasClient) Delete(ctx context.Context, scope, key string, dryRun boo
 	}
 	var resp diff.Changelog
 
-	ac.rc.Header("Scope", scope)
-	err := ac.rc.Send(ctx, "/alias", "DELETE", aliasQuery, &resp)
+	err := ac.rc.
+		Header("Scope", scope).
+		Send(ctx, "/alias", "DELETE", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -105,8 +108,9 @@ func (ac *AliasClient) Update(ctx context.Context, scope string, target string, 
 	}
 	var resp diff.Changelog
 
-	ac.rc.Header("Scope", scope)
-	err := ac.rc.Send(ctx, "/alias", "PUT", aliasQuery, &resp)
+	err := ac.rc.
+		Header("Scope", scope).
+		Send(ctx, "/alias", "PUT", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}

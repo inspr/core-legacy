@@ -12,6 +12,7 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
@@ -62,7 +63,7 @@ func TestAppClient_Delete(t *testing.T) {
 				}
 
 				var di models.AppQueryDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -154,7 +155,7 @@ func TestAppClient_Get(t *testing.T) {
 				}
 
 				var di models.AppQueryDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -250,7 +251,7 @@ func TestAppClient_Create(t *testing.T) {
 				}
 
 				var di models.AppDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -344,7 +345,7 @@ func TestAppClient_Update(t *testing.T) {
 				}
 
 				var di models.AppDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)

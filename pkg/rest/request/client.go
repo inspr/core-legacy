@@ -3,10 +3,36 @@ package request
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
-// TODO: move this to another package, it doens't really fit the rest pkg.
+// Encoder encodes an interface into bytes
+type Encoder func(interface{}) ([]byte, error)
+
+// DecoderGenerator creates a decoder for a given request
+type DecoderGenerator func(r io.Reader) Decoder
+
+// Decoder is an interface that decodes a reader into an struct
+type Decoder interface{ Decode(interface{}) error }
+
+// JSONDecoderGenerator generates a decoder for json encoded requests
+func JSONDecoderGenerator(r io.Reader) Decoder { return json.NewDecoder(r) }
+
+// Client is a generic rest client
+type Client struct {
+	c                http.Client
+	baseURL          string
+	encoder          Encoder
+	decoderGenerator DecoderGenerator
+	headers          map[string]string
+	auth             Authenticator
+}
+
+func (c *Client) routeToURL(route string) string {
+	return fmt.Sprintf("%s%s",
+		c.baseURL, route)
+}
 
 // Authenticator is an interface to perform authentication via tokens
 type Authenticator interface {
@@ -17,6 +43,14 @@ type Authenticator interface {
 // NewClient returns an address of a empty Client
 func NewClient() *Client {
 	return &Client{}
+}
+
+// NewJSONClient returns a client for the given url with json encoding and decoding
+func NewJSONClient(baseURL string) *Client {
+	return NewClient().
+		BaseURL(baseURL).
+		Encoder(json.Marshal).
+		Decoder(JSONDecoderGenerator)
 }
 
 // BaseURL sets the base URL for the client that is being built
@@ -55,26 +89,11 @@ func (c *Client) HTTPClient(client http.Client) *Client {
 	return c
 }
 
-// Build returns the client built by the builder
-func (c *Client) Build() *Client {
-	return c
-}
-
-// Header adds the given header to all requests made by the client
+// Header puts the value into the key in the client's header map, if previously was a value in the key, it will be replaced.
 func (c *Client) Header(key, value string) *Client {
 	if c.headers == nil {
 		c.headers = make(map[string]string)
 	}
 	c.headers[key] = value
 	return c
-}
-
-// NewJSONClient returns a client for the given url with json encoding and decoding
-func NewJSONClient(baseURL string) *Client {
-	client := &Client{}
-	return client.
-		BaseURL(baseURL).
-		Encoder(json.Marshal).
-		Decoder(JSONDecoderGenerator).
-		Build()
 }

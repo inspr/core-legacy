@@ -18,17 +18,12 @@ func NewControllerClient(
 	auth request.Authenticator,
 ) controller.Interface {
 
-	rc := request.NewClient()
-
-	client := rc.
-		BaseURL(url).
-		Encoder(json.Marshal).
-		Decoder(request.JSONDecoderGenerator).
-		Authenticator(auth).
-		Build()
-
 	return &Client{
-		HTTPClient: client,
+		HTTPClient: request.NewClient().
+			BaseURL(url).
+			Encoder(json.Marshal).
+			Decoder(request.JSONDecoderGenerator).
+			Authenticator(auth),
 	}
 }
 

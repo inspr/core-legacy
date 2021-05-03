@@ -28,7 +28,7 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 	logger.Info("handling Alias create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -92,7 +92,7 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 	logger.Info("handling Alias get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasQueryDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -130,7 +130,7 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 	logger.Info("handling Alias update request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -193,7 +193,7 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 	logger.Info("handling Alias delete request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasQueryDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {

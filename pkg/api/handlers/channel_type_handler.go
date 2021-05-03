@@ -29,7 +29,7 @@ func (cth *ChannelTypeHandler) HandleCreate() rest.Handler {
 	logger.Info("handling Channel Type create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -81,7 +81,7 @@ func (cth *ChannelTypeHandler) HandleGet() rest.Handler {
 	logger.Info("handling Channel Type get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -118,7 +118,7 @@ func (cth *ChannelTypeHandler) HandleUpdate() rest.Handler {
 	logger.Info("handling Channel Type update request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -180,7 +180,7 @@ func (cth *ChannelTypeHandler) HandleDelete() rest.Handler {
 	logger.Info("handling Channel Type delete request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
-		scope := r.Header.Get("Scope")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {

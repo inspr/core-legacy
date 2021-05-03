@@ -27,10 +27,9 @@ func (cc *ChannelClient) Get(ctx context.Context, scope string, name string) (*m
 	}
 	var resp meta.Channel
 
-	// adds scope to the header of the request
-	cc.rc.Header("Scope", scope)
-
-	err := cc.rc.Send(ctx, "/channels", "GET", cdi, &resp)
+	err := cc.rc.
+		Header("Scope", scope).
+		Send(ctx, "/channels", "GET", cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -54,10 +53,9 @@ func (cc *ChannelClient) Create(ctx context.Context, scope string, ch *meta.Chan
 	}
 	var resp diff.Changelog
 
-	// adds scope to the header of the request
-	cc.rc.Header("Scope", scope)
-
-	err := cc.rc.Send(ctx, "/channels", "POST", cdi, &resp)
+	err := cc.rc.
+		Header("Scope", scope).
+		Send(ctx, "/channels", "POST", cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -81,10 +79,9 @@ func (cc *ChannelClient) Delete(ctx context.Context, scope string, name string, 
 	}
 	var resp diff.Changelog
 
-	// adds scope to the header of the request
-	cc.rc.Header("Scope", scope)
-
-	err := cc.rc.Send(ctx, "/channels", "DELETE", cdi, &resp)
+	err := cc.rc.
+		Header("Scope", scope).
+		Send(ctx, "/channels", "DELETE", cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -108,10 +105,9 @@ func (cc *ChannelClient) Update(ctx context.Context, scope string, ch *meta.Chan
 	}
 	var resp diff.Changelog
 
-	// adds scope to the header of the request
-	cc.rc.Header("Scope", scope)
-
-	err := cc.rc.Send(ctx, "/channels", "PUT", cdi, &resp)
+	err := cc.rc.
+		Header("Scope", scope).
+		Send(ctx, "/channels", "PUT", cdi, &resp)
 	if err != nil {
 		return nil, err
 	}

@@ -4,39 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/inspr/inspr/pkg/ierrors"
 )
-
-// Client is a generic rest client
-type Client struct {
-	c                http.Client
-	baseURL          string
-	encoder          Encoder
-	decoderGenerator DecoderGenerator
-	headers          map[string]string
-	auth             Authenticator
-}
-
-func (c *Client) routeToURL(route string) string {
-	return fmt.Sprintf("%s%s",
-		c.baseURL, route)
-}
-
-// Encoder encodes an interface into bytes
-type Encoder func(interface{}) ([]byte, error)
-
-// DecoderGenerator creates a decoder for a given request
-type DecoderGenerator func(r io.Reader) Decoder
-
-// Decoder is an interface that decodes a reader into an struct
-type Decoder interface{ Decode(interface{}) error }
-
-// JSONDecoderGenerator generates a decoder for json encoded requests
-func JSONDecoderGenerator(r io.Reader) Decoder { return json.NewDecoder(r) }
 
 // Send sends a request to the url specified in instantiation, with the given
 // route and method, using

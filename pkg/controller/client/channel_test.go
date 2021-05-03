@@ -12,6 +12,7 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
@@ -63,7 +64,7 @@ func TestChannelClient_Delete(t *testing.T) {
 				}
 
 				var di models.ChannelQueryDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -154,7 +155,7 @@ func TestChannelClient_Get(t *testing.T) {
 				}
 
 				var di models.ChannelQueryDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -253,7 +254,7 @@ func TestChannelClient_Create(t *testing.T) {
 				}
 
 				var di models.ChannelDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -343,7 +344,7 @@ func TestChannelClient_Update(t *testing.T) {
 				}
 
 				var di models.ChannelDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)

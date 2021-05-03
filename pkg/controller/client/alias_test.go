@@ -12,6 +12,7 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
@@ -70,7 +71,7 @@ func TestAliasClient_Get(t *testing.T) {
 				}
 
 				var di models.AliasQueryDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -158,7 +159,7 @@ func TestAliasClient_Create(t *testing.T) {
 				}
 
 				var di models.AliasDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -234,7 +235,7 @@ func TestAliasClient_Delete(t *testing.T) {
 				}
 
 				var di models.AliasQueryDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -317,7 +318,7 @@ func TestAliasClient_Update(t *testing.T) {
 				}
 
 				var di models.AliasDI
-				scope := r.Header.Get("Scope")
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)

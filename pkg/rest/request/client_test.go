@@ -75,7 +75,7 @@ func TestClient_Encoder(t *testing.T) {
 	}{
 		{
 			name: "encoder setting",
-			c:    &Client{},
+			c:    NewJSONClient(""),
 			args: args{
 				encoder: json.Marshal,
 			},
@@ -106,7 +106,7 @@ func TestClient_Decoder(t *testing.T) {
 	}{
 		{
 			name:    "decoder setting",
-			c:       &Client{},
+			c:       NewJSONClient(""),
 			encoder: json.Marshal,
 			args: args{
 				decoder: JSONDecoderGenerator,
@@ -168,37 +168,6 @@ func TestClient_HTTPClient(t *testing.T) {
 			got := tt.c.HTTPClient(tt.args.client)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Client.HTTPClient() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestClient_Build(t *testing.T) {
-	c := &Client{
-		c:       *http.DefaultClient,
-		baseURL: "this is an url",
-	}
-	type fields struct {
-		c *Client
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   *Client
-	}{
-		{
-			name: "test client creation",
-			fields: fields{
-				c: c,
-			},
-			want: c,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := tt.fields.c.Build()
-			if !reflect.DeepEqual(*got, *tt.want) {
-				t.Errorf("Client.Build() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
@@ -403,6 +372,70 @@ func TestClient_Header(t *testing.T) {
 					got.headers,
 					tt.want,
 				)
+			}
+		})
+	}
+}
+
+func TestClient_routeToURL(t *testing.T) {
+	type args struct {
+		route string
+	}
+	tests := []struct {
+		name string
+		c    *Client
+		args args
+		want string
+	}{
+		{
+			name: "basic testing",
+			c: &Client{
+				baseURL: "http://test",
+			},
+			args: args{
+				route: "/route",
+			},
+			want: "http://test/route",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.c.routeToURL(tt.args.route); got != tt.want {
+				t.Errorf("Client.routeToURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestJSONDecoderGenerator(t *testing.T) {
+	type args struct {
+		value interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "decoder creation",
+			args: args{
+				value: "hello",
+			},
+			want: "hello",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			encoded, _ := json.Marshal(tt.args.value)
+			gotDecoder := JSONDecoderGenerator(bytes.NewBuffer(encoded))
+			var got string
+			err := gotDecoder.Decode(&got)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("JSONDecoderGenerator() = %v, want %v", got, tt.want)
+			}
+			if err != nil {
+				t.Error("error in decoding")
 			}
 		})
 	}
