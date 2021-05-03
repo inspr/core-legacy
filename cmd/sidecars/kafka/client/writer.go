@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const flushTimeout = 15 * 1000
+const flushTimeout = 10
 
 // Writer defines an interface for writing messages
 type Writer struct {
@@ -53,7 +53,7 @@ func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	}
 
 	logger.Info("flusing the producer")
-	writer.producer.Flush(10)
+	writer.producer.Flush(flushTimeout)
 	logger.Info("flushed")
 	return nil
 }
