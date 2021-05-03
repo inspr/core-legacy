@@ -134,7 +134,7 @@ func (s *Server) readMessageRoutine(ctx context.Context) error {
 	case err := <-errch:
 		return err
 	case <-ctx.Done():
-		return nil
+		return ctx.Err()
 	}
 
 }

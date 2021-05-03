@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const flushTimeout = 10
+const flushTimeout = 1000
 
 // Writer defines an interface for writing messages
 type Writer struct {
@@ -85,7 +85,7 @@ func (writer *Writer) produceMessage(message interface{}, resolvedChannel kafkaT
 	logger.Debug("writing message into Kafka Topic",
 		zap.String("topic", string(resolvedChannel)))
 
-	writer.producer.Produce(&kafka.Message{
+	return writer.producer.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic:     (*string)(&resolvedChannel),
 			Partition: kafka.PartitionAny,
@@ -93,7 +93,6 @@ func (writer *Writer) produceMessage(message interface{}, resolvedChannel kafkaT
 		Value: messageEncoded,
 	}, nil)
 
-	return nil
 }
 
 // Close closes the kafka producer

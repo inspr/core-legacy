@@ -19,33 +19,29 @@ func main() {
 	testChannels := []string{"testch1", "testch2", "testch3"}
 	checkChannel := "checkch"
 
-	for i := 0; i < 3; i++ {
-		client.HandleChannel(checkChannel, func(ctx context.Context, body io.Reader) error {
-			decoder := json.NewDecoder(body)
-			var checkMsg models.BrokerData
-			err := decoder.Decode(&checkMsg)
-			if err != nil {
-				return err
-			}
+	client.HandleChannel(checkChannel, func(ctx context.Context, body io.Reader) error {
+		decoder := json.NewDecoder(body)
+		var checkMsg models.BrokerData
+		err := decoder.Decode(&checkMsg)
+		if err != nil {
+			return err
+		}
 
-			log.Println("Check received")
-			log.Println(checkMsg.Message)
-			return nil
-		})
+		log.Println("Check received")
+		log.Println(checkMsg.Message)
+		return nil
+	})
 
-	}
 	go func() {
 		log.Fatalln(client.Run(ctx))
 	}()
 	for {
-
-		for i := 0; i < 3; i++ {
-			testMsg := fmt.Sprintf("Testing channel: %s", testChannels[i])
-			if err := client.WriteMessage(ctx, testChannels[i], testMsg); err != nil {
+		for _, testChannel := range testChannels {
+			testMsg := fmt.Sprintf("Testing channel: %s", testChannel)
+			if err := client.WriteMessage(ctx, testChannel, testMsg); err != nil {
 				fmt.Println(err)
 				continue
 			}
 		}
-
 	}
 }

@@ -48,7 +48,7 @@ spec:
         node:
           spec:
             image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
-            replicas: 8
+            replicas: 1
             environment:
               MODULE: 300
         boundary:

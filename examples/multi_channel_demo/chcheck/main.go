@@ -20,7 +20,8 @@ func main() {
 	checkChannel := "checkch"
 
 	for i := 0; i < 3; i++ {
-		client.HandleChannel(testChannels[i], func(ctx context.Context, body io.Reader) error {
+		testChannel := testChannels[i]
+		client.HandleChannel(testChannel, func(ctx context.Context, body io.Reader) error {
 			decoder := json.NewDecoder(body)
 			var testMsg models.BrokerData
 			err := decoder.Decode(&testMsg)
@@ -28,7 +29,7 @@ func main() {
 				return err
 			}
 
-			checkMessage := fmt.Sprintf("%s Check!", testChannels[i])
+			checkMessage := fmt.Sprintf("%s Check!", testChannel)
 			if err := client.WriteMessage(ctx, checkChannel, checkMessage); err != nil {
 				return err
 			}
@@ -36,7 +37,5 @@ func main() {
 		})
 
 	}
-	go func() {
-		log.Fatalln(client.Run(ctx))
-	}()
+	log.Fatalln(client.Run(ctx))
 }

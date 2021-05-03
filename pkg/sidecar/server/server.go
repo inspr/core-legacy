@@ -70,7 +70,6 @@ func (s *Server) Run(ctx context.Context) {
 		if errRead != nil {
 			log.Fatalln(err)
 		}
-
 	}
 
 }
