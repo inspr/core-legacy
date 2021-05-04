@@ -1,8 +1,6 @@
 package kafkasc
 
 import (
-	"log"
-
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/pkg/environment"
 	"go.uber.org/zap"
@@ -56,23 +54,6 @@ func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	writer.producer.Flush(flushTimeout)
 	logger.Info("flushed")
 	return nil
-}
-
-// Logs the ProduceChannel events for successful and failed messages sent
-func deliveryReport(producer *kafka.Producer) {
-	for event := range producer.Events() {
-		switch ev := event.(type) {
-		case *kafka.Message:
-			if ev.TopicPartition.Error != nil {
-				log.Printf("Delivery failed: %v\n", ev.TopicPartition)
-			} else {
-				log.Printf("Delivered message to %v\n", ev.TopicPartition)
-			}
-			return
-		default:
-			log.Println(ev)
-		}
-	}
 }
 
 // creates a Kafka message and sends it through the ProduceChannel
