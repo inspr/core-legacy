@@ -13,6 +13,7 @@ type MockConsumer struct {
 	pollMsg       string
 	topic         string
 	senderChannel string
+	events        chan kafka.Event
 }
 
 //MockEvent mock
@@ -24,35 +25,37 @@ func (me *MockEvent) String() string {
 	return me.message
 }
 
-//Poll mock
-func (mc *MockConsumer) Poll(timeout int) (event kafka.Event) {
+// Events mock for the events channel
+func (mc *MockConsumer) Events() chan kafka.Event {
+	return mc.events
+}
+
+// Poll mocks event polling
+func (mc *MockConsumer) Poll(timeoutMs int) kafka.Event {
+	return <-mc.events
+}
+
+// CreateEvent creates an event on the mock channel of thre consumer
+func (mc *MockConsumer) CreateEvent(ev kafka.Event) {
+	mc.events <- ev
+}
+
+// CreateMessage creates a message on the mock consumer from the field defined
+// in the structure
+func (mc *MockConsumer) CreateMessage() {
 
 	if mc.err {
-		return kafka.NewError(kafka.ErrAllBrokersDown, "", false)
+		mc.events <- kafka.NewError(kafka.ErrAllBrokersDown, "", false)
 	}
 
 	ch := kafkaTopic(mc.senderChannel)
 	msg, _ := ch.encode(mc.pollMsg)
-	return &kafka.Message{
+	mc.events <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic: &mc.topic,
 		},
 		Value: msg,
 	}
-
-}
-
-//SubscribeTopics mock
-func (mc *MockConsumer) SubscribeTopics(topics []string, rebalanceCb kafka.RebalanceCb) (err error) {
-	return nil
-}
-
-//CommitMessage mock
-func (mc *MockConsumer) CommitMessage(m *kafka.Message) ([]kafka.TopicPartition, error) {
-	if mc.err {
-		return nil, kafka.NewError(kafka.ErrApplication, "", false)
-	}
-	return nil, nil
 }
 
 //Commit mock
