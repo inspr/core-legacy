@@ -13,7 +13,7 @@ import (
 // Client implements communication with the Insprd
 type Client struct {
 	HTTPClient *request.Client
-	config     ControllerConfig
+	Config     ControllerConfig
 }
 
 // ControllerConfig stores controller configuration for ease of use and posterior verification.
@@ -29,7 +29,7 @@ func NewControllerClient(config ControllerConfig) controller.Interface {
 		Decoder(request.JSONDecoderGenerator).Authenticator(config.Auth).Build()
 	return &Client{
 		HTTPClient: client,
-		config:     config,
+		Config:     config,
 	}
 }
 
@@ -56,7 +56,7 @@ func GetInClusterConfigs() (*ControllerConfig, error) {
 func (c *Client) Channels() controller.ChannelInterface {
 	return &ChannelClient{
 		client: c.HTTPClient,
-		config: c.config,
+		config: c.Config,
 	}
 }
 
@@ -64,7 +64,7 @@ func (c *Client) Channels() controller.ChannelInterface {
 func (c *Client) Apps() controller.AppInterface {
 	return &AppClient{
 		client: c.HTTPClient,
-		config: c.config,
+		config: c.Config,
 	}
 }
 
@@ -72,7 +72,7 @@ func (c *Client) Apps() controller.AppInterface {
 func (c *Client) ChannelTypes() controller.ChannelTypeInterface {
 	return &ChannelTypeClient{
 		client: c.HTTPClient,
-		config: c.config,
+		config: c.Config,
 	}
 }
 
@@ -80,7 +80,7 @@ func (c *Client) ChannelTypes() controller.ChannelTypeInterface {
 func (c *Client) Authorization() controller.AuthorizationInterface {
 	return &AuthClient{
 		client: c.HTTPClient,
-		config: c.config,
+		config: c.Config,
 	}
 }
 
@@ -88,6 +88,6 @@ func (c *Client) Authorization() controller.AuthorizationInterface {
 func (c *Client) Alias() controller.AliasInterface {
 	return &AliasClient{
 		client: c.HTTPClient,
-		config: c.config,
+		config: c.Config,
 	}
 }
