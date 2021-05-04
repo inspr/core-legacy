@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
@@ -17,32 +18,31 @@ type discordMessage struct {
 	AvatarURL string `json:"avatar_url"`
 	TTS       bool   `json:"tts"`
 	File      []byte `json:"file"`
-	Embedded   []byte `json:"embeds"`
+	Embedded  []byte `json:"embeds"`
 }
 
 var webhook = "https://discord.com/api/webhooks/823903452475162666/o9aKLMVOb9-ZhfDD7RJ84OCW6WgU2PQnsEj0CzPgFzKC1icqgqWqF8LZxHSFXEzH1NED"
 var channel = "pubsubch"
 
 type expectedDataType struct {
-	Message struct {
-		Data string `json:"data"`
-	} `json:"message"`
+	Message string `json:"message"`
 	Channel string `json:"channel"`
 }
 
 func main() {
 	c := &http.Client{}
 	client := dappclient.NewAppClient()
-	for {
+	client.HandleChannel(channel, func(ctx context.Context, body io.Reader) error {
+		decoder := json.NewDecoder(body)
+
 		subMsg := expectedDataType{}
-		err := client.ReadMessage(context.Background(), channel, &subMsg)
+		err := decoder.Decode(&subMsg)
 		if err != nil {
-			log.Println(err)
-			continue
+			return err
 		}
 
 		msg := discordMessage{
-			Content:   fmt.Sprintf("%v", subMsg.Message.Data),
+			Content:   fmt.Sprintf("%v", subMsg.Message),
 			Username:  "Notifications",
 			AvatarURL: "",
 			TTS:       true,
@@ -56,12 +56,10 @@ func main() {
 		req.Header = head
 		_, err = c.Do(req)
 		if err != nil {
-			log.Println(err)
-			continue
+			return err
 		}
+		return nil
 
-		if err := client.CommitMessage(context.Background(), channel); err != nil {
-			log.Println(err.Error())
-		}
-	}
+	})
+	log.Fatalln(client.Run(context.Background()))
 }

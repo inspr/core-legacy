@@ -1,17 +1,19 @@
 package sidecarserv
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
+	"time"
 
-	env "github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/rest"
+	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/inspr/inspr/pkg/sidecar/models"
 )
 
@@ -35,65 +37,8 @@ type args struct {
 // sets the name of the test, it's handler and it's args
 type testCaseStruct struct {
 	name string
-	ch   *customHandlers
+	ch   *Server
 	args args
-}
-
-// generateTestCases returns the tests cases values to be used in each
-// handle test, the reason for them to share tests cases is because of
-// the models.BrokerData that sets a standard struct to be sent in each
-// request made in the handler func.
-func generateTestCases() []testCaseStruct {
-	// default values used in the test cases
-	parsedBody, _ := json.Marshal(models.BrokerData{
-		Message: models.Message{Data: "data"},
-		Channel: "chan",
-	})
-	noChanBody, _ := json.Marshal(models.BrokerData{
-		Message: models.Message{Data: "data"},
-		Channel: "donExist",
-	})
-	badBody := []byte{0}
-
-	// constants used in the tests
-	normalCustomHandler := newCustomHandlers(&MockServer(nil).Mutex, MockServer(nil).Reader, MockServer(nil).Writer)
-	err := errors.New("error")
-	throwCustomHandler := newCustomHandlers(&MockServer(err).Mutex, MockServer(err).Reader, MockServer(err).Writer)
-
-	return []testCaseStruct{
-		{
-			name: "successful_request",
-			ch:   normalCustomHandler,
-			args: args{
-				send: sendInRequest{parsedBody},
-				want: wantedResponse{http.StatusOK},
-			},
-		},
-		{
-			name: "unsuccessful_request",
-			ch:   throwCustomHandler,
-			args: args{
-				send: sendInRequest{parsedBody},
-				want: wantedResponse{http.StatusInternalServerError},
-			},
-		},
-		{
-			name: "bad_request",
-			ch:   normalCustomHandler,
-			args: args{
-				send: sendInRequest{badBody},
-				want: wantedResponse{http.StatusBadRequest},
-			},
-		},
-		{
-			name: "no_channel_request",
-			ch:   normalCustomHandler,
-			args: args{
-				send: sendInRequest{noChanBody},
-				want: wantedResponse{http.StatusBadRequest},
-			},
-		},
-	}
 }
 
 // createMockEnvVars - sets up the env values to be used in the tests functions
@@ -118,137 +63,228 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_APP_ID")
 }
 
-func Test_newCustomHandlers(t *testing.T) {
-	env.SetMockEnv()
-	type args struct {
-		server *Server
+type mockReader struct {
+	readMessage func(ctx context.Context, channel string) (models.BrokerData, error)
+	commit      func(ctx context.Context, channel string) error
+}
+
+func (m mockReader) Commit(ctx context.Context, channel string) error {
+	return m.commit(ctx, channel)
+}
+func (m mockReader) ReadMessage(ctx context.Context, channel string) (models.BrokerData, error) {
+	return m.readMessage(ctx, channel)
+}
+
+type mockWriter struct {
+	writeMessage func(channel string, message interface{}) error
+}
+
+func (m mockWriter) WriteMessage(channel string, message interface{}) error {
+	return m.writeMessage(channel, message)
+}
+func TestServer_writeMessageHandler(t *testing.T) {
+	createMockEnvVars()
+	defer deleteMockEnvVars()
+	type fields struct {
 	}
 	tests := []struct {
-		name string
-		args args
-		want *customHandlers
+		readerFunc func(t *testing.T) mockReader
+		writerFunc func(t *testing.T) mockWriter
+		channel    string
+		name       string
+		wantErr    bool
+		message    interface{}
 	}{
 		{
-			name: "successfully_created_custom_handlers",
-			args: args{MockServer(nil)},
-			want: &customHandlers{
-				Locker:         &MockServer(nil).Mutex,
-				r:              MockServer(nil).Reader,
-				w:              MockServer(nil).Writer,
-				InputChannels:  env.GetInputChannels(),
-				OutputChannels: env.GetOutputChannels(),
+			name:    "correct behaviour test",
+			channel: "chan",
+			message: struct {
+				Message interface{} `json:"message"`
+			}{"lofi nordeste"},
+		},
+		{
+			name:    "invalid channel",
+			channel: "invalid",
+			message: struct {
+				Message interface{} `json:"message"`
+			}{"lofi nordeste"},
+			wantErr: true,
+		},
+		{
+			name:    "invalid data for marshalling",
+			channel: "chan",
+			message: "invalid message",
+			wantErr: true,
+		},
+		{
+			name:    "invalid broker response",
+			channel: "chan",
+			message: struct {
+				Message interface{} `json:"message"`
+			}{"this is an invalid message"},
+			wantErr: true,
+			writerFunc: func(t *testing.T) mockWriter {
+				return mockWriter{
+					writeMessage: func(channel string, message interface{}) error {
+						return errors.New("this is an error")
+					},
+				}
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := newCustomHandlers(&MockServer(nil).Mutex, MockServer(nil).Reader, MockServer(nil).Writer)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newCustomHandlers() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-	env.UnsetMockEnv()
-}
+			if tt.writerFunc == nil {
+				tt.writerFunc = func(t *testing.T) mockWriter {
+					return mockWriter{
+						writeMessage: func(channel string, message interface{}) error {
+							if !reflect.DeepEqual(message, tt.message.(struct {
+								Message interface{} `json:"message"`
+							}).Message) {
 
-func Test_customHandlers_writeMessageHandler(t *testing.T) {
-	env.SetMockEnv()
-	tests := generateTestCases()
+								t.Errorf("Server_writeMessageHandler message = %v, want = %v", message, tt.message)
+							}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := http.HandlerFunc(tt.ch.writeMessageHandler)
-			ts := httptest.NewServer(handlerFunc)
-			defer ts.Close()
-
-			client := ts.Client()
-			res, err := client.Post(ts.URL, "", bytes.NewBuffer(tt.args.send.body))
-			if err != nil {
-				t.Errorf("error making a POST in the httptest server")
-			}
-			defer res.Body.Close()
-
-			if res.StatusCode != tt.args.want.status {
-				t.Errorf("writeMessageHandler = %v, want %v", res, tt.args.want.status)
-			}
-
-		})
-	}
-	env.UnsetMockEnv()
-}
-
-func Test_customHandlers_readMessageHandler(t *testing.T) {
-	env.SetMockEnv()
-	tests := generateTestCases()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := http.HandlerFunc(tt.ch.readMessageHandler)
-			ts := httptest.NewServer(handlerFunc)
-			defer ts.Close()
-
-			client := ts.Client()
-			res, err := client.Post(ts.URL, "", bytes.NewBuffer(tt.args.send.body))
-			if err != nil {
-				t.Errorf("error making a POST in the httptest server")
-			}
-			defer res.Body.Close()
-
-			// identifies if it responded properly
-			if res.StatusCode != tt.args.want.status {
-				t.Errorf("readMessageHandler = %v, want %v", res, tt.args.want.status)
-			}
-
-			if res.StatusCode != http.StatusOK { // reading error
-				err := rest.UnmarshalERROR(res.Body)
-				if err == nil {
-					t.Errorf("readMessageHandler.Body error = %v, want 'nil'", err)
-				}
-			} else { //reading message
-
-				// reads response and checks for the default mock values
-				msg := models.BrokerData{}
-				err := json.NewDecoder(res.Body).Decode(&msg)
-
-				// if it failed to parse body
-				if err != nil {
-					t.Log("Failed to parse the receive message")
-					t.Errorf("readMessageHandler.Body error = %v, want %v", err, nil)
-				}
-
-				// if channel isn't 'chan'
-				expectedData, _ := MockServer(nil).Reader.ReadMessage(msg.Channel)
-				if msg.Message.Data != expectedData.Message.Data {
-					t.Errorf("readMessageHandler.Body error, field 'data' = %v, want %v", msg.Message.Data, expectedData)
+							return nil
+						},
+					}
 				}
 			}
+			s := &Server{
+				Writer: tt.writerFunc(t),
+			}
+			server := httptest.NewServer(s.writeMessageHandler())
+			defer server.Close()
+			client := request.NewJSONClient(server.URL)
+
+			rest := struct {
+				Status string `json:"status"`
+			}{}
+
+			err := client.Send(context.Background(), tt.channel, "POST", tt.message, &rest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Server_writeMessageHandler err = %v, wantErr = %v", err, tt.wantErr)
+			}
+
 		})
 	}
-	env.UnsetMockEnv()
 }
 
-func Test_customHandlers_commitMessageHandler(t *testing.T) {
-	env.SetMockEnv()
+func TestServer_readMessageRoutine(t *testing.T) {
+	createMockEnvVars()
+	defer deleteMockEnvVars()
+	channels := map[string]chan interface{}{
+		"chan":    make(chan interface{}, 2),
+		"banana":  make(chan interface{}, 2),
+		"testing": make(chan interface{}, 2),
+	}
+	readerFuncErr := func(t *testing.T) mockReader {
+		return mockReader{
+			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
+				return models.BrokerData{}, errors.New("this is an error")
+			},
+		}
+	}
+	readerFunc := func(t *testing.T) mockReader {
+		return mockReader{
+			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
+				var msg interface{}
+				select {
 
-	tests := generateTestCases()
+				case msg = <-channels[channel]:
+				case <-ctx.Done():
+					return models.BrokerData{}, ctx.Err()
+				}
+				return models.BrokerData{
+					Message: msg,
+				}, nil
+			},
+			commit: func(ctx context.Context, channel string) error {
+				return nil
+			},
+		}
+	}
+	tests := []struct {
+		readerFunc func(t *testing.T) mockReader
+		writerFunc func(t *testing.T) mockWriter
+		channel    string
+		name       string
+		wantErr    bool
+		message    interface{}
+	}{
+
+		{
+			name:       "correct functionality",
+			channel:    "chan",
+			readerFunc: readerFunc,
+		},
+		{
+			name:       "correct functionality",
+			channel:    "testing",
+			readerFunc: readerFunc,
+		},
+		{
+			name:       "correct functionality",
+			channel:    "banana",
+			readerFunc: readerFunc,
+		},
+		{
+			name:       "incorrect functionality",
+			channel:    "banana",
+			wantErr:    true,
+			readerFunc: readerFuncErr,
+		},
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handlerFunc := http.HandlerFunc(tt.ch.commitMessageHandler)
-			ts := httptest.NewServer(handlerFunc)
-			defer ts.Close()
 
-			client := ts.Client()
-			res, err := client.Post(ts.URL, "", bytes.NewBuffer(tt.args.send.body))
-			if err != nil {
-				t.Errorf("error making a POST in the httptest server")
+			s := &Server{
+				Reader: tt.readerFunc(t),
 			}
-			defer res.Body.Close()
+			received := false
+			server := httptest.NewServer(rest.Handler(
+				func(w http.ResponseWriter, r *http.Request) {
 
-			if res.StatusCode != tt.args.want.status {
-				t.Errorf("writeMessageHandler = %v, want %v", res, tt.args.want.status)
+					received = true
+					channel := strings.TrimPrefix(r.URL.Path, "/")
+					if channel != tt.channel {
+						t.Errorf("Server_readMessageRoutine %v = %v , want %v", "channel", channel, tt.channel)
+					}
+
+					decoder := json.NewDecoder(r.Body)
+					ret := struct {
+						Message interface{} `json:"message"`
+					}{}
+					err := decoder.Decode(&ret)
+					if (err != nil) != tt.wantErr {
+						t.Errorf("Server_readMessageRoutine err = %v, wantErr = %v", err, tt.wantErr)
+					}
+
+					if !reflect.DeepEqual(ret.Message, tt.message) {
+						t.Errorf("Server_readMessageRoutine message = %v, want %v", ret.Message, tt.message)
+					}
+					encoder := json.NewEncoder(w)
+					encoder.Encode(struct {
+						Status string `json:"status"`
+					}{"OK"})
+				},
+			))
+			defer server.Close()
+
+			s.client = request.NewJSONClient(server.URL)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*300)
+			defer cancel()
+			go s.readMessageRoutine(ctx)
+
+			channels[tt.channel] <- tt.message
+			select {
+
+			case <-ctx.Done():
+				if received == tt.wantErr {
+					t.Errorf("Server_readMessageRoutine received = %v, wantErr = %v", received, tt.wantErr)
+				}
+
 			}
-
 		})
 	}
-	env.UnsetMockEnv()
 }

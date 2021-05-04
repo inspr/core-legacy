@@ -2,15 +2,12 @@ package sidecarserv
 
 import (
 	"context"
-	"net/http"
 	"reflect"
-	"sync"
 	"testing"
 	"time"
 
-	env "github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/sidecar/models"
-	"github.com/inspr/inspr/pkg/sidecar/transports"
 )
 
 func TestNewServer(t *testing.T) {
@@ -33,22 +30,13 @@ func TestNewServer(t *testing.T) {
 }
 
 func TestServer_Init(t *testing.T) {
-	type args struct {
-		r models.Reader
-		w models.Writer
-	}
 	test := struct {
 		name    string
 		addr    string
 		channel string
-		args    args
 	}{
-		name: "basic init test",
-		addr: "localhost:8080",
-		args: args{
-			r: MockServer(nil).Reader,
-			w: &mockWriter{},
-		},
+		name:    "basic init test",
+		addr:    "localhost:8080",
 		channel: "testing",
 	}
 
@@ -57,16 +45,28 @@ func TestServer_Init(t *testing.T) {
 
 	t.Run("basic init test", func(t *testing.T) {
 		s := &Server{
-			Mux:  MockServer(nil).Mux,
-			addr: test.addr,
+			writeAddr: test.addr,
 		}
-		s.Init(test.args.r, test.args.w)
+		r := mockReader{
+			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
+				return models.BrokerData{}, nil
+			},
+			commit: func(ctx context.Context, channel string) error {
+				return nil
+			},
+		}
+		w := mockWriter{
+			writeMessage: func(channel string, message interface{}) error {
+				return nil
+			},
+		}
+		s.Init(r, w)
 
 		// checking reader methods
-		if got := s.Reader.Commit(test.channel); got != nil {
+		if got := s.Reader.Commit(context.Background(), test.channel); got != nil {
 			t.Errorf("expected CommitMessage() == nil, received %v", got)
 		}
-		if _, got := s.Reader.ReadMessage(test.channel); got != nil {
+		if _, got := s.Reader.ReadMessage(context.Background(), test.channel); got != nil {
 			t.Errorf("expected CommitMessage() == nil, received %v", got)
 		}
 		if got := s.Writer.WriteMessage("channel", "msg"); got != nil {
@@ -76,74 +76,47 @@ func TestServer_Init(t *testing.T) {
 }
 
 func TestServer_Run(t *testing.T) {
-	routes := []string{"/commit", "/writeMessage", "/readMessage"}
-	env.SetMockEnv()
-	defer env.UnsetMockEnv()
-
-	// SERVER
-	s := MockServer(nil)
-	s.Init(s.Reader, s.Writer)
-	s.addr = "./test.sock"
-
-	// mock socket
-	c := transports.NewUnixSocketClient("./test.sock")
-
-	// starts server
-	go func() {
-		s.Run(context.Background())
-	}()
-	// gives time for the server to start up
-	time.Sleep(100 * time.Millisecond)
-
-	for _, r := range routes {
-		t.Run("run_test"+r, func(t *testing.T) {
-			resp, err := c.Post("http://unix"+r, "", nil)
-			if err != nil {
-				t.Errorf("Failed to make post to route '%v'", r)
-			}
-			if resp.StatusCode != http.StatusBadRequest {
-				t.Errorf(
-					"route '%v' = %v, want %v",
-					r,
-					resp.StatusCode,
-					http.StatusBadRequest,
-				)
-			}
-		})
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	environment.SetMockEnv()
+	server := &Server{
+		writeAddr: ":3000",
+		Reader: mockReader{
+			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
+				<-ctx.Done()
+				return models.BrokerData{}, ctx.Err()
+			},
+			commit: func(ctx context.Context, channel string) error {
+				return nil
+			},
+		},
 	}
-}
+	done := make(chan struct{})
+	go func() { server.Run(ctx); done <- struct{}{} }()
 
-func TestServer_Cancel(t *testing.T) {
-	env.SetMockEnv()
-	defer env.UnsetMockEnv()
+	time.Sleep(time.Second)
+	if !server.runningRead {
+		t.Error("Server_Run read message not initialized")
+	}
+	if !server.runningWrite {
+		t.Error("Server_Run write message not initialized")
+	}
 
-	t.Run("run_test/timeout", func(t *testing.T) {
-		// SERVER
-		var wg sync.WaitGroup
-		wg.Add(1)
-		defer wg.Wait()
+	deadContext, cancelDead := context.WithTimeout(context.Background(), time.Second)
+	defer cancelDead()
+	cancel()
+	select {
+	case <-done:
 
-		ctx, cancel := context.WithCancel(context.Background())
+		if server.runningRead {
+			t.Error("Server_Run read message not finalized")
 
-		s := MockServer(nil)
-		s.Init(s.Reader, s.Writer)
-		s.addr = "./test.sock"
-		go func() {
-			s.Run(ctx)
-		}()
+		}
+		if server.runningWrite {
+			t.Error("Server_Run write message not finalized")
+		}
+	case <-deadContext.Done():
+		t.Errorf("Server_Run timeout")
+	}
 
-		go func() {
-			defer wg.Done()
-			time.Sleep(500 * time.Microsecond)
-			cancel()
-			time.Sleep(500 * time.Microsecond)
-
-			c := transports.NewUnixSocketClient(env.GetUnixSocketAddress())
-
-			_, err := c.Post("http://unix/commit", "", nil)
-			if err == nil {
-				t.Errorf("Server should be down")
-			}
-		}()
-	})
 }

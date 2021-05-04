@@ -59,6 +59,8 @@ affinity: {}
 
 sidecar:
     port: 3051
+    readPort: 3047
+    writePort: 3048
 kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
 kafkaBootstrap: kafka.default.svc:9092
 kafkaAutoOffsetReset: earliest

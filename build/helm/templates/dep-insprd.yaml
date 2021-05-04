@@ -36,6 +36,10 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            - name: INSPR_SIDECAR_WRITE_PORT
+              value: "{{ .Values.sidecar.writePort}}"
+            - name: INSPR_SIDECAR_READ_PORT
+              value: "{{ .Values.sidecar.readPort}}"
             - name: INSPR_SIDECAR_PORT
               value: "{{ .Values.sidecar.port }}"
             - name: AUTH_PATH

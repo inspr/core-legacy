@@ -40,6 +40,16 @@ func GetSchema(channel string) (string, error) {
 	return schema, nil
 }
 
+// OutputChannnelList returns a list of input channels
+func OutputChannnelList() utils.StringArray {
+	return GetChannelBoundaryList(GetOutputChannels())
+}
+
+// InputChannelList returns a list of input channels
+func InputChannelList() utils.StringArray {
+	return GetChannelBoundaryList(GetInputChannels())
+}
+
 // GetResolvedChannel gets a resolved channel from a channel name
 func GetResolvedChannel(channel, inputChan, outputChan string) (string, error) {
 	if IsInChannelBoundary(channel, inputChan) || IsInChannelBoundary(channel, outputChan) {

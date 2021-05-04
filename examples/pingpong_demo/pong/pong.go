@@ -1,19 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 
 	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecar/models"
 	"golang.org/x/net/context"
 )
-
-type expectedDataType struct {
-	Message struct {
-		Data string `json:"data"`
-	} `json:"message"`
-	Channel string `json:"channel"`
-}
 
 func main() {
 
@@ -21,27 +16,25 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	for {
-		sentMsg := models.Message{
-			Data: "Pong!",
+	sentMsg := "pong"
+	if err := client.WriteMessage(ctx, "pongoutput", sentMsg); err != nil {
+		fmt.Println(err)
+		return
+	}
+	client.HandleChannel("ponginput", func(_ context.Context, r io.Reader) error {
+		decoder := json.NewDecoder(r)
+		var ret struct{ Message string }
+		err := decoder.Decode(&ret.Message)
+
+		if err != nil {
+			return err
 		}
 
 		if err := client.WriteMessage(ctx, "pongoutput", sentMsg); err != nil {
 			fmt.Println(err)
-			continue
+			return err
 		}
-
-		var recMsg expectedDataType
-		err := client.ReadMessage(ctx, "ponginput", &recMsg)
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		fmt.Println("Read message: ")
-		fmt.Println(recMsg.Message.Data)
-
-		if err := client.CommitMessage(ctx, "ponginput"); err != nil {
-			fmt.Println(err.Error())
-		}
-	}
+		return nil
+	})
+	log.Fatal(client.Run(ctx))
 }

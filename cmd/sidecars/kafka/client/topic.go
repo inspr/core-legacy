@@ -94,5 +94,5 @@ func (ch kafkaTopic) readMessage(value []byte) (models.BrokerData, error) {
 
 	channelName := ch
 
-	return models.BrokerData{Message: models.Message{Data: message}, Channel: string(channelName)}, nil
+	return models.BrokerData{Message: message, Channel: string(channelName)}, nil
 }
