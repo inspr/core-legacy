@@ -13,8 +13,8 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
-	"github.com/inspr/inspr/pkg/api/auth"
 	"github.com/inspr/inspr/pkg/api/models"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/rest"
 )
 
@@ -55,16 +55,14 @@ func TestClient_CreateUser(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user1",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user2",
+		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
+		Password:    "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -132,22 +130,19 @@ func TestClient_DeleteUser(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user1",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user2",
+		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
+		Password:    "none",
 	}
 	auxUser3 := User{
-		UID:      "user3",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "1234",
+		UID:         "user3",
+		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
+		Password:    "1234",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -211,16 +206,14 @@ func TestClient_UpdatePassword(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user1",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user2",
+		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
+		Password:    "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -285,10 +278,9 @@ func TestClient_Login(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user1",
+		Permissions: map[string][]string{"ascope": {auth.CreateToken}},
+		Password:    "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -354,16 +346,14 @@ func TestClient_RefreshToken(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user1",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user2",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -427,10 +417,9 @@ func Test_set(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user1",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    "none",
 	}
 
 	type args struct {
@@ -471,10 +460,9 @@ func Test_get(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user1",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -495,10 +483,9 @@ func Test_get(t *testing.T) {
 				key: "user1",
 			},
 			want: &User{
-				UID:      "user1",
-				Role:     1,
-				Scope:    []string{"ascope"},
-				Password: "none",
+				UID:         "user1",
+				Permissions: map[string][]string{"": {auth.CreateToken}},
+				Password:    "none",
 			},
 			wantErr: false,
 		},
@@ -532,10 +519,9 @@ func Test_delete(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user1",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -587,16 +573,14 @@ func Test_hasPermission(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:      "user1",
-		Role:     1,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user1",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    "none",
 	}
 	auxUser2 := User{
-		UID:      "user2",
-		Role:     0,
-		Scope:    []string{"ascope"},
-		Password: "none",
+		UID:         "user2",
+		Permissions: nil,
+		Password:    "none",
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -675,10 +659,9 @@ func Test_encrypt(t *testing.T) {
 			name: "Returns payload with encrypted refresh token",
 			args: args{
 				user: User{
-					UID:      "user1",
-					Role:     1,
-					Scope:    []string{"ascope"},
-					Password: "none",
+					UID:         "user1",
+					Permissions: map[string][]string{"": {auth.CreateToken}},
+					Password:    "none",
 				},
 			},
 		},
@@ -754,8 +737,8 @@ func Test_requestNewToken(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				payload: auth.Payload{
-					UID:   "user1",
-					Scope: []string{"app1", "app2"},
+					UID:         "user1",
+					Permissions: map[string][]string{"app1": {}, "app2": {}},
 				},
 			},
 			want:    "user1-app1-app2",
@@ -821,7 +804,12 @@ func insprServerHandler(w http.ResponseWriter, r *http.Request) {
 		rest.ERROR(w, err)
 		return
 	}
-	strScope := strings.Join(data.Scope, "-")
+
+	var scopes []string
+	for k := range data.Permissions {
+		scopes = append(scopes, k)
+	}
+	strScope := strings.Join(scopes, "-")
 	token := fmt.Sprintf("%s-%s", data.UID, strScope)
 	val := models.AuthDI{
 		Token: []byte(token),

@@ -14,7 +14,6 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/auth/models"
 )
 
 const bitSize = 512
@@ -39,17 +38,16 @@ func TestServer_Tokenize(t *testing.T) {
 	tests := []struct {
 		name string
 		want int
-		body models.Payload
+		body auth.Payload
 	}{
 		{
 			name: "Tokenize_valid_payload",
 			want: http.StatusOK,
-			body: models.Payload{
-				UID:        "u000001",
-				Scope:      []string{""},
-				Role:       1,
-				Refresh:    []byte("refreshtk"),
-				RefreshURL: "http://refresh.token",
+			body: auth.Payload{
+				UID:         "u000001",
+				Permissions: nil,
+				Refresh:     []byte("refreshtk"),
+				RefreshURL:  "http://refresh.token",
 			},
 		},
 	}
@@ -95,7 +93,7 @@ func TestServer_Tokenize(t *testing.T) {
 				return
 			}
 
-			jwtdo := models.JwtDO{}
+			jwtdo := auth.JwtDO{}
 			err = json.NewDecoder(res.Body).Decode(&jwtdo)
 			if err != nil {
 				t.Log("error making a POST in the httptest server")

@@ -13,9 +13,10 @@ import (
 	"strings"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/inspr/inspr/pkg/api/auth"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/controller/client"
 	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 // Client defines a Redis client, which has the interface methods
@@ -28,10 +29,9 @@ type Client struct {
 
 func (c *Client) initAdminUser() error {
 	adminUser := User{
-		UID:      "admin",
-		Role:     1,
-		Scope:    []string{""},
-		Password: os.Getenv("ADMIN_PASSWORD"),
+		UID:         "admin",
+		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Password:    os.Getenv("ADMIN_PASSWORD"),
 	}
 	payload, _ := c.encrypt(adminUser)
 	token, err := c.requestNewToken(context.Background(), *payload)
@@ -188,11 +188,10 @@ func (c *Client) encrypt(user User) (*auth.Payload, error) {
 	ciphertext := aesGCM.Seal(nonce, nonce, plaintext, nil)
 
 	payload := auth.Payload{
-		UID:        user.UID,
-		Role:       user.Role,
-		Scope:      user.Scope,
-		Refresh:    ciphertext,
-		RefreshURL: c.refreshURL,
+		UID:         user.UID,
+		Permissions: user.Permissions,
+		Refresh:     ciphertext,
+		RefreshURL:  c.refreshURL,
 	}
 
 	return &payload, nil
@@ -310,10 +309,13 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	if requestor.Password != pwd {
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
-	if requestor.Role != 1 {
-		return fmt.Errorf("user %v doesn't have admin permission", uid)
+
+	if rootPerm, ok := requestor.Permissions[""]; ok {
+		if utils.Includes(rootPerm, string(auth.CreateToken)) {
+			return nil
+		}
 	}
-	return nil
+	return fmt.Errorf("user %v doesn't have admin permission", uid)
 }
 
 func getEnv(name string) string {
