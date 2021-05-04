@@ -722,6 +722,23 @@ func Test_requestNewToken(t *testing.T) {
 	setup()
 	defer teardown()
 
+	check := func(got, want string) bool {
+		gotsplit := strings.Split(got, "-")
+		wantsplit := strings.Split(want, "-")
+
+		checker := make(map[string]bool)
+		for _, s := range gotsplit {
+			checker[s] = true
+		}
+
+		for _, s := range wantsplit {
+			if checker[s] == false {
+				return false
+			}
+		}
+		return true
+	}
+
 	type args struct {
 		ctx     context.Context
 		payload auth.Payload
@@ -752,7 +769,7 @@ func Test_requestNewToken(t *testing.T) {
 				t.Errorf("requestNewToken() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != tt.want {
+			if !check(got, tt.want) {
 				t.Errorf("requestNewToken() = %v, want %v", got, tt.want)
 			}
 		})

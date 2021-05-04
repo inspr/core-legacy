@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // Encoder encodes an interface into bytes
@@ -32,8 +33,7 @@ type Client struct {
 }
 
 func (c Client) routeToURL(route string) string {
-	return fmt.Sprintf("%s%s",
-		c.baseURL, route)
+	return fmt.Sprintf("%s/%s", c.baseURL, strings.TrimPrefix(route, "/"))
 }
 
 // Authenticator is an interface to perform authentication via tokens
