@@ -16,7 +16,6 @@
 - tests:
 	- changes kafka tests to handle the new channel based approach
 
->>>>>>> develop
 
 ## #40 Issue CORE-332 | adds a permissions field to the dApp definition
 
