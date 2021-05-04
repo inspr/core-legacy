@@ -10,6 +10,9 @@ import (
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
+const inClusterEnviromentError = "authentication as controller failed. controllers requires following " +
+	"variables: INSPR_INSPRD_ADDRESS, INSPR_CONTROLLER_SCOPE & INSPR_CONTROLLER_TOKEN"
+
 // Client implements communication with the Insprd
 type Client struct {
 	HTTPClient *request.Client
@@ -40,7 +43,7 @@ func GetInClusterConfigs() (*ControllerConfig, error) {
 	token, tknok := os.LookupEnv("INSPR_CONTROLLER_TOKEN")
 	if !urlok || !scopeok || !tknok {
 		return nil, ierrors.NewError().
-			Message("authentication as controller failed. controllers requires following variables: INSPR_INSPRD_ADDRESS, INSPR_CONTROLLER_SCOPE & INSPR_CONTROLLER_TOKEN").
+			Message(inClusterEnviromentError).
 			Build()
 	}
 	return &ControllerConfig{
