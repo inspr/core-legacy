@@ -71,9 +71,9 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 		}
 
-		log.Printf("payload.Scope = %+v\n", payload.Scope)
+		log.Printf("payload.Permissions = %+v\n", payload.Permissions)
 		valid := false
-		for _, scope := range payload.Scope {
+		for scope := range payload.Permissions {
 			log.Printf("scope = %+v\n", scope)
 			if strings.HasPrefix(requestData.Scope, scope) {
 				// scope found
