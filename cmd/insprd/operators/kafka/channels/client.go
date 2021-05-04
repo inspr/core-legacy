@@ -38,7 +38,7 @@ func getEnv() (env kafkaEnv) {
 }
 
 // NewOperator returns an initialized operator from the environment variables
-func NewOperator(mem memory.Manager) (*ChannelOperator, error) {
+func NewOperator(p meta.KafkaProvider, mem memory.Manager) (*ChannelOperator, error) {
 
 	var config *kafka.ConfigMap
 	var err error
@@ -47,10 +47,12 @@ func NewOperator(mem memory.Manager) (*ChannelOperator, error) {
 		logger.Info("initializing kafka admin with debug configs")
 		adminClient = &mockAdminClient{}
 	} else {
+
 		logger.Info("initializing kafka admin with production configs",
-			zap.String("kafka bootstrap servers", getEnv().kafkaBootstrapServers))
+			zap.String("kafka bootstrap servers", p.BootstrapServer))
+
 		config = &kafka.ConfigMap{
-			"bootstrap.servers": getEnv().kafkaBootstrapServers,
+			"bootstrap.servers": p.BootstrapServer,
 		}
 
 		adminClient, err = kafka.NewAdminClient(config)

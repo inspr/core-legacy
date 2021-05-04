@@ -23,6 +23,7 @@ import (
 //NodeOperator defines a node operations interface.
 type NodeOperator struct {
 	clientSet kubernetes.Interface
+	config    meta.KafkaProvider
 	memory    memory.Manager
 }
 
@@ -159,9 +160,10 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 }
 
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration
-func NewOperator(memory memory.Manager) (nop *NodeOperator, err error) {
+func NewOperator(p meta.KafkaProvider, memory memory.Manager) (nop *NodeOperator, err error) {
 	nop = &NodeOperator{
 		memory: memory,
+		config: p,
 	}
 	if _, exists := os.LookupEnv("DEBUG"); exists {
 		logger.Info("initializing node operator with debug configs")

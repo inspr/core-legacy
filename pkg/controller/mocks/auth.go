@@ -23,6 +23,6 @@ func (ac *AuthMock) GenerateToken(ctx context.Context, payload auth.Payload) (st
 }
 
 // Init is the AuthMock Init method
-func (ac *AuthMock) Init(ctx context.Context, key string) (string, error) {
+func (ac *AuthMock) Init(ctx context.Context, key string, b []byte) (string, error) {
 	return "", nil
 }

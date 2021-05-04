@@ -27,9 +27,8 @@ func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (
 }
 
 // Init function for initializing a cluster
-func (ac *AuthClient) Init(ctx context.Context, key string) (string, error) {
+func (ac *AuthClient) Init(ctx context.Context, key string, prov []byte) (string, error) {
 
-	authDO := struct{ Key string }{key}
 	authDI := models.JwtDO{}
 	err := ac.c.Send(ctx, "/init", "POST", authDO, &authDI)
 	if err != nil {

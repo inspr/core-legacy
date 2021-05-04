@@ -1,10 +1,14 @@
 package kafka
 
 import (
+	"encoding/json"
+	"io"
+
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/operators"
 	"github.com/inspr/inspr/cmd/insprd/operators/kafka/channels"
 	"github.com/inspr/inspr/cmd/insprd/operators/kafka/nodes"
+	"github.com/inspr/inspr/pkg/meta"
 )
 
 // Operator is an operator for creating channels and nodes inside kubernetes
@@ -32,7 +36,11 @@ func (op *Operator) Channels() operators.ChannelOperatorInterface {
 // NewKafkaOperator creates a kafka operator.
 //
 // View Operator
-func NewKafkaOperator(memory memory.Manager) (operators.OperatorInterface, error) {
+func NewKafkaOperator(memory memory.Manager, r io.Reader) (operators.OperatorInterface, error) {
+	decoder := json.NewDecoder(r)
+	config := meta.KafkaProvider{}
+	decoder.Decode(&config)
+
 	var err error
 	var chOp operators.ChannelOperatorInterface
 	chOp, err = channels.NewOperator(memory)

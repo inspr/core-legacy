@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
@@ -36,8 +35,8 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		"INSPR_APP_ID":            appID,
 		"INSPR_APP_CTX":           app.Meta.Parent,
 		"INSPR_ENV":               environment.GetInsprEnvironment(),
-		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
-		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
+		"KAFKA_BOOTSTRAP_SERVERS": no.config.AutoOffsetReset,
+		"KAFKA_AUTO_OFFSET_RESET": no.config.BootstrapServer,
 	}
 
 	resolves, err := no.memory.Apps().ResolveBoundary(app)

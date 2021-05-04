@@ -7,6 +7,7 @@ import (
 
 	"github.com/inspr/inspr/pkg/auth/models"
 	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/providers"
 	"github.com/inspr/inspr/pkg/rest"
 )
 
@@ -36,6 +37,15 @@ func (h *Handler) TokenHandler() rest.Handler {
 func (h *Handler) InitHandler() rest.Handler {
 
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
+
+		prov := r.Header.Get("provider")
+		op, err := providers.GetProvider().Get(prov)
+		if err != nil {
+			rest.ERROR(w, err)
+		}
+
+		h.Operator = op(h.Memory)
+
 		decoder := json.NewDecoder(r.Body)
 		res := struct{ Key string }{}
 		decoder.Decode(&res)
