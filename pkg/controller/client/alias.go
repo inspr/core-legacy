@@ -6,6 +6,7 @@ import (
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
@@ -29,7 +30,7 @@ func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias,
 	var resp meta.Alias
 
 	err := ac.rc.
-		Header("Scope", scope).
+		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/alias", "GET", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ func (ac *AliasClient) Create(ctx context.Context, scope string, target string, 
 	var resp diff.Changelog
 
 	err := ac.rc.
-		Header("Scope", scope).
+		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/alias", "POST", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
@@ -82,7 +83,7 @@ func (ac *AliasClient) Delete(ctx context.Context, scope, key string, dryRun boo
 	var resp diff.Changelog
 
 	err := ac.rc.
-		Header("Scope", scope).
+		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/alias", "DELETE", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
@@ -109,7 +110,7 @@ func (ac *AliasClient) Update(ctx context.Context, scope string, target string, 
 	var resp diff.Changelog
 
 	err := ac.rc.
-		Header("Scope", scope).
+		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/alias", "PUT", aliasQuery, &resp)
 	if err != nil {
 		return nil, err

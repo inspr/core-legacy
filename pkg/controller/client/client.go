@@ -23,7 +23,8 @@ func NewControllerClient(
 			BaseURL(url).
 			Encoder(json.Marshal).
 			Decoder(request.JSONDecoderGenerator).
-			Authenticator(auth),
+			Authenticator(auth).
+			Build(),
 	}
 }
 

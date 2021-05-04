@@ -12,11 +12,11 @@ import (
 func TestNewClient(t *testing.T) {
 	tests := []struct {
 		name string
-		want *Client
+		want Client
 	}{
 		{
 			name: "calling_NewClient",
-			want: &Client{},
+			want: Client{},
 		},
 	}
 	for _, tt := range tests {
@@ -35,17 +35,17 @@ func TestClient_BaseURL(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		c    *Client
+		c    Client
 		args args
-		want *Client
+		want Client
 	}{
 		{
 			name: "base url setting",
-			c:    &Client{},
+			c:    Client{},
 			args: args{
 				url: "test",
 			},
-			want: &Client{
+			want: Client{
 				baseURL: "test",
 			},
 		},
@@ -144,19 +144,19 @@ func TestClient_HTTPClient(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		c    *Client
+		c    Client
 		args args
-		want *Client
+		want Client
 	}{
 		{
 			name: "http client setting",
-			c:    &Client{},
+			c:    Client{},
 			args: args{
 				client: http.Client{
 					Timeout: 100,
 				},
 			},
-			want: &Client{
+			want: Client{
 				c: http.Client{
 					Timeout: 100,
 				},
@@ -297,7 +297,7 @@ func TestClient_Authenticator(t *testing.T) {
 
 func TestClient_Token(t *testing.T) {
 	type fields struct {
-		c *Client
+		c Client
 	}
 	type args struct {
 		token []byte
@@ -306,18 +306,18 @@ func TestClient_Token(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   map[string]string
+		want   map[string]stringSlice
 	}{
 		{
 			name: "basic_test_Token",
 			fields: fields{
-				c: &Client{},
+				c: Client{},
 			},
 			args: args{
 				token: []byte("mock_token"),
 			},
-			want: map[string]string{
-				"Authorization": "Bearer mock_token",
+			want: map[string]stringSlice{
+				"Authorization": {"Bearer mock_token"},
 			},
 		},
 	}
@@ -337,7 +337,7 @@ func TestClient_Token(t *testing.T) {
 
 func TestClient_Header(t *testing.T) {
 	type fields struct {
-		c *Client
+		c Client
 	}
 	type args struct {
 		key   string
@@ -347,19 +347,19 @@ func TestClient_Header(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   map[string]string
+		want   map[string]stringSlice
 	}{
 		{
 			name: "header_inserted_values",
 			fields: fields{
-				c: &Client{},
+				c: Client{},
 			},
 			args: args{
 				key:   "key",
 				value: "Bearer token",
 			},
-			want: map[string]string{
-				"key": "Bearer token",
+			want: map[string]stringSlice{
+				"key": {"Bearer token"},
 			},
 		},
 	}

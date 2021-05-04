@@ -14,7 +14,7 @@ import (
 // route and method, using
 // the encoder to encode the body and the decoder to decode the response into
 // the responsePtr
-func (c *Client) Send(ctx context.Context, route string, method string, body interface{}, responsePtr interface{}) (err error) {
+func (c Client) Send(ctx context.Context, route string, method string, body interface{}, responsePtr interface{}) (err error) {
 	buf, err := c.encoder(body)
 	if err != nil {
 		return ierrors.
@@ -40,8 +40,10 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 			Build()
 	}
 
-	for key, value := range c.headers {
-		req.Header.Add(key, value)
+	for key, values := range c.headers {
+		for _, v := range values {
+			req.Header.Add(key, v)
+		}
 	}
 
 	if c.auth != nil {
@@ -97,7 +99,7 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 	return err
 }
 
-func (c *Client) handleResponseErr(resp *http.Response) error {
+func (c Client) handleResponseErr(resp *http.Response) error {
 	decoder := c.decoderGenerator(resp.Body)
 	var err *ierrors.InsprError
 	defaultErr := ierrors.

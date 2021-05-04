@@ -109,7 +109,8 @@ func TestNewAppClient(t *testing.T) {
 					BaseURL("http://unix").
 					HTTPClient(*mockHTTPClient("http://unix")).
 					Encoder(json.Marshal).
-					Decoder(request.JSONDecoderGenerator),
+					Decoder(request.JSONDecoderGenerator).
+					Build(),
 			},
 		},
 	}
@@ -181,7 +182,8 @@ func TestClient_WriteMessage(t *testing.T) {
 					BaseURL(s.URL).
 					HTTPClient(*http.DefaultClient).
 					Encoder(json.Marshal).
-					Decoder(request.JSONDecoderGenerator),
+					Decoder(request.JSONDecoderGenerator).
+					Build(),
 			}
 
 			if tt.interruptServer {
@@ -246,7 +248,8 @@ func TestClient_ReadMessage(t *testing.T) {
 					BaseURL(s.URL).
 					HTTPClient(*http.DefaultClient).
 					Encoder(json.Marshal).
-					Decoder(request.JSONDecoderGenerator),
+					Decoder(request.JSONDecoderGenerator).
+					Build(),
 			}
 
 			if tt.interruptServer {
@@ -307,7 +310,8 @@ func TestClient_CommitMessage(t *testing.T) {
 					BaseURL(s.URL).
 					HTTPClient(*http.DefaultClient).
 					Encoder(json.Marshal).
-					Decoder(request.JSONDecoderGenerator),
+					Decoder(request.JSONDecoderGenerator).
+					Build(),
 			}
 
 			if tt.interruptServer {

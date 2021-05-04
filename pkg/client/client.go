@@ -34,7 +34,8 @@ func NewAppClient() *Client {
 			BaseURL("http://unix").
 			HTTPClient(transports.NewUnixSocketClient(envAddr)).
 			Encoder(json.Marshal).
-			Decoder(request.JSONDecoderGenerator),
+			Decoder(request.JSONDecoderGenerator).
+			Build(),
 	}
 }
 

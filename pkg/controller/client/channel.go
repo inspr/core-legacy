@@ -6,6 +6,7 @@ import (
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
@@ -28,7 +29,7 @@ func (cc *ChannelClient) Get(ctx context.Context, scope string, name string) (*m
 	var resp meta.Channel
 
 	err := cc.rc.
-		Header("Scope", scope).
+		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/channels", "GET", cdi, &resp)
 	if err != nil {
 		return nil, err
@@ -54,7 +55,7 @@ func (cc *ChannelClient) Create(ctx context.Context, scope string, ch *meta.Chan
 	var resp diff.Changelog
 
 	err := cc.rc.
-		Header("Scope", scope).
+		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/channels", "POST", cdi, &resp)
 	if err != nil {
 		return nil, err
@@ -80,7 +81,7 @@ func (cc *ChannelClient) Delete(ctx context.Context, scope string, name string, 
 	var resp diff.Changelog
 
 	err := cc.rc.
-		Header("Scope", scope).
+		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/channels", "DELETE", cdi, &resp)
 	if err != nil {
 		return nil, err
@@ -106,7 +107,7 @@ func (cc *ChannelClient) Update(ctx context.Context, scope string, ch *meta.Chan
 	var resp diff.Changelog
 
 	err := cc.rc.
-		Header("Scope", scope).
+		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/channels", "PUT", cdi, &resp)
 	if err != nil {
 		return nil, err
