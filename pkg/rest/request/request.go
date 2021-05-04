@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/inspr/inspr/pkg/ierrors"
 )
@@ -18,7 +19,6 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message("error encoding body to json").InnerError(err).Build()
 	}
-
 	req, err := http.NewRequestWithContext(ctx, method, c.routeToURL(route), bytes.NewBuffer(buf))
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message("error creating request").InnerError(err).Build()
@@ -42,7 +42,7 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 			NewError().
 			BadRequest().
 			InnerError(err).
-			Message("unable to send request to insprd").
+			Message(err.Error()).
 			Build()
 	}
 
@@ -59,20 +59,21 @@ func (c *Client) Send(ctx context.Context, route string, method string, body int
 		}
 	}
 
-	decoder := json.NewDecoder(resp.Body)
 	if responsePtr != nil {
+		decoder := json.NewDecoder(resp.Body)
 		err = decoder.Decode(responsePtr)
 
 		if err == io.EOF {
 			return nil
 		}
+
 	}
 
 	return err
 }
 
 func (c *Client) routeToURL(route string) string {
-	return fmt.Sprintf("%s%s", c.baseURL, route)
+	return fmt.Sprintf("%s/%s", c.baseURL, strings.TrimPrefix(route, "/"))
 }
 
 // Encoder encodes an interface into bytes

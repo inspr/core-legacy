@@ -110,35 +110,6 @@ func TestWriter_WriteMessage(t *testing.T) {
 	}
 }
 
-func Test_deliveryReport(t *testing.T) {
-	mProd, _ := NewWriter(true)
-	defer mProd.Close()
-	type args struct {
-		producer *kafka.Producer
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "Read two messages from de producer",
-			args: args{
-				producer: mProd.producer,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var strPointer = new(string)
-			*strPointer = "testTopic"
-			mockMessageSender(tt.args.producer, strPointer)
-			for i := 0; i < 2; i++ {
-				deliveryReport(tt.args.producer)
-			}
-		})
-	}
-}
-
 func TestWriter_produceMessage(t *testing.T) {
 	mProd, _ := NewWriter(true)
 	defer mProd.Close()

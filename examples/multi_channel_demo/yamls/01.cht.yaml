@@ -2,4 +2,4 @@ kind: channeltype
 apiVersion: v1
 meta:
   name: channelTestType
-schema: inspr/schema.avsc
+schema: yamls/schema.avsc

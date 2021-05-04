@@ -2,21 +2,16 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"math/big"
-	"math/rand"
-	"time"
 
 	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecar/models"
 )
 
 func main() {
-	var number int
-
-	// sets up ticker to sync with generator
-	ticker := time.NewTicker(2 * time.Second)
-	rand.Seed(time.Now().UnixNano())
 
 	// sets up client for sidecar
 	client := dappclient.NewAppClient()
@@ -26,36 +21,33 @@ func main() {
 	outputChannel := "output"
 
 	type Message struct {
-		Message struct {
-			Data int `json:"data"`
-		} `json:"message"`
+		Message int    `json:"message"`
 		Channel string `json:"channel"`
 	}
+
 	fmt.Println("starting...")
-	for range ticker.C {
+	// handles messages sent to the input channel
+	client.HandleChannel(inputChannel, func(_ context.Context, r io.Reader) error {
+		decoder := json.NewDecoder(r)
 		var msg Message
-		fmt.Println("reading message...")
-		err := client.ReadMessage(context.Background(), inputChannel, &msg)
+
+		err := decoder.Decode(&msg)
 		if err != nil {
-			fmt.Println(err.Error())
+			return err
 		}
-
-		number = msg.Message.Data
-		fmt.Println("Read: ", number)
-
-		err = client.CommitMessage(context.Background(), inputChannel)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-
-		if big.NewInt(int64(number)).ProbablyPrime(0) {
-			client.WriteMessage(
+		log.Printf("msg.Message = %+v\n", msg.Message)
+		if big.NewInt(int64(msg.Message)).ProbablyPrime(0) {
+			err = client.WriteMessage(
 				context.Background(),
 				outputChannel,
-				models.Message{
-					Data: number,
-				},
+				msg.Message,
 			)
+			if err != nil {
+				return err
+			}
 		}
-	}
+		// writes a message in the output channel
+		return nil
+	})
+	log.Fatalln(client.Run(context.Background()))
 }
