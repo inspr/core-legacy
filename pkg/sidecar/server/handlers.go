@@ -1,9 +1,11 @@
 package sidecarserv
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"sync"
+	"strings"
 
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -12,130 +14,132 @@ import (
 	"go.uber.org/zap"
 )
 
-// customHandlers is a struct that contains the handlers
-//  to be used to server
-type customHandlers struct {
-	sync.Locker
-	r              models.Reader
-	w              models.Writer
-	InputChannels  string
-	OutputChannels string
-}
-
 var logger *zap.Logger
 
-// newCustomHandlers returns a struct composed of the
-// Reader and Writer given in the parameters
-func newCustomHandlers(l sync.Locker, r models.Reader, w models.Writer) *customHandlers {
-	logger, _ = zap.NewDevelopment(
-		zap.Fields(zap.String("id", environment.GetInsprAppID()), zap.String("section", "sidecar handlers")),
-	)
-	return &customHandlers{
-		Locker:         l,
-		r:              r,
-		w:              w,
-		InputChannels:  environment.GetInputChannels(),
-		OutputChannels: environment.GetOutputChannels(),
-	}
+func init() {
+	logger, _ = zap.NewProduction()
 }
+
+const maxBrokerRetries = 5
+
+var (
+	writeMessageErr = ierrors.NewError().InternalServer().Message("broker's writeMessage failed")
+	decodingErr     = ierrors.NewError().BadRequest().Message("couldn't parse body")
+)
 
 // handles the /message route in the server
-func (ch *customHandlers) writeMessageHandler(w http.ResponseWriter, r *http.Request) {
-	ch.Lock()
-	defer ch.Unlock()
-	logger.Info("handling message write")
-	body := models.BrokerData{}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
-		rest.ERROR(w, insprError.Build())
-		return
-	}
+func (s *Server) writeMessageHandler() rest.Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("handling message write")
 
-	if !environment.IsInChannelBoundary(body.Channel, ch.OutputChannels) {
-		insprError := ierrors.
-			NewError().
-			BadRequest().
-			Message(
-				"channel '%s' not found",
-				body.Channel,
-			)
+		body := models.BrokerData{}
+		channel := strings.TrimPrefix(r.URL.Path, "/")
 
-		rest.ERROR(w, insprError.Build())
-		return
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			rest.ERROR(w, decodingErr.InnerError(err).Build())
+			return
+		}
+
+		if !environment.OutputChannnelList().Contains(channel) {
+			insprError := ierrors.
+				NewError().
+				BadRequest().
+				Message(
+					"channel '%s' not found",
+					channel,
+				)
+
+			rest.ERROR(w, insprError.Build())
+			return
+		}
+
+		logger.Info("writing message to broker", zap.String("channel", channel))
+		if err := s.Writer.WriteMessage(channel, body.Message); err != nil {
+			rest.ERROR(w, writeMessageErr.InnerError(err).Build())
+			return
+		}
+		rest.JSON(w, 200, struct{ Status string }{"OK"})
 	}
-	logger.Info("writing message to broker", zap.String("channel", body.Channel))
-	if err := ch.w.WriteMessage(body.Channel, body.Message.Data); err != nil {
-		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's writeMessage failed")
-		rest.ERROR(w, insprError.Build())
+}
+
+func (s *Server) writeWithRetry(ctx context.Context, channel string, data interface{}) (resp response, err error) {
+	for i := 0; ; i++ {
+		err = s.client.Send(ctx, "/"+channel, http.MethodPost, data, &resp)
+		if err != nil {
+			if i == maxBrokerRetries {
+				return
+			}
+			continue
+		}
 		return
 	}
 }
 
-// handles the /message route in the server
-func (ch *customHandlers) readMessageHandler(w http.ResponseWriter, r *http.Request) {
-	ch.Lock()
-	defer ch.Unlock()
-	logger.Info("handling message read")
-
-	body := models.BrokerData{}
-
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
-		rest.ERROR(w, insprError.Build())
+func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerResp models.BrokerData, err error) {
+	for i := 0; ; i++ {
+		brokerResp, err = s.Reader.ReadMessage(ctx, channel)
+		if err != nil {
+			if i == maxBrokerRetries {
+				return
+			}
+			continue
+		}
 		return
 	}
-
-	if !environment.IsInChannelBoundary(body.Channel, ch.InputChannels) {
-		insprError := ierrors.
-			NewError().
-			BadRequest().
-			Message(
-				"channel '%s' not found",
-				body.Channel,
-			)
-
-		rest.ERROR(w, insprError.Build())
-		return
-	}
-	logger.Info("reading message from broker", zap.String("channel", body.Channel))
-
-	brokerResp, err := ch.r.ReadMessage(body.Channel)
-	if err != nil {
-		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's ReadMessage returned an error")
-		rest.ERROR(w, insprError.Build())
-		return
-	}
-
-	rest.JSON(w, http.StatusOK, brokerResp)
 }
 
-// handles the /commit route in the server
-func (ch *customHandlers) commitMessageHandler(w http.ResponseWriter, r *http.Request) {
-	ch.Lock()
-	defer ch.Unlock()
+type response struct {
+	Status string
+}
 
-	body := models.BrokerData{}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		insprError := ierrors.NewError().BadRequest().Message("couldn't parse body")
-		rest.ERROR(w, insprError.Build())
-		return
+func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) error {
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			var err error
+			var brokerResp models.BrokerData
+
+			brokerResp, err = s.readWithRetry(ctx, channel)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("trying to send requess")
+
+			resp, err := s.writeWithRetry(ctx, channel, brokerResp)
+			if err != nil || resp.Status != "OK" {
+				return err
+			}
+			s.Reader.Commit(ctx, channel)
+		}
+	}
+}
+
+func (s *Server) readMessageRoutine(ctx context.Context) error {
+	s.runningRead = true
+	defer func() { s.runningRead = false }()
+
+	errch := make(chan error)
+	newCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	for _, channel := range environment.InputChannelList() {
+		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel)
 	}
 
-	if !environment.IsInChannelBoundary(body.Channel, ch.InputChannels) {
-		insprError := ierrors.
-			NewError().
-			BadRequest().
-			Message(
-				"channel '%s' not found",
-				body.Channel,
-			)
-
-		rest.ERROR(w, insprError.Build())
-		return
+	select {
+	case err := <-errch:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
 	}
 
-	if err := ch.r.Commit(body.Channel); err != nil {
-		insprError := ierrors.NewError().InternalServer().InnerError(err).Message("broker's commitMessage failed")
-		rest.ERROR(w, insprError.Build())
-	}
+}
+
+// Close closes the server connection
+func (s *Server) Close() {
+	s.cancel()
 }

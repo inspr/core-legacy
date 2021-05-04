@@ -1,11 +1,13 @@
 package models
 
+import "context"
+
 // BROKER's interfaces
 
 // Reader reads from a message broker
 type Reader interface {
-	ReadMessage(channel string) (BrokerData, error)
-	Commit(channel string) error
+	ReadMessage(ctx context.Context, channel string) (BrokerData, error)
+	Commit(ctx context.Context, channel string) error
 }
 
 // Writer writes messages in a message broker
