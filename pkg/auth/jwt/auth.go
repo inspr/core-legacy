@@ -134,7 +134,6 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 		Header("Authorization", fmt.Sprintf("Bearer %v", string(token))).
 		Build()
 
-	log.Printf("string(token) = %+v\n", string(token))
 	data := auth.JwtDO{}
 
 	err := client.Send(context.Background(), "/refresh", http.MethodGet, nil, &data)
