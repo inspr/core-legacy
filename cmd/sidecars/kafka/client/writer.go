@@ -1,14 +1,12 @@
 package kafkasc
 
 import (
-	"log"
-
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/pkg/environment"
 	"go.uber.org/zap"
 )
 
-const flushTimeout = 15 * 1000
+const flushTimeout = 1000
 
 // Writer defines an interface for writing messages
 type Writer struct {
@@ -45,7 +43,6 @@ func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	logger.Info("trying to write message in topic",
 		zap.String("channel", channel),
 		zap.String("resolved channel", resolvedCh))
-	go deliveryReport(writer.producer)
 
 	if errProduceMessage := writer.produceMessage(message, kafkaTopic(resolvedCh)); errProduceMessage != nil {
 		logger.Error("error while producing message",
@@ -53,26 +50,10 @@ func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 		return errProduceMessage
 	}
 
+	logger.Info("flusing the producer")
 	writer.producer.Flush(flushTimeout)
-
+	logger.Info("flushed")
 	return nil
-}
-
-// Logs the ProduceChannel events for successful and failed messages sent
-func deliveryReport(producer *kafka.Producer) {
-	for event := range producer.Events() {
-		switch ev := event.(type) {
-		case *kafka.Message:
-			if ev.TopicPartition.Error != nil {
-				log.Printf("Delivery failed: %v\n", ev.TopicPartition)
-			} else {
-				log.Printf("Delivered message to %v\n", ev.TopicPartition)
-			}
-			return
-		default:
-			log.Println(ev)
-		}
-	}
 }
 
 // creates a Kafka message and sends it through the ProduceChannel
@@ -85,15 +66,14 @@ func (writer *Writer) produceMessage(message interface{}, resolvedChannel kafkaT
 	logger.Debug("writing message into Kafka Topic",
 		zap.String("topic", string(resolvedChannel)))
 
-	writer.producer.ProduceChannel() <- &kafka.Message{
+	return writer.producer.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic:     (*string)(&resolvedChannel),
 			Partition: kafka.PartitionAny,
 		},
 		Value: messageEncoded,
-	}
+	}, nil)
 
-	return nil
 }
 
 // Close closes the kafka producer

@@ -2,25 +2,26 @@ package sidecarserv
 
 import (
 	"context"
+	"fmt"
 	"log"
-	"net"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 
-	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/inspr/inspr/pkg/sidecar/models"
 )
 
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
-	Mux *http.ServeMux
-	sync.Mutex
-	Reader models.Reader
-	Writer models.Writer
-	addr   string
+	Reader       models.Reader
+	Writer       models.Writer
+	writeAddr    string
+	client       *request.Client
+	cancel       context.CancelFunc
+	runningRead  bool
+	runningWrite bool
 }
 
 // NewServer returns a new sidecar server
@@ -31,54 +32,49 @@ func NewServer() *Server {
 // Init - configures the server
 func (s *Server) Init(r models.Reader, w models.Writer) {
 	// server requests related
-	s.Mux = http.NewServeMux()
-	s.addr = "/inspr/" + environment.GetUnixSocketAddress() + ".sock"
+	s.writeAddr = fmt.Sprintf(":%s", os.Getenv("INSPR_WRITE_PORT"))
+	s.client = request.NewJSONClient(fmt.Sprintf("http://localhost:%v", os.Getenv("INSPR_READ_PORT")))
 
 	// implementations of write and read for a specific sidecar
 	s.Reader = r
 	s.Writer = w
 
-	s.InitRoutes()
-}
-
-// InitRoutes establishes the routes of the server
-func (s *Server) InitRoutes() {
-	handler := newCustomHandlers(&s.Mutex, s.Reader, s.Writer)
-
-	s.Mux.HandleFunc("/writeMessage", handler.writeMessageHandler)
-
-	s.Mux.HandleFunc("/readMessage", handler.readMessageHandler)
-	s.Mux.HandleFunc("/commit", handler.commitMessageHandler)
 }
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(ctx context.Context) {
 	server := &http.Server{
-		ReadTimeout:       1 * time.Second,
-		WriteTimeout:      1 * time.Second,
-		IdleTimeout:       30 * time.Second,
-		ReadHeaderTimeout: 2 * time.Second,
-		Handler:           s.Mux,
+		Handler: s.writeMessageHandler().Post().JSON(),
+		Addr:    s.writeAddr,
 	}
+	errCh := make(chan error)
+	// create read message routine and captures its error
+	go func() { errCh <- s.readMessageRoutine(ctx) }()
 
-	os.Remove(s.addr)
-
-	listener, err := net.Listen("unix", s.addr)
-	if err != nil {
-		log.Println("couldn't listen to address: " + s.addr)
-		return
-	}
-
+	var err error
 	go func() {
-		if err = server.Serve(listener); err != nil && err != http.ErrServerClosed {
+		s.runningWrite = true
+		defer func() { s.runningWrite = false }()
+		if err = server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen:%v", err)
 		}
 	}()
 
 	log.Printf("sideCar listener is up...")
 
-	<-ctx.Done()
+	select {
+	case <-ctx.Done():
+		gracefulShutdown(server, err)
+	case errRead := <-errCh:
+		gracefulShutdown(server, err)
+		if errRead != nil {
+			log.Fatalln(err)
+		}
+	}
 
+}
+
+func gracefulShutdown(server *http.Server, err error) {
 	log.Println("gracefully shutting down...")
 
 	ctxShutdown, cancel := context.WithDeadline(
@@ -87,7 +83,6 @@ func (s *Server) Run(ctx context.Context) {
 	)
 	defer cancel()
 
-	err = os.RemoveAll(s.addr)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,5 +1,20 @@
 # Changelog
 
+### #37 - Feature: reactive sidecar <!-- This is the title -->
+- fixes:
+	- lowers the timeout on kafka writer's flush
+	- changes some loggers to be production and lower test cluttering
+	- some type fixes
+- features:
+	- sidecar server now has a goroutine for constant message polling. This routine reads from all subscribed channels and sends requests to the main dApp so that the dapp handles those requests
+	- sidecar's read message now has a maximum number of retries
+	- sidecar and dApp now communicate via tcp instead of unix sockets. This is helpful to add easier integration with libs for many languages, including requests for js, Flask for python, etc. 
+	- inspr client now acts as a wrapper on a http server for reading messages
+	- write message now takes the routes as channel parameters
+	- adds fields for port definition on the dApp metadata
+- tests:
+	- changes kafka tests to handle the new channel based approach
+
 ### #39 - Issue CORE-336 | Alter the token to contain the permissions... <!-- This is the title -->
 - features:
 	- changed Payload (`pkg/auth/models/payload.go`) field 'Role' (`int`) to 'Permission' (`map[string][]string`), and removed field 'Scope'

@@ -1,6 +1,8 @@
 package nodes
 
 import (
+	"os"
+	"strconv"
 	"strings"
 
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
@@ -17,7 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
+func (no *NodeOperator) sidecarEnvironment(app *meta.App) utils.EnvironmentMap {
 	logger.Debug("getting necessary environment variables for Node structure deployment")
 	input := app.Spec.Boundary.Input
 	output := app.Spec.Boundary.Output
@@ -27,6 +29,7 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 	appID := toAppID(app)
 	inputEnv := input.Join(";")
 	outputEnv := output.Join(";")
+	readPort, writePort := dAppSidecarPorts(app)
 	env := utils.EnvironmentMap{
 		"INSPR_INPUT_CHANNELS":    inputEnv,
 		"INSPR_OUTPUT_CHANNELS":   outputEnv,
@@ -36,6 +39,8 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 		"INSPR_ENV":               environment.GetInsprEnvironment(),
 		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
 		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
+		"INSPR_WRITE_PORT":        strconv.Itoa(writePort),
+		"INSPR_READ_PORT":         strconv.Itoa(readPort),
 	}
 
 	resolves, err := no.memory.Apps().ResolveBoundary(app)
@@ -59,21 +64,33 @@ func (no *NodeOperator) baseEnvironment(app *meta.App) utils.EnvironmentMap {
 	return env
 }
 
+func dAppSidecarPorts(app *meta.App) (int, int) {
+
+	writePort := app.Spec.Node.Spec.SidecarPort.Write
+	if writePort == 0 {
+		writePort, _ = strconv.Atoi(os.Getenv("INSPR_SIDECAR_WRITE_PORT"))
+	}
+	readPort := app.Spec.Node.Spec.SidecarPort.Read
+	if readPort == 0 {
+		readPort, _ = strconv.Atoi(os.Getenv("INSPR_SIDECAR_READ_PORT"))
+	}
+	return readPort, writePort
+}
+
 // dAppToDeployment translates the DApp
 func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 	logger.Debug("converting a dApp structure to a k8s deployment")
+	var baseDappEnvironment utils.EnvironmentMap
+	readPort, writePort := dAppSidecarPorts(app)
+	baseDappEnvironment = utils.EnvironmentMap{
+		"INSPR_WRITE_PORT": strconv.Itoa(writePort),
+		"INSPR_READ_PORT":  strconv.Itoa(readPort),
+	}
 
-	sidecarEnvironment := no.baseEnvironment(app)
+	sidecarEnvironment := no.sidecarEnvironment(app)
 
 	logger.Debug("defining Node's env vars")
-	nodeKubeEnv := append(app.Spec.Node.Spec.Environment.ParseToK8sArrEnv(), kubeCore.EnvVar{
-		Name: "INSPR_UNIX_SOCKET",
-		ValueFrom: &kubeCore.EnvVarSource{
-			FieldRef: &kubeCore.ObjectFieldSelector{
-				FieldPath: "metadata.name",
-			},
-		},
-	})
+	nodeKubeEnv := append(app.Spec.Node.Spec.Environment.ParseToK8sArrEnv(), baseDappEnvironment.ParseToK8sArrEnv()...)
 
 	logger.Debug("defining Node's k8s container data")
 	appDeployName := toDeploymentName(app)
@@ -82,12 +99,6 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 		Name:  appDeployName,
 		Image: app.Spec.Node.Spec.Image,
 		// parse from master env var to kube env vars
-		VolumeMounts: []kubeCore.VolumeMount{
-			{
-				Name:      appDeployName + "-volume",
-				MountPath: "/inspr",
-			},
-		},
 		Env: nodeKubeEnv,
 	}
 
@@ -103,24 +114,10 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 
 	logger.Debug("defining Sidecar's k8s container data")
 	sidecarContainer := kubeCore.Container{
-		Name:  appDeployName + "-sidecar",
-		Image: environment.GetSidecarImage(),
-		VolumeMounts: []kubeCore.VolumeMount{
-			{
-				Name:      appDeployName + "-volume",
-				MountPath: "/inspr",
-			},
-		},
-		Env: sidecarKubeEnv,
-	}
-
-	volume := kubeCore.Volume{
-		Name: appDeployName + "-volume",
-		VolumeSource: kubeCore.VolumeSource{
-			EmptyDir: &kubeCore.EmptyDirVolumeSource{
-				Medium: kubeCore.StorageMediumMemory,
-			},
-		},
+		Name:            appDeployName + "-sidecar",
+		Image:           environment.GetSidecarImage(),
+		Env:             sidecarKubeEnv,
+		ImagePullPolicy: kubeCore.PullAlways,
 	}
 
 	appLabels := map[string]string{"app": appID}
@@ -147,7 +144,6 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
 					Labels: appLabels,
 				},
 				Spec: kubeCore.PodSpec{
-					Volumes: []kubeCore.Volume{volume},
 					Containers: []kubeCore.Container{
 						sidecarContainer,
 						nodeContainer,

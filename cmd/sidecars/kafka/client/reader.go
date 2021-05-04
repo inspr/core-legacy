@@ -1,6 +1,8 @@
 package kafkasc
 
 import (
+	"context"
+
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	globalEnv "github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -12,7 +14,7 @@ const pollTimeout = 100
 
 // Consumer interface
 type Consumer interface {
-	Poll(timeout int) (event kafka.Event)
+	Poll(int) kafka.Event
 	Commit() ([]kafka.TopicPartition, error)
 	Close() (err error)
 }
@@ -46,7 +48,7 @@ func NewReader() (*Reader, error) {
 ReadMessage reads message by message. Returns channel the message belongs to,
 the message and an error if any occurred.
 */
-func (reader *Reader) ReadMessage(channel string) (models.BrokerData, error) {
+func (reader *Reader) ReadMessage(ctx context.Context, channel string) (models.BrokerData, error) {
 	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannels(), "")
 
 	logger.Info("trying to read message from topic",
@@ -56,45 +58,58 @@ func (reader *Reader) ReadMessage(channel string) (models.BrokerData, error) {
 	consumer := reader.consumers[channel]
 
 	for {
-		event := consumer.Poll(pollTimeout)
-		switch ev := event.(type) {
-		case *kafka.Message:
-			topic := *ev.TopicPartition.Topic
-			logger.Info("reading message from topic", zap.String("topic", topic))
-
-			return kafkaTopic(topic).readMessage(ev.Value)
-
-		case kafka.Error:
-			if ev.Code() == kafka.ErrAllBrokersDown {
-				return models.BrokerData{}, ierrors.
-					NewError().
-					InnerError(ev).
-					Message("kafka error = all brokers are down\n%s", ev.Error()).
-					InternalServer().
-					Build()
-			}
-			logger.Error("error in reading kafka message", zap.String("error", ev.Error()))
-			return models.BrokerData{}, ierrors.NewError().
-				Message("%v", ev).
-				Build()
-
+		select {
+		case <-ctx.Done():
+			return models.BrokerData{}, ctx.Err()
 		default:
-			continue
+			event := consumer.Poll(pollTimeout)
+			switch ev := event.(type) {
+			case *kafka.Message:
+				topic := *ev.TopicPartition.Topic
+				logger.Info("reading message from topic", zap.String("topic", topic))
+
+				return kafkaTopic(topic).readMessage(ev.Value)
+
+			case kafka.Error:
+				if ev.Code() == kafka.ErrAllBrokersDown {
+					return models.BrokerData{}, ierrors.
+						NewError().
+						InnerError(ev).
+						Message("kafka error = all brokers are down\n%s", ev.Error()).
+						InternalServer().
+						Build()
+				}
+				logger.Error("error in reading kafka message", zap.String("error", ev.Error()))
+				return models.BrokerData{}, ierrors.NewError().
+					Message("%v", ev).
+					Build()
+
+			default:
+				continue
+			}
+
 		}
 	}
 }
 
 // Commit commits the last message read by Reader
-func (reader *Reader) Commit(channel string) error {
+func (reader *Reader) Commit(ctx context.Context, channel string) error {
 	logger.Info("committing to channel", zap.String("channel", channel))
-	_, errCommit := reader.consumers[channel].Commit()
-	if errCommit != nil {
-		return ierrors.
-			NewError().
-			InnerError(errCommit).
-			Message("failed to commit last message").
-			InternalServer().
-			Build()
+	doneChan := make(chan error)
+	go func() { _, errCommit := reader.consumers[channel].Commit(); doneChan <- errCommit }()
+	select {
+	case <-ctx.Done():
+		<-doneChan
+		return ctx.Err()
+	case errCommit := <-doneChan:
+		if errCommit != nil {
+			return ierrors.
+				NewError().
+				InnerError(errCommit).
+				Message("failed to commit last message").
+				InternalServer().
+				Build()
+		}
 	}
 	return nil
 }

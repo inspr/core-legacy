@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
@@ -16,9 +17,7 @@ type slackMessage struct {
 }
 
 type expectedDataType struct {
-	Message struct {
-		Data string `json:"data"`
-	} `json:"message"`
+	Message string `json:"message"`
 	Channel string `json:"channel"`
 }
 
@@ -28,16 +27,17 @@ var channel = "pubsubch"
 func main() {
 	c := &http.Client{}
 	client := dappclient.NewAppClient()
-	for {
+	client.HandleChannel(channel, func(ctx context.Context, body io.Reader) error {
+		decoder := json.NewDecoder(body)
+
 		subMsg := expectedDataType{}
-		err := client.ReadMessage(context.Background(), channel, &subMsg)
+		err := decoder.Decode(&subMsg)
 		if err != nil {
-			log.Printf("%#v", err.Error())
-			continue
+			return err
 		}
 
 		msg := slackMessage{
-			Text: fmt.Sprintf("%v", subMsg.Message.Data),
+			Text: fmt.Sprintf("%v", subMsg.Message),
 		}
 
 		msgBuff, _ := json.Marshal(msg)
@@ -48,13 +48,11 @@ func main() {
 		req.Header = head
 		_, err = c.Do(req)
 		if err != nil {
-			log.Println(err)
-			continue
+			return err
 		}
 
-		if err := client.CommitMessage(context.Background(), channel); err != nil {
-			log.Println(err.Error())
-		}
-	}
+		return nil
+	})
 
+	log.Fatalln(client.Run(context.Background()))
 }

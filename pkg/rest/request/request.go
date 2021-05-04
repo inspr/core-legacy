@@ -65,7 +65,7 @@ func (c Client) Send(ctx context.Context, route string, method string, body inte
 			NewError().
 			BadRequest().
 			InnerError(err).
-			Message("unable to send request to insprd").
+			Message(err.Error()).
 			Build()
 	}
 
@@ -87,13 +87,14 @@ func (c Client) Send(ctx context.Context, route string, method string, body inte
 		}
 	}
 
-	decoder := json.NewDecoder(resp.Body)
 	if responsePtr != nil {
+		decoder := json.NewDecoder(resp.Body)
 		err = decoder.Decode(responsePtr)
 
 		if err == io.EOF {
 			return nil
 		}
+
 	}
 
 	return err
