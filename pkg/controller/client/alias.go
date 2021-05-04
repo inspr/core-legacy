@@ -5,13 +5,15 @@ import (
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 // AliasClient interacts with Aliases on the Insprd
 type AliasClient struct {
-	c *request.Client
+	client *request.Client
+	config ControllerConfig
 }
 
 // Get gets a alias from the Insprd
@@ -22,14 +24,15 @@ type AliasClient struct {
 // The key is the key of the alias. So to search for a alias inside app1 with the key aliasKey you
 // would call ac.Get(context.Background(), "app1", "aliasKey")
 func (ac *AliasClient) Get(ctx context.Context, context, key string) (*meta.Alias, error) {
+	fullscope, _ := metautils.JoinScopes(ac.config.Scope, context)
 	aliasQuery := models.AliasQueryDI{
-		Scope: context,
 		Key:   key,
+		Scope: fullscope,
 	}
 
 	var resp meta.Alias
 
-	err := ac.c.Send(ctx, "/alias", "GET", aliasQuery, &resp)
+	err := ac.client.Send(ctx, "/alias", "GET", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -47,15 +50,16 @@ func (ac *AliasClient) Get(ctx context.Context, context, key string) (*meta.Alia
 // So to create a alias inside app1 with the name aliasOne you
 // would call ctc.Create(context.Background(), "app1", &meta.Alias{...})
 func (ac *AliasClient) Create(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+	fullscope, _ := metautils.JoinScopes(ac.config.Scope, context)
 	aliasQuery := models.AliasDI{
-		Scope:  context,
+		Scope:  fullscope,
 		Target: target,
 		Alias:  *alias,
 		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
-	err := ac.c.Send(ctx, "/alias", "POST", aliasQuery, &resp)
+	err := ac.client.Send(ctx, "/alias", "POST", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -73,14 +77,15 @@ func (ac *AliasClient) Create(ctx context.Context, context string, target string
 // So to delete a alias inside app1 with the key alias1 you
 // would call ac.Delete(context.Background(), "app1", "alias1")
 func (ac *AliasClient) Delete(ctx context.Context, context, key string, dryRun bool) (diff.Changelog, error) {
+	fullscope, _ := metautils.JoinScopes(ac.config.Scope, context)
 	aliasQuery := models.AliasQueryDI{
-		Scope:  context,
+		Scope:  fullscope,
 		Key:    key,
 		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
-	err := ac.c.Send(ctx, "/alias", "DELETE", aliasQuery, &resp)
+	err := ac.client.Send(ctx, "/alias", "DELETE", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -98,15 +103,16 @@ func (ac *AliasClient) Delete(ctx context.Context, context, key string, dryRun b
 // So to update a alias inside app1 with the key myalias you
 // would call ac.Create(context.Background(), "app1", &meta.Alias{...})
 func (ac *AliasClient) Update(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+	fullscope, _ := metautils.JoinScopes(ac.config.Scope, context)
 	aliasQuery := models.AliasDI{
-		Scope:  context,
+		Scope:  fullscope,
 		Target: target,
 		Alias:  *alias,
 		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
-	err := ac.c.Send(ctx, "/alias", "PUT", aliasQuery, &resp)
+	err := ac.client.Send(ctx, "/alias", "PUT", aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
