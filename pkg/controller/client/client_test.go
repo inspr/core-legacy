@@ -32,7 +32,12 @@ func TestNewControllerClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewControllerClient(tt.args.url, nil)
+			config := ControllerConfig{
+				Auth:  nil,
+				Scope: "",
+				URL:   tt.args.url,
+			}
+			got := NewControllerClient(config)
 
 			if reflect.TypeOf(got) != reflect.TypeOf(tt.want) {
 				t.Errorf(
@@ -71,7 +76,12 @@ func TestClient_Channels(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewControllerClient("mock", nil)
+			config := ControllerConfig{
+				Auth:  nil,
+				Scope: "",
+				URL:   "mock",
+			}
+			c := NewControllerClient(config)
 
 			got := c.Channels()
 			if check(got) != check(tt.want) {
@@ -108,7 +118,12 @@ func TestClient_Apps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewControllerClient("mock", nil)
+			config := ControllerConfig{
+				Auth:  nil,
+				Scope: "",
+				URL:   "mock",
+			}
+			c := NewControllerClient(config)
 			got := c.Apps()
 
 			if check(got) != check(tt.want) {
@@ -145,7 +160,12 @@ func TestClient_ChannelTypes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewControllerClient("mock", nil)
+			config := ControllerConfig{
+				Auth:  nil,
+				Scope: "",
+				URL:   "mock",
+			}
+			c := NewControllerClient(config)
 			got := c.ChannelTypes()
 
 			if check(got) != check(tt.want) {
@@ -182,7 +202,12 @@ func TestClient_Alias(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewControllerClient("mock", nil)
+			config := ControllerConfig{
+				Auth:  nil,
+				Scope: "",
+				URL:   "mock",
+			}
+			c := NewControllerClient(config)
 			got := c.Alias()
 
 			if check(got) != check(tt.want) {
@@ -219,7 +244,12 @@ func TestClient_Auth(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewControllerClient("mock", nil)
+			config := ControllerConfig{
+				Auth:  nil,
+				Scope: "",
+				URL:   "mock",
+			}
+			c := NewControllerClient(config)
 			got := c.Authorization()
 
 			if check(got) != check(tt.want) {

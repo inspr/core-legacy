@@ -24,8 +24,8 @@ type clientMessage struct {
 
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
-	socket := os.Getenv("INSPR_UNIX_SOCKET")
-	if socket == "" {
+	socket, ok := os.LookupEnv("INSPR_UNIX_SOCKET")
+	if !ok {
 		panic("NO SOCKET ENVIRONMENT VARIABLE")
 	}
 	envAddr := "/inspr/" + socket + ".sock"
