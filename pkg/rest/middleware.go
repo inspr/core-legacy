@@ -53,16 +53,15 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			return
 		}
 
-		headerScopes := r.Header[HeaderScopeKey]
-		log.Printf("payload.Scope = %+v\n", payload.Scope)
+		reqScopes := r.Header[HeaderScopeKey]
 		valid := false
+		log.Printf("payload.Permissions = %+v\n", payload.Permissions)
 
-		for _, payloadScope := range payload.Scope {
-			log.Printf("payload-scope = %+v\n", payloadScope)
-
-			for _, scope := range headerScopes {
-				log.Printf("header-scope = %+v\n", scope)
-				if strings.HasPrefix(scope, payloadScope) {
+		for scope := range payload.Permissions {
+			log.Printf("permission-scope = %+v\n", scope)
+			for _, rs := range reqScopes {
+				log.Printf("request-scope = %+v\n", rs)
+				if strings.HasPrefix(rs, scope) {
 					// scope found
 					valid = true
 				}
