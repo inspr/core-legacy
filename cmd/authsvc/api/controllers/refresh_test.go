@@ -12,7 +12,6 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/auth/models"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
@@ -24,21 +23,20 @@ func TestServer_Refresh(t *testing.T) {
 	tests := []struct {
 		name      string
 		want      int
-		payload   models.Payload
+		payload   auth.Payload
 		importURL bool
 		headToken bool
-		token     func(models.Payload) []byte
+		token     func(auth.Payload) []byte
 		status    int
 	}{
 		{
 			name: "Valid refresh",
 			want: http.StatusOK,
-			payload: models.Payload{
-				UID:        "u000001",
-				Scope:      []string{""},
-				Role:       1,
-				Refresh:    []byte("refreshtk"),
-				RefreshURL: "http://refresh.token",
+			payload: auth.Payload{
+				UID:         "u000001",
+				Permissions: nil,
+				Refresh:     []byte("refreshtk"),
+				RefreshURL:  "http://refresh.token",
 			},
 			token:     getToken,
 			headToken: true,
@@ -48,7 +46,7 @@ func TestServer_Refresh(t *testing.T) {
 		{
 			name: "Invalid refresh, header missing 'Authentication'",
 			want: http.StatusUnauthorized,
-			token: func(models.Payload) []byte {
+			token: func(auth.Payload) []byte {
 				return nil
 			},
 			headToken: false,
@@ -56,7 +54,7 @@ func TestServer_Refresh(t *testing.T) {
 		{
 			name: "Invalid refresh, invalid token signature",
 			want: http.StatusForbidden,
-			token: func(models.Payload) []byte {
+			token: func(auth.Payload) []byte {
 				return []byte("cicada")
 			},
 			headToken: true,
@@ -64,7 +62,7 @@ func TestServer_Refresh(t *testing.T) {
 		{
 			name: "Invalid refresh, invalid token payload",
 			want: http.StatusForbidden,
-			token: func(models.Payload) []byte {
+			token: func(auth.Payload) []byte {
 				token := jwt.New()
 				payload := struct {
 					UID int
@@ -137,7 +135,7 @@ func TestServer_Refresh(t *testing.T) {
 			}
 
 			if tt.want == 200 {
-				jwtdo := models.JwtDO{}
+				jwtdo := auth.JwtDO{}
 				err = json.NewDecoder(res.Body).Decode(&jwtdo)
 				if err != nil {
 					t.Log("error making a POST in the httptest server")
@@ -159,7 +157,7 @@ func TestServer_Refresh(t *testing.T) {
 	}
 }
 
-func getToken(payload models.Payload) []byte {
+func getToken(payload auth.Payload) []byte {
 	token := jwt.New()
 	token.Set("payload", payload)
 	signed, _ := jwt.Sign(token, jwa.RS256, server.privKey)

@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"github.com/inspr/inspr/pkg/auth"
 	"gopkg.in/yaml.v2"
 )
 
@@ -17,6 +18,12 @@ type mockCl struct {
 	deleteUser     func(context.Context, string, string, string) error
 	login          func(context.Context, string, string) (string, error)
 	updatePassword func(context.Context, string, string, string, string) error
+}
+
+type taglessUser struct {
+	UID         string
+	Permissions map[string][]string
+	Password    string
 }
 
 func (cl mockCl) CreateUser(ctx context.Context, uid, pwd string, newUsr client.User) error {
@@ -48,10 +55,9 @@ func Test_createUser(t *testing.T) {
 	}{
 		{
 			usr: client.User{
-				UID:      "this is a uid",
-				Role:     12,
-				Scope:    []string{"scope1", "scope2"},
-				Password: "password",
+				UID:         "this is a uid",
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
+				Password:    "password",
 			},
 			name: "yaml user creation",
 			args: args{
@@ -61,10 +67,9 @@ func Test_createUser(t *testing.T) {
 			options: createUserOptionsDT{yaml: "user.yaml"},
 			before: func() {
 				usr := client.User{
-					UID:      "this is a uid",
-					Role:     12,
-					Scope:    []string{"scope1", "scope2"},
-					Password: "password",
+					UID:         "this is a uid",
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
+					Password:    "password",
 				}
 				buf, _ := yaml.Marshal(usr)
 				ioutil.WriteFile("user.yaml", buf, os.ModePerm)
@@ -76,10 +81,9 @@ func Test_createUser(t *testing.T) {
 		},
 		{
 			usr: client.User{
-				UID:      "this is a uid",
-				Role:     12,
-				Scope:    []string{"scope1", "scope2"},
-				Password: "password",
+				UID:         "this is a uid",
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
+				Password:    "password",
 			},
 			name: "yaml user creation -- invalid file name",
 			args: args{
@@ -89,10 +93,9 @@ func Test_createUser(t *testing.T) {
 			options: createUserOptionsDT{yaml: "inexistant-file.yaml"},
 			before: func() {
 				usr := client.User{
-					UID:      "this is a uid",
-					Role:     12,
-					Scope:    []string{"scope1", "scope2"},
-					Password: "password",
+					UID:         "this is a uid",
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
+					Password:    "password",
 				}
 				buf, _ := yaml.Marshal(usr)
 				ioutil.WriteFile("user.yaml", buf, os.ModePerm)
@@ -104,10 +107,9 @@ func Test_createUser(t *testing.T) {
 		},
 		{
 			usr: client.User{
-				UID:      "this is a uid",
-				Role:     12,
-				Scope:    []string{"scope1", "scope2"},
-				Password: "password",
+				UID:         "this is a uid",
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
+				Password:    "password",
 			},
 			name: "yaml user creation -- invalid file format",
 			args: args{
@@ -116,11 +118,10 @@ func Test_createUser(t *testing.T) {
 			},
 			options: createUserOptionsDT{yaml: "user.yaml"},
 			before: func() {
-				usr := client.User{
-					UID:      "this is a uid",
-					Role:     12,
-					Scope:    []string{"scope1", "scope2"},
-					Password: "password",
+				usr := taglessUser{
+					UID:         "this is a uid",
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
+					Password:    "password",
 				}
 				buf, _ := json.Marshal(usr)
 				ioutil.WriteFile("user.yaml", buf, os.ModePerm)
@@ -132,10 +133,9 @@ func Test_createUser(t *testing.T) {
 		},
 		{
 			usr: client.User{
-				UID:      "this is a uid",
-				Role:     12,
-				Scope:    []string{"scope1", "scope2"},
-				Password: "password",
+				UID:         "this is a uid",
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
+				Password:    "password",
 			},
 			name: "json user creation",
 			args: args{
@@ -145,10 +145,9 @@ func Test_createUser(t *testing.T) {
 			options: createUserOptionsDT{json: "user.json"},
 			before: func() {
 				usr := client.User{
-					UID:      "this is a uid",
-					Role:     12,
-					Scope:    []string{"scope1", "scope2"},
-					Password: "password",
+					UID:         "this is a uid",
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
+					Password:    "password",
 				}
 				buf, _ := json.Marshal(usr)
 				ioutil.WriteFile("user.json", buf, os.ModePerm)
@@ -160,10 +159,9 @@ func Test_createUser(t *testing.T) {
 		},
 		{
 			usr: client.User{
-				UID:      "this is a uid",
-				Role:     12,
-				Scope:    []string{"scope1", "scope2"},
-				Password: "password",
+				UID:         "this is a uid",
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
+				Password:    "password",
 			},
 			name: "json user creation -- invalid file format",
 			args: args{
@@ -173,10 +171,9 @@ func Test_createUser(t *testing.T) {
 			options: createUserOptionsDT{json: "user.json"},
 			before: func() {
 				usr := client.User{
-					UID:      "this is a uid",
-					Role:     12,
-					Scope:    []string{"scope1", "scope2"},
-					Password: "password",
+					UID:         "this is a uid",
+					Permissions: map[string][]string{"": {auth.CreateAlias}},
+					Password:    "password",
 				}
 				buf, _ := yaml.Marshal(usr)
 				ioutil.WriteFile("user.json", buf, os.ModePerm)
@@ -189,10 +186,9 @@ func Test_createUser(t *testing.T) {
 
 		{
 			usr: client.User{
-				UID:      "this is a uid",
-				Role:     12,
-				Scope:    []string{"scope1", "scope2"},
-				Password: "password",
+				UID:         "this is a uid",
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
+				Password:    "password",
 			},
 			name: "flag user creation",
 			args: args{
@@ -200,20 +196,18 @@ func Test_createUser(t *testing.T) {
 				s: []string{"user", "password"},
 			},
 			options: createUserOptionsDT{
-				username: "this is a uid",
-				password: "password",
-				scopes:   []string{"scope1", "scope2"},
-				role:     12,
+				username:    "this is a uid",
+				password:    "password",
+				permissions: map[string][]string{"": {auth.CreateAlias}},
 			},
 			wantErr: false,
 		},
 
 		{
 			usr: client.User{
-				UID:      "this is a uid",
-				Role:     12,
-				Scope:    []string{"scope1", "scope2"},
-				Password: "password",
+				UID:         "this is a uid",
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
+				Password:    "password",
 			},
 			name: "flag user creation -- bad uid",
 			args: args{
@@ -221,20 +215,18 @@ func Test_createUser(t *testing.T) {
 				s: []string{"user", "password"},
 			},
 			options: createUserOptionsDT{
-				username: "",
-				password: "password",
-				scopes:   []string{"scope1", "scope2"},
-				role:     12,
+				username:    "",
+				password:    "password",
+				permissions: map[string][]string{"": {auth.CreateAlias}},
 			},
 			wantErr: true,
 		},
 
 		{
 			usr: client.User{
-				UID:      "this is a uid",
-				Role:     12,
-				Scope:    []string{"scope1", "scope2"},
-				Password: "password",
+				UID:         "this is a uid",
+				Permissions: map[string][]string{"": {auth.CreateAlias}},
+				Password:    "password",
 			},
 			name: "flag user creation -- bad password",
 			args: args{
@@ -242,10 +234,9 @@ func Test_createUser(t *testing.T) {
 				s: []string{"user", "password"},
 			},
 			options: createUserOptionsDT{
-				username: "this is a uid",
-				password: "",
-				scopes:   []string{"scope1", "scope2"},
-				role:     12,
+				username:    "this is a uid",
+				password:    "",
+				permissions: map[string][]string{"": {auth.CreateAlias}},
 			},
 			wantErr: true,
 		},
