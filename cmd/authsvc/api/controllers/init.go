@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
 )
@@ -19,7 +19,7 @@ func (server *Server) HandleInit() rest.Handler {
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
 		var data struct {
 			Key string
-			models.Payload
+			auth.Payload
 		}
 		decoder := json.NewDecoder(r.Body)
 		decoder.Decode(&data)
@@ -38,7 +38,7 @@ func (server *Server) HandleInit() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		rest.JSON(w, 200, models.JwtDO{Token: token})
+		rest.JSON(w, 200, auth.JwtDO{Token: token})
 
 	}).Post().JSON().Recover()
 }

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/auth/models"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/lestrrat-go/jwx/jwa"
@@ -67,7 +66,7 @@ func (server *Server) Refresh() rest.Handler {
 		}
 		log.Printf("string(signed) = %+v\n", string(signed))
 
-		respBody := models.JwtDO{
+		respBody := auth.JwtDO{
 			Token: signed,
 		}
 
@@ -75,8 +74,8 @@ func (server *Server) Refresh() rest.Handler {
 	}
 }
 
-func refreshPayload(refreshToken []byte, refreshURL string) (*models.Payload, error) {
-	reqBody := models.ResfreshDO{
+func refreshPayload(refreshToken []byte, refreshURL string) (*auth.Payload, error) {
+	reqBody := auth.ResfreshDO{
 		RefreshToken: refreshToken,
 	}
 	reqBytes, err := json.Marshal(reqBody)
@@ -93,7 +92,7 @@ func refreshPayload(refreshToken []byte, refreshURL string) (*models.Payload, er
 	}
 	defer resp.Body.Close()
 
-	payload := models.Payload{}
+	payload := auth.Payload{}
 	err = json.NewDecoder(resp.Body).Decode(&payload)
 	if err != nil {
 		return nil, err

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,7 +20,7 @@ func TestServer_initRoutes(t *testing.T) {
 	testServer := &Server{
 		Mux:           http.NewServeMux(),
 		MemoryManager: fake.MockMemoryManager(nil),
-		auth:          authmock.NewMockAuth(nil),
+		auth:          authmock.NewMockAuth(errors.New("unauthorized")),
 	}
 	testServer.initRoutes()
 	defaultMethods := [...]string{
@@ -36,40 +37,40 @@ func TestServer_initRoutes(t *testing.T) {
 		{
 			name: "apps",
 			want: [...]int{
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channels",
 			want: [...]int{
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channeltypes",
 			want: [...]int{
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "alias",
 			want: [...]int{
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
@@ -95,7 +96,7 @@ func TestServer_initRoutes(t *testing.T) {
 				if err != nil {
 					t.Error("error creating request")
 				}
-				req.Header.Add("Authorization", "Bearer mock_tonken")
+				req.Header.Add("Authorization", "Bearer mock_token")
 				res, _ := client.Do(req)
 				if res.StatusCode != statusCodeResult {
 					t.Errorf("Method %v in url %v => got %v, wanted %v",
