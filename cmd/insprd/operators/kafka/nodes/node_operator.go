@@ -2,19 +2,15 @@ package nodes
 
 import (
 	"context"
-	"math"
 	"os"
-	"strconv"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils"
 	"go.uber.org/zap"
 	"k8s.io/client-go/rest"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 	v1 "k8s.io/client-go/kubernetes/typed/apps/v1"
@@ -28,40 +24,22 @@ type NodeOperator struct {
 	auth      auth.Auth
 }
 
-func (no *NodeOperator) secrets() cv1.SecretInterface {
+// Secrets returns the secret interface of the node operator
+func (no *NodeOperator) Secrets() cv1.SecretInterface {
 	appsNamespace := getK8SVariables().AppsNamespace
 	return no.clientSet.CoreV1().Secrets(appsNamespace)
 }
-func (no *NodeOperator) services() cv1.ServiceInterface {
+
+// Services returns the service interface for the node operator
+func (no *NodeOperator) Services() cv1.ServiceInterface {
 	appsNamespace := getK8SVariables().AppsNamespace
 	return no.clientSet.CoreV1().Services(appsNamespace)
 }
 
-func (no *NodeOperator) deployments() v1.DeploymentInterface {
+// Deployments returns the deployment interface for the k8s operator
+func (no *NodeOperator) Deployments() v1.DeploymentInterface {
 	appsNamespace := getK8SVariables().AppsNamespace
 	return no.clientSet.AppsV1().Deployments(appsNamespace)
-}
-
-// GetNode returns the node with the given name, if it exists.
-// Otherwise, returns an error
-func (no *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
-	kube := no.deployments()
-	deployName := toDeploymentName(app)
-
-	logger.Info("getting Node from k8s deployment",
-		zap.String("deployment name", deployName))
-
-	dep, err := kube.Get(deployName, metav1.GetOptions{})
-	if err != nil {
-		logger.Error("unable to find k8s deployment")
-		return nil, ierrors.NewError().Message(err.Error()).Build()
-	}
-
-	node, err := toNode(dep)
-	if err != nil {
-		return nil, err
-	}
-	return node, nil
 }
 
 // CreateNode deploys a new node structure, if it's information is valid.
@@ -120,11 +98,6 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration
 func NewOperator(memory memory.Manager) (nop *NodeOperator, err error) {
-	sidp, err := strconv.Atoi(os.Getenv("INSPR_SIDECAR_PORT"))
-	if err != nil {
-		panic(err)
-	}
-	sidecarPort = int32(math.Min(float64(sidp), math.MaxInt32))
 	nop = &NodeOperator{
 		memory: memory,
 	}
