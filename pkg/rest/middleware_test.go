@@ -344,23 +344,3 @@ func Test_getPermConst(t *testing.T) {
 		})
 	}
 }
-
-func TestHandleCRUD(t *testing.T) {
-	type args struct {
-		handler CRUDHandler
-	}
-	tests := []struct {
-		name string
-		args args
-		want Handler
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := HandleCRUD(tt.args.handler); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("HandleCRUD() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}

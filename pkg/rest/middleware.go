@@ -8,6 +8,7 @@ import (
 
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 // CRUDHandler handles crud requests to a given resource
@@ -115,19 +116,15 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		for scope := range payload.Permissions {
 			log.Printf("permission-scope = %+v\n", scope)
 
+			// usually the request will one have one scope
 			for _, rs := range reqScopes {
 				log.Printf("request-scope = %+v\n", rs)
 
-				if strings.HasPrefix(rs, scope) {
-
-					// todo use function that already checks and returns a bool if exists
-					for _, p := range payload.Permissions[scope] {
-						if p == perm {
-							// token and context are valid
-							h(w, r)
-							return
-						}
-					}
+				if strings.HasPrefix(rs, scope) &&
+					utils.Includes(payload.Permissions[scope], perm) {
+					// token and context are valid
+					h(w, r)
+					return
 				}
 			}
 		}
