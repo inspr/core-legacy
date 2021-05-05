@@ -144,38 +144,27 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 // getOperation returns the operation being done by the Request in the cluster
 // get, create, update, delete.
 func getOperation(r *http.Request) string {
-	switch r.Method {
-	case http.MethodGet:
-		return "get"
-	case http.MethodPost:
-		return "create"
-	case http.MethodPut:
-		return "update"
-	case http.MethodDelete:
-		return "delete"
-	default:
-		return "invalid"
+	// some methods represent their own operation
+	operation, ok := operationTranslator[r.Method]
+	if !ok {
+		return r.Method
 	}
+	return operation
 }
 
 // getTarget isolates the area that is being requested, for example the request
 // URL is https://example.org:8000/channels, the getTarget removes the base of the url and some unecessary '/' and returns only 'channels'
 func getTarget(r *http.Request) string {
-	url := strings.TrimSuffix(r.URL.Path, "/")
-	url = strings.TrimPrefix(url, r.URL.Host)
-	url = strings.TrimPrefix(url, "/")
+	route := strings.TrimSuffix(r.URL.Path, "/")
+	route = strings.TrimPrefix(route, r.URL.Host)
+	route = strings.TrimPrefix(route, "/")
 
 	// some constant values differ from the url name used
-	switch url {
-	case "apps":
-		return "dapp"
-	case "channels":
-		return "channel"
-	case "channeltypes":
-		return "ctype"
-	default:
-		return url
+	target, ok := routeTranslator[route]
+	if !ok {
+		return route
 	}
+	return target
 }
 
 // getPermConst receives the operation that is being done and who is the target,

@@ -53,7 +53,7 @@ func NewJSONClient(baseURL string) *Client {
 		BaseURL(baseURL).
 		Encoder(json.Marshal).
 		Decoder(JSONDecoderGenerator).
-		Build()
+		Pointer()
 }
 
 // BaseURL sets the base URL for the client that is being built
@@ -62,8 +62,8 @@ func (c Client) BaseURL(url string) Client {
 	return c
 }
 
-// Build returns the address of an existing client
-func (c Client) Build() *Client {
+// Pointer returns the address of an existing client
+func (c Client) Pointer() *Client {
 	return &c
 }
 

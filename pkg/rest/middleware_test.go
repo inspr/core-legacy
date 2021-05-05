@@ -248,7 +248,7 @@ func Test_getOperation(t *testing.T) {
 			args: args{
 				r: createReq(http.MethodPatch),
 			},
-			want: "invalid",
+			want: http.MethodPatch,
 		},
 	}
 	for _, tt := range tests {
