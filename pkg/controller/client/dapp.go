@@ -5,13 +5,15 @@ import (
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
 // AppClient is a client for getting and setting app information on Insprd
 type AppClient struct {
-	c *request.Client
+	client *request.Client
+	config ControllerConfig
 }
 
 // Get gets information from an app inside the Insprd
@@ -22,13 +24,14 @@ type AppClient struct {
 // So to get an app inside app1 with the name app2 you
 // would call ac.Get(context.Background(), "app1.app2")
 func (ac *AppClient) Get(ctx context.Context, context string) (*meta.App, error) {
+	fullscope, _ := metautils.JoinScopes(ac.config.Scope, context)
 	adi := models.AppQueryDI{
-		Scope: context,
+		Scope: fullscope,
 	}
 
 	var resp meta.App
 
-	err := ac.c.Send(ctx, "/apps", "GET", adi, &resp)
+	err := ac.client.Send(ctx, "/apps", "GET", adi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -47,13 +50,14 @@ func (ac *AppClient) Get(ctx context.Context, context string) (*meta.App, error)
 // So to create an app inside app1 with the name app2 you
 // would call ac.Create(context.Background(), "app1", &meta.App{...})
 func (ac *AppClient) Create(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+	fullscope, _ := metautils.JoinScopes(ac.config.Scope, context)
 	adi := models.AppDI{
-		Scope:  context,
+		Scope:  fullscope,
 		App:    *app,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
-	err := ac.c.Send(ctx, "/apps", "POST", adi, &resp)
+	err := ac.client.Send(ctx, "/apps", "POST", adi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -69,12 +73,13 @@ func (ac *AppClient) Create(ctx context.Context, context string, app *meta.App, 
 // So to delete an app inside app1 with the name app2 you
 // would call ac.Delete(context.Background(), "app1.app2")
 func (ac *AppClient) Delete(ctx context.Context, context string, dryRun bool) (diff.Changelog, error) {
+	fullscope, _ := metautils.JoinScopes(ac.config.Scope, context)
 	adi := models.AppQueryDI{
-		Scope:  context,
+		Scope:  fullscope,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
-	err := ac.c.Send(ctx, "/apps", "DELETE", adi, &resp)
+	err := ac.client.Send(ctx, "/apps", "DELETE", adi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -93,14 +98,15 @@ func (ac *AppClient) Delete(ctx context.Context, context string, dryRun bool) (d
 // So to update an app inside app1 with the name app2 you
 // would call ac.Update(context.Background(), "app1", &meta.App{...})
 func (ac *AppClient) Update(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+	fullscope, _ := metautils.JoinScopes(ac.config.Scope, context)
 	adi := models.AppDI{
-		Scope:  context,
+		Scope:  fullscope,
 		App:    *app,
 		DryRun: dryRun,
 	}
 
 	var resp diff.Changelog
-	err := ac.c.Send(ctx, "/apps", "PUT", adi, &resp)
+	err := ac.client.Send(ctx, "/apps", "PUT", adi, &resp)
 	if err != nil {
 		return nil, err
 	}

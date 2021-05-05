@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/cmd"
 	"github.com/inspr/inspr/pkg/controller"
 	"github.com/inspr/inspr/pkg/controller/client"
@@ -57,9 +58,14 @@ func SetClient(url string) {
 		dir, _ := os.UserHomeDir()
 		cmd.InsprOptions.Token = filepath.Join(dir, ".inspr/token")
 	}
-	defaults.client = client.NewControllerClient(url, Authenticator{
-		cmd.InsprOptions.Token,
-	})
+	config := client.ControllerConfig{
+		Auth: auth.Authenticator{
+			TokenPath: cmd.InsprOptions.Token,
+		},
+		Scope: "",
+		URL:   url,
+	}
+	defaults.client = client.NewControllerClient(config)
 }
 
 //SetMockedClient configures singleton's client as a mocked client given a error
