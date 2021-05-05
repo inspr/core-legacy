@@ -43,3 +43,28 @@ const (
 
 	CreateToken string = "create:token"
 )
+
+// CrudConsts is a slice of string that contains the values of the constants related to the CRUD methods
+var CrudConsts = []string{
+	CreateDapp,
+	CreateChannel,
+	CreateChannelType,
+	CreateAlias,
+
+	GetDapp,
+	GetChannel,
+	GetChannelType,
+	GetAlias,
+
+	UpdateDapp,
+	UpdateChannel,
+	UpdateChannelType,
+	UpdateAlias,
+
+	DeleteDapp,
+	DeleteChannel,
+	DeleteChannelType,
+	DeleteAlias,
+
+	CreateToken,
+}

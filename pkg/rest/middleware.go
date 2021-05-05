@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -8,6 +9,55 @@ import (
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/ierrors"
 )
+
+// CRUDHandler handles crud requests to a given resource
+type CRUDHandler interface {
+	HandleCreate() Handler
+	HandleDelete() Handler
+	HandleUpdate() Handler
+	HandleGet() Handler
+	GetAuth() auth.Auth
+}
+
+// HandleCRUD uses a CRUDHandler to handle HTTP requests for a CRUD resource
+func HandleCRUD(handler CRUDHandler) Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+
+		case http.MethodGet:
+			handler.
+				HandleGet().
+				Validate(handler.GetAuth()).
+				JSON().
+				Recover()(w, r)
+
+		case http.MethodPost:
+			handler.
+				HandleCreate().
+				Validate(handler.GetAuth()).
+				JSON().
+				Recover()(w, r)
+
+		case http.MethodPut:
+			handler.
+				HandleUpdate().
+				Validate(handler.GetAuth()).
+				JSON().
+				Recover()(w, r)
+
+		case http.MethodDelete:
+			handler.
+				HandleDelete().
+				Validate(handler.GetAuth()).
+				JSON().
+				Recover()(w, r)
+
+		default:
+			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+	}
+}
 
 // JSON specifies in the header that the response content is a json
 func (h Handler) JSON() Handler {
@@ -53,62 +103,93 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			return
 		}
 
+		// used for checking scope authorization
 		reqScopes := r.Header[HeaderScopeKey]
-		valid := false
 		log.Printf("payload.Permissions = %+v\n", payload.Permissions)
+
+		// used for checking permissions
+		operation := getOperation(r)
+		target := getTarget(r)
+		perm := getPermConst(operation, target)
 
 		for scope := range payload.Permissions {
 			log.Printf("permission-scope = %+v\n", scope)
+
 			for _, rs := range reqScopes {
 				log.Printf("request-scope = %+v\n", rs)
+
 				if strings.HasPrefix(rs, scope) {
-					// scope found
-					valid = true
+
+					// todo use function that already checks and returns a bool if exists
+					for _, p := range payload.Permissions[scope] {
+						if p == perm {
+							// token and context are valid
+							h(w, r)
+							return
+						}
+					}
 				}
 			}
 		}
 
-		// check for unauthorized error
-		if !valid {
-			ERROR(w, ierrors.NewError().Forbidden().Message("not enought permissions to perform request").Build())
-			return
-
-		}
-
-		// token and context are valid
-		h(w, r)
+		// there were no valid operations
+		ERROR(
+			w,
+			ierrors.
+				NewError().
+				Forbidden().
+				Message("not enought permissions to perform request").
+				Build(),
+		)
 	}
 }
 
-// CRUDHandler handles crud requests to a given resource
-type CRUDHandler interface {
-	HandleCreate() Handler
-	HandleDelete() Handler
-	HandleUpdate() Handler
-	HandleGet() Handler
-	GetAuth() auth.Auth
+// getOperation returns the operation being done by the Request in the cluster
+// get, create, update, delete.
+func getOperation(r *http.Request) string {
+	switch r.Method {
+	case http.MethodGet:
+		return "get"
+	case http.MethodPost:
+		return "create"
+	case http.MethodPut:
+		return "update"
+	case http.MethodDelete:
+		return "delete"
+	default:
+		return "invalid"
+	}
 }
 
-// HandleCRUD uses a CRUDHandler to handle HTTP requests for a CRUD resource
-func HandleCRUD(handler CRUDHandler) Handler {
-	return func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
+// getTarget isolates the area that is being requested, for example the request
+// URL is https://example.org:8000/channels, the getTarget removes the base of the url and some unecessary '/' and returns only 'channels'
+func getTarget(r *http.Request) string {
+	url := strings.TrimSuffix(r.URL.Path, "/")
+	url = strings.TrimPrefix(url, r.URL.Host)
+	url = strings.TrimPrefix(url, "/")
 
-		case http.MethodGet:
-			handler.HandleGet().Validate(handler.GetAuth()).JSON().Recover()(w, r)
+	// some constant values differ from the url name used
+	switch url {
+	case "apps":
+		return "dapp"
+	case "channels":
+		return "channel"
+	case "channeltypes":
+		return "ctype"
+	default:
+		return url
+	}
+}
 
-		case http.MethodPost:
-			handler.HandleCreate().Validate(handler.GetAuth()).JSON().Recover()(w, r)
-
-		case http.MethodPut:
-			handler.HandleUpdate().Validate(handler.GetAuth()).JSON().Recover()(w, r)
-
-		case http.MethodDelete:
-			handler.HandleDelete().Validate(handler.GetAuth()).JSON().Recover()(w, r)
-
-		default:
-			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
-			return
+// getPermConst receives the operation that is being done and who is the target,
+// then checks if the combination of the two exists in the slice of constants
+// related to CRUD methods
+func getPermConst(operation, target string) string {
+	perm := fmt.Sprintf("%s:%s", operation, target)
+	for _, knownConst := range auth.CrudConsts {
+		if knownConst == perm {
+			return knownConst
 		}
 	}
+	return "invalid"
 }
