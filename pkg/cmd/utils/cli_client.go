@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/cmd"
@@ -53,6 +54,10 @@ func SetOutput(out io.Writer) {
 
 // SetClient sets the default server IP of CLI
 func SetClient(url string) {
+	if cmd.InsprOptions.Token == "" {
+		dir, _ := os.UserHomeDir()
+		cmd.InsprOptions.Token = filepath.Join(dir, ".inspr/token")
+	}
 	config := client.ControllerConfig{
 		Auth: auth.Authenticator{
 			TokenPath: cmd.InsprOptions.Token,

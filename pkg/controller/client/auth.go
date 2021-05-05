@@ -3,8 +3,7 @@ package client
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/api/auth"
-	"github.com/inspr/inspr/pkg/auth/models"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
@@ -17,7 +16,7 @@ type AuthClient struct {
 // GenerateToken sends a request containing a payload so Insprd
 // generates a new auth token based on the payload's info
 func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (string, error) {
-	authDI := models.JwtDO{}
+	authDI := auth.JwtDO{}
 
 	err := ac.client.Send(ctx, "/auth", "POST", payload, &authDI)
 	if err != nil {
@@ -31,7 +30,7 @@ func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (
 func (ac *AuthClient) Init(ctx context.Context, key string) (string, error) {
 
 	authDO := struct{ Key string }{key}
-	authDI := models.JwtDO{}
+	authDI := auth.JwtDO{}
 	err := ac.client.Send(ctx, "/init", "POST", authDO, &authDI)
 	if err != nil {
 		return "", err
