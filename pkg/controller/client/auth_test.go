@@ -86,7 +86,7 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AuthClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			got, err := ac.GenerateToken(tt.args.ctx, tt.args.payload)
 			if (err != nil) != tt.wantErr {

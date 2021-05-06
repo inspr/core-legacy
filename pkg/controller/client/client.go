@@ -14,43 +14,47 @@ type Client struct {
 
 // NewControllerClient return a new Client
 func NewControllerClient(url string, auth request.Authenticator) controller.Interface {
-	client := request.NewClient().BaseURL(url).Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Authenticator(auth).Build()
 	return &Client{
-		HTTPClient: client,
+		HTTPClient: request.NewClient().
+			BaseURL(url).
+			Encoder(json.Marshal).
+			Decoder(request.JSONDecoderGenerator).
+			Authenticator(auth).
+			Pointer(),
 	}
 }
 
 // Channels interacts with channels on the Insprd
 func (c *Client) Channels() controller.ChannelInterface {
 	return &ChannelClient{
-		c: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // Apps interacts with apps on the Insprd
 func (c *Client) Apps() controller.AppInterface {
 	return &AppClient{
-		c: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // ChannelTypes interacts with channel types on the Insprd
 func (c *Client) ChannelTypes() controller.ChannelTypeInterface {
 	return &ChannelTypeClient{
-		c: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // Authorization interacts with Insprd's auth
 func (c *Client) Authorization() controller.AuthorizationInterface {
 	return &AuthClient{
-		c: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // Alias interacts with alias on the Insprd
 func (c *Client) Alias() controller.AliasInterface {
 	return &AliasClient{
-		c: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }

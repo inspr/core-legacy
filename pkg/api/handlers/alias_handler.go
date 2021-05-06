@@ -28,6 +28,7 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 	logger.Info("handling Alias create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -41,12 +42,12 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 		logger.Debug("initiating Alias create transaction")
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Alias().Create(data.Scope, data.Target, &data.Alias)
+		err = ah.Memory.Alias().Create(scope, data.Target, &data.Alias)
 		if err != nil {
 			logger.Error("unable to create Alias",
 				zap.Any("alias", data.Alias),
 				zap.String("targed", data.Target),
-				zap.String("context", data.Scope),
+				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -91,6 +92,7 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 	logger.Info("handling Alias get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasQueryDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -104,11 +106,11 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Alias get transaction")
 		ah.Memory.InitTransaction()
 
-		app, err := ah.Memory.Root().Alias().Get(data.Scope, data.Key)
+		app, err := ah.Memory.Root().Alias().Get(scope, data.Key)
 		if err != nil {
 			logger.Error("unable to get Alias",
 				zap.String("alias key", data.Key),
-				zap.String("context", data.Scope),
+				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -128,6 +130,7 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 	logger.Info("handling Alias update request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -140,12 +143,12 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 		logger.Debug("initiating Alias update transaction")
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Alias().Update(data.Scope, data.Target, &data.Alias)
+		err = ah.Memory.Alias().Update(scope, data.Target, &data.Alias)
 		if err != nil {
 			logger.Error("unable to update Alias",
 				zap.Any("alias", data.Alias),
 				zap.String("targed", data.Target),
-				zap.String("context", data.Scope),
+				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -190,6 +193,7 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 	logger.Info("handling Alias delete request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasQueryDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -202,11 +206,11 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 		logger.Debug("initiating Alias delete transaction")
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Alias().Delete(data.Scope, data.Key)
+		err = ah.Memory.Alias().Delete(scope, data.Key)
 		if err != nil {
 			logger.Error("unable to delete Alias",
 				zap.String("alias key", data.Key),
-				zap.String("context", data.Scope),
+				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()

@@ -17,7 +17,6 @@ func SetMockEnv() {
 	os.Setenv("INSPR_APP_ID", "testappid1")
 	os.Setenv("INSPR_SIDECAR_WRITE_PORT", "3001")
 	os.Setenv("INSPR_SIDECAR_READ_PORT", "3002")
-
 }
 
 // UnsetMockEnv - removes the values of the environment variables

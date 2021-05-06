@@ -38,7 +38,7 @@ func NewAppClient() *Client {
 			BaseURL(writeAddr).
 			Encoder(json.Marshal).
 			Decoder(request.JSONDecoderGenerator).
-			Build(),
+			Pointer(),
 		mux: http.NewServeMux(),
 	}
 }
