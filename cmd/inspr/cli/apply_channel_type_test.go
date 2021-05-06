@@ -21,10 +21,10 @@ func createSchema() string {
 	return string(data)
 }
 
-func TestNewApplyChannelType(t *testing.T) {
+func TestNewApplyType(t *testing.T) {
 	prepareToken(t)
-	chanTypeWithoutNameBytes, _ := yaml.Marshal(meta.ChannelType{})
-	chanTypeDefaultBytes, _ := yaml.Marshal(meta.ChannelType{Meta: meta.Metadata{Name: "mock"}})
+	chanTypeWithoutNameBytes, _ := yaml.Marshal(meta.Type{})
+	chanTypeDefaultBytes, _ := yaml.Marshal(meta.Type{Meta: meta.Metadata{Name: "mock"}})
 	type args struct {
 		b []byte
 	}
@@ -41,11 +41,11 @@ func TestNewApplyChannelType(t *testing.T) {
 			want: nil,
 		},
 		{
-			name: "channeltype_without_name",
+			name: "Type_without_name",
 			args: args{
 				b: chanTypeWithoutNameBytes,
 			},
-			want: ierrors.NewError().Message("channelType without name").Build(),
+			want: ierrors.NewError().Message("Type without name").Build(),
 		},
 		{
 			name: "error_testing",
@@ -58,17 +58,17 @@ func TestNewApplyChannelType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cliutils.SetMockedClient(tt.want)
-			got := NewApplyChannelType()
+			got := NewApplyType()
 
 			r := got(tt.args.b, nil)
 
 			if r != nil && tt.want != nil {
 				if r.Error() != tt.want.Error() {
-					t.Errorf("newApplyChannelType() = %v, want %v", r.Error(), tt.want.Error())
+					t.Errorf("newApplyType() = %v, want %v", r.Error(), tt.want.Error())
 				}
 			} else {
 				if r != tt.want {
-					t.Errorf("newApplyChannelType() = %v, want %v", r, tt.want)
+					t.Errorf("newApplyType() = %v, want %v", r, tt.want)
 				}
 			}
 		})

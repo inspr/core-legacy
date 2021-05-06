@@ -1,6 +1,8 @@
 package nodes
 
 import (
+	"os"
+	"strconv"
 	"strings"
 
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
@@ -53,7 +55,7 @@ func (no *NodeOperator) sidecarEnvironment(app *meta.App) utils.EnvironmentMap {
 		resolved := resolves[boundary]
 		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 		ch, _ := no.memory.Channels().Get(parent, chName)
-		ct, _ := no.memory.ChannelTypes().Get(parent, ch.Spec.Type)
+		ct, _ := no.memory.Types().Get(parent, ch.Spec.Type)
 		resolved = "INSPR_" + ch.Meta.UUID
 		env[resolved+"_SCHEMA"] = ct.Schema
 		env[boundary+"_RESOLVED"] = resolved

@@ -25,17 +25,17 @@ func main() {
 	createHelloWorldApp(&client, false)
 	fmt.Printf("\n\n")
 
-	fmt.Println("[Creating ChannelTypeHello inside HelloWorld app...]")
-	createChannelTypeInsideHelloWorld(&client, false)
+	fmt.Println("[Creating TypeHello inside HelloWorld app...]")
+	createTypeInsideHelloWorld(&client, false)
 	fmt.Printf("\n\n")
 
-	fmt.Println("[Getting ChannelTypeHello...]")
-	cType, err := client.ChannelTypes().Get(context.Background(), "HelloWorld", "ChannelTypeHello")
+	fmt.Println("[Getting TypeHello...]")
+	cType, err := client.Types().Get(context.Background(), "HelloWorld", "TypeHello")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	utils.PrintChannelTypeTree(cType, os.Stdout)
+	utils.PrintTypeTree(cType, os.Stdout)
 
 	fmt.Println("[Creating ChannelOne inside HelloWorld app...]")
 	createChannelInsideHelloWorld(&client, false)
@@ -49,13 +49,13 @@ func main() {
 	}
 	utils.PrintChannelTree(ch, os.Stdout)
 
-	fmt.Println("[Getting ChannelTypeHello...]")
-	cType, err = client.ChannelTypes().Get(context.Background(), "HelloWorld", "ChannelTypeHello")
+	fmt.Println("[Getting TypeHello...]")
+	cType, err = client.Types().Get(context.Background(), "HelloWorld", "TypeHello")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	utils.PrintChannelTypeTree(cType, os.Stdout)
+	utils.PrintTypeTree(cType, os.Stdout)
 
 	fmt.Println("[Creating NewApp inside HelloWorld app...]")
 	createNewAppInsideHelloWorld(&client, false)
@@ -69,8 +69,8 @@ func main() {
 	updateChannelOneAddAnnotationToIt(&client, false)
 	fmt.Printf("\n\n")
 
-	fmt.Println("[Update ChannelTypeHello adding a note to it...]")
-	updateChannelTypeHelloAddAnnotation(&client, false)
+	fmt.Println("[Update TypeHello adding a note to it...]")
+	updateTypeHelloAddAnnotation(&client, false)
 	fmt.Printf("\n\n")
 
 	fmt.Println("[Delete NewApp inside HelloWorld...]")
@@ -81,8 +81,8 @@ func main() {
 	deleteChannelOneInsideHelloWorld(&client, false)
 	fmt.Printf("\n\n")
 
-	fmt.Println("[Delete ChannelTypeHello inside HelloWorld]")
-	deleteChannelTypeHelloInsideHelloWorld(&client, false)
+	fmt.Println("[Delete TypeHello inside HelloWorld]")
+	deleteTypeHelloInsideHelloWorld(&client, false)
 	fmt.Printf("\n\n")
 
 	fmt.Println("[TESTING DRY RUN...]")
@@ -137,7 +137,7 @@ func createChannelInsideHelloWorld(client *client.Client, dryRun bool) {
 			Name: "ChannelOne",
 		},
 		Spec: meta.ChannelSpec{
-			Type: "ChannelTypeHello",
+			Type: "TypeHello",
 		},
 	}, dryRun)
 	if err != nil {
@@ -146,10 +146,10 @@ func createChannelInsideHelloWorld(client *client.Client, dryRun bool) {
 	resp.Print(os.Stdout)
 }
 
-func createChannelTypeInsideHelloWorld(client *client.Client, dryRun bool) {
-	resp, err := client.ChannelTypes().Create(context.Background(), "HelloWorld", &meta.ChannelType{
+func createTypeInsideHelloWorld(client *client.Client, dryRun bool) {
+	resp, err := client.Types().Create(context.Background(), "HelloWorld", &meta.Type{
 		Meta: meta.Metadata{
-			Name: "ChannelTypeHello",
+			Name: "TypeHello",
 		},
 	}, dryRun)
 	if err != nil {
@@ -197,7 +197,7 @@ func updateChannelOneAddAnnotationToIt(client *client.Client, dryRun bool) {
 			},
 		},
 		Spec: meta.ChannelSpec{
-			Type: "ChannelTypeHello",
+			Type: "TypeHello",
 		},
 	}, dryRun)
 	if err != nil {
@@ -206,12 +206,12 @@ func updateChannelOneAddAnnotationToIt(client *client.Client, dryRun bool) {
 	resp.Print(os.Stdout)
 }
 
-func updateChannelTypeHelloAddAnnotation(client *client.Client, dryRun bool) {
-	resp, err := client.ChannelTypes().Update(context.Background(), "HelloWorld", &meta.ChannelType{
+func updateTypeHelloAddAnnotation(client *client.Client, dryRun bool) {
+	resp, err := client.Types().Update(context.Background(), "HelloWorld", &meta.Type{
 		Meta: meta.Metadata{
-			Name: "ChannelTypeHello",
+			Name: "TypeHello",
 			Annotations: map[string]string{
-				"What's this?": "This is a note inside ChannelTypeHello",
+				"What's this?": "This is a note inside TypeHello",
 			},
 		},
 	}, dryRun)
@@ -237,8 +237,8 @@ func deleteChannelOneInsideHelloWorld(client *client.Client, dryRun bool) {
 	resp.Print(os.Stdout)
 }
 
-func deleteChannelTypeHelloInsideHelloWorld(client *client.Client, dryRun bool) {
-	resp, err := client.ChannelTypes().Delete(context.Background(), "HelloWorld", "ChannelTypeHello", dryRun)
+func deleteTypeHelloInsideHelloWorld(client *client.Client, dryRun bool) {
+	resp, err := client.Types().Delete(context.Background(), "HelloWorld", "TypeHello", dryRun)
 	if err != nil {
 		fmt.Printf("%#v", err)
 	}

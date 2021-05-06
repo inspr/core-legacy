@@ -6,29 +6,29 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// YamlToChannelType - deserializes the yaml to a meta.ChannelType struct
-func YamlToChannelType(bytes []byte) (meta.ChannelType, error) {
-	channelType := meta.ChannelType{
+// YamlToType - deserializes the yaml to a meta.Type struct
+func YamlToType(bytes []byte) (meta.Type, error) {
+	Type := meta.Type{
 		Meta: meta.Metadata{Annotations: make(map[string]string)},
 	}
 
-	if err := yaml.Unmarshal(bytes, &channelType); err != nil {
-		return meta.ChannelType{},
+	if err := yaml.Unmarshal(bytes, &Type); err != nil {
+		return meta.Type{},
 			ierrors.
 				NewError().
-				InvalidChannelType().
+				InvalidType().
 				Message("Error parsing the file").
 				Build()
 	}
 
-	if channelType.Meta.Name == "" {
-		return meta.ChannelType{},
+	if Type.Meta.Name == "" {
+		return meta.Type{},
 			ierrors.
 				NewError().
 				InvalidName().
-				Message("channelType without name").
+				Message("Type without name").
 				Build()
 	}
 
-	return channelType, nil
+	return Type, nil
 }

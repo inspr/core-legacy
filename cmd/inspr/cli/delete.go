@@ -30,9 +30,9 @@ func NewDeleteCmd() *cobra.Command {
 		WithCommonFlags().
 		MinimumArgs(1, deleteChannels)
 	deleteTypes := cmd.NewCmd("ctypes").
-		WithDescription("Delete channel types from context").
-		WithExample("Delete channel type from the default scope", "delete ctypes <ctypename>").
-		WithExample("Delete channel type from a custom scope", "delete ctypes <ctypename> --scope app1.app2").
+		WithDescription("Delete Types from context").
+		WithExample("Delete Type from the default scope", "delete ctypes <ctypename>").
+		WithExample("Delete Type from a custom scope", "delete ctypes <ctypename> --scope app1.app2").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		MinimumArgs(1, deleteCTypes)
@@ -50,7 +50,7 @@ func NewDeleteCmd() *cobra.Command {
 		WithLongDescription("Delete takes a component type (apps | channels | ctypes | alias) its scope and name, and deletes it from the cluster").
 		WithExample("deletes app", "delete apps <app_name>").
 		WithExample("deletes channel", "delete ch <channel_name>").
-		WithExample("deletes channel_type", "delete ct <channel_type_name>").
+		WithExample("deletes type", "delete ct <type_name>").
 		WithExample("deletes alias", "delete al <alias_key>").
 		AddSubCommand(deleteApps).
 		AddSubCommand(deleteChannels).
@@ -136,7 +136,7 @@ func deleteCTypes(_ context.Context, args []string) error {
 			return err
 		}
 
-		cl, err := client.ChannelTypes().Delete(
+		cl, err := client.Types().Delete(
 			context.Background(),
 			path,
 			ctName,

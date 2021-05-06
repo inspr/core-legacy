@@ -335,7 +335,7 @@ func TestTypesMakeSet(t *testing.T) {
 		{
 			name: "Disjuction between ctypes arrays that returns a set",
 			args: args{
-				types: MTypes{"ct1": &meta.ChannelType{}, "ct2": &meta.ChannelType{}},
+				types: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},
 			want: StrSet{"ct1": true, "ct2": true},
 		},
@@ -361,7 +361,7 @@ func TestStrSet_TypesAppendSet(t *testing.T) {
 		{
 			name: "Appends ctypes slice to a set",
 			args: args{
-				types: MTypes{"ct1": &meta.ChannelType{}, "ct2": &meta.ChannelType{}},
+				types: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},
 			set: &StrSet{"ct1": true, "ct2": true},
 		},
@@ -391,8 +391,8 @@ func TestTypesDisjuncSet(t *testing.T) {
 		{
 			name: "Disjuction between ct arrays that returns a set",
 			args: args{
-				types1: MTypes{"ct1": &meta.ChannelType{}},
-				types2: MTypes{"ct1": &meta.ChannelType{}, "ct2": &meta.ChannelType{}},
+				types1: MTypes{"ct1": &meta.Type{}},
+				types2: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},
 			want: StrSet{"ct2": true},
 		},
@@ -421,8 +421,8 @@ func TestTypesIntersecSet(t *testing.T) {
 		{
 			name: "Intersection between ct arrays that returns a set",
 			args: args{
-				types1: MTypes{"ct1": &meta.ChannelType{}},
-				types2: MTypes{"ct1": &meta.ChannelType{}, "ct2": &meta.ChannelType{}},
+				types1: MTypes{"ct1": &meta.Type{}},
+				types2: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},
 			want: StrSet{"ct1": true},
 		},

@@ -32,14 +32,14 @@ func NewDescribeCmd() *cobra.Command {
 		WithCommonFlags().
 		ExactArgs(1, displayChannelState)
 
-	describeChannelType := cmd.NewCmd("ctypes <ctype_name | ctype_path>").
-		WithDescription("Retrieves the full state of the channelType from a given namespace").
-		WithExample("Display the state of the given channelType on the default scope", "describe ctypes hello_world").
-		WithExample("Display the state of the given channelType on a custom scope", "describe ctypes --scope app1.app2 hello_world").
-		WithExample("Display the state of the given channelType by the path", "describe ctypes app1.app2.hello_world").
+	describeType := cmd.NewCmd("ctypes <ctype_name | ctype_path>").
+		WithDescription("Retrieves the full state of the Type from a given namespace").
+		WithExample("Display the state of the given Type on the default scope", "describe ctypes hello_world").
+		WithExample("Display the state of the given Type on a custom scope", "describe ctypes --scope app1.app2 hello_world").
+		WithExample("Display the state of the given Type by the path", "describe ctypes app1.app2.hello_world").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
-		ExactArgs(1, displayChannelTypeState)
+		ExactArgs(1, displayTypeState)
 
 	describeAlias := cmd.NewCmd("alias <alias_key | alais_path>").
 		WithDescription("Retrieves the full state of the alias from a given namespace").
@@ -59,7 +59,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithLongDescription("describe takes a component type (apps | channels | ctypes | alias) plus the name of the component, and displays the state tree)").
 		AddSubCommand(describeApp).
 		AddSubCommand(describeChannel).
-		AddSubCommand(describeChannelType).
+		AddSubCommand(describeType).
 		AddSubCommand(describeAlias).
 		Super()
 
@@ -117,7 +117,7 @@ func displayChannelState(_ context.Context, args []string) error {
 	return nil
 }
 
-func displayChannelTypeState(_ context.Context, args []string) error {
+func displayTypeState(_ context.Context, args []string) error {
 	client := cliutils.GetCliClient()
 	out := cliutils.GetCliOutput()
 
@@ -131,12 +131,12 @@ func displayChannelTypeState(_ context.Context, args []string) error {
 		return err
 	}
 
-	channelType, err := client.ChannelTypes().Get(context.Background(), path, ctName)
+	Type, err := client.Types().Get(context.Background(), path, ctName)
 	if err != nil {
 		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
-	utils.PrintChannelTypeTree(channelType, out)
+	utils.PrintTypeTree(Type, out)
 
 	return nil
 }

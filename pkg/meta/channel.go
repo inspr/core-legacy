@@ -11,7 +11,7 @@ type Channel struct {
 }
 
 // ChannelSpec is the specification of a channel.
-// 'Type' string references a Channel Type structure name
+// 'Type' string references a Type structure name
 type ChannelSpec struct {
 	Type string `yaml:"type,omitempty"  json:"type" `
 }

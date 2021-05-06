@@ -533,8 +533,8 @@ spec:
   type: ppctype1
 ```
 
-**3) Channel Type YAML**
-Both Channels use the same Channel Type to define the kind of message that goes through them. So we must specify the kind, apiVersion and then the Channel Type information for it to be created in the same context (the same dApp) as the Channels'.  
+**3) Type YAML**
+Both Channels use the same Type to define the kind of message that goes through them. So we must specify the kind, apiVersion and then the Type information for it to be created in the same context (the same dApp) as the Channels'.  
 First we create "/ctypes" folder and _ct1.yaml_:
 
 ```zsh
@@ -545,7 +545,7 @@ touch ctypes/ct1.yaml
 And it's content should be:
 
 ```yaml
-kind: channeltype
+kind: Type
 apiVersion: v1
 
 meta:
@@ -553,7 +553,7 @@ meta:
 schema: yamls/ctypes/schema.avsc
 ```
 
-Notice that the `schema` field is actually a reference to an **Avro Schema** file. By defining it like this, when a Channel Type is created Inspr searches for the file and injects its value into the `schema` fiel. You can find more information on how schemas should be created to be used in Inspr [here](schemas_and_types.md).  
+Notice that the `schema` field is actually a reference to an **Avro Schema** file. By defining it like this, when a Type is created Inspr searches for the file and injects its value into the `schema` fiel. You can find more information on how schemas should be created to be used in Inspr [here](schemas_and_types.md).  
 To make everythink work properly, let's create _schema.avsc_:
 
 ```zsh
@@ -590,7 +590,7 @@ pingpong_demo
     └── table.yaml
 ```
 
-### Deploying dApps, Channels and Channel Type
+### Deploying dApps, Channels and Type
 
 Finally, now that we have Ping and Pong images in the cluster and all Inspr workspace structures well-defined in YAML files, we can deploy everything that we created and see it working in our cluster.
 
@@ -622,7 +622,7 @@ Success: inspr config [serverip] changed to 'CLUSTER_INGRESS_HOST'
 
 Now, from within "/pingpong_demo" folder, we apply the YAML files by using Inspr CLIs commands. The files should be applied in the following order:
 
-1. Channel Type `ppctype1`
+1. Type `ppctype1`
 2. Channels `ppchannel1` and `ppchannel2`
 3. dApp `pptable`
 4. Nodes `ping` and `pong`
@@ -645,10 +645,10 @@ If everything worked fine, the Inspr deamon will have printed a changelog simila
 ct1.yaml
 On:
 Field                         | From       | To
-Spec.ChannelTypes[ppctype1]   | <nil>      | {...}
+Spec.Types[ppctype1]   | <nil>      | {...}
 
 Applied:
-ct1.yaml | channeltype | v1
+ct1.yaml | Type | v1
 
 ➜  pingpong_demo ✗ inspr apply -k yamls/channels
 ch1.yaml

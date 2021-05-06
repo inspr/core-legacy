@@ -7,81 +7,81 @@ import (
 	"github.com/inspr/inspr/pkg/meta"
 )
 
-// ChannelTypes - mocks the implementation of the ChannelTypeMemory interface methods
-type ChannelTypes struct {
+// Types - mocks the implementation of the TypeMemory interface methods
+type Types struct {
 	*MemManager
-	fail         error
-	channelTypes map[string]*meta.ChannelType
+	fail  error
+	Types map[string]*meta.Type
 }
 
 // Get - simple mock
-func (chType *ChannelTypes) Get(context string, ctName string) (*meta.ChannelType, error) {
+func (chType *Types) Get(context string, ctName string) (*meta.Type, error) {
 	if chType.fail != nil {
 		return nil, chType.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ctName)
-	ct, ok := chType.channelTypes[query]
+	ct, ok := chType.Types[query]
 	if !ok {
 		return nil, ierrors.
 			NewError().
 			NotFound().
-			Message("channel type %s not found", query).
+			Message("Type %s not found", query).
 			Build()
 	}
 	return ct, nil
 }
 
 // Create - simple mock
-func (chType *ChannelTypes) Create(context string, ct *meta.ChannelType) error {
+func (chType *Types) Create(context string, ct *meta.Type) error {
 	if chType.fail != nil {
 		return chType.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
-	_, ok := chType.channelTypes[query]
+	_, ok := chType.Types[query]
 	if ok {
 		return ierrors.
 			NewError().
 			AlreadyExists().
-			Message("channel type %s already exists", query).
+			Message("Type %s already exists", query).
 			Build()
 	}
-	chType.channelTypes[query] = ct
+	chType.Types[query] = ct
 	return nil
 }
 
 // Delete - simple mock
-func (chType *ChannelTypes) Delete(context string, ctName string) error {
+func (chType *Types) Delete(context string, ctName string) error {
 	if chType.fail != nil {
 		return chType.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ctName)
-	_, ok := chType.channelTypes[query]
+	_, ok := chType.Types[query]
 	if !ok {
 		return ierrors.
 			NewError().
 			NotFound().
-			Message("channel type %s not found", query).
+			Message("Type %s not found", query).
 			Build()
 	}
 
-	delete(chType.channelTypes, query)
+	delete(chType.Types, query)
 	return nil
 }
 
 // Update - simple mock
-func (chType *ChannelTypes) Update(context string, ct *meta.ChannelType) error {
+func (chType *Types) Update(context string, ct *meta.Type) error {
 	if chType.fail != nil {
 		return chType.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
-	_, ok := chType.channelTypes[query]
+	_, ok := chType.Types[query]
 	if !ok {
 		return ierrors.
 			NewError().
 			NotFound().
-			Message("channel type %s not found", query).
+			Message("Type %s not found", query).
 			Build()
 	}
-	chType.channelTypes[query] = ct
+	chType.Types[query] = ct
 	return nil
 }

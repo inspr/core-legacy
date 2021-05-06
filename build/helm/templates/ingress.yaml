@@ -17,7 +17,7 @@ spec:
             backend:
               serviceName: {{ .Values.service.insprdName }}
               servicePort: {{ .Values.service.insprdPort }}
-          - path: /channeltypes
+          - path: /Types
             backend:
               serviceName: {{ .Values.service.insprdName }}
               servicePort: {{ .Values.service.insprdPort }}

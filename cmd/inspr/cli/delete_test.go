@@ -42,7 +42,7 @@ func getMockAppWithoutApp1() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",
@@ -95,9 +95,9 @@ func getMockAppWithoutCh1() *meta.App {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -105,8 +105,8 @@ func getMockAppWithoutCh1() *meta.App {
 								},
 							},
 						},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch1"},
@@ -125,7 +125,7 @@ func getMockAppWithoutCh1() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{},
+			Types: map[string]*meta.Type{},
 			Boundary: meta.AppBoundary{
 				Input:  []string{},
 				Output: []string{},
@@ -167,9 +167,9 @@ func getMockAppWithoutCt1() *meta.App {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -187,7 +187,7 @@ func getMockAppWithoutCt1() *meta.App {
 								Spec:          meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch1"},
@@ -206,7 +206,7 @@ func getMockAppWithoutCt1() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{},
+			Types: map[string]*meta.Type{},
 			Boundary: meta.AppBoundary{
 				Input:  []string{},
 				Output: []string{},
@@ -257,9 +257,9 @@ func getMockAppWithoutAlias() *meta.App {
 											UUID:        "",
 										},
 									},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -277,7 +277,7 @@ func getMockAppWithoutAlias() *meta.App {
 								Spec:          meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch1"},
@@ -296,7 +296,7 @@ func getMockAppWithoutAlias() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",
@@ -514,7 +514,7 @@ func Test_deleteCTypes(t *testing.T) {
 	outResp, _ := ioutil.ReadAll(bufResp)
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		data := models.ChannelTypeQueryDI{}
+		data := models.TypeQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
@@ -537,7 +537,7 @@ func Test_deleteCTypes(t *testing.T) {
 		expectedOutput []byte
 	}{
 		{
-			name:           "Should delete the channelType and return the diff",
+			name:           "Should delete the Type and return the diff",
 			flagsAndArgs:   []string{"ct", "appParent.ct1"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,

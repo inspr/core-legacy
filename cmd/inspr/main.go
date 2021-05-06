@@ -24,8 +24,8 @@ func main() {
 
 	cli.GetFactory().Subscribe(meta.Component{
 		APIVersion: "v1",
-		Kind:       "channeltype",
-	}, cli.NewApplyChannelType())
+		Kind:       "Type",
+	}, cli.NewApplyType())
 
 	cli.GetFactory().Subscribe(meta.Component{
 		APIVersion: "v1",

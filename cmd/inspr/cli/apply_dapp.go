@@ -22,8 +22,8 @@ func NewApplyApp() RunMethod {
 		if err != nil {
 			return err
 		}
-		if len(app.Spec.ChannelTypes) > 0 {
-			err = schemaInjection(app.Spec.ChannelTypes)
+		if len(app.Spec.Types) > 0 {
+			err = schemaInjection(app.Spec.Types)
 			if err != nil {
 				return err
 			}
@@ -70,7 +70,7 @@ func NewApplyApp() RunMethod {
 	}
 }
 
-func schemaInjection(ctypes map[string]*meta.ChannelType) error {
+func schemaInjection(ctypes map[string]*meta.Type) error {
 	var err error
 	for ctypeName, ctype := range ctypes {
 		ctype.Meta.Name = ctypeName
@@ -87,8 +87,8 @@ func schemaInjection(ctypes map[string]*meta.ChannelType) error {
 func recursiveSchemaInjection(apps map[string]*meta.App) error {
 	var err error
 	for appName, app := range apps {
-		if len(app.Spec.ChannelTypes) > 0 {
-			err = schemaInjection(app.Spec.ChannelTypes)
+		if len(app.Spec.Types) > 0 {
+			err = schemaInjection(app.Spec.Types)
 			if err != nil {
 				return err
 			}

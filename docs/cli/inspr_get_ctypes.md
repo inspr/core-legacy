@@ -1,6 +1,6 @@
 ## inspr get ctypes
 
-Get channel types from context
+Get Types from context
 
 ```
 inspr get ctypes [flags]
@@ -9,10 +9,10 @@ inspr get ctypes [flags]
 ### Examples
 
 ```
-  # Get channel types from the default scope
+  # Get Types from the default scope
  inspr get ctypes 
 
-  # Get channel types from a custom scope
+  # Get Types from a custom scope
  inspr get ctypes --scope app1.app2
 
 ```

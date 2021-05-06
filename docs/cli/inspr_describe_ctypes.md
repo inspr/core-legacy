@@ -1,6 +1,6 @@
 ## inspr describe ctypes
 
-Retrieves the full state of the channelType from a given namespace
+Retrieves the full state of the Type from a given namespace
 
 ```
 inspr describe ctypes <ctype_name | ctype_path> [flags]
@@ -9,13 +9,13 @@ inspr describe ctypes <ctype_name | ctype_path> [flags]
 ### Examples
 
 ```
-  # Display the state of the given channelType on the default scope
+  # Display the state of the given Type on the default scope
  inspr describe ctypes hello_world
 
-  # Display the state of the given channelType on a custom scope
+  # Display the state of the given Type on a custom scope
  inspr describe ctypes --scope app1.app2 hello_world
 
-  # Display the state of the given channelType by the path
+  # Display the state of the given Type by the path
  inspr describe ctypes app1.app2.hello_world
 
 ```

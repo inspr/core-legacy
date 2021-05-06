@@ -14,19 +14,19 @@ import (
 	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
 )
 
-// NewApplyChannelType receives a controller ChannelTypeInterface and calls it's methods
+// NewApplyType receives a controller TypeInterface and calls it's methods
 // depending on the flags values
-func NewApplyChannelType() RunMethod {
+func NewApplyType() RunMethod {
 	return func(data []byte, out io.Writer) error {
-		c := cliutils.GetCliClient().ChannelTypes()
-		// unmarshal into a channelType
-		channelType, err := utils.YamlToChannelType(data)
+		c := cliutils.GetCliClient().Types()
+		// unmarshal into a Type
+		Type, err := utils.YamlToType(data)
 		if err != nil {
 			return err
 		}
 
-		if schemaNeedsInjection(channelType.Schema) {
-			channelType.Schema, err = injectedSchema(channelType.Schema)
+		if schemaNeedsInjection(Type.Schema) {
+			Type.Schema, err = injectedSchema(Type.Schema)
 		}
 		if err != nil {
 			return err
@@ -42,16 +42,16 @@ func NewApplyChannelType() RunMethod {
 			return err
 		}
 
-		parentPath, err := metautils.JoinScopes(scope, channelType.Meta.Parent)
+		parentPath, err := metautils.JoinScopes(scope, Type.Meta.Parent)
 		if err != nil {
 			return err
 		}
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentPath, &channelType, flagDryRun)
+			log, err = c.Update(context.Background(), parentPath, &Type, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), parentPath, &channelType, flagDryRun)
+			log, err = c.Create(context.Background(), parentPath, &Type, flagDryRun)
 		}
 
 		if err != nil {

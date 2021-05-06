@@ -26,14 +26,14 @@ func (tmm *MockManager) Channels() memory.ChannelMemory {
 	}
 }
 
-// ChannelTypes mocks a channelType interface for testing
-func (tmm *MockManager) ChannelTypes() memory.ChannelTypeMemory {
+// Types mocks a Type interface for testing
+func (tmm *MockManager) Types() memory.TypeMemory {
 	if tmm.mockCT {
-		return &ChannelTypeMockManager{
+		return &TypeMockManager{
 			MockManager: tmm,
 		}
 	}
-	return &ChannelTypeMemoryManager{
+	return &TypeMemoryManager{
 		MemoryManager: tmm.MemoryManager,
 	}
 }

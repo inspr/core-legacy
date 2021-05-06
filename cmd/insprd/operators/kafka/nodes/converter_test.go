@@ -271,7 +271,7 @@ func Test_baseEnvironment(t *testing.T) {
 				UUID:   "uuid-channel1",
 			},
 			Spec: meta.ChannelSpec{
-				Type: "channelType1",
+				Type: "Type1",
 			},
 		},
 		"channel2": {
@@ -281,7 +281,7 @@ func Test_baseEnvironment(t *testing.T) {
 				UUID:   "uuid-channel2",
 			},
 			Spec: meta.ChannelSpec{
-				Type: "channelType2",
+				Type: "Type2",
 			},
 		},
 	}
@@ -293,17 +293,17 @@ func Test_baseEnvironment(t *testing.T) {
 		Spec: meta.AppSpec{
 			Channels: chs,
 			Aliases:  map[string]*meta.Alias{},
-			ChannelTypes: map[string]*meta.ChannelType{
-				"channelType1": {
+			Types: map[string]*meta.Type{
+				"Type1": {
 					Meta: meta.Metadata{
-						Name:   "channelType1",
+						Name:   "Type1",
 						Parent: "parent",
 					},
 					Schema: "schema1",
 				},
-				"channelType2": {
+				"Type2": {
 					Meta: meta.Metadata{
-						Name:   "channelType2",
+						Name:   "Type2",
 						Parent: "parent",
 					},
 					Schema: "schema2",

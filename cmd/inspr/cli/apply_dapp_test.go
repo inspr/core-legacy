@@ -68,7 +68,7 @@ func TestNewApplyApp(t *testing.T) {
 func Test_schemaInjection(t *testing.T) {
 	prepareToken(t)
 	type args struct {
-		ctypes map[string]*meta.ChannelType
+		ctypes map[string]*meta.Type
 	}
 	tests := []struct {
 		name    string
@@ -78,7 +78,7 @@ func Test_schemaInjection(t *testing.T) {
 		{
 			name: "Valid schema injection",
 			args: args{
-				ctypes: map[string]*meta.ChannelType{
+				ctypes: map[string]*meta.Type{
 					"ct1": {
 						Meta: meta.Metadata{
 							Name: "ct1",
@@ -130,7 +130,7 @@ func getAppMap() map[string]*meta.App {
 	return map[string]*meta.App{
 		"app1": {
 			Spec: meta.AppSpec{
-				ChannelTypes: map[string]*meta.ChannelType{
+				Types: map[string]*meta.Type{
 					"ct1": {
 						Meta: meta.Metadata{
 							Name: "ct1",
@@ -142,7 +142,7 @@ func getAppMap() map[string]*meta.App {
 		},
 		"app2": {
 			Spec: meta.AppSpec{
-				ChannelTypes: map[string]*meta.ChannelType{
+				Types: map[string]*meta.Type{
 					"ct2": {
 						Meta: meta.Metadata{
 							Name: "ct2",
@@ -153,7 +153,7 @@ func getAppMap() map[string]*meta.App {
 				Apps: map[string]*meta.App{
 					"app3": {
 						Spec: meta.AppSpec{
-							ChannelTypes: map[string]*meta.ChannelType{
+							Types: map[string]*meta.Type{
 								"ct3": {
 									Meta: meta.Metadata{
 										Name: "ct3",

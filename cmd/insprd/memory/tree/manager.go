@@ -43,10 +43,10 @@ func newTreeMemory() *MemoryManager {
 				Annotations: map[string]string{},
 			},
 			Spec: meta.AppSpec{
-				Apps:         map[string]*meta.App{},
-				Channels:     map[string]*meta.Channel{},
-				ChannelTypes: map[string]*meta.ChannelType{},
-				Aliases:      map[string]*meta.Alias{},
+				Apps:     map[string]*meta.App{},
+				Channels: map[string]*meta.Channel{},
+				Types:    map[string]*meta.Type{},
+				Aliases:  map[string]*meta.Alias{},
 			},
 		},
 	}
@@ -98,9 +98,9 @@ func (t *RootGetter) Channels() memory.ChannelGetInterface {
 	return &ChannelRootGetter{}
 }
 
-// ChannelTypes returns a getter for channel types on the root
-func (t *RootGetter) ChannelTypes() memory.ChannelTypeGetInterface {
-	return &ChannelTypeRootGetter{}
+// Types returns a getter for Types on the root
+func (t *RootGetter) Types() memory.TypeGetInterface {
+	return &TypeRootGetter{}
 }
 
 // Alias returns a getter for alias on the root

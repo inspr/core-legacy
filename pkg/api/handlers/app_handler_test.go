@@ -102,8 +102,8 @@ func appDICases(funcName string) []appAPITest {
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
-			name: "invalid_channel_type_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			name: "invalid_type_request_" + funcName,
+			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
@@ -180,8 +180,8 @@ func appQueryDICases(funcName string) []appAPITest {
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
-			name: "invalid_channel_type_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			name: "invalid_type_request_" + funcName,
+			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},

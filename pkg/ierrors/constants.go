@@ -11,7 +11,7 @@ const (
 	InvalidName
 	InvalidApp
 	InvalidChannel
-	InvalidChannelType
+	InvalidType
 	BadRequest
 	InvalidToken
 	ExpiredToken

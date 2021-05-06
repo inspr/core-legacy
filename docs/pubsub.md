@@ -46,10 +46,10 @@ Note that this dApp isn't a [Node](dapp_overview.md), that's because it serves a
 
 Next we have to create a Channel the publisher can write text to and the subscribers can read from. Doing so is as simple as defining the following:
 
-Channel Type (02.ct.yaml) :
+Type (02.ct.yaml) :
 
 ```yaml
-kind: channeltype
+kind: Type
 apiVersion: v1
 meta:
   name: pubsubct
@@ -298,7 +298,7 @@ Your app is now done, but before publishing it first you must build it. Inspr re
 Keep in mind Slack an Discord are only examples.
 
 Deployment:
-You have to apply every yaml we created, dApps Channels and ChannelTypes can be done by running:
+You have to apply every yaml we created, dApps Channels and Types can be done by running:
 inspr apply -k yamls
 
 Your ingress and service have to be deployed as well, run:

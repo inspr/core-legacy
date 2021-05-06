@@ -15,7 +15,7 @@ import (
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
-func TestChannelTypeClient_Delete(t *testing.T) {
+func TestTypeClient_Delete(t *testing.T) {
 
 	type args struct {
 		ctx     context.Context
@@ -54,15 +54,15 @@ func TestChannelTypeClient_Delete(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/channeltypes" {
-					t.Errorf("path is not channeltypes")
+				if r.URL.Path != "/Types" {
+					t.Errorf("path is not Types")
 				}
 
 				if r.Method != "DELETE" {
 					t.Errorf("method is not DELETE")
 				}
 
-				var di models.ChannelTypeQueryDI
+				var di models.TypeQueryDI
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -81,17 +81,17 @@ func TestChannelTypeClient_Delete(t *testing.T) {
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
-			ac := &ChannelTypeClient{
+			ac := &TypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name, false); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TypeClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestChannelTypeClient_Get(t *testing.T) {
+func TestTypeClient_Get(t *testing.T) {
 
 	type args struct {
 		ctx     context.Context
@@ -101,7 +101,7 @@ func TestChannelTypeClient_Get(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *meta.ChannelType
+		want    *meta.Type
 		wantErr bool
 	}{
 		{
@@ -111,7 +111,7 @@ func TestChannelTypeClient_Get(t *testing.T) {
 				context: "app1.app2",
 			},
 			wantErr: false,
-			want: &meta.ChannelType{
+			want: &meta.Type{
 				Meta: meta.Metadata{
 					Name:      "app2",
 					Reference: "app1",
@@ -138,15 +138,15 @@ func TestChannelTypeClient_Get(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/channeltypes" {
-					t.Errorf("path is not channeltypes")
+				if r.URL.Path != "/Types" {
+					t.Errorf("path is not Types")
 				}
 
 				if r.Method != "GET" {
 					t.Errorf("method is not GET")
 				}
 
-				var di models.ChannelTypeQueryDI
+				var di models.TypeQueryDI
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -166,26 +166,26 @@ func TestChannelTypeClient_Get(t *testing.T) {
 
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
-			ac := &ChannelTypeClient{
+			ac := &TypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
 			got, err := ac.Get(tt.args.ctx, tt.args.context, tt.args.name)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeClient.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TypeClient.Get() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ChannelTypeClient.Get() got = %v, want %v", got, tt.want)
+				t.Errorf("TypeClient.Get() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestChannelTypeClient_Create(t *testing.T) {
+func TestTypeClient_Create(t *testing.T) {
 
 	type args struct {
 		ctx     context.Context
 		context string
-		ch      *meta.ChannelType
+		ch      *meta.Type
 	}
 	tests := []struct {
 		name    string
@@ -197,7 +197,7 @@ func TestChannelTypeClient_Create(t *testing.T) {
 			args: args{
 				ctx:     context.Background(),
 				context: "app1.app2",
-				ch: &meta.ChannelType{
+				ch: &meta.Type{
 					Meta: meta.Metadata{
 						Name: "app3",
 					},
@@ -211,7 +211,7 @@ func TestChannelTypeClient_Create(t *testing.T) {
 			args: args{
 				ctx:     context.Background(),
 				context: "app1.app2",
-				ch:      &meta.ChannelType{},
+				ch:      &meta.Type{},
 			},
 			wantErr: true,
 		},
@@ -226,15 +226,15 @@ func TestChannelTypeClient_Create(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/channeltypes" {
-					t.Errorf("path is not channeltypes")
+				if r.URL.Path != "/Types" {
+					t.Errorf("path is not Types")
 				}
 
 				if r.Method != "POST" {
 					t.Errorf("method is not POST")
 				}
 
-				var di models.ChannelTypeDI
+				var di models.TypeDI
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -246,29 +246,29 @@ func TestChannelTypeClient_Create(t *testing.T) {
 					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
-				if !reflect.DeepEqual(di.ChannelType, *tt.args.ch) {
-					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.ChannelType, tt.args.ch)
+				if !reflect.DeepEqual(di.Type, *tt.args.ch) {
+					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.Type, tt.args.ch)
 				}
 				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
-			ac := &ChannelTypeClient{
+			ac := &TypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeClient.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TypeClient.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestChannelTypeClient_Update(t *testing.T) {
+func TestTypeClient_Update(t *testing.T) {
 
 	type args struct {
 		ctx     context.Context
 		context string
-		ch      *meta.ChannelType
+		ch      *meta.Type
 	}
 	tests := []struct {
 		name    string
@@ -280,7 +280,7 @@ func TestChannelTypeClient_Update(t *testing.T) {
 			args: args{
 				ctx:     context.Background(),
 				context: "app1.app2",
-				ch: &meta.ChannelType{
+				ch: &meta.Type{
 					Meta: meta.Metadata{
 						Name: "app3",
 					},
@@ -294,7 +294,7 @@ func TestChannelTypeClient_Update(t *testing.T) {
 			args: args{
 				ctx:     context.Background(),
 				context: "app1.app2",
-				ch:      &meta.ChannelType{},
+				ch:      &meta.Type{},
 			},
 			wantErr: true,
 		},
@@ -309,15 +309,15 @@ func TestChannelTypeClient_Update(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/channeltypes" {
-					t.Errorf("path is not channeltypes")
+				if r.URL.Path != "/Types" {
+					t.Errorf("path is not Types")
 				}
 
 				if r.Method != "PUT" {
 					t.Errorf("method is not PUT")
 				}
 
-				var di models.ChannelTypeDI
+				var di models.TypeDI
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -329,18 +329,18 @@ func TestChannelTypeClient_Update(t *testing.T) {
 					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
 				}
 
-				if !reflect.DeepEqual(di.ChannelType, *tt.args.ch) {
-					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.ChannelType, tt.args.ch)
+				if !reflect.DeepEqual(di.Type, *tt.args.ch) {
+					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.Type, tt.args.ch)
 				}
 				encoder.Encode(diff.Changelog{})
 			}
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
-			ac := &ChannelTypeClient{
+			ac := &TypeClient{
 				c: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeClient.Update() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TypeClient.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

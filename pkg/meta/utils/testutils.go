@@ -46,9 +46,9 @@ func RecursiveValidateUUIDS(name string, app *meta.App, t *testing.T) {
 		}
 	}
 
-	for _, ct := range app.Spec.ChannelTypes {
+	for _, ct := range app.Spec.Types {
 		if !ValidateUUID(ct.Meta.UUID) {
-			t.Errorf("%s invalid channel type UUID on %s, uuid = %v", name, ct.Meta.Name, ct.Meta.UUID)
+			t.Errorf("%s invalid Type UUID on %s, uuid = %v", name, ct.Meta.Name, ct.Meta.UUID)
 		}
 	}
 

@@ -63,7 +63,7 @@ func getMockApp() *meta.App {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -90,9 +90,9 @@ func getMockApp() *meta.App {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -117,7 +117,7 @@ func getMockApp() *meta.App {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -156,9 +156,9 @@ func getMockApp() *meta.App {
 											Image: "imageNodeApp3",
 										},
 									},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app2"},
 										Output: []string{"ch2app2"},
@@ -205,7 +205,7 @@ func getMockApp() *meta.App {
 											Spec: meta.ChannelSpec{},
 										},
 									},
-									ChannelTypes: map[string]*meta.ChannelType{
+									Types: map[string]*meta.Type{
 										"ctapp4": {
 											Meta: meta.Metadata{
 												Name:        "ctUpdate1",
@@ -239,7 +239,7 @@ func getMockApp() *meta.App {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -311,9 +311,9 @@ func getMockApp() *meta.App {
 														Image: "imageNodeAppNode",
 													},
 												},
-												Apps:         map[string]*meta.App{},
-												Channels:     map[string]*meta.Channel{},
-												ChannelTypes: map[string]*meta.ChannelType{},
+												Apps:     map[string]*meta.App{},
+												Channels: map[string]*meta.Channel{},
+												Types:    map[string]*meta.Type{},
 												Boundary: meta.AppBoundary{
 													Input:  []string{"alias1"},
 													Output: []string{"alias2"},
@@ -321,8 +321,8 @@ func getMockApp() *meta.App {
 											},
 										},
 									},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"alias1"},
 										Output: []string{"alias2"},
@@ -372,9 +372,9 @@ func getMockApp() *meta.App {
 														Image: "imageNodeAppNode",
 													},
 												},
-												Apps:         map[string]*meta.App{},
-												Channels:     map[string]*meta.Channel{},
-												ChannelTypes: map[string]*meta.ChannelType{},
+												Apps:     map[string]*meta.App{},
+												Channels: map[string]*meta.Channel{},
+												Types:    map[string]*meta.Type{},
 												Boundary: meta.AppBoundary{
 													Input:  []string{"alias1"},
 													Output: []string{"alias2"},
@@ -382,8 +382,8 @@ func getMockApp() *meta.App {
 											},
 										},
 									},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"alias1"},
 										Output: []string{"alias2"},
@@ -411,9 +411,9 @@ func getMockApp() *meta.App {
 											Image: "imageNodeAppNode",
 										},
 									},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1"},
 										Output: []string{"alias3"},
@@ -441,9 +441,9 @@ func getMockApp() *meta.App {
 											Image: "imageNodeAppNode",
 										},
 									},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1"},
 										Output: []string{"alias4"},
@@ -493,9 +493,9 @@ func getMockApp() *meta.App {
 														Image: "imageNodeAppNode",
 													},
 												},
-												Apps:         map[string]*meta.App{},
-												Channels:     map[string]*meta.Channel{},
-												ChannelTypes: map[string]*meta.ChannelType{},
+												Apps:     map[string]*meta.App{},
+												Channels: map[string]*meta.Channel{},
+												Types:    map[string]*meta.Type{},
 												Boundary: meta.AppBoundary{
 													Input:  []string{"bdch1"},
 													Output: []string{"alias3"},
@@ -503,8 +503,8 @@ func getMockApp() *meta.App {
 											},
 										},
 									},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"bdch1"},
 										Output: []string{"alias3"},
@@ -536,7 +536,7 @@ func getMockApp() *meta.App {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -657,7 +657,7 @@ func getMockApp() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",
@@ -867,10 +867,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -888,10 +888,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					UUID:        "",
 				},
 				Spec: meta.AppSpec{
-					Node:         meta.Node{},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
+					Node:     meta.Node{},
+					Apps:     map[string]*meta.App{},
+					Channels: map[string]*meta.Channel{},
+					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
 						Input:  []string{},
 						Output: []string{},
@@ -920,10 +920,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -941,10 +941,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					UUID:        "",
 				},
 				Spec: meta.AppSpec{
-					Node:         meta.Node{},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
+					Node:     meta.Node{},
+					Apps:     map[string]*meta.App{},
+					Channels: map[string]*meta.Channel{},
+					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
 						Input:  []string{},
 						Output: []string{},
@@ -973,10 +973,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -1008,10 +1008,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -1043,10 +1043,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -1078,10 +1078,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -1099,10 +1099,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					UUID:        "",
 				},
 				Spec: meta.AppSpec{
-					Node:         meta.Node{},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
+					Node:     meta.Node{},
+					Apps:     map[string]*meta.App{},
+					Channels: map[string]*meta.Channel{},
+					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
 						Input:  []string{},
 						Output: []string{},
@@ -1131,10 +1131,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2"},
 							Output: []string{"ch2app2"},
@@ -1152,10 +1152,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					UUID:        "",
 				},
 				Spec: meta.AppSpec{
-					Node:         meta.Node{},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
+					Node:     meta.Node{},
+					Apps:     map[string]*meta.App{},
+					Channels: map[string]*meta.Channel{},
+					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
 						Input:  []string{"ch1app2"},
 						Output: []string{"ch2app2"},
@@ -1184,10 +1184,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2invalid"},
 							Output: []string{"ch2app2"},
@@ -1234,8 +1234,8 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Apps: map[string]*meta.App{
 							"appTest1": {},
 						},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -1279,9 +1279,9 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								Image: "imageNodeAppTest",
 							},
 						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -1311,9 +1311,9 @@ func TestAppMemoryManager_Create(t *testing.T) {
 							Image: "imageNodeAppTest",
 						},
 					},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
+					Apps:     map[string]*meta.App{},
+					Channels: map[string]*meta.Channel{},
+					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
 						Input:  []string{},
 						Output: []string{},
@@ -1351,10 +1351,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Node:         meta.Node{},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Node:     meta.Node{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"channel1"},
 										Output: []string{},
@@ -1373,7 +1373,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
+						Types: map[string]*meta.Type{
 							"ct1": {
 								Meta: meta.Metadata{
 									Name: "ct1",
@@ -1402,7 +1402,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			},
 		},
 		{
-			name: "Create App with a channel that has a invalid channelType",
+			name: "Create App with a channel that has a invalid Type",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -1430,11 +1430,11 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								},
 								ConnectedApps: []string{},
 								Spec: meta.ChannelSpec{
-									Type: "invalidChannelTypeName",
+									Type: "invalidTypeName",
 								},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
+						Types: map[string]*meta.Type{
 							"ct1": {
 								Meta: meta.Metadata{
 									Name: "ct1",
@@ -1452,7 +1452,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "It should update the channelType's connectedChannels list",
+			name: "It should update the Type's connectedChannels list",
 			fields: fields{
 				root:   getMockApp(),
 				appErr: nil,
@@ -1484,7 +1484,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
+						Types: map[string]*meta.Type{
 							"ct1": {
 								Meta: meta.Metadata{
 									Name: "ct1",
@@ -1501,10 +1501,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			},
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
-				am := GetTreeMemory().ChannelTypes()
+				am := GetTreeMemory().Types()
 				ct, err := am.Get("app2.app2", "ct1")
 				if err != nil {
-					t.Errorf("cant get channelType ct1")
+					t.Errorf("cant get Type ct1")
 				}
 				if !utils.Includes(ct.ConnectedChannels, "channel1") {
 					t.Errorf("connectedChannels of ct1 dont have channel1")
@@ -1532,10 +1532,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						UUID:        "",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -1579,9 +1579,9 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								Image: "imageNodeAppTest",
 							},
 						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{},
 							Output: []string{},
@@ -1611,9 +1611,9 @@ func TestAppMemoryManager_Create(t *testing.T) {
 							Image: "imageNodeAppTest",
 						},
 					},
-					Apps:         map[string]*meta.App{},
-					Channels:     map[string]*meta.Channel{},
-					ChannelTypes: map[string]*meta.ChannelType{},
+					Apps:     map[string]*meta.App{},
+					Channels: map[string]*meta.Channel{},
+					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
 						Input:  []string{},
 						Output: []string{},
@@ -1665,7 +1665,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								Spec:          meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"input1"},
 							Output: []string{"output1"},
@@ -1741,7 +1741,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 								Spec:          meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2"},
 							Output: []string{"ch1app2"},
@@ -2000,7 +2000,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -2062,7 +2062,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -2113,7 +2113,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -2201,7 +2201,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
+						Types: map[string]*meta.Type{
 							"ctUpdate1": {
 								Meta: meta.Metadata{
 									Name:        "ctUpdate1",
@@ -2270,7 +2270,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 							},
 						},
 					},
-					ChannelTypes: map[string]*meta.ChannelType{
+					Types: map[string]*meta.Type{
 						"ctUpdate1": {
 							Meta: meta.Metadata{
 								Name:        "ctUpdate1",
@@ -2320,9 +2320,9 @@ func TestAppMemoryManager_Update(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{},
 										Output: []string{},
@@ -2338,7 +2338,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								},
 								ConnectedApps: []string{"thenewapp"},
 								Spec: meta.ChannelSpec{
-									Type: "newChannelType",
+									Type: "newType",
 								},
 							},
 							"ch2app1": {
@@ -2349,11 +2349,11 @@ func TestAppMemoryManager_Update(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"newChannelType": {
+						Types: map[string]*meta.Type{
+							"newType": {
 								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
+									Name:        "newType",
+									Reference:   "app1.newType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
 									UUID:        "",

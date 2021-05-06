@@ -28,10 +28,10 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 			channels.Add(chName)
 		}
 	}
-	if len(app.Spec.ChannelTypes) > 0 {
-		channelTypes := spec.Add("ChannelTypes")
-		for ctName := range app.Spec.ChannelTypes {
-			channelTypes.Add(ctName)
+	if len(app.Spec.Types) > 0 {
+		Types := spec.Add("Types")
+		for ctName := range app.Spec.Types {
+			Types.Add(ctName)
 		}
 	}
 	if len(app.Spec.Aliases) > 0 {
@@ -46,7 +46,7 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 		nodeSpec.Add("Image: " + app.Spec.Node.Spec.Image)
 		if len(app.Spec.Node.Spec.Environment) > 0 {
 			env := spec.Add("Environment")
-			for name, value := range app.Spec.ChannelTypes {
+			for name, value := range app.Spec.Types {
 				env.Add(fmt.Sprintf("%s: %s", name, value))
 			}
 		}
@@ -93,24 +93,24 @@ func PrintChannelTree(ch *meta.Channel, out io.Writer) {
 	fmt.Fprintln(out, channel.Print())
 }
 
-// PrintChannelTypeTree prints the channel structure
-func PrintChannelTypeTree(ct *meta.ChannelType, out io.Writer) {
-	channelType := gotree.New(ct.Meta.Name)
-	meta := channelType.Add("Meta")
+// PrintTypeTree prints the channel structure
+func PrintTypeTree(ct *meta.Type, out io.Writer) {
+	Type := gotree.New(ct.Meta.Name)
+	meta := Type.Add("Meta")
 
 	populateMeta(meta, &ct.Meta)
 
-	spec := channelType.Add("Spec")
+	spec := Type.Add("Spec")
 	spec.Add("Schema: " + string(ct.Schema))
 
 	if len(ct.ConnectedChannels) > 0 {
-		conChannels := channelType.Add("ConnectedChannels")
+		conChannels := Type.Add("ConnectedChannels")
 		for _, appName := range ct.ConnectedChannels {
 			conChannels.Add(appName)
 		}
 	}
 
-	fmt.Fprintln(out, channelType.Print())
+	fmt.Fprintln(out, Type.Print())
 }
 
 // PrintAliasTree prints the alias structure

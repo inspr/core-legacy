@@ -13,9 +13,9 @@ import (
 func main() {
 	mem := tree.GetTreeMemory()
 	mem.InitTransaction()
-	err := mem.ChannelTypes().Create("", &meta.ChannelType{
+	err := mem.Types().Create("", &meta.Type{
 		Meta: meta.Metadata{
-			Name: "channelType1",
+			Name: "Type1",
 		},
 		Schema: "{\"type\":\"string\"}",
 	})
@@ -28,7 +28,7 @@ func main() {
 			Name: "ch1",
 		},
 		Spec: meta.ChannelSpec{
-			Type: "channelType1",
+			Type: "Type1",
 		},
 	})
 	if err != nil {

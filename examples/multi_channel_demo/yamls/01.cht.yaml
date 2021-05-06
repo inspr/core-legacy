@@ -1,4 +1,4 @@
-kind: channeltype
+kind: Type
 apiVersion: v1
 meta:
   name: channelTestType
