@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -111,7 +110,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		// used for checking permissions
 		operation := getOperation(r)
 		target := getTarget(r)
-		perm := getPermConst(operation, target)
+		perm := operation + ":" + target
 
 		for scope := range payload.Permissions {
 			log.Printf("permission-scope = %+v\n", scope)
@@ -165,17 +164,4 @@ func getTarget(r *http.Request) string {
 		return route
 	}
 	return target
-}
-
-// getPermConst receives the operation that is being done and who is the target,
-// then checks if the combination of the two exists in the slice of constants
-// related to CRUD methods
-func getPermConst(operation, target string) string {
-	perm := fmt.Sprintf("%s:%s", operation, target)
-	for _, knownConst := range auth.CrudConsts {
-		if knownConst == perm {
-			return knownConst
-		}
-	}
-	return "invalid"
 }

@@ -308,39 +308,3 @@ func Test_getTarget(t *testing.T) {
 		})
 	}
 }
-
-func Test_getPermConst(t *testing.T) {
-	type args struct {
-		operation string
-		target    string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			name: "constant_exists",
-			args: args{
-				operation: "create",
-				target:    "ctype",
-			},
-			want: auth.CreateChannelType,
-		},
-		{
-			name: "invalid",
-			args: args{
-				operation: "uphold",
-				target:    "unkown",
-			},
-			want: "invalid",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getPermConst(tt.args.operation, tt.args.target); got != tt.want {
-				t.Errorf("getPermConst() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}

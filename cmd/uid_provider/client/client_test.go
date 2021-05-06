@@ -732,11 +732,10 @@ func Test_requestNewToken(t *testing.T) {
 		wantsplit := strings.Split(want, "-")
 		wantset, _ := utils.MakeStrSet(wantsplit)
 
-		oldLen := len(wantset)
-		wantset.AppendSet(gotset)
+		disjunct := utils.DisjunctSet(gotset, wantset)
 
 		// if their length stays the same nothing new was added
-		return len(gotset) == len(wantset) && len(gotset) == oldLen
+		return len(disjunct) == 0
 	}
 
 	type args struct {
