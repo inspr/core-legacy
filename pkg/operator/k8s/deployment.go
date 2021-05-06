@@ -24,9 +24,9 @@ func WithContainer(cont ...corev1.Container) DeploymentOption {
 }
 
 // WithInitContainers adds initialization containers to the deployment
-func WithInitContainers(cont corev1.Container) DeploymentOption {
+func WithInitContainers(cont ...corev1.Container) DeploymentOption {
 	return func(d *appsv1.Deployment) {
-		d.Spec.Template.Spec.InitContainers = append(d.Spec.Template.Spec.InitContainers, cont)
+		d.Spec.Template.Spec.InitContainers = append(d.Spec.Template.Spec.InitContainers, cont...)
 	}
 }
 
