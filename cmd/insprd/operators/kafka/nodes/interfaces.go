@@ -1,6 +1,8 @@
 package nodes
 
 import (
+	"log"
+
 	"github.com/inspr/inspr/pkg/meta"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -30,6 +32,7 @@ func (k *kubeService) del(no *NodeOperator) error {
 type kubeSecret corev1.Secret
 
 func (k *kubeSecret) create(no *NodeOperator) error {
+	log.Println("creating secret")
 	_, err := no.Secrets().Create((*corev1.Secret)(k))
 	return err
 }
@@ -59,6 +62,7 @@ func (k *kubeDeploy) del(no *NodeOperator) error {
 
 func (no *NodeOperator) dappApplications(app *meta.App) []applyable {
 	return []applyable{
+		no.toSecret(app),
 		no.dAppToDeployment(app),
 		dappToService(app),
 	}

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/cmd/insprd/memory/tree"
+	authmock "github.com/inspr/inspr/pkg/auth/mocks"
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/meta"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -24,6 +25,7 @@ type k8sKind string
 
 const (
 	k8sService    k8sKind = "services"
+	k8sSecret     k8sKind = "secrets"
 	k8sDeployment k8sKind = "deployments"
 )
 

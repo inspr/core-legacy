@@ -1,10 +1,13 @@
 package nodes
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
@@ -16,6 +19,49 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
+
+func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
+	log.Println("creating secret")
+	scope, err := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+	if err != nil {
+		log.Printf("err = %+v\n", err)
+	}
+
+	payload := auth.Payload{
+		UID: app.Meta.UUID,
+		Permissions: map[string][]string{
+			app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
+		},
+		Refresh:    []byte(scope),
+		RefreshURL: fmt.Sprintf("%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
+	}
+
+	token, err := no.auth.Tokenize(payload)
+	if err != nil {
+		log.Printf("err = %+v\n", err)
+	}
+
+	return &kubeSecret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: toDeploymentName(app),
+		},
+		Data: map[string][]byte{
+			"INSPR_CONTROLLER_TOKEN": token,
+			"INSPR_CONTROLLER_SCOPE": []byte(app.Spec.Auth.Scope),
+		},
+	}
+}
+
+func withSecretDefinition(app *meta.App) k8s.ContainerOption {
+	env := corev1.EnvFromSource{
+		SecretRef: &corev1.SecretEnvSource{
+			LocalObjectReference: corev1.LocalObjectReference{
+				Name: toDeploymentName(app),
+			},
+		},
+	}
+	return k8s.ContainerWithEnvFrom(env)
+}
 
 // withBoundary adds the boundary configuration to the kubernetes' deployment environment variables
 func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
@@ -98,6 +144,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 	appLabels := map[string]string{
 		"inspr-app": toAppID(app),
 	}
+	log.Println("constructing deployment")
 	return (*kubeDeploy)(
 		k8s.NewDeployment(
 			appDeployName,
@@ -107,6 +154,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 					appDeployName,
 					app.Spec.Node.Spec.Image,
 					withSidecarPorts(app),
+					withSecretDefinition(app),
 					withSidecarConfiguration(),
 				),
 				k8s.NewContainer(
@@ -202,4 +250,49 @@ func toAppID(app *meta.App) string {
 func intToint32(v int) *int32 {
 	t := int32(v)
 	return &t
+}
+
+type sidecarFactory map[string]func(*meta.App) k8s.DeploymentOption
+
+var f sidecarFactory
+
+func getAllSidecarNames(app *meta.App) []string
+
+func addAllSidecars(app *meta.App) []k8s.DeploymentOption {
+	var ret []k8s.DeploymentOption
+	for _, broker := range getAllSidecarNames(app) {
+		if option, ok := f[broker]; ok {
+			ret = append(ret, option(app))
+		} else {
+			panic("broker not allowed")
+		}
+	}
+	return ret
+}
+
+type kafkaConfig struct {
+	bootstrapServers string
+	autoOffsetReset  string
+	sidecarImage     string
+}
+
+func kafkaSidecarFactory(config kafkaConfig) func(*meta.App) k8s.DeploymentOption {
+	return func(app *meta.App) k8s.DeploymentOption {
+		return k8s.WithContainer(
+			k8s.NewContainer(
+				app.Meta.UUID,
+				config.sidecarImage,
+				k8s.ContainerWithEnv(
+					corev1.EnvVar{
+						Name:  "KAFKA_BOOTSTRAP_SERVERS",
+						Value: config.bootstrapServers,
+					},
+					corev1.EnvVar{
+						Name:  "KAFK_AUTO_OFFSET_RESET",
+						Value: config.bootstrapServers,
+					},
+				),
+			),
+		)
+	}
 }

@@ -10,8 +10,11 @@ import (
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/memory/fake"
 	"github.com/inspr/inspr/pkg/auth"
+	authmock "github.com/inspr/inspr/pkg/auth/mocks"
 	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/utils"
 	kubeCore "k8s.io/api/core/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	kfake "k8s.io/client-go/kubernetes/fake"
 )
@@ -526,6 +529,71 @@ func Test_withSidecarConfiguration(t *testing.T) {
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("withSidecarConfiguration() got = %v, want = %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNodeOperator_toSecret(t *testing.T) {
+
+	type fields struct {
+		clientSet kubernetes.Interface
+		memory    memory.Manager
+		auth      auth.Auth
+	}
+	type args struct {
+		app *meta.App
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *kubeSecret
+	}{
+		{
+			name: "correct secret definition",
+			fields: fields{
+				clientSet: kfake.NewSimpleClientset(),
+				auth:      authmock.NewMockAuth(nil),
+			},
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "app1",
+						UUID: "app1_UUID",
+					},
+					Spec: meta.AppSpec{
+
+						Auth: meta.AppAuth{
+							Scope: "scope1",
+							Permissions: utils.StringArray{
+								"create:dapp",
+								"delete:dapp",
+							},
+						},
+					},
+				},
+			},
+			want: &kubeSecret{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "node-app1_UUID",
+				},
+				Data: map[string][]byte{
+					"INSPR_CONTROLLER_TOKEN": []byte("mock"),
+					"INSPR_CONTROLLER_SCOPE": []byte("scope1"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			no := &NodeOperator{
+				clientSet: tt.fields.clientSet,
+				memory:    tt.fields.memory,
+				auth:      tt.fields.auth,
+			}
+			if got := no.toSecret(tt.args.app); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NodeOperator.toSecret() = %v, want %v", got, tt.want)
 			}
 		})
 	}
