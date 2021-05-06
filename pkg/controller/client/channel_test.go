@@ -88,7 +88,7 @@ func TestChannelClient_Delete(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
-				rc: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Delete(tt.args.ctx, tt.args.scope, tt.args.name, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -184,7 +184,7 @@ func TestChannelClient_Get(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
-				rc: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			got, err := ac.Get(tt.args.ctx, tt.args.context, tt.args.name)
 			if (err != nil) != tt.wantErr {
@@ -278,7 +278,7 @@ func TestChannelClient_Create(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
-				rc: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelClient.Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -368,7 +368,7 @@ func TestChannelClient_Update(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
-				rc: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelClient.Update() error = %v, wantErr %v", err, tt.wantErr)

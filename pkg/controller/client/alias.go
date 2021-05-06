@@ -12,7 +12,7 @@ import (
 
 // AliasClient interacts with Aliases on the Insprd
 type AliasClient struct {
-	rc *request.Client
+	reqClient *request.Client
 }
 
 // Get gets a alias from the Insprd
@@ -20,7 +20,7 @@ type AliasClient struct {
 // The scope refers to the parent app of the given alias, represented with a dot separated query
 // such as app1.app2
 //
-// The key is the key of the alias. So to search for a alias inside app1 with the key aliasKey you
+// The key is the key of the alias. So to seareqClienth for a alias inside app1 with the key aliasKey you
 // would call ac.Get(context.Background(), "app1", "aliasKey")
 func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias, error) {
 	aliasQuery := models.AliasQueryDI{
@@ -29,7 +29,7 @@ func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias,
 
 	var resp meta.Alias
 
-	err := ac.rc.
+	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/alias", "GET", aliasQuery, &resp)
 	if err != nil {
@@ -56,7 +56,7 @@ func (ac *AliasClient) Create(ctx context.Context, scope string, target string, 
 	}
 	var resp diff.Changelog
 
-	err := ac.rc.
+	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/alias", "POST", aliasQuery, &resp)
 	if err != nil {
@@ -82,7 +82,7 @@ func (ac *AliasClient) Delete(ctx context.Context, scope, key string, dryRun boo
 	}
 	var resp diff.Changelog
 
-	err := ac.rc.
+	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/alias", "DELETE", aliasQuery, &resp)
 	if err != nil {
@@ -109,7 +109,7 @@ func (ac *AliasClient) Update(ctx context.Context, scope string, target string, 
 	}
 	var resp diff.Changelog
 
-	err := ac.rc.
+	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/alias", "PUT", aliasQuery, &resp)
 	if err != nil {

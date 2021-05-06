@@ -27,34 +27,34 @@ func NewControllerClient(url string, auth request.Authenticator) controller.Inte
 // Channels interacts with channels on the Insprd
 func (c *Client) Channels() controller.ChannelInterface {
 	return &ChannelClient{
-		rc: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // Apps interacts with apps on the Insprd
 func (c *Client) Apps() controller.AppInterface {
 	return &AppClient{
-		rc: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // ChannelTypes interacts with channel types on the Insprd
 func (c *Client) ChannelTypes() controller.ChannelTypeInterface {
 	return &ChannelTypeClient{
-		rc: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // Authorization interacts with Insprd's auth
 func (c *Client) Authorization() controller.AuthorizationInterface {
 	return &AuthClient{
-		rc: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // Alias interacts with alias on the Insprd
 func (c *Client) Alias() controller.AliasInterface {
 	return &AliasClient{
-		rc: c.HTTPClient,
+		reqClient: c.HTTPClient,
 	}
 }

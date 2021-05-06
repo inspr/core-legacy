@@ -15,6 +15,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/auth"
+	"github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/rest"
 )
 
@@ -722,21 +723,20 @@ func Test_requestNewToken(t *testing.T) {
 	setup()
 	defer teardown()
 
+	// checks whether the two strings are the same or not, handles different
+	// orders
 	check := func(got, want string) bool {
 		gotsplit := strings.Split(got, "-")
+		gotset, _ := utils.MakeStrSet(gotsplit)
+
 		wantsplit := strings.Split(want, "-")
+		wantset, _ := utils.MakeStrSet(wantsplit)
 
-		checker := make(map[string]bool)
-		for _, s := range gotsplit {
-			checker[s] = true
-		}
+		oldLen := len(wantset)
+		wantset.AppendSet(gotset)
 
-		for _, s := range wantsplit {
-			if checker[s] == false {
-				return false
-			}
-		}
-		return true
+		// if their length stays the same nothing new was added
+		return len(gotset) == len(wantset) && len(gotset) == oldLen
 	}
 
 	type args struct {

@@ -12,7 +12,7 @@ import (
 
 // ChannelClient interacts with channels on the Insprd
 type ChannelClient struct {
-	rc *request.Client
+	reqClient *request.Client
 }
 
 // Get gets a channel from the Insprd
@@ -20,7 +20,7 @@ type ChannelClient struct {
 // The scope refers to the parent app of the given channel, represented with a dot separated query
 // such as app1.app2
 //
-// The name is the name of the channel. So to search for a channel inside app1 with the name channel1 you
+// The name is the name of the channel. So to seareqClienth for a channel inside app1 with the name channel1 you
 // would call cc.Get(context.Background(), "app1", "channel1")
 func (cc *ChannelClient) Get(ctx context.Context, scope string, name string) (*meta.Channel, error) {
 	cdi := models.ChannelQueryDI{
@@ -28,7 +28,7 @@ func (cc *ChannelClient) Get(ctx context.Context, scope string, name string) (*m
 	}
 	var resp meta.Channel
 
-	err := cc.rc.
+	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/channels", "GET", cdi, &resp)
 	if err != nil {
@@ -54,7 +54,7 @@ func (cc *ChannelClient) Create(ctx context.Context, scope string, ch *meta.Chan
 	}
 	var resp diff.Changelog
 
-	err := cc.rc.
+	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/channels", "POST", cdi, &resp)
 	if err != nil {
@@ -80,7 +80,7 @@ func (cc *ChannelClient) Delete(ctx context.Context, scope string, name string, 
 	}
 	var resp diff.Changelog
 
-	err := cc.rc.
+	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/channels", "DELETE", cdi, &resp)
 	if err != nil {
@@ -106,7 +106,7 @@ func (cc *ChannelClient) Update(ctx context.Context, scope string, ch *meta.Chan
 	}
 	var resp diff.Changelog
 
-	err := cc.rc.
+	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/channels", "PUT", cdi, &resp)
 	if err != nil {

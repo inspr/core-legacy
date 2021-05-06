@@ -12,7 +12,7 @@ import (
 
 // AppClient is a client for getting and setting app information on Insprd
 type AppClient struct {
-	rc *request.Client
+	reqClient *request.Client
 }
 
 // Get gets information from an app inside the Insprd
@@ -26,7 +26,7 @@ func (ac *AppClient) Get(ctx context.Context, scope string) (*meta.App, error) {
 	adi := models.AppQueryDI{}
 	var resp meta.App
 
-	err := ac.rc.
+	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/apps", "GET", adi, &resp)
 	if err != nil {
@@ -53,7 +53,7 @@ func (ac *AppClient) Create(ctx context.Context, scope string, app *meta.App, dr
 	}
 	var resp diff.Changelog
 
-	err := ac.rc.
+	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/apps", "POST", adi, &resp)
 	if err != nil {
@@ -76,7 +76,7 @@ func (ac *AppClient) Delete(ctx context.Context, scope string, dryRun bool) (dif
 	}
 	var resp diff.Changelog
 
-	err := ac.rc.
+	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/apps", "DELETE", adi, &resp)
 	if err != nil {
@@ -103,7 +103,7 @@ func (ac *AppClient) Update(ctx context.Context, scope string, app *meta.App, dr
 	}
 	var resp diff.Changelog
 
-	err := ac.rc.
+	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
 		Send(ctx, "/apps", "PUT", adi, &resp)
 	if err != nil {

@@ -33,7 +33,7 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 	logger.Info("handling dApp create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppDI{}
-		scope := r.Header.Get("")
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
