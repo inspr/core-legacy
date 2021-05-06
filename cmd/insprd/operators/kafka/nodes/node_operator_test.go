@@ -199,6 +199,7 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			nop := &NodeOperator{
 				clientSet: tt.fields.clientSet,
+				auth:      authmock.NewMockAuth(nil),
 				memory:    tree.GetTreeMemory(),
 			}
 			_, err := nop.CreateNode(tt.args.ctx, tt.args.app)
@@ -331,6 +332,7 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			nop := &NodeOperator{
 				clientSet: tt.fields.clientSet,
+				auth:      authmock.NewMockAuth(nil),
 				memory:    tree.GetTreeMemory(),
 			}
 			_, err := nop.UpdateNode(tt.args.ctx, tt.args.app)
@@ -448,6 +450,7 @@ func TestNodeOperator_DeleteNode(t *testing.T) {
 			nop := &NodeOperator{
 				clientSet: tt.fields.clientSet,
 				memory:    mem,
+				auth:      authmock.NewMockAuth(nil),
 			}
 			if err := nop.DeleteNode(tt.args.ctx, tt.args.nodeContext, tt.args.nodeName); (err != nil) != tt.wantErr {
 				t.Errorf("NodeOperator.DeleteNode() error = %v, wantErr %v", err, tt.wantErr)

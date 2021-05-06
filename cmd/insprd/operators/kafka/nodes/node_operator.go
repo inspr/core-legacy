@@ -97,9 +97,10 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 }
 
 // NewOperator initializes a k8s based kafka node operator with in cluster configuration
-func NewOperator(memory memory.Manager) (nop *NodeOperator, err error) {
+func NewOperator(memory memory.Manager, a auth.Auth) (nop *NodeOperator, err error) {
 	nop = &NodeOperator{
 		memory: memory,
+		auth:   a,
 	}
 	if _, exists := os.LookupEnv("DEBUG"); exists {
 		logger.Info("initializing node operator with debug configs")
