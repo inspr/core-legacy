@@ -1,6 +1,15 @@
 
 # Changelog
 
+### #44 Issue CORE-333 | Create the token for authentication inside the cluster
+- features:
+	- creates a secret for each node with its permissions
+	- adds environment variables necessary for controller authentication
+- refactor:
+	- major refactor of the k8s operator conversion system
+	- creates a helper package for kubernetes deployment and container building
+	- changes node operator operations to be interface based
+
 ### #43 Issue CORE-335 | Controllers configuration for in cluster initialization.
 - fixes:
         - Renamed poorly named rest clients on controller clients.
