@@ -20,7 +20,7 @@ type ChannelClient struct {
 // The scope refers to the parent app of the given channel, represented with a dot separated query
 // such as app1.app2
 //
-// The name is the name of the channel. So to seareqClienth for a channel inside app1 with the name channel1 you
+// The name is the name of the channel. So to search for a channel inside app1 with the name channel1 you
 // would call cc.Get(context.Background(), "app1", "channel1")
 func (cc *ChannelClient) Get(ctx context.Context, scope string, name string) (*meta.Channel, error) {
 	cdi := models.ChannelQueryDI{

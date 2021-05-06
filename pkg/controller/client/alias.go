@@ -20,7 +20,7 @@ type AliasClient struct {
 // The scope refers to the parent app of the given alias, represented with a dot separated query
 // such as app1.app2
 //
-// The key is the key of the alias. So to seareqClienth for a alias inside app1 with the key aliasKey you
+// The key is the key of the alias. So to search for a alias inside app1 with the key aliasKey you
 // would call ac.Get(context.Background(), "app1", "aliasKey")
 func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias, error) {
 	aliasQuery := models.AliasQueryDI{
