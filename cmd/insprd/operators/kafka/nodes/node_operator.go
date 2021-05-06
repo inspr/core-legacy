@@ -49,6 +49,9 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 		zap.Any("node", app))
 
 	for _, applicable := range no.dappApplications(app) {
+		if applicable == nil {
+			continue
+		}
 		err := applicable.create(no)
 		if err != nil {
 			return nil, err
