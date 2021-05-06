@@ -109,7 +109,7 @@ func TestNewAppClient(t *testing.T) {
 					HTTPClient(*mockHTTPClient("http://unix")).
 					Encoder(json.Marshal).
 					Decoder(request.JSONDecoderGenerator).
-					Build(),
+					Pointer(),
 			},
 		},
 	}
@@ -182,7 +182,7 @@ func TestClient_WriteMessage(t *testing.T) {
 					HTTPClient(*http.DefaultClient).
 					Encoder(json.Marshal).
 					Decoder(request.JSONDecoderGenerator).
-					Build(),
+					Pointer(),
 			}
 
 			if tt.interruptServer {

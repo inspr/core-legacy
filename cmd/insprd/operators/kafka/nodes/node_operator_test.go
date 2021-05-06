@@ -49,36 +49,6 @@ func mockK8sClientSet(verbsToDepAndErr map[k8sKind]map[string]struct {
 	return client
 }
 
-func mockK8sClientset(verb string, dep kubeApp.Deployment, svc kubeCore.Service, erro error, serviceErr error) kubernetes.Interface {
-	environment.SetMockEnv()
-	client := &fake.Clientset{}
-	client.Fake.AddReactor(verb, "deployments", func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-		mysar := &dep
-		return true, mysar, erro
-	})
-	client.Fake.AddReactor(verb, "services", func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-		mysar := &svc
-		return true, mysar, serviceErr
-	})
-	os.Setenv("NODES_APPS_NAMESPACE", "default.node.opr")
-	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
-	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
-	return client
-}
-
-func mockK8sList(verb string, deps kubeApp.DeploymentList, erro error) kubernetes.Interface {
-	environment.SetMockEnv()
-	client := &fake.Clientset{}
-	client.Fake.AddReactor(verb, "deployments", func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-		mysar := &deps
-		return true, mysar, erro
-	})
-	os.Setenv("NODES_APPS_NAMESPACE", "default.node.opr")
-	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
-	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
-	return client
-}
-
 func TestNodeOperator_GetNode(t *testing.T) {
 	type fields struct {
 		clientSet kubernetes.Interface

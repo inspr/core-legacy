@@ -1,5 +1,26 @@
 # Changelog
 
+### #41 - Feature: Handling invalid requests in the middleware authorization
+- features:
+    - rest/middleware.go -> using the `permissions` field in the payload, created in the issue
+      CORE-336, for the scope and permissions check.
+    - reading the scope information from the http.request header, instead of the
+      body
+    - changing the controller/client so is more functional in nature, functions
+      return a copy of the struct with the new value.
+    - rest/request -> changed so the scope is inserted in the header of the
+      request, the structs that were the body of the request were changed so
+they no longer have a `scope` field.
+
+- fixes:
+    - fixed tests in the controller/client and cli/handlers that were broken due
+      to some struct changes.
+
+- tests:
+    - new tests for the middleware, since there is a new logic step due to the
+      permission introduction.
+
+
 ### #37 - Feature: reactive sidecar <!-- This is the title -->
 - fixes:
 	- lowers the timeout on kafka writer's flush

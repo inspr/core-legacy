@@ -356,13 +356,14 @@ func Test_deleteApps(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
 		decoder := json.NewDecoder(r.Body)
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := decoder.Decode(&data)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		if data.Scope != "appParent.app1" {
+		if scope != "appParent.app1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -435,6 +436,7 @@ func Test_deleteChannels(t *testing.T) {
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
@@ -442,7 +444,7 @@ func Test_deleteChannels(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		if data.Scope != "appParent" || data.ChName != "ch1" {
+		if scope != "appParent" || data.ChName != "ch1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -516,13 +518,14 @@ func Test_deleteCTypes(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelTypeQueryDI{}
 		decoder := json.NewDecoder(r.Body)
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := decoder.Decode(&data)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		if data.Scope != "appParent" || data.CtName != "ct1" {
+		if scope != "appParent" || data.CtName != "ct1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -596,13 +599,15 @@ func Test_deleteAlias(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasQueryDI{}
 		decoder := json.NewDecoder(r.Body)
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := decoder.Decode(&data)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		if data.Scope != "appParent" || data.Key != "alias_name" {
+		fmt.Println(scope)
+		if scope != "appParent" || data.Key != "alias_name" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
