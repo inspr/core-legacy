@@ -9,8 +9,7 @@ import (
 
 // AuthClient is a client for getting auth information from Insprd
 type AuthClient struct {
-	client *request.Client
-	config ControllerConfig
+	reqClient *request.Client
 }
 
 // GenerateToken sends a request containing a payload so Insprd
@@ -18,7 +17,7 @@ type AuthClient struct {
 func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (string, error) {
 	authDI := auth.JwtDO{}
 
-	err := ac.client.Send(ctx, "/auth", "POST", payload, &authDI)
+	err := ac.reqClient.Send(ctx, "/auth", "POST", payload, &authDI)
 	if err != nil {
 		return "", err
 	}
@@ -31,7 +30,7 @@ func (ac *AuthClient) Init(ctx context.Context, key string) (string, error) {
 
 	authDO := struct{ Key string }{key}
 	authDI := auth.JwtDO{}
-	err := ac.client.Send(ctx, "/init", "POST", authDO, &authDI)
+	err := ac.reqClient.Send(ctx, "/init", "POST", authDO, &authDI)
 	if err != nil {
 		return "", err
 	}

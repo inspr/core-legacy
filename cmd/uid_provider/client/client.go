@@ -250,12 +250,11 @@ func (authorizer) SetToken(token []byte) error {
 }
 
 func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
-
 	config := client.ControllerConfig{
-		Auth:  authorizer{},
-		Scope: "",
-		URL:   c.insprdAddress,
+		Auth: authorizer{},
+		URL:  c.insprdAddress,
 	}
+
 	ncc := client.NewControllerClient(config)
 
 	token, err := ncc.Authorization().GenerateToken(ctx, payload)

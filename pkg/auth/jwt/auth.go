@@ -131,8 +131,7 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 		BaseURL(JA.authURL).
 		Encoder(json.Marshal).
 		Decoder(request.JSONDecoderGenerator).
-		Header("Authorization", fmt.Sprintf("Bearer %v", string(token))).
-		Build()
+		Header("Authorization", fmt.Sprintf("Bearer %v", string(token)))
 
 	data := auth.JwtDO{}
 

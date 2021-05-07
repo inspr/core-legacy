@@ -13,27 +13,11 @@ import (
 const inClusterEnviromentError = "authentication as controller failed. controllers requires following " +
 	"variables: INSPR_INSPRD_ADDRESS, INSPR_CONTROLLER_SCOPE & INSPR_CONTROLLER_TOKEN"
 
-// Client implements communication with the Insprd
-type Client struct {
-	HTTPClient *request.Client
-	Config     ControllerConfig
-}
-
 // ControllerConfig stores controller configuration for ease of use and posterior verification.
 type ControllerConfig struct {
 	Auth  request.Authenticator
 	Scope string
 	URL   string
-}
-
-// NewControllerClient return a new Client
-func NewControllerClient(config ControllerConfig) controller.Interface {
-	client := request.NewClient().BaseURL(config.URL).Encoder(json.Marshal).
-		Decoder(request.JSONDecoderGenerator).Authenticator(config.Auth).Build()
-	return &Client{
-		HTTPClient: client,
-		Config:     config,
-	}
 }
 
 // GetInClusterConfigs retrieves controller configs from current dApp deployment.
@@ -55,42 +39,55 @@ func GetInClusterConfigs() (*ControllerConfig, error) {
 	}, nil
 }
 
+// Client implements communication with the Insprd
+type Client struct {
+	HTTPClient *request.Client
+	Config     ControllerConfig
+}
+
+// NewControllerClient return a new Client
+func NewControllerClient(config ControllerConfig) controller.Interface {
+	return &Client{
+		HTTPClient: request.NewClient().
+			BaseURL(config.URL).
+			Encoder(json.Marshal).
+			Decoder(request.JSONDecoderGenerator).
+			Authenticator(config.Auth).
+			Pointer(),
+	}
+}
+
 // Channels interacts with channels on the Insprd
 func (c *Client) Channels() controller.ChannelInterface {
 	return &ChannelClient{
-		client: c.HTTPClient,
-		config: c.Config,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // Apps interacts with apps on the Insprd
 func (c *Client) Apps() controller.AppInterface {
 	return &AppClient{
-		client: c.HTTPClient,
-		config: c.Config,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // ChannelTypes interacts with channel types on the Insprd
 func (c *Client) ChannelTypes() controller.ChannelTypeInterface {
 	return &ChannelTypeClient{
-		client: c.HTTPClient,
-		config: c.Config,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // Authorization interacts with Insprd's auth
 func (c *Client) Authorization() controller.AuthorizationInterface {
 	return &AuthClient{
-		client: c.HTTPClient,
-		config: c.Config,
+		reqClient: c.HTTPClient,
 	}
 }
 
 // Alias interacts with alias on the Insprd
 func (c *Client) Alias() controller.AliasInterface {
 	return &AliasClient{
-		client: c.HTTPClient,
-		config: c.Config,
+		reqClient: c.HTTPClient,
 	}
 }

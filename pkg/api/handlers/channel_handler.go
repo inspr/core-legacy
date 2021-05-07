@@ -28,6 +28,7 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 	logger.Info("handling Channel create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -40,11 +41,11 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 		logger.Debug("initiating Channel create transaction")
 		ch.Memory.InitTransaction()
 
-		err = ch.Memory.Channels().Create(data.Scope, &data.Channel)
+		err = ch.Memory.Channels().Create(scope, &data.Channel)
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("channel", data.Channel.Meta.Name),
-				zap.String("context", data.Scope),
+				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -89,6 +90,7 @@ func (ch *ChannelHandler) HandleGet() rest.Handler {
 	logger.Info("handling Channel get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -101,11 +103,11 @@ func (ch *ChannelHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Channel get transaction")
 		ch.Memory.InitTransaction()
 
-		channel, err := ch.Memory.Root().Channels().Get(data.Scope, data.ChName)
+		channel, err := ch.Memory.Root().Channels().Get(scope, data.ChName)
 		if err != nil {
 			logger.Error("unable to get Channel",
 				zap.String("channel", data.ChName),
-				zap.String("context", data.Scope),
+				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -125,6 +127,7 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 	logger.Info("handling Channel update request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -137,11 +140,11 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 		logger.Debug("initiating Channel update transaction")
 		ch.Memory.InitTransaction()
 
-		err = ch.Memory.Channels().Update(data.Scope, &data.Channel)
+		err = ch.Memory.Channels().Update(scope, &data.Channel)
 		if err != nil {
 			logger.Error("unable to update Channel",
 				zap.String("channel", data.Channel.Meta.Name),
-				zap.String("context", data.Scope),
+				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -186,6 +189,7 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 	logger.Info("handling Channel delete request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -198,11 +202,11 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 		logger.Debug("initiating Channel delete transaction")
 		ch.Memory.InitTransaction()
 
-		err = ch.Memory.Channels().Delete(data.Scope, data.ChName)
+		err = ch.Memory.Channels().Delete(scope, data.ChName)
 		if err != nil {
 			logger.Error("unable to delete Channel",
 				zap.String("channel", data.ChName),
-				zap.String("context", data.Scope),
+				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
