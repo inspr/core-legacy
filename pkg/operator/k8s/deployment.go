@@ -51,13 +51,11 @@ func WithLabels(labels map[string]string) DeploymentOption {
 		if d.Labels == nil {
 			d.Labels = make(map[string]string)
 		}
-		for key, value := range labels {
-			d.Labels[key] = value
-		}
 		if d.Spec.Template.Labels == nil {
 			d.Spec.Template.Labels = make(map[string]string)
 		}
 		for key, value := range labels {
+			d.Labels[key] = value
 			d.Spec.Template.Labels[key] = value
 		}
 		d.Spec.Selector = &metav1.LabelSelector{
@@ -72,13 +70,11 @@ func WithAnnotations(labels map[string]string) DeploymentOption {
 		if d.Annotations == nil {
 			d.Annotations = make(map[string]string)
 		}
-		for key, value := range labels {
-			d.Annotations[key] = value
-		}
 		if d.Spec.Template.Annotations == nil {
 			d.Spec.Template.Annotations = make(map[string]string)
 		}
 		for key, value := range labels {
+			d.Annotations[key] = value
 			d.Spec.Template.Annotations[key] = value
 		}
 	}
