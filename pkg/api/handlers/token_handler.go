@@ -45,8 +45,7 @@ func (h *Handler) InitHandler() rest.Handler {
 		}
 		token, err := h.Auth.Init(res.Key, load)
 		if err != nil {
-
-			rest.ERROR(w, ierrors.NewError().InternalServer().Message("unable to authenticate token").Build())
+			rest.ERROR(w, ierrors.NewError().InternalServer().Message("unable to authenticate token: %v", err.Error()).Build())
 			return
 		}
 		rest.JSON(w, http.StatusOK, auth.JwtDO{

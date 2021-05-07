@@ -57,9 +57,11 @@ func SetClient(url string) {
 		dir, _ := os.UserHomeDir()
 		cmd.InsprOptions.Token = filepath.Join(dir, ".inspr/token")
 	}
+
 	defaults.client = client.NewControllerClient(url, Authenticator{
 		cmd.InsprOptions.Token,
 	})
+
 }
 
 //SetMockedClient configures singleton's client as a mocked client given a error

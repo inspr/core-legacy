@@ -1,7 +1,23 @@
-uid: user
-password: 123123
+uid: nick
+password: 123456
 permissions:
-  "app1":
+  "":
     - "create:dapp"
-  "app2":
+    - "create:channel"
+    - "create:ctype"
+    - "create:alias"
+    
     - "get:dapp"
+    - "get:channel"
+    - "get:ctype"
+    - "get:alias"
+
+    - "update:dapp"
+    - "update:channel"
+    - "update:ctype"
+    - "update:alias"
+
+    - "delete:dapp"
+    - "delete:channel"
+    - "delete:ctype"
+    - "delete:alias"
