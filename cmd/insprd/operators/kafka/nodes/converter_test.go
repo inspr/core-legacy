@@ -3,176 +3,21 @@ package nodes
 import (
 	"os"
 	"reflect"
-	"strings"
+	"sort"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	mfake "github.com/inspr/inspr/cmd/insprd/memory/fake"
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
-	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/insprd/memory/fake"
+	"github.com/inspr/inspr/pkg/auth"
+	authmock "github.com/inspr/inspr/pkg/auth/mocks"
 	"github.com/inspr/inspr/pkg/meta"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/utils"
-	kubeApp "k8s.io/api/apps/v1"
 	kubeCore "k8s.io/api/core/v1"
-	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/client-go/kubernetes/fake"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	kfake "k8s.io/client-go/kubernetes/fake"
 )
-
-func TestInsprDAppToK8sDeployment(t *testing.T) {
-	environment.SetMockEnv()
-	defer environment.UnsetMockEnv()
-
-	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
-	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
-	defer os.Unsetenv("KAFKA_BOOTSTRAP_SERVERS")
-	defer os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
-	testApp := meta.App{
-		Meta: meta.Metadata{
-			Name:      "mock_app",
-			Reference: "ref",
-			Parent:    "parent",
-			UUID:      "parent-UUID",
-		},
-		Spec: meta.AppSpec{
-			Node: meta.Node{
-				Meta: meta.Metadata{
-					Name:      "mock_node",
-					Reference: "ref",
-					Parent:    "mock_app",
-					UUID:      "parent-UUID",
-				},
-				Spec: meta.NodeSpec{
-					Image:    "nodeImage",
-					Replicas: 3,
-					Environment: map[string]string{
-						"key_1": "value_1",
-						"key_2": "value_2",
-						"key_3": "value_3",
-					},
-				},
-			},
-		},
-	}
-
-	outputChannels := strings.Join(testApp.Spec.Boundary.Output, ";")
-	inputChannels := strings.Join(testApp.Spec.Boundary.Input, ";")
-	appID, _ := metautils.JoinScopes(environment.GetInsprAppContext(), testApp.Meta.Name)
-	testEnv := map[string]string{
-		"INSPR_INPUT_CHANNELS":  inputChannels,
-		"INSPR_CHANNEL_SIDECAR": environment.GetSidecarImage(),
-		"INSPR_APPS_TLS":        "true",
-		"INSPR_OUTPUT_CHANNELS": outputChannels,
-		"INSPR_APP_ID":          appID,
-	}
-
-	appDeployName := toDeploymentName(&testApp)
-	appID = toAppID(&testApp)
-	type args struct {
-		app *meta.App
-	}
-
-	replicasHelper := int32(testApp.Spec.Node.Spec.Replicas)
-
-	tests := []struct {
-		name string
-		args args
-		want *kubeApp.Deployment
-	}{
-		{
-			name: "successful",
-			args: args{&testApp},
-			want: &kubeApp.Deployment{
-				ObjectMeta: kubeMeta.ObjectMeta{
-					Name:   appDeployName,
-					Labels: map[string]string{"app": appID},
-				},
-				Spec: kubeApp.DeploymentSpec{
-					Selector: &kubeMeta.LabelSelector{
-						MatchLabels: map[string]string{
-							"app": appID,
-						},
-					},
-					Replicas: &replicasHelper,
-					Template: kubeCore.PodTemplateSpec{
-
-						ObjectMeta: kubeMeta.ObjectMeta{
-							Labels: map[string]string{
-								"app": appID,
-							},
-						},
-						Spec: kubeCore.PodSpec{
-							Volumes: []kubeCore.Volume{
-								{
-									Name: appDeployName + "-volume",
-									VolumeSource: kubeCore.VolumeSource{
-										EmptyDir: &kubeCore.EmptyDirVolumeSource{
-											Medium: kubeCore.StorageMediumMemory,
-										},
-									},
-								},
-							},
-							Containers: []kubeCore.Container{
-								{
-									Name:  appDeployName,
-									Image: testApp.Spec.Node.Spec.Image,
-									// parse from master env var to kube env vars
-									VolumeMounts: []kubeCore.VolumeMount{
-										{
-											Name:      appDeployName + "-volume",
-											MountPath: "/inspr",
-										},
-									},
-									Env: append(utils.EnvironmentMap(testApp.Spec.Node.Spec.Environment).ParseToK8sArrEnv(),
-										kubeCore.EnvVar{
-											Name: "INSPR_UNIX_SOCKET",
-											ValueFrom: &kubeCore.EnvVarSource{
-												FieldRef: &kubeCore.ObjectFieldSelector{
-													FieldPath: "metadata.name",
-												},
-											},
-										}),
-								},
-								{
-									Name:  appDeployName + "-sidecar",
-									Image: environment.GetSidecarImage(),
-									VolumeMounts: []kubeCore.VolumeMount{
-										{
-											Name:      appDeployName + "-volume",
-											MountPath: "/inspr",
-										},
-									},
-									Env: append(utils.EnvironmentMap(testEnv).ParseToK8sArrEnv(), kubeCore.EnvVar{
-										Name: "INSPR_UNIX_SOCKET",
-										ValueFrom: &kubeCore.EnvVarSource{
-											FieldRef: &kubeCore.ObjectFieldSelector{
-												FieldPath: "metadata.name",
-											},
-										},
-									}),
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-	op := &NodeOperator{
-		memory:    mfake.MockMemoryManager(nil),
-		clientSet: fake.NewSimpleClientset(),
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := op.dAppToDeployment(tt.args.app); !cmp.Equal(got, tt.want, utils.GetMapCompareOptions()) {
-				t.Errorf("InsprDAppToK8sDeployment() = \n%v, \nwant \n%v", got, tt.want)
-			}
-		})
-	}
-	environment.UnsetMockEnv()
-}
 
 func Test_toDeploymentName(t *testing.T) {
 	testApp := meta.App{
@@ -250,110 +95,63 @@ func Test_intToint32(t *testing.T) {
 	}
 }
 
-func Test_baseEnvironment(t *testing.T) {
-	environment.SetMockEnv()
-	defer environment.UnsetMockEnv()
-	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "bootstrap")
-	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "earliest")
-	os.Setenv("INSPR_SIDECAR_IMAGE", "sidecar")
-	os.Setenv("INSPR_ENV", "environment")
-	defer os.Unsetenv("KAFKA_BOOTSTRAP_SERVERS")
-	defer os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
-	defer os.Unsetenv("INSPR_SIDECAR_IMAGE")
-	defer os.Unsetenv("INSPR_ENV")
-	kafkasc.RefreshEnviromentVariables()
-	mem := tree.GetTreeMemory()
-	chs := map[string]*meta.Channel{
-		"channel1": {
-			Meta: meta.Metadata{
-				Name:   "channel1",
-				Parent: "parent",
-				UUID:   "uuid-channel1",
-			},
-			Spec: meta.ChannelSpec{
-				Type: "channelType1",
-			},
-		},
-		"channel2": {
-			Meta: meta.Metadata{
-				Name:   "channel2",
-				Parent: "parent",
-				UUID:   "uuid-channel2",
-			},
-			Spec: meta.ChannelSpec{
-				Type: "channelType2",
-			},
-		},
-	}
+func TestNodeOperator_withBoundary(t *testing.T) {
+	mem := fake.MockMemoryManager(nil)
 	mem.InitTransaction()
-	mem.Apps().Create("", &meta.App{
+	mem.Channels().Create("", &meta.Channel{
 		Meta: meta.Metadata{
-			Name: "parent",
+			Name: "channel1_resolved",
+			UUID: "channel1_UUID",
 		},
-		Spec: meta.AppSpec{
-			Channels: chs,
-			Aliases:  map[string]*meta.Alias{},
-			ChannelTypes: map[string]*meta.ChannelType{
-				"channelType1": {
-					Meta: meta.Metadata{
-						Name:   "channelType1",
-						Parent: "parent",
-					},
-					Schema: "schema1",
-				},
-				"channelType2": {
-					Meta: meta.Metadata{
-						Name:   "channelType2",
-						Parent: "parent",
-					},
-					Schema: "schema2",
-				},
-			},
+		Spec: meta.ChannelSpec{
+			Type: "channel1type",
 		},
 	})
-	mem.Commit()
+	mem.Channels().Create("", &meta.Channel{
+		Meta: meta.Metadata{
+			Name: "channel2_resolved",
+			UUID: "channel2_UUID",
+		},
+		Spec: meta.ChannelSpec{
+			Type: "channel2type",
+		},
+	})
+
+	mem.ChannelTypes().Create("", &meta.ChannelType{
+		Meta: meta.Metadata{
+			Name: "channel1type",
+		},
+		Schema: "channel1type",
+	})
+	mem.ChannelTypes().Create("", &meta.ChannelType{
+		Meta: meta.Metadata{
+			Name: "channel2type",
+		},
+		Schema: "channel2type",
+	})
+
+	type fields struct {
+		clientSet kubernetes.Interface
+		memory    memory.Manager
+		auth      auth.Auth
+	}
 	type args struct {
 		app *meta.App
 	}
-	type fields struct {
-	}
 	tests := []struct {
 		name   string
-		args   args
 		fields fields
-		want   utils.EnvironmentMap
+		args   args
+		want   *kubeCore.Container
 	}{
 		{
-			name: "no boundary",
+			name: "no input channels",
+			fields: fields{
+				clientSet: kfake.NewSimpleClientset(),
+				memory:    mem,
+			},
 			args: args{
 				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:   "app1",
-						Parent: "parent",
-					},
-				},
-			},
-			want: utils.EnvironmentMap{
-				"INSPR_INPUT_CHANNELS":    "",
-				"INSPR_OUTPUT_CHANNELS":   "",
-				"INSPR_SIDECAR_IMAGE":     "sidecar",
-				"INSPR_APP_ID":            "parent-app1",
-				"INSPR_APP_CTX":           "parent",
-				"INSPR_ENV":               "environment",
-				"KAFKA_BOOTSTRAP_SERVERS": "bootstrap",
-				"KAFKA_AUTO_OFFSET_RESET": "earliest",
-				"INSPR_READ_PORT":         "3002",
-				"INSPR_WRITE_PORT":        "3001",
-			},
-		},
-		{
-			name: "only input boundary",
-			args: args{
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:   "app1",
-						Parent: "parent",
-					},
 					Spec: meta.AppSpec{
 						Boundary: meta.AppBoundary{
 							Input: []string{
@@ -361,100 +159,162 @@ func Test_baseEnvironment(t *testing.T) {
 								"channel2",
 							},
 						},
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+							"channel2": {
+								Meta: meta.Metadata{Name: "channel2"},
+							},
+						},
 					},
 				},
 			},
-			want: utils.EnvironmentMap{
-				"INSPR_INPUT_CHANNELS":    "channel1;channel2",
-				"INSPR_OUTPUT_CHANNELS":   "",
-				"INSPR_SIDECAR_IMAGE":     "sidecar",
-				"INSPR_APP_ID":            "parent-app1",
-				"INSPR_APP_CTX":           "parent",
-				"INSPR_ENV":               "environment",
-				"KAFKA_BOOTSTRAP_SERVERS": "bootstrap",
-				"KAFKA_AUTO_OFFSET_RESET": "earliest",
-				"INSPR_" + chs["channel1"].Meta.UUID + "_SCHEMA": "schema1",
-				"INSPR_" + chs["channel2"].Meta.UUID + "_SCHEMA": "schema2",
-				"channel1_RESOLVED": "INSPR_" + chs["channel1"].Meta.UUID,
-				"channel2_RESOLVED": "INSPR_" + chs["channel2"].Meta.UUID,
-				"INSPR_READ_PORT":   "3002",
-				"INSPR_WRITE_PORT":  "3001",
+			want: &kubeCore.Container{
+				Env: []kubeCore.EnvVar{
+					{
+						Name:  "INSPR_INPUT_CHANNELS",
+						Value: "channel1;channel2",
+					},
+					{
+						Name:  "INSPR_OUTPUT_CHANNELS",
+						Value: "",
+					},
+					{
+						Name:  "INSPR_channel1_UUID_SCHEMA",
+						Value: "channel1type",
+					},
+					{
+						Name:  "channel1_RESOLVED",
+						Value: "INSPR_channel1_UUID",
+					},
+					{
+						Name:  "INSPR_channel2_UUID_SCHEMA",
+						Value: "channel2type",
+					},
+					{
+						Name:  "channel2_RESOLVED",
+						Value: "INSPR_channel2_UUID",
+					},
+				},
+			},
+		},
+		{
+			name: "no output channels",
+			fields: fields{
+				clientSet: kfake.NewSimpleClientset(),
+				memory:    mem,
+			},
+			args: args{
+				app: &meta.App{
+					Spec: meta.AppSpec{
+						Boundary: meta.AppBoundary{
+							Output: []string{
+								"channel1",
+								"channel2",
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+							"channel2": {
+								Meta: meta.Metadata{Name: "channel2"},
+							},
+						},
+					},
+				},
+			},
+			want: &kubeCore.Container{
+				Env: []kubeCore.EnvVar{
+					{
+						Name:  "INSPR_OUTPUT_CHANNELS",
+						Value: "channel1;channel2",
+					},
+					{
+						Name:  "INSPR_INPUT_CHANNELS",
+						Value: "",
+					},
+					{
+						Name:  "INSPR_channel1_UUID_SCHEMA",
+						Value: "channel1type",
+					},
+					{
+						Name:  "channel1_RESOLVED",
+						Value: "INSPR_channel1_UUID",
+					},
+					{
+						Name:  "INSPR_channel2_UUID_SCHEMA",
+						Value: "channel2type",
+					},
+					{
+						Name:  "channel2_RESOLVED",
+						Value: "INSPR_channel2_UUID",
+					},
+				},
 			},
 		},
 	}
-
 	for _, tt := range tests {
-		op := &NodeOperator{
-			memory:    mem,
-			clientSet: fake.NewSimpleClientset(),
-		}
 		t.Run(tt.name, func(t *testing.T) {
-			mem.InitTransaction()
-			if got := op.sidecarEnvironment(tt.args.app); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("baseEnvironment() = \n%v, want \n%v", got, tt.want)
+			no := &NodeOperator{
+				clientSet: tt.fields.clientSet,
+				memory:    tt.fields.memory,
+				auth:      tt.fields.auth,
 			}
-			mem.Cancel()
+			got := &kubeCore.Container{}
+			option := no.withBoundary(tt.args.app)
+			option(got)
+			if !cmp.Equal(got, tt.want, cmp.Comparer(func(a1, a2 []kubeCore.EnvVar) bool {
+				a1cmp, a2cmp := envVarArr(a1), envVarArr(a2)
+				sort.Sort(a1cmp)
+				sort.Sort(a2cmp)
+
+				return cmp.Equal(a1cmp, a2cmp)
+			})) {
+				t.Errorf("TestNodeOperator_withBoundary got = \n%v, \nwant \n%v", got, tt.want)
+			}
+
 		})
 	}
 }
 
-func Test_dappToService(t *testing.T) {
-	m := metautils.InjectUUID(meta.Metadata{
-		Name:   "test-dapp",
-		Parent: "",
-	})
+type envVarArr []kubeCore.EnvVar
+
+func (a envVarArr) Len() int {
+	return len(a)
+}
+func (a envVarArr) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+func (a envVarArr) Less(i, j int) bool {
+	return a[i].Name < a[j].Name
+}
+
+func Test_withNodeID(t *testing.T) {
 	type args struct {
 		app *meta.App
 	}
 	tests := []struct {
 		name string
 		args args
-		want *kubeCore.Service
+		want *kubeCore.Container
 	}{
 		{
-			name: "node with ports",
+			name: "correct injection",
 			args: args{
 				app: &meta.App{
-					Meta: m,
-					Spec: meta.AppSpec{
-						Node: meta.Node{
-							Spec: meta.NodeSpec{
-								Ports: []meta.NodePort{
-									{
-										Port:       80,
-										TargetPort: 80,
-									},
-									{
-										Port:       90,
-										TargetPort: 100,
-									},
-								},
-							},
-						},
+					Meta: meta.Metadata{
+						Name: "app1",
+						UUID: "UUID",
 					},
 				},
 			},
-			want: &kubeCore.Service{
-				ObjectMeta: kubeMeta.ObjectMeta{
-					Name: "node-" + m.UUID,
-				},
-				Spec: kubeCore.ServiceSpec{
-					Ports: []kubeCore.ServicePort{
-						{
-							Port:       80,
-							TargetPort: intstr.FromInt(80),
-						},
-						{
-							Port:       90,
-							TargetPort: intstr.FromInt(100),
-						},
-						{
-							Port:       sidecarPort,
-							TargetPort: intstr.FromInt(int(sidecarPort)),
-						},
-					},
-					Selector: map[string]string{
-						"app": "test-dapp",
+			want: &kubeCore.Container{
+				Env: []kubeCore.EnvVar{
+					{
+						Name:  "INSPR_APP_ID",
+						Value: "app1",
 					},
 				},
 			},
@@ -462,8 +322,278 @@ func Test_dappToService(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := dappToService(tt.args.app); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("dappToService() = %v, want %v", got, tt.want)
+			option := withNodeID(tt.args.app)
+			got := &kubeCore.Container{}
+			option(got)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("withNodeID() got = %v, want = %v", got, tt.want)
+			}
+
+		})
+	}
+}
+
+func Test_withSidecarPorts(t *testing.T) {
+	type args struct {
+		app *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+		want *kubeCore.Container
+	}{
+		{
+			name: "only write port",
+			args: args{
+				app: &meta.App{
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Spec: meta.NodeSpec{
+								SidecarPort: meta.SidecarPort{
+									Write: 1234,
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &kubeCore.Container{
+				Env: []kubeCore.EnvVar{
+					{
+						Name:  "INSPR_SIDECAR_WRITE_PORT",
+						Value: "1234",
+					},
+				},
+			},
+		},
+		{
+			name: "only read port",
+			args: args{
+				app: &meta.App{
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Spec: meta.NodeSpec{
+								SidecarPort: meta.SidecarPort{
+									Read: 1234,
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &kubeCore.Container{
+				Env: []kubeCore.EnvVar{
+					{
+						Name:  "INSPR_SIDECAR_READ_PORT",
+						Value: "1234",
+					},
+				},
+			},
+		},
+		{
+			name: "both ports",
+			args: args{
+				app: &meta.App{
+					Spec: meta.AppSpec{
+						Node: meta.Node{
+							Spec: meta.NodeSpec{
+								SidecarPort: meta.SidecarPort{
+									Read:  1234,
+									Write: 1234,
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &kubeCore.Container{
+				Env: []kubeCore.EnvVar{
+					{
+						Name:  "INSPR_SIDECAR_WRITE_PORT",
+						Value: "1234",
+					},
+					{
+						Name:  "INSPR_SIDECAR_READ_PORT",
+						Value: "1234",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			option := withSidecarPorts(tt.args.app)
+			got := &kubeCore.Container{}
+			option(got)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("withSidecarPorts() got = %v, want = %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNodeOperator_withSidecarImage(t *testing.T) {
+	type args struct {
+		app *meta.App
+	}
+	tests := []struct {
+		name string
+		env  string
+		args args
+		want *kubeCore.Container
+	}{
+		{
+			name: "correct sidecar image",
+			want: &kubeCore.Container{
+				Image: "inspr-sidecar-image",
+			},
+			env: "inspr-sidecar-image",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			os.Setenv("INSPR_SIDECAR_IMAGE", tt.env)
+			defer os.Unsetenv("INSPR_SIDECAR_IMAGE")
+			no := &NodeOperator{}
+			option := no.withSidecarImage(tt.args.app)
+			got := &kubeCore.Container{}
+			option(got)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("withSidecarPorts() got = %v, want = %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_withKafkaConfiguration(t *testing.T) {
+	tests := []struct {
+		name string
+		want *kubeCore.Container
+	}{
+		{
+			name: "correct configmap configuration",
+			want: &kubeCore.Container{
+				EnvFrom: []kubeCore.EnvFromSource{
+					{
+						ConfigMapRef: &kubeCore.ConfigMapEnvSource{
+							LocalObjectReference: kubeCore.LocalObjectReference{
+								Name: "inspr-kafka-configuration",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			option := withKafkaConfiguration()
+			got := &kubeCore.Container{}
+			option(got)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("withKafkaConfiguration() got = %v, want = %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_withSidecarConfiguration(t *testing.T) {
+	tests := []struct {
+		name string
+		want *kubeCore.Container
+	}{
+		{
+			name: "correct configmap configuration",
+			want: &kubeCore.Container{
+				EnvFrom: []kubeCore.EnvFromSource{
+					{
+						ConfigMapRef: &kubeCore.ConfigMapEnvSource{
+							LocalObjectReference: kubeCore.LocalObjectReference{
+								Name: "inspr-sidecar-configuration",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			option := withSidecarConfiguration()
+			got := &kubeCore.Container{}
+			option(got)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("withSidecarConfiguration() got = %v, want = %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNodeOperator_toSecret(t *testing.T) {
+
+	type fields struct {
+		clientSet kubernetes.Interface
+		memory    memory.Manager
+		auth      auth.Auth
+	}
+	type args struct {
+		app *meta.App
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *kubeSecret
+	}{
+		{
+			name: "correct secret definition",
+			fields: fields{
+				clientSet: kfake.NewSimpleClientset(),
+				auth:      authmock.NewMockAuth(nil),
+			},
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "app1",
+						UUID: "app1_UUID",
+					},
+					Spec: meta.AppSpec{
+
+						Auth: meta.AppAuth{
+							Scope: "scope1",
+							Permissions: utils.StringArray{
+								"create:dapp",
+								"delete:dapp",
+							},
+						},
+					},
+				},
+			},
+			want: &kubeSecret{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "node-app1_UUID",
+				},
+				Data: map[string][]byte{
+					"INSPR_CONTROLLER_TOKEN": []byte("mock"),
+					"INSPR_CONTROLLER_SCOPE": []byte("scope1"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			no := &NodeOperator{
+				clientSet: tt.fields.clientSet,
+				memory:    tt.fields.memory,
+				auth:      tt.fields.auth,
+			}
+			if got := no.toSecret(tt.args.app); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NodeOperator.toSecret() = %v, want %v", got, tt.want)
 			}
 		})
 	}

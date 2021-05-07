@@ -5,6 +5,7 @@ import (
 	"github.com/inspr/inspr/cmd/insprd/operators"
 	"github.com/inspr/inspr/cmd/insprd/operators/kafka/channels"
 	"github.com/inspr/inspr/cmd/insprd/operators/kafka/nodes"
+	"github.com/inspr/inspr/pkg/auth"
 )
 
 // Operator is an operator for creating channels and nodes inside kubernetes
@@ -32,14 +33,14 @@ func (op *Operator) Channels() operators.ChannelOperatorInterface {
 // NewKafkaOperator creates a kafka operator.
 //
 // View Operator
-func NewKafkaOperator(memory memory.Manager) (operators.OperatorInterface, error) {
+func NewKafkaOperator(memory memory.Manager, authenticator auth.Auth) (operators.OperatorInterface, error) {
 	var err error
 	var chOp operators.ChannelOperatorInterface
 	chOp, err = channels.NewOperator(memory)
 	if err != nil {
 		return nil, err
 	}
-	nOp, err := nodes.NewOperator(memory)
+	nOp, err := nodes.NewOperator(memory, authenticator)
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -9,6 +10,38 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
 )
+
+// ControllerRefreshHandler handles requests for token refresing on inspr controllers on Insprd
+func (h *Handler) ControllerRefreshHandler() rest.Handler {
+
+	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
+		received := auth.ResfreshDO{}
+		err := json.NewDecoder(r.Body).Decode(&received)
+		if err != nil {
+			rest.ERROR(w, err)
+		}
+
+		// this is the path to the app
+		appQuery := string(received.RefreshToken)
+
+		app, err := h.Memory.Apps().Get(appQuery)
+		if err != nil {
+			rest.ERROR(w, err)
+		}
+
+		// refresh the payload with the current permissions of the dApp
+		payload := auth.Payload{
+			UID: app.Meta.UUID,
+			Permissions: map[string][]string{
+				app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
+			},
+			Refresh:    []byte(appQuery),
+			RefreshURL: fmt.Sprintf("%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
+		}
+		rest.JSON(w, 200, payload)
+
+	}).Recover().Post().JSON()
+}
 
 // TokenHandler handles requests for token creation on Insprd
 func (h *Handler) TokenHandler() rest.Handler {
