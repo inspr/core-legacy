@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 
@@ -55,6 +56,8 @@ func NewRedisClient() *Client {
 	}
 	err := c.initAdminUser()
 	if err != nil {
+		fmt.Println("ERROR CREATING REDIS-CLIENT", err.Error())
+		log.Println("ERROR CREATING REDIS-CLIENT", err.Error())
 		panic(err)
 	}
 	return c
