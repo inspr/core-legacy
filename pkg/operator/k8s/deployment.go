@@ -96,7 +96,9 @@ func NewDeployment(name string, options ...DeploymentOption) *appsv1.Deployment 
 	}
 
 	for _, option := range options {
-		option(cont)
+		if option != nil {
+			option(cont)
+		}
 	}
 	return cont
 }

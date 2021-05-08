@@ -82,7 +82,9 @@ func NewContainer(name string, image string, options ...ContainerOption) corev1.
 		Image: image,
 	}
 	for _, option := range options {
-		option(&cont)
+		if option != nil {
+			option(&cont)
+		}
 	}
 	return cont
 }
