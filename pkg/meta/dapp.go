@@ -11,7 +11,7 @@ type Node struct {
 // NodePort represents a connection for a node
 type NodePort struct {
 	Port       int `yaml:"port" json:"port"`
-	TargetPort int `yaml:"node_port" json:"node_port"`
+	TargetPort int `yaml:"targetPort" json:"targetPort"`
 }
 
 // SidecarPort represents the port for communication between node and sidecar
@@ -22,7 +22,7 @@ type SidecarPort struct {
 
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.
 type NodeSpec struct {
-	Ports       []NodePort           `json:"ports,omitempty"`
+	Ports       []NodePort           `json:"ports,omitempty" yaml:"ports,omitempty"`
 	Image       string               `yaml:"image,omitempty"  json:"image"`
 	Replicas    int                  `yaml:"replicas,omitempty" json:"replicas"`
 	Environment utils.EnvironmentMap `yaml:"environment,omitempty" json:"environment"`

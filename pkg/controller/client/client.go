@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/controller"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest/request"
@@ -20,20 +19,28 @@ type ControllerConfig struct {
 	URL   string
 }
 
+type authenticator struct{}
+
+func (authenticator) GetToken() ([]byte, error) {
+	return []byte("Bearer " + os.Getenv("INSPR_CONTROLLER_TOKEN")), nil
+}
+func (authenticator) SetToken(tok []byte) error {
+	os.Setenv("INSPR_CONTROLLER_TOKEN", string(tok)[len("Bearer "):])
+	return nil
+}
+
 // GetInClusterConfigs retrieves controller configs from current dApp deployment.
 func GetInClusterConfigs() (*ControllerConfig, error) {
 	url, urlok := os.LookupEnv("INSPR_INSPRD_ADDRESS")
 	scope, scopeok := os.LookupEnv("INSPR_CONTROLLER_SCOPE")
-	token, tknok := os.LookupEnv("INSPR_CONTROLLER_TOKEN")
+	_, tknok := os.LookupEnv("INSPR_CONTROLLER_TOKEN")
 	if !urlok || !scopeok || !tknok {
 		return nil, ierrors.NewError().
 			Message(inClusterEnviromentError).
 			Build()
 	}
 	return &ControllerConfig{
-		Auth: auth.Authenticator{
-			TokenPath: token,
-		},
+		Auth:  authenticator{},
 		Scope: scope,
 		URL:   url,
 	}, nil

@@ -25,6 +25,7 @@ func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
 	scope, err := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
 	if err != nil {
 		log.Printf("err = %+v\n", err)
+		return nil
 	}
 
 	payload := auth.Payload{
@@ -39,6 +40,7 @@ func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
 	token, err := no.auth.Tokenize(payload)
 	if err != nil {
 		log.Printf("err = %+v\n", err)
+		return nil
 	}
 
 	return &kubeSecret{
@@ -65,6 +67,10 @@ func withSecretDefinition(app *meta.App) k8s.ContainerOption {
 
 // withBoundary adds the boundary configuration to the kubernetes' deployment environment variables
 func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
+	scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+	if _, err := no.memory.Apps().Get(scope); err != nil {
+		return nil
+	}
 	return func(c *corev1.Container) {
 
 		input := app.Spec.Boundary.Input
@@ -211,13 +217,15 @@ func dappToService(app *meta.App) *kubeService {
 		},
 		Spec: corev1.ServiceSpec{
 			Ports: func() (ports []corev1.ServicePort) {
-				for _, port := range app.Spec.Node.Spec.Ports {
+				for i, port := range app.Spec.Node.Spec.Ports {
 					ports = append(ports, corev1.ServicePort{
+						Name:       fmt.Sprintf("port%v", i),
 						Port:       int32(port.Port),
 						TargetPort: intstr.FromInt(port.TargetPort),
 					})
 				}
 				ports = append(ports, corev1.ServicePort{
+					Name:       "sidecar-port",
 					Port:       sidecarPort,
 					TargetPort: intstr.FromInt(int(sidecarPort)),
 				})

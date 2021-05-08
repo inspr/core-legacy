@@ -6,7 +6,7 @@ data:
     INSPR_SIDECAR_READ_PORT: !!str {{ .Values.sidecar.readPort }}
     INSPR_SIDECAR_WRITE_PORT: !!str {{ .Values.sidecar.writePort }}
     INSPR_SIDECAR_PORT: !!str {{ .Values.sidecar.port }}
-    INSPR_INSPRD_ADDRESS: http://{{ .Values.service.insprdName }}.{{ .Release.namespace }}.svc:{{ .Values.service.insprdPort }}
+    INSPR_INSPRD_ADDRESS: http://{{ .Values.service.insprdName }}.{{ .Release.Namespace }}.svc:{{ .Values.service.insprdPort }}
     
 ---
 apiVersion: v1
@@ -18,4 +18,4 @@ data:
     INSPR_SIDECAR_READ_PORT: !!str {{ .Values.sidecar.readPort }}
     INSPR_SIDECAR_WRITE_PORT: !!str {{ .Values.sidecar.writePort }}
     INSPR_SIDECAR_PORT: !!str {{ .Values.sidecar.port }}
-    INSPR_INSPRD_ADDRESS: http://{{ .Values.service.insprdName }}.{{ .Release.namespace }}.svc:{{ .Values.service.insprdPort }}
+    INSPR_INSPRD_ADDRESS: http://{{ .Values.service.insprdName }}.{{ .Release.Namespace }}.svc:{{ .Values.service.insprdPort }}
