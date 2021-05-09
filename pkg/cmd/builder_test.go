@@ -331,7 +331,7 @@ func Test_builder_WithFlagAdder(t *testing.T) {
 			}
 			_ = b.WithFlagAdder(tt.args.adder)
 
-			if !reflect.DeepEqual(bufResp.String(), tt.want) {
+			if !reflect.DeepEqual(len(bufResp.String()), len(tt.want)) {
 				t.Errorf(
 					"builder.WithFlagAdder() = %v, want %v",
 					bufResp,
@@ -396,7 +396,7 @@ func Test_builder_WithFlags(t *testing.T) {
 				)
 			}
 
-			got = b.WithFlags(tt.args.flags).NoArgs(nil)
+			got = b.WithFlags(tt.args.flags...).NoArgs(nil)
 			if got.Flags() == nil {
 				t.Errorf(
 					"builder.WithFlags() = %v, want not nil",
