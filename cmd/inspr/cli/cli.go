@@ -37,12 +37,18 @@ func mainCmdPreRun(cm *cobra.Command, args []string) error {
 	if cm.Name() == "init" {
 		return nil
 	}
+	cm.Root().SilenceErrors = true
 	cm.Root().SilenceUsage = true
 	utils.InitViperConfig()
 	// viper defaults values or reads from the config location
+	var err error
 	if cmd.InsprOptions.Config == "" {
-		fmt.Println("AAAAA")
-		return utils.ReadDefaultConfig()
+		err = utils.ReadDefaultConfig()
+	} else {
+		err = utils.ReadConfigFromFile(cmd.InsprOptions.Config)
 	}
-	return utils.ReadConfigFromFile(cmd.InsprOptions.Config)
+	if err != nil {
+		fmt.Fprintf(utils.GetCliOutput(), "Invalid config file! Did you run inspr init?")
+	}
+	return nil
 }
