@@ -1,4 +1,16 @@
 # Changelog
+### #48 - Feature: adds init command to the cli
+
+- features:
+    - creates an init command for configuration initialization
+    - adds config flag to specify configuration file
+    - changes flow so that if the config is invalid, asks for initialization
+- refactors:
+    - refactors configuration initialization to allow different files
+    - changes command builder to now use variadic flag argument instead of slice
+- fix:
+    - silences main command to remove duplicate errors
+
 
 ### #41 - Feature: Handling invalid requests in the middleware authorization
 - features:
