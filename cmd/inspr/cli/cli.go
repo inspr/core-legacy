@@ -1,11 +1,11 @@
 package cli
 
 import (
+	"fmt"
 	"io"
-	"os"
 
 	"github.com/inspr/inspr/pkg/cmd"
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	"github.com/inspr/inspr/pkg/cmd/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -34,15 +34,15 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 }
 
 func mainCmdPreRun(cm *cobra.Command, args []string) error {
-	cm.Root().SilenceUsage = true
-	// viper defaults values or reads from the config location
-	cliutils.InitViperConfig()
-
-	homeDir, _ := os.UserHomeDir()
-
-	if err := cliutils.ReadViperConfig(homeDir); err != nil {
-		return err
+	if cm.Name() == "init" {
+		return nil
 	}
-
-	return nil
+	cm.Root().SilenceUsage = true
+	utils.InitViperConfig()
+	// viper defaults values or reads from the config location
+	if cmd.InsprOptions.Config == "" {
+		fmt.Println("AAAAA")
+		return utils.ReadDefaultConfig()
+	}
+	return utils.ReadConfigFromFile(cmd.InsprOptions.Config)
 }
