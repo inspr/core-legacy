@@ -21,6 +21,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 			NewDescribeCmd(),
 			NewConfigChangeCmd(),
 			authCommand,
+			initCommand,
 		).
 		Version(version).
 		WithLongDescription("main command of the inspr cli, to see the full list of subcommands existent please use 'inspr help'").

@@ -60,7 +60,7 @@ It can be called with the flag --dry-run so the changes that would be made are s
 				FlagAddMethod: "BoolVar",
 				DefinedOn:     []string{"apply"},
 			},
-		}).
+		}...).
 		NoArgs(doApply)
 
 	applyCmd.MarkFlagFilename("file", "yaml", "yml")
