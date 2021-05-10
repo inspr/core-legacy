@@ -295,7 +295,7 @@ func Test_getTarget(t *testing.T) {
 			want: "dapp",
 		},
 		{
-			name: "exception_channeltypes",
+			name: "exception_types",
 			args: args{createReq("types")},
 			want: "ctype",
 		},

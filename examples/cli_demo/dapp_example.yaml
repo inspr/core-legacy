@@ -6,7 +6,7 @@ spec:
   boundary:
     input:
       - "bananita"
-  Types:
+  types:
     ct1:
       schema: '{"type":"string"}'
   channels:

@@ -1,4 +1,4 @@
-kind: Type
+kind: type
 apiVersion: v1
 
 meta:

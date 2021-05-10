@@ -40,7 +40,7 @@ func createChannelYaml() string {
 
 func createTypeYaml() string {
 	comp := meta.Component{
-		Kind:       "Type",
+		Kind:       "type",
 		APIVersion: "v1",
 	}
 	data, _ := yaml.Marshal(&comp)
@@ -482,7 +482,7 @@ func orderedContent() []applied {
 		{
 			fileName: "ct.yml",
 			component: meta.Component{
-				Kind:       "Type",
+				Kind:       "type",
 				APIVersion: "v1",
 			},
 			content: []byte(createTypeYaml()),

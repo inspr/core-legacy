@@ -3,7 +3,7 @@ kind: dapp
 meta:
   name: "basicexample"
 spec:
-  Types:
+  types:
     primes_ct1:
       meta:
         name: "primes_ct1"

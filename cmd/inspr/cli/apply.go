@@ -182,7 +182,7 @@ func getOrderedFiles(path string, files []string) []applied {
 				apps = append(apps, applied{component: comp, fileName: file, content: f})
 			} else if comp.Kind == "channel" {
 				channels = append(channels, applied{component: comp, fileName: file, content: f})
-			} else if comp.Kind == "Type" {
+			} else if comp.Kind == "type" {
 				ctypes = append(ctypes, applied{component: comp, fileName: file, content: f})
 			} else if comp.Kind == "alias" {
 				aliases = append(aliases, applied{component: comp, fileName: file, content: f})
