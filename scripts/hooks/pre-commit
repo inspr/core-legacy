@@ -1,0 +1,19 @@
+all=0
+files=()
+for file in $(git diff --cached --name-only --diff-filter=ATMR --line-prefix=./ | grep "\.go\$")
+do
+	golint -set_exit_status $file 2> /dev/null
+	if [[ $? -ne 0 ]]
+	then
+		all=1
+	fi
+done
+
+if [[ $all -ne 0 ]]
+then
+	echo "Lint for cached files failed, fix it before commiting"
+fi
+
+exit $all
+
+
