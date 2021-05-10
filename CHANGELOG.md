@@ -1,5 +1,19 @@
 # Changelog
 
+### 46 - misc: changing the name of channelType to type
+- fixes:
+    - use the replace funcionality in vscode to replace `Channel_Type` for `Type`
+    - use the replace funcionality in vscode to replace `ChannelType` for `Type`
+    - use the replace funcionality in vscode to replace `Channel Type` for `Type`
+    - changed the DI structures used in the cli handlers
+    - changed the tests of the handlers, updated the query being used to test
+      the methods
+    - changed a few file names for it to have just `type` instead of
+      `channel_type`
+    - left some places with `ctype` as is more intuitive as to what type is
+      being managed.
+
+
 ### #41 - Feature: Handling invalid requests in the middleware authorization
 - features:
     - rest/middleware.go -> using the `permissions` field in the payload, created in the issue
