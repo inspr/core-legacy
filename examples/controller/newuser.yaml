@@ -1,0 +1,5 @@
+uid: pdrim
+password: abcdefg
+permissions:
+    controllerexample: ["get:dapp"]
+
