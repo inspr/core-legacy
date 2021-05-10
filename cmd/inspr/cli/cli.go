@@ -21,6 +21,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 			NewDescribeCmd(),
 			NewConfigChangeCmd(),
 			authCommand,
+			completionCmd,
 		).
 		Version(version).
 		WithLongDescription("main command of the inspr cli, to see the full list of subcommands existent please use 'inspr help'").
@@ -33,6 +34,9 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 }
 
 func mainCmdPreRun(cm *cobra.Command, args []string) error {
+	if cm.Name() == "completion" {
+		return nil
+	}
 	cm.Root().SilenceUsage = true
 	// viper defaults values or reads from the config location
 	cliutils.InitViperConfig()
