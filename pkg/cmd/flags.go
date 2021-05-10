@@ -64,7 +64,7 @@ var flagRegistry = []Flag{
 	{
 		Name:      "config",
 		Shorthand: "c",
-		Usage:     "set the config folder for the command",
+		Usage:     "set the config file for the command",
 		Value:     &InsprOptions.Config,
 		DefValue:  "",
 		DefinedOn: []string{"all"},
