@@ -22,15 +22,17 @@ type initOptionsDT struct {
 
 var initOptions initOptionsDT
 
-var initCommand = cmd.NewCmd("init").WithFlags(
-	&cmd.Flag{
-		Name:      "file",
-		Shorthand: "f",
-		DefValue:  "",
-		Usage:     "set the value for storing the configuration file",
-		Value:     &initOptions.folder,
-	},
-).NoArgs(
+var initCommand = cmd.NewCmd("init").
+	WithDescription("Initialize the CLI configuration").
+	WithFlags(
+		&cmd.Flag{
+			Name:      "file",
+			Shorthand: "f",
+			DefValue:  "",
+			Usage:     "set the value for storing the configuration file",
+			Value:     &initOptions.folder,
+		},
+	).NoArgs(
 	func(c context.Context) error {
 		config := insprConfiguration{}
 		fmt.Print("enter insprd host (http://localhost:8080):")
