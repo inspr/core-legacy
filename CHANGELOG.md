@@ -1,7 +1,6 @@
 
 # Changelog
 
-<<<<<<< HEAD
 ### #44 Issue CORE-333 | Create the token for authentication inside the cluster
 - features:
 	- creates a secret for each node with its permissions
@@ -27,7 +26,7 @@
 	- adds a permission field to dapp meta
 	- changes new dapp on tree to handle the injection
 ---
-=======
+
 ### #41 - Feature: Handling invalid requests in the middleware authorization
 - features:
     - rest/middleware.go -> using the `permissions` field in the payload, created in the issue
@@ -47,7 +46,6 @@ they no longer have a `scope` field.
 - tests:
     - new tests for the middleware, since there is a new logic step due to the
       permission introduction.
->>>>>>> develop
 
 
 ### #37 - Feature: reactive sidecar <!-- This is the title -->
