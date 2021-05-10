@@ -17,6 +17,7 @@ import (
 	authmock "github.com/inspr/inspr/pkg/auth/mocks"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
+	"go.uber.org/zap"
 )
 
 type TypeAPITest struct {
@@ -32,7 +33,7 @@ type TypeAPITest struct {
 // use these test cases
 func TypeDICases(funcName string) []TypeAPITest {
 	parsedCTDI, _ := json.Marshal(models.TypeDI{
-		Type:   meta.Type{Meta: meta.Metadata{Name: "mock_channelType"}},
+		Type:   meta.Type{Meta: meta.Metadata{Name: "mock_Type"}},
 		DryRun: false,
 	})
 	wrongFormatData := []byte{1}
@@ -112,8 +113,8 @@ func TypeDICases(funcName string) []TypeAPITest {
 // use these test cases
 func TypeQueryDICases(funcName string) []TypeAPITest {
 	parsedCTQDI, _ := json.Marshal(models.TypeQueryDI{
-		CtName: "mock_channelType",
-		DryRun: false,
+		TypeName: "mock_Type",
+		DryRun:   false,
 	})
 	wrongFormatData := []byte{1}
 	return []TypeAPITest{
@@ -222,6 +223,7 @@ func TestNewTypeHandler(t *testing.T) {
 }
 
 func TestTypeHandler_HandleCreate(t *testing.T) {
+	logger = zap.New(nil)
 	tests := TypeDICases("HandleCreate")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -245,6 +247,7 @@ func TestTypeHandler_HandleCreate(t *testing.T) {
 }
 
 func TestTypeHandler_HandleGet(t *testing.T) {
+	logger = zap.New(nil)
 	tests := TypeQueryDICases("HandleGet")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -252,10 +255,18 @@ func TestTypeHandler_HandleGet(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.cth.Memory.Types().Create("", &meta.Type{Meta: meta.Metadata{Name: "mock_Type"}})
+			tt.cth.Memory.Types().Create(
+				"",
+				&meta.Type{Meta: meta.Metadata{Name: "mock_Type"}},
+			)
 
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
+			res, err := client.Post(
+				ts.URL,
+				"application/json",
+				bytes.NewBuffer(tt.send.body),
+			)
+
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
@@ -270,6 +281,7 @@ func TestTypeHandler_HandleGet(t *testing.T) {
 }
 
 func TestTypeHandler_HandleUpdate(t *testing.T) {
+	logger = zap.New(nil)
 	tests := TypeDICases("HandleUpdate")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -295,6 +307,7 @@ func TestTypeHandler_HandleUpdate(t *testing.T) {
 }
 
 func TestTypeHandler_HandleDelete(t *testing.T) {
+	logger = zap.New(nil)
 	tests := TypeQueryDICases("HandleDelete")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

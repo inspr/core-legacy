@@ -337,7 +337,7 @@ func Test_displayTypeState(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		ct := getMockApp().Spec.Types[data.CtName]
+		ct := getMockApp().Spec.Types[data.TypeName]
 
 		rest.JSON(w, http.StatusOK, ct)
 	}

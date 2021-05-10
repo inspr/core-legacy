@@ -525,7 +525,7 @@ func Test_deleteCTypes(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		if scope != "appParent" || data.CtName != "ct1" {
+		if scope != "appParent" || data.TypeName != "ct1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}

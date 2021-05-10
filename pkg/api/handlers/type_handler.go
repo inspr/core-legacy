@@ -94,10 +94,10 @@ func (cth *TypeHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Type get transaction")
 		cth.Memory.InitTransaction()
 
-		Type, err := cth.Memory.Root().Types().Get(scope, data.CtName)
+		ctype, err := cth.Memory.Root().Types().Get(scope, data.TypeName)
 		if err != nil {
 			logger.Error("unable to get Type",
-				zap.String("ctype", data.CtName),
+				zap.String("type-name", data.TypeName),
 				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
@@ -107,7 +107,7 @@ func (cth *TypeHandler) HandleGet() rest.Handler {
 
 		defer cth.Memory.Cancel()
 
-		rest.JSON(w, http.StatusOK, Type)
+		rest.JSON(w, http.StatusOK, ctype)
 	}
 	return rest.Handler(handler)
 }
@@ -193,10 +193,10 @@ func (cth *TypeHandler) HandleDelete() rest.Handler {
 		logger.Debug("initiating Type delete transaction")
 		cth.Memory.InitTransaction()
 
-		err = cth.Memory.Types().Delete(scope, data.CtName)
+		err = cth.Memory.Types().Delete(scope, data.TypeName)
 		if err != nil {
 			logger.Error("unable to delete Type",
-				zap.String("ctype", data.CtName),
+				zap.String("ctype", data.TypeName),
 				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)

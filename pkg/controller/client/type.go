@@ -24,7 +24,7 @@ type TypeClient struct {
 // would call ctc.Get(context.Background(), "app1", "type1")
 func (ctc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta.Type, error) {
 	ctdi := models.TypeQueryDI{
-		CtName: name,
+		TypeName: name,
 	}
 	var resp meta.Type
 
@@ -75,8 +75,8 @@ func (ctc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, 
 // would call ctc.Delete(context.Background(), "app1", "type1")
 func (ctc *TypeClient) Delete(ctx context.Context, scope string, name string, dryRun bool) (diff.Changelog, error) {
 	ctdi := models.TypeQueryDI{
-		CtName: name,
-		DryRun: dryRun,
+		TypeName: name,
+		DryRun:   dryRun,
 	}
 	var resp diff.Changelog
 

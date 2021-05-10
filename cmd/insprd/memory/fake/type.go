@@ -15,12 +15,12 @@ type Types struct {
 }
 
 // Get - simple mock
-func (chType *Types) Get(context string, ctName string) (*meta.Type, error) {
-	if chType.fail != nil {
-		return nil, chType.fail
+func (t *Types) Get(context string, ctName string) (*meta.Type, error) {
+	if t.fail != nil {
+		return nil, t.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ctName)
-	ct, ok := chType.Types[query]
+	ct, ok := t.Types[query]
 	if !ok {
 		return nil, ierrors.
 			NewError().
@@ -32,12 +32,12 @@ func (chType *Types) Get(context string, ctName string) (*meta.Type, error) {
 }
 
 // Create - simple mock
-func (chType *Types) Create(context string, ct *meta.Type) error {
-	if chType.fail != nil {
-		return chType.fail
+func (t *Types) Create(context string, ct *meta.Type) error {
+	if t.fail != nil {
+		return t.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
-	_, ok := chType.Types[query]
+	_, ok := t.Types[query]
 	if ok {
 		return ierrors.
 			NewError().
@@ -45,17 +45,17 @@ func (chType *Types) Create(context string, ct *meta.Type) error {
 			Message("Type %s already exists", query).
 			Build()
 	}
-	chType.Types[query] = ct
+	t.Types[query] = ct
 	return nil
 }
 
 // Delete - simple mock
-func (chType *Types) Delete(context string, ctName string) error {
-	if chType.fail != nil {
-		return chType.fail
+func (t *Types) Delete(context string, ctName string) error {
+	if t.fail != nil {
+		return t.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ctName)
-	_, ok := chType.Types[query]
+	_, ok := t.Types[query]
 	if !ok {
 		return ierrors.
 			NewError().
@@ -64,17 +64,17 @@ func (chType *Types) Delete(context string, ctName string) error {
 			Build()
 	}
 
-	delete(chType.Types, query)
+	delete(t.Types, query)
 	return nil
 }
 
 // Update - simple mock
-func (chType *Types) Update(context string, ct *meta.Type) error {
-	if chType.fail != nil {
-		return chType.fail
+func (t *Types) Update(context string, ct *meta.Type) error {
+	if t.fail != nil {
+		return t.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
-	_, ok := chType.Types[query]
+	_, ok := t.Types[query]
 	if !ok {
 		return ierrors.
 			NewError().
@@ -82,6 +82,6 @@ func (chType *Types) Update(context string, ct *meta.Type) error {
 			Message("Type %s not found", query).
 			Build()
 	}
-	chType.Types[query] = ct
+	t.Types[query] = ct
 	return nil
 }

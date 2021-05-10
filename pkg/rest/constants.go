@@ -22,7 +22,7 @@ var operationTranslator = map[string]string{
 // proceeds to translate into a string that represents its abbreviation used for
 // the const permission in the auth pkg.
 var routeTranslator = map[string]string{
-	"apps":         "dapp",
-	"channels":     "channel",
-	"channeltypes": "ctype",
+	"apps":     "dapp",
+	"channels": "channel",
+	"types":    "ctype",
 }

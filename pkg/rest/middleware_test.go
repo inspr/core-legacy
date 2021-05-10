@@ -296,7 +296,7 @@ func Test_getTarget(t *testing.T) {
 		},
 		{
 			name: "exception_channeltypes",
-			args: args{createReq("channeltypes")},
+			args: args{createReq("types")},
 			want: "ctype",
 		},
 	}

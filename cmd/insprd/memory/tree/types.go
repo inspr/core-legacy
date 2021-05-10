@@ -170,8 +170,7 @@ func (ctm *TypeMemoryManager) Update(context string, ct *meta.Type) error {
 
 // TypeRootGetter returns a getter that gets Types from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
-type TypeRootGetter struct {
-}
+type TypeRootGetter struct{}
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the Type which name is equal to the last query element.

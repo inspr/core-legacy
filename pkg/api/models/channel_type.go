@@ -10,6 +10,6 @@ type TypeDI struct {
 
 // TypeQueryDI - Data Input format for queries requests
 type TypeQueryDI struct {
-	CtName string `json:"ctname"`
-	DryRun bool   `json:"dry"`
+	TypeName string `json:"tname"`
+	DryRun   bool   `json:"dry"`
 }

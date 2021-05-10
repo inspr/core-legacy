@@ -55,8 +55,8 @@ func TestTypeClient_Delete(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/Types" {
-					t.Errorf("path is not Types")
+				if r.URL.Path != "/types" {
+					t.Errorf("path is not types")
 				}
 
 				if r.Method != "DELETE" {
@@ -75,8 +75,8 @@ func TestTypeClient_Delete(t *testing.T) {
 				if scope != tt.args.context {
 					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
-				if di.CtName != tt.args.name {
-					t.Errorf("name set incorrectly. want = %v, got = %v", di.CtName, tt.args.name)
+				if di.TypeName != tt.args.name {
+					t.Errorf("name set incorrectly. want = %v, got = %v", di.TypeName, tt.args.name)
 				}
 
 				encoder.Encode(diff.Changelog{})
@@ -140,7 +140,7 @@ func TestTypeClient_Get(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/Types" {
+				if r.URL.Path != "/types" {
 					t.Errorf("path is not Types")
 				}
 
@@ -160,8 +160,8 @@ func TestTypeClient_Get(t *testing.T) {
 				if scope != tt.args.context {
 					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
-				if di.CtName != tt.args.name {
-					t.Errorf("name set incorrectly. want = %v, got = %v", di.CtName, tt.args.name)
+				if di.TypeName != tt.args.name {
+					t.Errorf("name set incorrectly. want = %v, got = %v", di.TypeName, tt.args.name)
 				}
 
 				encoder.Encode(tt.want)
@@ -229,7 +229,7 @@ func TestTypeClient_Create(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/Types" {
+				if r.URL.Path != "/types" {
 					t.Errorf("path is not Types")
 				}
 
@@ -313,7 +313,7 @@ func TestTypeClient_Update(t *testing.T) {
 					return
 				}
 
-				if r.URL.Path != "/Types" {
+				if r.URL.Path != "/types" {
 					t.Errorf("path is not Types")
 				}
 
