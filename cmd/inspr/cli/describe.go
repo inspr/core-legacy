@@ -33,10 +33,10 @@ func NewDescribeCmd() *cobra.Command {
 		ExactArgs(1, displayChannelState)
 
 	describeType := cmd.NewCmd("ctypes <ctype_name | ctype_path>").
-		WithDescription("Retrieves the full state of the Type from a given namespace").
-		WithExample("Display the state of the given Type on the default scope", "describe ctypes hello_world").
-		WithExample("Display the state of the given Type on a custom scope", "describe ctypes --scope app1.app2 hello_world").
-		WithExample("Display the state of the given Type by the path", "describe ctypes app1.app2.hello_world").
+		WithDescription("Retrieves the full state of the ctype from a given namespace").
+		WithExample("Display the state of the given ctype on the default scope", "describe ctypes hello_world").
+		WithExample("Display the state of the given ctype on a custom scope", "describe ctypes --scope app1.app2 hello_world").
+		WithExample("Display the state of the given ctype by the path", "describe ctypes app1.app2.hello_world").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		ExactArgs(1, displayTypeState)
@@ -131,12 +131,12 @@ func displayTypeState(_ context.Context, args []string) error {
 		return err
 	}
 
-	Type, err := client.Types().Get(context.Background(), path, ctName)
+	insprType, err := client.Types().Get(context.Background(), path, ctName)
 	if err != nil {
 		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
-	utils.PrintTypeTree(Type, out)
+	utils.PrintTypeTree(insprType, out)
 
 	return nil
 }

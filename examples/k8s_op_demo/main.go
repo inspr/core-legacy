@@ -15,7 +15,7 @@ func main() {
 	mem.InitTransaction()
 	err := mem.Types().Create("", &meta.Type{
 		Meta: meta.Metadata{
-			Name: "Type1",
+			Name: "type1",
 		},
 		Schema: "{\"type\":\"string\"}",
 	})
@@ -28,7 +28,7 @@ func main() {
 			Name: "ch1",
 		},
 		Spec: meta.ChannelSpec{
-			Type: "Type1",
+			Type: "type1",
 		},
 	})
 	if err != nil {

@@ -41,11 +41,11 @@ func TestNewApplyType(t *testing.T) {
 			want: nil,
 		},
 		{
-			name: "Type_without_name",
+			name: "type_without_name",
 			args: args{
 				b: chanTypeWithoutNameBytes,
 			},
-			want: ierrors.NewError().Message("Type without name").Build(),
+			want: ierrors.NewError().Message("type without name").Build(),
 		},
 		{
 			name: "error_testing",

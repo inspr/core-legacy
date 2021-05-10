@@ -8,11 +8,11 @@ import (
 
 // YamlToType - deserializes the yaml to a meta.Type struct
 func YamlToType(bytes []byte) (meta.Type, error) {
-	Type := meta.Type{
+	insprType := meta.Type{
 		Meta: meta.Metadata{Annotations: make(map[string]string)},
 	}
 
-	if err := yaml.Unmarshal(bytes, &Type); err != nil {
+	if err := yaml.Unmarshal(bytes, &insprType); err != nil {
 		return meta.Type{},
 			ierrors.
 				NewError().
@@ -21,14 +21,14 @@ func YamlToType(bytes []byte) (meta.Type, error) {
 				Build()
 	}
 
-	if Type.Meta.Name == "" {
+	if insprType.Meta.Name == "" {
 		return meta.Type{},
 			ierrors.
 				NewError().
 				InvalidName().
-				Message("Type without name").
+				Message("type without name").
 				Build()
 	}
 
-	return Type, nil
+	return insprType, nil
 }

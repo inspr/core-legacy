@@ -85,7 +85,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 				},
 				ConnectedApps: []string{"app1"},
 				Spec: meta.ChannelSpec{
-					Type: "Type1",
+					Type: "type1",
 				},
 			},
 		},
@@ -181,7 +181,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Parent: "",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "Type1",
+						Type: "type1",
 					},
 				},
 			},
@@ -192,7 +192,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 					Parent: "",
 				},
 				Spec: meta.ChannelSpec{
-					Type: "Type1",
+					Type: "type1",
 				},
 			},
 		},
@@ -241,7 +241,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "It should not create a channel because the Type is invalid",
+			name: "It should not create a channel because the type is invalid",
 			fields: fields{
 				root:   getMockChannels(),
 				appErr: nil,
@@ -265,7 +265,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "It should create a channel because the Type is valid",
+			name: "It should create a channel because the type is valid",
 			fields: fields{
 				root:   getMockChannels(),
 				appErr: nil,
@@ -281,7 +281,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Parent: "",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "Type1",
+						Type: "type1",
 					},
 				},
 			},
@@ -289,13 +289,13 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 			want:    nil,
 			checkFunction: func() (bool, string) {
 				am := GetTreeMemory().Types()
-				ct, err := am.Get("", "Type1")
+				ct, err := am.Get("", "type1")
 				if err != nil {
-					return false, "cant get Type 'Type1'"
+					return false, "cant get type 'type1'"
 				}
 
 				if !utils.Includes(ct.ConnectedChannels, "channel3") {
-					return false, "connectedChannels of Type1 dont have channel3"
+					return false, "connectedChannels of type1 dont have channel3"
 				}
 				return true, ""
 			},
@@ -317,7 +317,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Parent: "",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "Type1",
+						Type: "type1",
 					},
 				},
 			},
@@ -451,7 +451,7 @@ func TestChannelMemoryManager_Delete(t *testing.T) {
 				},
 				ConnectedApps: []string{"app1"},
 				Spec: meta.ChannelSpec{
-					Type: "Type1",
+					Type: "type1",
 				},
 			},
 		},
@@ -520,7 +520,7 @@ func TestChannelMemoryManager_Update(t *testing.T) {
 					},
 					ConnectedApps: []string{"app1"},
 					Spec: meta.ChannelSpec{
-						Type: "Type1",
+						Type: "type1",
 					},
 				},
 			},
@@ -535,7 +535,7 @@ func TestChannelMemoryManager_Update(t *testing.T) {
 				},
 				ConnectedApps: []string{"app1"},
 				Spec: meta.ChannelSpec{
-					Type: "Type1",
+					Type: "type1",
 				},
 			},
 		},
@@ -691,7 +691,7 @@ func getMockChannels() *meta.App {
 					},
 					ConnectedApps: []string{"app1"},
 					Spec: meta.ChannelSpec{
-						Type: "Type1",
+						Type: "type1",
 					},
 				},
 				"channel2": {
@@ -700,14 +700,14 @@ func getMockChannels() *meta.App {
 						Parent: "",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "Type1",
+						Type: "type1",
 					},
 				},
 			},
 			Types: map[string]*meta.Type{
-				"Type1": {
+				"type1": {
 					Meta: meta.Metadata{
-						Name: "Type1",
+						Name: "type1",
 					},
 					Schema: string(sha256.New().Sum([]byte("hello"))),
 				},

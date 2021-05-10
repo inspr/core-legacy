@@ -25,7 +25,7 @@ func (handler *Handler) NewTypeHandler() *TypeHandler {
 
 // HandleCreate - returns the handle function that
 // manages the creation of a Type
-func (cth *TypeHandler) HandleCreate() rest.Handler {
+func (th *TypeHandler) HandleCreate() rest.Handler {
 	logger.Info("handling Type create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.TypeDI{}
@@ -40,34 +40,34 @@ func (cth *TypeHandler) HandleCreate() rest.Handler {
 		}
 
 		logger.Debug("initiating Type create transaction")
-		cth.Memory.InitTransaction()
+		th.Memory.InitTransaction()
 
-		err = cth.Memory.Types().Create(scope, &data.Type)
+		err = th.Memory.Types().Create(scope, &data.Type)
 		if err != nil {
 			logger.Error("unable to create Channel Type",
 				zap.String("ctype", data.Type.Meta.Name),
 				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			cth.Memory.Cancel()
+			th.Memory.Cancel()
 			return
 		}
 
-		diff, err := cth.Memory.GetTransactionChanges()
+		diff, err := th.Memory.GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Type create request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			cth.Memory.Cancel()
+			th.Memory.Cancel()
 			return
 		}
 
 		if !data.DryRun {
 			logger.Info("committing Type create changes")
-			defer cth.Memory.Commit()
+			defer th.Memory.Commit()
 		} else {
 			logger.Info("canceling Type create changes")
-			defer cth.Memory.Cancel()
+			defer th.Memory.Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, diff)
@@ -77,7 +77,7 @@ func (cth *TypeHandler) HandleCreate() rest.Handler {
 
 // HandleGet - return a handle function that obtains
 // a Type by the reference given
-func (cth *TypeHandler) HandleGet() rest.Handler {
+func (th *TypeHandler) HandleGet() rest.Handler {
 	logger.Info("handling Type get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.TypeQueryDI{}
@@ -92,20 +92,20 @@ func (cth *TypeHandler) HandleGet() rest.Handler {
 		}
 
 		logger.Debug("initiating Type get transaction")
-		cth.Memory.InitTransaction()
+		th.Memory.InitTransaction()
 
-		ctype, err := cth.Memory.Root().Types().Get(scope, data.TypeName)
+		ctype, err := th.Memory.Root().Types().Get(scope, data.TypeName)
 		if err != nil {
 			logger.Error("unable to get Type",
 				zap.String("type-name", data.TypeName),
 				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			cth.Memory.Cancel()
+			th.Memory.Cancel()
 			return
 		}
 
-		defer cth.Memory.Cancel()
+		defer th.Memory.Cancel()
 
 		rest.JSON(w, http.StatusOK, ctype)
 	}
@@ -114,7 +114,7 @@ func (cth *TypeHandler) HandleGet() rest.Handler {
 
 // HandleUpdate - returns a handle function that
 // updates the Type with the parameters given in the request
-func (cth *TypeHandler) HandleUpdate() rest.Handler {
+func (th *TypeHandler) HandleUpdate() rest.Handler {
 	logger.Info("handling Type update request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.TypeDI{}
@@ -129,44 +129,44 @@ func (cth *TypeHandler) HandleUpdate() rest.Handler {
 		}
 
 		logger.Debug("initiating Type update transaction")
-		cth.Memory.InitTransaction()
+		th.Memory.InitTransaction()
 
-		err = cth.Memory.Types().Update(scope, &data.Type)
+		err = th.Memory.Types().Update(scope, &data.Type)
 		if err != nil {
 			logger.Error("unable to update Channel Type",
 				zap.String("ctype", data.Type.Meta.Name),
 				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			cth.Memory.Cancel()
+			th.Memory.Cancel()
 			return
 		}
 
-		diff, err := cth.Memory.GetTransactionChanges()
+		diff, err := th.Memory.GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Type update request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			cth.Memory.Cancel()
+			th.Memory.Cancel()
 			return
 		}
 
 		if !data.DryRun {
 			logger.Debug("applying Type update changes in diff")
-			err = cth.applyChangesInDiff(diff)
+			err = th.applyChangesInDiff(diff)
 			if err != nil {
 				logger.Error("unable to apply Type update changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				cth.Memory.Cancel()
+				th.Memory.Cancel()
 				return
 			}
 
 			logger.Info("committing Type update changes")
-			defer cth.Memory.Commit()
+			defer th.Memory.Commit()
 		} else {
 			logger.Info("canceling Type update changes")
-			defer cth.Memory.Cancel()
+			defer th.Memory.Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, diff)
@@ -176,7 +176,7 @@ func (cth *TypeHandler) HandleUpdate() rest.Handler {
 
 // HandleDelete - returns a handle function that
 // deletes the Type of the given path
-func (cth *TypeHandler) HandleDelete() rest.Handler {
+func (th *TypeHandler) HandleDelete() rest.Handler {
 	logger.Info("handling Type delete request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.TypeQueryDI{}
@@ -191,34 +191,34 @@ func (cth *TypeHandler) HandleDelete() rest.Handler {
 		}
 
 		logger.Debug("initiating Type delete transaction")
-		cth.Memory.InitTransaction()
+		th.Memory.InitTransaction()
 
-		err = cth.Memory.Types().Delete(scope, data.TypeName)
+		err = th.Memory.Types().Delete(scope, data.TypeName)
 		if err != nil {
 			logger.Error("unable to delete Type",
 				zap.String("ctype", data.TypeName),
 				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			cth.Memory.Cancel()
+			th.Memory.Cancel()
 			return
 		}
 
-		diff, err := cth.Memory.GetTransactionChanges()
+		diff, err := th.Memory.GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Type delete request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			cth.Memory.Cancel()
+			th.Memory.Cancel()
 			return
 		}
 
 		if !data.DryRun {
 			logger.Info("committing Type delete changes")
-			defer cth.Memory.Commit()
+			defer th.Memory.Commit()
 		} else {
 			logger.Info("canceling Type delete changes")
-			defer cth.Memory.Cancel()
+			defer th.Memory.Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, diff)

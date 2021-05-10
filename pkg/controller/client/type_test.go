@@ -141,7 +141,7 @@ func TestTypeClient_Get(t *testing.T) {
 				}
 
 				if r.URL.Path != "/types" {
-					t.Errorf("path is not Types")
+					t.Errorf("path is not types")
 				}
 
 				if r.Method != "GET" {
@@ -230,7 +230,7 @@ func TestTypeClient_Create(t *testing.T) {
 				}
 
 				if r.URL.Path != "/types" {
-					t.Errorf("path is not Types")
+					t.Errorf("path is not types")
 				}
 
 				if r.Method != "POST" {
@@ -314,7 +314,7 @@ func TestTypeClient_Update(t *testing.T) {
 				}
 
 				if r.URL.Path != "/types" {
-					t.Errorf("path is not Types")
+					t.Errorf("path is not types")
 				}
 
 				if r.Method != "PUT" {

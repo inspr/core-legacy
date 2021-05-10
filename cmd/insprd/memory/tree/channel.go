@@ -156,13 +156,16 @@ func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 
 	parentApp, _ := GetTreeMemory().Apps().Get(context)
 
-	Type := parentApp.Spec.Types[channel.Spec.Type]
+	insprType := parentApp.Spec.Types[channel.Spec.Type]
 
 	logger.Debug("removing Channel from Type connected channels list",
 		zap.String("channel", chName),
-		zap.String("Type", Type.Meta.Name))
+		zap.String("type", insprType.Meta.Name))
 
-	Type.ConnectedChannels = utils.Remove(Type.ConnectedChannels, channel.Meta.Name)
+	insprType.ConnectedChannels = utils.Remove(
+		insprType.ConnectedChannels,
+		channel.Meta.Name,
+	)
 
 	logger.Debug("removing Channel from its parents 'Channels' structure",
 		zap.String("channel", chName),

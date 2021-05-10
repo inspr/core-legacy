@@ -128,7 +128,7 @@ func checkAndUpdates(app *meta.App) (bool, string) {
 	for ctName := range chTypes {
 		nameErr := metautils.StructureNameIsValid(ctName)
 		if nameErr != nil {
-			return false, "invalid Type name: " + ctName
+			return false, "invalid type name: " + ctName
 		}
 	}
 	for channelName, channel := range channels {
@@ -138,7 +138,7 @@ func checkAndUpdates(app *meta.App) (bool, string) {
 		}
 		if channel.Spec.Type != "" {
 			if _, ok := chTypes[channel.Spec.Type]; !ok {
-				return false, "invalid channel: using non-existent Type;"
+				return false, "invalid channel: using non-existent type;"
 			}
 
 			for _, appName := range channel.ConnectedApps {

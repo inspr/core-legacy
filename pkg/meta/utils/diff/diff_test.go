@@ -545,7 +545,7 @@ func TestChange_diffChannels(t *testing.T) {
 		want    Change
 	}{
 		{
-			name:   "Unchanged Types",
+			name:   "Unchanged types",
 			fields: fields{},
 			args: args{
 				chOrig: metautils.MChannels{
@@ -569,7 +569,7 @@ func TestChange_diffChannels(t *testing.T) {
 			want:    Change{},
 		},
 		{
-			name:   "Valid changes on Types",
+			name:   "Valid changes on types",
 			fields: fields{},
 			args: args{
 				chOrig: metautils.MChannels{
@@ -699,7 +699,7 @@ func TestChange_diffTypes(t *testing.T) {
 		want    Change
 	}{
 		{
-			name:   "Unchanged Types",
+			name:   "Unchanged types",
 			fields: fields{},
 			args: args{
 				chtOrig: metautils.MTypes{
@@ -719,7 +719,7 @@ func TestChange_diffTypes(t *testing.T) {
 			want:    Change{},
 		},
 		{
-			name:   "Valid changes on Types",
+			name:   "Valid changes on types",
 			fields: fields{},
 			args: args{
 				chtOrig: metautils.MTypes{
@@ -764,7 +764,7 @@ func TestChange_diffTypes(t *testing.T) {
 			},
 		},
 		{
-			name:   "create Type",
+			name:   "create type",
 			fields: fields{},
 			args: args{
 				chtOrig: metautils.MTypes{},
@@ -798,7 +798,7 @@ func TestChange_diffTypes(t *testing.T) {
 			},
 		},
 		{
-			name:   "delete Type",
+			name:   "delete type",
 			fields: fields{},
 			args: args{
 				chtOrig: metautils.MTypes{

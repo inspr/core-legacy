@@ -540,7 +540,7 @@ func Test_deleteCTypes(t *testing.T) {
 		expectedOutput []byte
 	}{
 		{
-			name:           "Should delete the Type and return the diff",
+			name:           "Should delete the type and return the diff",
 			flagsAndArgs:   []string{"ct", "appParent.ct1"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,

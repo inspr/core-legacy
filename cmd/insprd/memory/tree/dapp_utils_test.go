@@ -451,7 +451,7 @@ func Test_checkAndUpdates(t *testing.T) {
 			want1: "",
 		},
 		{
-			name: "invalid channel: using non-existent Type",
+			name: "invalid channel: using non-existent type",
 			args: args{
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -521,7 +521,7 @@ func Test_checkAndUpdates(t *testing.T) {
 				},
 			},
 			want:  false,
-			want1: "invalid channel: using non-existent Type;",
+			want1: "invalid channel: using non-existent type;",
 		},
 		{
 			name: "invalid channel structure - it should return a name channel error",
@@ -649,7 +649,7 @@ func Test_checkAndUpdates(t *testing.T) {
 							},
 						},
 						Types: map[string]*meta.Type{
-							"invalid.channel.type": {
+							"invalid.type": {
 								Meta: meta.Metadata{
 									Name:        "newType",
 									Reference:   "app1.newType",
@@ -667,7 +667,7 @@ func Test_checkAndUpdates(t *testing.T) {
 				},
 			},
 			want:  false,
-			want1: "invalid Type name: invalid.channel.type",
+			want1: "invalid type name: invalid.type",
 		},
 	}
 	for _, tt := range tests {

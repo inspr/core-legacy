@@ -349,7 +349,7 @@ func Test_displayTypeState(t *testing.T) {
 		expectedOutput []byte
 	}{
 		{
-			name:           "Should describe the Type state",
+			name:           "Should describe the type state",
 			flagsAndArgs:   []string{"ct", "appParent.ct1"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,

@@ -30,9 +30,9 @@ func NewGetCmd() *cobra.Command {
 		WithCommonFlags().
 		NoArgs(getChannels)
 	getTypes := cmd.NewCmd("ctypes").
-		WithDescription("Get Types from context").
-		WithExample("Get Types from the default scope", "get ctypes ").
-		WithExample("Get Types from a custom scope", "get ctypes --scope app1.app2").
+		WithDescription("Get ctypes from context").
+		WithExample("Get ctypes from the default scope", "get ctypes ").
+		WithExample("Get ctypes from a custom scope", "get ctypes --scope app1.app2").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		NoArgs(getCTypes)
@@ -55,7 +55,7 @@ func NewGetCmd() *cobra.Command {
 		WithDescription("Retrieves the components from a given namespace").
 		WithExample("gets apps from cluster", "get apps --scope <scope>").
 		WithExample("gets channels from cluster", "get ch --scope <scope>").
-		WithExample("gets types from cluster", "get ct --scope <scope>").
+		WithExample("gets ctypes from cluster", "get ct --scope <scope>").
 		WithExample("gets nodes from cluster", "get nodes --scope <scope>").
 		WithExample("gets alias from cluster", "get alias --scope <scope>").
 		WithLongDescription("get takes a component type (apps | channels | ctypes | nodes | alias) and displays names for those components is a scope)").

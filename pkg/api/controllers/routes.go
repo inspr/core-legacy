@@ -19,7 +19,7 @@ func (s *Server) initRoutes() {
 	s.Mux.Handle("/channels", rest.HandleCRUD(chandler))
 
 	cthandler := h.NewTypeHandler()
-	s.Mux.Handle("/Types", rest.HandleCRUD(cthandler))
+	s.Mux.Handle("/types", rest.HandleCRUD(cthandler))
 
 	aliasHandler := h.NewAliasHandler()
 	s.Mux.Handle("/alias", rest.HandleCRUD(aliasHandler))

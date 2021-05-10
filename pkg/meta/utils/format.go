@@ -94,23 +94,23 @@ func PrintChannelTree(ch *meta.Channel, out io.Writer) {
 }
 
 // PrintTypeTree prints the channel structure
-func PrintTypeTree(ct *meta.Type, out io.Writer) {
-	Type := gotree.New(ct.Meta.Name)
-	meta := Type.Add("Meta")
+func PrintTypeTree(t *meta.Type, out io.Writer) {
+	insprType := gotree.New(t.Meta.Name)
+	meta := insprType.Add("Meta")
 
-	populateMeta(meta, &ct.Meta)
+	populateMeta(meta, &t.Meta)
 
-	spec := Type.Add("Spec")
-	spec.Add("Schema: " + string(ct.Schema))
+	spec := insprType.Add("Spec")
+	spec.Add("Schema: " + string(t.Schema))
 
-	if len(ct.ConnectedChannels) > 0 {
-		conChannels := Type.Add("ConnectedChannels")
-		for _, appName := range ct.ConnectedChannels {
+	if len(t.ConnectedChannels) > 0 {
+		conChannels := insprType.Add("ConnectedChannels")
+		for _, appName := range t.ConnectedChannels {
 			conChannels.Add(appName)
 		}
 	}
 
-	fmt.Fprintln(out, Type.Print())
+	fmt.Fprintln(out, insprType.Print())
 }
 
 // PrintAliasTree prints the alias structure
