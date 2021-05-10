@@ -21,16 +21,16 @@ type TypeClient struct {
 // such as app1.app2
 //
 // The name is the name of the channel type. So to search for a channel type inside app1 with the name type1 you
-// would call ctc.Get(context.Background(), "app1", "type1")
-func (ctc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta.Type, error) {
-	ctdi := models.TypeQueryDI{
+// would call tc.Get(context.Background(), "app1", "type1")
+func (tc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta.Type, error) {
+	tdi := models.TypeQueryDI{
 		TypeName: name,
 	}
 	var resp meta.Type
 
-	err := ctc.reqClient.
+	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "GET", ctdi, &resp)
+		Send(ctx, "/types", "GET", tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -46,17 +46,17 @@ func (ctc *TypeClient) Get(ctx context.Context, scope string, name string) (*met
 // The Type information such as name and etc will be inferred from the given Type's metadata.
 //
 // So to create a channel type inside app1 with the name type1 you
-// would call ctc.Create(context.Background(), "app1", &meta.Type{...})
-func (ctc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
-	ctdi := models.TypeDI{
+// would call tc.Create(context.Background(), "app1", &meta.Type{...})
+func (tc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
+	tdi := models.TypeDI{
 		Type:   *ch,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
 
-	err := ctc.reqClient.
+	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "POST", ctdi, &resp)
+		Send(ctx, "/types", "POST", tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -72,17 +72,17 @@ func (ctc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, 
 // The name is the name of the Type to be deleted.
 //
 // So to delete a channel type inside app1 with the name type1 you
-// would call ctc.Delete(context.Background(), "app1", "type1")
-func (ctc *TypeClient) Delete(ctx context.Context, scope string, name string, dryRun bool) (diff.Changelog, error) {
-	ctdi := models.TypeQueryDI{
+// would call tc.Delete(context.Background(), "app1", "type1")
+func (tc *TypeClient) Delete(ctx context.Context, scope string, name string, dryRun bool) (diff.Changelog, error) {
+	tdi := models.TypeQueryDI{
 		TypeName: name,
 		DryRun:   dryRun,
 	}
 	var resp diff.Changelog
 
-	err := ctc.reqClient.
+	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "DELETE", ctdi, &resp)
+		Send(ctx, "/types", "DELETE", tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -98,17 +98,17 @@ func (ctc *TypeClient) Delete(ctx context.Context, scope string, name string, dr
 // The Type information such as name and etc will be inferred from the given Type's metadata.
 //
 // So to update a channel type inside app1 with the name type1 you
-// would call ctc.Create(context.Background(), "app1", &meta.Type{...})
-func (ctc *TypeClient) Update(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
-	ctdi := models.TypeDI{
+// would call tc.Create(context.Background(), "app1", &meta.Type{...})
+func (tc *TypeClient) Update(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
+	tdi := models.TypeDI{
 		Type:   *ch,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
 
-	err := ctc.reqClient.
+	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "PUT", ctdi, &resp)
+		Send(ctx, "/types", "PUT", tdi, &resp)
 	if err != nil {
 		return nil, err
 	}

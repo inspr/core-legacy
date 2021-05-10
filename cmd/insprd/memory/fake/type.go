@@ -25,7 +25,7 @@ func (t *Types) Get(context string, ctName string) (*meta.Type, error) {
 		return nil, ierrors.
 			NewError().
 			NotFound().
-			Message("Type %s not found", query).
+			Message("type %s not found", query).
 			Build()
 	}
 	return ct, nil
@@ -42,7 +42,7 @@ func (t *Types) Create(context string, ct *meta.Type) error {
 		return ierrors.
 			NewError().
 			AlreadyExists().
-			Message("Type %s already exists", query).
+			Message("type %s already exists", query).
 			Build()
 	}
 	t.Types[query] = ct
@@ -60,7 +60,7 @@ func (t *Types) Delete(context string, ctName string) error {
 		return ierrors.
 			NewError().
 			NotFound().
-			Message("Type %s not found", query).
+			Message("type %s not found", query).
 			Build()
 	}
 
@@ -79,7 +79,7 @@ func (t *Types) Update(context string, ct *meta.Type) error {
 		return ierrors.
 			NewError().
 			NotFound().
-			Message("Type %s not found", query).
+			Message("type %s not found", query).
 			Build()
 	}
 	t.Types[query] = ct

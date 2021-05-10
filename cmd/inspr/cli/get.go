@@ -30,9 +30,9 @@ func NewGetCmd() *cobra.Command {
 		WithCommonFlags().
 		NoArgs(getChannels)
 	getTypes := cmd.NewCmd("ctypes").
-		WithDescription("Get Types from context").
-		WithExample("Get Types from the default scope", "get ctypes ").
-		WithExample("Get Types from a custom scope", "get ctypes --scope app1.app2").
+		WithDescription("Get ctypes from context").
+		WithExample("Get ctypes from the default scope", "get ctypes ").
+		WithExample("Get ctypes from a custom scope", "get ctypes --scope app1.app2").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		NoArgs(getCTypes)

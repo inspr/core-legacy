@@ -525,7 +525,7 @@ func getMockAlias() *meta.App {
 					},
 					ConnectedApps: []string{"app1"},
 					Spec: meta.ChannelSpec{
-						Type: "Type1",
+						Type: "type1",
 					},
 				},
 				"channel2": {
@@ -534,14 +534,14 @@ func getMockAlias() *meta.App {
 						Parent: "",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "Type1",
+						Type: "type1",
 					},
 				},
 			},
 			Types: map[string]*meta.Type{
-				"Type1": {
+				"type1": {
 					Meta: meta.Metadata{
-						Name: "Type1",
+						Name: "type1",
 					},
 					Schema: string(sha256.New().Sum([]byte("hello"))),
 				},

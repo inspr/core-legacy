@@ -20,13 +20,13 @@ func NewApplyType() RunMethod {
 	return func(data []byte, out io.Writer) error {
 		c := cliutils.GetCliClient().Types()
 		// unmarshal into a Type
-		Type, err := utils.YamlToType(data)
+		insprType, err := utils.YamlToType(data)
 		if err != nil {
 			return err
 		}
 
-		if schemaNeedsInjection(Type.Schema) {
-			Type.Schema, err = injectedSchema(Type.Schema)
+		if schemaNeedsInjection(insprType.Schema) {
+			insprType.Schema, err = injectedSchema(insprType.Schema)
 		}
 		if err != nil {
 			return err
@@ -42,16 +42,16 @@ func NewApplyType() RunMethod {
 			return err
 		}
 
-		parentPath, err := metautils.JoinScopes(scope, Type.Meta.Parent)
+		parentPath, err := metautils.JoinScopes(scope, insprType.Meta.Parent)
 		if err != nil {
 			return err
 		}
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentPath, &Type, flagDryRun)
+			log, err = c.Update(context.Background(), parentPath, &insprType, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), parentPath, &Type, flagDryRun)
+			log, err = c.Create(context.Background(), parentPath, &insprType, flagDryRun)
 		}
 
 		if err != nil {

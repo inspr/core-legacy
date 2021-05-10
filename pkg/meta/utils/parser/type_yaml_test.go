@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	TypeFile = "type_yaml_test.yaml"
+	typefile = "type_yaml_test.yaml"
 )
 
 func TestYamlToType(t *testing.T) {
@@ -21,13 +21,13 @@ func TestYamlToType(t *testing.T) {
 	yamlString, mockCT := createTypeYaml()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
-		TypeFile,
+		typefile,
 		[]byte(yamlString),
 		os.ModePerm,
 	)
 
 	// reads file created
-	bytes, err := ioutil.ReadFile(TypeFile)
+	bytes, err := ioutil.ReadFile(typefile)
 	if err != nil {
 		t.Errorf("couldn't read file")
 	}
@@ -57,7 +57,7 @@ func TestYamlToType(t *testing.T) {
 		}) {
 		t.Errorf("unexpected error -> got %v, expected %v", channel, mockCT)
 	}
-	os.Remove(TypeFile)
+	os.Remove(typefile)
 }
 
 func TestIncorrectCTypeYaml(t *testing.T) {
@@ -71,7 +71,7 @@ func TestIncorrectCTypeYaml(t *testing.T) {
 	})
 }
 
-func TestNonExistentCTypeFile(t *testing.T) {
+func TestNonExistentCtypefile(t *testing.T) {
 	// reads file created
 	bytes := []byte{1}
 	_, err := YamlToType(bytes)
