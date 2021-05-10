@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: dapp
+meta:
+    name: "controllerexample"
+spec:
+    auth:
+        scope: ""
+        permissions: ["create:dapp", "delete:dapp", "update:dapp"]
+    node:
+        spec:
+            ports:
+                - port: 8080
+                  targetPort: 8000
+            image: gcr.io/red-inspr/examples/controller:latest
+            replicas: 1

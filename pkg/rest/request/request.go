@@ -41,9 +41,7 @@ func (c Client) Send(ctx context.Context, route string, method string, body inte
 	}
 
 	for key, values := range c.headers {
-		for _, v := range values {
-			req.Header.Add(key, v)
-		}
+		req.Header[key] = values
 	}
 
 	if c.auth != nil {

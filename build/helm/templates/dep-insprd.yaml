@@ -35,21 +35,16 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: inspr-sidecar-configuration
+            - configMapRef:
+                name: inspr-kafka-configuration
           env:
-            - name: INSPR_SIDECAR_WRITE_PORT
-              value: "{{ .Values.sidecar.writePort}}"
-            - name: INSPR_SIDECAR_READ_PORT
-              value: "{{ .Values.sidecar.readPort}}"
-            - name: INSPR_SIDECAR_PORT
-              value: "{{ .Values.sidecar.port }}"
             - name: AUTH_PATH
               value: http://{{ .Values.service.authName }}.{{ .Release.Namespace }}.svc
             - name: "INSPR_SIDECAR_IMAGE"
-              value: {{ .Values.kafkaSidecarImage}}
-            - name: "KAFKA_BOOTSTRAP_SERVERS"
-              value: {{ .Values.kafkaBootstrap}}
-            - name: "KAFKA_AUTO_OFFSET_RESET"
-              value: {{ .Values.kafkaAutoOffsetReset}}
+              value: {{ .Values.sidecarImage}}
             - name: "NODES_APPS_NAMESPACE"
               value: {{ .Values.insprAppsNamespace}}
             - name: "INSPR_ENV"

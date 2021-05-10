@@ -1,195 +1,245 @@
 package nodes
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 
-	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
+	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/operator/k8s"
 	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
 
-	kubeApp "k8s.io/api/apps/v1"
-	kubeCore "k8s.io/api/core/v1"
-	kubeMeta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func (no *NodeOperator) sidecarEnvironment(app *meta.App) utils.EnvironmentMap {
-	logger.Debug("getting necessary environment variables for Node structure deployment")
-	input := app.Spec.Boundary.Input
-	output := app.Spec.Boundary.Output
-	channels := input.Union(output)
-
-	// label name to be used in the service
-	appID := toAppID(app)
-	inputEnv := input.Join(";")
-	outputEnv := output.Join(";")
-	readPort, writePort := dAppSidecarPorts(app)
-	env := utils.EnvironmentMap{
-		"INSPR_INPUT_CHANNELS":    inputEnv,
-		"INSPR_OUTPUT_CHANNELS":   outputEnv,
-		"INSPR_SIDECAR_IMAGE":     environment.GetSidecarImage(),
-		"INSPR_APP_ID":            appID,
-		"INSPR_APP_CTX":           app.Meta.Parent,
-		"INSPR_ENV":               environment.GetInsprEnvironment(),
-		"KAFKA_BOOTSTRAP_SERVERS": kafkasc.GetEnvironment().KafkaBootstrapServers,
-		"KAFKA_AUTO_OFFSET_RESET": kafkasc.GetEnvironment().KafkaAutoOffsetReset,
-		"INSPR_WRITE_PORT":        strconv.Itoa(writePort),
-		"INSPR_READ_PORT":         strconv.Itoa(readPort),
-	}
-
-	resolves, err := no.memory.Apps().ResolveBoundary(app)
+func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
+	log.Println("creating secret")
+	scope, err := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
 	if err != nil {
-		logger.Error("unable to resolve Node boundaries",
-			zap.Any("boundaries", app.Spec.Boundary))
-		panic(err)
+		log.Printf("err = %+v\n", err)
+		return nil
 	}
 
-	logger.Debug("resolving Node Boundary in the cluster")
-	channels.Map(func(boundary string) string {
-		resolved := resolves[boundary]
-		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
-		ch, _ := no.memory.Channels().Get(parent, chName)
-		ct, _ := no.memory.ChannelTypes().Get(parent, ch.Spec.Type)
-		resolved = "INSPR_" + ch.Meta.UUID
-		env[resolved+"_SCHEMA"] = ct.Schema
-		env[boundary+"_RESOLVED"] = resolved
-		return boundary
-	})
-	return env
+	payload := auth.Payload{
+		UID: app.Meta.UUID,
+		Permissions: map[string][]string{
+			app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
+		},
+		Refresh:    []byte(scope),
+		RefreshURL: fmt.Sprintf("%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
+	}
+
+	token, err := no.auth.Tokenize(payload)
+	if err != nil {
+		log.Printf("err = %+v\n", err)
+		return nil
+	}
+
+	return &kubeSecret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: toDeploymentName(app),
+		},
+		Data: map[string][]byte{
+			"INSPR_CONTROLLER_TOKEN": token,
+			"INSPR_CONTROLLER_SCOPE": []byte(app.Spec.Auth.Scope),
+		},
+	}
 }
 
-func dAppSidecarPorts(app *meta.App) (int, int) {
+func withSecretDefinition(app *meta.App) k8s.ContainerOption {
+	env := corev1.EnvFromSource{
+		SecretRef: &corev1.SecretEnvSource{
+			LocalObjectReference: corev1.LocalObjectReference{
+				Name: toDeploymentName(app),
+			},
+		},
+	}
+	return k8s.ContainerWithEnvFrom(env)
+}
 
-	writePort := app.Spec.Node.Spec.SidecarPort.Write
-	if writePort == 0 {
-		writePort, _ = strconv.Atoi(os.Getenv("INSPR_SIDECAR_WRITE_PORT"))
+// withBoundary adds the boundary configuration to the kubernetes' deployment environment variables
+func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
+	scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+	if _, err := no.memory.Apps().Get(scope); err != nil {
+		return nil
 	}
-	readPort := app.Spec.Node.Spec.SidecarPort.Read
-	if readPort == 0 {
-		readPort, _ = strconv.Atoi(os.Getenv("INSPR_SIDECAR_READ_PORT"))
+	return func(c *corev1.Container) {
+
+		input := app.Spec.Boundary.Input
+		output := app.Spec.Boundary.Output
+		channels := input.Union(output)
+
+		// label name to be used in the service
+		inputEnv := input.Join(";")
+		outputEnv := output.Join(";")
+		env := utils.EnvironmentMap{
+			"INSPR_INPUT_CHANNELS":  inputEnv,
+			"INSPR_OUTPUT_CHANNELS": outputEnv,
+		}
+
+		resolves, err := no.memory.Apps().ResolveBoundary(app)
+		if err != nil {
+			logger.Error("unable to resolve Node boundaries",
+				zap.Any("boundaries", app.Spec.Boundary))
+			panic(err)
+		}
+
+		logger.Debug("resolving Node Boundary in the cluster")
+		channels.Map(func(boundary string) string {
+			resolved := resolves[boundary]
+			parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
+			ch, _ := no.memory.Channels().Get(parent, chName)
+			ct, _ := no.memory.ChannelTypes().Get(parent, ch.Spec.Type)
+			resolved = "INSPR_" + ch.Meta.UUID
+			env[resolved+"_SCHEMA"] = ct.Schema
+			env[boundary+"_RESOLVED"] = resolved
+			return boundary
+		})
+
+		c.Env = append(c.Env, env.ParseToK8sArrEnv()...)
 	}
-	return readPort, writePort
+}
+
+func withNodeID(app *meta.App) k8s.ContainerOption {
+	return k8s.ContainerWithEnv(corev1.EnvVar{
+		Name:  "INSPR_APP_ID",
+		Value: toAppID(app),
+	})
+}
+
+// withSidecarPorts adds the sidecar ports if they are defined in the dApp definitions.
+// On kubernetes, this onverrides the defined configuration on the configmap
+func withSidecarPorts(app *meta.App) k8s.ContainerOption {
+	return func(c *corev1.Container) {
+		writePort := app.Spec.Node.Spec.SidecarPort.Write
+		readPort := app.Spec.Node.Spec.SidecarPort.Read
+
+		if writePort > 0 {
+			c.Env = append(c.Env, corev1.EnvVar{
+				Name:  "INSPR_SIDECAR_WRITE_PORT",
+				Value: strconv.Itoa(writePort),
+			})
+		}
+		if readPort > 0 {
+			c.Env = append(c.Env, corev1.EnvVar{
+				Name:  "INSPR_SIDECAR_READ_PORT",
+				Value: strconv.Itoa(readPort),
+			})
+		}
+	}
+}
+
+// withSidecarImage adds the sidecar image to the dApp
+func (no *NodeOperator) withSidecarImage(app *meta.App) k8s.ContainerOption {
+	return func(c *corev1.Container) {
+		c.Image = environment.GetSidecarImage()
+	}
 }
 
 // dAppToDeployment translates the DApp
-func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeApp.Deployment {
-	logger.Debug("converting a dApp structure to a k8s deployment")
-	var baseDappEnvironment utils.EnvironmentMap
-	readPort, writePort := dAppSidecarPorts(app)
-	baseDappEnvironment = utils.EnvironmentMap{
-		"INSPR_WRITE_PORT": strconv.Itoa(writePort),
-		"INSPR_READ_PORT":  strconv.Itoa(readPort),
-	}
-
-	sidecarEnvironment := no.sidecarEnvironment(app)
-
-	logger.Debug("defining Node's env vars")
-	nodeKubeEnv := append(app.Spec.Node.Spec.Environment.ParseToK8sArrEnv(), baseDappEnvironment.ParseToK8sArrEnv()...)
-
-	logger.Debug("defining Node's k8s container data")
+func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 	appDeployName := toDeploymentName(app)
-	appID := toAppID(app)
-	nodeContainer := kubeCore.Container{
-		Name:  appDeployName,
-		Image: app.Spec.Node.Spec.Image,
-		// parse from master env var to kube env vars
-		Env: nodeKubeEnv,
+	appLabels := map[string]string{
+		"inspr-app": toAppID(app),
 	}
-
-	logger.Debug("defining Sidecars's k8s env vars")
-	sidecarKubeEnv := append(sidecarEnvironment.ParseToK8sArrEnv(), kubeCore.EnvVar{
-		Name: "INSPR_UNIX_SOCKET",
-		ValueFrom: &kubeCore.EnvVarSource{
-			FieldRef: &kubeCore.ObjectFieldSelector{
-				FieldPath: "metadata.name",
-			},
-		},
-	})
-
-	logger.Debug("defining Sidecar's k8s container data")
-	sidecarContainer := kubeCore.Container{
-		Name:            appDeployName + "-sidecar",
-		Image:           environment.GetSidecarImage(),
-		Env:             sidecarKubeEnv,
-		ImagePullPolicy: kubeCore.PullAlways,
-	}
-
-	appLabels := map[string]string{"app": appID}
-	replicas := new(int32)
-
-	if app.Spec.Node.Spec.Replicas == 0 {
-		app.Spec.Node.Spec.Replicas = 1
-	}
-
-	*replicas = int32(app.Spec.Node.Spec.Replicas)
-
-	logger.Debug("building and returning the k8s complete deployment")
-	return &kubeApp.Deployment{
-		ObjectMeta: kubeMeta.ObjectMeta{
-			Name:   appDeployName,
-			Labels: appLabels,
-		},
-		Spec: kubeApp.DeploymentSpec{
-			Selector: &kubeMeta.LabelSelector{
-				MatchLabels: appLabels,
-			},
-			Template: kubeCore.PodTemplateSpec{
-				ObjectMeta: kubeMeta.ObjectMeta{
-					Labels: appLabels,
-				},
-				Spec: kubeCore.PodSpec{
-					Containers: []kubeCore.Container{
-						sidecarContainer,
-						nodeContainer,
-					},
-				},
-			},
-			Replicas: replicas,
-		},
-	}
+	log.Println("constructing deployment")
+	return (*kubeDeploy)(
+		k8s.NewDeployment(
+			appDeployName,
+			k8s.WithLabels(appLabels),
+			k8s.WithContainer(
+				k8s.NewContainer(
+					appDeployName,
+					app.Spec.Node.Spec.Image,
+					withSidecarPorts(app),
+					withSecretDefinition(app),
+					withSidecarConfiguration(),
+				),
+				k8s.NewContainer(
+					appDeployName+"-sidecar",
+					"",
+					no.withSidecarImage(app),
+					no.withBoundary(app),
+					withSidecarPorts(app),
+					withKafkaConfiguration(),
+					withSidecarConfiguration(),
+					withNodeID(app),
+					k8s.ContainerWithPullPolicy(corev1.PullAlways),
+				),
+			),
+		))
 }
 
 var sidecarPort int32
 
-func dappToService(app *meta.App) *kubeCore.Service {
+func withKafkaConfiguration() k8s.ContainerOption {
+	return k8s.ContainerWithEnvFrom(
+		corev1.EnvFromSource{
+			ConfigMapRef: &corev1.ConfigMapEnvSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: "inspr-kafka-configuration",
+				},
+			},
+		},
+	)
+}
+
+func withSidecarConfiguration() k8s.ContainerOption {
+	return k8s.ContainerWithEnvFrom(
+		corev1.EnvFromSource{
+			ConfigMapRef: &corev1.ConfigMapEnvSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: "inspr-sidecar-configuration",
+				},
+			},
+		},
+	)
+}
+
+func dappToService(app *meta.App) *kubeService {
+	temp, _ := strconv.Atoi(os.Getenv("INSPR_SIDECAR_PORT"))
+	sidecarPort = int32(temp)
 	appID := toAppID(app)
 	appDeployName := toDeploymentName(app)
-	appLabels := map[string]string{"app": appID}
+	appLabels := map[string]string{"inspr-app": appID}
 
-	svc := &kubeCore.Service{
-		ObjectMeta: kubeMeta.ObjectMeta{
+	svc := &kubeService{
+		ObjectMeta: metav1.ObjectMeta{
 			Name: appDeployName,
 		},
-		Spec: kubeCore.ServiceSpec{
-			Ports: func() (ports []kubeCore.ServicePort) {
-				for _, port := range app.Spec.Node.Spec.Ports {
-					ports = append(ports, kubeCore.ServicePort{
+		Spec: corev1.ServiceSpec{
+			Ports: func() (ports []corev1.ServicePort) {
+				for i, port := range app.Spec.Node.Spec.Ports {
+					ports = append(ports, corev1.ServicePort{
+						Name:       fmt.Sprintf("port%v", i),
 						Port:       int32(port.Port),
 						TargetPort: intstr.FromInt(port.TargetPort),
 					})
 				}
-				ports = append(ports, kubeCore.ServicePort{
+				ports = append(ports, corev1.ServicePort{
+					Name:       "sidecar-port",
 					Port:       sidecarPort,
 					TargetPort: intstr.FromInt(int(sidecarPort)),
 				})
-
 				return
 			}(),
 			Selector: appLabels,
 		},
 	}
+
 	return svc
 }
 
 // toDeployment - creates the kubernetes deployment name from the app
 func toDeploymentName(app *meta.App) string {
-
 	return "node-" + app.Meta.UUID
 }
 
@@ -208,34 +258,4 @@ func toAppID(app *meta.App) string {
 func intToint32(v int) *int32 {
 	t := int32(v)
 	return &t
-}
-
-func toNode(kdep *kubeApp.Deployment) (*meta.Node, error) {
-	var err error
-	node := &meta.Node{}
-	node.Meta.Name, err = toNodeName(kdep.ObjectMeta.Name)
-	if err != nil {
-		return nil, err
-	}
-	node.Meta.Parent, err = toNodeParent(kdep.ObjectMeta.Name)
-	if err != nil {
-		return nil, err
-	}
-	if len(kdep.Spec.Template.Spec.Containers) == 0 {
-		return nil, ierrors.NewError().Message("node does not contain a container").InvalidApp().Build()
-	}
-	node.Spec.Image = kdep.Spec.Template.Spec.Containers[0].Image
-	node.Spec.Environment = utils.ParseFromK8sEnvironment(kdep.Spec.Template.Spec.Containers[0].Env)
-	node.Spec.Replicas = int(*kdep.Spec.Replicas)
-	return node, nil
-}
-
-func toNodeName(deployName string) (string, error) {
-	strs := strings.Split(deployName, "-")
-	return strs[len(strs)-1], nil
-}
-
-func toNodeParent(deployName string) (string, error) {
-	strs := utils.StringArray(strings.Split(deployName, "-"))
-	return strs[:len(strs)-1].Join("."), nil
 }

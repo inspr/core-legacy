@@ -10,7 +10,6 @@ func mockInsprEnvironment() *InsprEnvVars {
 	return &InsprEnvVars{
 		InputChannels:    "chan;chan1;chan2;chan3",
 		OutputChannels:   "chan;chan1;chan2;chan3",
-		UnixSocketAddr:   "socket_addr",
 		SidecarImage:     "mock_sidecar_image",
 		InsprAppContext:  "mock.dapp.context",
 		InsprEnvironment: "mock_env",
@@ -115,7 +114,6 @@ func TestRefreshEnviromentVariables(t *testing.T) {
 			want: &InsprEnvVars{
 				InputChannels:    "one",
 				OutputChannels:   "two",
-				UnixSocketAddr:   "three",
 				InsprAppContext:  "four",
 				InsprEnvironment: "five",
 				SidecarImage:     "seven",
