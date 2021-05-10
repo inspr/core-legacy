@@ -2,6 +2,12 @@
 # Changelog
 
 
+### #50 - Feature: creates git hooks scripts and pre-commit
+- feature:
+	- creates a wrapper script for git hooks
+	- creates a pre-commit script for linting files that are staged for committing
+	- creates an installation script that creates symlinks for the hooks
+  
 ### #79 Story CORE-481 | Adding fields descriptions to the documentations in docs/yamls 
 - misc:
     - created the alias doc
@@ -34,6 +40,9 @@
 ---
 
 ### #77 Story CORE-463 | Create documentation for Auth
+
+### #41 - Feature: Handling invalid requests in the middleware authorization
+
 - features:
     - authentication doc
 ---
