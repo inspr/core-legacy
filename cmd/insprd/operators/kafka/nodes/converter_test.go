@@ -152,6 +152,9 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 			},
 			args: args{
 				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "app1",
+					},
 					Spec: meta.AppSpec{
 						Boundary: meta.AppBoundary{
 							Input: []string{
@@ -207,6 +210,9 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 			},
 			args: args{
 				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "app2",
+					},
 					Spec: meta.AppSpec{
 						Boundary: meta.AppBoundary{
 							Output: []string{
@@ -257,6 +263,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			mem.Apps().Create("", tt.args.app)
 			no := &NodeOperator{
 				clientSet: tt.fields.clientSet,
 				memory:    tt.fields.memory,
