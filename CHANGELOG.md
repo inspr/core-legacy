@@ -1,6 +1,14 @@
 # Changelog
 
+### #50 - Feature: creates git hooks scripts and pre-commit
+- feature:
+	- creates a wrapper script for git hooks
+	- creates a pre-commit script for linting files that are staged for committing
+	- creates an installation script that creates symlinks for the hooks
+
+
 ### #41 - Feature: Handling invalid requests in the middleware authorization
+
 - features:
     - rest/middleware.go -> using the `permissions` field in the payload, created in the issue
       CORE-336, for the scope and permissions check.
