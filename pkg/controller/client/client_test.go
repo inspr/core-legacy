@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/controller"
 	"github.com/inspr/inspr/pkg/controller/mocks"
 	"github.com/inspr/inspr/pkg/rest/request"
@@ -318,9 +317,7 @@ func TestGetInClusterConfigs(t *testing.T) {
 			}
 			if !tt.wantErr {
 				want := &ControllerConfig{
-					Auth: auth.Authenticator{
-						TokenPath: tt.tokenenv,
-					},
+					Auth:  authenticator{},
 					Scope: tt.scopeenv,
 					URL:   tt.urlenv,
 				}
