@@ -51,7 +51,7 @@ func (c Client) Send(ctx context.Context, route string, method string, body inte
 		if err != nil {
 			return ierrors.
 				NewError().
-				BadRequest().
+				Unauthorized().
 				Message("unable to get token from configuration").
 				InnerError(err).
 				Build()

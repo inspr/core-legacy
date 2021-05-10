@@ -48,7 +48,7 @@ func mainCmdPreRun(cm *cobra.Command, args []string) error {
 		err = utils.ReadConfigFromFile(cmd.InsprOptions.Config)
 	}
 	if err != nil {
-		fmt.Fprintf(utils.GetCliOutput(), "Invalid config file! Did you run inspr init?")
+		fmt.Fprintln(utils.GetCliOutput(), "Invalid config file! Did you run inspr init?")
 	}
-	return nil
+	return err
 }
