@@ -34,7 +34,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 }
 
 func mainCmdPreRun(cm *cobra.Command, args []string) error {
-	if cm.Name() == "init" {
+	if cm.Name() == "init" && cm.Parent().Name() == "inspr" {
 		return nil
 	}
 	cm.Root().SilenceErrors = true
