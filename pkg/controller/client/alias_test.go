@@ -12,6 +12,7 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
@@ -70,6 +71,7 @@ func TestAliasClient_Get(t *testing.T) {
 				}
 
 				var di models.AliasQueryDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -77,8 +79,8 @@ func TestAliasClient_Get(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 				if di.Key != tt.args.name {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.Key, tt.args.name)
@@ -90,7 +92,7 @@ func TestAliasClient_Get(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AliasClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			got, err := ac.Get(tt.args.ctx, tt.args.context, tt.args.name)
 			if (err != nil) != tt.wantErr {
@@ -157,6 +159,7 @@ func TestAliasClient_Create(t *testing.T) {
 				}
 
 				var di models.AliasDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -164,8 +167,8 @@ func TestAliasClient_Create(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.Alias, *tt.args.ch) {
@@ -176,7 +179,7 @@ func TestAliasClient_Create(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AliasClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Create(tt.args.ctx, tt.args.context, "alias_target", tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AliasClient.Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -232,6 +235,7 @@ func TestAliasClient_Delete(t *testing.T) {
 				}
 
 				var di models.AliasQueryDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -239,8 +243,8 @@ func TestAliasClient_Delete(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 				if di.Key != tt.args.name {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.Key, tt.args.name)
@@ -251,7 +255,7 @@ func TestAliasClient_Delete(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AliasClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name, false); (err != nil) != tt.wantErr {
 				t.Errorf("AliasClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -314,6 +318,7 @@ func TestAliasClient_Update(t *testing.T) {
 				}
 
 				var di models.AliasDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -321,8 +326,8 @@ func TestAliasClient_Update(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.Alias, *tt.args.ch) {
@@ -333,7 +338,7 @@ func TestAliasClient_Update(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AliasClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Update(tt.args.ctx, tt.args.context, "alias_target", tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AliasClient.Update() error = %v, wantErr %v", err, tt.wantErr)

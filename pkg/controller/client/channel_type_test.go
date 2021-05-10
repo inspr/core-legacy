@@ -12,6 +12,7 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
 
@@ -63,6 +64,7 @@ func TestTypeClient_Delete(t *testing.T) {
 				}
 
 				var di models.TypeQueryDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -70,8 +72,8 @@ func TestTypeClient_Delete(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 				if di.CtName != tt.args.name {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.CtName, tt.args.name)
@@ -82,7 +84,7 @@ func TestTypeClient_Delete(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &TypeClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name, false); (err != nil) != tt.wantErr {
 				t.Errorf("TypeClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -147,6 +149,7 @@ func TestTypeClient_Get(t *testing.T) {
 				}
 
 				var di models.TypeQueryDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -154,8 +157,8 @@ func TestTypeClient_Get(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 				if di.CtName != tt.args.name {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.CtName, tt.args.name)
@@ -167,7 +170,7 @@ func TestTypeClient_Get(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &TypeClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			got, err := ac.Get(tt.args.ctx, tt.args.context, tt.args.name)
 			if (err != nil) != tt.wantErr {
@@ -235,6 +238,7 @@ func TestTypeClient_Create(t *testing.T) {
 				}
 
 				var di models.TypeDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -242,8 +246,8 @@ func TestTypeClient_Create(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.Type, *tt.args.ch) {
@@ -254,7 +258,7 @@ func TestTypeClient_Create(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &TypeClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("TypeClient.Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -318,6 +322,7 @@ func TestTypeClient_Update(t *testing.T) {
 				}
 
 				var di models.TypeDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -325,8 +330,8 @@ func TestTypeClient_Update(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.Type, *tt.args.ch) {
@@ -337,7 +342,7 @@ func TestTypeClient_Update(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &TypeClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("TypeClient.Update() error = %v, wantErr %v", err, tt.wantErr)

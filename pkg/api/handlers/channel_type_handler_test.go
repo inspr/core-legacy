@@ -32,8 +32,7 @@ type TypeAPITest struct {
 // use these test cases
 func TypeDICases(funcName string) []TypeAPITest {
 	parsedCTDI, _ := json.Marshal(models.TypeDI{
-		Type:   meta.Type{Meta: meta.Metadata{Name: "mock_Type"}},
-		Scope:  "",
+		Type:   meta.Type{Meta: meta.Metadata{Name: "mock_channelType"}},
 		DryRun: false,
 	})
 	wrongFormatData := []byte{1}
@@ -113,8 +112,7 @@ func TypeDICases(funcName string) []TypeAPITest {
 // use these test cases
 func TypeQueryDICases(funcName string) []TypeAPITest {
 	parsedCTQDI, _ := json.Marshal(models.TypeQueryDI{
-		Scope:  "",
-		CtName: "mock_Type",
+		CtName: "mock_channelType",
 		DryRun: false,
 	})
 	wrongFormatData := []byte{1}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -14,7 +13,7 @@ import (
 
 func main() {
 	client := client.Client{
-		HTTPClient: request.NewClient().BaseURL("http://127.0.0.1:8080").Encoder(json.Marshal).Decoder(request.JSONDecoderGenerator).Build(),
+		HTTPClient: request.NewJSONClient("http://127.0.0.1:8080"),
 	}
 
 	fmt.Println("[Creating App HelloWorld in Root...]")
