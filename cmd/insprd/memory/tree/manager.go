@@ -47,6 +47,10 @@ func newTreeMemory() *MemoryManager {
 				Channels: map[string]*meta.Channel{},
 				Types:    map[string]*meta.Type{},
 				Aliases:  map[string]*meta.Alias{},
+				Auth: meta.AppAuth{
+					Scope:       "",
+					Permissions: nil,
+				},
 			},
 		},
 	}

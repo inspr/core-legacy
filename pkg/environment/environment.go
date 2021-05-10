@@ -25,7 +25,6 @@ func GetEnvironment() *InsprEnvVars {
 		env = &InsprEnvVars{
 			InputChannels:    GetInputChannels(),
 			OutputChannels:   GetOutputChannels(),
-			UnixSocketAddr:   GetUnixSocketAddress(),
 			SidecarImage:     GetSidecarImage(),
 			InsprAppContext:  GetInsprAppContext(),
 			InsprEnvironment: GetInsprEnvironment(),
@@ -48,7 +47,6 @@ func RefreshEnviromentVariables() *InsprEnvVars {
 	env = &InsprEnvVars{
 		InputChannels:    GetInputChannels(),
 		OutputChannels:   GetOutputChannels(),
-		UnixSocketAddr:   GetUnixSocketAddress(),
 		SidecarImage:     GetSidecarImage(),
 		InsprAppContext:  GetInsprAppContext(),
 		InsprEnvironment: GetInsprEnvironment(),

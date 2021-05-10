@@ -22,7 +22,7 @@ func main() {
 	if _, ok := os.LookupEnv("DEBUG"); ok {
 		authenticator = authmock.NewMockAuth(nil)
 		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator(memoryManager)
+		operator, err = kafka.NewKafkaOperator(memoryManager, authenticator)
 		if err != nil {
 			panic(err)
 		}
@@ -33,7 +33,7 @@ func main() {
 		}
 		authenticator = jwtauth.NewJWTauth(pubKey)
 		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator(memoryManager)
+		operator, err = kafka.NewKafkaOperator(memoryManager, authenticator)
 		if err != nil {
 			panic(err)
 		}

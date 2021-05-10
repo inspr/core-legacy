@@ -67,7 +67,7 @@ func main() {
 		panic(err)
 	}
 
-	op, err := nodes.NewOperator(tree.GetTreeMemory())
+	op, err := nodes.NewOperator(tree.GetTreeMemory(), nil)
 	if err != nil {
 		panic(err)
 	}

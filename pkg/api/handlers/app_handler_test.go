@@ -124,7 +124,7 @@ func appDICases(funcName string) []appAPITest {
 // For example, HandleGet and HandleDelete use these test cases
 func appQueryDICases(funcName string) []appAPITest {
 	parsedQueryAppDI, _ := json.Marshal(models.AppQueryDI{})
-	const scope = ".mock_app"
+	const scope = "mock_app"
 	wrongFormatData, _ := json.Marshal([]byte{1})
 	return []appAPITest{
 		{

@@ -25,4 +25,5 @@ var routeTranslator = map[string]string{
 	"apps":     "dapp",
 	"channels": "channel",
 	"types":    "ctype",
+	"auth":     "token",
 }
