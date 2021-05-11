@@ -1,9 +1,14 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"strings"
 
+	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -65,4 +70,85 @@ PowerShell:
 			cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
 		}
 	},
+}
+
+func completeDapps(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return generateCompletion(func(app *meta.App) []string {
+		scopes := []string{}
+		for name := range app.Spec.Apps {
+			scopes = append(scopes, name)
+		}
+		return scopes
+	})(cm, args, toComplete)
+}
+func completeChannels(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return generateCompletion(func(app *meta.App) []string {
+		scopes := []string{}
+		for name := range app.Spec.Apps {
+			scopes = append(scopes, name+".")
+		}
+		for name := range app.Spec.Channels {
+			scopes = append(scopes, name)
+		}
+		return scopes
+	})(cm, args, toComplete)
+}
+func generateCompletion(tg func(*meta.App) []string) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+	return func(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		toComplete = strings.TrimSuffix(toComplete, ".")
+		client := cliutils.GetCliClient()
+		scope, err := cliutils.GetScope()
+
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+
+		newScope, err := utils.JoinScopes(scope, toComplete)
+		if _, err := client.Apps().Get(context.Background(), newScope); err != nil {
+			newScope, _, _ = utils.RemoveLastPartInScope(newScope)
+		}
+
+		app, err := client.Apps().Get(context.Background(), newScope)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+		newOnes := tg(app)
+		for i := range newOnes {
+			if newScope != "" {
+				newOnes[i] = newScope + "." + newOnes[i]
+			}
+		}
+		ret := []string{}
+		for _, s := range newOnes {
+			if strings.HasPrefix(s, toComplete) {
+				ret = append(ret, s)
+			}
+		}
+		return ret, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	}
+
+}
+func completeChannelTypes(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return generateCompletion(func(app *meta.App) []string {
+		scopes := []string{}
+		for name := range app.Spec.Apps {
+			scopes = append(scopes, name+".")
+		}
+		for name := range app.Spec.ChannelTypes {
+			scopes = append(scopes, name)
+		}
+		return scopes
+	})(cm, args, toComplete)
+}
+func completeAliases(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return generateCompletion(func(app *meta.App) []string {
+		scopes := []string{}
+		for name := range app.Spec.Apps {
+			scopes = append(scopes, name+".")
+		}
+		for name := range app.Spec.Aliases {
+			scopes = append(scopes, name)
+		}
+		return scopes
+	})(cm, args, toComplete)
 }
