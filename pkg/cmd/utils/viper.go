@@ -4,8 +4,10 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/inspr/inspr/pkg/cmd"
+	"github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -22,22 +24,32 @@ var defaultValues map[string]string = map[string]string{
 
 var flagCompletionRegistry = map[string]func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective){
 	"scope": func(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		toComplete = strings.TrimSuffix(toComplete, ".")
 		client := GetCliClient()
 		scope, err := GetScope()
-		if err != nil {
-			return []string{"AAAAA"}, cobra.ShellCompDirectiveError
-		}
-		app, err := client.Apps().Get(context.Background(), scope)
 
 		if err != nil {
-			return []string{"BBBBBB"}, cobra.ShellCompDirectiveError
+			return nil, cobra.ShellCompDirectiveError
+		}
+
+		newScope, err := utils.JoinScopes(scope, toComplete)
+		if _, err := client.Apps().Get(context.Background(), newScope); err != nil {
+			newScope, _, _ = utils.RemoveLastPartInScope(newScope)
+		}
+
+		app, err := client.Apps().Get(context.Background(), newScope)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
 		}
 
 		scopes := []string{}
-		for _, child := range app.Spec.Apps {
-			scopes = append(scopes, "."+child.Meta.Name)
+		for name := range app.Spec.Apps {
+			newScope, _ := utils.JoinScopes(newScope, name)
+			if strings.HasPrefix(newScope, toComplete) {
+				scopes = append(scopes, newScope+".")
+			}
 		}
-		return nil, cobra.ShellCompDirectiveNoSpace
+		return scopes, cobra.ShellCompDirectiveNoSpace
 	},
 }
 
@@ -46,6 +58,10 @@ func AddDefaultFlagCompletion() cmd.CMDOption {
 		for name, f := range flagCompletionRegistry {
 			c.RegisterFlagCompletionFunc(name, f)
 		}
+		c.MarkFlagFilename("token")
+		c.MarkFlagFilename("config")
+		c.MarkFlagFilename("file")
+		c.MarkFlagDirname("folder")
 	}
 }
 
