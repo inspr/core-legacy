@@ -29,9 +29,9 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 		}
 	}
 	if len(app.Spec.Types) > 0 {
-		Types := spec.Add("Types")
-		for ctName := range app.Spec.Types {
-			Types.Add(ctName)
+		insprTypes := spec.Add("Types")
+		for typeName := range app.Spec.Types {
+			insprTypes.Add(typeName)
 		}
 	}
 	if len(app.Spec.Aliases) > 0 {

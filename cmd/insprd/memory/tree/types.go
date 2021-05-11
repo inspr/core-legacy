@@ -15,65 +15,65 @@ type TypeMemoryManager struct {
 }
 
 // Types is a MemoryManager method that provides an access point for Types
-func (tmm *MemoryManager) Types() memory.TypeMemory {
+func (mm *MemoryManager) Types() memory.TypeMemory {
 	return &TypeMemoryManager{
-		MemoryManager: tmm,
+		MemoryManager: mm,
 	}
 }
 
 // Create creates, if it doesn't already exist, a new Type for a given app.
-// ct: ChannetType to be created.
+// insprType: ChannetType to be created.
 // context: Path to reference app (x.y.z...)
-func (ctm *TypeMemoryManager) Create(context string, ct *meta.Type) error {
+func (tmm *TypeMemoryManager) Create(context string, insprType *meta.Type) error {
 	logger.Info("trying to create a Type",
-		zap.String("Type", ct.Meta.Name),
+		zap.String("Type", insprType.Meta.Name),
 		zap.String("context", context))
 
 	logger.Debug("validating Type structure")
-	nameErr := utils.StructureNameIsValid(ct.Meta.Name)
+	nameErr := utils.StructureNameIsValid(insprType.Meta.Name)
 	if nameErr != nil {
 		logger.Error("invalid Type name",
-			zap.String("type", ct.Meta.Name))
+			zap.String("type", insprType.Meta.Name))
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
 	logger.Debug("checking if Type already exists",
-		zap.String("channel", ct.Meta.Name),
+		zap.String("channel", insprType.Meta.Name),
 		zap.String("context", context))
 
-	_, err := ctm.Get(context, ct.Meta.Name)
+	_, err := tmm.Get(context, insprType.Meta.Name)
 	if err == nil {
 		logger.Error("Type already exists")
 		return ierrors.NewError().AlreadyExists().
-			Message("target app already has a '" + ct.Meta.Name + "' Type").Build()
+			Message("target app already has a '" + insprType.Meta.Name + "' Type").Build()
 	}
 
 	logger.Debug("getting Type parent dApp")
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).InvalidChannel().
-			Message("couldn't create Type " + ct.Meta.Name + "\n" + err.Error()).
+		newError := ierrors.NewError().InnerError(err).InvalidType().
+			Message("couldn't create Type " + insprType.Meta.Name + "\n" + err.Error()).
 			Build()
 		return newError
 	}
 
 	logger.Debug("adding Type to dApp",
-		zap.String("Type", ct.Meta.Name),
+		zap.String("Type", insprType.Meta.Name),
 		zap.String("context", parentApp.Meta.Name))
 	if parentApp.Spec.Types == nil {
 		parentApp.Spec.Types = map[string]*meta.Type{}
 	}
-	ct.Meta = utils.InjectUUID(ct.Meta)
-	parentApp.Spec.Types[ct.Meta.Name] = ct
+	insprType.Meta = utils.InjectUUID(insprType.Meta)
+	parentApp.Spec.Types[insprType.Meta.Name] = insprType
 	return nil
 }
 
 // Get returns, if it exists, a specific Type from a given app.
-// ctName: Name of desired Type.
+// typeName: Name of desired Type.
 // context: Path to reference app (x.y.z...)
-func (ctm *TypeMemoryManager) Get(context string, ctName string) (*meta.Type, error) {
+func (tmm *TypeMemoryManager) Get(context string, typeName string) (*meta.Type, error) {
 	logger.Info("trying to get a Type",
-		zap.String("Type", ctName),
+		zap.String("Type", typeName),
 		zap.String("context", context))
 
 	parentApp, err := GetTreeMemory().Apps().Get(context)
@@ -83,13 +83,13 @@ func (ctm *TypeMemoryManager) Get(context string, ctName string) (*meta.Type, er
 	}
 
 	if parentApp.Spec.Types != nil {
-		if ct, ok := parentApp.Spec.Types[ctName]; ok {
-			return ct, nil
+		if insprType, ok := parentApp.Spec.Types[typeName]; ok {
+			return insprType, nil
 		}
 	}
 
 	logger.Debug("unable to get Type in given context",
-		zap.String("type", ctName),
+		zap.String("type", typeName),
 		zap.String("context", context))
 
 	return nil, ierrors.NewError().NotFound().
@@ -98,14 +98,14 @@ func (ctm *TypeMemoryManager) Get(context string, ctName string) (*meta.Type, er
 }
 
 // Delete deletes, if it exists, a Type from a given app.
-// ctName: Name of desired Type.
+// typeName: Name of desired Type.
 // context: Path to reference app (x.y.z...)
-func (ctm *TypeMemoryManager) Delete(context string, ctName string) error {
+func (tmm *TypeMemoryManager) Delete(context string, typeName string) error {
 	logger.Info("trying to delete a Type",
-		zap.String("Type", ctName),
+		zap.String("Type", typeName),
 		zap.String("context", context))
 
-	curCt, err := ctm.Get(context, ctName)
+	curCt, err := tmm.Get(context, typeName)
 	if curCt == nil || err != nil {
 		return ierrors.NewError().BadRequest().
 			Message("target app doesn't contain a '" + context + "' Type").Build()
@@ -118,7 +118,7 @@ func (ctm *TypeMemoryManager) Delete(context string, ctName string) error {
 
 		return ierrors.NewError().
 			BadRequest().
-			Message("Type cannot be deleted as it is being used by other channels").
+			Message("Type cannot be deleted as it is being used by other structures").
 			Build()
 	}
 
@@ -129,30 +129,30 @@ func (ctm *TypeMemoryManager) Delete(context string, ctName string) error {
 	}
 
 	logger.Debug("removing Type from its parents 'Types' structure",
-		zap.String("Type", ctName),
+		zap.String("Type", typeName),
 		zap.String("dApp", parentApp.Meta.Name))
 
-	delete(parentApp.Spec.Types, ctName)
+	delete(parentApp.Spec.Types, typeName)
 
 	return nil
 }
 
 // Update updates, if it exists, a Type of a given app.
-// ct: Updated ChannetType to be updated on app
+// insprType: Updated ChannetType to be updated on app
 // context: Path to reference app (x.y.z...)
-func (ctm *TypeMemoryManager) Update(context string, ct *meta.Type) error {
+func (tmm *TypeMemoryManager) Update(context string, insprType *meta.Type) error {
 	logger.Info("trying to update a Type",
-		zap.String("Type", ct.Meta.Name),
+		zap.String("Type", insprType.Meta.Name),
 		zap.String("context", context))
 
-	oldChType, err := ctm.Get(context, ct.Meta.Name)
+	oldChType, err := tmm.Get(context, insprType.Meta.Name)
 	if err != nil {
 		return ierrors.NewError().BadRequest().
 			Message("target app doesn't contain a '" + context + "' Type").Build()
 	}
 
-	ct.ConnectedChannels = oldChType.ConnectedChannels
-	ct.Meta.UUID = oldChType.Meta.UUID
+	insprType.ConnectedChannels = oldChType.ConnectedChannels
+	insprType.Meta.UUID = oldChType.Meta.UUID
 
 	parentApp, err := GetTreeMemory().Apps().Get(context)
 	if err != nil {
@@ -160,11 +160,11 @@ func (ctm *TypeMemoryManager) Update(context string, ct *meta.Type) error {
 			Message("target app doesn't exist").Build()
 	}
 
-	logger.Debug("replacing old Type with the new one in dApps 'Types",
-		zap.String("channel", ct.Meta.Name),
+	logger.Debug("replacing old Type with the new one in dApps 'Types'",
+		zap.String("inspr-type", insprType.Meta.Name),
 		zap.String("dApp", parentApp.Meta.Name))
 
-	parentApp.Spec.Types[ct.Meta.Name] = ct
+	parentApp.Spec.Types[insprType.Meta.Name] = insprType
 	return nil
 }
 
@@ -176,9 +176,9 @@ type TypeRootGetter struct{}
 // memory tree until it finds the Type which name is equal to the last query element.
 // If the specified Type is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (amm *TypeRootGetter) Get(context string, ctName string) (*meta.Type, error) {
+func (trg *TypeRootGetter) Get(context string, typeName string) (*meta.Type, error) {
 	logger.Info("trying to get a Type (Root Getter)",
-		zap.String("Type", ctName),
+		zap.String("Type", typeName),
 		zap.String("context", context))
 
 	parentApp, err := GetTreeMemory().Root().Apps().Get(context)
@@ -192,13 +192,13 @@ func (amm *TypeRootGetter) Get(context string, ctName string) (*meta.Type, error
 	}
 
 	if parentApp.Spec.Types != nil {
-		if ch, ok := parentApp.Spec.Types[ctName]; ok {
+		if ch, ok := parentApp.Spec.Types[typeName]; ok {
 			return ch, nil
 		}
 	}
 
 	logger.Error("unable to get Type in given context (Root Getter)",
-		zap.String("type", ctName),
+		zap.String("type", typeName),
 		zap.String("context", context))
 
 	return nil, ierrors.

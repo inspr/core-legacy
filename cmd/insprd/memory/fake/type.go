@@ -10,8 +10,8 @@ import (
 // Types - mocks the implementation of the TypeMemory interface methods
 type Types struct {
 	*MemManager
-	fail  error
-	Types map[string]*meta.Type
+	fail       error
+	insprTypes map[string]*meta.Type
 }
 
 // Get - simple mock
@@ -20,7 +20,7 @@ func (t *Types) Get(context string, ctName string) (*meta.Type, error) {
 		return nil, t.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ctName)
-	ct, ok := t.Types[query]
+	ct, ok := t.insprTypes[query]
 	if !ok {
 		return nil, ierrors.
 			NewError().
@@ -37,7 +37,7 @@ func (t *Types) Create(context string, ct *meta.Type) error {
 		return t.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
-	_, ok := t.Types[query]
+	_, ok := t.insprTypes[query]
 	if ok {
 		return ierrors.
 			NewError().
@@ -45,7 +45,7 @@ func (t *Types) Create(context string, ct *meta.Type) error {
 			Message("type %s already exists", query).
 			Build()
 	}
-	t.Types[query] = ct
+	t.insprTypes[query] = ct
 	return nil
 }
 
@@ -55,7 +55,7 @@ func (t *Types) Delete(context string, ctName string) error {
 		return t.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ctName)
-	_, ok := t.Types[query]
+	_, ok := t.insprTypes[query]
 	if !ok {
 		return ierrors.
 			NewError().
@@ -64,7 +64,7 @@ func (t *Types) Delete(context string, ctName string) error {
 			Build()
 	}
 
-	delete(t.Types, query)
+	delete(t.insprTypes, query)
 	return nil
 }
 
@@ -74,7 +74,7 @@ func (t *Types) Update(context string, ct *meta.Type) error {
 		return t.fail
 	}
 	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
-	_, ok := t.Types[query]
+	_, ok := t.insprTypes[query]
 	if !ok {
 		return ierrors.
 			NewError().
@@ -82,6 +82,6 @@ func (t *Types) Update(context string, ct *meta.Type) error {
 			Message("type %s not found", query).
 			Build()
 	}
-	t.Types[query] = ct
+	t.insprTypes[query] = ct
 	return nil
 }

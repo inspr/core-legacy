@@ -52,7 +52,7 @@ type AppSpec struct {
 	Node     Node                `yaml:"node,omitempty"   json:"node"`
 	Apps     map[string]*App     `yaml:"apps,omitempty"   json:"apps"`
 	Channels map[string]*Channel `yaml:"channels,omitempty"   json:"channels"`
-	Types    map[string]*Type    `yaml:"channeltypes,omitempty"   json:"channel_types"`
+	Types    map[string]*Type    `yaml:"types,omitempty"   json:"types"`
 	Aliases  map[string]*Alias   `yaml:"aliases"   json:"aliases"`
 	Boundary AppBoundary         `yaml:"boundary,omitempty"   json:"boundary"`
 	Auth     AppAuth             `yaml:"auth"  json:"auth"`

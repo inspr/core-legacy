@@ -44,7 +44,7 @@ func (th *TypeHandler) HandleCreate() rest.Handler {
 
 		err = th.Memory.Types().Create(scope, &data.Type)
 		if err != nil {
-			logger.Error("unable to create Channel Type",
+			logger.Error("unable to create Type",
 				zap.String("type", data.Type.Meta.Name),
 				zap.String("context", scope),
 				zap.Any("error", err))
@@ -133,7 +133,7 @@ func (th *TypeHandler) HandleUpdate() rest.Handler {
 
 		err = th.Memory.Types().Update(scope, &data.Type)
 		if err != nil {
-			logger.Error("unable to update Channel Type",
+			logger.Error("unable to update Type",
 				zap.String("type", data.Type.Meta.Name),
 				zap.String("context", scope),
 				zap.Any("error", err))

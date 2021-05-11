@@ -43,8 +43,8 @@ func (l LookupMemManager) Alias() memory.AliasGetInterface {
 func MockMemoryManager(failErr error) memory.Manager {
 	return &MemManager{
 		insprType: Types{
-			fail:  failErr,
-			Types: make(map[string]*meta.Type),
+			fail:       failErr,
+			insprTypes: make(map[string]*meta.Type),
 		},
 		channel: Channels{
 			fail:     failErr,
