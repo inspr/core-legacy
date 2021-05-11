@@ -53,7 +53,8 @@ var flagCompletionRegistry = map[string]func(cmd *cobra.Command, args []string, 
 	},
 }
 
-func AddDefaultFlagCompletion() cmd.CMDOption {
+// AddDefaultFlagCompletion adds the default completion for most used flags
+func AddDefaultFlagCompletion() cmd.Option {
 	return func(c *cobra.Command) {
 		for name, f := range flagCompletionRegistry {
 			c.RegisterFlagCompletionFunc(name, f)

@@ -9,7 +9,8 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type CMDOption func(*cobra.Command)
+// Option is an option to be applied on the construction of a command
+type Option func(*cobra.Command)
 
 // Builder is used to build cobra commands.
 // it contains all the methods to manipulate a command
@@ -27,7 +28,7 @@ type Builder interface {
 	NoArgs(action func(context.Context) error) *cobra.Command
 	AddSubCommand(cmds ...*cobra.Command) Builder
 	Version(version string) Builder
-	WithOptions(...CMDOption) Builder
+	WithOptions(...Option) Builder
 	ValidArgsFunc(validation func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective)) Builder
 	WithRequiredFlag(string) Builder
 	Super() *cobra.Command
@@ -61,7 +62,7 @@ func (b *builder) ValidArgsFunc(validation func(*cobra.Command, []string, string
 
 // WithOptions adds custom options to the command. These options are functions that
 // cause some change in the command
-func (b *builder) WithOptions(options ...CMDOption) Builder {
+func (b *builder) WithOptions(options ...Option) Builder {
 	for _, opt := range options {
 		if opt != nil {
 			opt(&b.cmd)
