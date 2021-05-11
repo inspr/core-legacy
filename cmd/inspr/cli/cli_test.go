@@ -2,10 +2,13 @@ package cli
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/inspr/inspr/pkg/cmd/utils"
+	"gopkg.in/yaml.v2"
 )
 
 // TestNewInsprCommand is mainly for improving test coverage,
@@ -31,6 +34,26 @@ func TestNewInsprCommand(t *testing.T) {
 	}
 }
 
+func prepareConfig(f string, c struct {
+	ServerIP string `yaml:"serverip"`
+	Scope    string `yaml:"scope"`
+}) {
+	os.Mkdir(filepath.Join(f, ".inspr"), 0755)
+	f = filepath.Join(f, ".inspr", "config")
+	arr, _ := yaml.Marshal(c)
+	ioutil.WriteFile(f, arr, 0644)
+}
+
+var defaultConfig struct {
+	ServerIP string `yaml:"serverip"`
+	Scope    string `yaml:"scope"`
+} = struct {
+	ServerIP string "yaml:\"serverip\""
+	Scope    string "yaml:\"scope\""
+}{
+	ServerIP: "http://localhost:8080",
+}
+
 func Test_mainCmdPreRun(t *testing.T) {
 	prepareToken(t)
 	folder := t.TempDir()
@@ -38,6 +61,8 @@ func Test_mainCmdPreRun(t *testing.T) {
 	os.Setenv("HOME", folder)
 	defer os.Setenv("HOME", prev)
 	utils.InitViperConfig()
+	prepareConfig(folder, defaultConfig)
+
 	type args struct {
 		args []string
 	}

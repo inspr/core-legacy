@@ -1,4 +1,43 @@
+
 # Changelog
+### #48 - Feature: adds init command to the cli
+
+- features:
+    - creates an init command for configuration initialization
+    - adds config flag to specify configuration file
+    - changes flow so that if the config is invalid, asks for initialization
+- refactors:
+    - refactors configuration initialization to allow different files
+    - changes command builder to now use variadic flag argument instead of slice
+- fix:
+    - silences main command to remove duplicate errors
+
+
+### #44 Issue CORE-333 | Create the token for authentication inside the cluster
+- features:
+	- creates a secret for each node with its permissions
+	- adds environment variables necessary for controller authentication
+- refactor:
+	- major refactor of the k8s operator conversion system
+	- creates a helper package for kubernetes deployment and container building
+	- changes node operator operations to be interface based
+
+### #43 Issue CORE-335 | Controllers configuration for in cluster initialization.
+- fixes:
+        - Renamed poorly named rest clients on controller clients.
+- features:
+	- ControllerConfig object developed to help initialize controllers and ease of config validation.
+	- GetInClusterConfigs function implemented to fetch controller configs from current in-cluster dapp deployment
+- tests:
+	- unit tests for GetInClusterConfigs
+---
+
+### #40 Issue CORE-332 | adds a permissions field to the dApp definition
+
+- features:
+	- adds a permission field to dapp meta
+	- changes new dapp on tree to handle the injection
+---
 
 ### #50 - Feature: creates the completion command on the CLI
 
@@ -68,3 +107,10 @@ they no longer have a `scope` field.
 - misc:
     - removed `init()` func that wasn't working in `cmd/insprd/operators/kafka/nodes/converter.go` (@ptcar2009 fixed it PR #37)
     - created example yaml file for uid provider user's structure definition (`cmd/uid_provider/inprov/user_example.yaml`)
+
+
+### #40 Issue CORE-332 | adds a permissions field to the dApp definition
+- features:
+	- adds a permission field to dapp meta
+	- changes new dapp on tree to handle the injection
+=======

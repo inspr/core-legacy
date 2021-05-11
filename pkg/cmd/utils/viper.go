@@ -31,11 +31,7 @@ func GetConfiguredScope() string {
 
 //InitViperConfig - sets defaults values and where is the file in which new values can be read
 func InitViperConfig() {
-	// specifies the path in which the config file present
-	viper.AddConfigPath("$HOME/.inspr/")
-	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-
 	for k, v := range defaultValues {
 		viper.SetDefault(k, v)
 	}
@@ -65,25 +61,35 @@ func createInsprConfigFolder(path string) error {
 	return nil
 }
 
+// ConfigFile is the currently loaded config file
+var ConfigFile string
+
+// ReadDefaultConfig reads the default inspr configuration
+func ReadDefaultConfig() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	return ReadViperConfig(home)
+}
+
+// ReadConfigFromFile reads a config from a file
+func ReadConfigFromFile(file string) error {
+	ConfigFile = file
+	f, err := os.Open(file)
+	if err != nil {
+		return err
+	}
+	return viper.ReadConfig(f)
+}
+
 // ReadViperConfig - reads the inspr's viper config, in case it didn't
 // found any, it creates one with the defaults values
 func ReadViperConfig(basePath string) error {
 	folderPath := filepath.Join(basePath, ".inspr")
 	filePath := filepath.Join(folderPath, "config")
 
-	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-		if createErr := createInsprConfigFolder(folderPath); createErr != nil {
-			return createErr
-		}
-	}
-
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		if configErr := createViperConfig(filePath); configErr != nil {
-			return configErr
-		}
-	}
-
-	if err := viper.ReadInConfig(); err != nil {
+	if err := ReadConfigFromFile(filePath); err != nil {
 		return err
 	}
 	return nil
@@ -94,7 +100,7 @@ func ReadViperConfig(basePath string) error {
 // it will return an error.
 func ChangeViperValues(key string, value interface{}) error {
 	viper.Set(key, value)
-	if err := viper.WriteConfig(); err != nil {
+	if err := viper.WriteConfigAs(ConfigFile); err != nil {
 		return err
 	}
 	if key == configServerIP {

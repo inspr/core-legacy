@@ -1,11 +1,11 @@
 package cli
 
 import (
+	"fmt"
 	"io"
-	"os"
 
 	"github.com/inspr/inspr/pkg/cmd"
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	"github.com/inspr/inspr/pkg/cmd/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -22,6 +22,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 			NewConfigChangeCmd(),
 			authCommand,
 			completionCmd,
+			initCommand,
 		).
 		Version(version).
 		WithLongDescription("main command of the inspr cli, to see the full list of subcommands existent please use 'inspr help'").
@@ -37,15 +38,21 @@ func mainCmdPreRun(cm *cobra.Command, args []string) error {
 	if cm.Name() == "completion" {
 		return nil
 	}
-	cm.Root().SilenceUsage = true
-	// viper defaults values or reads from the config location
-	cliutils.InitViperConfig()
-
-	homeDir, _ := os.UserHomeDir()
-
-	if err := cliutils.ReadViperConfig(homeDir); err != nil {
-		return err
+	if cm.Name() == "init" && cm.Parent().Name() == "inspr" {
+		return nil
 	}
-
-	return nil
+	cm.Root().SilenceErrors = true
+	cm.Root().SilenceUsage = true
+	utils.InitViperConfig()
+	// viper defaults values or reads from the config location
+	var err error
+	if cmd.InsprOptions.Config == "" {
+		err = utils.ReadDefaultConfig()
+	} else {
+		err = utils.ReadConfigFromFile(cmd.InsprOptions.Config)
+	}
+	if err != nil {
+		fmt.Fprintln(utils.GetCliOutput(), "Invalid config file! Did you run inspr init?")
+	}
+	return err
 }

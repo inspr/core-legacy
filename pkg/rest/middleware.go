@@ -111,6 +111,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		operation := getOperation(r)
 		target := getTarget(r)
 		perm := operation + ":" + target
+		log.Printf("reqOperation = %v\n", perm)
 
 		for scope := range payload.Permissions {
 			log.Printf("permission-scope = %+v\n", scope)

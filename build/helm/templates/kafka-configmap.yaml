@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inspr-kafka-configuration
+data:
+    KAFKA_BOOTSTRAP_SERVERS: !!str {{ .Values.kafka.bootstrap }}
+    KAFKA_AUTO_OFFSET_RESET: !!str {{ .Values.kafka.offsetReset }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inspr-kafka-configuration
+  namespace: {{ .Values.insprAppsNamespace }}
+data:
+    KAFKA_BOOTSTRAP_SERVERS: !!str {{ .Values.kafka.bootstrap }}
+    KAFKA_AUTO_OFFSET_RESET: !!str {{ .Values.kafka.offsetReset }}

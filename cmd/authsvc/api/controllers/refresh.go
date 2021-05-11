@@ -58,7 +58,7 @@ func (server *Server) Refresh() rest.Handler {
 		}
 		log.Printf("payload = %+v\n", payload)
 
-		signed, err := server.tokenize(*payload, time.Now().Add(time.Minute*30))
+		signed, err := server.tokenize(*payload, time.Now().Add(time.Hour*24))
 		if err != nil {
 			err := ierrors.NewError().InternalServer().Message(err.Error()).Build()
 			rest.ERROR(w, err)

@@ -74,13 +74,13 @@ func TestJWTauth_Validate(t *testing.T) {
 	}
 	noPayloadToken := func() []byte {
 		token := jwt.New()
-		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
+		token.Set(jwt.ExpirationKey, time.Now().Add(3*time.Hour))
 		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
 		return signed
 	}
 	fineToken := func() []byte {
 		token := jwt.New()
-		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
+		token.Set(jwt.ExpirationKey, time.Now().Add(3*time.Hour))
 
 		payload := auth.Payload{
 			UID:         "mock_UID",
@@ -396,7 +396,7 @@ func TestJWTauth_Refresh(t *testing.T) {
 
 func mockenize(load auth.Payload) []byte {
 	token := jwt.New()
-	token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
+	token.Set(jwt.ExpirationKey, time.Now().Add(3*time.Hour))
 	token.Set("payload", load)
 	key, _ := rsa.GenerateKey(rand.Reader, 512)
 	signed, _ := jwt.Sign(token, jwa.RS256, key)

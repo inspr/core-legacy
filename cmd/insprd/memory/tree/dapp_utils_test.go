@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/inspr/inspr/pkg/meta"
@@ -925,6 +926,142 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 				},
 			},
 		},
+
+		{
+			name: "authentication injection",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:   "singleLevelInjection",
+						Parent: "",
+					},
+				},
+				parentApp: "",
+			},
+			fields: fields{
+				root: &meta.App{
+					Spec: meta.AppSpec{
+						Auth: meta.AppAuth{
+							Scope:       "",
+							Permissions: utils.StringArray{"permission1", "permission2"},
+						},
+					},
+				},
+			},
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:   "singleLevelInjection",
+					Parent: "",
+				},
+				Spec: meta.AppSpec{
+					Auth: meta.AppAuth{
+						Scope:       "",
+						Permissions: utils.StringArray{"permission1", "permission2"},
+					},
+				},
+			},
+		},
+		{
+			name: "authentication keeping",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:   "singleLevelInjection",
+						Parent: "",
+					},
+					Spec: meta.AppSpec{
+						Auth: meta.AppAuth{
+							Scope:       "scope",
+							Permissions: utils.StringArray{"permission12"},
+						},
+					},
+				},
+				parentApp: "",
+			},
+			fields: fields{
+				root: &meta.App{
+					Spec: meta.AppSpec{
+						Auth: meta.AppAuth{
+							Scope:       "",
+							Permissions: utils.StringArray{"permission1", "permission2"},
+						},
+					},
+				},
+			},
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:   "singleLevelInjection",
+					Parent: "",
+				},
+				Spec: meta.AppSpec{
+					Auth: meta.AppAuth{
+						Scope:       "scope",
+						Permissions: utils.StringArray{"permission12"},
+					},
+				},
+			},
+		},
+
+		{
+			name: "multilevel authentication keeping",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:   "singleLevelInjection",
+						Parent: "",
+					},
+					Spec: meta.AppSpec{
+						Apps: map[string]*meta.App{
+							"son1": {
+								Meta: meta.Metadata{
+									Name: "son1",
+								},
+							},
+						},
+						Auth: meta.AppAuth{
+							Scope:       "scope",
+							Permissions: utils.StringArray{"permission12"},
+						},
+					},
+				},
+				parentApp: "",
+			},
+			fields: fields{
+				root: &meta.App{
+					Spec: meta.AppSpec{
+						Auth: meta.AppAuth{
+							Scope:       "",
+							Permissions: utils.StringArray{"permission1", "permission2"},
+						},
+					},
+				},
+			},
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:   "singleLevelInjection",
+					Parent: "",
+				},
+				Spec: meta.AppSpec{
+					Auth: meta.AppAuth{
+						Scope:       "scope",
+						Permissions: utils.StringArray{"permission12"},
+					},
+					Apps: map[string]*meta.App{
+						"son1": {
+							Meta: meta.Metadata{
+								Name: "son1",
+							},
+							Spec: meta.AppSpec{
+								Auth: meta.AppAuth{
+									Scope:       "scope",
+									Permissions: utils.StringArray{"permission12"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -941,6 +1078,153 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 			amm := GetTreeMemory().Apps().(*AppMemoryManager)
 			parentApp, _ := amm.Get(tt.args.parentApp)
 			amm.addAppInTree(tt.args.app, parentApp)
+		})
+	}
+}
+
+func TestAppMemoryManager_updateUUID(t *testing.T) {
+
+	type args struct {
+		app       *meta.App
+		parentStr string
+		tree      *meta.App
+		want      *meta.App
+	}
+	tests := []struct {
+		name   string
+		args   args
+		update bool
+	}{
+		{
+			name: "new dapp",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "dapp1",
+					},
+					Spec: meta.AppSpec{
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{
+							"channeltype1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+
+						Aliases: map[string]*meta.Alias{
+							"alias1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+					},
+				},
+				parentStr: "",
+				tree:      &meta.App{},
+			},
+			update: false,
+		},
+		{
+			name: "updating dapp",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "dapp1",
+					},
+					Spec: meta.AppSpec{
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{
+							"channeltype1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+
+						Aliases: map[string]*meta.Alias{
+							"alias1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+					},
+				},
+				parentStr: "",
+				want: &meta.App{
+					Meta: meta.Metadata{
+						Name: "dapp1",
+						UUID: "123456",
+					},
+					Spec: meta.AppSpec{
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+						ChannelTypes: map[string]*meta.ChannelType{
+							"channeltype1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+
+						Aliases: map[string]*meta.Alias{
+							"alias1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+					},
+				},
+				tree: &meta.App{
+					Spec: meta.AppSpec{
+						Apps: map[string]*meta.App{
+							"dapp1": {
+								Meta: meta.Metadata{
+									Name: "dapp1",
+									UUID: "123456",
+								},
+								Spec: meta.AppSpec{
+									Channels: map[string]*meta.Channel{
+										"channel1": {
+											Meta: meta.Metadata{Name: "channel1"},
+										},
+									},
+									ChannelTypes: map[string]*meta.ChannelType{
+										"channeltype1": {
+											Meta: meta.Metadata{Name: "channel1"},
+										},
+									},
+
+									Aliases: map[string]*meta.Alias{
+										"alias1": {
+											Meta: meta.Metadata{Name: "channel1"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			update: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			amm := &AppMemoryManager{
+				MemoryManager: &MemoryManager{
+					root: tt.args.tree,
+					tree: tt.args.tree,
+				},
+			}
+			amm.updateUUID(tt.args.app, tt.args.parentStr)
+			if !tt.update {
+				metautils.RecursiveValidateUUIDS("", tt.args.app, t)
+			} else if !reflect.DeepEqual(tt.args.app, tt.args.want) {
+				t.Error("chaged uuid")
+			}
 		})
 	}
 }

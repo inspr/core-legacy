@@ -57,11 +57,7 @@ func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
 	return nil
 }
 
-func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
-	if parentApp.Spec.Apps == nil {
-		parentApp.Spec.Apps = make(map[string]*meta.App)
-	}
-	parentStr := getParentString(app, parentApp)
+func (amm *AppMemoryManager) updateUUID(app *meta.App, parentStr string) {
 
 	app.Meta.Parent = parentStr
 	query, _ := metautils.JoinScopes(parentStr, app.Meta.Name)
@@ -107,7 +103,17 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 			al.Meta = metautils.InjectUUID(al.Meta)
 		}
 	}
+}
 
+func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
+	if parentApp.Spec.Apps == nil {
+		parentApp.Spec.Apps = make(map[string]*meta.App)
+	}
+	parentStr := getParentString(app, parentApp)
+	amm.updateUUID(app, parentStr)
+	if app.Spec.Auth.Permissions == nil {
+		app.Spec.Auth = parentApp.Spec.Auth
+	}
 	for _, child := range app.Spec.Apps {
 		amm.addAppInTree(child, app)
 	}

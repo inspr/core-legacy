@@ -57,9 +57,15 @@ func SetClient(url string) {
 		dir, _ := os.UserHomeDir()
 		cmd.InsprOptions.Token = filepath.Join(dir, ".inspr/token")
 	}
-	defaults.client = client.NewControllerClient(url, Authenticator{
-		cmd.InsprOptions.Token,
-	})
+
+	config := client.ControllerConfig{
+		Auth: Authenticator{
+			cmd.InsprOptions.Token,
+		},
+		URL: url,
+	}
+
+	defaults.client = client.NewControllerClient(config)
 }
 
 //SetMockedClient configures singleton's client as a mocked client given a error
@@ -75,7 +81,7 @@ func RequestErrorMessage(err error, w io.Writer) {
 	if ok {
 		switch ierr.Code {
 		case ierrors.Unauthorized:
-			fmt.Fprintf(w, "did you login ?\n")
+			fmt.Fprintf(w, "We couldn't authenticate with the cluster. Is your token configured correctly?\n")
 		case ierrors.Forbidden:
 			fmt.Fprintf(w, "forbidden operation, please check for the scope.\n")
 		default:
