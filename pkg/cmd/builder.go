@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/pflag"
 )
 
+type CMDOption func(*cobra.Command)
+
 // Builder is used to build cobra commands.
 // it contains all the methods to manipulate a command
 type Builder interface {
@@ -25,6 +27,7 @@ type Builder interface {
 	NoArgs(action func(context.Context) error) *cobra.Command
 	AddSubCommand(cmds ...*cobra.Command) Builder
 	Version(version string) Builder
+	WithOptions(...CMDOption) Builder
 	Super() *cobra.Command
 }
 
@@ -42,6 +45,15 @@ func NewCmd(use string) Builder {
 	}
 }
 
+func (b *builder) WithOptions(options ...CMDOption) Builder {
+
+	for _, opt := range options {
+		if opt != nil {
+			opt(&b.cmd)
+		}
+	}
+	return b
+}
 func (b *builder) Version(v string) Builder {
 	b.cmd.Version = v
 	return b

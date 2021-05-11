@@ -8,6 +8,8 @@ import (
 	"github.com/inspr/inspr/pkg/meta"
 )
 
+var K string
+
 var version string
 
 func init() {

@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 
+	"github.com/inspr/inspr/pkg/cmd"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -15,6 +18,35 @@ const (
 var defaultValues map[string]string = map[string]string{
 	configScope:    "",
 	configServerIP: "http://127.0.0.1:8080",
+}
+
+var flagCompletionRegistry = map[string]func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective){
+	"scope": func(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		client := GetCliClient()
+		scope, err := GetScope()
+		if err != nil {
+			return []string{"AAAAA"}, cobra.ShellCompDirectiveError
+		}
+		app, err := client.Apps().Get(context.Background(), scope)
+
+		if err != nil {
+			return []string{"BBBBBB"}, cobra.ShellCompDirectiveError
+		}
+
+		scopes := []string{}
+		for _, child := range app.Spec.Apps {
+			scopes = append(scopes, "."+child.Meta.Name)
+		}
+		return nil, cobra.ShellCompDirectiveNoSpace
+	},
+}
+
+func AddDefaultFlagCompletion() cmd.CMDOption {
+	return func(c *cobra.Command) {
+		for name, f := range flagCompletionRegistry {
+			c.RegisterFlagCompletionFunc(name, f)
+		}
+	}
 }
 
 //GetConfiguredServerIP is responsible for returning config value for serverIp.

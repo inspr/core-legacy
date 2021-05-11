@@ -32,6 +32,7 @@ It can be called with the flag --dry-run so the changes that would be made are s
 		WithExample("Applies components defined in a specific folder", "apply -k randfolder/").
 		WithExample("Applies a structure component defined in a specific scope", "apply -f app.yaml --scope app1.app2").
 		WithCommonFlags().
+		WithOptions(cliutils.AddDefaultFlagCompletion()).
 		WithFlags([]*cmd.Flag{
 			{
 				Name:          "file",
