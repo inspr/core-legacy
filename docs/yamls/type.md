@@ -20,7 +20,7 @@
 ### YAML example
 ```yaml
 apiVersion: v1
-kind: Type
+kind: type
 meta:
   name: primes_ct1  
 schema: '{"type":"int"}'

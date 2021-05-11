@@ -49,7 +49,7 @@ Next we have to create a Channel the publisher can write text to and the subscri
 Type (02.ct.yaml) :
 
 ```yaml
-kind: Type
+kind: type
 apiVersion: v1
 meta:
   name: pubsubct

@@ -545,7 +545,7 @@ touch types/ct1.yaml
 And it's content should be:
 
 ```yaml
-kind: Type
+kind: type
 apiVersion: v1
 
 meta:

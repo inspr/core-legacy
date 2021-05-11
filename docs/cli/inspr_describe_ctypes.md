@@ -1,6 +1,6 @@
 ## inspr describe types
 
-Retrieves the full state of the Type from a given namespace
+Retrieves the full state of the type from a given namespace
 
 ```
 inspr describe types <type_name | type_path> [flags]
@@ -9,13 +9,13 @@ inspr describe types <type_name | type_path> [flags]
 ### Examples
 
 ```
-  # Display the state of the given Type on the default scope
+  # Display the state of the given type on the default scope
  inspr describe types hello_world
 
-  # Display the state of the given Type on a custom scope
+  # Display the state of the given type on a custom scope
  inspr describe types --scope app1.app2 hello_world
 
-  # Display the state of the given Type by the path
+  # Display the state of the given type by the path
  inspr describe types app1.app2.hello_world
 
 ```

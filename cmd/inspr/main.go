@@ -24,7 +24,7 @@ func main() {
 
 	cli.GetFactory().Subscribe(meta.Component{
 		APIVersion: "v1",
-		Kind:       "Type",
+		Kind:       "type",
 	}, cli.NewApplyType())
 
 	cli.GetFactory().Subscribe(meta.Component{
