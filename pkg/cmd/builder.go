@@ -69,6 +69,8 @@ func (b *builder) WithOptions(options ...CMDOption) Builder {
 	}
 	return b
 }
+
+// Version adds the version to the cli
 func (b *builder) Version(v string) Builder {
 	b.cmd.Version = v
 	return b
@@ -141,6 +143,7 @@ func (b *builder) Hidden() Builder {
 	return b
 }
 
+// AddSubCommand adds subcommands to the command
 func (b *builder) AddSubCommand(cmds ...*cobra.Command) Builder {
 	for _, cmd := range cmds {
 		b.cmd.AddCommand(cmd)
