@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"github.com/inspr/inspr/pkg/cmd"
 	build "github.com/inspr/inspr/pkg/cmd"
 	"gopkg.in/yaml.v2"
 )
@@ -34,35 +35,34 @@ var createUserCmd = build.NewCmd(
 ).WithExample(
 	"create a new user directly from a json file",
 	"inprov create --json user.json username password",
-).WithFlags([]*build.Flag{
-	{
+).WithFlags(
+	&cmd.Flag{
 		Name:      "username",
 		Shorthand: "u",
 		Usage:     "set the username of the user that will be created",
 		Value:     &createUsrOptions.username,
 		DefValue:  "",
 	},
-	{
+	&cmd.Flag{
 		Name:      "password",
 		Shorthand: "p",
 		Usage:     "set the password of the user that will be created",
 		Value:     &createUsrOptions.password,
 		DefValue:  "",
 	},
-	{
+	&cmd.Flag{
 		Name:     "yaml",
 		Usage:    "read the user definition from a YAML file",
 		Value:    &createUsrOptions.yaml,
 		DefValue: "",
 	},
-
-	{
+	&cmd.Flag{
 		Name:     "json",
 		Usage:    "read the user definition from a JSON file",
 		Value:    &createUsrOptions.json,
 		DefValue: "",
 	},
-}).ExactArgs(2, createUser)
+).ExactArgs(2, createUser)
 
 func createUser(ctx context.Context, inputArgs []string) error {
 	var err error
