@@ -1,26 +1,26 @@
-## inspr delete ctypes
+## inspr delete types
 
 Delete Types from context
 
 ```
-inspr delete ctypes [flags]
+inspr delete types [flags]
 ```
 
 ### Examples
 
 ```
   # Delete Type from the default scope
- inspr delete ctypes <ctypename>
+ inspr delete types <typename>
 
   # Delete Type from a custom scope
- inspr delete ctypes <ctypename> --scope app1.app2
+ inspr delete types <typename> --scope app1.app2
 
 ```
 
 ### Options
 
 ```
-  -h, --help           help for ctypes
+  -h, --help           help for types
   -s, --scope string   inspr <command> --scope app1.app2
 ```
 

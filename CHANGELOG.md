@@ -11,7 +11,7 @@
       the methods
     - changed a few file names for it to have just `type` instead of
       `channel_type`
-    - left some places with `ctype` as is more intuitive as to what type is
+    - left some places with `type` as is more intuitive as to what type is
       being managed.
 
 ### #44 Issue CORE-333 | Create the token for authentication inside the cluster

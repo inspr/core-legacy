@@ -29,13 +29,13 @@ func NewDeleteCmd() *cobra.Command {
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
 		MinimumArgs(1, deleteChannels)
-	deleteTypes := cmd.NewCmd("ctypes").
-		WithDescription("Delete ctypes from context").
-		WithExample("Delete ctype from the default scope", "delete ctypes <ctypename>").
-		WithExample("Delete ctype from a custom scope", "delete ctypes <ctypename> --scope app1.app2").
+	deleteTypes := cmd.NewCmd("types").
+		WithDescription("Delete types from context").
+		WithExample("Delete type from the default scope", "delete types <typename>").
+		WithExample("Delete type from a custom scope", "delete types <typename> --scope app1.app2").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
-		MinimumArgs(1, deleteCTypes)
+		MinimumArgs(1, deletetypes)
 
 	deleteAlias := cmd.NewCmd("alias").
 		WithDescription("Delete alias from context").
@@ -47,10 +47,10 @@ func NewDeleteCmd() *cobra.Command {
 
 	return cmd.NewCmd("delete").
 		WithDescription("Delete component of object type").
-		WithLongDescription("Delete takes a component type (apps | channels | ctypes | alias) its scope and name, and deletes it from the cluster").
+		WithLongDescription("Delete takes a component type (apps | channels | types | alias) its scope and name, and deletes it from the cluster").
 		WithExample("deletes app", "delete apps <app_name>").
 		WithExample("deletes channel", "delete ch <channel_name>").
-		WithExample("deletes ctype", "delete ct <type_name>").
+		WithExample("deletes type", "delete ct <type_name>").
 		WithExample("deletes alias", "delete al <alias_key>").
 		AddSubCommand(deleteApps).
 		AddSubCommand(deleteChannels).
@@ -121,7 +121,7 @@ func deleteChannels(_ context.Context, args []string) error {
 	return nil
 }
 
-func deleteCTypes(_ context.Context, args []string) error {
+func deletetypes(_ context.Context, args []string) error {
 	client := cliutils.GetCliClient()
 	out := cliutils.GetCliOutput()
 

@@ -68,7 +68,7 @@ func TestNewApplyApp(t *testing.T) {
 func Test_schemaInjection(t *testing.T) {
 	prepareToken(t)
 	type args struct {
-		ctypes map[string]*meta.Type
+		types map[string]*meta.Type
 	}
 	tests := []struct {
 		name    string
@@ -78,7 +78,7 @@ func Test_schemaInjection(t *testing.T) {
 		{
 			name: "Valid schema injection",
 			args: args{
-				ctypes: map[string]*meta.Type{
+				types: map[string]*meta.Type{
 					"ct1": {
 						Meta: meta.Metadata{
 							Name: "ct1",
@@ -92,7 +92,7 @@ func Test_schemaInjection(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := schemaInjection(tt.args.ctypes); (err != nil) != tt.wantErr {
+			if err := schemaInjection(tt.args.types); (err != nil) != tt.wantErr {
 				t.Errorf("schemaInjection() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -1,26 +1,26 @@
-## inspr get ctypes
+## inspr get types
 
 Get Types from context
 
 ```
-inspr get ctypes [flags]
+inspr get types [flags]
 ```
 
 ### Examples
 
 ```
   # Get Types from the default scope
- inspr get ctypes 
+ inspr get types 
 
   # Get Types from a custom scope
- inspr get ctypes --scope app1.app2
+ inspr get types --scope app1.app2
 
 ```
 
 ### Options
 
 ```
-  -h, --help           help for ctypes
+  -h, --help           help for types
   -s, --scope string   inspr <command> --scope app1.app2
 ```
 

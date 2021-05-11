@@ -70,12 +70,12 @@ func NewApplyApp() RunMethod {
 	}
 }
 
-func schemaInjection(ctypes map[string]*meta.Type) error {
+func schemaInjection(types map[string]*meta.Type) error {
 	var err error
-	for ctypeName, ctype := range ctypes {
-		ctype.Meta.Name = ctypeName
-		if schemaNeedsInjection(ctype.Schema) {
-			ctype.Schema, err = injectedSchema(ctype.Schema)
+	for typeName, insprType := range types {
+		insprType.Meta.Name = typeName
+		if schemaNeedsInjection(insprType.Schema) {
+			insprType.Schema, err = injectedSchema(insprType.Schema)
 			if err != nil {
 				return err
 			}

@@ -297,7 +297,7 @@ func Test_getTarget(t *testing.T) {
 		{
 			name: "exception_types",
 			args: args{createReq("types")},
-			want: "ctype",
+			want: "type",
 		},
 	}
 	for _, tt := range tests {

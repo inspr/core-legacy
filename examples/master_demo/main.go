@@ -29,12 +29,12 @@ func main() {
 	fmt.Printf("\n\n")
 
 	fmt.Println("[Getting TypeHello...]")
-	cType, err := client.Types().Get(context.Background(), "HelloWorld", "TypeHello")
+	insprType, err := client.Types().Get(context.Background(), "HelloWorld", "TypeHello")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	utils.PrintTypeTree(cType, os.Stdout)
+	utils.PrintTypeTree(insprType, os.Stdout)
 
 	fmt.Println("[Creating ChannelOne inside HelloWorld app...]")
 	createChannelInsideHelloWorld(&client, false)
@@ -49,12 +49,12 @@ func main() {
 	utils.PrintChannelTree(ch, os.Stdout)
 
 	fmt.Println("[Getting TypeHello...]")
-	cType, err = client.Types().Get(context.Background(), "HelloWorld", "TypeHello")
+	insprType, err = client.Types().Get(context.Background(), "HelloWorld", "TypeHello")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	utils.PrintTypeTree(cType, os.Stdout)
+	utils.PrintTypeTree(insprType, os.Stdout)
 
 	fmt.Println("[Creating NewApp inside HelloWorld app...]")
 	createNewAppInsideHelloWorld(&client, false)

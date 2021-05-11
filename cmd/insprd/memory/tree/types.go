@@ -33,7 +33,7 @@ func (ctm *TypeMemoryManager) Create(context string, ct *meta.Type) error {
 	nameErr := utils.StructureNameIsValid(ct.Meta.Name)
 	if nameErr != nil {
 		logger.Error("invalid Type name",
-			zap.String("ctype", ct.Meta.Name))
+			zap.String("type", ct.Meta.Name))
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
@@ -89,7 +89,7 @@ func (ctm *TypeMemoryManager) Get(context string, ctName string) (*meta.Type, er
 	}
 
 	logger.Debug("unable to get Type in given context",
-		zap.String("ctype", ctName),
+		zap.String("type", ctName),
 		zap.String("context", context))
 
 	return nil, ierrors.NewError().NotFound().
@@ -198,7 +198,7 @@ func (amm *TypeRootGetter) Get(context string, ctName string) (*meta.Type, error
 	}
 
 	logger.Error("unable to get Type in given context (Root Getter)",
-		zap.String("ctype", ctName),
+		zap.String("type", ctName),
 		zap.String("context", context))
 
 	return nil, ierrors.

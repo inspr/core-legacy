@@ -23,22 +23,22 @@ type Payload struct {
 const (
 	CreateDapp    string = "create:dapp"
 	CreateChannel string = "create:channel"
-	CreateType    string = "create:ctype"
+	CreateType    string = "create:type"
 	CreateAlias   string = "create:alias"
 
 	GetDapp    string = "get:dapp"
 	GetChannel string = "get:channel"
-	GetType    string = "get:ctype"
+	GetType    string = "get:type"
 	GetAlias   string = "get:alias"
 
 	UpdateDapp    string = "update:dapp"
 	UpdateChannel string = "update:channel"
-	UpdateType    string = "update:ctype"
+	UpdateType    string = "update:type"
 	UpdateAlias   string = "update:alias"
 
 	DeleteDapp    string = "delete:dapp"
 	DeleteChannel string = "delete:channel"
-	DeleteType    string = "delete:ctype"
+	DeleteType    string = "delete:type"
 	DeleteAlias   string = "delete:alias"
 
 	CreateToken string = "create:token"

@@ -3,12 +3,12 @@
 
 .SH NAME
 .PP
-inspr\-delete\-ctypes \- Delete Types from context
+inspr\-delete\-types \- Delete Types from context
 
 
 .SH SYNOPSIS
 .PP
-\fBinspr delete ctypes [flags]\fP
+\fBinspr delete types [flags]\fP
 
 
 .SH DESCRIPTION
@@ -19,7 +19,7 @@ Delete Types from context
 .SH OPTIONS
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
-	help for ctypes
+	help for types
 
 .PP
 \fB\-s\fP, \fB\-\-scope\fP=""
@@ -32,10 +32,10 @@ Delete Types from context
 
 .nf
   # Delete Type from the default scope
- inspr delete ctypes <ctypename>
+ inspr delete types <typename>
 
   # Delete Type from a custom scope
- inspr delete ctypes <ctypename> \-\-scope app1.app2
+ inspr delete types <typename> \-\-scope app1.app2
 
 
 .fi

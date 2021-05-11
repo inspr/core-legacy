@@ -506,7 +506,7 @@ func Test_deleteChannels(t *testing.T) {
 	}
 }
 
-func Test_deleteCTypes(t *testing.T) {
+func Test_deletetypes(t *testing.T) {
 	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
@@ -581,7 +581,7 @@ func Test_deleteCTypes(t *testing.T) {
 			got, _ := ioutil.ReadAll(buf)
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("deleteCtypes() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf("deletetypes() = %v, want %v", string(got), string(tt.expectedOutput))
 			}
 		})
 	}

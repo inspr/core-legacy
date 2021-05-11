@@ -60,7 +60,7 @@ func TestYamlToType(t *testing.T) {
 	os.Remove(typefile)
 }
 
-func TestIncorrectCTypeYaml(t *testing.T) {
+func TestIncorrecttypeYaml(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		bytes, _ := ioutil.ReadFile("mock_incorrect.yaml")
 
@@ -71,7 +71,7 @@ func TestIncorrectCTypeYaml(t *testing.T) {
 	})
 }
 
-func TestNonExistentCtypefile(t *testing.T) {
+func TestNonExistenttypefile(t *testing.T) {
 	// reads file created
 	bytes := []byte{1}
 	_, err := YamlToType(bytes)

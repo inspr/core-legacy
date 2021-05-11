@@ -51,7 +51,7 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 	}
 
 	logger.Debug("unable to get Channel in given context",
-		zap.String("ctype", chName),
+		zap.String("type", chName),
 		zap.String("context", context))
 
 	newError := ierrors.
@@ -72,7 +72,7 @@ func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error 
 	nameErr := metautils.StructureNameIsValid(ch.Meta.Name)
 	if nameErr != nil {
 		logger.Error("invalid Channel name",
-			zap.String("ctype", ch.Meta.Name))
+			zap.String("type", ch.Meta.Name))
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
@@ -251,7 +251,7 @@ func (amm *ChannelRootGetter) Get(context string, chName string) (*meta.Channel,
 	}
 
 	logger.Error("unable to get Channel in given context (Root Getter)",
-		zap.String("ctype", chName),
+		zap.String("type", chName),
 		zap.String("context", context))
 
 	newError := ierrors.

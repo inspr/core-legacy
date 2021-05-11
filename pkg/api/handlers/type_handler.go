@@ -45,7 +45,7 @@ func (th *TypeHandler) HandleCreate() rest.Handler {
 		err = th.Memory.Types().Create(scope, &data.Type)
 		if err != nil {
 			logger.Error("unable to create Channel Type",
-				zap.String("ctype", data.Type.Meta.Name),
+				zap.String("type", data.Type.Meta.Name),
 				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
@@ -94,7 +94,7 @@ func (th *TypeHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Type get transaction")
 		th.Memory.InitTransaction()
 
-		ctype, err := th.Memory.Root().Types().Get(scope, data.TypeName)
+		insprType, err := th.Memory.Root().Types().Get(scope, data.TypeName)
 		if err != nil {
 			logger.Error("unable to get Type",
 				zap.String("type-name", data.TypeName),
@@ -107,7 +107,7 @@ func (th *TypeHandler) HandleGet() rest.Handler {
 
 		defer th.Memory.Cancel()
 
-		rest.JSON(w, http.StatusOK, ctype)
+		rest.JSON(w, http.StatusOK, insprType)
 	}
 	return rest.Handler(handler)
 }
@@ -134,7 +134,7 @@ func (th *TypeHandler) HandleUpdate() rest.Handler {
 		err = th.Memory.Types().Update(scope, &data.Type)
 		if err != nil {
 			logger.Error("unable to update Channel Type",
-				zap.String("ctype", data.Type.Meta.Name),
+				zap.String("type", data.Type.Meta.Name),
 				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
@@ -196,7 +196,7 @@ func (th *TypeHandler) HandleDelete() rest.Handler {
 		err = th.Memory.Types().Delete(scope, data.TypeName)
 		if err != nil {
 			logger.Error("unable to delete Type",
-				zap.String("ctype", data.TypeName),
+				zap.String("type", data.TypeName),
 				zap.String("context", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)

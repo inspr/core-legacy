@@ -24,6 +24,6 @@ var operationTranslator = map[string]string{
 var routeTranslator = map[string]string{
 	"apps":     "dapp",
 	"channels": "channel",
-	"types":    "ctype",
+	"types":    "type",
 	"auth":     "token",
 }

@@ -32,11 +32,11 @@ func NewDescribeCmd() *cobra.Command {
 		WithCommonFlags().
 		ExactArgs(1, displayChannelState)
 
-	describeType := cmd.NewCmd("ctypes <ctype_name | ctype_path>").
-		WithDescription("Retrieves the full state of the ctype from a given namespace").
-		WithExample("Display the state of the given ctype on the default scope", "describe ctypes hello_world").
-		WithExample("Display the state of the given ctype on a custom scope", "describe ctypes --scope app1.app2 hello_world").
-		WithExample("Display the state of the given ctype by the path", "describe ctypes app1.app2.hello_world").
+	describeType := cmd.NewCmd("types <type_name | type_path>").
+		WithDescription("Retrieves the full state of the type from a given namespace").
+		WithExample("Display the state of the given type on the default scope", "describe types hello_world").
+		WithExample("Display the state of the given type on a custom scope", "describe types --scope app1.app2 hello_world").
+		WithExample("Display the state of the given type by the path", "describe types app1.app2.hello_world").
 		WithAliases([]string{"ct"}).
 		WithCommonFlags().
 		ExactArgs(1, displayTypeState)
@@ -56,7 +56,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Describes the app component type", "describe a <namespace> --scope <specific-scope>").
 		WithExample("Describes the channel component type", "describe ch <namespace>").
 		WithExample("Describes the alias component type", "describe al <namespace>").
-		WithLongDescription("describe takes a component type (apps | channels | ctypes | alias) plus the name of the component, and displays the state tree)").
+		WithLongDescription("describe takes a component type (apps | channels | types | alias) plus the name of the component, and displays the state tree)").
 		AddSubCommand(describeApp).
 		AddSubCommand(describeChannel).
 		AddSubCommand(describeType).

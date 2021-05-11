@@ -186,7 +186,7 @@ func Test_getChannels(t *testing.T) {
 	}
 }
 
-func Test_getCTypes(t *testing.T) {
+func Test_gettypes(t *testing.T) {
 	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
 	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
@@ -205,7 +205,7 @@ func Test_getCTypes(t *testing.T) {
 		handler func(w http.ResponseWriter, r *http.Request)
 	}{
 		{
-			name: "getCTypes valid test",
+			name: "gettypes valid test",
 			args: args{
 				in0: context.Background(),
 			},
@@ -226,7 +226,7 @@ func Test_getCTypes(t *testing.T) {
 			},
 		},
 		{
-			name: "getCTypes invalid test, HTTP error",
+			name: "gettypes invalid test, HTTP error",
 			args: args{
 				in0: context.Background(),
 			},
@@ -243,13 +243,13 @@ func Test_getCTypes(t *testing.T) {
 			cliutils.SetClient(server.URL)
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
-			err := getCTypes(tt.args.in0)
+			err := gettypes(tt.args.in0)
 			got, _ := ioutil.ReadAll(buf)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getCTypes() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("gettypes() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(got, tt.tab) {
-				t.Errorf("getCTypes() error = %v, want %v", string(got), string(tt.tab))
+				t.Errorf("gettypes() error = %v, want %v", string(got), string(tt.tab))
 			}
 		})
 	}
@@ -447,7 +447,7 @@ func Test_printChannels(t *testing.T) {
 	}
 }
 
-func Test_printCTypes(t *testing.T) {
+func Test_printtypes(t *testing.T) {
 	prepareToken(t)
 	type args struct {
 		app   *meta.App
@@ -459,7 +459,7 @@ func Test_printCTypes(t *testing.T) {
 		lines *[]string
 	}{
 		{
-			name: "printCTypes test",
+			name: "printtypes test",
 			args: args{
 				app:   getMockApp(),
 				lines: &[]string{},
@@ -469,9 +469,9 @@ func Test_printCTypes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			printCTypes(tt.args.app, tt.args.lines)
+			printtypes(tt.args.app, tt.args.lines)
 			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
-				t.Errorf("printCTypes() error = %v, want %v", tt.args.lines, tt.lines)
+				t.Errorf("printtypes() error = %v, want %v", tt.args.lines, tt.lines)
 			}
 		})
 	}

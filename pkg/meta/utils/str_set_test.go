@@ -333,7 +333,7 @@ func TestTypesMakeSet(t *testing.T) {
 		want StrSet
 	}{
 		{
-			name: "Disjuction between ctypes arrays that returns a set",
+			name: "Disjuction between types arrays that returns a set",
 			args: args{
 				types: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},
@@ -359,7 +359,7 @@ func TestStrSet_TypesAppendSet(t *testing.T) {
 		args args
 	}{
 		{
-			name: "Appends ctypes slice to a set",
+			name: "Appends types slice to a set",
 			args: args{
 				types: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},

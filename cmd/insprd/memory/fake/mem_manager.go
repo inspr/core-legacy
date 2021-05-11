@@ -10,10 +10,10 @@ import (
 // MemManager is the api struct with the necessary implementations
 // to satisfy the interface used in the routes established
 type MemManager struct {
-	itype   Types // inspr type
-	channel Channels
-	app     Apps
-	alias   Alias
+	insprType Types // inspr type
+	channel   Channels
+	app       Apps
+	alias     Alias
 }
 
 // LookupMemManager mocks getter for roots
@@ -31,7 +31,7 @@ func (l LookupMemManager) Channels() memory.ChannelGetInterface {
 
 // Types mocks a Type getter
 func (l LookupMemManager) Types() memory.TypeGetInterface {
-	return &l.itype
+	return &l.insprType
 }
 
 // Alias mocks a alias getter
@@ -42,7 +42,7 @@ func (l LookupMemManager) Alias() memory.AliasGetInterface {
 // MockMemoryManager mock exported with propagated error through the functions
 func MockMemoryManager(failErr error) memory.Manager {
 	return &MemManager{
-		itype: Types{
+		insprType: Types{
 			fail:  failErr,
 			Types: make(map[string]*meta.Type),
 		},
@@ -78,7 +78,7 @@ func (mm *MemManager) Channels() memory.ChannelMemory {
 
 // Types returns manager's DApp
 func (mm *MemManager) Types() memory.TypeMemory {
-	return &mm.itype
+	return &mm.insprType
 }
 
 // Alias returns manager's Alias
