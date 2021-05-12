@@ -1221,8 +1221,8 @@ func Test_validAliases(t *testing.T) {
 				app: &appTest,
 			},
 			valid: false,
-			msg1:  "alias: invalid.alias2 points to an non-existent channel 'ch4'; alias: invalid.alias1 points to an non-existent channel 'ch3';",
-			msg2:  "alias: invalid.alias1 points to an non-existent channel 'ch3'; alias: invalid.alias2 points to an non-existent channel 'ch4';",
+			msg1:  "alias: invalid.alias2 points to an non-existent channel 'ch4'; alias: invalid.alias1 points to an non-existent channel 'ch3'",
+			msg2:  "alias: invalid.alias1 points to an non-existent channel 'ch3'; alias: invalid.alias2 points to an non-existent channel 'ch4'",
 		},
 	}
 	for _, tt := range tests {
