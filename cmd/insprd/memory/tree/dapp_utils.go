@@ -185,7 +185,7 @@ func nodeIsEmpty(node meta.Node) bool {
 }
 
 func validAliases(app *meta.App) (bool, string) {
-	var msg string
+	var msg utils.StringArray
 	var valid bool = true
 	for key, val := range app.Spec.Aliases {
 		if ch, ok := app.Spec.Channels[val.Target]; ok {
@@ -195,14 +195,10 @@ func validAliases(app *meta.App) (bool, string) {
 		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val.Target) {
 			continue
 		}
-		if valid {
-			valid = false
-			msg = fmt.Sprintf("alias: %s points to an non-existent channel '%s';", key, val.Target)
-		} else {
-			msg = fmt.Sprintf("%s alias: %s points to an non-existent channel '%s';", msg, key, val.Target)
-		}
+		valid = false
+		msg = append(msg, fmt.Sprintf("alias: %s points to an non-existent channel '%s'", key, val.Target))
 	}
-	return valid, msg
+	return valid, msg.Join(";")
 }
 
 func getParentApp(childQuery string) (*meta.App, error) {
