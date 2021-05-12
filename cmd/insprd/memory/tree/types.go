@@ -38,7 +38,7 @@ func (tmm *TypeMemoryManager) Create(context string, insprType *meta.Type) error
 	}
 
 	logger.Debug("checking if Type already exists",
-		zap.String("channel", insprType.Meta.Name),
+		zap.String("type", insprType.Meta.Name),
 		zap.String("context", context))
 
 	_, err := tmm.Get(context, insprType.Meta.Name)
@@ -105,16 +105,16 @@ func (tmm *TypeMemoryManager) Delete(context string, typeName string) error {
 		zap.String("Type", typeName),
 		zap.String("context", context))
 
-	curCt, err := tmm.Get(context, typeName)
-	if curCt == nil || err != nil {
+	currType, err := tmm.Get(context, typeName)
+	if currType == nil || err != nil {
 		return ierrors.NewError().BadRequest().
 			Message("target app doesn't contain a '" + context + "' Type").Build()
 	}
 
 	logger.Debug("checking if Type can be deleted")
-	if len(curCt.ConnectedChannels) > 0 {
+	if len(currType.ConnectedChannels) > 0 {
 		logger.Error("unable to delete Type for it's being used",
-			zap.Any("connected channels", curCt.ConnectedChannels))
+			zap.Any("connected channels", currType.ConnectedChannels))
 
 		return ierrors.NewError().
 			BadRequest().

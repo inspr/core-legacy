@@ -33,9 +33,9 @@ func NewGetCmd() *cobra.Command {
 		WithDescription("Get types from context").
 		WithExample("Get types from the default scope", "get types ").
 		WithExample("Get types from a custom scope", "get types --scope app1.app2").
-		WithAliases([]string{"ct"}).
+		WithAliases([]string{"t"}).
 		WithCommonFlags().
-		NoArgs(gettypes)
+		NoArgs(getTypes)
 	getNodes := cmd.NewCmd("nodes").
 		WithDescription("Get nodes from context").
 		WithExample("Get nodes from the default scope", "get nodes ").
@@ -55,7 +55,7 @@ func NewGetCmd() *cobra.Command {
 		WithDescription("Retrieves the components from a given namespace").
 		WithExample("gets apps from cluster", "get apps --scope <scope>").
 		WithExample("gets channels from cluster", "get ch --scope <scope>").
-		WithExample("gets types from cluster", "get ct --scope <scope>").
+		WithExample("gets types from cluster", "get t --scope <scope>").
 		WithExample("gets nodes from cluster", "get nodes --scope <scope>").
 		WithExample("gets alias from cluster", "get alias --scope <scope>").
 		WithLongDescription("get takes a component type (apps | channels | types | nodes | alias) and displays names for those components is a scope)").
@@ -91,10 +91,10 @@ func getChannels(_ context.Context) error {
 	return nil
 }
 
-func gettypes(_ context.Context) error {
+func getTypes(_ context.Context) error {
 	lines := make([]string, 0)
 	initTab(&lines)
-	err := getObj(printtypes, &lines)
+	err := getObj(printTypes, &lines)
 	if err != nil {
 		return err
 	}
@@ -162,12 +162,12 @@ func printChannels(app *meta.App, lines *[]string) {
 	}
 }
 
-func printtypes(app *meta.App, lines *[]string) {
-	for ct := range app.Spec.Types {
-		printLine(ct, lines)
+func printTypes(app *meta.App, lines *[]string) {
+	for insprType := range app.Spec.Types {
+		printLine(insprType, lines)
 	}
 	for _, child := range app.Spec.Apps {
-		printtypes(child, lines)
+		printTypes(child, lines)
 	}
 }
 

@@ -525,7 +525,7 @@ func Test_deletetypes(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		if scope != "appParent" || data.TypeName != "ct1" {
+		if scope != "appParent" || data.TypeName != "t1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -541,25 +541,25 @@ func Test_deletetypes(t *testing.T) {
 	}{
 		{
 			name:           "Should delete the type and return the diff",
-			flagsAndArgs:   []string{"ct", "appParent.ct1"},
+			flagsAndArgs:   []string{"t", "appParent.t1"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,
 		},
 		{
 			name:           "Invalid scope flag, should not print",
-			flagsAndArgs:   []string{"ct", "appParent.ct1", "--scope", "invalid..scope"},
+			flagsAndArgs:   []string{"t", "appParent.ct1", "--scope", "invalid..scope"},
 			handlerFunc:    handler,
 			expectedOutput: []byte(""),
 		},
 		{
 			name:           "Valid scope flag",
-			flagsAndArgs:   []string{"ct", "ct1", "--scope", "appParent"},
+			flagsAndArgs:   []string{"t", "t1", "--scope", "appParent"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,
 		},
 		{
 			name:           "Invalid arg",
-			flagsAndArgs:   []string{"ct", "invalid..args", "--scope", "appParent.ct1"},
+			flagsAndArgs:   []string{"t", "invalid..args", "--scope", "appParent.t1"},
 			handlerFunc:    handler,
 			expectedOutput: []byte(""),
 		},

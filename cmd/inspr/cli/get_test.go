@@ -243,7 +243,7 @@ func Test_gettypes(t *testing.T) {
 			cliutils.SetClient(server.URL)
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
-			err := gettypes(tt.args.in0)
+			err := getTypes(tt.args.in0)
 			got, _ := ioutil.ReadAll(buf)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("gettypes() error = %v, wantErr %v", err, tt.wantErr)
@@ -469,7 +469,7 @@ func Test_printtypes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			printtypes(tt.args.app, tt.args.lines)
+			printTypes(tt.args.app, tt.args.lines)
 			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
 				t.Errorf("printtypes() error = %v, want %v", tt.args.lines, tt.lines)
 			}

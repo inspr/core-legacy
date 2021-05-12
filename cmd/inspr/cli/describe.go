@@ -37,7 +37,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given type on the default scope", "describe types hello_world").
 		WithExample("Display the state of the given type on a custom scope", "describe types --scope app1.app2 hello_world").
 		WithExample("Display the state of the given type by the path", "describe types app1.app2.hello_world").
-		WithAliases([]string{"ct"}).
+		WithAliases([]string{"t"}).
 		WithCommonFlags().
 		ExactArgs(1, displayTypeState)
 
@@ -126,12 +126,12 @@ func displayTypeState(_ context.Context, args []string) error {
 		return err
 	}
 
-	path, ctName, err := cliutils.ProcessArg(args[0], scope)
+	path, typeName, err := cliutils.ProcessArg(args[0], scope)
 	if err != nil {
 		return err
 	}
 
-	insprType, err := client.Types().Get(context.Background(), path, ctName)
+	insprType, err := client.Types().Get(context.Background(), path, typeName)
 	if err != nil {
 		cliutils.RequestErrorMessage(err, out)
 		return err
