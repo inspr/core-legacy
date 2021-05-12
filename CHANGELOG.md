@@ -1,5 +1,9 @@
 
 # Changelog
+
+### #53 - Tech CORE-362 | Validate alias when applying app
+  - features:
+    - created a validation function for aliases and used it on Create and Delete
 ### #48 - Feature: adds init command to the cli
 
 - features:
