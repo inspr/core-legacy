@@ -223,63 +223,6 @@ func Test_nodeIsEmpty(t *testing.T) {
 	}
 }
 
-func Test_validBoundaries(t *testing.T) {
-	type args struct {
-		appName        string
-		bound          meta.AppBoundary
-		parentChannels map[string]*meta.Channel
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			name: "Valid boundary",
-			args: args{
-				appName: "thenewapp",
-				bound: meta.AppBoundary{
-					Input:  []string{"ch1app1"},
-					Output: []string{},
-				},
-				parentChannels: getMockApp().Spec.Apps["app1"].Spec.Channels,
-			},
-			want: "",
-		},
-		{
-			name: "invalidboundary - parent without channels",
-			args: args{
-				appName: "",
-				bound: meta.AppBoundary{
-					Input:  []string{"ch1app2"},
-					Output: []string{},
-				},
-				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Apps["app3"].Spec.Channels,
-			},
-			want: "invalid app boundary - channel 'ch1app2' doesnt exist in parent app;",
-		},
-		{
-			name: "invalid input boundary",
-			args: args{
-				appName: "app3",
-				bound: meta.AppBoundary{
-					Input:  []string{"ch1app1"},
-					Output: []string{},
-				},
-				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Channels,
-			},
-			want: "invalid app boundary - channel 'ch1app1' doesnt exist in parent app;",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := validBoundaries(tt.args.appName, tt.args.bound, tt.args.parentChannels); got != tt.want {
-				t.Errorf("validBoundaries() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_getParentApp(t *testing.T) {
 	type fields struct {
 		root   *meta.App
@@ -1224,6 +1167,77 @@ func TestAppMemoryManager_updateUUID(t *testing.T) {
 				metautils.RecursiveValidateUUIDS("", tt.args.app, t)
 			} else if !reflect.DeepEqual(tt.args.app, tt.args.want) {
 				t.Error("chaged uuid")
+			}
+		})
+	}
+}
+
+func Test_validAliases(t *testing.T) {
+	appTest := meta.App{
+		Meta: meta.Metadata{
+			Name: "app",
+		},
+		Spec: meta.AppSpec{
+			Aliases: map[string]*meta.Alias{
+				"valid.alias1": {
+					Target: "ch1",
+				},
+				"valid.alias2": {
+					Target: "ch2",
+				},
+				"invalid.alias1": {
+					Target: "ch3",
+				},
+				"invalid.alias2": {
+					Target: "ch4",
+				},
+			},
+			Channels: map[string]*meta.Channel{
+				"ch1": {
+					Meta: meta.Metadata{
+						Name:   "ch1",
+						Parent: "",
+					},
+				},
+			},
+			Boundary: meta.AppBoundary{
+				Output: []string{"ch2"},
+			},
+		},
+	}
+	type args struct {
+		app *meta.App
+	}
+	tests := []struct {
+		name  string
+		args  args
+		valid bool
+		msg1  string
+		msg2  string
+	}{
+		{
+			name: "test alias validation",
+			args: args{
+				app: &appTest,
+			},
+			valid: false,
+			msg1:  "alias: invalid.alias2 points to an non-existent channel 'ch4'; alias: invalid.alias1 points to an non-existent channel 'ch3';",
+			msg2:  "alias: invalid.alias1 points to an non-existent channel 'ch3'; alias: invalid.alias2 points to an non-existent channel 'ch4';",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := validAliases(tt.args.app)
+			if got != tt.valid {
+				t.Errorf("validAliases() got = %v, want %v", got, tt.valid)
+			}
+			if got1 != tt.msg1 && got1 != tt.msg2 {
+				if got1 != tt.msg1 {
+					t.Errorf("validAliases() got1 = %v, want %v", got1, tt.msg1)
+				}
+				if got1 != tt.msg2 {
+					t.Errorf("validAliases() got1 = %v, want %v", got1, tt.msg2)
+				}
 			}
 		})
 	}
