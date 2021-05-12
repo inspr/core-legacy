@@ -26,7 +26,7 @@ func getCodec(schema string) (*goavro.Codec, error) {
 	return codec, nil
 }
 
-// returns the channel's channel type schema
+// returns the channel's Type schema
 func (ch kafkaTopic) getSchema() (string, error) {
 	logger.Debug("getting Channel schema")
 	schema, err := environment.GetSchema(string(ch))

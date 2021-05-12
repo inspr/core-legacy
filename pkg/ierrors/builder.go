@@ -82,9 +82,9 @@ func (b *ErrBuilder) InvalidChannel() *ErrBuilder {
 	return b
 }
 
-// InvalidChannelType adds Invalid Channel Type code to Inspr Error
-func (b *ErrBuilder) InvalidChannelType() *ErrBuilder {
-	b.err.Code = InvalidChannelType
+// InvalidType adds Invalid Type code to Inspr Error
+func (b *ErrBuilder) InvalidType() *ErrBuilder {
+	b.err.Code = InvalidType
 	return b
 }
 

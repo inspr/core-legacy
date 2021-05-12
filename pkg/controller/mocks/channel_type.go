@@ -8,42 +8,42 @@ import (
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 )
 
-// ChannelTypeMock mock structure for the operations of the controller.ChannelTypes()
-type ChannelTypeMock struct {
+// TypeMock mock structure for the operations of the controller.Types()
+type TypeMock struct {
 	err error
 }
 
-// NewChannelTypeMock exports a mock of the channelType.interface
-func NewChannelTypeMock(err error) controller.ChannelTypeInterface {
-	return &ChannelTypeMock{err: err}
+// NewTypeMock exports a mock of the Type.interface
+func NewTypeMock(err error) controller.TypeInterface {
+	return &TypeMock{err: err}
 }
 
-// Get is the ChannelTypeMock Get
-func (cm *ChannelTypeMock) Get(ctx context.Context, context string, ctName string) (*meta.ChannelType, error) {
+// Get is the TypeMock Get
+func (cm *TypeMock) Get(ctx context.Context, context string, ctName string) (*meta.Type, error) {
 	if cm.err != nil {
-		return &meta.ChannelType{}, cm.err
+		return &meta.Type{}, cm.err
 	}
-	return &meta.ChannelType{}, nil
+	return &meta.Type{}, nil
 }
 
-// Create is the ChannelTypeMock Create
-func (cm *ChannelTypeMock) Create(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
-	}
-	return diff.Changelog{}, nil
-}
-
-// Delete is the ChannelTypeMock Delete
-func (cm *ChannelTypeMock) Delete(ctx context.Context, context string, ctName string, dryRun bool) (diff.Changelog, error) {
+// Create is the TypeMock Create
+func (cm *TypeMock) Create(ctx context.Context, context string, ct *meta.Type, dryRun bool) (diff.Changelog, error) {
 	if cm.err != nil {
 		return diff.Changelog{}, cm.err
 	}
 	return diff.Changelog{}, nil
 }
 
-// Update is the ChannelTypeMock Update
-func (cm *ChannelTypeMock) Update(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error) {
+// Delete is the TypeMock Delete
+func (cm *TypeMock) Delete(ctx context.Context, context string, ctName string, dryRun bool) (diff.Changelog, error) {
+	if cm.err != nil {
+		return diff.Changelog{}, cm.err
+	}
+	return diff.Changelog{}, nil
+}
+
+// Update is the TypeMock Update
+func (cm *TypeMock) Update(ctx context.Context, context string, ct *meta.Type, dryRun bool) (diff.Changelog, error) {
 	if cm.err != nil {
 		return diff.Changelog{}, cm.err
 	}

@@ -42,7 +42,7 @@ func getMockAppWithoutApp1() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",
@@ -95,9 +95,9 @@ func getMockAppWithoutCh1() *meta.App {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -105,8 +105,8 @@ func getMockAppWithoutCh1() *meta.App {
 								},
 							},
 						},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch1"},
@@ -125,7 +125,7 @@ func getMockAppWithoutCh1() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{},
+			Types: map[string]*meta.Type{},
 			Boundary: meta.AppBoundary{
 				Input:  []string{},
 				Output: []string{},
@@ -167,9 +167,9 @@ func getMockAppWithoutCt1() *meta.App {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -187,7 +187,7 @@ func getMockAppWithoutCt1() *meta.App {
 								Spec:          meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch1"},
@@ -206,7 +206,7 @@ func getMockAppWithoutCt1() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{},
+			Types: map[string]*meta.Type{},
 			Boundary: meta.AppBoundary{
 				Input:  []string{},
 				Output: []string{},
@@ -257,9 +257,9 @@ func getMockAppWithoutAlias() *meta.App {
 											UUID:        "",
 										},
 									},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -277,7 +277,7 @@ func getMockAppWithoutAlias() *meta.App {
 								Spec:          meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch1"},
@@ -296,7 +296,7 @@ func getMockAppWithoutAlias() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",
@@ -506,7 +506,7 @@ func Test_deleteChannels(t *testing.T) {
 	}
 }
 
-func Test_deleteCTypes(t *testing.T) {
+func Test_deletetypes(t *testing.T) {
 	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
@@ -516,7 +516,7 @@ func Test_deleteCTypes(t *testing.T) {
 	outResp, _ := ioutil.ReadAll(bufResp)
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		data := models.ChannelTypeQueryDI{}
+		data := models.TypeQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 		scope := r.Header.Get(rest.HeaderScopeKey)
 
@@ -525,7 +525,7 @@ func Test_deleteCTypes(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		if scope != "appParent" || data.CtName != "ct1" {
+		if scope != "appParent" || data.TypeName != "t1" {
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -540,26 +540,26 @@ func Test_deleteCTypes(t *testing.T) {
 		expectedOutput []byte
 	}{
 		{
-			name:           "Should delete the channelType and return the diff",
-			flagsAndArgs:   []string{"ct", "appParent.ct1"},
+			name:           "Should delete the type and return the diff",
+			flagsAndArgs:   []string{"t", "appParent.t1"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,
 		},
 		{
 			name:           "Invalid scope flag, should not print",
-			flagsAndArgs:   []string{"ct", "appParent.ct1", "--scope", "invalid..scope"},
+			flagsAndArgs:   []string{"t", "appParent.ct1", "--scope", "invalid..scope"},
 			handlerFunc:    handler,
 			expectedOutput: []byte(""),
 		},
 		{
 			name:           "Valid scope flag",
-			flagsAndArgs:   []string{"ct", "ct1", "--scope", "appParent"},
+			flagsAndArgs:   []string{"t", "t1", "--scope", "appParent"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,
 		},
 		{
 			name:           "Invalid arg",
-			flagsAndArgs:   []string{"ct", "invalid..args", "--scope", "appParent.ct1"},
+			flagsAndArgs:   []string{"t", "invalid..args", "--scope", "appParent.t1"},
 			handlerFunc:    handler,
 			expectedOutput: []byte(""),
 		},
@@ -581,7 +581,7 @@ func Test_deleteCTypes(t *testing.T) {
 			got, _ := ioutil.ReadAll(buf)
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("deleteCtypes() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf("deletetypes() = %v, want %v", string(got), string(tt.expectedOutput))
 			}
 		})
 	}

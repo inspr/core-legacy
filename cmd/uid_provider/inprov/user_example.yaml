@@ -4,20 +4,20 @@ permissions:
   "":
     - "create:dapp"
     - "create:channel"
-    - "create:ctype"
+    - "create:type"
     - "create:alias"
     
     - "get:dapp"
     - "get:channel"
-    - "get:ctype"
+    - "get:type"
     - "get:alias"
 
     - "update:dapp"
     - "update:channel"
-    - "update:ctype"
+    - "update:type"
     - "update:alias"
 
     - "delete:dapp"
     - "delete:channel"
-    - "delete:ctype"
+    - "delete:type"
     - "delete:alias"

@@ -10,23 +10,23 @@ import (
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 )
 
-func TestMemoryManager_ChannelTypes(t *testing.T) {
+func TestMemoryManager_Types(t *testing.T) {
 	type fields struct {
 		root *meta.App
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		want   memory.ChannelTypeMemory
+		want   memory.TypeMemory
 	}{
 		{
-			name: "creating a ChannelTypeMemortMannager",
+			name: "creating a TypeMemortMannager",
 			fields: fields{
-				root: getMockChannelTypes(),
+				root: getMockTypes(),
 			},
-			want: &ChannelTypeMemoryManager{
+			want: &TypeMemoryManager{
 				&MemoryManager{
-					root: getMockChannelTypes(),
+					root: getMockTypes(),
 				},
 			},
 		},
@@ -36,14 +36,14 @@ func TestMemoryManager_ChannelTypes(t *testing.T) {
 			tmm := &MemoryManager{
 				root: tt.fields.root,
 			}
-			if got := tmm.ChannelTypes(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MemoryManager.ChannelTypes() = %v, want %v", got, tt.want)
+			if got := tmm.Types(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MemoryManager.Types() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
+func TestTypeMemoryManager_GetType(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -59,13 +59,13 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *meta.ChannelType
+		want    *meta.Type
 		wantErr bool
 	}{
 		{
-			name: "Getting a valid ChannelType on a valid app",
+			name: "Getting a valid Type on a valid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -76,7 +76,7 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 				ctName:  "ct1",
 			},
 			wantErr: false,
-			want: &meta.ChannelType{
+			want: &meta.Type{
 				Meta: meta.Metadata{
 					Name:        "ct1",
 					Reference:   "ct1",
@@ -88,9 +88,9 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 			},
 		},
 		{
-			name: "Getting a invalid ChannelType on a valid app",
+			name: "Getting a invalid Type on a valid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -104,9 +104,9 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Getting any ChannelType on a invalid app",
+			name: "Getting any Type on a invalid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: ierrors.NewError().NotFound().Build(),
 				mockA:  true,
 				mockC:  true,
@@ -131,20 +131,20 @@ func TestChannelTypeMemoryManager_GetChannelType(t *testing.T) {
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
 			})
-			ctm := GetTreeMemory().ChannelTypes()
+			ctm := GetTreeMemory().Types()
 			got, err := ctm.Get(tt.args.context, tt.args.ctName)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TypeMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
+				t.Errorf("TypeMemoryManager.Get() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestChannelTypeMemoryManager_Create(t *testing.T) {
+func TestTypeMemoryManager_Create(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -153,7 +153,7 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 		mockCT bool
 	}
 	type args struct {
-		ct      *meta.ChannelType
+		ct      *meta.Type
 		context string
 	}
 	tests := []struct {
@@ -161,19 +161,19 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 		fields  fields
 		args    args
 		wantErr bool
-		want    *meta.ChannelType
+		want    *meta.Type
 	}{
 		{
-			name: "Creating a new ChannelType on a valid app",
+			name: "Creating a new Type on a valid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
 			},
 			args: args{
-				ct: &meta.ChannelType{
+				ct: &meta.Type{
 					Meta: meta.Metadata{
 						Name:        "ct4",
 						Reference:   "ct1",
@@ -186,7 +186,7 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 				context: "",
 			},
 			wantErr: false,
-			want: &meta.ChannelType{
+			want: &meta.Type{
 				Meta: meta.Metadata{
 					Name:        "ct4",
 					Reference:   "ct1",
@@ -198,16 +198,16 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 			},
 		},
 		{
-			name: "Trying to create an old ChannelType on a valid app",
+			name: "Trying to create an old Type on a valid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
 			},
 			args: args{
-				ct: &meta.ChannelType{
+				ct: &meta.Type{
 					Meta: meta.Metadata{
 						Name:        "ct1",
 						Reference:   "ct1",
@@ -220,7 +220,7 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 				context: "",
 			},
 			wantErr: true,
-			want: &meta.ChannelType{
+			want: &meta.Type{
 				Meta: meta.Metadata{
 					Name:        "ct1",
 					Reference:   "ct1",
@@ -232,16 +232,16 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 			},
 		},
 		{
-			name: "Trying to create an ChannelType on a invalid app",
+			name: "Trying to create an Type on a invalid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: ierrors.NewError().NotFound().Build(),
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
 			},
 			args: args{
-				ct: &meta.ChannelType{
+				ct: &meta.Type{
 					Meta: meta.Metadata{
 						Name:        "ct1",
 						Reference:   "ct1",
@@ -257,16 +257,16 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Invalid name - doesn't create channel type",
+			name: "Invalid name - doesn't create Type",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
 			},
 			args: args{
-				ct: &meta.ChannelType{
+				ct: &meta.Type{
 					Meta: meta.Metadata{
 						Name:        "-ct3-",
 						Reference:   "ct1",
@@ -294,28 +294,28 @@ func TestChannelTypeMemoryManager_Create(t *testing.T) {
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
 			})
-			ctm := GetTreeMemory().ChannelTypes()
+			ctm := GetTreeMemory().Types()
 			err := ctm.Create(tt.args.context, tt.args.ct)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TypeMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {
 				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
 				if !tt.wantErr {
 					if !metautils.ValidateUUID(got.Meta.UUID) {
-						t.Errorf("ChannelTypeMemoryManager.Create() invalid UUID, uuid=%v", got.Meta.UUID)
+						t.Errorf("TypeMemoryManager.Create() invalid UUID, uuid=%v", got.Meta.UUID)
 					}
 				}
 				if (err != nil) || !metautils.CompareWithoutUUID(got, tt.want) {
-					t.Errorf("ChannelTypeMemoryManager.Create() = %v, want %v", got, tt.want)
+					t.Errorf("TypeMemoryManager.Create() = %v, want %v", got, tt.want)
 				}
 			}
 		})
 	}
 }
 
-func TestChannelTypeMemoryManager_Delete(t *testing.T) {
+func TestTypeMemoryManager_Delete(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -332,12 +332,12 @@ func TestChannelTypeMemoryManager_Delete(t *testing.T) {
 		fields  fields
 		args    args
 		wantErr bool
-		want    *meta.ChannelType
+		want    *meta.Type
 	}{
 		{
-			name: "Deleting a valid ChannelType on a valid app",
+			name: "Deleting a valid Type on a valid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -351,9 +351,9 @@ func TestChannelTypeMemoryManager_Delete(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Deleting a invalid ChannelType on a valid app",
+			name: "Deleting a invalid Type on a valid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -367,9 +367,9 @@ func TestChannelTypeMemoryManager_Delete(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Deleting any ChannelType on a invalid app",
+			name: "Deleting any Type on a invalid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: ierrors.NewError().NotFound().Build(),
 				mockA:  true,
 				mockC:  true,
@@ -383,9 +383,9 @@ func TestChannelTypeMemoryManager_Delete(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "It should not delete the channelType because it's been used by a channel",
+			name: "It should not delete the Type because it's been used by a channel",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
@@ -396,7 +396,7 @@ func TestChannelTypeMemoryManager_Delete(t *testing.T) {
 				ctName:  "ct3",
 			},
 			wantErr: true,
-			want: &meta.ChannelType{
+			want: &meta.Type{
 				Meta: meta.Metadata{
 					Name:        "ct3",
 					Reference:   "ct3",
@@ -420,20 +420,20 @@ func TestChannelTypeMemoryManager_Delete(t *testing.T) {
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
 			})
-			ctm := GetTreeMemory().ChannelTypes()
+			ctm := GetTreeMemory().Types()
 			if err := ctm.Delete(tt.args.context, tt.args.ctName); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TypeMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			got, _ := ctm.Get(tt.args.context, tt.args.ctName)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
+				t.Errorf("TypeMemoryManager.Get() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestChannelTypeMemoryManager_Update(t *testing.T) {
+func TestTypeMemoryManager_Update(t *testing.T) {
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -442,7 +442,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 		mockCT bool
 	}
 	type args struct {
-		ct      *meta.ChannelType
+		ct      *meta.Type
 		context string
 	}
 	tests := []struct {
@@ -450,19 +450,19 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 		fields  fields
 		args    args
 		wantErr bool
-		want    *meta.ChannelType
+		want    *meta.Type
 	}{
 		{
-			name: "Updating a valid ChannelType on a valid app",
+			name: "Updating a valid Type on a valid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
 			},
 			args: args{
-				ct: &meta.ChannelType{
+				ct: &meta.Type{
 					Meta: meta.Metadata{
 						Name:        "ct1",
 						Reference:   "ct1",
@@ -475,7 +475,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 				context: "",
 			},
 			wantErr: false,
-			want: &meta.ChannelType{
+			want: &meta.Type{
 				Meta: meta.Metadata{
 					Name:        "ct1",
 					Reference:   "ct1",
@@ -487,16 +487,16 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 			},
 		},
 		{
-			name: "Updating a invalid ChannelType on a valid app",
+			name: "Updating a invalid Type on a valid app",
 			fields: fields{
-				root:   getMockChannelTypes(),
+				root:   getMockTypes(),
 				appErr: nil,
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
 			},
 			args: args{
-				ct: &meta.ChannelType{
+				ct: &meta.Type{
 					Meta: meta.Metadata{
 						Name:        "ct42",
 						Reference:   "ct42",
@@ -512,7 +512,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 			want:    nil,
 		},
 		{
-			name: "Updating any ChannelType on a invalid app",
+			name: "Updating any Type on a invalid app",
 			fields: fields{
 				root:   nil,
 				appErr: ierrors.NewError().NotFound().Build(),
@@ -521,7 +521,7 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 				mockCT: false,
 			},
 			args: args{
-				ct: &meta.ChannelType{
+				ct: &meta.Type{
 					Meta: meta.Metadata{
 						Name:        "ct3",
 						Reference:   "ct1",
@@ -548,22 +548,22 @@ func TestChannelTypeMemoryManager_Update(t *testing.T) {
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
 			})
-			ctm := GetTreeMemory().ChannelTypes()
+			ctm := GetTreeMemory().Types()
 			if err := ctm.Update(tt.args.context, tt.args.ct); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelTypeMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TypeMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.want != nil {
 				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
 				if (err != nil) || !metautils.CompareWithUUID(got, tt.want) {
-					t.Errorf("ChannelTypeMemoryManager.Get() = %v, want %v", got, tt.want)
+					t.Errorf("TypeMemoryManager.Get() = %v, want %v", got, tt.want)
 				}
 			}
 		})
 	}
 }
 
-func getMockChannelTypes() *meta.App {
+func getMockTypes() *meta.App {
 	root := meta.App{
 		Meta: meta.Metadata{
 			Name:        "",
@@ -589,7 +589,7 @@ func getMockChannelTypes() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",

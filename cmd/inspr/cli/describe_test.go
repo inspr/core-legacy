@@ -76,9 +76,9 @@ func getMockApp() *meta.App {
 											UUID:        "",
 										},
 									},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -96,7 +96,7 @@ func getMockApp() *meta.App {
 								Spec:          meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch1"},
@@ -115,7 +115,7 @@ func getMockApp() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",
@@ -320,16 +320,16 @@ func Test_displayChannelState(t *testing.T) {
 	}
 }
 
-func Test_displayChannelTypeState(t *testing.T) {
+func Test_displayTypeState(t *testing.T) {
 	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
-	utils.PrintChannelTypeTree(getMockApp().Spec.ChannelTypes["ct1"], bufResp)
+	utils.PrintTypeTree(getMockApp().Spec.Types["ct1"], bufResp)
 	outResp, _ := ioutil.ReadAll(bufResp)
 	prepareToken(t)
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		data := models.ChannelTypeQueryDI{}
+		data := models.TypeQueryDI{}
 		decoder := json.NewDecoder(r.Body)
 
 		err := decoder.Decode(&data)
@@ -337,9 +337,9 @@ func Test_displayChannelTypeState(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		ct := getMockApp().Spec.ChannelTypes[data.CtName]
+		t := getMockApp().Spec.Types[data.TypeName]
 
-		rest.JSON(w, http.StatusOK, ct)
+		rest.JSON(w, http.StatusOK, t)
 	}
 
 	tests := []struct {
@@ -349,26 +349,26 @@ func Test_displayChannelTypeState(t *testing.T) {
 		expectedOutput []byte
 	}{
 		{
-			name:           "Should describe the channelType state",
-			flagsAndArgs:   []string{"ct", "appParent.ct1"},
+			name:           "Should describe the type state",
+			flagsAndArgs:   []string{"t", "appParent.ct1"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,
 		},
 		{
 			name:           "Invalid scope flag, should not print",
-			flagsAndArgs:   []string{"ct", "ct1", "--scope", "invalid..scope"},
+			flagsAndArgs:   []string{"t", "ct1", "--scope", "invalid..scope"},
 			handlerFunc:    handler,
 			expectedOutput: []byte(""),
 		},
 		{
 			name:           "Valid scope flag",
-			flagsAndArgs:   []string{"ct", "ct1", "--scope", "appParent"},
+			flagsAndArgs:   []string{"t", "ct1", "--scope", "appParent"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,
 		},
 		{
 			name:           "Invalid arg",
-			flagsAndArgs:   []string{"ct", "invalid..args", "--scope", "appParent"},
+			flagsAndArgs:   []string{"t", "invalid..args", "--scope", "appParent"},
 			handlerFunc:    handler,
 			expectedOutput: []byte(""),
 		},
@@ -390,7 +390,7 @@ func Test_displayChannelTypeState(t *testing.T) {
 			got, _ := ioutil.ReadAll(buf)
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("displayChannelTypeState() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf("displayTypeState() = %v, want %v", string(got), string(tt.expectedOutput))
 			}
 		})
 	}

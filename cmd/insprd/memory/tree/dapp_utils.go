@@ -78,9 +78,9 @@ func (amm *AppMemoryManager) updateUUID(app *meta.App, parentStr string) {
 				}
 			}
 		}
-		for ctName, ct := range app.Spec.ChannelTypes {
-			if oldApp.Spec.ChannelTypes != nil {
-				if oldCt, ok := oldApp.Spec.ChannelTypes[ctName]; ok {
+		for ctName, ct := range app.Spec.Types {
+			if oldApp.Spec.Types != nil {
+				if oldCt, ok := oldApp.Spec.Types[ctName]; ok {
 					ct.Meta.UUID = oldCt.Meta.UUID
 				} else {
 					ct.Meta = metautils.InjectUUID(ct.Meta)
@@ -101,7 +101,7 @@ func (amm *AppMemoryManager) updateUUID(app *meta.App, parentStr string) {
 		for _, ch := range app.Spec.Channels {
 			ch.Meta = metautils.InjectUUID(ch.Meta)
 		}
-		for _, ct := range app.Spec.ChannelTypes {
+		for _, ct := range app.Spec.Types {
 			ct.Meta = metautils.InjectUUID(ct.Meta)
 		}
 		for _, al := range app.Spec.Aliases {
@@ -135,11 +135,11 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 func checkAndUpdates(app *meta.App) (bool, string) {
 	boundaries := app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)
 	channels := app.Spec.Channels
-	chTypes := app.Spec.ChannelTypes
+	chTypes := app.Spec.Types
 	for ctName := range chTypes {
 		nameErr := metautils.StructureNameIsValid(ctName)
 		if nameErr != nil {
-			return false, "invalid channelType name: " + ctName
+			return false, "invalid type name: " + ctName
 		}
 	}
 	for channelName, channel := range channels {
@@ -149,7 +149,7 @@ func checkAndUpdates(app *meta.App) (bool, string) {
 		}
 		if channel.Spec.Type != "" {
 			if _, ok := chTypes[channel.Spec.Type]; !ok {
-				return false, "invalid channel: using non-existent channel type;"
+				return false, "invalid channel: using non-existent type;"
 			}
 
 			for _, appName := range channel.ConnectedApps {

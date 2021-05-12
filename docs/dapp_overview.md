@@ -2,7 +2,7 @@
 This document gives a brief introduction to Inspr's main structures, on how they are arranged and how they interact with each other. Through the use of images and clear descriptions, this introduction will help you understand how and why your applications can be much more scalable and composable.
 
 ## What are dApps?  
-A dApp is the base without which none of the other structures would exist, it contains all other structures inside of it. That is to say, a dApp is the base structure of Inspr, and inside of it there can be created Channels, Channel Types and even other dApps!  
+A dApp is the base without which none of the other structures would exist, it contains all other structures inside of it. That is to say, a dApp is the base structure of Inspr, and inside of it there can be created Channels, Types and even other dApps!  
 A dApp can also be a Node, which is basically the same as a normal dApp but has slightly different functionalities, which will be discussed ahead.
 
 ![dapp](img/dapp-struct.png)
@@ -25,7 +25,7 @@ The unique characteristics of a Node are defined by three structures set by the 
 **Nodes are created insite a Kubernetes cluster as Deployments.**  
 As described previously in "What are dApps?", a dApp that is a Node can't have child dApps. This means that:
 1) A Node is a dApp that has a Node structure defined in it.
-    - This implies that Nodes make use of all the structures defined within it's parent (Channels, Channel Types, Boundaries and Aliases)
+    - This implies that Nodes make use of all the structures defined within it's parent (Channels, Types, Boundaries and Aliases)
 2) In the tree-like organization, Nodes are always leaves.
 
 
@@ -35,18 +35,18 @@ A dApp/Node inputs and outputs are defined by it's Boundary. The Boundary, on th
 
 ![channel](img/chan-func.png)  
 
-Channels are created to receive and send a specific kind of information. This specification is defined by a **Channel's Type**, which is a reference to a Channel Type structure defined in the same context (in the same dApp) as the Channel. In other words:
+Channels are created to receive and send a specific kind of information. This specification is defined by a **Channel's Type**, which is a reference to a Type structure defined in the same context (in the same dApp) as the Channel. In other words:
 - A Channel only carries a specific kind of data (such as *int*, *string*, or an object defined by the user).
-- A Channel can't exist without a Channel Type.  
+- A Channel can't exist without a Type.  
 
 In a more detailed explanation, the cluster's structures communication is done through a [Message Broker](https://en.wikipedia.org/wiki/Message_broker) (such as Apache Kafka, RabbitMQ, etc.). So what a Channel really does is to define from which part of the broker (which Topic) a Node should read a message, or to which part it should write a message.  
 
 ![chan-topic](img/chan-topic.jpg)
 
-## What are Channel Types?
-Whilst a Channel is the way in or out of a dApp, the **type of information that can go through it is defined by the Channel Type.**  
-A Channel Type can't be deleted if there are Channels connected to it.
-Also, the kind of information that can go through a Channel is defined in it's Channel Type's Schema. **A Channel Type Schema is an Avro schema, in string format.**  
+## What are Types?
+Whilst a Channel is the way in or out of a dApp, the **type of information that can go through it is defined by the Type.**  
+A Type can't be deleted if there are Channels connected to it.
+Also, the kind of information that can go through a Channel is defined in it's Type's Schema. **A Type Schema is an Avro schema, in string format.**  
 Generate Avro schema from a JSON [here](https://toolslick.com/generation/metadata/avro-schema-from-json).
 
 ## How is information passed between Nodes?

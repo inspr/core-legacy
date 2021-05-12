@@ -117,13 +117,13 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 		},
 	})
 
-	mem.ChannelTypes().Create("", &meta.ChannelType{
+	mem.Types().Create("", &meta.Type{
 		Meta: meta.Metadata{
 			Name: "channel1type",
 		},
 		Schema: "channel1type",
 	})
-	mem.ChannelTypes().Create("", &meta.ChannelType{
+	mem.Types().Create("", &meta.Type{
 		Meta: meta.Metadata{
 			Name: "channel2type",
 		},

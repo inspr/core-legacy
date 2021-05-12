@@ -29,13 +29,13 @@ func NewDeleteCmd() *cobra.Command {
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
 		MinimumArgs(1, deleteChannels)
-	deleteTypes := cmd.NewCmd("ctypes").
-		WithDescription("Delete channel types from context").
-		WithExample("Delete channel type from the default scope", "delete ctypes <ctypename>").
-		WithExample("Delete channel type from a custom scope", "delete ctypes <ctypename> --scope app1.app2").
-		WithAliases([]string{"ct"}).
+	deleteTypes := cmd.NewCmd("types").
+		WithDescription("Delete types from context").
+		WithExample("Delete type from the default scope", "delete types <typename>").
+		WithExample("Delete type from a custom scope", "delete types <typename> --scope app1.app2").
+		WithAliases([]string{"t"}).
 		WithCommonFlags().
-		MinimumArgs(1, deleteCTypes)
+		MinimumArgs(1, deleteTypes)
 
 	deleteAlias := cmd.NewCmd("alias").
 		WithDescription("Delete alias from context").
@@ -47,10 +47,10 @@ func NewDeleteCmd() *cobra.Command {
 
 	return cmd.NewCmd("delete").
 		WithDescription("Delete component of object type").
-		WithLongDescription("Delete takes a component type (apps | channels | ctypes | alias) its scope and name, and deletes it from the cluster").
+		WithLongDescription("Delete takes a component type (apps | channels | types | alias) its scope and name, and deletes it from the cluster").
 		WithExample("deletes app", "delete apps <app_name>").
 		WithExample("deletes channel", "delete ch <channel_name>").
-		WithExample("deletes channel_type", "delete ct <channel_type_name>").
+		WithExample("deletes type", "delete t <type_name>").
 		WithExample("deletes alias", "delete al <alias_key>").
 		AddSubCommand(deleteApps).
 		AddSubCommand(deleteChannels).
@@ -121,7 +121,7 @@ func deleteChannels(_ context.Context, args []string) error {
 	return nil
 }
 
-func deleteCTypes(_ context.Context, args []string) error {
+func deleteTypes(_ context.Context, args []string) error {
 	client := cliutils.GetCliClient()
 	out := cliutils.GetCliOutput()
 
@@ -131,15 +131,15 @@ func deleteCTypes(_ context.Context, args []string) error {
 	}
 
 	for _, arg := range args {
-		path, ctName, err := cliutils.ProcessArg(arg, scope)
+		path, typeName, err := cliutils.ProcessArg(arg, scope)
 		if err != nil {
 			return err
 		}
 
-		cl, err := client.ChannelTypes().Delete(
+		cl, err := client.Types().Delete(
 			context.Background(),
 			path,
-			ctName,
+			typeName,
 			cmd.InsprOptions.DryRun,
 		)
 		if err != nil {

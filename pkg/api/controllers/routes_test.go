@@ -55,7 +55,7 @@ func TestServer_initRoutes(t *testing.T) {
 			},
 		},
 		{
-			name: "channeltypes",
+			name: "types",
 			want: [...]int{
 				http.StatusInternalServerError,
 				http.StatusInternalServerError,
