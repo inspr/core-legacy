@@ -1,12 +1,18 @@
 
 # Changelog
 
+### #52 - Bug CORE-425 | Check failing controller update method
+- fixes:
+    - fixed the Controller dApp example so create/update/delete methods are working
+- misc:
+    - formated the CHANGELOG.md file so all changelogs have the same format
+
 ### #48 - Feature: adds init command to the cli
 - features:
     - creates an init command for configuration initialization
     - adds config flag to specify configuration file
     - changes flow so that if the config is invalid, asks for initialization
-- fix:
+- fixes:
     - silences main command to remove duplicate errors
 - refactors:
     - refactors configuration initialization to allow different files
@@ -26,17 +32,17 @@
     - left some places with `type` as is more intuitive as to what type is
       being managed.
 
-### #44 Issue CORE-333 | Create the token for authentication inside the cluster
+### #44 - Issue CORE-333 | Create the token for authentication inside the cluster
 - features:
 	- creates a secret for each node with its permissions
 	- adds environment variables necessary for controller authentication
-- refactor:
+- refactors:
 	- major refactor of the k8s operator conversion system
 	- creates a helper package for kubernetes deployment and container building
 	- changes node operator operations to be interface based
 ---
 
-### #43 Issue CORE-335 | Controllers configuration for in cluster initialization.
+### #43 - Issue CORE-335 | Controllers configuration for in cluster initialization.
 - features:
 	- ControllerConfig object developed to help initialize controllers and ease of config validation.
 	- GetInClusterConfigs function implemented to fetch controller configs from current in-cluster dapp deployment
@@ -58,7 +64,7 @@
     - new tests for the middleware, since there is a new logic step due to the permission introduction.
 ---
 
-### #40 Issue CORE-332 | adds a permissions field to the dApp definition
+### #40 - Issue CORE-332 | adds a permissions field to the dApp definition
 - features:
 	- adds a permission field to dapp meta
 	- changes new dapp on tree to handle the injection
@@ -81,7 +87,7 @@
 - fixes:
 	- Inspr CLI token flag default value is now being properly set
 	- removed duplicated Payload struct that was being defined in `pkg/api/auth/payload.go`
-- refactor:
+- refactors:
     - grouped files under `pkg/auth/models` into `models.go` in `pkg/auth`, and deleted the folder (this was done so the structures have the package prefix `auth` when being imported)
         - Adapted all methods which use the structures defined in `models` so they continue to work as intended
 - tests:
@@ -105,5 +111,4 @@
 	- some type fixes
 - tests:
 	- changes kafka tests to handle the new channel based approach
-
 =======
