@@ -3,11 +3,13 @@ package cli
 import (
 	"context"
 	"fmt"
+	"io"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	"github.com/inspr/inspr/pkg/controller"
 
 	"github.com/inspr/inspr/pkg/cmd"
 	"github.com/inspr/inspr/pkg/meta"
@@ -70,9 +72,17 @@ func NewGetCmd() *cobra.Command {
 }
 
 func getApps(_ context.Context) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+	scope, err := cliutils.GetScope()
+	if err != nil {
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
+	}
+
 	lines := make([]string, 0)
 	initTab(&lines)
-	err := getObj(printApps, &lines)
+	err = getObj(printApps, &lines, client, out, scope)
 	if err != nil {
 		return err
 	}
@@ -81,9 +91,24 @@ func getApps(_ context.Context) error {
 }
 
 func getChannels(_ context.Context) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+	scope, err := cliutils.GetScope()
+	if err != nil {
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
+	}
+
+	_, err = client.Channels().Get(context.Background(), scope, "")
+	if err != nil {
+		cliutils.RequestErrorMessage(err, out)
+		return err
+	}
+
 	lines := make([]string, 0)
 	initTab(&lines)
-	err := getObj(printChannels, &lines)
+
+	err = getObj(printChannels, &lines, client, out, scope)
 	if err != nil {
 		return err
 	}
@@ -92,48 +117,81 @@ func getChannels(_ context.Context) error {
 }
 
 func getCTypes(_ context.Context) error {
-	lines := make([]string, 0)
-	initTab(&lines)
-	err := getObj(printCTypes, &lines)
-	if err != nil {
-		return err
-	}
-	printTab(&lines)
-	return nil
-}
-
-func getAlias(_ context.Context) error {
-	lines := make([]string, 0)
-	initTab(&lines)
-	err := getObj(printAliases, &lines)
-	if err != nil {
-		return err
-	}
-	printTab(&lines)
-	return nil
-}
-
-func getNodes(_ context.Context) error {
-	lines := make([]string, 0)
-	initTab(&lines)
-	err := getObj(printNodes, &lines)
-	if err != nil {
-		return err
-	}
-	printTab(&lines)
-	return nil
-}
-
-func getObj(printObj func(*meta.App, *[]string), lines *[]string) error {
 	client := cliutils.GetCliClient()
 	out := cliutils.GetCliOutput()
-
 	scope, err := cliutils.GetScope()
 	if err != nil {
 		fmt.Fprint(out, err.Error()+"\n")
 		return err
 	}
 
+	_, err = client.ChannelTypes().Get(context.Background(), scope, "")
+	if err != nil {
+		cliutils.RequestErrorMessage(err, out)
+		return err
+	}
+
+	lines := make([]string, 0)
+	initTab(&lines)
+
+	err = getObj(printCTypes, &lines, client, out, scope)
+	if err != nil {
+		return err
+	}
+
+	printTab(&lines)
+	return nil
+}
+
+func getAlias(_ context.Context) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+	scope, err := cliutils.GetScope()
+	if err != nil {
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
+	}
+
+	_, err = client.Alias().Get(context.Background(), scope, "")
+	if err != nil {
+		cliutils.RequestErrorMessage(err, out)
+		return err
+	}
+
+	lines := make([]string, 0)
+	initTab(&lines)
+
+	err = getObj(printAliases, &lines, client, out, scope)
+	if err != nil {
+		return err
+	}
+
+	printTab(&lines)
+	return nil
+}
+
+func getNodes(_ context.Context) error {
+	client := cliutils.GetCliClient()
+	out := cliutils.GetCliOutput()
+	scope, err := cliutils.GetScope()
+	if err != nil {
+		fmt.Fprint(out, err.Error()+"\n")
+		return err
+	}
+
+	lines := make([]string, 0)
+	initTab(&lines)
+
+	err = getObj(printNodes, &lines, client, out, scope)
+	if err != nil {
+		return err
+	}
+
+	printTab(&lines)
+	return nil
+}
+
+func getObj(printObj func(*meta.App, *[]string), lines *[]string, client controller.Interface, out io.Writer, scope string) error {
 	resp, err := client.Apps().Get(context.Background(), scope)
 	if err != nil {
 		cliutils.RequestErrorMessage(err, out)
