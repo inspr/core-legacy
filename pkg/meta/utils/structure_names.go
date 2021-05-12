@@ -6,7 +6,7 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 )
 
-// StructureNameIsValid checks if the given name is valid for naming Channels, CTypes and dApps
+// StructureNameIsValid checks if the given name is valid for naming Channels, types and dApps
 func StructureNameIsValid(name string) error {
 	if len(name) == 0 || len(name) >= 64 {
 		return ierrors.NewError().BadRequest().Message("invalid name length, must be (0 < length < 64)").Build()

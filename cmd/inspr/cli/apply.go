@@ -36,7 +36,7 @@ It can be called with the flag --dry-run so the changes that would be made are s
 			{
 				Name:          "file",
 				Shorthand:     "f",
-				Usage:         "inspr apply -f ctype.yaml",
+				Usage:         "inspr apply -f type.yaml",
 				Value:         &cmd.InsprOptions.AppliedFileStructure,
 				DefValue:      "",
 				FlagAddMethod: "",
@@ -163,7 +163,7 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 }
 
 func getOrderedFiles(path string, files []string) []applied {
-	var apps, channels, ctypes, aliases []applied
+	var apps, channels, types, aliases []applied
 	for _, file := range files {
 		if isYaml(file) {
 			comp := meta.Component{}
@@ -182,14 +182,14 @@ func getOrderedFiles(path string, files []string) []applied {
 				apps = append(apps, applied{component: comp, fileName: file, content: f})
 			} else if comp.Kind == "channel" {
 				channels = append(channels, applied{component: comp, fileName: file, content: f})
-			} else if comp.Kind == "channeltype" {
-				ctypes = append(ctypes, applied{component: comp, fileName: file, content: f})
+			} else if comp.Kind == "type" {
+				types = append(types, applied{component: comp, fileName: file, content: f})
 			} else if comp.Kind == "alias" {
 				aliases = append(aliases, applied{component: comp, fileName: file, content: f})
 			}
 		}
 	}
-	ordered := append(apps, ctypes...)
+	ordered := append(apps, types...)
 	ordered = append(ordered, channels...)
 	ordered = append(ordered, aliases...)
 	return ordered

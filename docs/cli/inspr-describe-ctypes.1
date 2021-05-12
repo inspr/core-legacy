@@ -3,23 +3,23 @@
 
 .SH NAME
 .PP
-inspr\-describe\-ctypes \- Retrieves the full state of the channelType from a given namespace
+inspr\-describe\-types \- Retrieves the full state of the type from a given namespace
 
 
 .SH SYNOPSIS
 .PP
-\fBinspr describe ctypes  [flags]\fP
+\fBinspr describe types  [flags]\fP
 
 
 .SH DESCRIPTION
 .PP
-Retrieves the full state of the channelType from a given namespace
+Retrieves the full state of the type from a given namespace
 
 
 .SH OPTIONS
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
-	help for ctypes
+	help for types
 
 .PP
 \fB\-s\fP, \fB\-\-scope\fP=""
@@ -31,14 +31,14 @@ Retrieves the full state of the channelType from a given namespace
 .RS
 
 .nf
-  # Display the state of the given channelType on the default scope
- inspr describe ctypes hello\_world
+  # Display the state of the given type on the default scope
+ inspr describe types hello\_world
 
-  # Display the state of the given channelType on a custom scope
- inspr describe ctypes \-\-scope app1.app2 hello\_world
+  # Display the state of the given type on a custom scope
+ inspr describe types \-\-scope app1.app2 hello\_world
 
-  # Display the state of the given channelType by the path
- inspr describe ctypes app1.app2.hello\_world
+  # Display the state of the given type by the path
+ inspr describe types app1.app2.hello\_world
 
 
 .fi

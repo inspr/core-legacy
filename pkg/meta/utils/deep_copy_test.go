@@ -20,7 +20,7 @@ func getMockedTree() *meta.App {
 			Node:     meta.Node{},
 			Apps:     map[string]*meta.App{},
 			Channels: map[string]*meta.Channel{},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",

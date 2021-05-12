@@ -14,7 +14,7 @@
 | &rarr; parent     | Defines the Channel context in the cluster through the path of the dApp in which it is stored, for example: `app1.app2` means that the Channel is defined in the `app2`. |
 | &rarr; sha256     | Tags images with their sha256 digest.                                                                                                                                    |
 | spec              |                                                                                                                                                                          |
-| &rarr; type       | Defines the type of the Channel, this is a string that contains the name of any Channel Type in the same context as the dApp that the channel is being created on.       |
+| &rarr; type       | Defines the type of the Channel, this is a string that contains the name of any Type in the same context as the dApp that the channel is being created on.       |
 | connectedapps     | List of dApp names that are using this Channel, this is injected by the Inspr daemon                                                                                     |
 | connectedaliasses | A simple list of the aliases that are being used to reference this channel.                                                                                              |
 

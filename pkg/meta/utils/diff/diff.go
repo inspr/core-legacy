@@ -19,7 +19,7 @@ const (
 	NodeKind
 	MetaKind
 	ChannelKind
-	ChannelTypeKind
+	TypeKind
 	BoundaryKind
 	FieldKind
 	AnnotationKind
@@ -131,7 +131,7 @@ func (change *Change) diffAppSpec(from, to meta.AppSpec) error {
 		return err
 	}
 
-	err = change.diffChannelTypes(from.ChannelTypes, to.ChannelTypes)
+	err = change.diffTypes(from.Types, to.Types)
 	if err != nil {
 		return err
 	}
@@ -445,7 +445,7 @@ func (change *Change) diffChannels(from, to metautils.MChannels) error {
 	return nil
 }
 
-func (change *Change) diffChannelTypes(from, to metautils.MTypes) error {
+func (change *Change) diffTypes(from, to metautils.MTypes) error {
 	fromSet, _ := metautils.MakeStrSet(from)
 	toSet, _ := metautils.MakeStrSet(to)
 
@@ -467,14 +467,14 @@ func (change *Change) diffChannelTypes(from, to metautils.MTypes) error {
 		}
 
 		change.Diff = append(change.Diff, Difference{
-			Field:     fmt.Sprintf("Spec.ChannelTypes[%s]", ct),
+			Field:     fmt.Sprintf("Spec.Types[%s]", ct),
 			From:      fromStr,
 			To:        toStr,
-			Kind:      ChannelTypeKind,
+			Kind:      TypeKind,
 			Operation: op,
 			Name:      ct,
 		})
-		change.Kind |= ChannelTypeKind
+		change.Kind |= TypeKind
 		change.Operation |= op
 	}
 
@@ -486,18 +486,18 @@ func (change *Change) diffChannelTypes(from, to metautils.MTypes) error {
 
 		if string(fromCT.Schema) != string(toCT.Schema) {
 			change.Diff = append(change.Diff, Difference{
-				Field:     fmt.Sprintf("Spec.ChannelTypes[%s].Spec.Schema", ct),
+				Field:     fmt.Sprintf("Spec.Types[%s].Spec.Schema", ct),
 				From:      string(fromCT.Schema),
 				To:        string(toCT.Schema),
-				Kind:      ChannelTypeKind,
+				Kind:      TypeKind,
 				Operation: Update,
 				Name:      ct,
 			})
-			change.Kind |= ChannelTypeKind
+			change.Kind |= TypeKind
 			change.Operation |= Update
 		}
 
-		err := change.diffMetadata(ct, ChannelTypeKind, fromCT.Meta, toCT.Meta, fmt.Sprintf("Spec.ChannelTypes[%s].", ct))
+		err := change.diffMetadata(ct, TypeKind, fromCT.Meta, toCT.Meta, fmt.Sprintf("Spec.Types[%s].", ct))
 		if err != nil {
 			return err
 		}
