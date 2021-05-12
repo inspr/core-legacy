@@ -198,7 +198,7 @@ func validAliases(app *meta.App) (bool, string) {
 		valid = false
 		msg = append(msg, fmt.Sprintf("alias: %s points to an non-existent channel '%s'", key, val.Target))
 	}
-	return valid, msg.Join(";")
+	return valid, msg.Join("; ")
 }
 
 func getParentApp(childQuery string) (*meta.App, error) {
