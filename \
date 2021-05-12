@@ -1,5 +1,0 @@
-kind: type
-apiVersion: v1
-meta:
-  name: channelTestType
-schema: yamls/schema.avsc
