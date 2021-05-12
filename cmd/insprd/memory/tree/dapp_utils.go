@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -31,7 +32,8 @@ func validAppStructure(app, parentApp *meta.App) string {
 	}
 	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
 	validSubstructure = appWithoutNode || (len(app.Spec.Apps) == 0)
-	validChannels, msg := checkAndUpdates(app)
+	validChannels, chanMsg := checkAndUpdates(app)
+	validAlias, aliasMsg := validAliases(app)
 
 	if nameErr != nil {
 		errDescription = errDescription + "invalid dApp name;"
@@ -43,7 +45,10 @@ func validAppStructure(app, parentApp *meta.App) string {
 		errDescription = errDescription + "parent has Node;"
 	}
 	if !validChannels {
-		errDescription = errDescription + msg
+		errDescription = errDescription + chanMsg
+	}
+	if !validAlias {
+		errDescription = errDescription + aliasMsg
 	}
 
 	return errDescription
@@ -164,7 +169,7 @@ func checkAndUpdates(app *meta.App) (bool, string) {
 
 		}
 		if len(boundaries) > 0 && boundaries.Contains(channelName) {
-			return false, "channel and boundary with same name: " + channelName
+			return false, "channel and boundary with same name: " + channelName + ";"
 		}
 	}
 	return true, ""
@@ -179,16 +184,21 @@ func nodeIsEmpty(node meta.Node) bool {
 	return noAnnotations && noName && noParent && noImage
 }
 
-func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
-	appBoundary := utils.StringSliceUnion(bound.Input, bound.Output)
-
-	for _, chName := range appBoundary {
-		if parentChannels[chName] == nil {
-			return "invalid app boundary - channel '" + chName + "' doesnt exist in parent app;"
+func validAliases(app *meta.App) (bool, string) {
+	var msg utils.StringArray
+	var valid bool = true
+	for key, val := range app.Spec.Aliases {
+		if ch, ok := app.Spec.Channels[val.Target]; ok {
+			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
+			continue
 		}
+		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val.Target) {
+			continue
+		}
+		valid = false
+		msg = append(msg, fmt.Sprintf("alias: %s points to an non-existent channel '%s'", key, val.Target))
 	}
-
-	return ""
+	return valid, msg.Join("; ")
 }
 
 func getParentApp(childQuery string) (*meta.App, error) {
@@ -243,7 +253,7 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(val.Target) {
 			continue
 		}
-		merr.Add(ierrors.NewError().Message("error: %s alias: %s points to an unexisting channel", parentApp.Meta.Name, key).Build())
+		merr.Add(ierrors.NewError().Message("error: %s alias: %s points to an non-existent channel", parentApp.Meta.Name, key).Build())
 	}
 	if !merr.Empty() {
 		return &merr

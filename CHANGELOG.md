@@ -1,6 +1,10 @@
 
 # Changelog
 
+### #53 - Tech CORE-362 | Validate alias when applying app
+  - features:
+    - created a validation function for aliases and used it on Create and Delete
+    
 ### #52 - Bug CORE-425 | Check failing controller update method
 - fixes:
     - fixed the Controller dApp example so create/update/delete methods are working
