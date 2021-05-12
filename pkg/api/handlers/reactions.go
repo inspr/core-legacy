@@ -69,20 +69,20 @@ var deletedApps func(handler *Handler) diff.DifferenceReaction = func(handler *H
 	)
 }
 
-// apply this on updated channel types
-var updatedChannelTypes func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
+// apply this on updated Types
+var updatedTypes func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
 	return diff.NewDifferenceReaction(
 		func(scope string, d diff.Difference) bool {
-			// if the diff is for a channel type and the channel type has been updated
-			return d.Kind&diff.ChannelTypeKind > 0 && d.Operation&diff.Update > 0
+			// if the diff is for a Type and the Type has been updated
+			return d.Kind&diff.TypeKind > 0 && d.Operation&diff.Update > 0
 		},
 		func(scope string, d diff.Difference) error {
 			errors := ierrors.MultiError{
 				Errors: []error{},
 			}
-			ct, _ := handler.Memory.ChannelTypes().Get(scope, d.Name)
+			ct, _ := handler.Memory.Types().Get(scope, d.Name)
 
-			for _, channelName := range ct.ConnectedChannels { // for each channel connected to the channel type
+			for _, channelName := range ct.ConnectedChannels { // for each channel connected to the Type
 				channel, _ := handler.Memory.Channels().Get(scope, channelName)
 
 				for _, appName := range channel.ConnectedApps { // for each app connected to each channel
@@ -201,7 +201,7 @@ func (h *Handler) initReactions() {
 		deletedChannels(h),
 		deletedApps(h),
 		updatedChannels(h),
-		updatedChannelTypes(h),
+		updatedTypes(h),
 		updatedAliases(h),
 	)
 }

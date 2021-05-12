@@ -34,7 +34,7 @@ inspr apply [flags]
 
 ```
   -d, --dry-run         inspr <command> --dry-run
-  -f, --file string     inspr apply -f ctype.yaml
+  -f, --file string     inspr apply -f type.yaml
   -k, --folder string   inspr apply -k randfolder/
   -h, --help            help for apply
   -s, --scope string    inspr <command> --scope app1.app2

@@ -123,7 +123,7 @@ func TestChannelClient_Get(t *testing.T) {
 					Reference: "app1",
 				},
 				Spec: meta.ChannelSpec{
-					Type: "channeltype1",
+					Type: "type1",
 				},
 			},
 		},
@@ -219,7 +219,7 @@ func TestChannelClient_Create(t *testing.T) {
 						Name: "app3",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "channeltype1",
+						Type: "type1",
 					},
 				},
 			},
@@ -309,7 +309,7 @@ func TestChannelClient_Update(t *testing.T) {
 						Name: "app3",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "channeltype1",
+						Type: "type1",
 					},
 				},
 			},

@@ -509,7 +509,7 @@ meta:
     kafka.replication.factor: 1
     kafka.partition.number: 2
 spec:
-  type: ppctype1
+  type: pptype1
 ```
 
 Now we do the same for _ch2.yaml_:
@@ -530,34 +530,34 @@ meta:
     kafka.replication.factor: 1
     kafka.partition.number: 2
 spec:
-  type: ppctype1
+  type: pptype1
 ```
 
-**3) Channel Type YAML**
-Both Channels use the same Channel Type to define the kind of message that goes through them. So we must specify the kind, apiVersion and then the Channel Type information for it to be created in the same context (the same dApp) as the Channels'.  
-First we create "/ctypes" folder and _ct1.yaml_:
+**3) Type YAML**
+Both Channels use the same Type to define the kind of message that goes through them. So we must specify the kind, apiVersion and then the Type information for it to be created in the same context (the same dApp) as the Channels'.  
+First we create "/types" folder and _ct1.yaml_:
 
 ```zsh
-mkdir ctypes
-touch ctypes/ct1.yaml
+mkdir types
+touch types/ct1.yaml
 ```
 
 And it's content should be:
 
 ```yaml
-kind: channeltype
+kind: type
 apiVersion: v1
 
 meta:
-  name: ppctype1
-schema: yamls/ctypes/schema.avsc
+  name: pptype1
+schema: yamls/types/schema.avsc
 ```
 
-Notice that the `schema` field is actually a reference to an **Avro Schema** file. By defining it like this, when a Channel Type is created Inspr searches for the file and injects its value into the `schema` fiel. You can find more information on how schemas should be created to be used in Inspr [here](schemas_and_types.md).  
+Notice that the `schema` field is actually a reference to an **Avro Schema** file. By defining it like this, when a Type is created Inspr searches for the file and injects its value into the `schema` fiel. You can find more information on how schemas should be created to be used in Inspr [here](schemas_and_types.md).  
 To make everythink work properly, let's create _schema.avsc_:
 
 ```zsh
-touch ctypes/schema.avsc
+touch types/schema.avsc
 ```
 
 As we defined in our Ping and Pong applications, the type of information that they will send and receive is just a simple string. To do so, _schema.avsc_ content should be:
@@ -581,7 +581,7 @@ pingpong_demo
     ├── channels
     │   ├── ch1.yaml
     │   └── ch2.yaml
-    ├── ctypes
+    ├── types
     │   ├── ct1.yaml
     │   └── schema.avsc
     ├── nodes
@@ -590,7 +590,7 @@ pingpong_demo
     └── table.yaml
 ```
 
-### Deploying dApps, Channels and Channel Type
+### Deploying dApps, Channels and Type
 
 Finally, now that we have Ping and Pong images in the cluster and all Inspr workspace structures well-defined in YAML files, we can deploy everything that we created and see it working in our cluster.
 
@@ -622,7 +622,7 @@ Success: inspr config [serverip] changed to 'CLUSTER_INGRESS_HOST'
 
 Now, from within "/pingpong_demo" folder, we apply the YAML files by using Inspr CLIs commands. The files should be applied in the following order:
 
-1. Channel Type `ppctype1`
+1. Type `pptype1`
 2. Channels `ppchannel1` and `ppchannel2`
 3. dApp `pptable`
 4. Nodes `ping` and `pong`
@@ -630,7 +630,7 @@ Now, from within "/pingpong_demo" folder, we apply the YAML files by using Inspr
 You can do so by running the following commands from within "/pingpong_demo" folder:
 
 ```
-inspr apply -k yamls/ctypes
+inspr apply -k yamls/types
 inspr apply -k yamls/channels
 inspr apply -f yamls/table.yaml
 inspr apply -k yamls/nodes
@@ -641,14 +641,14 @@ To learn more about Inspr CLI, check [this](cli/inspr.md) documentation.
 If everything worked fine, the Inspr deamon will have printed a changelog similar to the following for each command written in your terminal:
 
 ```zsh
-➜  pingpong_demo ✗ inspr apply -k yamls/ctypes
+➜  pingpong_demo ✗ inspr apply -k yamls/types
 ct1.yaml
 On:
 Field                         | From       | To
-Spec.ChannelTypes[ppctype1]   | <nil>      | {...}
+Spec.Types[pptype1]   | <nil>      | {...}
 
 Applied:
-ct1.yaml | channeltype | v1
+ct1.yaml | Type | v1
 
 ➜  pingpong_demo ✗ inspr apply -k yamls/channels
 ch1.yaml

@@ -13,26 +13,26 @@ import (
 )
 
 const (
-	channelTypeFile = "channel_type_yaml_test.yaml"
+	typefile = "type_yaml_test.yaml"
 )
 
-func TestYamlToChannelType(t *testing.T) {
+func TestYamlToType(t *testing.T) {
 
-	yamlString, mockCT := createChannelTypeYaml()
+	yamlString, mockCT := createTypeYaml()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
-		channelTypeFile,
+		typefile,
 		[]byte(yamlString),
 		os.ModePerm,
 	)
 
 	// reads file created
-	bytes, err := ioutil.ReadFile(channelTypeFile)
+	bytes, err := ioutil.ReadFile(typefile)
 	if err != nil {
 		t.Errorf("couldn't read file")
 	}
 
-	channel, err := YamlToChannelType(bytes)
+	channel, err := YamlToType(bytes)
 	if err != nil {
 		t.Errorf("YamlToChannel() error -> got %v, expected %v", err, nil)
 	}
@@ -57,32 +57,32 @@ func TestYamlToChannelType(t *testing.T) {
 		}) {
 		t.Errorf("unexpected error -> got %v, expected %v", channel, mockCT)
 	}
-	os.Remove(channelTypeFile)
+	os.Remove(typefile)
 }
 
-func TestIncorrectCTypeYaml(t *testing.T) {
+func TestIncorrecttypeYaml(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		bytes, _ := ioutil.ReadFile("mock_incorrect.yaml")
 
-		_, err := YamlToChannelType(bytes)
+		_, err := YamlToType(bytes)
 		if err == nil {
 			t.Errorf("expected %v, received %v\n", errors.New("channel without name").Error(), err)
 		}
 	})
 }
 
-func TestNonExistentCTypeFile(t *testing.T) {
+func TestNonExistenttypefile(t *testing.T) {
 	// reads file created
 	bytes := []byte{1}
-	_, err := YamlToChannelType(bytes)
+	_, err := YamlToType(bytes)
 	if err == nil {
 		t.Errorf("expected -> %v, expected %v", err, "error")
 	}
 }
 
 // CreateYaml - creates an yaml example
-func createChannelTypeYaml() (string, meta.ChannelType) {
-	ct := meta.ChannelType{
+func createTypeYaml() (string, meta.Type) {
+	ct := meta.Type{
 		Meta: meta.Metadata{
 			Name:        "mock_name",
 			Reference:   "mock_reference",

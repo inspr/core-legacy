@@ -43,9 +43,9 @@ func Test_validAppStructure(t *testing.T) {
 								Image: "imageNodeApp5",
 							},
 						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2"},
 							Output: []string{"ch2app2"},
@@ -80,9 +80,9 @@ func Test_validAppStructure(t *testing.T) {
 								Image: "imageNodeApp3",
 							},
 						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2"},
 							Output: []string{"ch2app2"},
@@ -120,8 +120,8 @@ func Test_validAppStructure(t *testing.T) {
 						Apps: map[string]*meta.App{
 							"invalidApp": {},
 						},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2"},
 							Output: []string{"ch2app2"},
@@ -156,9 +156,9 @@ func Test_validAppStructure(t *testing.T) {
 								Image: "imageNodeApp3",
 							},
 						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app1"},
 							Output: []string{"ch2app1"},
@@ -401,9 +401,9 @@ func Test_checkAndUpdates(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -419,7 +419,7 @@ func Test_checkAndUpdates(t *testing.T) {
 								},
 								ConnectedApps: []string{"thenewapp"},
 								Spec: meta.ChannelSpec{
-									Type: "newChannelType",
+									Type: "newType",
 								},
 							},
 							"ch2app1": {
@@ -430,11 +430,11 @@ func Test_checkAndUpdates(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"newChannelType": {
+						Types: map[string]*meta.Type{
+							"newType": {
 								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
+									Name:        "newType",
+									Reference:   "app1.newType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
 									UUID:        "",
@@ -452,7 +452,7 @@ func Test_checkAndUpdates(t *testing.T) {
 			want1: "",
 		},
 		{
-			name: "invalid channel: using non-existent channel type",
+			name: "invalid channel: using non-existent type",
 			args: args{
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -474,9 +474,9 @@ func Test_checkAndUpdates(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -503,11 +503,11 @@ func Test_checkAndUpdates(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"newChannelType": {
+						Types: map[string]*meta.Type{
+							"newType": {
 								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
+									Name:        "newType",
+									Reference:   "app1.newType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
 									UUID:        "",
@@ -522,7 +522,7 @@ func Test_checkAndUpdates(t *testing.T) {
 				},
 			},
 			want:  false,
-			want1: "invalid channel: using non-existent channel type;",
+			want1: "invalid channel: using non-existent type;",
 		},
 		{
 			name: "invalid channel structure - it should return a name channel error",
@@ -547,9 +547,9 @@ func Test_checkAndUpdates(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -565,7 +565,7 @@ func Test_checkAndUpdates(t *testing.T) {
 								},
 								ConnectedApps: []string{"thenewapp"},
 								Spec: meta.ChannelSpec{
-									Type: "newChannelType",
+									Type: "newType",
 								},
 							},
 							"ch2app1": {
@@ -576,11 +576,11 @@ func Test_checkAndUpdates(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"newChannelType": {
+						Types: map[string]*meta.Type{
+							"newType": {
 								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
+									Name:        "newType",
+									Reference:   "app1.newType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
 									UUID:        "",
@@ -620,9 +620,9 @@ func Test_checkAndUpdates(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -638,7 +638,7 @@ func Test_checkAndUpdates(t *testing.T) {
 								},
 								ConnectedApps: []string{"thenewapp"},
 								Spec: meta.ChannelSpec{
-									Type: "newChannelType",
+									Type: "newType",
 								},
 							},
 							"ch2app1": {
@@ -649,11 +649,11 @@ func Test_checkAndUpdates(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"invalid.channel.type": {
+						Types: map[string]*meta.Type{
+							"invalid.type": {
 								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
+									Name:        "newType",
+									Reference:   "app1.newType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
 									UUID:        "",
@@ -668,7 +668,7 @@ func Test_checkAndUpdates(t *testing.T) {
 				},
 			},
 			want:  false,
-			want1: "invalid channelType name: invalid.channel.type",
+			want1: "invalid type name: invalid.type",
 		},
 	}
 	for _, tt := range tests {
@@ -1108,7 +1108,7 @@ func TestAppMemoryManager_updateUUID(t *testing.T) {
 								Meta: meta.Metadata{Name: "channel1"},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
+						Types: map[string]*meta.Type{
 							"channeltype1": {
 								Meta: meta.Metadata{Name: "channel1"},
 							},
@@ -1139,7 +1139,7 @@ func TestAppMemoryManager_updateUUID(t *testing.T) {
 								Meta: meta.Metadata{Name: "channel1"},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
+						Types: map[string]*meta.Type{
 							"channeltype1": {
 								Meta: meta.Metadata{Name: "channel1"},
 							},
@@ -1164,7 +1164,7 @@ func TestAppMemoryManager_updateUUID(t *testing.T) {
 								Meta: meta.Metadata{Name: "channel1"},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
+						Types: map[string]*meta.Type{
 							"channeltype1": {
 								Meta: meta.Metadata{Name: "channel1"},
 							},
@@ -1191,7 +1191,7 @@ func TestAppMemoryManager_updateUUID(t *testing.T) {
 											Meta: meta.Metadata{Name: "channel1"},
 										},
 									},
-									ChannelTypes: map[string]*meta.ChannelType{
+									Types: map[string]*meta.Type{
 										"channeltype1": {
 											Meta: meta.Metadata{Name: "channel1"},
 										},
