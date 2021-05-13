@@ -76,7 +76,7 @@ and returns the new scope and the alias that was removed
 */
 func RemoveAliasInScope(scope string) (string, string, error) {
 	if !IsValidScope(scope) {
-		return "", "", ierrors.NewError().Message("invalid scope: " + scope).InvalidName().Build()
+		return "", "", ierrors.NewError().Message("invalid scope: %s", scope).InvalidName().Build()
 	}
 
 	names := strings.Split(scope, ".")
