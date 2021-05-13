@@ -25,7 +25,7 @@ jobs:
         run: bash .github/scripts/buildcli.sh
 
       - name: Push CLI
-        run: bash .github/scripts/pushcli.sh ${{ secret.GCR_ACCOUNT_KEY }} ${{ github.run_id }}
+        run: bash .github/scripts/pushcli.sh ${{ secrets.GCR_ACCOUNT_KEY }} "${{ github.run_id }}"
 
       - name: Release CLI
         run: bash .github/scripts/releasecli.sh "${{ github.sha }}"
