@@ -161,3 +161,47 @@ func TestJoinScopes(t *testing.T) {
 		})
 	}
 }
+
+func TestIsInnerScope(t *testing.T) {
+	type args struct {
+		s1 string
+		s2 string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "s2  is inner of s1",
+			args: args{
+				s1: "a.b",
+				s2: "a.b.c",
+			},
+			want: true,
+		},
+		{
+			name: "s1 is root and s2 is inner of s1",
+			args: args{
+				s1: "",
+				s2: "a.b.c",
+			},
+			want: true,
+		},
+		{
+			name: "s2 is not inner of s1",
+			args: args{
+				s1: "a.b",
+				s2: "a",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsInnerScope(tt.args.s1, tt.args.s2); got != tt.want {
+				t.Errorf("IsInnerScope() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
