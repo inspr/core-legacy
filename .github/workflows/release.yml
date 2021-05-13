@@ -1,0 +1,51 @@
+name: "tagged-release"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16.0"
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+
+      - name: Build CLI
+        run: bash .github/scripts/buildcli.sh
+
+      - name: Push CLI
+        run: bash .github/scripts/pushcli.sh
+
+      - name: Release CLI
+        run: bash .github/scripts/releasecli.sh
+
+      - name: Create temp file to store skaffold build return
+        run: |
+          touch tags.out
+
+      - name: Run Skaffold build
+        uses: hiberbee/github-action-skaffold@latest
+        with:
+          command: build --file-output=tags.out
+
+      - name: Helm Chart update
+        run: bash .github/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            LICENSE.txt
+            *.jar
