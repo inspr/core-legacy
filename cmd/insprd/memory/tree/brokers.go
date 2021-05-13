@@ -8,6 +8,7 @@ import (
 	"github.com/inspr/inspr/pkg/utils"
 )
 
+// BrokersMemoryManager implements the methods described by the BrokersInterface
 type BrokersMemoryManager struct {
 }
 
@@ -18,10 +19,12 @@ func (tmm *MemoryManager) Brokers() memory.BrokerInterface {
 
 var bro *brokers.Brokers
 
+// GetAll returns an array containing all currently configured brokers
 func (bmm *BrokersMemoryManager) GetAll() utils.StringArray {
 	return bmm.get().Availible.ToArray()
 }
 
+// GetDefault returns the broker configured as default
 func (bmm *BrokersMemoryManager) GetDefault() string {
 	return bmm.get().Default
 }
@@ -35,6 +38,7 @@ func (bmm *BrokersMemoryManager) get() *brokers.Brokers {
 	return bro
 }
 
+// Create configures a new broker on insprd
 func (bmm *BrokersMemoryManager) Create(broker string, config interface{}) error {
 	if ok := bmm.get().Availible[broker]; ok {
 		return ierrors.NewError().Message("error: %s is already configured on memory", broker).Build()
@@ -45,6 +49,7 @@ func (bmm *BrokersMemoryManager) Create(broker string, config interface{}) error
 	return nil
 }
 
+// SetDefault sets a previoulsy configured broker as insprd's default broker
 func (bmm *BrokersMemoryManager) SetDefault(broker string) error {
 	if ok := bmm.get().Availible[broker]; !ok {
 		return ierrors.NewError().Message("error: %s is not configured on memory", broker).Build()
