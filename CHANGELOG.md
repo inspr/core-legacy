@@ -5,6 +5,13 @@
 - features:
     - alias name injection on apply app
     - updated user example to include token creation
+    - created a alias naming structure validator
+    - created a alias parser from compound scope
+    - created a cli argument processor for alias names
+- fix:
+    - describe alias cli command
+- refactors:
+    - removed code duplication from cli's dApp apply functionality
 
 ### #53 - Tech CORE-362 | Validate alias when applying app
   - features:
