@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #55 - Tech CORE-310 | Automatic Helm chart tags update
+- features:
+    - created new GitHub action to automatically create a new release if a tag is pushed
+    - adapted the Inspr CLI scripts that were used in GitLab to work in GitHub
+---
+
 ### #54 - Tech CORE-365 | Alias Meta.Name automatic injection when applying app
 - features:
     - alias name injection on apply app
@@ -8,7 +14,7 @@
     - created a alias naming structure validator
     - created a alias parser from compound scope
     - created a cli argument processor for alias names
-- fix:
+- fixes:
     - describe alias cli command
 - refactors:
     - removed code duplication from cli's dApp apply functionality
@@ -16,12 +22,14 @@
 ### #53 - Tech CORE-362 | Validate alias when applying app
   - features:
     - created a validation function for aliases and used it on Create and Delete
+---
     
 ### #52 - Bug CORE-425 | Check failing controller update method
 - fixes:
     - fixed the Controller dApp example so create/update/delete methods are working
 - misc:
     - formated the CHANGELOG.md file so all changelogs have the same format
+---
 
 ### #48 - Feature: adds init command to the cli
 - features:
