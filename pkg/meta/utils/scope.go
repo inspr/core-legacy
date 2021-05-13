@@ -71,8 +71,8 @@ func JoinScopes(s1, s2 string) (string, error) {
 }
 
 /*
-RemoveAliasInScope removes the last name defined in the scope
-and returns the new scope and the element that was removed
+RemoveAliasInScope removes the two last names defined in the scope
+and returns the new scope and the alias that was removed
 */
 func RemoveAliasInScope(scope string) (string, string, error) {
 	if !IsValidScope(scope) {
