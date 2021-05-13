@@ -4,6 +4,7 @@ import (
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta/brokers"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/utils"
 )
 
@@ -27,7 +28,9 @@ func (bmm *BrokersMemoryManager) GetDefault() string {
 
 func (bmm *BrokersMemoryManager) get() *brokers.Brokers {
 	if bro == nil {
-		bro = &brokers.Brokers{}
+		bro = &brokers.Brokers{
+			Availible: make(metautils.StrSet),
+		}
 	}
 	return bro
 }
