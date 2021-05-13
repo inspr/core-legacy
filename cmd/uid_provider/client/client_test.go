@@ -832,3 +832,55 @@ func insprServerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rest.JSON(w, 200, val)
 }
+
+func Test_isPermissionAllowed(t *testing.T) {
+	type args struct {
+		newUserPermissionScope   string
+		newUserPermissions       []string
+		requestorPermissionScope string
+		requestorPermissions     []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "requestor permissions are enough to create new user",
+			args: args{
+				newUserPermissionScope:   "a.b.c",
+				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
+				requestorPermissionScope: "a.b",
+				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel},
+			},
+			want: true,
+		},
+		{
+			name: "requestor permissions (scope) are not enough to create new user",
+			args: args{
+				newUserPermissionScope:   "a.b.c",
+				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
+				requestorPermissionScope: "a.b.c.d",
+				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel},
+			},
+			want: false,
+		},
+		{
+			name: "requestor permissions (permissions) are not enough to create new user",
+			args: args{
+				newUserPermissionScope:   "a.b.c",
+				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
+				requestorPermissionScope: "a.b",
+				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isPermissionAllowed(tt.args.newUserPermissionScope, tt.args.newUserPermissions, tt.args.requestorPermissionScope, tt.args.requestorPermissions); got != tt.want {
+				t.Errorf("isPermissionAllowed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

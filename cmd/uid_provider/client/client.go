@@ -80,7 +80,7 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 	for newUserPermissionScope, newUserPermissions := range newUser.Permissions {
 		isAllowed := false
 		for requestorPermissionScope, requestorPermissions := range requestor.Permissions {
-			if c.isPermissionAllowed(newUserPermissionScope, newUserPermissions, requestorPermissionScope, requestorPermissions) {
+			if isPermissionAllowed(newUserPermissionScope, newUserPermissions, requestorPermissionScope, requestorPermissions) {
 				isAllowed = true
 				break
 			}
@@ -98,7 +98,7 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 	return nil
 }
 
-func (c *Client) isPermissionAllowed(newUserPermissionScope string, newUserPermissions []string, requestorPermissionScope string, requestorPermissions []string) bool {
+func isPermissionAllowed(newUserPermissionScope string, newUserPermissions []string, requestorPermissionScope string, requestorPermissions []string) bool {
 	if !metautils.IsInnerScope(requestorPermissionScope, newUserPermissionScope) {
 		return false
 	}
