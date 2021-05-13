@@ -2,13 +2,15 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -72,83 +74,101 @@ PowerShell:
 	},
 }
 
+func appsFromApp(app *meta.App) utils.StringArray {
+	scopes := utils.StringArray{}
+	for name := range app.Spec.Apps {
+		scopes = append(scopes, name)
+	}
+	return scopes
+}
+
+func channelsFromApp(app *meta.App) utils.StringArray {
+	scopes := utils.StringArray{}
+	for name := range app.Spec.Apps {
+		scopes = append(scopes, name+".")
+	}
+	for name := range app.Spec.Channels {
+		scopes = append(scopes, name)
+	}
+	return scopes
+}
+
+func typesFromApp(app *meta.App) utils.StringArray {
+	scopes := utils.StringArray{}
+	for name := range app.Spec.Apps {
+		scopes = append(scopes, name+".")
+	}
+	for name := range app.Spec.ChannelTypes {
+		scopes = append(scopes, name)
+	}
+	return scopes
+}
+
+func aliasesFromApp(app *meta.App) utils.StringArray {
+	scopes := utils.StringArray{}
+	for name := range app.Spec.Apps {
+		scopes = append(scopes, name+".")
+	}
+	for name := range app.Spec.Aliases {
+		scopes = append(scopes, name)
+	}
+	return scopes
+}
+
 func completeDapps(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	return generateCompletion(func(app *meta.App) []string {
-		scopes := []string{}
-		for name := range app.Spec.Apps {
-			scopes = append(scopes, name)
-		}
-		return scopes
-	})(cm, args, toComplete)
+	return generateCompletion(appsFromApp)(cm, args, toComplete)
 }
+
 func completeChannels(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	return generateCompletion(func(app *meta.App) []string {
-		scopes := []string{}
-		for name := range app.Spec.Apps {
-			scopes = append(scopes, name+".")
-		}
-		for name := range app.Spec.Channels {
-			scopes = append(scopes, name)
-		}
-		return scopes
-	})(cm, args, toComplete)
+	return generateCompletion(channelsFromApp)(cm, args, toComplete)
 }
-func generateCompletion(tg func(*meta.App) []string) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+
+func completeChannelTypes(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return generateCompletion(typesFromApp)(cm, args, toComplete)
+}
+
+func completeAliases(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return generateCompletion(aliasesFromApp)(cm, args, toComplete)
+}
+
+func generateCompletion(tg func(*meta.App) utils.StringArray) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
 	return func(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		toComplete = strings.TrimSuffix(toComplete, ".")
-		client := cliutils.GetCliClient()
-		scope, err := cliutils.GetScope()
-
+		newScope, app, err := getCurrentValidApp(toComplete)
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveError
 		}
-
-		newScope, err := utils.JoinScopes(scope, toComplete)
-		if _, err := client.Apps().Get(context.Background(), newScope); err != nil {
-			newScope, _, _ = utils.RemoveLastPartInScope(newScope)
-		}
-
-		app, err := client.Apps().Get(context.Background(), newScope)
-		if err != nil {
-			return nil, cobra.ShellCompDirectiveError
-		}
-		newOnes := tg(app)
-		for i := range newOnes {
+		newOnes := tg(app).Map(func(s string) string {
 			if newScope != "" {
-				newOnes[i] = newScope + "." + newOnes[i]
+				return newScope + "." + s
 			}
-		}
-		ret := []string{}
-		for _, s := range newOnes {
-			if strings.HasPrefix(s, toComplete) {
-				ret = append(ret, s)
-			}
-		}
-		return ret, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+			return s
+		}).Filter(
+			func(s string) bool {
+				return strings.HasPrefix(s, toComplete)
+			},
+		)
+
+		return newOnes, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	}
+}
+
+func getCurrentValidApp(toComplete string) (string, *meta.App, error) {
+	toComplete = strings.TrimSuffix(toComplete, ".")
+	client := cliutils.GetCliClient()
+	scope, err := cliutils.GetScope()
+
+	if err != nil {
+		return "", nil, errors.New("")
 	}
 
-}
-func completeChannelTypes(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	return generateCompletion(func(app *meta.App) []string {
-		scopes := []string{}
-		for name := range app.Spec.Apps {
-			scopes = append(scopes, name+".")
-		}
-		for name := range app.Spec.ChannelTypes {
-			scopes = append(scopes, name)
-		}
-		return scopes
-	})(cm, args, toComplete)
-}
-func completeAliases(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	return generateCompletion(func(app *meta.App) []string {
-		scopes := []string{}
-		for name := range app.Spec.Apps {
-			scopes = append(scopes, name+".")
-		}
-		for name := range app.Spec.Aliases {
-			scopes = append(scopes, name)
-		}
-		return scopes
-	})(cm, args, toComplete)
+	newScope, err := metautils.JoinScopes(scope, toComplete)
+	if _, err := client.Apps().Get(context.Background(), newScope); err != nil {
+		newScope, _, _ = metautils.RemoveLastPartInScope(newScope)
+	}
+
+	app, err := client.Apps().Get(context.Background(), newScope)
+	if err != nil {
+		return "", nil, errors.New("")
+	}
+	return newScope, app, nil
 }
