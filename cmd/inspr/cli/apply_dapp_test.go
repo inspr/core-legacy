@@ -102,7 +102,7 @@ func Test_schemaInjection(t *testing.T) {
 func Test_recursiveSchemaInjection(t *testing.T) {
 	prepareToken(t)
 	type args struct {
-		apps map[string]*meta.App
+		apps *meta.App
 	}
 	tests := []struct {
 		name    string
@@ -126,39 +126,43 @@ func Test_recursiveSchemaInjection(t *testing.T) {
 	}
 }
 
-func getAppMap() map[string]*meta.App {
-	return map[string]*meta.App{
-		"app1": {
-			Spec: meta.AppSpec{
-				Types: map[string]*meta.Type{
-					"ct1": {
-						Meta: meta.Metadata{
-							Name: "ct1",
+func getAppMap() *meta.App {
+	return &meta.App{
+		Spec: meta.AppSpec{
+			Apps: map[string]*meta.App{
+				"app1": {
+					Spec: meta.AppSpec{
+						Types: map[string]*meta.Type{
+							"ct1": {
+								Meta: meta.Metadata{
+									Name: "ct1",
+								},
+								Schema: "test/schema_example.schema",
+							},
 						},
-						Schema: "test/schema_example.schema",
 					},
 				},
-			},
-		},
-		"app2": {
-			Spec: meta.AppSpec{
-				Types: map[string]*meta.Type{
-					"ct2": {
-						Meta: meta.Metadata{
-							Name: "ct2",
+				"app2": {
+					Spec: meta.AppSpec{
+						Types: map[string]*meta.Type{
+							"ct2": {
+								Meta: meta.Metadata{
+									Name: "ct2",
+								},
+								Schema: "test/schema_example.schema",
+							},
 						},
-						Schema: "test/schema_example.schema",
-					},
-				},
-				Apps: map[string]*meta.App{
-					"app3": {
-						Spec: meta.AppSpec{
-							Types: map[string]*meta.Type{
-								"ct3": {
-									Meta: meta.Metadata{
-										Name: "ct3",
+						Apps: map[string]*meta.App{
+							"app3": {
+								Spec: meta.AppSpec{
+									Types: map[string]*meta.Type{
+										"ct3": {
+											Meta: meta.Metadata{
+												Name: "ct3",
+											},
+											Schema: "test/schema_example.schema",
+										},
 									},
-									Schema: "test/schema_example.schema",
 								},
 							},
 						},
