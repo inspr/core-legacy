@@ -1,6 +1,13 @@
 
 # Changelog
 
+### #56 Story CORE-417 | Create a broker-tracking structure
+- features:
+    - created a Brokers struct on meta/brokers to store broker information.
+    -  created a Brokers interface to handle storage of broker data
+    - included said interface on MemoryManager
+    - developed a mock structure for the new interface
+
 ### #54 - Tech CORE-365 | Alias Meta.Name automatic injection when applying app
 - features:
     - alias name injection on apply app
