@@ -102,6 +102,10 @@ func recursiveSchemaInjection(apps map[string]*meta.App) error {
 			channel.Meta.Name = chName
 		}
 
+		for aliasName, alias := range app.Spec.Aliases {
+			alias.Meta.Name = aliasName
+		}
+
 		if len(app.Spec.Apps) > 0 {
 			err = recursiveSchemaInjection(app.Spec.Apps)
 			if err != nil {
