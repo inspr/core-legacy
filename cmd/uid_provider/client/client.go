@@ -17,6 +17,7 @@ import (
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/controller/client"
 	"github.com/inspr/inspr/pkg/ierrors"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/utils"
 )
 
@@ -70,10 +71,45 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 	if err != nil {
 		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
 	}
+
+	requestor, err := get(ctx, c.rdb, uid)
+	if err != nil {
+		return err
+	}
+
+	for newUserPermissionScope, newUserPermissions := range newUser.Permissions {
+		isAllowed := false
+		for requestorPermissionScope, requestorPermissions := range requestor.Permissions {
+			if c.isPermissionAllowed(newUserPermissionScope, newUserPermissions, requestorPermissionScope, requestorPermissions) {
+				isAllowed = true
+				break
+			}
+		}
+
+		if !isAllowed {
+			return ierrors.NewError().Forbidden().Message("You are not allowed to create a user with those permissions").Build()
+		}
+
+	}
+
 	if err := set(ctx, c.rdb, newUser); err != nil {
 		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
 	return nil
+}
+
+func (c *Client) isPermissionAllowed(newUserPermissionScope string, newUserPermissions []string, requestorPermissionScope string, requestorPermissions []string) bool {
+	if !metautils.IsInnerScope(requestorPermissionScope, newUserPermissionScope) {
+		return false
+	}
+
+	for _, permission := range newUserPermissions {
+		if !utils.Includes(requestorPermissions, permission) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // DeleteUser deletes an user from Redis, if it exists
