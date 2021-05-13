@@ -37,7 +37,7 @@ func TestYamlToApp(t *testing.T) {
 
 	// uses cmp Equal to not evaluate comparison between maps
 	if !cmp.Equal(
-		app,
+		*app,
 		mockApp,
 		cmp.Options{
 			cmp.FilterValues(func(x, y interface{}) bool {

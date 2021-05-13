@@ -150,7 +150,7 @@ func displayAlias(_ context.Context, args []string) error {
 		return err
 	}
 
-	path, aliasKey, err := cliutils.ProcessArg(args[0], scope)
+	path, aliasKey, err := cliutils.ProcessAliasArg(args[0], scope)
 	if err != nil {
 		return err
 	}

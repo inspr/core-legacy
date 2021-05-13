@@ -2,6 +2,7 @@ package utils
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/inspr/inspr/pkg/ierrors"
 )
@@ -20,4 +21,18 @@ func StructureNameIsValid(name string) error {
 		return nil
 	}
 	return ierrors.NewError().BadRequest().Message("invalid character in structure's name").Build()
+}
+
+// AliasNameIsValid checks if the given name is valid for naming aliasses
+func AliasNameIsValid(name string) error {
+	names := strings.Split(name, ".")
+	if len(names) != 2 || names[len(names)-1] == "" {
+		return ierrors.NewError().BadRequest().Message("invalid alias name structure").Build()
+	}
+	err := StructureNameIsValid(names[0])
+	if err != nil {
+		return err
+	}
+
+	return StructureNameIsValid(names[1])
 }

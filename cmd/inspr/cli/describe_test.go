@@ -132,9 +132,9 @@ func getMockApp() *meta.App {
 				Output: []string{},
 			},
 			Aliases: map[string]*meta.Alias{
-				"alias_name": {
+				"alias.name": {
 					Meta: meta.Metadata{
-						Name: "alias_name",
+						Name: "alias.name",
 					},
 					Target: "alias_target",
 				},
@@ -400,7 +400,7 @@ func Test_displayAlias(t *testing.T) {
 	prepareToken(t)
 	defer restartScopeFlag()
 	bufResp := bytes.NewBufferString("")
-	utils.PrintAliasTree(getMockApp().Spec.Aliases["alias_name"], bufResp)
+	utils.PrintAliasTree(getMockApp().Spec.Aliases["alias.name"], bufResp)
 	outResp, _ := ioutil.ReadAll(bufResp)
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
@@ -425,19 +425,19 @@ func Test_displayAlias(t *testing.T) {
 	}{
 		{
 			name:           "Should describe the alias state",
-			flagsAndArgs:   []string{"al", "appParent.alias_name"},
+			flagsAndArgs:   []string{"al", "appParent.alias.name"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,
 		},
 		{
 			name:           "Invalid scope flag, should not print",
-			flagsAndArgs:   []string{"al", "alias_name", "--scope", "invalid..scope"},
+			flagsAndArgs:   []string{"al", "alias.name", "--scope", "invalid..scope"},
 			handlerFunc:    handler,
 			expectedOutput: []byte(""),
 		},
 		{
 			name:           "Valid scope flag",
-			flagsAndArgs:   []string{"al", "alias_name", "--scope", "appParent"},
+			flagsAndArgs:   []string{"al", "alias.name", "--scope", "appParent"},
 			handlerFunc:    handler,
 			expectedOutput: outResp,
 		},

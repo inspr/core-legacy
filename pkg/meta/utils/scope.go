@@ -69,3 +69,23 @@ func JoinScopes(s1, s2 string) (string, error) {
 
 	return newScope, nil
 }
+
+/*
+RemoveAliasInScope removes the two last names defined in the scope
+and returns the new scope and the alias that was removed
+*/
+func RemoveAliasInScope(scope string) (string, string, error) {
+	if !IsValidScope(scope) {
+		return "", "", ierrors.NewError().Message("invalid scope: %s", scope).InvalidName().Build()
+	}
+
+	names := strings.Split(scope, ".")
+	aliasNames := names[len(names)-2:]
+	names = names[:len(names)-2]
+
+	alias := strings.Join(aliasNames, ".")
+	newScope := strings.Join(names, ".")
+
+	return newScope, alias, nil
+
+}

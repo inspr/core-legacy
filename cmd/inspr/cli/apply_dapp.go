@@ -22,22 +22,10 @@ func NewApplyApp() RunMethod {
 		if err != nil {
 			return err
 		}
-		if len(app.Spec.Types) > 0 {
-			err = schemaInjection(app.Spec.Types)
-			if err != nil {
-				return err
-			}
-		}
 
-		for chName, channel := range app.Spec.Channels {
-			channel.Meta.Name = chName
-		}
-
-		if len(app.Spec.Apps) > 0 {
-			err = recursiveSchemaInjection(app.Spec.Apps)
-			if err != nil {
-				return err
-			}
+		err = recursiveSchemaInjection(app)
+		if err != nil {
+			return err
 		}
 
 		flagDryRun := cmd.InsprOptions.DryRun
@@ -54,9 +42,9 @@ func NewApplyApp() RunMethod {
 			if errQuery != nil {
 				return errQuery
 			}
-			log, err = c.Update(context.Background(), updateQuery, &app, flagDryRun)
+			log, err = c.Update(context.Background(), updateQuery, app, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), query, &app, flagDryRun)
+			log, err = c.Create(context.Background(), query, app, flagDryRun)
 		}
 
 		if err != nil {
@@ -84,29 +72,31 @@ func schemaInjection(types map[string]*meta.Type) error {
 	return nil
 }
 
-func recursiveSchemaInjection(apps map[string]*meta.App) error {
+func recursiveSchemaInjection(app *meta.App) error {
 	var err error
-	for appName, app := range apps {
-		if len(app.Spec.Types) > 0 {
-			err = schemaInjection(app.Spec.Types)
-			if err != nil {
-				return err
-			}
+
+	if len(app.Spec.Types) > 0 {
+		err = schemaInjection(app.Spec.Types)
+		if err != nil {
+			return err
 		}
-
-		for chName, channel := range app.Spec.Channels {
-			channel.Meta.Name = chName
-		}
-
-		if len(app.Spec.Apps) > 0 {
-			err = recursiveSchemaInjection(app.Spec.Apps)
-			if err != nil {
-				return err
-			}
-		}
-
-		app.Meta.Name = appName
-
 	}
+
+	for chName, channel := range app.Spec.Channels {
+		channel.Meta.Name = chName
+	}
+
+	for aliasName, alias := range app.Spec.Aliases {
+		alias.Meta.Name = aliasName
+	}
+
+	for appName, childApp := range app.Spec.Apps {
+		childApp.Meta.Name = appName
+		err = recursiveSchemaInjection(childApp)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
