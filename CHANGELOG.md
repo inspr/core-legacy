@@ -1,6 +1,11 @@
 
 # Changelog
 
+### #54 - Tech CORE-365 | Alias Meta.Name automatic injection when applying app
+- features:
+    - alias name injection on apply app
+    - updated user example to include token creation
+
 ### #53 - Tech CORE-362 | Validate alias when applying app
   - features:
     - created a validation function for aliases and used it on Create and Delete
