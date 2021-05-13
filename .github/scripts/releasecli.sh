@@ -1,10 +1,11 @@
+#!/bin/bash
 GITHUB_SHA=$1
 VERSION=$(cat version)
 BASE_URL="https://console.cloud.google.com/storage/browser/inspr-cli/bin"
 
 release-cli create --name "Release $VERSION" \
         --tag-name $VERSION \
-        --ref GITHUB_SHA \
+        --ref $GITHUB_SHA \
         --assets-link "{\"name\":\"insprcli-linux-arm64\",
                         \"url\":\"$BASE_URL/insprcli-linux-arm64-$VERSION\"}" \
         --assets-link "{\"name\":\"insprcli-linux-amd64\",
