@@ -3,7 +3,7 @@ BASE_URL="https://console.cloud.google.com/storage/browser/inspr-cli/bin"
 
 release-cli create --name "Release $VERSION" \
         --tag-name $VERSION \
-        --ref "$CI_COMMIT_SHA" \
+        --ref "${{ github.sha }}" \
         --assets-link "{\"name\":\"insprcli-linux-arm64\",
                         \"url\":\"$BASE_URL/insprcli-linux-arm64-$VERSION\"}" \
         --assets-link "{\"name\":\"insprcli-linux-amd64\",
