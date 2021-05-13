@@ -622,7 +622,7 @@ func Test_printAliases(t *testing.T) {
 				app:   getMockApp(),
 				lines: &[]string{},
 			},
-			lines: &[]string{"alias_name\n"},
+			lines: &[]string{"alias.name\n"},
 		},
 	}
 	for _, tt := range tests {
@@ -640,7 +640,7 @@ func Test_getAlias(t *testing.T) {
 	bufResp := bytes.NewBufferString("")
 	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
 	fmt.Fprint(tabWriter, "NAME\n")
-	fmt.Fprint(tabWriter, "alias_name\n")
+	fmt.Fprint(tabWriter, "alias.name\n")
 	tabWriter.Flush()
 	outResp, _ := ioutil.ReadAll(bufResp)
 	type args struct {
