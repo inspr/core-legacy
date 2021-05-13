@@ -1,7 +1,9 @@
-uid: nick
-password: 123456
+uid: name
+password: password
 permissions:
   "":
+    - "create:token"
+    
     - "create:dapp"
     - "create:channel"
     - "create:type"
