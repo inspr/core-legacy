@@ -51,7 +51,7 @@ func (chh *ChannelMemoryManager) Get(context string, chName string) (*meta.Chann
 	}
 
 	logger.Debug("unable to get Channel in given context",
-		zap.String("ctype", chName),
+		zap.String("type", chName),
 		zap.String("context", context))
 
 	newError := ierrors.
@@ -72,7 +72,7 @@ func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error 
 	nameErr := metautils.StructureNameIsValid(ch.Meta.Name)
 	if nameErr != nil {
 		logger.Error("invalid Channel name",
-			zap.String("ctype", ch.Meta.Name))
+			zap.String("type", ch.Meta.Name))
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
@@ -96,15 +96,15 @@ func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error 
 	}
 
 	logger.Debug("checking if Channel's type is valid")
-	if _, ok := parentApp.Spec.ChannelTypes[ch.Spec.Type]; !ok {
+	if _, ok := parentApp.Spec.Types[ch.Spec.Type]; !ok {
 		logger.Error("channel's type is invalid")
-		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
+		return ierrors.NewError().InvalidChannel().Message("references a Type that doesn't exist").Build()
 	}
 
-	connectedChannels := parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels
+	connectedChannels := parentApp.Spec.Types[ch.Spec.Type].ConnectedChannels
 	if !utils.Includes(connectedChannels, ch.Meta.Name) {
 		connectedChannels = append(connectedChannels, ch.Meta.Name)
-		parentApp.Spec.ChannelTypes[ch.Spec.Type].ConnectedChannels = connectedChannels
+		parentApp.Spec.Types[ch.Spec.Type].ConnectedChannels = connectedChannels
 	}
 
 	logger.Debug("adding Channel to dApp",
@@ -156,13 +156,16 @@ func (chh *ChannelMemoryManager) Delete(context string, chName string) error {
 
 	parentApp, _ := GetTreeMemory().Apps().Get(context)
 
-	channelType := parentApp.Spec.ChannelTypes[channel.Spec.Type]
+	insprType := parentApp.Spec.Types[channel.Spec.Type]
 
-	logger.Debug("removing Channel from ChannelType connected channels list",
+	logger.Debug("removing Channel from Type connected channels list",
 		zap.String("channel", chName),
-		zap.String("channelType", channelType.Meta.Name))
+		zap.String("type", insprType.Meta.Name))
 
-	channelType.ConnectedChannels = utils.Remove(channelType.ConnectedChannels, channel.Meta.Name)
+	insprType.ConnectedChannels = utils.Remove(
+		insprType.ConnectedChannels,
+		channel.Meta.Name,
+	)
 
 	logger.Debug("removing Channel from its parents 'Channels' structure",
 		zap.String("channel", chName),
@@ -201,11 +204,11 @@ func (chh *ChannelMemoryManager) Update(context string, ch *meta.Channel) error 
 
 	logger.Debug("validating new Channel structure")
 
-	if _, ok := parentApp.Spec.ChannelTypes[ch.Spec.Type]; !ok {
-		logger.Error("unable to create Channel for it references an invalid Channel Type",
-			zap.String("invalid Channel Type", ch.Spec.Type))
+	if _, ok := parentApp.Spec.Types[ch.Spec.Type]; !ok {
+		logger.Error("unable to create Channel for it references an invalid Type",
+			zap.String("invalid Type", ch.Spec.Type))
 
-		return ierrors.NewError().InvalidChannel().Message("references a Channel Type that doesn't exist").Build()
+		return ierrors.NewError().InvalidChannel().Message("references a Type that doesn't exist").Build()
 	}
 
 	logger.Debug("replacing old Channel with the new one in dApps 'Channels'",
@@ -248,7 +251,7 @@ func (amm *ChannelRootGetter) Get(context string, chName string) (*meta.Channel,
 	}
 
 	logger.Error("unable to get Channel in given context (Root Getter)",
-		zap.String("ctype", chName),
+		zap.String("type", chName),
 		zap.String("context", context))
 
 	newError := ierrors.

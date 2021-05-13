@@ -7,8 +7,8 @@ import (
 )
 
 // YamlToApp - deserializes the yaml to a meta.App struct
-func YamlToApp(bytes []byte) (meta.App, error) {
-	app := meta.App{
+func YamlToApp(bytes []byte) (*meta.App, error) {
+	app := &meta.App{
 		Meta: meta.Metadata{Annotations: make(map[string]string)},
 	}
 
@@ -17,7 +17,7 @@ func YamlToApp(bytes []byte) (meta.App, error) {
 	}
 
 	if app.Meta.Name == "" {
-		return meta.App{}, ierrors.NewError().Message("dapp without name").Build()
+		return &meta.App{}, ierrors.NewError().Message("dapp without name").Build()
 	}
 
 	return app, nil

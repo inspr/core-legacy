@@ -43,7 +43,7 @@ func ERROR(w http.ResponseWriter, err error) {
 			JSON(w, http.StatusForbidden, e)
 		case ierrors.InvalidChannel:
 			JSON(w, http.StatusForbidden, e)
-		case ierrors.InvalidChannelType:
+		case ierrors.InvalidType:
 			JSON(w, http.StatusForbidden, e)
 		case ierrors.BadRequest:
 			JSON(w, http.StatusBadRequest, e)

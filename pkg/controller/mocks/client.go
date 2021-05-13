@@ -24,9 +24,9 @@ func (cm *ClientMock) Channels() controller.ChannelInterface {
 	return NewChannelMock(cm.err)
 }
 
-//ChannelTypes mocks a chanl types controller
-func (cm *ClientMock) ChannelTypes() controller.ChannelTypeInterface {
-	return NewChannelTypeMock(cm.err)
+//Types mocks a chanl types controller
+func (cm *ClientMock) Types() controller.TypeInterface {
+	return NewTypeMock(cm.err)
 }
 
 //Authorization mocks a app controller

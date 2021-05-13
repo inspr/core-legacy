@@ -237,7 +237,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff4",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
@@ -258,7 +258,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff8",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
@@ -280,7 +280,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff4",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
@@ -289,7 +289,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 					Diff: []Difference{
 						{
 							Name: "diff8",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
@@ -315,7 +315,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff4",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
@@ -336,7 +336,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff8",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},

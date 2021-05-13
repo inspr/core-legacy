@@ -128,13 +128,13 @@ func generateCompletion(tg func(*meta.App) []string) func(*cobra.Command, []stri
 	}
 
 }
-func completeChannelTypes(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func completeTypes(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	return generateCompletion(func(app *meta.App) []string {
 		scopes := []string{}
 		for name := range app.Spec.Apps {
 			scopes = append(scopes, name+".")
 		}
-		for name := range app.Spec.ChannelTypes {
+		for name := range app.Spec.Types {
 			scopes = append(scopes, name)
 		}
 		return scopes
