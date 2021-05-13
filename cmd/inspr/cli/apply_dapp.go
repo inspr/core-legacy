@@ -90,13 +90,11 @@ func recursiveSchemaInjection(app *meta.App) error {
 		alias.Meta.Name = aliasName
 	}
 
-	if len(app.Spec.Apps) > 0 {
-		for appName, childApp := range app.Spec.Apps {
-			childApp.Meta.Name = appName
-			err = recursiveSchemaInjection(childApp)
-			if err != nil {
-				return err
-			}
+	for appName, childApp := range app.Spec.Apps {
+		childApp.Meta.Name = appName
+		err = recursiveSchemaInjection(childApp)
+		if err != nil {
+			return err
 		}
 	}
 
