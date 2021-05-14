@@ -51,7 +51,7 @@
                 "Operation": 2
             },
             {
-                "field": "Spec.ChannelTypes[ct2]",
+                "field": "Spec.Types[ct2]",
                 "from": "{...}",
                 "to": "\u003cnil\u003e",
                 "Kind": 16,
@@ -59,7 +59,7 @@
                 "Operation": 1
             },
             {
-                "field": "Spec.ChannelTypes[ct1].Meta.Reference",
+                "field": "Spec.Types[ct1].Meta.Reference",
                 "from": "root.ct1",
                 "to": "root.ct1diff",
                 "Kind": 20,

@@ -25,3 +25,24 @@ func ProcessArg(arg, scope string) (string, string, error) {
 	}
 	return path, component, nil
 }
+
+//ProcessAliasArg is responsible for separating a path into an alias name and it's parent's path.
+// < path, name, error >
+func ProcessAliasArg(arg, scope string) (string, string, error) {
+	path := scope
+	var alias string
+
+	if err := utils.AliasNameIsValid(arg); err != nil {
+		if !utils.IsValidScope(arg) {
+			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
+		}
+
+		newScope, lastName, _ := utils.RemoveAliasInScope(arg)
+		path, _ = utils.JoinScopes(path, newScope)
+
+		alias = lastName
+	} else {
+		alias = arg
+	}
+	return path, alias, nil
+}

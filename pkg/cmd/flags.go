@@ -61,6 +61,14 @@ var flagRegistry = []Flag{
 		DefValue:  "",
 		DefinedOn: []string{"all"},
 	},
+	{
+		Name:      "config",
+		Shorthand: "c",
+		Usage:     "set the config file for the command",
+		Value:     &InsprOptions.Config,
+		DefValue:  "",
+		DefinedOn: []string{"all"},
+	},
 }
 
 func methodNameByType(v reflect.Value) string {

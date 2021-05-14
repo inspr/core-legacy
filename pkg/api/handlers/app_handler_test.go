@@ -106,7 +106,7 @@ func appDICases(funcName string) []appAPITest {
 		},
 		{
 			name: "invalid_channel_type_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
@@ -124,7 +124,7 @@ func appDICases(funcName string) []appAPITest {
 // For example, HandleGet and HandleDelete use these test cases
 func appQueryDICases(funcName string) []appAPITest {
 	parsedQueryAppDI, _ := json.Marshal(models.AppQueryDI{})
-	const scope = ".mock_app"
+	const scope = "mock_app"
 	wrongFormatData, _ := json.Marshal([]byte{1})
 	return []appAPITest{
 		{
@@ -183,7 +183,7 @@ func appQueryDICases(funcName string) []appAPITest {
 		},
 		{
 			name: "invalid_channel_type_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},

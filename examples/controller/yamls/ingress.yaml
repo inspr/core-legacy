@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: controller-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: inspr.com
+      http:
+        paths:
+          - path: /update
+            backend:
+              serviceName: node-393e2007-0f02-4971-80f6-3bd7af2f0463
+              servicePort: 8080
+          - path: /delete
+            backend:
+              serviceName: node-393e2007-0f02-4971-80f6-3bd7af2f0463
+              servicePort: 8080
+          - path: /create
+            backend:
+              serviceName: node-393e2007-0f02-4971-80f6-3bd7af2f0463
+              servicePort: 8080

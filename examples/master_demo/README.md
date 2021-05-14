@@ -11,7 +11,7 @@ Then, in another terminal instance, run:
 
 `go run examples/master_demo/main.go`  
 
-As a result, new dApps, Channels and Channel Types will be  created, got (as in Get), updated and then deleted, and each operation done will be printed in the terminal, along with the diff applied.  
+As a result, new dApps, Channels and Types will be  created, got (as in Get), updated and then deleted, and each operation done will be printed in the terminal, along with the diff applied.  
 
 **PS:**  
 If desired, the main.go in this folder can be edited to do different operations. Also, if Inspr's CLI is installed, it is possible to run Create/Get/Update/Delete methods by using the CLI's commands.

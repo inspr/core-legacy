@@ -95,8 +95,8 @@ func TestERROR(t *testing.T) {
 			want: http.StatusForbidden,
 		},
 		{
-			name: "InsprErrors_InvalidChannelType",
-			err:  ierrors.NewError().InvalidChannelType().Build(),
+			name: "InsprErrors_InvalidType",
+			err:  ierrors.NewError().InvalidType().Build(),
 			want: http.StatusForbidden,
 		},
 		{

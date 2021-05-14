@@ -3,23 +3,23 @@
 
 .SH NAME
 .PP
-inspr\-delete\-ctypes \- Delete channel types from context
+inspr\-delete\-types \- Delete types from context
 
 
 .SH SYNOPSIS
 .PP
-\fBinspr delete ctypes [flags]\fP
+\fBinspr delete types [flags]\fP
 
 
 .SH DESCRIPTION
 .PP
-Delete channel types from context
+Delete types from context
 
 
 .SH OPTIONS
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
-	help for ctypes
+	help for types
 
 .PP
 \fB\-s\fP, \fB\-\-scope\fP=""
@@ -31,11 +31,11 @@ Delete channel types from context
 .RS
 
 .nf
-  # Delete channel type from the default scope
- inspr delete ctypes <ctypename>
+  # Delete type from the default scope
+ inspr delete types <typename>
 
-  # Delete channel type from a custom scope
- inspr delete ctypes <ctypename> \-\-scope app1.app2
+  # Delete type from a custom scope
+ inspr delete types <typename> \-\-scope app1.app2
 
 
 .fi

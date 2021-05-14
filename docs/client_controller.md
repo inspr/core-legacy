@@ -1,6 +1,6 @@
 # Client Controller
 
-The client controller is the entry point for making changes to the Inspr tree structure. By using the client, it is possible to create, modify and delete dApps, Channels and Channel Types.
+The client controller is the entry point for making changes to the Inspr tree structure. By using the client, it is possible to create, modify and delete dApps, Channels and Types.
 
 ## Instantiating a new Client
 
@@ -44,11 +44,11 @@ resp, err := client.Channels().Create(context.Background(), "HelloWorldApp", &me
         Name: "NewChannel",
     },
     Spec: meta.ChannelSpec{
-        Type: "ChannelTypeHello",
+        Type: "TypeHello",
     },
 }, dryRun)
 ```
-Remember that in the case above, the Channel Type `ChannelTypeHello` must exist within `HelloWorldApp`.
+Remember that in the case above, the Type `TypeHello` must exist within `HelloWorldApp`.
 
 ## Apps
 
@@ -118,36 +118,36 @@ func (cc *ChannelClient) Delete(ctx context.Context, context string, name string
 `Delete` deletes a Channel inside the Insprd. The `context string` refers to the parent dApp of the given Channel, represented with a dot separated query, such as **app1.app2**. The name is the name of the Channel to be deleted.  
 So to delete a Channel inside `app1` with the name `channel1` you would call `cc.Delete(context.Background(), "app1", "channel1")`.
 
-## Channel Types
+## Types
 
-### func \(\*ChannelTypeClient) Get
-
-```go
-func (ctc *ChannelTypeClient) Get(ctx context.Context, context string, name string) (*meta.ChannelType, error)
-```
-`Get` gets a Channel Type from the Insprd. The `context string` refers to the parent dApp of the given Channel Type, represented with a dot separated query, such as **app1.app2**. The name is the name of the Channel Type.  
-So to search for a Channel Type inside `app1` with the name `channeltype1` you would call ctc.Get(context.Background(), "app1", "channeltype1").
-
-### func \(\*ChannelTypeClient) Create
+### func \(\*TypeClient) Get
 
 ```go
-func (ctc *ChannelTypeClient) Create(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error)
+func (ctc *TypeClient) Get(ctx context.Context, context string, name string) (*meta.Type, error)
 ```
-`Create` creates a Channel Type inside the Insprd. The `context string` refers to the parent dApp of the given Channel Type, represented with a dot separated query, such as **app1.app2**. The Channel Type information such as its name will be extracted from the given Channel Type's metadata.  
-So to create a Channel Type inside `app1` with the name `channeltype1` you would call `ctc.Create(context.Background(), "app1", &meta.ChannelType{...})`.
+`Get` gets a Type from the Insprd. The `context string` refers to the parent dApp of the given Type, represented with a dot separated query, such as **app1.app2**. The name is the name of the Type.  
+So to search for a Type inside `app1` with the name `Type1` you would call ctc.Get(context.Background(), "app1", "Type1").
 
-### func \(\*ChannelTypeClient) Update
+### func \(\*TypeClient) Create
 
 ```go
-func (ctc *ChannelTypeClient) Update(ctx context.Context, context string, ch *meta.ChannelType, dryRun bool) (diff.Changelog, error)
+func (ctc *TypeClient) Create(ctx context.Context, context string, ch *meta.Type, dryRun bool) (diff.Changelog, error)
 ```
-`Update` updates a Channel Type inside the Insprd. The `context string` refers to the parent dApp of the given Channel Type, represented with a dot separated query, such as **app1.app2**. The Channel Type information such as its name will be extracted from the given Channel Type's metadata.  
-So to update a Channel Type inside `app1` with the name `channeltype1` you would call ` ctc.Create(context.Background(), "app1", &meta.ChannelType{...})`.
+`Create` creates a Type inside the Insprd. The `context string` refers to the parent dApp of the given Type, represented with a dot separated query, such as **app1.app2**. The Type information such as its name will be extracted from the given Type's metadata.  
+So to create a Type inside `app1` with the name `Type1` you would call `ctc.Create(context.Background(), "app1", &meta.Type{...})`.
 
-### func \(\*ChannelTypeClient) Delete
+### func \(\*TypeClient) Update
 
 ```go
-func (ctc *ChannelTypeClient) Delete(ctx context.Context, context string, name string, dryRun bool) (diff.Changelog, error)
+func (ctc *TypeClient) Update(ctx context.Context, context string, ch *meta.Type, dryRun bool) (diff.Changelog, error)
 ```
-`Delete` deletes a Channel Type inside the Insprd. The `context string` refers to the parent dApp of the given Channel Type, represented with a dot separated query, such as **app1.app2**. The name is the name of the Channel Type to be deleted.   
-So to delete a Channel Type inside `app1` with the name `channeltype1` you would call `ctc.Delete(context.Background(), "app1", "channeltype1")`.
+`Update` updates a Type inside the Insprd. The `context string` refers to the parent dApp of the given Type, represented with a dot separated query, such as **app1.app2**. The Type information such as its name will be extracted from the given Type's metadata.  
+So to update a Type inside `app1` with the name `Type1` you would call ` ctc.Create(context.Background(), "app1", &meta.Type{...})`.
+
+### func \(\*TypeClient) Delete
+
+```go
+func (ctc *TypeClient) Delete(ctx context.Context, context string, name string, dryRun bool) (diff.Changelog, error)
+```
+`Delete` deletes a Type inside the Insprd. The `context string` refers to the parent dApp of the given Type, represented with a dot separated query, such as **app1.app2**. The name is the name of the Type to be deleted.   
+So to delete a Type inside `app1` with the name `Type1` you would call `ctc.Delete(context.Background(), "app1", "Type1")`.

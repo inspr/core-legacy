@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 
@@ -55,6 +56,8 @@ func NewRedisClient() *Client {
 	}
 	err := c.initAdminUser()
 	if err != nil {
+		fmt.Println("ERROR CREATING REDIS-CLIENT", err.Error())
+		log.Println("ERROR CREATING REDIS-CLIENT", err.Error())
 		panic(err)
 	}
 	return c
@@ -250,8 +253,12 @@ func (authorizer) SetToken(token []byte) error {
 }
 
 func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
+	config := client.ControllerConfig{
+		Auth: authorizer{},
+		URL:  c.insprdAddress,
+	}
 
-	ncc := client.NewControllerClient(c.insprdAddress, authorizer{})
+	ncc := client.NewControllerClient(config)
 
 	token, err := ncc.Authorization().GenerateToken(ctx, payload)
 	if err != nil {

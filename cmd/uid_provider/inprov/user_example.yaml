@@ -1,7 +1,25 @@
-uid: user
-password: 123123
+uid: name
+password: password
 permissions:
-  "app1":
+  "":
+    - "create:token"
+    
     - "create:dapp"
-  "app2":
+    - "create:channel"
+    - "create:type"
+    - "create:alias"
+    
     - "get:dapp"
+    - "get:channel"
+    - "get:type"
+    - "get:alias"
+
+    - "update:dapp"
+    - "update:channel"
+    - "update:type"
+    - "update:alias"
+
+    - "delete:dapp"
+    - "delete:channel"
+    - "delete:type"
+    - "delete:alias"

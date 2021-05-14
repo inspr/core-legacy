@@ -26,7 +26,7 @@
 | Environment          | Defines the environment variables of your Node                                                                                                                                              |
 | &rarr; Apps          | Set of dApps that are connected to this dApp, can be specified when creating a new dApp or modified when a dApp is updated.                                                                 |
 | &rarr; Channels      | Set of Channels that are created in the context of this dApp                                                                                                                                |
-| &rarr; ChannelTypes  | Set of Channel Types that are created in the context of this dApp                                                                                                                           |
+| &rarr; Types  | Set of Types that are created in the context of this dApp                                                                                                                           |
 | &rarr; Boundary      |                                                                                                                                                                                             |
 | &rarr; &rarr; Input  | List of Channels that are used for the input of this dApp                                                                                                                                   |
 | &rarr; &rarr; Output | List of Channels that are used as the output of this dApp                                                                                                                                   |

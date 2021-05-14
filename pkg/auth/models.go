@@ -21,25 +21,25 @@ type Payload struct {
 
 // All Permissions possible values
 const (
-	CreateDapp        string = "create:dapp"
-	CreateChannel     string = "create:channel"
-	CreateChannelType string = "create:ctype"
-	CreateAlias       string = "create:alias"
+	CreateDapp    string = "create:dapp"
+	CreateChannel string = "create:channel"
+	CreateType    string = "create:type"
+	CreateAlias   string = "create:alias"
 
-	GetDapp        string = "get:dapp"
-	GetChannel     string = "get:channel"
-	GetChannelType string = "get:ctype"
-	GetAlias       string = "get:alias"
+	GetDapp    string = "get:dapp"
+	GetChannel string = "get:channel"
+	GetType    string = "get:type"
+	GetAlias   string = "get:alias"
 
-	UpdateDapp        string = "update:dapp"
-	UpdateChannel     string = "update:channel"
-	UpdateChannelType string = "update:ctype"
-	UpdateAlias       string = "update:alias"
+	UpdateDapp    string = "update:dapp"
+	UpdateChannel string = "update:channel"
+	UpdateType    string = "update:type"
+	UpdateAlias   string = "update:alias"
 
-	DeleteDapp        string = "delete:dapp"
-	DeleteChannel     string = "delete:channel"
-	DeleteChannelType string = "delete:ctype"
-	DeleteAlias       string = "delete:alias"
+	DeleteDapp    string = "delete:dapp"
+	DeleteChannel string = "delete:channel"
+	DeleteType    string = "delete:type"
+	DeleteAlias   string = "delete:alias"
 
 	CreateToken string = "create:token"
 )

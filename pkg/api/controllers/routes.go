@@ -18,12 +18,13 @@ func (s *Server) initRoutes() {
 	chandler := h.NewChannelHandler()
 	s.Mux.Handle("/channels", rest.HandleCRUD(chandler))
 
-	cthandler := h.NewChannelTypeHandler()
-	s.Mux.Handle("/channeltypes", rest.HandleCRUD(cthandler))
+	cthandler := h.NewTypeHandler()
+	s.Mux.Handle("/types", rest.HandleCRUD(cthandler))
 
 	aliasHandler := h.NewAliasHandler()
 	s.Mux.Handle("/alias", rest.HandleCRUD(aliasHandler))
 
 	s.Mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
+	s.Mux.Handle("/refreshController", h.ControllerRefreshHandler())
 	s.Mux.Handle("/init", h.InitHandler())
 }

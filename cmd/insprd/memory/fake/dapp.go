@@ -1,10 +1,9 @@
 package fake
 
 import (
-	"fmt"
-
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/utils"
 )
 
 // Apps - mocks the implementation of the AppMemory interface methods
@@ -35,7 +34,7 @@ func (a *Apps) Create(context string, ct *meta.App) error {
 	if a.fail != nil {
 		return a.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
+	query, _ := utils.JoinScopes(context, ct.Meta.Name)
 
 	_, ok := a.apps[query]
 	if ok {
@@ -72,7 +71,7 @@ func (a *Apps) Update(context string, ct *meta.App) error {
 	if a.fail != nil {
 		return a.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
+	query, _ := utils.JoinScopes(context, ct.Meta.Name)
 	_, ok := a.apps[query]
 	if !ok {
 		return ierrors.

@@ -15,4 +15,6 @@ var InsprOptions struct {
 	Update bool
 
 	Token string
+
+	Config string
 }

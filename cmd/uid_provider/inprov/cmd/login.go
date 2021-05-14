@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"github.com/inspr/inspr/pkg/cmd"
 	build "github.com/inspr/inspr/pkg/cmd"
 )
 
@@ -24,21 +25,21 @@ var loginCmd = build.NewCmd("login").WithDescription(
 ).WithExample(
 	"log in with your user and password",
 	"inprov login usr pwd",
-).WithFlags([]*build.Flag{
-	{
+).WithFlags(
+	&cmd.Flag{
 		Name:      "output",
 		Shorthand: "o",
 		Usage:     "set the output file for the returned token",
 		Value:     &loginOptions.output,
 		DefValue:  "",
 	},
-	{
+	&cmd.Flag{
 		Name:     "stdout",
 		Usage:    "set the output of the token to stdout",
 		Value:    &loginOptions.stdout,
 		DefValue: false,
 	},
-}).ExactArgs(2, loginAction)
+).ExactArgs(2, loginAction)
 
 func loginAction(c context.Context, s []string) error {
 
