@@ -123,7 +123,7 @@ func completeChannels(cm *cobra.Command, args []string, toComplete string) ([]st
 	return generateCompletion(channelsFromApp)(cm, args, toComplete)
 }
 
-func completeChannelTypes(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func completeTypes(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	return generateCompletion(typesFromApp)(cm, args, toComplete)
 }
 
