@@ -20,17 +20,8 @@ jobs:
         with:
           go-version: "^1.16.0"
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@master
-
       - name: Build CLI
         run: bash .github/scripts/buildcli.sh
-
-      - name: Push CLI
-        run: bash .github/scripts/pushcli.sh ${{ secrets.GCR_ACCOUNT_KEY }} "${{ github.run_id }}"
-
-      - name: Release CLI
-        run: bash .github/scripts/releasecli.sh "${{ github.sha }}"
 
       - name: Create temp file to store skaffold build return
         run: |
@@ -46,8 +37,11 @@ jobs:
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
+          title: "Release ${{ github.sha }}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
             LICENSE.txt
             *.jar
+            bin/*
+  # ${{ github.run_id }}
