@@ -11,6 +11,11 @@ type Brokers struct {
 	Available utils.StrSet
 }
 
+// BrokerConfiguration generic interface type
 type BrokerConfiguration interface{}
+
+// BrokerStatus generiic status type for brokers, used as parameters and returns
 type BrokerStatus string
+
+// BrokerStatusArray generic status array, used to return brokers data
 type BrokerStatusArray pkgutils.StringArray
