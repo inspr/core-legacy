@@ -28,14 +28,14 @@ type AppInterface interface {
 	Update(ctx context.Context, query string, app *meta.App, dryRun bool) (diff.Changelog, error)
 }
 
-// ChannelTypeInterface is the interface that allows to
+// TypeInterface is the interface that allows to
 // obtain or change information related to the current
-// state of the ChannelTypes in the cluster
-type ChannelTypeInterface interface {
-	Get(ctx context.Context, context string, ctName string) (*meta.ChannelType, error)
-	Create(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error)
+// state of the Types in the cluster
+type TypeInterface interface {
+	Get(ctx context.Context, context string, ctName string) (*meta.Type, error)
+	Create(ctx context.Context, context string, ct *meta.Type, dryRun bool) (diff.Changelog, error)
 	Delete(ctx context.Context, context string, ctName string, dryRun bool) (diff.Changelog, error)
-	Update(ctx context.Context, context string, ct *meta.ChannelType, dryRun bool) (diff.Changelog, error)
+	Update(ctx context.Context, context string, ct *meta.Type, dryRun bool) (diff.Changelog, error)
 }
 
 // AuthorizationInterface is the interface that allows to
@@ -58,11 +58,11 @@ type AliasInterface interface {
 
 // Interface is the interface that allows the management
 // of the current state of the cluster. Permiting the
-// modification of Channels, DApps and ChannelTypes
+// modification of Channels, DApps and Types
 type Interface interface {
 	Channels() ChannelInterface
 	Apps() AppInterface
-	ChannelTypes() ChannelTypeInterface
+	Types() TypeInterface
 	Authorization() AuthorizationInterface
 	Alias() AliasInterface
 }

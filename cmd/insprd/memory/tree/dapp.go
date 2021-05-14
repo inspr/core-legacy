@@ -103,7 +103,7 @@ func (amm *AppMemoryManager) Create(context string, app *meta.App) error {
 // Delete receives a query and searches for the specified dApp through the tree.
 // If the dApp is found and it doesn't have any dApps insite of it, it's deleted.
 // If it has other dApps inside of itself, those dApps are deleted recursively.
-// Channels and Channel Types inside the dApps to be deleted are also deleted
+// Channels and Types inside the dApps to be deleted are also deleted
 // dApp's reference inside of it's parent is also deleted.
 // In case of dApp not found an error is returned.
 func (amm *AppMemoryManager) Delete(query string) error {

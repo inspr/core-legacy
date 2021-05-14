@@ -92,8 +92,8 @@ func AliasDICases(funcName string) []AliasAPITest {
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
-			name: "invalid_channel_type_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAliasHandler(),
+			name: "invalid_type_request_" + funcName,
+			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
@@ -171,8 +171,8 @@ func AliasQueryDICases(funcName string) []AliasAPITest {
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
-			name: "invalid_channel_type_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannelType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAliasHandler(),
+			name: "invalid_type_request_" + funcName,
+			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},

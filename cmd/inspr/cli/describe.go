@@ -34,15 +34,15 @@ func NewDescribeCmd() *cobra.Command {
 		ValidArgsFunc(completeChannels).
 		ExactArgs(1, displayChannelState)
 
-	describeChannelType := cmd.NewCmd("ctypes <ctype_name | ctype_path>").
-		WithDescription("Retrieves the full state of the channelType from a given namespace").
-		WithExample("Display the state of the given channelType on the default scope", "describe ctypes hello_world").
-		WithExample("Display the state of the given channelType on a custom scope", "describe ctypes --scope app1.app2 hello_world").
-		WithExample("Display the state of the given channelType by the path", "describe ctypes app1.app2.hello_world").
-		WithAliases([]string{"ct"}).
+	describeType := cmd.NewCmd("types <type_name | type_path>").
+		WithDescription("Retrieves the full state of the type from a given namespace").
+		WithExample("Display the state of the given type on the default scope", "describe types hello_world").
+		WithExample("Display the state of the given type on a custom scope", "describe types --scope app1.app2 hello_world").
+		WithExample("Display the state of the given type by the path", "describe types app1.app2.hello_world").
+		WithAliases([]string{"t"}).
 		WithCommonFlags().
-		ValidArgsFunc(completeChannelTypes).
-		ExactArgs(1, displayChannelTypeState)
+		ValidArgsFunc(completeTypes).
+		ExactArgs(1, displayTypeState)
 
 	describeAlias := cmd.NewCmd("alias <alias_key | alais_path>").
 		WithDescription("Retrieves the full state of the alias from a given namespace").
@@ -60,10 +60,10 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Describes the app component type", "describe a <namespace> --scope <specific-scope>").
 		WithExample("Describes the channel component type", "describe ch <namespace>").
 		WithExample("Describes the alias component type", "describe al <namespace>").
-		WithLongDescription("describe takes a component type (apps | channels | ctypes | alias) plus the name of the component, and displays the state tree)").
+		WithLongDescription("describe takes a component type (apps | channels | types | alias) plus the name of the component, and displays the state tree)").
 		AddSubCommand(describeApp).
 		AddSubCommand(describeChannel).
-		AddSubCommand(describeChannelType).
+		AddSubCommand(describeType).
 		AddSubCommand(describeAlias).
 		Super()
 
@@ -121,7 +121,7 @@ func displayChannelState(_ context.Context, args []string) error {
 	return nil
 }
 
-func displayChannelTypeState(_ context.Context, args []string) error {
+func displayTypeState(_ context.Context, args []string) error {
 	client := cliutils.GetCliClient()
 	out := cliutils.GetCliOutput()
 
@@ -130,17 +130,17 @@ func displayChannelTypeState(_ context.Context, args []string) error {
 		return err
 	}
 
-	path, ctName, err := cliutils.ProcessArg(args[0], scope)
+	path, typeName, err := cliutils.ProcessArg(args[0], scope)
 	if err != nil {
 		return err
 	}
 
-	channelType, err := client.ChannelTypes().Get(context.Background(), path, ctName)
+	insprType, err := client.Types().Get(context.Background(), path, typeName)
 	if err != nil {
 		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
-	utils.PrintChannelTypeTree(channelType, out)
+	utils.PrintTypeTree(insprType, out)
 
 	return nil
 }
@@ -154,7 +154,7 @@ func displayAlias(_ context.Context, args []string) error {
 		return err
 	}
 
-	path, aliasKey, err := cliutils.ProcessArg(args[0], scope)
+	path, aliasKey, err := cliutils.ProcessAliasArg(args[0], scope)
 	if err != nil {
 		return err
 	}

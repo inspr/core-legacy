@@ -1,26 +1,26 @@
-## inspr delete ctypes
+## inspr delete types
 
-Delete channel types from context
+Delete Types from context
 
 ```
-inspr delete ctypes [flags]
+inspr delete types [flags]
 ```
 
 ### Examples
 
 ```
-  # Delete channel type from the default scope
- inspr delete ctypes <ctypename>
+  # Delete Type from the default scope
+ inspr delete types <typename>
 
-  # Delete channel type from a custom scope
- inspr delete ctypes <ctypename> --scope app1.app2
+  # Delete Type from a custom scope
+ inspr delete types <typename> --scope app1.app2
 
 ```
 
 ### Options
 
 ```
-  -h, --help           help for ctypes
+  -h, --help           help for types
   -s, --scope string   inspr <command> --scope app1.app2
 ```
 

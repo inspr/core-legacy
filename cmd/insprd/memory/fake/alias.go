@@ -59,7 +59,7 @@ func (a *Alias) Delete(context string, aliasKey string) error {
 		return ierrors.
 			NewError().
 			NotFound().
-			Message("channel type %s not found", context).
+			Message("type %s not found", context).
 			Build()
 	}
 
@@ -77,7 +77,7 @@ func (a *Alias) Update(context string, aliasKey string, alias *meta.Alias) error
 		return ierrors.
 			NewError().
 			NotFound().
-			Message("channel type %s not found", context).
+			Message("type %s not found", context).
 			Build()
 	}
 	a.alias[context] = alias

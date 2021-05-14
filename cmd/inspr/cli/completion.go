@@ -98,7 +98,7 @@ func typesFromApp(app *meta.App) utils.StringArray {
 	for name := range app.Spec.Apps {
 		scopes = append(scopes, name+".")
 	}
-	for name := range app.Spec.ChannelTypes {
+	for name := range app.Spec.Types {
 		scopes = append(scopes, name)
 	}
 	return scopes

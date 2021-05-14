@@ -97,7 +97,7 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 			resolved := resolves[boundary]
 			parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 			ch, _ := no.memory.Channels().Get(parent, chName)
-			ct, _ := no.memory.ChannelTypes().Get(parent, ch.Spec.Type)
+			ct, _ := no.memory.Types().Get(parent, ch.Spec.Type)
 			resolved = "INSPR_" + ch.Meta.UUID
 			env[resolved+"_SCHEMA"] = ct.Schema
 			env[boundary+"_RESOLVED"] = resolved
