@@ -4,6 +4,7 @@ package memory
 
 import (
 	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 )
 
@@ -80,6 +81,7 @@ type Manager interface {
 	Types() TypeMemory
 	Alias() AliasMemory
 	Root() GetInterface
+	Brokers() BrokerInterface
 }
 
 // GetInterface is an interface to get components from memory
@@ -96,4 +98,13 @@ type TransactionInterface interface {
 	GetTransactionChanges() (diff.Changelog, error)
 	InitTransaction()
 	Cancel()
+}
+
+// BrokerInterface is the interface tht allows for interaction
+// with the systems multiple brokers
+type BrokerInterface interface {
+	GetAll() brokers.BrokerStatusArray
+	GetDefault() brokers.BrokerStatus
+	Create(broker brokers.BrokerStatus, config brokers.BrokerConfiguration) error
+	SetDefault(broker brokers.BrokerStatus) error
 }

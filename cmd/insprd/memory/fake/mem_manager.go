@@ -1,6 +1,7 @@
 package fake
 
 import (
+	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
@@ -14,6 +15,7 @@ type MemManager struct {
 	channel   Channels
 	app       Apps
 	alias     Alias
+	brokers   Brokers
 }
 
 // LookupMemManager mocks getter for roots
@@ -58,6 +60,10 @@ func MockMemoryManager(failErr error) memory.Manager {
 			fail:  failErr,
 			alias: make(map[string]*meta.Alias),
 		},
+		brokers: Brokers{
+			fail:   failErr,
+			broker: &brokers.Brokers{},
+		},
 	}
 }
 
@@ -98,4 +104,9 @@ func (mm *MemManager) Cancel() {}
 //GetTransactionChanges mock interface structure
 func (mm *MemManager) GetTransactionChanges() (diff.Changelog, error) {
 	return diff.Changelog{}, nil
+}
+
+//Brokers returns mocked manager interface
+func (mm *MemManager) Brokers() memory.BrokerInterface {
+	return &mm.brokers
 }
