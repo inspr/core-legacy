@@ -1,10 +1,9 @@
-package tree
+package brokers
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/pkg/meta/brokers"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 )
@@ -13,7 +12,7 @@ func TestMemoryManager_Brokers(t *testing.T) {
 
 	tests := []struct {
 		name string
-		want memory.BrokerInterface
+		want BrokerInterface
 	}{
 		{
 			name: "standard Brokers() behaviour",
@@ -23,8 +22,8 @@ func TestMemoryManager_Brokers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resetSingleton()
-			tmm := &MemoryManager{}
-			if got := tmm.Brokers(); !reflect.DeepEqual(got, tt.want) {
+			bm := &BrokersManager{}
+			if got := bm.Brokers(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MemoryManager.Brokers() = %v, want %v", got, tt.want)
 			}
 		})

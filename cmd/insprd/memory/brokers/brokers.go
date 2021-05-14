@@ -1,7 +1,6 @@
-package tree
+package brokers
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta/brokers"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
@@ -9,11 +8,6 @@ import (
 
 // BrokersMemoryManager implements the methods described by the BrokersInterface
 type BrokersMemoryManager struct {
-}
-
-// Brokers is a MemoryManager method that provides an access point for Alias
-func (mm *MemoryManager) Brokers() memory.BrokerInterface {
-	return &BrokersMemoryManager{}
 }
 
 var broker *brokers.Brokers
