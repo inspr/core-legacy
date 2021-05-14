@@ -4,8 +4,8 @@ package memory
 
 import (
 	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/utils"
 )
 
 // ChannelMemory is the interface that allows to obtain
@@ -103,8 +103,8 @@ type TransactionInterface interface {
 // BrokerInterface is the interface tht allows for interaction
 // with the systems multiple brokers
 type BrokerInterface interface {
-	GetAll() utils.StringArray
-	GetDefault() string
-	Create(broker string, config interface{}) error
-	SetDefault(broker string) error
+	GetAll() brokers.BrokerStatusArray
+	GetDefault() brokers.BrokerStatus
+	Create(broker brokers.BrokerStatus, config brokers.BrokerConfiguration) error
+	SetDefault(broker brokers.BrokerStatus) error
 }

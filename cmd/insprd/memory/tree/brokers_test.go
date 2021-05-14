@@ -59,7 +59,7 @@ func TestBrokersMemoryManager_GetDefault(t *testing.T) {
 	tests := []struct {
 		name string
 		bmm  *BrokersMemoryManager
-		want string
+		want brokers.BrokerStatus
 	}{
 		{
 			name: "getall from empty brokerMM",
@@ -92,7 +92,7 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 
 			},
 			want: &brokers.Brokers{
-				Availible: make(metautils.StrSet),
+				Available: make(metautils.StrSet),
 			},
 		},
 		{
@@ -105,7 +105,7 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 				bmm.SetDefault("brk1")
 			},
 			want: &brokers.Brokers{
-				Availible: metautils.StrSet{
+				Available: metautils.StrSet{
 					"brk1": true,
 					"brk2": true,
 					"brk3": true,
@@ -128,8 +128,8 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 
 func TestBrokersMemoryManager_Create(t *testing.T) {
 	type args struct {
-		broker string
-		config interface{}
+		broker brokers.BrokerStatus
+		config brokers.BrokerConfiguration
 	}
 	tests := []struct {
 		name    string
@@ -177,7 +177,7 @@ func TestBrokersMemoryManager_Create(t *testing.T) {
 
 func TestBrokersMemoryManager_SetDefault(t *testing.T) {
 	type args struct {
-		broker string
+		broker brokers.BrokerStatus
 	}
 	tests := []struct {
 		name    string
@@ -222,6 +222,6 @@ func TestBrokersMemoryManager_SetDefault(t *testing.T) {
 
 func resetSingleton() {
 	broker = &brokers.Brokers{
-		Availible: make(metautils.StrSet),
+		Available: make(metautils.StrSet),
 	}
 }

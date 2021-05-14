@@ -5,7 +5,6 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta/brokers"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
 )
 
 // BrokersMemoryManager implements the methods described by the BrokersInterface
@@ -20,41 +19,41 @@ func (mm *MemoryManager) Brokers() memory.BrokerInterface {
 var broker *brokers.Brokers
 
 // GetAll returns an array containing all currently configured brokers
-func (bmm *BrokersMemoryManager) GetAll() utils.StringArray {
-	return bmm.get().Availible.ToArray()
+func (bmm *BrokersMemoryManager) GetAll() brokers.BrokerStatusArray {
+	return brokers.BrokerStatusArray(bmm.get().Available.ToArray())
 }
 
 // GetDefault returns the broker configured as default
-func (bmm *BrokersMemoryManager) GetDefault() string {
-	return bmm.get().Default
+func (bmm *BrokersMemoryManager) GetDefault() brokers.BrokerStatus {
+	return brokers.BrokerStatus(bmm.get().Default)
 }
 
 func (bmm *BrokersMemoryManager) get() *brokers.Brokers {
 	if broker == nil {
 		broker = &brokers.Brokers{
-			Availible: make(metautils.StrSet),
+			Available: make(metautils.StrSet),
 		}
 	}
 	return broker
 }
 
 // Create configures a new broker on insprd
-func (bmm *BrokersMemoryManager) Create(broker string, config interface{}) error {
-	if ok := bmm.get().Availible[broker]; ok {
+func (bmm *BrokersMemoryManager) Create(broker brokers.BrokerStatus, config brokers.BrokerConfiguration) error {
+	if ok := bmm.get().Available[string(broker)]; ok {
 		return ierrors.NewError().Message("broker %s is already configured on memory", broker).Build()
 	}
 	//configure the sidecarFactory for the given broker
 	//if succesful:
-	bmm.get().Availible[broker] = true
+	bmm.get().Available[string(broker)] = true
 	return nil
 }
 
 // SetDefault sets a previoulsy configured broker as insprd's default broker
-func (bmm *BrokersMemoryManager) SetDefault(broker string) error {
-	if ok := bmm.get().Availible[broker]; !ok {
+func (bmm *BrokersMemoryManager) SetDefault(broker brokers.BrokerStatus) error {
+	if ok := bmm.get().Available[string(broker)]; !ok {
 		return ierrors.NewError().Message("broker %s is not configured on memory", broker).Build()
 	}
 
-	bmm.get().Default = broker
+	bmm.get().Default = (broker)
 	return nil
 }
