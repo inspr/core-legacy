@@ -16,7 +16,8 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "memory-tree")))
+	// logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "memory-tree")))
+	logger = zap.NewNop()
 }
 
 // MemoryManager defines a memory manager interface

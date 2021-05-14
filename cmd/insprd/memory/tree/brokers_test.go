@@ -7,7 +7,6 @@ import (
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/pkg/meta/brokers"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
 )
 
 func TestMemoryManager_Brokers(t *testing.T) {
@@ -36,12 +35,12 @@ func TestBrokersMemoryManager_GetAll(t *testing.T) {
 	tests := []struct {
 		name string
 		bmm  *BrokersMemoryManager
-		want utils.StringArray
+		want brokers.BrokerStatusArray
 	}{
 		{
 			name: "getall from empty brokerMM",
 			bmm:  &BrokersMemoryManager{},
-			want: utils.StringArray{},
+			want: brokers.BrokerStatusArray{},
 		},
 	}
 	for _, tt := range tests {
