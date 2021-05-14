@@ -13,11 +13,11 @@ type BrokersMemoryManager struct {
 }
 
 // Brokers is a MemoryManager method that provides an access point for Alias
-func (tmm *MemoryManager) Brokers() memory.BrokerInterface {
+func (mm *MemoryManager) Brokers() memory.BrokerInterface {
 	return &BrokersMemoryManager{}
 }
 
-var bro *brokers.Brokers
+var broker *brokers.Brokers
 
 // GetAll returns an array containing all currently configured brokers
 func (bmm *BrokersMemoryManager) GetAll() utils.StringArray {
@@ -30,18 +30,18 @@ func (bmm *BrokersMemoryManager) GetDefault() string {
 }
 
 func (bmm *BrokersMemoryManager) get() *brokers.Brokers {
-	if bro == nil {
-		bro = &brokers.Brokers{
+	if broker == nil {
+		broker = &brokers.Brokers{
 			Availible: make(metautils.StrSet),
 		}
 	}
-	return bro
+	return broker
 }
 
 // Create configures a new broker on insprd
 func (bmm *BrokersMemoryManager) Create(broker string, config interface{}) error {
 	if ok := bmm.get().Availible[broker]; ok {
-		return ierrors.NewError().Message("error: %s is already configured on memory", broker).Build()
+		return ierrors.NewError().Message("broker %s is already configured on memory", broker).Build()
 	}
 	//configure the sidecarFactory for the given broker
 	//if succesful:
@@ -52,7 +52,7 @@ func (bmm *BrokersMemoryManager) Create(broker string, config interface{}) error
 // SetDefault sets a previoulsy configured broker as insprd's default broker
 func (bmm *BrokersMemoryManager) SetDefault(broker string) error {
 	if ok := bmm.get().Availible[broker]; !ok {
-		return ierrors.NewError().Message("error: %s is not configured on memory", broker).Build()
+		return ierrors.NewError().Message("broker %s is not configured on memory", broker).Build()
 	}
 
 	bmm.get().Default = broker

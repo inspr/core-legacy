@@ -221,7 +221,7 @@ func TestBrokersMemoryManager_SetDefault(t *testing.T) {
 }
 
 func resetSingleton() {
-	bro = &brokers.Brokers{
+	broker = &brokers.Brokers{
 		Availible: make(metautils.StrSet),
 	}
 }
