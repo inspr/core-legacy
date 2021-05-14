@@ -102,8 +102,9 @@ func TestClient_CreateUser(t *testing.T) {
 				uid: auxUser2.UID,
 				pwd: auxUser2.Password,
 				newUser: User{
-					UID:      "user3",
-					Password: "u3pwd",
+					UID:         "user3",
+					Password:    "u3pwd",
+					Permissions: map[string][]string{"ascope.bscope": {auth.UpdateAlias, auth.CreateAlias}},
 				},
 			},
 			wantErr: true,
@@ -635,7 +636,7 @@ func Test_hasPermission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := hasPermission(auxCtx, redisClient.rdb, tt.args.uid, tt.args.pwd)
+			err := hasPermission(auxCtx, redisClient.rdb, tt.args.uid, tt.args.pwd, auxUser, true)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -851,7 +852,7 @@ func Test_isPermissionAllowed(t *testing.T) {
 				newUserPermissionScope:   "a.b.c",
 				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
 				requestorPermissionScope: "a.b",
-				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel},
+				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel, auth.CreateToken},
 			},
 			want: true,
 		},
@@ -878,7 +879,7 @@ func Test_isPermissionAllowed(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isPermissionAllowed(tt.args.newUserPermissionScope, tt.args.newUserPermissions, tt.args.requestorPermissionScope, tt.args.requestorPermissions); got != tt.want {
+			if got := isPermissionAllowed(tt.args.newUserPermissionScope, tt.args.newUserPermissions, tt.args.requestorPermissionScope, tt.args.requestorPermissions, true); got != tt.want {
 				t.Errorf("isPermissionAllowed() = %v, want %v", got, tt.want)
 			}
 		})

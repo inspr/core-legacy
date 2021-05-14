@@ -1,0 +1,7 @@
+uid: ghi
+password: 123456
+permissions:
+  "a.b":
+    - "get:ctype"
+    - "get:dapp"
+    - "get:channel"
