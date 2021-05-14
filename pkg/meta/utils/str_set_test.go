@@ -576,3 +576,35 @@ func TestMakeStrSet(t *testing.T) {
 		})
 	}
 }
+
+func TestStrSet_ToArray(t *testing.T) {
+	tests := []struct {
+		name string
+		set  *StrSet
+		want utils.StringArray
+	}{
+		{
+			name: "Empty set to array",
+			set:  &StrSet{},
+			want: utils.StringArray{},
+		},
+		{
+			name: "Filled set to array",
+			set: &StrSet{
+				"item":  exists,
+				"item2": exists,
+			},
+			want: utils.StringArray{"item", "item2"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.set.ToArray()
+			gotenSet, _ := MakeStrSet(got)
+			wantedSet, _ := MakeStrSet(tt.want)
+			if len(DisjunctSet(wantedSet, gotenSet)) > 0 {
+				t.Errorf("StrSet.ToArray() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

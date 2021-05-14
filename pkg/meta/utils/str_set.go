@@ -102,6 +102,15 @@ func (set *StrSet) AppendSet(target StrSet) {
 	}
 }
 
+//ToArray returns an array of all items in the set.
+func (set *StrSet) ToArray() utils.StringArray {
+	arr := utils.StringArray{}
+	for k := range *set {
+		arr = append(arr, k)
+	}
+	return arr
+}
+
 //DisjunctSet returns the disjunction set between two StrSet.
 func DisjunctSet(set1, set2 StrSet) StrSet {
 	setFinal := make(StrSet)

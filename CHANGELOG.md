@@ -1,10 +1,18 @@
 
 # Changelog
 
+### #56 Story CORE-417 | Create a broker-tracking structure
+- features:
+    - created a Brokers struct on meta/brokers to store broker information.
+    - created a Brokers interface to handle storage of broker data
+    - included said interface on MemoryManager
+    - developed a mock structure for the new interface
+---
+
 ### #55 - Tech CORE-310 | Automatic Helm chart tags update
 - features:
     - created new GitHub action to automatically create a new release if a tag is pushed
-    - adapted the Inspr CLI scripts that were used in GitLab to work in GitHub
+    - Inspr CLI binaries are now going to be available in the GitHub Release instead of GCloud
 ---
 
 ### #54 - Tech CORE-365 | Alias Meta.Name automatic injection when applying app
@@ -18,6 +26,7 @@
     - describe alias cli command
 - refactors:
     - removed code duplication from cli's dApp apply functionality
+---
 
 ### #53 - Tech CORE-362 | Validate alias when applying app
   - features:

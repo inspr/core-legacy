@@ -17,6 +17,7 @@ var logger *zap.Logger
 // have been initialized
 func init() {
 	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "memory-tree")))
+	// logger = zap.NewNop()
 }
 
 // MemoryManager defines a memory manager interface
