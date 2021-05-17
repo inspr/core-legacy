@@ -10,6 +10,7 @@ import (
 
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/inspr/inspr/pkg/controller"
+	"github.com/inspr/inspr/pkg/ierrors"
 
 	"github.com/inspr/inspr/pkg/cmd"
 	"github.com/inspr/inspr/pkg/meta"
@@ -100,7 +101,7 @@ func getChannels(_ context.Context) error {
 	}
 
 	_, err = client.Channels().Get(context.Background(), scope, "")
-	if err != nil {
+	if ierrors.HasCode(err, ierrors.Forbidden) {
 		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
@@ -126,7 +127,7 @@ func getTypes(_ context.Context) error {
 	}
 
 	_, err = client.Types().Get(context.Background(), scope, "")
-	if err != nil {
+	if ierrors.HasCode(err, ierrors.Forbidden) {
 		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
@@ -153,7 +154,7 @@ func getAlias(_ context.Context) error {
 	}
 
 	_, err = client.Alias().Get(context.Background(), scope, "")
-	if err != nil {
+	if ierrors.HasCode(err, ierrors.Forbidden) {
 		cliutils.RequestErrorMessage(err, out)
 		return err
 	}
