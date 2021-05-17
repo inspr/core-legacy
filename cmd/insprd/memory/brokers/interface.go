@@ -24,6 +24,6 @@ type BrokerInterface interface {
 // SidecarInterface is the interface that allows the build and deployment of
 // available brokers
 type SidecarInterface interface {
-	Get(broker string) models.SidecarFactory
+	Get(broker string) (models.SidecarFactory, error)
 	Subscribe(broker string, factory models.SidecarFactory) error
 }

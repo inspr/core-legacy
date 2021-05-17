@@ -14,9 +14,9 @@ func (f *Factory) Subscribe(broker string, factory models.SidecarFactory) error 
 }
 
 // Get mock of factory get method
-func (f *Factory) Get(broker string) models.SidecarFactory {
+func (f *Factory) Get(broker string) (models.SidecarFactory, error) {
 	if f.fail != nil {
-		panic(f.fail.Error())
+		return nil, f.fail
 	}
-	return nil
+	return nil, nil
 }

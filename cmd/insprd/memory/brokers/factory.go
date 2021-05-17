@@ -29,11 +29,14 @@ func (abf *AbstractBrokerFactory) Subscribe(broker string, factory models.Sideca
 }
 
 // Get returns a factory for the specifyed broker
-func (abf *AbstractBrokerFactory) Get(broker string) models.SidecarFactory {
-	if factory, ok := f[broker]; ok {
-		return factory
+func (abf *AbstractBrokerFactory) Get(broker string) (models.SidecarFactory, error) {
+	if f == nil {
+		return nil, ierrors.NewError().Message("no brokers are allowed").Build()
 	}
-	panic("broker not allowed")
+	if factory, ok := f[broker]; ok {
+		return factory, nil
+	}
+	return nil, ierrors.NewError().Message("%s broker not allowed", broker).Build()
 }
 
 func getAvailiblePorts() *models.SidecarConnections {
@@ -48,7 +51,7 @@ func getAllSidecarsDeployments(app *meta.App) []k8s.DeploymentOption {
 	var ret []k8s.DeploymentOption
 	for _, broker := range getAllSidecarNames(app) {
 		if option, ok := f[broker]; ok {
-			ret = append(ret, option(app, *getAvailiblePorts()))
+			ret = append(ret, option(app, getAvailiblePorts()))
 		} else {
 			panic("broker not allowed")
 		}

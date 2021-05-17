@@ -12,4 +12,4 @@ type SidecarConnections struct {
 }
 
 // SidecarFactory function type responsible for creating a sidecar for a broker
-type SidecarFactory func(app *meta.App, conn SidecarConnections) k8s.DeploymentOption
+type SidecarFactory func(app *meta.App, conn *SidecarConnections) k8s.DeploymentOption
