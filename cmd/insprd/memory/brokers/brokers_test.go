@@ -16,13 +16,15 @@ func TestMemoryManager_Brokers(t *testing.T) {
 	}{
 		{
 			name: "standard Brokers() behaviour",
-			want: &BrokersMemoryManager{},
+			want: &BrokerMemoryManager{
+				factory: &AbstractBrokerFactory{},
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetSingleton()
-			bm := &BrokersManager{}
+			resetBrokers()
+			bm := &BrokerManager{}
 			if got := bm.Brokers(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MemoryManager.Brokers() = %v, want %v", got, tt.want)
 			}
@@ -33,19 +35,19 @@ func TestMemoryManager_Brokers(t *testing.T) {
 func TestBrokersMemoryManager_GetAll(t *testing.T) {
 	tests := []struct {
 		name string
-		bmm  *BrokersMemoryManager
+		bmm  *BrokerMemoryManager
 		want brokers.BrokerStatusArray
 	}{
 		{
 			name: "getall from empty brokerMM",
-			bmm:  &BrokersMemoryManager{},
+			bmm:  &BrokerMemoryManager{},
 			want: brokers.BrokerStatusArray{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetSingleton()
-			bmm := &BrokersMemoryManager{}
+			resetBrokers()
+			bmm := &BrokerMemoryManager{}
 			if got := bmm.GetAll(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("BrokersMemoryManager.GetAll() = %v, want %v", got, tt.want)
 			}
@@ -56,19 +58,19 @@ func TestBrokersMemoryManager_GetAll(t *testing.T) {
 func TestBrokersMemoryManager_GetDefault(t *testing.T) {
 	tests := []struct {
 		name string
-		bmm  *BrokersMemoryManager
+		bmm  *BrokerMemoryManager
 		want brokers.BrokerStatus
 	}{
 		{
 			name: "getall from empty brokerMM",
-			bmm:  &BrokersMemoryManager{},
+			bmm:  &BrokerMemoryManager{},
 			want: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetSingleton()
-			bmm := &BrokersMemoryManager{}
+			resetBrokers()
+			bmm := &BrokerMemoryManager{}
 			if got := bmm.GetDefault(); got != tt.want {
 				t.Errorf("BrokersMemoryManager.GetDefault() = %v, want %v", got, tt.want)
 			}
@@ -79,14 +81,14 @@ func TestBrokersMemoryManager_GetDefault(t *testing.T) {
 func TestBrokersMemoryManager_get(t *testing.T) {
 	tests := []struct {
 		name string
-		bmm  *BrokersMemoryManager
-		exec func(bmm *BrokersMemoryManager)
+		bmm  *BrokerMemoryManager
+		exec func(bmm *BrokerMemoryManager)
 		want *brokers.Brokers
 	}{
 		{
 			name: "getall from empty brokerMM",
-			bmm:  &BrokersMemoryManager{},
-			exec: func(bmm *BrokersMemoryManager) {
+			bmm:  &BrokerMemoryManager{},
+			exec: func(bmm *BrokerMemoryManager) {
 
 			},
 			want: &brokers.Brokers{
@@ -95,8 +97,8 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 		},
 		{
 			name: "getall from instanciated singleton",
-			bmm:  &BrokersMemoryManager{},
-			exec: func(bmm *BrokersMemoryManager) {
+			bmm:  &BrokerMemoryManager{},
+			exec: func(bmm *BrokerMemoryManager) {
 				bmm.Create("brk1", nil)
 				bmm.Create("brk2", nil)
 				bmm.Create("brk3", nil)
@@ -114,8 +116,8 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetSingleton()
-			bmm := &BrokersMemoryManager{}
+			resetBrokers()
+			bmm := &BrokerMemoryManager{}
 			tt.exec(bmm)
 			if got := bmm.get(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("BrokersMemoryManager.get() = %v, want %v", got, tt.want)
@@ -131,9 +133,9 @@ func TestBrokersMemoryManager_Create(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		bmm     *BrokersMemoryManager
+		bmm     *BrokerMemoryManager
 		args    args
-		exec    func(bmm *BrokersMemoryManager)
+		exec    func(bmm *BrokerMemoryManager)
 		wantErr bool
 	}{
 		{
@@ -142,10 +144,10 @@ func TestBrokersMemoryManager_Create(t *testing.T) {
 				broker: "brk1",
 				config: nil,
 			},
-			exec: func(bmm *BrokersMemoryManager) {
+			exec: func(bmm *BrokerMemoryManager) {
 
 			},
-			bmm:     &BrokersMemoryManager{},
+			bmm:     &BrokerMemoryManager{},
 			wantErr: false,
 		},
 		{
@@ -154,8 +156,8 @@ func TestBrokersMemoryManager_Create(t *testing.T) {
 				broker: "brk1",
 				config: nil,
 			},
-			bmm: &BrokersMemoryManager{},
-			exec: func(bmm *BrokersMemoryManager) {
+			bmm: &BrokerMemoryManager{},
+			exec: func(bmm *BrokerMemoryManager) {
 				bmm.Create("brk1", nil)
 			},
 			wantErr: true,
@@ -163,8 +165,8 @@ func TestBrokersMemoryManager_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetSingleton()
-			bmm := &BrokersMemoryManager{}
+			resetBrokers()
+			bmm := &BrokerMemoryManager{}
 			tt.exec(bmm)
 			if err := bmm.Create(tt.args.broker, tt.args.config); (err != nil) != tt.wantErr {
 				t.Errorf("BrokersMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -179,9 +181,9 @@ func TestBrokersMemoryManager_SetDefault(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		bmm     *BrokersMemoryManager
+		bmm     *BrokerMemoryManager
 		args    args
-		exec    func(bmm *BrokersMemoryManager)
+		exec    func(bmm *BrokerMemoryManager)
 		wantErr bool
 	}{
 		{
@@ -189,9 +191,9 @@ func TestBrokersMemoryManager_SetDefault(t *testing.T) {
 			args: args{
 				broker: "brk1",
 			},
-			exec: func(bmm *BrokersMemoryManager) {
+			exec: func(bmm *BrokerMemoryManager) {
 			},
-			bmm:     &BrokersMemoryManager{},
+			bmm:     &BrokerMemoryManager{},
 			wantErr: true,
 		},
 		{
@@ -199,17 +201,17 @@ func TestBrokersMemoryManager_SetDefault(t *testing.T) {
 			args: args{
 				broker: "brk1",
 			},
-			exec: func(bmm *BrokersMemoryManager) {
+			exec: func(bmm *BrokerMemoryManager) {
 				bmm.Create("brk1", nil)
 			},
-			bmm:     &BrokersMemoryManager{},
+			bmm:     &BrokerMemoryManager{},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetSingleton()
-			bmm := &BrokersMemoryManager{}
+			resetBrokers()
+			bmm := &BrokerMemoryManager{}
 			tt.exec(bmm)
 			if err := bmm.SetDefault(tt.args.broker); (err != nil) != tt.wantErr {
 				t.Errorf("BrokersMemoryManager.SetDefault() error = %v, wantErr %v", err, tt.wantErr)
@@ -218,6 +220,6 @@ func TestBrokersMemoryManager_SetDefault(t *testing.T) {
 	}
 }
 
-func resetSingleton() {
+func resetBrokers() {
 	broker = nil
 }
