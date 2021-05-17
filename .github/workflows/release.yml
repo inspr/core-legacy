@@ -49,7 +49,7 @@ jobs:
           PROJECT_ID: "red-inspr"
           APPLICATION_CREDENTIALS: ${{ secrets.GCR_ACCOUNT_KEY }}
         with:
-          args: auth activate-service-account --key-file=$GCR_FILENAME.json
+          args: auth activate-service-account ${{ secrets.GCR_ACCOUNT }}--key-file=$GCR_FILENAME.json
 
       # - name: Build CLI
       #   run: bash .github/scripts/buildcli.sh
