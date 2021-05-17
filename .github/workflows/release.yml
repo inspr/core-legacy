@@ -38,7 +38,7 @@ jobs:
 
       - name: Get GCR config
         run: |
-          echo ${{ secrets.GCR_ACCOUNT_KEY }}> "${{ github.sha }}".json
+          echo ${{ secrets.GCR_ACCOUNT_KEY }} > "${{ github.sha }}".json
 
       - uses: actions-hub/gcloud@master
         env:
