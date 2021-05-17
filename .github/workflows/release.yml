@@ -18,8 +18,13 @@ jobs:
           fetch-depth: 2
       - uses: yokawasa/action-setup-kube-tools@v0.7.1
         with:
-          skaffold: "1.21.0"
+          setup-tools: |
+            kubectl
+            helmv3
+            skaffold
+          kubectl: "1.20.2"
           helmv3: "3.5.4"
+          skaffold: "1.21.0"
       - uses: actions/setup-go@v2
         with:
           go-version: "^1.16.0"
