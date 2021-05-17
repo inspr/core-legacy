@@ -5,23 +5,18 @@ import (
 	metabroker "github.com/inspr/inspr/pkg/meta/brokers"
 )
 
-// BrkManager is the api struct with the necessary implementations
+// BrokersMock is the struct with the necessary implementations
 // to mock the interface used to manage brokers
-type BrkManager struct {
-	brokers Brokers
+type BrokersMock struct {
+	fail    error
+	broker  *metabroker.Brokers
+	factory *Factory
 }
 
 // MockBrokerManager mock exported with propagated error through the functions
 func MockBrokerManager(failErr error) brokers.Manager {
-	return &BrkManager{
-		brokers: Brokers{
-			fail:   failErr,
-			broker: &metabroker.Brokers{},
-		},
+	return &BrokersMock{
+		fail:   failErr,
+		broker: &metabroker.Brokers{},
 	}
-}
-
-// Brokers mock of broker interface
-func (bm *BrkManager) Brokers() brokers.BrokerInterface {
-	return &bm.brokers
 }
