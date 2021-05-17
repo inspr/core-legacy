@@ -37,7 +37,7 @@ jobs:
         uses: hiberbee/github-action-skaffold@latest
         with:
           cache-artifacts: false
-          filename: /home/runner/work/inspr/inspr/skaffold.yaml
+          filename: ../skaffold.yaml
           command: build --file-output=tags.out
 
       - name: Helm Chart update
