@@ -1,6 +1,17 @@
 
 # Changelog
 
+### #58  Story CORE-418 | Create Sidecar Factory
+- features:
+    - developed a function type to represent sidecar factories
+    - declared a interface for sidecars and implemented its structure as an abstract factory
+    - developed a Manager interface to envelop BrokerManager and  AbstractBrokerFactory
+    - implemented Manager's struct
+    - implemented SidecarInterface's methods
+    - tested previously mentioned methods
+- fixes:
+    - moved broker management interfaces and structures to a more appropriate directory
+
 ### #56 Story CORE-417 | Create a broker-tracking structure
 - features:
     - created a Brokers struct on meta/brokers to store broker information.
