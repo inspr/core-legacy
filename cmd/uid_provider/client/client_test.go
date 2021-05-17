@@ -879,7 +879,7 @@ func Test_isPermissionAllowed(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isPermissionAllowed(tt.args.newUserPermissionScope, tt.args.newUserPermissions, tt.args.requestorPermissionScope, tt.args.requestorPermissions, true); got != tt.want {
+			if got := isPermissionAllowed(tt.args.newUserPermissionScope, tt.args.requestorPermissionScope, tt.args.newUserPermissions, tt.args.requestorPermissions, true); got != tt.want {
 				t.Errorf("isPermissionAllowed() = %v, want %v", got, tt.want)
 			}
 		})

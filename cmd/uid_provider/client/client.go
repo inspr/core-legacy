@@ -78,20 +78,6 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 	return nil
 }
 
-func isPermissionAllowed(newUserPermissionScope string, newUserPermissions []string, requestorPermissionScope string, requestorPermissions []string, isCreation bool) bool {
-	if !metautils.IsInnerScope(requestorPermissionScope, newUserPermissionScope) {
-		return false
-	}
-
-	for _, permission := range newUserPermissions {
-		if (isCreation && !utils.Includes(requestorPermissions, permission)) || !utils.Includes(requestorPermissions, auth.CreateToken) {
-			return false
-		}
-	}
-
-	return true
-}
-
 // DeleteUser deletes an user from Redis, if it exists
 func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error {
 	user, err := get(ctx, c.rdb, usrToBeDeleted)
@@ -344,7 +330,7 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	for newUserPermissionScope, newUserPermissions := range newUser.Permissions {
 		isAllowed := false
 		for requestorPermissionScope, requestorPermissions := range requestor.Permissions {
-			if isPermissionAllowed(newUserPermissionScope, newUserPermissions, requestorPermissionScope, requestorPermissions, isCreation) {
+			if isPermissionAllowed(newUserPermissionScope, requestorPermissionScope, newUserPermissions, requestorPermissions, isCreation) {
 				isAllowed = true
 				break
 			}
@@ -357,6 +343,20 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	}
 
 	return nil
+}
+
+func isPermissionAllowed(newUserPermissionScope, requestorPermissionScope string, newUserPermissions, requestorPermissions []string, isCreation bool) bool {
+	if !metautils.IsInnerScope(requestorPermissionScope, newUserPermissionScope) {
+		return false
+	}
+
+	for _, permission := range newUserPermissions {
+		if (isCreation && !utils.Includes(requestorPermissions, permission)) || !utils.Includes(requestorPermissions, auth.CreateToken) {
+			return false
+		}
+	}
+
+	return true
 }
 
 func getEnv(name string) string {
