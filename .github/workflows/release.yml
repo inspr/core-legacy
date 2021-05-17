@@ -37,8 +37,7 @@ jobs:
         uses: hiberbee/github-action-skaffold@latest
         with:
           cache-artifacts: false
-          filename: ../skaffold.yaml
-          command: build --file-output=tags.out
+          command: build --file-output=tags.out --filename=../skaffold.yaml
 
       - name: Helm Chart update
         run: bash .github/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
