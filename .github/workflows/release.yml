@@ -22,13 +22,12 @@ jobs:
 
       - name: Echo data
         run: |
-          ls
           for file in /home/runner/work/inspr/inspr/*; do
             echo "${file##*/}"
           done
 
-      - name: Build CLI
-        run: bash .github/scripts/buildcli.sh
+      # - name: Build CLI
+      #   run: bash .github/scripts/buildcli.sh
 
       - name: Create temp file to store skaffold build return
         run: |
@@ -37,7 +36,10 @@ jobs:
       - name: Run Skaffold build
         uses: hiberbee/github-action-skaffold@latest
         with:
-          command: build --file-output=tags.out --filename=/home/runner/work/inspr/inspr/skaffold.yaml
+          cache-artifacts: false
+          filename: /home/runner/work/inspr/inspr/skaffold.yaml
+          command: build --file-output=tags.out
+        run: echo $PWD
 
       - name: Helm Chart update
         run: bash .github/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
