@@ -38,10 +38,10 @@ jobs:
 
       - uses: actions-hub/gcloud@master
         env:
-          PROJECT_ID: red-inspr
+          PROJECT_ID: "red-inspr"
           APPLICATION_CREDENTIALS: ${{ secrets.GCR_ACCOUNT_KEY }}
         with:
-          args: gcloud auth activate-service-account --key-file=${{ secrets.GCR_ACCOUNT_KEY }}
+          args: auth activate-service-account --key-file=${{ secrets.GCR_ACCOUNT_KEY }}
 
       # - name: Build CLI
       #   run: bash .github/scripts/buildcli.sh
