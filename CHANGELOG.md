@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #57 Tech CORE-426 | Review Permissions
+- features:
+    - created functions in the UIDP client that make sure when creating a token, it’s permissions should be the same as the creator’s permissions (or have less permissions).
+- fixes:
+    - all functions of the get command. For example, if you're trying to get channels, before calling the getDapp directly it will call the getChannels to check if the user have the right permissions.
+
 ### #56 Story CORE-417 | Create a broker-tracking structure
 - features:
     - created a Brokers struct on meta/brokers to store broker information.
