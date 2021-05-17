@@ -1,11 +1,11 @@
 name: "tagged-release"
 
 on:
-  push:
-    branches:
-      - develop
-    tags:
-      - "v*"
+  push
+  # branches:
+  #   - develop
+  # tags:
+  #   - "v*"
 
 jobs:
   tagged-release:
@@ -20,6 +20,13 @@ jobs:
         with:
           go-version: "^1.16.0"
 
+      - name: Echo data
+        run: |
+          ls
+          for file in /home/runner/work/inspr/inspr/*; do
+            echo "${file##*/}"
+          done
+
       - name: Build CLI
         run: bash .github/scripts/buildcli.sh
 
@@ -30,7 +37,7 @@ jobs:
       - name: Run Skaffold build
         uses: hiberbee/github-action-skaffold@latest
         with:
-          command: build --cache-artifacts=false --file-output=tags.out
+          command: build --file-output=tags.out --cache-artifacts=false
 
       - name: Helm Chart update
         run: bash .github/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
