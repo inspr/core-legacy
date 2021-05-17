@@ -35,11 +35,10 @@ jobs:
 
       - name: Run Skaffold build
         uses: hiberbee/github-action-skaffold@latest
-        # with:
-        #   cache-artifacts: false
-        #   filename: /home/runner/work/inspr/inspr/skaffold.yaml
-        #   command: build --file-output=tags.out
-        run: echo $PWD
+        with:
+          cache-artifacts: false
+          filename: /home/runner/work/inspr/inspr/skaffold.yaml
+          command: build --file-output=tags.out
 
       - name: Helm Chart update
         run: bash .github/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
