@@ -3,15 +3,7 @@ package brokers
 import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta/brokers"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
 )
-
-// BrokerMemoryManager implements the methods described by the BrokersInterface
-type BrokerMemoryManager struct {
-	factory SidecarInterface
-}
-
-var broker *brokers.Brokers
 
 // GetAll returns an array containing all currently configured brokers
 func (bmm *BrokerMemoryManager) GetAll() brokers.BrokerStatusArray {
@@ -24,12 +16,10 @@ func (bmm *BrokerMemoryManager) GetDefault() brokers.BrokerStatus {
 }
 
 func (bmm *BrokerMemoryManager) get() *brokers.Brokers {
-	if broker == nil {
-		broker = &brokers.Brokers{
-			Available: make(metautils.StrSet),
-		}
+	if bmm.broker == nil {
+		panic("broker status memory unavailible")
 	}
-	return broker
+	return bmm.broker
 }
 
 // Create configures a new broker on insprd
@@ -54,6 +44,6 @@ func (bmm *BrokerMemoryManager) SetDefault(broker brokers.BrokerStatus) error {
 }
 
 // Factory provides the struct implementation for Sidecarfactory
-func (bmm *BrokerMemoryManager) Factory() SidecarInterface {
+func (bmm *BrokerMemoryManager) Factory() SidecarManager {
 	return bmm.factory
 }
