@@ -1,13 +1,15 @@
 package fake
 
 import (
+	memory "github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/meta/brokers"
 )
 
 // Brokers - mocks the implementation of BrokersMemory interface methods
 type Brokers struct {
-	fail   error
-	broker *brokers.Brokers
+	fail    error
+	broker  *brokers.Brokers
+	factory *Factory
 }
 
 // GetAll returns an array containing all currently mocked brokers
@@ -38,4 +40,9 @@ func (bks *Brokers) SetDefault(broker brokers.BrokerStatus) error {
 
 	bks.broker.Default = broker
 	return nil
+}
+
+// Factory mock of factory interface
+func (bks *Brokers) Factory() memory.SidecarInterface {
+	return bks.factory
 }
