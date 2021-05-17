@@ -44,6 +44,9 @@ jobs:
         env:
           GCR_KEY: ${{ secrets.GCR_ACCOUNT_KEY }}
 
+      - env:
+          GOOGLE_APPLICATION_CREDENTIALS: $GCR_FILENAME.json
+
       - name: Activate GCR account
         uses: actions-hub/gcloud@master
         env:
@@ -52,12 +55,12 @@ jobs:
         with:
           args: auth activate-service-account ${{ secrets.GCR_ACCOUNT }} --key-file=$GCR_FILENAME.json
 
-      - name: Switch to active GCR account
-        uses: actions-hub/gcloud@master
-        env:
-          PROJECT_ID: "red-inspr"
-        with:
-          args: config set account ${{ secrets.GCR_ACCOUNT }}
+      # - name: Switch to active GCR account
+      #   uses: actions-hub/gcloud@master
+      #   env:
+      #     PROJECT_ID: "red-inspr"
+      #   with:
+      #     args: config set account ${{ secrets.GCR_ACCOUNT }}
 
       # - name: Build CLI
       #   run: bash .github/scripts/buildcli.sh
