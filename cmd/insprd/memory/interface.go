@@ -4,6 +4,7 @@ package memory
 
 import (
 	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 )
 
@@ -40,20 +41,20 @@ type AppGetInterface interface {
 	Get(query string) (*meta.App, error)
 }
 
-// ChannelTypeMemory is the interface that allows to
+// TypeMemory is the interface that allows to
 // obtain or change information related to the current
-// state of the ChannelTypes in the cluster
-type ChannelTypeMemory interface {
+// state of the Types in the cluster
+type TypeMemory interface {
 	TransactionInterface
-	ChannelTypeGetInterface
-	Create(context string, ct *meta.ChannelType) error
+	TypeGetInterface
+	Create(context string, ct *meta.Type) error
 	Delete(context string, ctName string) error
-	Update(context string, ct *meta.ChannelType) error
+	Update(context string, ct *meta.Type) error
 }
 
-// ChannelTypeGetInterface is an interface to get channel types from memory
-type ChannelTypeGetInterface interface {
-	Get(context string, ctName string) (*meta.ChannelType, error)
+// TypeGetInterface is an interface to get Types from memory
+type TypeGetInterface interface {
+	Get(context string, ctName string) (*meta.Type, error)
 }
 
 // AliasMemory is an interface to get alias types from memory
@@ -72,21 +73,22 @@ type AliasGetInterface interface {
 
 // Manager is the interface that allows the management
 // of the current state of the cluster. Permiting the
-// modification of Channels, DApps and ChannelTypes
+// modification of Channels, DApps and Types
 type Manager interface {
 	TransactionInterface
 	Apps() AppMemory
 	Channels() ChannelMemory
-	ChannelTypes() ChannelTypeMemory
+	Types() TypeMemory
 	Alias() AliasMemory
 	Root() GetInterface
+	Brokers() BrokerInterface
 }
 
 // GetInterface is an interface to get components from memory
 type GetInterface interface {
 	Apps() AppGetInterface
 	Channels() ChannelGetInterface
-	ChannelTypes() ChannelTypeGetInterface
+	Types() TypeGetInterface
 	Alias() AliasGetInterface
 }
 
@@ -96,4 +98,13 @@ type TransactionInterface interface {
 	GetTransactionChanges() (diff.Changelog, error)
 	InitTransaction()
 	Cancel()
+}
+
+// BrokerInterface is the interface tht allows for interaction
+// with the systems multiple brokers
+type BrokerInterface interface {
+	GetAll() brokers.BrokerStatusArray
+	GetDefault() brokers.BrokerStatus
+	Create(broker brokers.BrokerStatus, config brokers.BrokerConfiguration) error
+	SetDefault(broker brokers.BrokerStatus) error
 }

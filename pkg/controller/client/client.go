@@ -78,9 +78,9 @@ func (c *Client) Apps() controller.AppInterface {
 	}
 }
 
-// ChannelTypes interacts with channel types on the Insprd
-func (c *Client) ChannelTypes() controller.ChannelTypeInterface {
-	return &ChannelTypeClient{
+// Types interacts with types on the Insprd
+func (c *Client) Types() controller.TypeInterface {
+	return &TypeClient{
 		reqClient: c.HTTPClient,
 	}
 }

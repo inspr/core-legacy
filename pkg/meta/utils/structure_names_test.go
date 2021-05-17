@@ -1,6 +1,8 @@
 package utils
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestStructureNameIsValid(t *testing.T) {
 	type args struct {
@@ -123,6 +125,46 @@ func TestStructureNameIsValid(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("StructureNameIsValid() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			}
+		})
+	}
+}
+
+func TestAliasNameIsValid(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Valid alais name",
+			args: args{
+				name: "app.alias",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Invalid alias name structure",
+			args: args{
+				name: "app",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Invalid target app name structure",
+			args: args{
+				name: "ap&p.alias",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := AliasNameIsValid(tt.args.name); (err != nil) != tt.wantErr {
+				t.Errorf("AliasNameIsValid() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

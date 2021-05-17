@@ -138,10 +138,10 @@ func TestClient_Apps(t *testing.T) {
 	}
 }
 
-func TestClient_ChannelTypes(t *testing.T) {
+func TestClient_Types(t *testing.T) {
 	check := func(x interface{}) bool {
 		// Declare a type object representing ChannelInterface
-		ct := reflect.TypeOf((*controller.ChannelTypeInterface)(nil)).Elem()
+		ct := reflect.TypeOf((*controller.TypeInterface)(nil)).Elem()
 		// see if implements the channelInterface
 		return reflect.PtrTo(reflect.TypeOf(x)).Implements(ct)
 	}
@@ -151,12 +151,12 @@ func TestClient_ChannelTypes(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   controller.ChannelTypeInterface
+		want   controller.TypeInterface
 	}{
 		{
-			name:   "channelType_creation",
+			name:   "Type_creation",
 			fields: fields{rc: request.NewJSONClient("mock")},
-			want:   mocks.NewChannelTypeMock(nil),
+			want:   mocks.NewTypeMock(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -167,11 +167,11 @@ func TestClient_ChannelTypes(t *testing.T) {
 				URL:   "mock",
 			}
 			c := NewControllerClient(config)
-			got := c.ChannelTypes()
+			got := c.Types()
 
 			if check(got) != check(tt.want) {
 				t.Errorf(
-					"Client.ChannelTypes() = %v, want %v",
+					"Client.Types() = %v, want %v",
 					check(got),
 					check(tt.want),
 				)

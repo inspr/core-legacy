@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 func TestNewConfigChangeCmd(t *testing.T) {
@@ -64,8 +66,10 @@ func TestNewListConfig(t *testing.T) {
 
 func Test_doConfigChange(t *testing.T) {
 	prepareToken(t)
-	defer deleteMockViper()
-	mockViper()
+	folder := setupViperTest(t)
+	os.Setenv("HOME", folder)
+	defer os.Unsetenv("HOME")
+	cliutils.ReadDefaultConfig()
 
 	bufResp := bytes.NewBufferString("")
 	fmt.Fprintf(bufResp, "Success: inspr config [%v] changed to '%v'\n", "key_example", "new_value")
@@ -110,7 +114,24 @@ func Test_doConfigChange(t *testing.T) {
 		})
 	}
 }
-
+func setupViperTest(t *testing.T) string {
+	folder := t.TempDir()
+	config := struct {
+		KeyExample string `yaml:"key_example"`
+	}{}
+	mars, _ := yaml.Marshal(config)
+	err := os.MkdirAll(filepath.Join(folder, ".inspr"), 0755)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	err = os.WriteFile(filepath.Join(folder, ".inspr", "config"), mars, 0644)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	return folder
+}
 func Test_doListConfig(t *testing.T) {
 	prepareToken(t)
 	bufResp := bytes.NewBufferString("")

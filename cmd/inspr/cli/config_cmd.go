@@ -26,6 +26,7 @@ func NewConfigChangeCmd() *cobra.Command {
 func NewListConfig() *cobra.Command {
 	return cmd.NewCmd("list").
 		WithDescription("See the list of configuration variables and their current values").
+		WithCommonFlags().
 		WithExample("type", "config list").
 		NoArgs(doListConfig)
 }

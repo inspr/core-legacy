@@ -1,6 +1,7 @@
 package fake
 
 import (
+	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
@@ -10,10 +11,11 @@ import (
 // MemManager is the api struct with the necessary implementations
 // to satisfy the interface used in the routes established
 type MemManager struct {
-	channelType ChannelTypes
-	channel     Channels
-	app         Apps
-	alias       Alias
+	insprType Types // inspr type
+	channel   Channels
+	app       Apps
+	alias     Alias
+	brokers   Brokers
 }
 
 // LookupMemManager mocks getter for roots
@@ -29,9 +31,9 @@ func (l LookupMemManager) Channels() memory.ChannelGetInterface {
 	return &l.channel
 }
 
-// ChannelTypes mocks a channel type getter
-func (l LookupMemManager) ChannelTypes() memory.ChannelTypeGetInterface {
-	return &l.channelType
+// Types mocks a Type getter
+func (l LookupMemManager) Types() memory.TypeGetInterface {
+	return &l.insprType
 }
 
 // Alias mocks a alias getter
@@ -42,9 +44,9 @@ func (l LookupMemManager) Alias() memory.AliasGetInterface {
 // MockMemoryManager mock exported with propagated error through the functions
 func MockMemoryManager(failErr error) memory.Manager {
 	return &MemManager{
-		channelType: ChannelTypes{
-			fail:         failErr,
-			channelTypes: make(map[string]*meta.ChannelType),
+		insprType: Types{
+			fail:       failErr,
+			insprTypes: make(map[string]*meta.Type),
 		},
 		channel: Channels{
 			fail:     failErr,
@@ -57,6 +59,10 @@ func MockMemoryManager(failErr error) memory.Manager {
 		alias: Alias{
 			fail:  failErr,
 			alias: make(map[string]*meta.Alias),
+		},
+		brokers: Brokers{
+			fail:   failErr,
+			broker: &brokers.Brokers{},
 		},
 	}
 }
@@ -76,9 +82,9 @@ func (mm *MemManager) Channels() memory.ChannelMemory {
 	return &mm.channel
 }
 
-// ChannelTypes returns manager's DApp
-func (mm *MemManager) ChannelTypes() memory.ChannelTypeMemory {
-	return &mm.channelType
+// Types returns manager's DApp
+func (mm *MemManager) Types() memory.TypeMemory {
+	return &mm.insprType
 }
 
 // Alias returns manager's Alias
@@ -98,4 +104,9 @@ func (mm *MemManager) Cancel() {}
 //GetTransactionChanges mock interface structure
 func (mm *MemManager) GetTransactionChanges() (diff.Changelog, error) {
 	return diff.Changelog{}, nil
+}
+
+//Brokers returns mocked manager interface
+func (mm *MemManager) Brokers() memory.BrokerInterface {
+	return &mm.brokers
 }

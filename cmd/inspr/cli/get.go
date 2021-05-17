@@ -31,13 +31,13 @@ func NewGetCmd() *cobra.Command {
 		WithAliases([]string{"ch"}).
 		WithCommonFlags().
 		NoArgs(getChannels)
-	getTypes := cmd.NewCmd("ctypes").
-		WithDescription("Get channel types from context").
-		WithExample("Get channel types from the default scope", "get ctypes ").
-		WithExample("Get channel types from a custom scope", "get ctypes --scope app1.app2").
-		WithAliases([]string{"ct"}).
+	getTypes := cmd.NewCmd("types").
+		WithDescription("Get types from context").
+		WithExample("Get types from the default scope", "get types ").
+		WithExample("Get types from a custom scope", "get types --scope app1.app2").
+		WithAliases([]string{"t"}).
 		WithCommonFlags().
-		NoArgs(getCTypes)
+		NoArgs(getTypes)
 	getNodes := cmd.NewCmd("nodes").
 		WithDescription("Get nodes from context").
 		WithExample("Get nodes from the default scope", "get nodes ").
@@ -57,10 +57,10 @@ func NewGetCmd() *cobra.Command {
 		WithDescription("Retrieves the components from a given namespace").
 		WithExample("gets apps from cluster", "get apps --scope <scope>").
 		WithExample("gets channels from cluster", "get ch --scope <scope>").
-		WithExample("gets channel_types from cluster", "get ct --scope <scope>").
+		WithExample("gets types from cluster", "get t --scope <scope>").
 		WithExample("gets nodes from cluster", "get nodes --scope <scope>").
 		WithExample("gets alias from cluster", "get alias --scope <scope>").
-		WithLongDescription("get takes a component type (apps | channels | ctypes | nodes | alias) and displays names for those components is a scope)").
+		WithLongDescription("get takes a component type (apps | channels | types | nodes | alias) and displays names for those components is a scope)").
 		WithAliases([]string{"list"}).
 		AddSubCommand(getApps).
 		AddSubCommand(getChannels).
@@ -116,7 +116,7 @@ func getChannels(_ context.Context) error {
 	return nil
 }
 
-func getCTypes(_ context.Context) error {
+func getTypes(_ context.Context) error {
 	client := cliutils.GetCliClient()
 	out := cliutils.GetCliOutput()
 	scope, err := cliutils.GetScope()
@@ -125,7 +125,7 @@ func getCTypes(_ context.Context) error {
 		return err
 	}
 
-	_, err = client.ChannelTypes().Get(context.Background(), scope, "")
+	_, err = client.Types().Get(context.Background(), scope, "")
 	if err != nil {
 		cliutils.RequestErrorMessage(err, out)
 		return err
@@ -134,7 +134,7 @@ func getCTypes(_ context.Context) error {
 	lines := make([]string, 0)
 	initTab(&lines)
 
-	err = getObj(printCTypes, &lines, client, out, scope)
+	err = getObj(printTypes, &lines, client, out, scope)
 	if err != nil {
 		return err
 	}
@@ -220,12 +220,12 @@ func printChannels(app *meta.App, lines *[]string) {
 	}
 }
 
-func printCTypes(app *meta.App, lines *[]string) {
-	for ct := range app.Spec.ChannelTypes {
-		printLine(ct, lines)
+func printTypes(app *meta.App, lines *[]string) {
+	for insprType := range app.Spec.Types {
+		printLine(insprType, lines)
 	}
 	for _, child := range app.Spec.Apps {
-		printCTypes(child, lines)
+		printTypes(child, lines)
 	}
 }
 

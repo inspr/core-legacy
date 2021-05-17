@@ -28,7 +28,7 @@ func main() {
 		temp := dapp
 		temp.Meta.Annotations = make(map[string]string)
 		temp.Meta.Annotations["hahahahaha"] = "hehehehehe"
-		diff, err := c.Apps().Update(context.Background(), "", &temp, false)
+		diff, err := c.Apps().Update(context.Background(), temp.Meta.Name, &temp, false)
 		diff.Print(os.Stdout)
 		if err != nil {
 			rest.ERROR(rw, err)

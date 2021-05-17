@@ -19,8 +19,8 @@ type MAliases map[string]*meta.Alias
 //MChannels is a string->channel map
 type MChannels map[string]*meta.Channel
 
-//MTypes is a string->ChannelType map
-type MTypes map[string]*meta.ChannelType
+//MTypes is a string->Type map
+type MTypes map[string]*meta.Type
 
 //MStr is a string->string map
 type MStr map[string]string
@@ -100,6 +100,15 @@ func (set *StrSet) AppendSet(target StrSet) {
 	for k := range target {
 		(*set)[k] = exists
 	}
+}
+
+//ToArray returns an array of all items in the set.
+func (set *StrSet) ToArray() utils.StringArray {
+	arr := utils.StringArray{}
+	for k := range *set {
+		arr = append(arr, k)
+	}
+	return arr
 }
 
 //DisjunctSet returns the disjunction set between two StrSet.

@@ -205,3 +205,48 @@ func TestIsInnerScope(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveAliasInScope(t *testing.T) {
+	type args struct {
+		scope string
+	}
+	tests := []struct {
+		name     string
+		args     args
+		newScope string
+		alias    string
+		wantErr  bool
+	}{
+		{
+			name: "Invalid scope - should return an error",
+			args: args{
+				scope: "..app1.app2",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Valid scope - should return the newScope and the alias",
+			args: args{
+				scope: "app1.app2.alias",
+			},
+			newScope: "app1",
+			alias:    "app2.alias",
+			wantErr:  false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1, err := RemoveAliasInScope(tt.args.scope)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RemoveAliasInScope() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.newScope {
+				t.Errorf("RemoveAliasInScope() got = %v, want %v", got, tt.newScope)
+			}
+			if got1 != tt.alias {
+				t.Errorf("RemoveAliasInScope() got1 = %v, want %v", got1, tt.alias)
+			}
+		})
+	}
+}

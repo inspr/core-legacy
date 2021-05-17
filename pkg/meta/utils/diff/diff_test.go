@@ -43,7 +43,7 @@ func TestDiff(t *testing.T) {
 				},
 				{
 					Context:   "",
-					Kind:      MetaKind | AnnotationKind | AppKind | ChannelKind | ChannelTypeKind,
+					Kind:      MetaKind | AnnotationKind | AppKind | ChannelKind | TypeKind,
 					Operation: Create | Update | Delete,
 					Diff: []Difference{
 						{
@@ -87,18 +87,18 @@ func TestDiff(t *testing.T) {
 							Name:      "ch1",
 						},
 						{
-							Field:     "Spec.ChannelTypes[ct2]",
+							Field:     "Spec.Types[ct2]",
 							From:      "{...}",
 							To:        "<nil>",
-							Kind:      ChannelTypeKind,
+							Kind:      TypeKind,
 							Operation: Delete,
 							Name:      "ct2",
 						},
 						{
-							Field:     "Spec.ChannelTypes[ct1].Meta.Reference",
+							Field:     "Spec.Types[ct1].Meta.Reference",
 							From:      "root.ct1",
 							To:        "root.ct1diff",
-							Kind:      MetaKind | ChannelTypeKind,
+							Kind:      MetaKind | TypeKind,
 							Operation: Update,
 							Name:      "ct1",
 						},
@@ -545,7 +545,7 @@ func TestChange_diffChannels(t *testing.T) {
 		want    Change
 	}{
 		{
-			name:   "Unchanged Channel Types",
+			name:   "Unchanged types",
 			fields: fields{},
 			args: args{
 				chOrig: metautils.MChannels{
@@ -569,7 +569,7 @@ func TestChange_diffChannels(t *testing.T) {
 			want:    Change{},
 		},
 		{
-			name:   "Valid changes on Channel Types",
+			name:   "Valid changes on types",
 			fields: fields{},
 			args: args{
 				chOrig: metautils.MChannels{
@@ -682,7 +682,7 @@ func TestChange_diffChannels(t *testing.T) {
 	}
 }
 
-func TestChange_diffChannelTypes(t *testing.T) {
+func TestChange_diffTypes(t *testing.T) {
 	type fields struct {
 		Context string
 		Diff    []Difference
@@ -699,17 +699,17 @@ func TestChange_diffChannelTypes(t *testing.T) {
 		want    Change
 	}{
 		{
-			name:   "Unchanged Channel Types",
+			name:   "Unchanged types",
 			fields: fields{},
 			args: args{
 				chtOrig: metautils.MTypes{
-					"ct1": &meta.ChannelType{
+					"ct1": &meta.Type{
 						Meta:   meta.Metadata{},
 						Schema: "",
 					},
 				},
 				chtCurr: metautils.MTypes{
-					"ct1": &meta.ChannelType{
+					"ct1": &meta.Type{
 						Meta:   meta.Metadata{},
 						Schema: "",
 					},
@@ -719,11 +719,11 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			want:    Change{},
 		},
 		{
-			name:   "Valid changes on Channel Types",
+			name:   "Valid changes on types",
 			fields: fields{},
 			args: args{
 				chtOrig: metautils.MTypes{
-					"ct1": &meta.ChannelType{
+					"ct1": &meta.Type{
 						Meta: meta.Metadata{
 							Name:        "ct1",
 							Reference:   "root.ct1",
@@ -735,7 +735,7 @@ func TestChange_diffChannelTypes(t *testing.T) {
 					},
 				},
 				chtCurr: metautils.MTypes{
-					"ct1": &meta.ChannelType{
+					"ct1": &meta.Type{
 						Meta: meta.Metadata{
 							Name:        "ct1",
 							Reference:   "root.ct1",
@@ -749,14 +749,14 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			},
 			wantErr: false,
 			want: Change{
-				Kind:      ChannelTypeKind,
+				Kind:      TypeKind,
 				Operation: Update,
 				Diff: []Difference{
 					{
-						Field:     "Spec.ChannelTypes[ct1].Spec.Schema",
+						Field:     "Spec.Types[ct1].Spec.Schema",
 						From:      string([]byte{0, 1, 0, 1, 0, 0, 1, 1, 1, 0}),
 						To:        string([]byte{0, 1, 0, 1, 0, 1, 1, 1, 1, 1}),
-						Kind:      ChannelTypeKind,
+						Kind:      TypeKind,
 						Operation: Update,
 						Name:      "ct1",
 					},
@@ -764,12 +764,12 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			},
 		},
 		{
-			name:   "create channel type",
+			name:   "create type",
 			fields: fields{},
 			args: args{
 				chtOrig: metautils.MTypes{},
 				chtCurr: metautils.MTypes{
-					"ct1": &meta.ChannelType{
+					"ct1": &meta.Type{
 						Meta: meta.Metadata{
 							Name:        "ct1",
 							Reference:   "root.ct1",
@@ -783,14 +783,14 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			},
 			wantErr: false,
 			want: Change{
-				Kind:      ChannelTypeKind,
+				Kind:      TypeKind,
 				Operation: Create,
 				Diff: []Difference{
 					{
-						Field:     "Spec.ChannelTypes[ct1]",
+						Field:     "Spec.Types[ct1]",
 						From:      "<nil>",
 						To:        "{...}",
-						Kind:      ChannelTypeKind,
+						Kind:      TypeKind,
 						Operation: Create,
 						Name:      "ct1",
 					},
@@ -798,11 +798,11 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			},
 		},
 		{
-			name:   "delete channel type",
+			name:   "delete type",
 			fields: fields{},
 			args: args{
 				chtOrig: metautils.MTypes{
-					"ct1": &meta.ChannelType{
+					"ct1": &meta.Type{
 						Meta: meta.Metadata{
 							Name:        "ct1",
 							Reference:   "root.ct1",
@@ -817,14 +817,14 @@ func TestChange_diffChannelTypes(t *testing.T) {
 			},
 			wantErr: false,
 			want: Change{
-				Kind:      ChannelTypeKind,
+				Kind:      TypeKind,
 				Operation: Delete,
 				Diff: []Difference{
 					{
-						Field:     "Spec.ChannelTypes[ct1]",
+						Field:     "Spec.Types[ct1]",
 						From:      "{...}",
 						To:        "<nil>",
-						Kind:      ChannelTypeKind,
+						Kind:      TypeKind,
 						Operation: Delete,
 						Name:      "ct1",
 					},
@@ -838,8 +838,8 @@ func TestChange_diffChannelTypes(t *testing.T) {
 				Context: tt.fields.Context,
 				Diff:    tt.fields.Diff,
 			}
-			if err := change.diffChannelTypes(tt.args.chtOrig, tt.args.chtCurr); (err != nil) != tt.wantErr {
-				t.Errorf("Change.diffChannelTypes() error = %v, wantErr %v", err, tt.wantErr)
+			if err := change.diffTypes(tt.args.chtOrig, tt.args.chtCurr); (err != nil) != tt.wantErr {
+				t.Errorf("Change.diffTypes() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
@@ -1430,9 +1430,9 @@ func getMockRootApp() *meta.App {
 								Image: "imageNodeApp1",
 							},
 						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -1471,9 +1471,9 @@ func getMockRootApp() *meta.App {
 											Image: "imageNodeApp3",
 										},
 									},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1"},
 										Output: []string{"ch2"},
@@ -1497,7 +1497,7 @@ func getMockRootApp() *meta.App {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -1525,7 +1525,7 @@ func getMockRootApp() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",
@@ -1603,9 +1603,9 @@ func getMockRootApp2() *meta.App {
 											Image: "imageNodeApp3diff",
 										},
 									},
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1"},
 										Output: []string{"ch2"},
@@ -1629,7 +1629,7 @@ func getMockRootApp2() *meta.App {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1"},
 							Output: []string{"ch2"},
@@ -1648,7 +1648,7 @@ func getMockRootApp2() *meta.App {
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
+			Types: map[string]*meta.Type{
 				"ct1": {
 					Meta: meta.Metadata{
 						Name:        "ct1",

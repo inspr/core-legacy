@@ -76,3 +76,22 @@ IsInnerScope checks if scope s2 is children or the same scope of s1
 func IsInnerScope(s1, s2 string) bool {
 	return strings.HasPrefix(s2, s1)
 }
+
+/*
+RemoveAliasInScope removes the two last names defined in the scope
+and returns the new scope and the alias that was removed
+*/
+func RemoveAliasInScope(scope string) (string, string, error) {
+	if !IsValidScope(scope) {
+		return "", "", ierrors.NewError().Message("invalid scope: %s", scope).InvalidName().Build()
+	}
+
+	names := strings.Split(scope, ".")
+	aliasNames := names[len(names)-2:]
+	names = names[:len(names)-2]
+
+	alias := strings.Join(aliasNames, ".")
+	newScope := strings.Join(names, ".")
+
+	return newScope, alias, nil
+}

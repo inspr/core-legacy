@@ -7,4 +7,4 @@ meta:
     kafka.replication.factor: 1
     kafka.partition.number: 2
 spec:
-  type: ppctype1
+  type: pptype1

@@ -38,9 +38,9 @@ func createChannelYaml() string {
 	return string(data)
 }
 
-func createChannelTypeYaml() string {
+func createTypeYaml() string {
 	comp := meta.Component{
-		Kind:       "channeltype",
+		Kind:       "type",
 		APIVersion: "v1",
 	}
 	data, _ := yaml.Marshal(&comp)
@@ -338,7 +338,7 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.NewError().Message("unauthorized").Unauthorized().Build(),
-			errMsg:  "did you login ?\n",
+			errMsg:  "We couldn't authenticate with the cluster. Is your token configured correctly?\n",
 		},
 		{
 			name: "forbidden_error",
@@ -428,7 +428,7 @@ func Test_getOrderedFiles(t *testing.T) {
 	)
 	ioutil.WriteFile(
 		"ct.yml",
-		[]byte(createChannelTypeYaml()),
+		[]byte(createTypeYaml()),
 		os.ModePerm,
 	)
 	ioutil.WriteFile(
@@ -482,10 +482,10 @@ func orderedContent() []applied {
 		{
 			fileName: "ct.yml",
 			component: meta.Component{
-				Kind:       "channeltype",
+				Kind:       "type",
 				APIVersion: "v1",
 			},
-			content: []byte(createChannelTypeYaml()),
+			content: []byte(createTypeYaml()),
 		},
 		{
 			fileName: "ch.yml",

@@ -17,7 +17,7 @@ type Builder interface {
 	WithLongDescription(long string) Builder
 	WithExample(comment, command string) Builder
 	WithFlagAdder(adder func(*pflag.FlagSet)) Builder
-	WithFlags([]*Flag) Builder
+	WithFlags(...*Flag) Builder
 	WithCommonFlags() Builder
 	Hidden() Builder
 	ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command
@@ -89,6 +89,7 @@ func (b *builder) WithCommonFlags() Builder {
 // config.AddSetUnsetFlags(f)
 //
 // }).
+
 func (b *builder) WithFlagAdder(adder func(*pflag.FlagSet)) Builder {
 	adder(b.cmd.Flags())
 	return b
@@ -96,7 +97,7 @@ func (b *builder) WithFlagAdder(adder func(*pflag.FlagSet)) Builder {
 
 // WithFlags - receives a slice of flags (defined in the cmd pkg)
 // adds each of the flags in the command
-func (b *builder) WithFlags(flags []*Flag) Builder {
+func (b *builder) WithFlags(flags ...*Flag) Builder {
 	for _, f := range flags {
 		fl := f.Flag()
 		b.cmd.Flags().AddFlag(fl)
