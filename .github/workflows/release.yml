@@ -44,9 +44,6 @@ jobs:
         env:
           GCR_KEY: ${{ secrets.GCR_ACCOUNT_KEY }}
 
-      - env:
-          GOOGLE_APPLICATION_CREDENTIALS: $GCR_FILENAME.json
-
       - name: Activate GCR account
         uses: actions-hub/gcloud@master
         env:
@@ -70,6 +67,8 @@ jobs:
           touch tags.out
 
       - name: Run skaffold build
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $GCR_FILENAME.json
         run: |
           skaffold build --file-output=tags.out --filename=/home/runner/work/inspr/inspr/skaffold.yaml
 
