@@ -351,7 +351,7 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 		}
 
 		if !isAllowed {
-			return ierrors.NewError().Forbidden().Message("You are not allowed to create/delete/update a user with those permissions").Build()
+			return ierrors.NewError().Forbidden().Message("not allowed to create/delete/update a user with current permissions").Build()
 		}
 
 	}
