@@ -41,7 +41,7 @@ jobs:
           PROJECT_ID: red-inspr
           APPLICATION_CREDENTIALS: ${{ secrets.GCR_ACCOUNT_KEY }}
         with:
-          args: auth configure-docker
+          args: gcloud auth activate-service-account --key-file=${{ secrets.GCR_ACCOUNT_KEY }}
 
       # - name: Build CLI
       #   run: bash .github/scripts/buildcli.sh
