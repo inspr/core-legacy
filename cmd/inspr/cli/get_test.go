@@ -377,7 +377,12 @@ func Test_getObj(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.handler))
 			cliutils.SetClient(server.URL)
-			if err := getObj(tt.args.printObj, tt.args.lines); (err != nil) != tt.wantErr {
+
+			client := cliutils.GetCliClient()
+			out := cliutils.GetCliOutput()
+			scope, _ := cliutils.GetScope()
+
+			if err := getObj(tt.args.printObj, tt.args.lines, client, out, scope); (err != nil) != tt.wantErr {
 				t.Errorf("getObj() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(tt.lines, tt.args.lines) {

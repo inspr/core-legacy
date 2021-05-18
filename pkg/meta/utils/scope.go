@@ -71,6 +71,13 @@ func JoinScopes(s1, s2 string) (string, error) {
 }
 
 /*
+IsInnerScope checks if scope s2 is children or the same scope of s1
+*/
+func IsInnerScope(s1, s2 string) bool {
+	return strings.HasPrefix(s2, s1)
+}
+
+/*
 RemoveAliasInScope removes the two last names defined in the scope
 and returns the new scope and the alias that was removed
 */
@@ -87,5 +94,4 @@ func RemoveAliasInScope(scope string) (string, string, error) {
 	newScope := strings.Join(names, ".")
 
 	return newScope, alias, nil
-
 }

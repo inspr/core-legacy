@@ -113,7 +113,7 @@ func TestHandler_DeleteUserHandler(t *testing.T) {
 				Password:        "123",
 				UserToBeDeleted: "rand2",
 			},
-			want: http.StatusForbidden,
+			want: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
@@ -162,7 +162,7 @@ func TestHandler_UpdatePasswordHandler(t *testing.T) {
 				UserToBeUpdated: "rand2",
 				NewPassword:     "321",
 			},
-			want: http.StatusForbidden,
+			want: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
