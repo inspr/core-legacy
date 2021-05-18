@@ -33,7 +33,6 @@ func TestKafkaToDeployment(t *testing.T) {
 		kafkaInsprdName:  testKafkaInsprdName,
 		kafkaInsprPort:   testKafkaInsprPort,
 		kafkaNamespace:   testKafkaNamespace,
-		ports:            testPorts,
 	}
 	deploymentDApp := meta.App{
 		Meta: meta.Metadata{
@@ -62,7 +61,6 @@ func TestKafkaToDeployment(t *testing.T) {
 					kafkaInsprdName:  testKafkaInsprdName,
 					kafkaInsprPort:   testKafkaInsprPort,
 					kafkaNamespace:   testKafkaNamespace,
-					ports:            testPorts,
 				},
 				dapp: meta.App{},
 			},
@@ -71,8 +69,8 @@ func TestKafkaToDeployment(t *testing.T) {
 					"sidecar-kafka-dappUUID",
 					testSidecarImage,
 					insprAppIDConfig(&deploymentDApp),
-					kafkaConfig(deploymentKafkaConfig),
-					sidecarConfig(deploymentKafkaConfig),
+					kafkaEnvConfig(deploymentKafkaConfig),
+					kafkaSidecarConfig(deploymentKafkaConfig, &testPorts),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
 				),
 			),
@@ -95,7 +93,7 @@ func TestKafkaToDeployment(t *testing.T) {
 	}
 }
 
-func Test_kafkaConfig(t *testing.T) {
+func Test_kafkaEnvConfig(t *testing.T) {
 	type args struct {
 		config KafkaConfig
 	}
@@ -125,7 +123,7 @@ func Test_kafkaConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := kafkaConfig(tt.args.config)
+			got := kafkaEnvConfig(tt.args.config)
 
 			gotContainer := k8s.NewContainer("", "", got)
 			wantContainer := k8s.NewContainer("", "", tt.want)
@@ -139,7 +137,7 @@ func Test_kafkaConfig(t *testing.T) {
 	}
 }
 
-func Test_sidecarConfig(t *testing.T) {
+func Test_kafkaSidecarConfig(t *testing.T) {
 	type args struct {
 		config KafkaConfig
 	}
@@ -157,23 +155,22 @@ func Test_sidecarConfig(t *testing.T) {
 				kafkaInsprdName:  testKafkaInsprdName,
 				kafkaInsprPort:   testKafkaInsprPort,
 				kafkaNamespace:   testKafkaNamespace,
-				ports:            testPorts,
 			}},
 			want: k8s.ContainerWithEnv(
 				corev1.EnvVar{
-					Name:  "INSPR_SIDECAR_READ_PORT",
+					Name:  "KAFKA_SIDECAR_READ_PORT",
 					Value: string(testPorts.OutPort),
 				},
 				corev1.EnvVar{
-					Name:  "INSPR_SIDECAR_WRITE_PORT",
+					Name:  "KAFKA_SIDECAR_WRITE_PORT",
 					Value: string(testPorts.InPort),
 				},
 				corev1.EnvVar{
-					Name:  "INSPR_SIDECAR_PORT",
+					Name:  "KAFKA_SIDECAR_PORT",
 					Value: testKafkaInsprPort,
 				},
 				corev1.EnvVar{
-					Name:  "INSPR_INSPRD_ADDRESS",
+					Name:  "KAFKA_INSPRD_ADDRESS",
 					Value: "http://" + testKafkaInsprdName + "." + testKafkaNamespace + "." + "svc:" + testKafkaInsprPort,
 				},
 			),
@@ -181,7 +178,7 @@ func Test_sidecarConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := sidecarConfig(tt.args.config)
+			got := kafkaSidecarConfig(tt.args.config, &testPorts)
 
 			gotContainer := k8s.NewContainer("", "", got)
 			wantContainer := k8s.NewContainer("", "", tt.want)

@@ -19,8 +19,6 @@ type KafkaConfig struct {
 	kafkaInsprPort string
 	// namespace is the release namespace in which the insprd is located
 	kafkaNamespace string
-	// ports of the
-	ports models.SidecarConnections
 }
 
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
@@ -34,8 +32,8 @@ func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
 
 				// label to the dApp associated with it
 				insprAppIDConfig(app),
-				kafkaConfig(config),
-				sidecarConfig(config),
+				kafkaEnvConfig(config),
+				kafkaSidecarConfig(config, conn),
 				k8s.ContainerWithPullPolicy(corev1.PullAlways),
 			),
 		)
@@ -43,7 +41,7 @@ func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
 }
 
 // kafkaConfig adds teh necessary env variables to configure kafka
-func kafkaConfig(config KafkaConfig) k8s.ContainerOption {
+func kafkaEnvConfig(config KafkaConfig) k8s.ContainerOption {
 	return k8s.ContainerWithEnv(
 		corev1.EnvVar{
 			Name:  "KAFKA_BOOTSTRAP_SERVERS",
@@ -57,22 +55,22 @@ func kafkaConfig(config KafkaConfig) k8s.ContainerOption {
 }
 
 // sidecarConfig adds the necessary env variables to configure the sidecar in the cluster
-func sidecarConfig(config KafkaConfig) k8s.ContainerOption {
+func kafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) k8s.ContainerOption {
 	return k8s.ContainerWithEnv(
 		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_READ_PORT",
-			Value: string(config.ports.OutPort),
+			Name:  "KAFKA_SIDECAR_READ_PORT",
+			Value: string(conns.OutPort),
 		},
 		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_WRITE_PORT",
-			Value: string(config.ports.InPort),
+			Name:  "KAFKA_SIDECAR_WRITE_PORT",
+			Value: string(conns.InPort),
 		},
 		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_PORT",
+			Name:  "KAFKA_SIDECAR_PORT",
 			Value: config.kafkaInsprPort,
 		},
 		corev1.EnvVar{
-			Name:  "INSPR_INSPRD_ADDRESS",
+			Name:  "KAFKA_INSPRD_ADDRESS",
 			Value: "http://" + config.kafkaInsprdName + "." + config.kafkaNamespace + "." + "svc:" + config.kafkaInsprPort,
 		},
 	)
