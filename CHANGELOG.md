@@ -7,7 +7,14 @@
 - fixes:
     - all functions of the get command. For example, if you're trying to get channels, before calling the getDapp directly it will call the getChannels to check if the user have the right permissions.
 
-### #56 Story CORE-417 | Create a broker-tracking structure
+### #59 - Fix: CORE-310 | Automatic Helm chart tags update
+- fixes:
+    - The workflow/GitHub action `release.yml` wasn't properly working. To fix it:
+        - Added action to setup Skaffold and Helm tools
+        - Added action to setup Cloud SDK and configure the service account
+---
+
+### #56 - Story CORE-417 | Create a broker-tracking structure
 - features:
     - created a Brokers struct on meta/brokers to store broker information.
     - created a Brokers interface to handle storage of broker data
