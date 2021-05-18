@@ -9,7 +9,7 @@ import (
 
 type brokerFactory map[string]models.SidecarFactory
 
-var f brokerFactory
+var factories brokerFactory
 
 // AbstractBrokerFactory singleton and abstract factory
 // implementation for SidecarInterface
@@ -18,11 +18,11 @@ type AbstractBrokerFactory struct {
 
 // Subscribe includes a broker specific factory on the Abstract broker factory
 func (abf *AbstractBrokerFactory) Subscribe(broker string, factory models.SidecarFactory) error {
-	if f == nil {
-		f = make(brokerFactory)
+	if factories == nil {
+		factories = make(brokerFactory)
 	}
-	if _, ok := f[broker]; !ok {
-		f[broker] = factory
+	if _, ok := factories[broker]; !ok {
+		factories[broker] = factory
 		return nil
 	}
 	return ierrors.NewError().Message("%s broker already subscribed", broker).Build()
@@ -30,10 +30,10 @@ func (abf *AbstractBrokerFactory) Subscribe(broker string, factory models.Sideca
 
 // Get returns a factory for the specifyed broker
 func (abf *AbstractBrokerFactory) Get(broker string) (models.SidecarFactory, error) {
-	if f == nil {
+	if factories == nil {
 		return nil, ierrors.NewError().Message("no brokers are allowed").Build()
 	}
-	if factory, ok := f[broker]; ok {
+	if factory, ok := factories[broker]; ok {
 		return factory, nil
 	}
 	return nil, ierrors.NewError().Message("%s broker not allowed", broker).Build()
@@ -50,7 +50,7 @@ func getAllSidecarNames(app *meta.App) []string {
 func getAllSidecarsDeployments(app *meta.App) []k8s.DeploymentOption {
 	var ret []k8s.DeploymentOption
 	for _, broker := range getAllSidecarNames(app) {
-		if option, ok := f[broker]; ok {
+		if option, ok := factories[broker]; ok {
 			ret = append(ret, option(app, getAvailiblePorts()))
 		} else {
 			panic("broker not allowed")

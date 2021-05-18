@@ -65,7 +65,7 @@ func TestAbstractBrokerFactory_Subscribe(t *testing.T) {
 }
 
 func resetFactories() {
-	f = nil
+	factories = nil
 }
 
 func TestAbstractBrokerFactory_Get(t *testing.T) {
