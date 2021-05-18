@@ -1,6 +1,15 @@
 
 # Changelog
 
+### #60 Story CORE-419 | Create Kafka sidecar Factory
+- features:
+    - developed a function that returns a `SidecarFactory` type, responsible for
+      the sidecar deployment configuration in the k8s.
+    - opted for the implementation of the sidecar factory to be in the
+      `sidecars` pkg.
+    - created the utils file containing small functions and mocks of functions
+      to be, these functions should be able to be used by other sidecars.
+
 ### #58  Story CORE-418 | Create Sidecar Factory
 - features:
     - developed a function type to represent sidecar factories
