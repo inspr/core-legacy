@@ -1,12 +1,12 @@
 #!/bin/bash
+GCR_DETAILS=$1
+CI_RUN_ID=$2
 VERSION=$(cat version)
 
-echo $GCR_ACCOUNT_KEY
-
 gcloud auth configure-docker
-echo $GCR_ACCOUNT_KEY > $CI_PIPELINE_ID.json
-gcloud auth activate-service-account --key-file $CI_PIPELINE_ID.json
-export GOOGLE_APPLICATION_CREDENTIALS=$CI_PIPELINE_ID.json
+echo $GCR_DETAILS > ($CI_RUN_ID).json
+gcloud auth activate-service-account --key-file ($CI_RUN_ID).json
+export GOOGLE_APPLICATION_CREDENTIALS=($CI_RUN_ID).json
 gcloud config set project red-inspr
 
 gsutil rsync bin gs://inspr-cli/$VERSION

@@ -9,7 +9,7 @@ import (
 // of the system's message brokers.
 
 // Manager is the interface that allows for interaction
-// with the systems multiple brokers and its conficurations.
+// with the systems multiple brokers and its configurations.
 type Manager interface {
 	GetAll() brokers.BrokerStatusArray
 	GetDefault() brokers.BrokerStatus
