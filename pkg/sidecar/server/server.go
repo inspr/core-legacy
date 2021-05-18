@@ -32,8 +32,8 @@ func NewServer() *Server {
 // Init - configures the server
 func (s *Server) Init(r models.Reader, w models.Writer) {
 	// server requests related
-	s.writeAddr = fmt.Sprintf(":%s", os.Getenv("INSPR_SIDECAR_WRITE_PORT"))
-	s.client = request.NewJSONClient(fmt.Sprintf("http://localhost:%v", os.Getenv("INSPR_SIDECAR_READ_PORT")))
+	s.writeAddr = fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"))
+	s.client = request.NewJSONClient(fmt.Sprintf("http://localhost:%v", os.Getenv("INSPR_LBSIDECAR_READ_PORT")))
 
 	// implementations of write and read for a specific sidecar
 	s.Reader = r

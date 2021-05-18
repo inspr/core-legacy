@@ -368,7 +368,7 @@ func Test_withSidecarPorts(t *testing.T) {
 			want: &kubeCore.Container{
 				Env: []kubeCore.EnvVar{
 					{
-						Name:  "INSPR_SIDECAR_WRITE_PORT",
+						Name:  "INSPR_LBSIDECAR_WRITE_PORT",
 						Value: "1234",
 					},
 				},
@@ -392,7 +392,7 @@ func Test_withSidecarPorts(t *testing.T) {
 			want: &kubeCore.Container{
 				Env: []kubeCore.EnvVar{
 					{
-						Name:  "INSPR_SIDECAR_READ_PORT",
+						Name:  "INSPR_LBSIDECAR_READ_PORT",
 						Value: "1234",
 					},
 				},
@@ -417,11 +417,11 @@ func Test_withSidecarPorts(t *testing.T) {
 			want: &kubeCore.Container{
 				Env: []kubeCore.EnvVar{
 					{
-						Name:  "INSPR_SIDECAR_WRITE_PORT",
+						Name:  "INSPR_LBSIDECAR_WRITE_PORT",
 						Value: "1234",
 					},
 					{
-						Name:  "INSPR_SIDECAR_READ_PORT",
+						Name:  "INSPR_LBSIDECAR_READ_PORT",
 						Value: "1234",
 					},
 				},

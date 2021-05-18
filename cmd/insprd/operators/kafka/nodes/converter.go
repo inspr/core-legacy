@@ -124,13 +124,13 @@ func withSidecarPorts(app *meta.App) k8s.ContainerOption {
 
 		if writePort > 0 {
 			c.Env = append(c.Env, corev1.EnvVar{
-				Name:  "INSPR_SIDECAR_WRITE_PORT",
+				Name:  "INSPR_LBSIDECAR_WRITE_PORT",
 				Value: strconv.Itoa(writePort),
 			})
 		}
 		if readPort > 0 {
 			c.Env = append(c.Env, corev1.EnvVar{
-				Name:  "INSPR_SIDECAR_READ_PORT",
+				Name:  "INSPR_LBSIDECAR_READ_PORT",
 				Value: strconv.Itoa(readPort),
 			})
 		}
@@ -205,7 +205,7 @@ func withSidecarConfiguration() k8s.ContainerOption {
 }
 
 func dappToService(app *meta.App) *kubeService {
-	temp, _ := strconv.Atoi(os.Getenv("INSPR_SIDECAR_PORT"))
+	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_PORT"))
 	sidecarPort = int32(temp)
 	appID := toAppID(app)
 	appDeployName := toDeploymentName(app)
