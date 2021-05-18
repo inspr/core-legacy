@@ -28,10 +28,3 @@ func GetBrokerMemory() Manager {
 	}
 	return brokerMemory
 }
-
-// Brokers provides access to brokers memory
-func (bm *BrokerMemoryManager) Brokers() Manager {
-	return &BrokerMemoryManager{
-		factory: &AbstractBrokerFactory{},
-	}
-}
