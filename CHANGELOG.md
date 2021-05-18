@@ -1,7 +1,30 @@
 
 # Changelog
 
-### #56 Story CORE-417 | Create a broker-tracking structure
+### #58  Story CORE-418 | Create Sidecar Factory
+- features:
+    - developed a function type to represent sidecar factories
+    - declared a interface for sidecars and implemented its structure as an abstract factory
+    - developed a Manager interface to envelop BrokerManager and  AbstractBrokerFactory
+    - implemented Manager's struct
+    - implemented SidecarInterface's methods
+    - tested previously mentioned methods
+- fixes:
+    - moved broker management interfaces and structures to a more appropriate directory
+### #57 Tech CORE-426 | Review Permissions
+- features:
+    - created functions in the UIDP client that make sure when creating a token, it’s permissions should be the same as the creator’s permissions (or have less permissions).
+- fixes:
+    - all functions of the get command. For example, if you're trying to get channels, before calling the getDapp directly it will call the getChannels to check if the user have the right permissions.
+
+### #59 - Fix: CORE-310 | Automatic Helm chart tags update
+- fixes:
+    - The workflow/GitHub action `release.yml` wasn't properly working. To fix it:
+        - Added action to setup Skaffold and Helm tools
+        - Added action to setup Cloud SDK and configure the service account
+---
+
+### #56 - Story CORE-417 | Create a broker-tracking structure
 - features:
     - created a Brokers struct on meta/brokers to store broker information.
     - created a Brokers interface to handle storage of broker data

@@ -82,7 +82,7 @@ func TestKafkaToDeployment(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := KafkaToDeployment(tt.args.config)
 
-			gotDepOption := got(&deploymentDApp, testPorts)
+			gotDepOption := got(&deploymentDApp, &testPorts)
 
 			gotDeploy := k8s.NewDeployment("", gotDepOption)
 			wantDeploy := k8s.NewDeployment("", tt.want)
