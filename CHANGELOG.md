@@ -11,6 +11,11 @@
     - tested previously mentioned methods
 - fixes:
     - moved broker management interfaces and structures to a more appropriate directory
+### #57 Tech CORE-426 | Review Permissions
+- features:
+    - created functions in the UIDP client that make sure when creating a token, it’s permissions should be the same as the creator’s permissions (or have less permissions).
+- fixes:
+    - all functions of the get command. For example, if you're trying to get channels, before calling the getDapp directly it will call the getChannels to check if the user have the right permissions.
 
 ### #59 - Fix: CORE-310 | Automatic Helm chart tags update
 - fixes:
