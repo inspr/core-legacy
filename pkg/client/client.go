@@ -30,7 +30,7 @@ type clientMessage struct {
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
 
-	writeAddr := fmt.Sprintf("http://localhost:%s", os.Getenv("INSPR_SIDECAR_WRITE_PORT"))
+	writeAddr := fmt.Sprintf("http://localhost:%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"))
 	readAddr := fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT"))
 	return &Client{
 		readAddr: readAddr,
