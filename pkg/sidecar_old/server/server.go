@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 )
 
 // Server is a struct that contains the variables necessary

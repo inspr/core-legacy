@@ -14,7 +14,7 @@ import (
 
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 )
 
 // createMockEnvVars - sets up the env values to be used in the tests functions

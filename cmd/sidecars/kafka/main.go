@@ -6,8 +6,8 @@ import (
 
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
 	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/sidecar/models"
 	sidecarserv "github.com/inspr/inspr/pkg/sidecar/server"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 	"go.uber.org/zap"
 )
 

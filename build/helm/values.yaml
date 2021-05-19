@@ -57,7 +57,7 @@ tolerations: []
 
 affinity: {}
 
-sidecar:
+lbSidecar:
     port: 3051
     readPort: 3047
     writePort: 3048

@@ -10,22 +10,26 @@ import (
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 	"go.uber.org/zap"
 )
 
 var logger *zap.Logger
 
-func init() {
-	logger, _ = zap.NewProduction()
-}
-
 const maxBrokerRetries = 5
+
+type response struct {
+	Status string
+}
 
 var (
 	writeMessageErr = ierrors.NewError().InternalServer().Message("broker's writeMessage failed")
 	decodingErr     = ierrors.NewError().BadRequest().Message("couldn't parse body")
 )
+
+func init() {
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
+}
 
 // handles the /message route in the server
 func (s *Server) writeMessageHandler() rest.Handler {
@@ -53,7 +57,12 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		logger.Info("writing message to broker", zap.String("channel", channel))
+		// get env var nisso que vai dar bom channel+"_RESOLVED"
+
+		logger.Info("sending message to broker",
+			zap.String("broker", channel),
+			zap.String("channel", channel))
+
 		if err := s.Writer.WriteMessage(channel, body.Message); err != nil {
 			rest.ERROR(w, writeMessageErr.InnerError(err).Build())
 			return
@@ -86,10 +95,6 @@ func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerResp 
 		}
 		return
 	}
-}
-
-type response struct {
-	Status string
 }
 
 func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) error {

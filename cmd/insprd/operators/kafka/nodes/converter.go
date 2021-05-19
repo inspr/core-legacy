@@ -197,7 +197,7 @@ func withSidecarConfiguration() k8s.ContainerOption {
 		corev1.EnvFromSource{
 			ConfigMapRef: &corev1.ConfigMapEnvSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "inspr-sidecar-configuration",
+					Name: "inspr-lbsidecar-configuration",
 				},
 			},
 		},

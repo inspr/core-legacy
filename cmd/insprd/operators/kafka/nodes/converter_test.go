@@ -520,7 +520,7 @@ func Test_withSidecarConfiguration(t *testing.T) {
 					{
 						ConfigMapRef: &kubeCore.ConfigMapEnvSource{
 							LocalObjectReference: kubeCore.LocalObjectReference{
-								Name: "inspr-sidecar-configuration",
+								Name: "inspr-lbsidecar-configuration",
 							},
 						},
 					},
