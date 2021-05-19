@@ -108,7 +108,7 @@ func Test_insprAppIDConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := insprAppIDConfig(tt.args.app)
+			got := InsprAppIDConfig(tt.args.app)
 
 			gotContainer := k8s.NewContainer("", "", got)
 			wantContainer := k8s.NewContainer("", "", tt.want)

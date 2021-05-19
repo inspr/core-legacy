@@ -9,18 +9,11 @@ import (
 
 // KafkaConfig configurations used to create the KafkaSidecar
 type KafkaConfig struct {
-	bootstrapServers string
-	autoOffsetReset  string
-	sidecarImage     string
-
-	// insprdName is the name used in the insprd service of your cluster
-	kafkaInsprdName string
+	BootstrapServers string
+	AutoOffsetReset  string
+	SidecarImage     string
 	// insprdPort is the port used in the insprd service of your cluster
-	kafkaInsprPort string
-	// namespace is the release namespace in which the insprd is located
-	kafkaNamespace string
-	// ports of the
-	ports models.SidecarConnections
+	KafkaInsprPort string
 }
 
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
@@ -30,50 +23,46 @@ func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
 		return k8s.WithContainer(
 			k8s.NewContainer(
 				"sidecar-kafka-"+app.Meta.UUID, // deployment name
-				config.sidecarImage,            // image url
+				config.SidecarImage,            // image url
 
 				// label to the dApp associated with it
-				insprAppIDConfig(app),
-				kafkaConfig(config),
-				sidecarConfig(config),
+				InsprAppIDConfig(app),
+				KafkaEnvConfig(config),
+				KafkaSidecarConfig(config, conn),
 				k8s.ContainerWithPullPolicy(corev1.PullAlways),
 			),
 		)
 	}
 }
 
-// kafkaConfig adds teh necessary env variables to configure kafka
-func kafkaConfig(config KafkaConfig) k8s.ContainerOption {
+// KafkaEnvConfig adds teh necessary env variables to configure kafka
+func KafkaEnvConfig(config KafkaConfig) k8s.ContainerOption {
 	return k8s.ContainerWithEnv(
 		corev1.EnvVar{
-			Name:  "KAFKA_BOOTSTRAP_SERVERS",
-			Value: config.bootstrapServers,
+			Name:  "INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS",
+			Value: config.BootstrapServers,
 		},
 		corev1.EnvVar{
-			Name:  "KAFKA_AUTO_OFFSET_RESET",
-			Value: config.autoOffsetReset,
+			Name:  "INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET",
+			Value: config.AutoOffsetReset,
 		},
 	)
 }
 
-// sidecarConfig adds the necessary env variables to configure the sidecar in the cluster
-func sidecarConfig(config KafkaConfig) k8s.ContainerOption {
+// KafkaSidecarConfig adds the necessary env variables to configure the sidecar in the cluster
+func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) k8s.ContainerOption {
 	return k8s.ContainerWithEnv(
 		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_READ_PORT",
-			Value: string(config.ports.OutPort),
+			Name:  "INSPR_SIDECAR_KAFKA_READ_PORT",
+			Value: string(conns.OutPort),
 		},
 		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_WRITE_PORT",
-			Value: string(config.ports.InPort),
+			Name:  "INSPR_SIDECAR_KAFKA_WRITE_PORT",
+			Value: string(conns.InPort),
 		},
 		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_PORT",
-			Value: config.kafkaInsprPort,
-		},
-		corev1.EnvVar{
-			Name:  "INSPR_INSPRD_ADDRESS",
-			Value: "http://" + config.kafkaInsprdName + "." + config.kafkaNamespace + "." + "svc:" + config.kafkaInsprPort,
+			Name:  "INSPR_SIDECAR_KAFKA_PORT",
+			Value: config.KafkaInsprPort,
 		},
 	)
 }

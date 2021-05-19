@@ -24,8 +24,8 @@ func toAppID(app *meta.App) string {
 	return depNames.Join("-")
 }
 
-// insprAppIDConfig adds the dapp id that the sidecar is related to
-func insprAppIDConfig(app *meta.App) k8s.ContainerOption {
+// InsprAppIDConfig adds the dapp id that the sidecar is related to
+func InsprAppIDConfig(app *meta.App) k8s.ContainerOption {
 	return k8s.ContainerWithEnv(corev1.EnvVar{
 		Name:  "INSPR_APP_ID",
 		Value: toAppID(app),
