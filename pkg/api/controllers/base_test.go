@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/cmd/insprd/memory/fake"
 	"github.com/inspr/inspr/cmd/insprd/operators"
 	ofake "github.com/inspr/inspr/cmd/insprd/operators/fake"
@@ -14,9 +15,10 @@ import (
 
 func TestServer_Init(t *testing.T) {
 	type args struct {
-		mm   memory.Manager
-		op   operators.OperatorInterface
-		auth auth.Auth
+		mm      memory.Manager
+		op      operators.OperatorInterface
+		auth    auth.Auth
+		brokers brokers.Manager
 	}
 	tests := []struct {
 		name string
@@ -27,15 +29,16 @@ func TestServer_Init(t *testing.T) {
 			name: "successful_server_init",
 			s:    &Server{},
 			args: args{
-				mm:   fake.MockMemoryManager(nil),
-				op:   ofake.NewFakeOperator(),
-				auth: authmock.NewMockAuth(nil),
+				mm:      fake.MockMemoryManager(nil),
+				op:      ofake.NewFakeOperator(),
+				auth:    authmock.NewMockAuth(nil),
+				brokers: fake.MockBrokerManager(nil),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.s.Init(tt.args.mm, tt.args.op, tt.args.auth)
+			tt.s.Init(tt.args.mm, tt.args.op, tt.args.auth, tt.args.brokers)
 			if !reflect.DeepEqual(tt.s.MemoryManager, fake.MockMemoryManager(nil)) {
 				t.Errorf("TestServer_Init() = %v, want %v", tt.s.MemoryManager, nil)
 			}
