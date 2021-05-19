@@ -174,6 +174,14 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 					withNodeID(app),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
 				),
+				k8s.NewContainer(
+					"lbsidecar",
+					"",
+					k8s.ContainerWithEnv(corev1.EnvVar{
+						Name:  "NODE_SCOPE",
+						Value: app.Meta.Parent,
+					}),
+				),
 			),
 		))
 }
