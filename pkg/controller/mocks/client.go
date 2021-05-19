@@ -39,6 +39,7 @@ func (cm *ClientMock) Alias() controller.AliasInterface {
 	return NewAliasMock(cm.err)
 }
 
+//Brokers mocks brokers controller
 func (cm *ClientMock) Brokers() controller.BrokersInterface {
 	return NewBrokersMock(cm.err)
 }
