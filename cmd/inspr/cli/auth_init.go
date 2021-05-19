@@ -8,7 +8,7 @@ import (
 	"github.com/inspr/inspr/pkg/cmd/utils"
 )
 
-var authCommand = cmd.NewCmd("cluster").AddSubCommand(
+var clusterCommand = cmd.NewCmd("cluster").AddSubCommand(
 	cmd.NewCmd("init").
 		WithCommonFlags().
 		ExactArgs(1,
@@ -24,4 +24,5 @@ var authCommand = cmd.NewCmd("cluster").AddSubCommand(
 				return nil
 			},
 		),
+	getBorkers,
 ).WithCommonFlags().Super()
