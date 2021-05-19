@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 
+	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
@@ -54,6 +55,13 @@ type AliasInterface interface {
 	Create(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
 	Delete(ctx context.Context, context, key string, dryRun bool) (diff.Changelog, error)
 	Update(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
+}
+
+// BrokersInterface is the interface that allows to
+// obtain or change information related to the current
+// cluster's message brokers.
+type BrokersInterface interface {
+	Get(ctx context.Context) (*models.BrokersDi, error)
 }
 
 // Interface is the interface that allows the management
