@@ -19,6 +19,7 @@ func (handler *Handler) NewBrokerHandler() *BrokerHandler {
 	}
 }
 
+// HandleGet returns the get handler for brokers
 func (bh *BrokerHandler) HandleGet() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		brokers := &models.BrokersDi{
