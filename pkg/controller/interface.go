@@ -73,4 +73,5 @@ type Interface interface {
 	Types() TypeInterface
 	Authorization() AuthorizationInterface
 	Alias() AliasInterface
+	Brokers() BrokersInterface
 }
