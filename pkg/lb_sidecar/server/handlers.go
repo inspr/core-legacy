@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
+	"github.com/inspr/inspr/cmd/insprd/memory/tree"
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
@@ -56,19 +58,61 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			rest.ERROR(w, insprError.Build())
 			return
 		}
+		channelBroker, err := getChannelBroker(channel)
 
+		tree.GetTreeMemory().Apps().Get(pathToNode)
+		// Get Channel
+		// Check channel broker
+		// get env INSPR_SIDECAR_<broker>_WRITE_PORT
+		// Send request to that port
 		// get env var nisso que vai dar bom channel+"_RESOLVED"
 
 		logger.Info("sending message to broker",
 			zap.String("broker", channel),
 			zap.String("channel", channel))
 
-		if err := s.Writer.WriteMessage(channel, body.Message); err != nil {
-			rest.ERROR(w, writeMessageErr.InnerError(err).Build())
-			return
-		}
+		s.client.Send("localhost:port", body.Message)
+		// if err := s.Writer.WriteMessage(channel, body.Message); err != nil {
+		// 	rest.ERROR(w, writeMessageErr.InnerError(err).Build())
+		// 	return
+		// }
 		rest.JSON(w, 200, struct{ Status string }{"OK"})
 	}
+}
+
+func getChannelBroker(channel string) (string, error) {
+	pathToNode := os.Getenv("NODE_SCOPE")
+	if pathToNode != "" {
+		return "", ierrors.NewError().
+			NotFound().
+			Message("[ENV VAR] NODE_SCOPE not found").
+			Build()
+	}
+
+	resolvedChannel := os.Getenv(channel + "_RESOLVED")
+	if resolvedChannel != "" {
+		return "", ierrors.NewError().
+			NotFound().
+			Message("[ENV VAR] %s_RESOLVED not found", channel).
+			Build()
+	}
+	channelUUID := strings.Split(resolvedChannel, "_")[1]
+
+	parentNode, err := tree.GetTreeMemory().Apps().Get(pathToNode)
+	if err != nil {
+		return "", err
+	}
+
+	for _, ch := range parentNode.Spec.Channels {
+		if ch.Meta.UUID == channelUUID {
+			return ch.Spec.SelectedBroker, nil
+		}
+	}
+
+	return "", ierrors.NewError().
+		NotFound().
+		Message("unable to get channel broker for channel %s", channel).
+		Build()
 }
 
 func (s *Server) writeWithRetry(ctx context.Context, channel string, data interface{}) (resp response, err error) {
