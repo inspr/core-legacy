@@ -98,3 +98,10 @@ func (c *Client) Alias() controller.AliasInterface {
 		reqClient: c.HTTPClient,
 	}
 }
+
+// Brokers interacts with brokers from the Insprd
+func (c *Client) Brokers() controller.BrokersInterface {
+	return &BrokersClient{
+		reqClient: c.HTTPClient,
+	}
+}

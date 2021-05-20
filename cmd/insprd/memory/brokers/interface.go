@@ -11,8 +11,8 @@ import (
 // Manager is the interface that allows for interaction
 // with the systems multiple brokers and its configurations.
 type Manager interface {
-	GetAll() brokers.BrokerStatusArray
-	GetDefault() brokers.BrokerStatus
+	GetAll() (brokers.BrokerStatusArray, error)
+	GetDefault() (*brokers.BrokerStatus, error)
 	Create(broker brokers.BrokerStatus, config brokers.BrokerConfiguration) error
 	SetDefault(broker brokers.BrokerStatus) error
 	Factory() SidecarManager
