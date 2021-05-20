@@ -21,7 +21,7 @@ var getBorkers = cmd.NewCmd("brokers").
 			}
 
 			fmt.Fprintf(out, "DEFAULT:\n%s\n", resp.Default)
-			fmt.Fprintln(out, "AVAILIBLE:")
+			fmt.Fprintln(out, "AVAILABLE:")
 			lines := []string(resp.Installed)
 			printTab(&lines)
 			return nil
