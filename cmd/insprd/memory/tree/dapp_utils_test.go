@@ -1245,7 +1245,6 @@ func Test_validAliases(t *testing.T) {
 }
 
 func TestSelectBrokerFromPriorityList(t *testing.T) {
-	defer brokers.ResetBrokerMemory()
 	type args struct {
 		brokerList []string
 	}
@@ -1268,6 +1267,30 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 				bmm.SetDefault("Broker_A")
 			},
 		},
+		{
+			name: "Should return the default broker",
+			args: args{
+				brokerList: []string{"A", "Broker_B"},
+			},
+			want: "Broker_A",
+			before: func() {
+				bmm := brokers.GetBrokerMemory()
+				bmm.Create("Broker_A", nil)
+				bmm.SetDefault("Broker_A")
+			},
+		},
+		{
+			name: "Should return the default broker when priority list is empty",
+			args: args{
+				brokerList: []string{},
+			},
+			want: "Broker_A",
+			before: func() {
+				bmm := brokers.GetBrokerMemory()
+				bmm.Create("Broker_A", nil)
+				bmm.SetDefault("Broker_A")
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1277,6 +1300,7 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 			if got := SelectBrokerFromPriorityList(tt.args.brokerList); got != tt.want {
 				t.Errorf("SelectBrokerFromPriorityList() = %v, want %v", got, tt.want)
 			}
+			brokers.ResetBrokerMemory()
 		})
 	}
 }
