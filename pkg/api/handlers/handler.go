@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/cmd/insprd/operators"
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -22,6 +23,7 @@ func init() {
 // for managing components on each route.
 type Handler struct {
 	Memory          memory.Manager
+	Brokers         brokers.Manager
 	Operator        operators.OperatorInterface
 	Auth            auth.Auth
 	diffReactions   []diff.DifferenceReaction
@@ -30,10 +32,11 @@ type Handler struct {
 
 // NewHandler creates a handler from a memory manager and an operator. It also initializes the reactors for
 // changes on the cluster.
-func NewHandler(memory memory.Manager, operator operators.OperatorInterface, auth auth.Auth) *Handler {
+func NewHandler(memory memory.Manager, operator operators.OperatorInterface, auth auth.Auth, brokers brokers.Manager) *Handler {
 	logger.Info("creating new Insprd API handler")
 	h := Handler{
 		Memory:          memory,
+		Brokers:         brokers,
 		Operator:        operator,
 		Auth:            auth,
 		diffReactions:   []diff.DifferenceReaction{},
