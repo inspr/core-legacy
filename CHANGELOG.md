@@ -1,6 +1,14 @@
 
 # Changelog
 
+### #62 Story CORE-413 | Modify Channel structure
+- features
+    - Added SelectedBroker and BrokerPriorityList to Channel structure
+    - Create a function that sets the SelectedBroker of a Channel based on the BrokerPriorityList and the available brokers
+    - Call the function above in create App and Channel
+    - Added a function in brokers that resets the manager (for tests)
+---
+
 ### #58  Story CORE-418 | Create Sidecar Factory
 - features:
     - developed a function type to represent sidecar factories
@@ -11,6 +19,8 @@
     - tested previously mentioned methods
 - fixes:
     - moved broker management interfaces and structures to a more appropriate directory
+---
+
 ### #57 Tech CORE-426 | Review Permissions
 - features:
     - created functions in the UIDP client that make sure when creating a token, it’s permissions should be the same as the creator’s permissions (or have less permissions).
