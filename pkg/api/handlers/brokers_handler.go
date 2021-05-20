@@ -26,7 +26,7 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		available, err := bh.Brokers.GetAll()
 		if err != nil {
-			logger.Error("unable to obtain currently available vrokers on cluster",
+			logger.Error("unable to obtain currently available brokers on cluster",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 		}
