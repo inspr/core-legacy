@@ -20,7 +20,7 @@ import (
 func NewGetCmd() *cobra.Command {
 	getApps := cmd.NewCmd("apps").
 		WithDescription("Get apps from context ").
-		WithAliases([]string{"a"}).
+		WithAliases("a").
 		WithExample("Get apps from the default scope", "get apps ").
 		WithExample("Get apps from a custom scope", "get apps --scope app1.app2").
 		WithCommonFlags().
@@ -29,28 +29,28 @@ func NewGetCmd() *cobra.Command {
 		WithDescription("Get channels from context").
 		WithExample("Get channels from the default scope", "get channels ").
 		WithExample("Get channels from a custom scope", "get channels --scope app1.app2").
-		WithAliases([]string{"ch"}).
+		WithAliases("ch").
 		WithCommonFlags().
 		NoArgs(getChannels)
 	getTypes := cmd.NewCmd("types").
 		WithDescription("Get types from context").
 		WithExample("Get types from the default scope", "get types ").
 		WithExample("Get types from a custom scope", "get types --scope app1.app2").
-		WithAliases([]string{"t"}).
+		WithAliases("t").
 		WithCommonFlags().
 		NoArgs(getTypes)
 	getNodes := cmd.NewCmd("nodes").
 		WithDescription("Get nodes from context").
 		WithExample("Get nodes from the default scope", "get nodes ").
 		WithExample("Get nodes from a custom scope", "get nodes --scope app1.app2").
-		WithAliases([]string{"n"}).
+		WithAliases("n").
 		WithCommonFlags().
 		NoArgs(getNodes)
 	getAlias := cmd.NewCmd("alias").
 		WithDescription("Get alias from context").
 		WithExample("Get alias from the default scope", "get alias ").
 		WithExample("Get alias from a custom scope", "get alias --scope app1.app2").
-		WithAliases([]string{"al"}).
+		WithAliases("al").
 		WithCommonFlags().
 		NoArgs(getAlias)
 	return cmd.NewCmd("get").
@@ -62,7 +62,7 @@ func NewGetCmd() *cobra.Command {
 		WithExample("gets nodes from cluster", "get nodes --scope <scope>").
 		WithExample("gets alias from cluster", "get alias --scope <scope>").
 		WithLongDescription("get takes a component type (apps | channels | types | nodes | alias) and displays names for those components is a scope)").
-		WithAliases([]string{"list"}).
+		WithAliases("list").
 		AddSubCommand(getApps).
 		AddSubCommand(getChannels).
 		AddSubCommand(getTypes).

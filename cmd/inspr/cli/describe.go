@@ -19,7 +19,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given app on the default scope", "describe apps hello_world").
 		WithExample("Display the state of the given app on a custom scope", "describe apps --scope app1.app2 hello_world").
 		WithExample("Display the state of the given app by the path", "describe apps app1.app2.hello_world").
-		WithAliases([]string{"a"}).
+		WithAliases("a").
 		WithCommonFlags().
 		ExactArgs(1, displayAppState)
 
@@ -28,7 +28,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given channel on the default scope", "describe channels hello_world").
 		WithExample("Display the state of the given channel on a custom scope", "describe channels --scope app1.app2 hello_world").
 		WithExample("Display the state of the given channel by the path", "describe channels app1.app2.hello_world").
-		WithAliases([]string{"ch"}).
+		WithAliases("ch").
 		WithCommonFlags().
 		ExactArgs(1, displayChannelState)
 
@@ -37,7 +37,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given type on the default scope", "describe types hello_world").
 		WithExample("Display the state of the given type on a custom scope", "describe types --scope app1.app2 hello_world").
 		WithExample("Display the state of the given type by the path", "describe types app1.app2.hello_world").
-		WithAliases([]string{"t"}).
+		WithAliases("t").
 		WithCommonFlags().
 		ExactArgs(1, displayTypeState)
 
@@ -46,7 +46,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given alias on the default scope", "describe alias myalias").
 		WithExample("Display the state of the given alias on a custom scope", "describe alias --scope app1.app2 myalias").
 		WithExample("Display the state of the given alias by the path", "describe alias app1.app2.myalias").
-		WithAliases([]string{"al"}).
+		WithAliases("al").
 		WithCommonFlags().
 		ExactArgs(1, displayAlias)
 

@@ -597,7 +597,7 @@ func Test_builder_WithAliases(t *testing.T) {
 			b := &builder{
 				cmd: tt.fields.cmd,
 			}
-			got := b.WithAliases(tt.args.alias).NoArgs(nil)
+			got := b.WithAliases(tt.args.alias...).NoArgs(nil)
 
 			if !reflect.DeepEqual(got.Aliases, tt.args.alias) {
 				t.Errorf(
