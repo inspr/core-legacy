@@ -24,9 +24,21 @@ func (handler *Handler) NewBrokerHandler() *BrokerHandler {
 func (bh *BrokerHandler) HandleGet() rest.Handler {
 	logger.Info("handling Brokers get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
+		available, err := bh.Brokers.GetAll()
+		if err != nil {
+			logger.Error("unable to obtain currently available vrokers on cluster",
+				zap.Any("error", err))
+			rest.ERROR(w, err)
+		}
+		def, err := bh.Brokers.GetDefault()
+		if err != nil {
+			logger.Error("unable to obtain currently default vrokers on cluster",
+				zap.Any("error", err))
+			rest.ERROR(w, err)
+		}
 		brokers := &models.BrokersDI{
-			Installed: bh.Brokers.GetAll(),
-			Default:   string(bh.Brokers.GetDefault()),
+			Installed: available,
+			Default:   string(*def),
 		}
 		logger.Debug("current brokers:", zap.Any("brokers", brokers.Default))
 

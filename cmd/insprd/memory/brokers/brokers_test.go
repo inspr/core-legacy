@@ -10,42 +10,58 @@ import (
 
 func TestBrokersMemoryManager_GetAll(t *testing.T) {
 	tests := []struct {
-		name string
-		want brokers.BrokerStatusArray
+		name    string
+		want    brokers.BrokerStatusArray
+		wantErr bool
 	}{
 		{
-			name: "getall from empty brokerMM",
-			want: brokers.BrokerStatusArray{},
+			name:    "getall from empty brokerMM",
+			want:    brokers.BrokerStatusArray{},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resetBrokers()
 			bmm := GetBrokerMemory()
-			if got := bmm.GetAll(); !reflect.DeepEqual(got, tt.want) {
+			got, err := bmm.GetAll()
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("BrokersMemoryManager.GetAll() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("BrokersMemoryManager.GetAll() = %v, want %v", got, tt.want)
 			}
+
 		})
 	}
 }
 
 func TestBrokersMemoryManager_GetDefault(t *testing.T) {
 	tests := []struct {
-		name string
-		bmm  *BrokerMemoryManager
-		want brokers.BrokerStatus
+		name    string
+		bmm     *BrokerMemoryManager
+		want    brokers.BrokerStatus
+		wantErr bool
 	}{
 		{
-			name: "getall from empty brokerMM",
-			bmm:  &BrokerMemoryManager{},
-			want: "",
+			name:    "getdefault from empty brokerMM",
+			bmm:     &BrokerMemoryManager{},
+			want:    "",
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resetBrokers()
 			bmm := GetBrokerMemory()
-			if got := bmm.GetDefault(); got != tt.want {
+			got, err := bmm.GetDefault()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("BrokersMemoryManager.GetDefault() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if *got != tt.want {
 				t.Errorf("BrokersMemoryManager.GetDefault() = %v, want %v", got, tt.want)
 			}
 		})
@@ -54,12 +70,13 @@ func TestBrokersMemoryManager_GetDefault(t *testing.T) {
 
 func TestBrokersMemoryManager_get(t *testing.T) {
 	tests := []struct {
-		name string
-		bmm  *BrokerMemoryManager
-		want *brokers.Brokers
+		name    string
+		bmm     *BrokerMemoryManager
+		want    *brokers.Brokers
+		wantErr bool
 	}{
 		{
-			name: "getall from instanciated singleton",
+			name: "get from instanciated singleton",
 			bmm: &BrokerMemoryManager{
 				broker: &brokers.Brokers{
 					Available: metautils.StrSet{
@@ -78,12 +95,26 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 				},
 				Default: "brk1",
 			},
+			wantErr: false,
+		},
+		{
+			name: "get from nil singleton memory",
+			bmm: &BrokerMemoryManager{
+				broker: nil,
+			},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resetBrokers()
-			if got := tt.bmm.get(); !reflect.DeepEqual(got, tt.want) {
+			got, err := tt.bmm.get()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("BrokersMemoryManager.get() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("BrokersMemoryManager.get() = %v, want %v", got, tt.want)
 			}
 		})
