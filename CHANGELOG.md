@@ -9,6 +9,14 @@
     - changed WithAliases method from command builder to receive a variadic parameter
 ---
 
+### #62 Story CORE-413 | Modify Channel structure
+- features
+    - Added SelectedBroker and BrokerPriorityList to Channel structure
+    - Create a function that sets the SelectedBroker of a Channel based on the BrokerPriorityList and the available brokers
+    - Call the function above in create App and Channel
+    - Added a function in brokers that resets the manager (for tests)
+---
+
 ### #61 Story CORE-428 | CLI get installed brokers command
 - features:
     - added a Brokers method and Brokers interface to controllers interface

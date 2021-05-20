@@ -28,3 +28,9 @@ func GetBrokerMemory() Manager {
 	}
 	return brokerMemory
 }
+
+// ResetBrokerMemory makes the BrokersManagers singleton points to nil,
+// used only in tests
+func ResetBrokerMemory() {
+	brokerMemory = nil
+}
