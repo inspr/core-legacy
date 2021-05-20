@@ -32,7 +32,7 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 		}
 		def, err := bh.Brokers.GetDefault()
 		if err != nil {
-			logger.Error("unable to obtain currently default vrokers on cluster",
+			logger.Error("unable to obtain currently default brokers on cluster",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 		}

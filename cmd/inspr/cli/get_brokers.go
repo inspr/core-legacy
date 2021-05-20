@@ -9,7 +9,7 @@ import (
 )
 
 var getBrokers = cmd.NewCmd("brokers").
-	WithDescription("Retrieves brokers curently installed").
+	WithDescription("Retrieves brokers currently installed").
 	NoArgs(
 		func(ctx context.Context) error {
 			client := cliutils.GetCliClient()
