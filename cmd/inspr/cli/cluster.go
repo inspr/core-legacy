@@ -13,6 +13,7 @@ import (
 func NewClusterCommand() *cobra.Command {
 	getBrokers := cmd.NewCmd("brokers").
 		WithDescription("Retrieves brokers currently installed").
+		WithExample("init insprd as admin", " inspr cluster init <admin_password>").
 		WithAliases("b").
 		NoArgs(getBrokers)
 	authInit := cmd.NewCmd("init").
@@ -23,7 +24,7 @@ func NewClusterCommand() *cobra.Command {
 		WithDescription("Configure aspects of your inspr cluster").
 		WithLongDescription("Cluster takes a subcommand of (brokers | init)").
 		WithExample("get cluster's brokers", "inspr cluster brokers").
-		WithExample("init insprd as admin", " inspr cluster init <admin_name> <admin_password>").
+		WithExample("init insprd as admin", " inspr cluster init <admin_password>").
 		AddSubCommand(getBrokers, authInit).
 		Super()
 }
