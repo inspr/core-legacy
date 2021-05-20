@@ -169,7 +169,12 @@ func checkAndUpdates(app *meta.App) (bool, string) {
 				chTypes[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
 			}
 
-			channel.Spec.SelectedBroker = SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList)
+			broker, err := SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList)
+			if err != nil {
+				return false, err.Error()
+			}
+
+			channel.Spec.SelectedBroker = broker
 
 		}
 		if len(boundaries) > 0 && boundaries.Contains(channelName) {
@@ -309,19 +314,26 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 
 // SelectBrokerFromPriorityList takes a broker priority list and returns the first
 // broker that is available
-func SelectBrokerFromPriorityList(brokerList []string) string {
+func SelectBrokerFromPriorityList(brokerList []string) (string, error) {
 	bmm := brokers.GetBrokerMemory()
-	availableBrokers := bmm.GetAll()
+	availableBrokers, err := bmm.GetAll()
+	if err != nil {
+		return "", err
+	}
 
 	for _, broker := range brokerList {
 		if utils.Includes(availableBrokers, broker) {
 			logger.Debug("selected broker: ", zap.String("broker", broker))
-			return broker
+			return broker, nil
 		}
 	}
 
-	defBroker := string(bmm.GetDefault())
+	def, err := bmm.GetDefault()
+	if err != nil {
+		return "", err
+	}
+	defBroker := string(*def)
 	logger.Debug("selected the default broker: ", zap.String("broker", defBroker))
 
-	return defBroker
+	return defBroker, nil
 }

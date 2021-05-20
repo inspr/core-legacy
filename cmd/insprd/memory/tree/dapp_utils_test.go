@@ -1297,7 +1297,7 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 			if tt.before != nil {
 				tt.before()
 			}
-			if got := SelectBrokerFromPriorityList(tt.args.brokerList); got != tt.want {
+			if got, _ := SelectBrokerFromPriorityList(tt.args.brokerList); got != tt.want {
 				t.Errorf("SelectBrokerFromPriorityList() = %v, want %v", got, tt.want)
 			}
 			brokers.ResetBrokerMemory()
