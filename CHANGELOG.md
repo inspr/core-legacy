@@ -1,6 +1,14 @@
 
 # Changelog
 
+### # 64 Tech CORE-448 | Unification of inspr cluster commands
+- fixes:
+    - tested cluster commands `brokers` and `init`
+- refactors:
+    - changed `cluster` command to follow pattern of inspr commands
+    - changed WithAliases method from command builder to receive a variadic parameter
+---
+
 ### #61 Story CORE-428 | CLI get installed brokers command
 - features:
     - added a Brokers method and Brokers interface to controllers interface
