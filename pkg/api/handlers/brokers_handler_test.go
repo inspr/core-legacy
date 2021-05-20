@@ -74,7 +74,7 @@ func TestBrokerHandler_HandleGet(t *testing.T) {
 		name     string
 		fields   fields
 		want     int
-		wantData *models.BrokersDi
+		wantData *models.BrokersDI
 	}{
 		{
 			name: "valid broker get test",
@@ -84,7 +84,7 @@ func TestBrokerHandler_HandleGet(t *testing.T) {
 				},
 			},
 			want: 200,
-			wantData: &models.BrokersDi{
+			wantData: &models.BrokersDI{
 				Installed: metabroker.BrokerStatusArray{"default_mock"},
 				Default:   "default_mock",
 			},

@@ -61,7 +61,7 @@ type AliasInterface interface {
 // obtain or change information related to the current
 // cluster's message brokers.
 type BrokersInterface interface {
-	Get(ctx context.Context) (*models.BrokersDi, error)
+	Get(ctx context.Context) (*models.BrokersDI, error)
 }
 
 // Interface is the interface that allows the management

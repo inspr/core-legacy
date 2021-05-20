@@ -24,7 +24,7 @@ func (handler *Handler) NewBrokerHandler() *BrokerHandler {
 func (bh *BrokerHandler) HandleGet() rest.Handler {
 	logger.Info("handling Brokers get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		brokers := &models.BrokersDi{
+		brokers := &models.BrokersDI{
 			Installed: bh.Brokers.GetAll(),
 			Default:   string(bh.Brokers.GetDefault()),
 		}

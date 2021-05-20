@@ -13,8 +13,8 @@ type BrokersClient struct {
 }
 
 // Get gets a brokers from the Insprd
-func (cc *BrokersClient) Get(ctx context.Context) (*models.BrokersDi, error) {
-	resp := &models.BrokersDi{}
+func (cc *BrokersClient) Get(ctx context.Context) (*models.BrokersDI, error) {
+	resp := &models.BrokersDI{}
 
 	err := cc.reqClient.Send(ctx, "/brokers", "GET", nil, resp)
 	if err != nil {
