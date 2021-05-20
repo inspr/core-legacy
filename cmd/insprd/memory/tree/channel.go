@@ -107,6 +107,8 @@ func (chh *ChannelMemoryManager) Create(context string, ch *meta.Channel) error 
 		parentApp.Spec.Types[ch.Spec.Type].ConnectedChannels = connectedChannels
 	}
 
+	ch.Spec.SelectedBroker = SelectBrokerFromPriorityList(ch.Spec.BrokerPriorityList)
+
 	logger.Debug("adding Channel to dApp",
 		zap.String("channel", ch.Meta.Name),
 		zap.String("dApp", parentApp.Meta.Name))

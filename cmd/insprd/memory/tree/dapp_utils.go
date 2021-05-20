@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
@@ -167,6 +168,8 @@ func checkAndUpdates(app *meta.App) (bool, string) {
 				chTypes[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
 			}
 
+			channel.Spec.SelectedBroker = SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList)
+
 		}
 		if len(boundaries) > 0 && boundaries.Contains(channelName) {
 			return false, "channel and boundary with same name: " + channelName + ";"
@@ -301,4 +304,19 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 	}
 
 	return nil
+}
+
+// SelectBrokerFromPriorityList takes a broker priority list and returns the first
+// broker that is available
+func SelectBrokerFromPriorityList(brokerList []string) string {
+	bmm := brokers.GetBrokerMemory()
+	availableBrokers := bmm.GetAll()
+
+	for _, broker := range brokerList {
+		if utils.Includes(availableBrokers, broker) {
+			return broker
+		}
+	}
+
+	return string(bmm.GetDefault())
 }

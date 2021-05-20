@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/utils"
@@ -1238,6 +1239,43 @@ func Test_validAliases(t *testing.T) {
 				if got1 != tt.msg2 {
 					t.Errorf("validAliases() got1 = %v, want %v", got1, tt.msg2)
 				}
+			}
+		})
+	}
+}
+
+func TestSelectBrokerFromPriorityList(t *testing.T) {
+	defer brokers.ResetBrokerMemory()
+	type args struct {
+		brokerList []string
+	}
+	tests := []struct {
+		name   string
+		args   args
+		want   string
+		before func()
+	}{
+		{
+			name: "Should return the first available broker",
+			args: args{
+				brokerList: []string{"A", "Broker_B"},
+			},
+			want: "Broker_B",
+			before: func() {
+				bmm := brokers.GetBrokerMemory()
+				bmm.Create("Broker_A", nil)
+				bmm.Create("Broker_B", nil)
+				bmm.SetDefault("Broker_A")
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.before != nil {
+				tt.before()
+			}
+			if got := SelectBrokerFromPriorityList(tt.args.brokerList); got != tt.want {
+				t.Errorf("SelectBrokerFromPriorityList() = %v, want %v", got, tt.want)
 			}
 		})
 	}
