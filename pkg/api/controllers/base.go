@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/cmd/insprd/operators"
 	"github.com/inspr/inspr/pkg/auth"
 	"go.uber.org/zap"
@@ -25,16 +26,18 @@ func init() {
 type Server struct {
 	Mux           *http.ServeMux
 	MemoryManager memory.Manager
+	BrokerManager brokers.Manager
 	op            operators.OperatorInterface
 	auth          auth.Auth
 }
 
 // Init - configures the server
-func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface, auth auth.Auth) {
+func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface, auth auth.Auth, bm brokers.Manager) {
 	logger.Info("initializing Insprd server")
 
 	s.Mux = http.NewServeMux()
 	s.MemoryManager = mm
+	s.BrokerManager = bm
 	s.op = op
 	s.auth = auth
 	s.initRoutes()

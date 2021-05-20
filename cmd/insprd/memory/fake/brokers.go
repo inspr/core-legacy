@@ -6,13 +6,21 @@ import (
 )
 
 // GetAll returns an array containing all currently mocked brokers
-func (bks *BrokersMock) GetAll() brokers.BrokerStatusArray {
-	return brokers.BrokerStatusArray(bks.broker.Available.ToArray())
+func (bks *BrokersMock) GetAll() (brokers.BrokerStatusArray, error) {
+	if bks.fail != nil {
+		return nil, bks.fail
+	}
+
+	return brokers.BrokerStatusArray(bks.broker.Available.ToArray()), nil
 }
 
 // GetDefault returns the broker mocked as default
-func (bks *BrokersMock) GetDefault() brokers.BrokerStatus {
-	return brokers.BrokerStatus(bks.broker.Default)
+func (bks *BrokersMock) GetDefault() (*brokers.BrokerStatus, error) {
+	if bks.fail != nil {
+		return nil, bks.fail
+	}
+	var status brokers.BrokerStatus = bks.broker.Default
+	return &status, nil
 }
 
 // Create mocks a new broker on insprd
