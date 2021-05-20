@@ -12,7 +12,7 @@ import (
 // Builder is used to build cobra commands.
 // it contains all the methods to manipulate a command
 type Builder interface {
-	WithAliases([]string) Builder
+	WithAliases(...string) Builder
 	WithDescription(description string) Builder
 	WithLongDescription(long string) Builder
 	WithExample(comment, command string) Builder
@@ -178,7 +178,7 @@ func handleWellKnownErrors(err error) error {
 }
 
 // WithAliases adds command aliases
-func (b *builder) WithAliases(alias []string) Builder {
+func (b *builder) WithAliases(alias ...string) Builder {
 	b.cmd.Aliases = alias
 	return b
 }
