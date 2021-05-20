@@ -98,6 +98,7 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 			parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 			ch, _ := no.memory.Channels().Get(parent, chName)
 			ct, _ := no.memory.Types().Get(parent, ch.Spec.Type)
+			env[boundary+"_RESOLVED_SCOPE"] = resolved
 			resolved = "INSPR_" + ch.Meta.UUID
 			env[resolved+"_SCHEMA"] = ct.Schema
 			env[boundary+"_RESOLVED"] = resolved
@@ -173,14 +174,6 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 					withSidecarConfiguration(),
 					withNodeID(app),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
-				),
-				k8s.NewContainer(
-					"lbsidecar",
-					"",
-					k8s.ContainerWithEnv(corev1.EnvVar{
-						Name:  "NODE_SCOPE",
-						Value: app.Meta.Parent,
-					}),
 				),
 			),
 		))
