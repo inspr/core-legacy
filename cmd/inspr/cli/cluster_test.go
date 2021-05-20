@@ -26,14 +26,14 @@ func TestNewClusterCommand(t *testing.T) {
 			name: "It should create a new delete command",
 			checkFunction: func(t *testing.T, got *cobra.Command) {
 				if got == nil {
-					t.Errorf("NewDeleteCmd() not created successfully")
+					t.Errorf("NewClusterCommand() not created successfully")
 				}
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewDeleteCmd()
+			got := NewClusterCommand()
 			if tt.checkFunction != nil {
 				tt.checkFunction(t, got)
 			}
