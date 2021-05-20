@@ -120,21 +120,22 @@ func withNodeID(app *meta.App) k8s.ContainerOption {
 // On kubernetes, this onverrides the defined configuration on the configmap
 func withSidecarPorts(app *meta.App) k8s.ContainerOption {
 	return func(c *corev1.Container) {
-		writePort := app.Spec.Node.Spec.SidecarPort.Write
-		readPort := app.Spec.Node.Spec.SidecarPort.Read
+		lbWritePort := app.Spec.Node.Spec.SidecarPort.LBWrite
+		lbReadPort := app.Spec.Node.Spec.SidecarPort.LBRead
 
-		if writePort > 0 {
+		if lbWritePort > 0 {
 			c.Env = append(c.Env, corev1.EnvVar{
 				Name:  "INSPR_LBSIDECAR_WRITE_PORT",
-				Value: strconv.Itoa(writePort),
+				Value: strconv.Itoa(lbWritePort),
 			})
 		}
-		if readPort > 0 {
+		if lbReadPort > 0 {
 			c.Env = append(c.Env, corev1.EnvVar{
 				Name:  "INSPR_LBSIDECAR_READ_PORT",
-				Value: strconv.Itoa(readPort),
+				Value: strconv.Itoa(lbReadPort),
 			})
 		}
+		// The Sidecar Client read port must be added here
 	}
 }
 
