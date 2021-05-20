@@ -11,7 +11,7 @@
     - implemented cli command for getting broker data
 -  tests:
     - unit tested handler
-    - interation test realized on cluster, flying colours
+    - integration test succeeded on cluster
 ---
 
 ### #58  Story CORE-418 | Create Sidecar Factory
