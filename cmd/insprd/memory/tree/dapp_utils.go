@@ -9,6 +9,7 @@ import (
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/utils"
+	"go.uber.org/zap"
 )
 
 // Auxiliar dapp unexported functions
@@ -314,9 +315,13 @@ func SelectBrokerFromPriorityList(brokerList []string) string {
 
 	for _, broker := range brokerList {
 		if utils.Includes(availableBrokers, broker) {
+			logger.Debug("selected broker: ", zap.String("broker", broker))
 			return broker
 		}
 	}
 
-	return string(bmm.GetDefault())
+	defBroker := string(bmm.GetDefault())
+	logger.Debug("selected the default broker: ", zap.String("broker", defBroker))
+
+	return defBroker
 }
