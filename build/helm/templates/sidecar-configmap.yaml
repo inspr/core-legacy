@@ -6,6 +6,7 @@ data:
     INSPR_LBSIDECAR_READ_PORT: !!str {{ .Values.lbSidecar.readPort }}
     INSPR_LBSIDECAR_WRITE_PORT: !!str {{ .Values.lbSidecar.writePort }}
     INSPR_LBSIDECAR_PORT: !!str {{ .Values.lbSidecar.port }}
+    INSPR_SCCLIENT_READ_PORT: !!str {{ .Values.sidecarClient.readPort }}
     INSPR_INSPRD_ADDRESS: http://{{ .Values.service.insprdName }}.{{ .Release.Namespace }}.svc:{{ .Values.service.insprdPort }}
     
 ---
@@ -18,4 +19,5 @@ data:
     INSPR_LBSIDECAR_READ_PORT: !!str {{ .Values.lbSidecar.readPort }}
     INSPR_LBSIDECAR_WRITE_PORT: !!str {{ .Values.lbSidecar.writePort }}
     INSPR_LBSIDECAR_PORT: !!str {{ .Values.lbSidecar.port }}
+    INSPR_SCCLIENT_READ_PORT: !!str {{ .Values.sidecarClient.readPort }}
     INSPR_INSPRD_ADDRESS: http://{{ .Values.service.insprdName }}.{{ .Release.Namespace }}.svc:{{ .Values.service.insprdPort }}
