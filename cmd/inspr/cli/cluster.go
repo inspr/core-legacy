@@ -13,11 +13,12 @@ import (
 func NewClusterCommand() *cobra.Command {
 	getBrokers := cmd.NewCmd("brokers").
 		WithDescription("Retrieves brokers currently installed").
-		WithExample("init insprd as admin", " inspr cluster init <admin_password>").
+		WithExample("get cluster's brokers", "inspr cluster brokers").
 		WithAliases("b").
 		NoArgs(getBrokers)
 	authInit := cmd.NewCmd("init").
 		WithDescription("Init configures insprd's default token").
+		WithExample("init insprd as admin", " inspr cluster init <admin_password>").
 		WithCommonFlags().
 		ExactArgs(1, authInit)
 	return cmd.NewCmd("cluster").
