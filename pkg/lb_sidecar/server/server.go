@@ -36,15 +36,12 @@ func (s *Server) Init(r models.Reader, w models.Writer) {
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(ctx context.Context) {
+	var err error
 	server := &http.Server{
 		Handler: s.writeMessageHandler().Post().JSON(),
 		Addr:    s.writeAddr,
 	}
-	errCh := make(chan error)
-	// create read message routine and captures its error
-	go func() { errCh <- s.readMessageRoutine(ctx) }()
 
-	var err error
 	go func() {
 		s.runningWrite = true
 		defer func() { s.runningWrite = false }()
@@ -53,7 +50,11 @@ func (s *Server) Run(ctx context.Context) {
 		}
 	}()
 
-	log.Printf("sideCar listener is up...")
+	errCh := make(chan error)
+	// create read message routine and captures its error
+	go func() { errCh <- s.readMessageRoutine(ctx) }()
+
+	log.Printf("LB Sidecar listener is up...")
 
 	select {
 	case <-ctx.Done():

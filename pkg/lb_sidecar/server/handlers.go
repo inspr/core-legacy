@@ -11,6 +11,7 @@ import (
 	"github.com/inspr/inspr/cmd/insprd/memory/tree"
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
+	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/sidecar_old/models"
 	"go.uber.org/zap"
@@ -33,19 +34,12 @@ func init() {
 	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
 }
 
-// handles the /message route in the server
+// handles requests sent to the write message server
 func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger.Info("handling message write")
 
 		channel := strings.TrimPrefix(r.URL.Path, "/")
-
-		// THE MESSAGE SENT NOW SHOULD BE ENCODED
-		// body := models.BrokerData{}
-		// if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		// 	rest.ERROR(w, decodingErr.InnerError(err).Build())
-		// 	return
-		// }
 
 		if !environment.OutputChannnelList().Contains(channel) {
 			logger.Error("channel " + channel + " not found in output channel list")
@@ -66,7 +60,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		sidecarWritePort := os.Getenv("INSPR_SIDECAR_" + channelBroker + "_WRITE_PORT")
+		sidecarWritePort := os.Getenv("INSPR_SIDECAR_" + strings.ToUpper(channelBroker) + "_WRITE_PORT")
 		if sidecarWritePort == "" {
 			logger.Error("unable to get broker " + channelBroker + " port")
 			insprError := ierrors.NewError().
@@ -77,7 +71,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		reqAddress := fmt.Sprintf("http://localhost:%v", sidecarWritePort)
+		reqAddress := fmt.Sprintf("http://localhost:%v/%v", sidecarWritePort, channel)
 
 		logger.Info("sending message to broker",
 			zap.String("broker", channelBroker),
@@ -176,38 +170,25 @@ func (s *Server) Close() {
 // Write message helper functions
 
 func getChannelBroker(channel string) (string, error) {
-	pathToNode := os.Getenv("NODE_SCOPE")
-	if pathToNode != "" {
+	pathToChannel := os.Getenv(channel + "_RESOLVED_SCOPE")
+	if pathToChannel != "" {
 		return "", ierrors.NewError().
 			NotFound().
-			Message("[ENV VAR] NODE_SCOPE not found").
+			Message("[ENV VAR] %s_RESOLVED_SCOPE not found", channel).
 			Build()
 	}
 
-	resolvedChannel := os.Getenv(channel + "_RESOLVED")
-	if resolvedChannel != "" {
-		return "", ierrors.NewError().
-			NotFound().
-			Message("[ENV VAR] %s_RESOLVED not found", channel).
-			Build()
-	}
-	channelUUID := strings.Split(resolvedChannel, "_")[1]
-
-	parentNode, err := tree.GetTreeMemory().Apps().Get(pathToNode)
+	scope, chName, err := metautils.RemoveLastPartInScope(pathToChannel)
 	if err != nil {
 		return "", err
 	}
 
-	for _, ch := range parentNode.Spec.Channels {
-		if ch.Meta.UUID == channelUUID {
-			return ch.Spec.SelectedBroker, nil
-		}
+	chStructure, err := tree.GetTreeMemory().Channels().Get(scope, chName)
+	if err != nil {
+		return "", err
 	}
 
-	return "", ierrors.NewError().
-		NotFound().
-		Message("unable to get channel broker for channel %s", channel).
-		Build()
+	return chStructure.Spec.SelectedBroker, nil
 }
 
 func sendWriteRequest(addr string, body io.Reader) (*http.Response, error) {
