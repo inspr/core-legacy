@@ -9,12 +9,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// NewClusterCommand creates cluster command for Inspr CLI
 func NewClusterCommand() *cobra.Command {
 	getBrokers := cmd.NewCmd("brokers").
 		WithDescription("Retrieves brokers currently installed").
 		WithAliases("b").
 		NoArgs(getBrokers)
-	auth_init := cmd.NewCmd("init").
+	authInit := cmd.NewCmd("init").
 		WithDescription("Init configures insprd's default token").
 		WithCommonFlags().
 		ExactArgs(1, authInit)
@@ -23,7 +24,7 @@ func NewClusterCommand() *cobra.Command {
 		WithLongDescription("Cluster takes a subcommand of (brokers | init)").
 		WithExample("get cluster's brokers", "inspr cluster brokers").
 		WithExample("init insprd as admin", " inspr cluster init <admin_name> <admin_password>").
-		AddSubCommand(getBrokers, auth_init).
+		AddSubCommand(getBrokers, authInit).
 		Super()
 }
 
