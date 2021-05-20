@@ -24,5 +24,5 @@ var clusterCommand = cmd.NewCmd("cluster").AddSubCommand(
 				return nil
 			},
 		),
-	getBorkers,
+	getBrokers,
 ).WithCommonFlags().Super()

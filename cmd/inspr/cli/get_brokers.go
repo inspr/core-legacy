@@ -8,7 +8,7 @@ import (
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 )
 
-var getBorkers = cmd.NewCmd("brokers").
+var getBrokers = cmd.NewCmd("brokers").
 	WithDescription("Retreives brokers curently installed on cluster").
 	NoArgs(
 		func(ctx context.Context) error {
