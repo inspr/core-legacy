@@ -9,10 +9,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func generateReadPort() int32 { return int32(0) }
-
-func generateWritePort() int32 { return int32(0) }
-
 // toAppID - creates the kubernetes deployment name from the app
 func toAppID(app *meta.App) string {
 	var depNames utils.StringArray
