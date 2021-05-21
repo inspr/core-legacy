@@ -19,7 +19,6 @@ type Server struct {
 	Writer       models.Writer
 	writeAddr    string
 	client       *request.Client
-	cancel       context.CancelFunc
 	runningRead  bool
 	runningWrite bool
 }
@@ -31,24 +30,36 @@ func NewServer() *Server {
 
 // Init - configures the server
 func (s *Server) Init(r models.Reader, w models.Writer) {
-	// server requests related
-	s.writeAddr = fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"))
-	s.client = request.NewJSONClient(fmt.Sprintf("http://localhost:%v", os.Getenv("INSPR_LBSIDECAR_READ_PORT")))
+
+	// server fetches required addresses from deployment.
+
+	wAddr, ok := os.LookupEnv("INSPR_SIDECAR_KAFKA_WRITE_PORT")
+	if !ok {
+		panic("[ENV VAR] INSPR_SIDECAR_KAFKA_WRITE_PORT not found")
+	}
+
+	rAddr, ok := os.LookupEnv("INSPR_SIDECAR_KAFKA_READ_PORT")
+	if !ok {
+		panic("[ENV VAR] INSPR_SIDECAR_KAFKA_READ_PORT not found")
+	}
+
+	s.writeAddr = fmt.Sprintf(":%s", wAddr)
+	s.client = request.NewJSONClient(fmt.Sprintf("http://localhost:%v", rAddr))
 
 	// implementations of write and read for a specific sidecar
 	s.Reader = r
 	s.Writer = w
-}
+} // looked
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(ctx context.Context) {
 	server := &http.Server{
-		Handler: s.writeMessageHandler().Post().JSON(),
+		Handler: s.writeMessageHandler().Post().JSON(), // look writeMessageHandler
 		Addr:    s.writeAddr,
 	}
 	errCh := make(chan error)
 	// create read message routine and captures its error
-	go func() { errCh <- s.readMessageRoutine(ctx) }()
+	go func() { errCh <- s.readMessageRoutine(ctx) }() // readMessageRoutine
 
 	var err error
 	go func() {

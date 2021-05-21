@@ -40,7 +40,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		if !environment.OutputChannnelList().Contains(channel) {
+		if !environment.OutputChannnelList().Contains(channel) { // OutputChannnelList must be checked for obtaining the right list
 			insprError := ierrors.
 				NewError().
 				BadRequest().
@@ -127,7 +127,7 @@ func (s *Server) readMessageRoutine(ctx context.Context) error {
 	defer cancel()
 
 	for _, channel := range environment.InputChannelList() {
-		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel)
+		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel) // separates several trhead for each channel of this broker
 	}
 
 	select {
@@ -137,9 +137,4 @@ func (s *Server) readMessageRoutine(ctx context.Context) error {
 		return ctx.Err()
 	}
 
-}
-
-// Close closes the server connection
-func (s *Server) Close() {
-	s.cancel()
 }
