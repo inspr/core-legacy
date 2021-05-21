@@ -13,7 +13,7 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecars/lb_sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
 // Client is the struct which implements the methods of AppClient interface
