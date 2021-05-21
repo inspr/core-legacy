@@ -6,7 +6,7 @@ import (
 
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/operator/k8s"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 	corev1 "k8s.io/api/core/v1"
 )
 
