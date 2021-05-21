@@ -116,7 +116,7 @@ func withNodeID(app *meta.App) k8s.ContainerOption {
 }
 
 // withSidecarPorts adds the sidecar ports if they are defined in the dApp definitions.
-// On kubernetes, this onverrides the defined configuration on the configmap
+// On kubernetes, this overrides the defined configuration on the configmap
 func withSidecarPorts(app *meta.App) k8s.ContainerOption {
 	return func(c *corev1.Container) {
 		writePort := app.Spec.Node.Spec.SidecarPort.Write
