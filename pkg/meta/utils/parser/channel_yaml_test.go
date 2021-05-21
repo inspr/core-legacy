@@ -1,4 +1,4 @@
-package utils
+package parser
 
 import (
 	"errors"
@@ -12,20 +12,20 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-const fileName = "channel_yaml_test.yaml"
+const fileNameChannel = "channel_yaml_test.yaml"
 
 func TestYamlToChannel(t *testing.T) {
 
 	yamlString, mockChannel := createYaml()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
-		fileName,
+		fileNameChannel,
 		[]byte(yamlString),
 		os.ModePerm,
 	)
 
 	// reads file created
-	bytes, err := ioutil.ReadFile(fileName)
+	bytes, err := ioutil.ReadFile(fileNameChannel)
 	if err != nil {
 		t.Errorf("couldn't read file")
 	}
@@ -55,7 +55,7 @@ func TestYamlToChannel(t *testing.T) {
 		}) {
 		t.Errorf("unexpected error -> got %v, expected %v", channel, mockChannel)
 	}
-	os.Remove(fileName)
+	os.Remove(fileNameChannel)
 }
 
 func TestIncorrectChannelYaml(t *testing.T) {

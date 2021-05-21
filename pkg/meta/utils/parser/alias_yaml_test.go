@@ -1,4 +1,4 @@
-package utils
+package parser
 
 import (
 	"errors"
@@ -18,13 +18,13 @@ func TestYamlToAlias(t *testing.T) {
 	yamlString, mockAlias := createAliasYaml()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
-		fileName,
+		fileNameAlias,
 		[]byte(yamlString),
 		os.ModePerm,
 	)
 
 	// reads file created
-	bytes, err := ioutil.ReadFile(fileName)
+	bytes, err := ioutil.ReadFile(fileNameAlias)
 	if err != nil {
 		t.Errorf("couldn't read file")
 	}
@@ -54,7 +54,7 @@ func TestYamlToAlias(t *testing.T) {
 		}) {
 		t.Errorf("unexpected error -> got %v, expected %v", alias, mockAlias)
 	}
-	os.Remove(fileName)
+	os.Remove(fileNameAlias)
 }
 
 func TestIncorrectAliasYaml(t *testing.T) {

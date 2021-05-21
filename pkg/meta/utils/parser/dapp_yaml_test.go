@@ -1,4 +1,4 @@
-package utils
+package parser
 
 import (
 	"errors"
@@ -12,20 +12,20 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-const appFile = "dapp_yaml_test.yaml"
+const fileNameDapp = "dapp_yaml_test.yaml"
 
 func TestYamlToApp(t *testing.T) {
 
 	yamlString, mockApp := createDAppYaml()
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
-		appFile,
+		fileNameDapp,
 		[]byte(yamlString),
 		os.ModePerm,
 	)
 
 	// reads file created
-	bytes, err := ioutil.ReadFile(appFile)
+	bytes, err := ioutil.ReadFile(fileNameDapp)
 	if err != nil {
 		t.Errorf("couldn't read file")
 	}
@@ -55,7 +55,7 @@ func TestYamlToApp(t *testing.T) {
 		}) {
 		t.Errorf("unexpected error -> got %v, expected %v", app, mockApp)
 	}
-	os.Remove(appFile)
+	os.Remove(fileNameDapp)
 }
 
 func TestIncorrectDAppYaml(t *testing.T) {
@@ -69,7 +69,7 @@ func TestIncorrectDAppYaml(t *testing.T) {
 	})
 }
 
-func TestNonExistentDAppFile(t *testing.T) {
+func TestNonExistentDfileNameDapp(t *testing.T) {
 	// reads file created
 	bytes := []byte{1}
 	_, err := YamlToApp(bytes)
