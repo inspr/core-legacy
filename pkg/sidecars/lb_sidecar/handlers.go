@@ -18,7 +18,9 @@ import (
 var logger *zap.Logger
 
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
+	logger = zap.NewNop()
+
+	// logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
 }
 
 // writeMessageHandler handles requests sent to the write message server
@@ -94,6 +96,14 @@ func (s *Server) readMessageHandler() rest.Handler {
 		}
 
 		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
+		if clientReadPort == "" {
+			insprError := ierrors.NewError().
+				NotFound().
+				Message("[ENV VAR] INSPR_SCCLIENT_READ_PORT not found")
+
+			rest.ERROR(w, insprError.Build())
+			return
+		}
 
 		reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
 
@@ -114,7 +124,7 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 func getChannelBroker(channel string) (string, error) {
 	pathToChannel := os.Getenv(channel + "_RESOLVED_SCOPE")
-	if pathToChannel != "" {
+	if pathToChannel == "" {
 		return "", ierrors.NewError().
 			NotFound().
 			Message("[ENV VAR] %s_RESOLVED_SCOPE not found", channel).
