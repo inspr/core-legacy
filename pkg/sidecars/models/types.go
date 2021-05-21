@@ -4,3 +4,9 @@ package models
 type BrokerMessage struct {
 	Message interface{} `json:"message"`
 }
+
+// ConnectionVariables
+type ConnectionVariables struct {
+	ReadVar  string
+	WriteVar string
+}

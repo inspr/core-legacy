@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
 // Server is a struct that contains the variables necessary
@@ -29,18 +29,19 @@ func NewServer() *Server {
 }
 
 // Init - configures the server
-func (s *Server) Init(r models.Reader, w models.Writer) { // transformar isso emn uma factory?
+func (s *Server) Init(r models.Reader, w models.Writer, vars models.ConnectionVariables) { // transformar isso emn uma factory?
+	// init receberia um
 
 	// server fetches required addresses from deployment.
 
-	wAddr, ok := os.LookupEnv("INSPR_SIDECAR_KAFKA_WRITE_PORT")
+	wAddr, ok := os.LookupEnv(vars.WriteVar)
 	if !ok {
-		panic("[ENV VAR] INSPR_SIDECAR_KAFKA_WRITE_PORT not found")
+		panic(fmt.Sprintf("[ENV VAR] %s not found", vars.WriteVar))
 	}
 
-	rAddr, ok := os.LookupEnv("INSPR_SIDECAR_KAFKA_READ_PORT")
+	rAddr, ok := os.LookupEnv(vars.ReadVar)
 	if !ok {
-		panic("[ENV VAR] INSPR_SIDECAR_KAFKA_READ_PORT not found")
+		panic(fmt.Sprintf("[ENV VAR] %s not found", vars.ReadVar))
 	}
 
 	s.writeAddr = fmt.Sprintf(":%s", wAddr)
