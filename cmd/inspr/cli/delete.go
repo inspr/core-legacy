@@ -17,7 +17,7 @@ import (
 func NewDeleteCmd() *cobra.Command {
 	deleteApps := cmd.NewCmd("apps").
 		WithDescription("Delete apps from context ").
-		WithAliases([]string{"a"}).
+		WithAliases("a").
 		WithExample("Delete app from the default scope", "delete apps <appname> ").
 		WithExample("Delete app from a custom scope", "delete apps <appname> --scope app1.app2").
 		WithCommonFlags().
@@ -26,14 +26,14 @@ func NewDeleteCmd() *cobra.Command {
 		WithDescription("Delete channels from context").
 		WithExample("Delete channel from the default scope", "delete channels <channelname>").
 		WithExample("Delete channels from a custom scope", "delete channels <channelname> --scope app1.app2").
-		WithAliases([]string{"ch"}).
+		WithAliases("ch").
 		WithCommonFlags().
 		MinimumArgs(1, deleteChannels)
 	deleteTypes := cmd.NewCmd("types").
 		WithDescription("Delete types from context").
 		WithExample("Delete type from the default scope", "delete types <typename>").
 		WithExample("Delete type from a custom scope", "delete types <typename> --scope app1.app2").
-		WithAliases([]string{"t"}).
+		WithAliases("t").
 		WithCommonFlags().
 		MinimumArgs(1, deleteTypes)
 
@@ -41,7 +41,7 @@ func NewDeleteCmd() *cobra.Command {
 		WithDescription("Delete alias from context").
 		WithExample("Delete alias from default scope", "delete alias <aliaskey>").
 		WithExample("Delete alias from a custom scope", "delete alias <aliaskey> --scope app1.app2").
-		WithAliases([]string{"al"}).
+		WithAliases("al").
 		WithCommonFlags().
 		MinimumArgs(1, deleteAlias)
 

@@ -9,6 +9,25 @@
       `sidecars` pkg.
     - created the utils file containing small functions and mocks of functions
       to be, these functions should be able to be used by other sidecars.
+---
+
+
+### # 64 Tech CORE-448 | Unification of inspr cluster commands
+- fixes:
+    - tested cluster commands `brokers` and `init`
+- refactors:
+    - changed `cluster` command to follow pattern of inspr commands
+    - changed WithAliases method from command builder to receive a variadic parameter
+---
+
+### #62 Story CORE-413 | Modify Channel structure
+- features
+    - Added SelectedBroker and BrokerPriorityList to Channel structure
+    - Create a function that sets the SelectedBroker of a Channel based on the BrokerPriorityList and the available brokers
+    - Call the function above in create App and Channel
+    - Added a function in brokers that resets the manager (for tests)
+---
+
 ### #61 Story CORE-428 | CLI get installed brokers command
 - features:
     - added a Brokers method and Brokers interface to controllers interface
