@@ -20,7 +20,7 @@ type ChannelMemory interface {
 
 // ChannelGetInterface is an interface to get channels from memory
 type ChannelGetInterface interface {
-	Get(context string, ctName string) (*meta.Channel, error)
+	Get(context string, chName string) (*meta.Channel, error)
 }
 
 // AppMemory is the interface that allows to obtain or

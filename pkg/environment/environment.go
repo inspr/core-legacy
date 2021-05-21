@@ -79,7 +79,7 @@ func GetOutputChannels() string {
 
 // GetUnixSocketAddress returns environment variable which contains the unix socket address
 func GetUnixSocketAddress() string {
-	return getEnv("INSPR_UNIX_SOCKET")
+	return getEnv("INSPR_UNIX_SOCKET") // DEPRECATED
 }
 
 // GetSidecarImage returns environment variable which contains the sidecar image reference

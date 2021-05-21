@@ -192,12 +192,20 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Value: "INSPR_channel1_UUID",
 					},
 					{
+						Name:  "channel1_RESOLVED_SCOPE",
+						Value: "channel1_resolved",
+					},
+					{
 						Name:  "INSPR_channel2_UUID_SCHEMA",
 						Value: "channel2type",
 					},
 					{
 						Name:  "channel2_RESOLVED",
 						Value: "INSPR_channel2_UUID",
+					},
+					{
+						Name:  "channel2_RESOLVED_SCOPE",
+						Value: "channel2_resolved",
 					},
 				},
 			},
@@ -250,12 +258,20 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Value: "INSPR_channel1_UUID",
 					},
 					{
+						Name:  "channel1_RESOLVED_SCOPE",
+						Value: "channel1_resolved",
+					},
+					{
 						Name:  "INSPR_channel2_UUID_SCHEMA",
 						Value: "channel2type",
 					},
 					{
 						Name:  "channel2_RESOLVED",
 						Value: "INSPR_channel2_UUID",
+					},
+					{
+						Name:  "channel2_RESOLVED_SCOPE",
+						Value: "channel2_resolved",
 					},
 				},
 			},
@@ -358,7 +374,7 @@ func Test_withSidecarPorts(t *testing.T) {
 						Node: meta.Node{
 							Spec: meta.NodeSpec{
 								SidecarPort: meta.SidecarPort{
-									Write: 1234,
+									LBWrite: 1234,
 								},
 							},
 						},
@@ -368,7 +384,7 @@ func Test_withSidecarPorts(t *testing.T) {
 			want: &kubeCore.Container{
 				Env: []kubeCore.EnvVar{
 					{
-						Name:  "INSPR_SIDECAR_WRITE_PORT",
+						Name:  "INSPR_LBSIDECAR_WRITE_PORT",
 						Value: "1234",
 					},
 				},
@@ -382,7 +398,7 @@ func Test_withSidecarPorts(t *testing.T) {
 						Node: meta.Node{
 							Spec: meta.NodeSpec{
 								SidecarPort: meta.SidecarPort{
-									Read: 1234,
+									LBRead: 1234,
 								},
 							},
 						},
@@ -392,7 +408,7 @@ func Test_withSidecarPorts(t *testing.T) {
 			want: &kubeCore.Container{
 				Env: []kubeCore.EnvVar{
 					{
-						Name:  "INSPR_SIDECAR_READ_PORT",
+						Name:  "INSPR_LBSIDECAR_READ_PORT",
 						Value: "1234",
 					},
 				},
@@ -406,8 +422,8 @@ func Test_withSidecarPorts(t *testing.T) {
 						Node: meta.Node{
 							Spec: meta.NodeSpec{
 								SidecarPort: meta.SidecarPort{
-									Read:  1234,
-									Write: 1234,
+									LBRead:  1234,
+									LBWrite: 1234,
 								},
 							},
 						},
@@ -417,11 +433,11 @@ func Test_withSidecarPorts(t *testing.T) {
 			want: &kubeCore.Container{
 				Env: []kubeCore.EnvVar{
 					{
-						Name:  "INSPR_SIDECAR_WRITE_PORT",
+						Name:  "INSPR_LBSIDECAR_WRITE_PORT",
 						Value: "1234",
 					},
 					{
-						Name:  "INSPR_SIDECAR_READ_PORT",
+						Name:  "INSPR_LBSIDECAR_READ_PORT",
 						Value: "1234",
 					},
 				},
@@ -520,7 +536,7 @@ func Test_withSidecarConfiguration(t *testing.T) {
 					{
 						ConfigMapRef: &kubeCore.ConfigMapEnvSource{
 							LocalObjectReference: kubeCore.LocalObjectReference{
-								Name: "inspr-sidecar-configuration",
+								Name: "inspr-lbsidecar-configuration",
 							},
 						},
 					},

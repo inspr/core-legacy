@@ -13,6 +13,7 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/sidecars/lb_sidecar/models"
 )
 
 // Client is the struct which implements the methods of AppClient interface
@@ -22,16 +23,11 @@ type Client struct {
 	readAddr string
 }
 
-// clientMessage is the struct that represents the client's request format
-type clientMessage struct {
-	Message interface{} `json:"message"`
-}
-
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
 
-	writeAddr := fmt.Sprintf("http://localhost:%s", os.Getenv("INSPR_SIDECAR_WRITE_PORT"))
-	readAddr := fmt.Sprintf(":%s", os.Getenv("INSPR_SIDECAR_READ_PORT"))
+	writeAddr := fmt.Sprintf("http://localhost:%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"))
+	readAddr := fmt.Sprintf(":%s", os.Getenv("INSPR_SCCLIENT_READ_PORT"))
 	return &Client{
 		readAddr: readAddr,
 		client: request.NewClient().
@@ -45,7 +41,7 @@ func NewAppClient() *Client {
 
 // WriteMessage receives a channel and a message and sends it in a request to the sidecar server
 func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface{}) error {
-	data := clientMessage{
+	data := models.BrokerMessage{
 		Message: msg,
 	}
 

@@ -98,6 +98,7 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 			parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 			ch, _ := no.memory.Channels().Get(parent, chName)
 			ct, _ := no.memory.Types().Get(parent, ch.Spec.Type)
+			env[boundary+"_RESOLVED_SCOPE"] = resolved
 			resolved = "INSPR_" + ch.Meta.UUID
 			env[resolved+"_SCHEMA"] = ct.Schema
 			env[boundary+"_RESOLVED"] = resolved
@@ -119,21 +120,22 @@ func withNodeID(app *meta.App) k8s.ContainerOption {
 // On kubernetes, this overrides the defined configuration on the configmap
 func withSidecarPorts(app *meta.App) k8s.ContainerOption {
 	return func(c *corev1.Container) {
-		writePort := app.Spec.Node.Spec.SidecarPort.Write
-		readPort := app.Spec.Node.Spec.SidecarPort.Read
+		lbWritePort := app.Spec.Node.Spec.SidecarPort.LBWrite
+		lbReadPort := app.Spec.Node.Spec.SidecarPort.LBRead
 
-		if writePort > 0 {
+		if lbWritePort > 0 {
 			c.Env = append(c.Env, corev1.EnvVar{
-				Name:  "INSPR_SIDECAR_WRITE_PORT",
-				Value: strconv.Itoa(writePort),
+				Name:  "INSPR_LBSIDECAR_WRITE_PORT",
+				Value: strconv.Itoa(lbWritePort),
 			})
 		}
-		if readPort > 0 {
+		if lbReadPort > 0 {
 			c.Env = append(c.Env, corev1.EnvVar{
-				Name:  "INSPR_SIDECAR_READ_PORT",
-				Value: strconv.Itoa(readPort),
+				Name:  "INSPR_LBSIDECAR_READ_PORT",
+				Value: strconv.Itoa(lbReadPort),
 			})
 		}
+		// The Sidecar Client read port must be added here
 	}
 }
 
@@ -198,7 +200,7 @@ func withSidecarConfiguration() k8s.ContainerOption {
 		corev1.EnvFromSource{
 			ConfigMapRef: &corev1.ConfigMapEnvSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "inspr-sidecar-configuration",
+					Name: "inspr-lbsidecar-configuration",
 				},
 			},
 		},
@@ -206,7 +208,7 @@ func withSidecarConfiguration() k8s.ContainerOption {
 }
 
 func dappToService(app *meta.App) *kubeService {
-	temp, _ := strconv.Atoi(os.Getenv("INSPR_SIDECAR_PORT"))
+	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_PORT"))
 	sidecarPort = int32(temp)
 	appID := toAppID(app)
 	appDeployName := toDeploymentName(app)
