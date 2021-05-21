@@ -29,7 +29,7 @@ func NewServer() *Server {
 }
 
 // Init - configures the server
-func (s *Server) Init(r models.Reader, w models.Writer) {
+func (s *Server) Init(r models.Reader, w models.Writer) { // transformar isso emn uma factory?
 
 	// server fetches required addresses from deployment.
 
