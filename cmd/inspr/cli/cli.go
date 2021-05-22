@@ -37,7 +37,7 @@ func mainCmdPreRun(cm *cobra.Command, args []string) error {
 	if cm.Name() == "init" && cm.Parent().Name() == "inspr" {
 		return nil
 	}
-	cm.Root().SilenceErrors = true
+	cm.Root().SilenceErrors = false
 	cm.Root().SilenceUsage = true
 	utils.InitViperConfig()
 	// viper defaults values or reads from the config location

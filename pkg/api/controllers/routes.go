@@ -26,6 +26,7 @@ func (s *Server) initRoutes() {
 
 	brokersHandler := h.NewBrokerHandler()
 	s.Mux.Handle("/brokers", brokersHandler.HandleGet())
+	// TODO add the /brokers/kafka here with its handler
 
 	s.Mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
 	s.Mux.Handle("/refreshController", h.ControllerRefreshHandler())

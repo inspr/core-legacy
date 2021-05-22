@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
@@ -43,6 +44,29 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 		logger.Debug("current brokers:", zap.Any("brokers", brokers.Default))
 
 		rest.JSON(w, http.StatusOK, brokers)
+	}
+	return rest.Handler(handler)
+}
+
+// HandlerCreate handles the creation of brokers in the insprd/cluster
+func (bh *BrokerHandler) HandlerCreate() rest.Handler {
+	logger.Info("handling Brokers' create request")
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		var data models.BrokerDataDI
+
+		err := json.NewDecoder(r.Body).Decode(&data)
+		if err != nil {
+			logger.Error("Unable to read body from request")
+			rest.ERROR(w, err)
+		}
+
+		// parsing the bytes to specific handler config
+
+		// err := bh.Brokers.Create(brokers.BrokerStatus(data.BrokerName), // TODO config parsed from the []bytes in data.FileContents)
+		if err != nil {
+			logger.Error("Unable to create broker with passed data")
+			rest.ERROR(w, err)
+		}
 	}
 	return rest.Handler(handler)
 }

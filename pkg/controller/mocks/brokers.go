@@ -26,3 +26,8 @@ func (cm *BrokersMock) Get(ctx context.Context) (*models.BrokersDI, error) {
 	}
 	return &models.BrokersDI{}, nil
 }
+
+// Create moscks the Brokers controller interface method
+func (cm *BrokersMock) Create(ctx context.Context, brokerName string, config []byte) error {
+	return cm.err
+}

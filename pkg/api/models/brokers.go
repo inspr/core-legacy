@@ -7,3 +7,10 @@ type BrokersDI struct {
 	Installed brokers.BrokerStatusArray `json:"installed"`
 	Default   string                    `json:"default"`
 }
+
+// BrokerDataDI is the struct that defines the means in which the data used
+// in operations related to creating or altering the broker in the insprd/cluster
+type BrokerDataDI struct {
+	BrokerName   string `json:"brokername"`
+	FileContents []byte `json:"filecontents"`
+}
