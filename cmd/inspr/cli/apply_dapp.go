@@ -9,7 +9,6 @@ import (
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
 )
 
 // NewApplyApp receives a controller AppInterface and calls it's methods
@@ -18,7 +17,7 @@ func NewApplyApp() RunMethod {
 	return func(data []byte, out io.Writer) error {
 		c := cliutils.GetCliClient().Apps()
 		// unmarshal into an app
-		app, err := utils.YamlToApp(data)
+		app, err := metautils.YamlToApp(data)
 		if err != nil {
 			return err
 		}

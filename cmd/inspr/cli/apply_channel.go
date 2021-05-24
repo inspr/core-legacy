@@ -8,7 +8,6 @@ import (
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
 )
 
 // NewApplyChannel receives a controller ChannelInterface and calls it's methods
@@ -17,7 +16,7 @@ func NewApplyChannel() RunMethod {
 	return func(data []byte, out io.Writer) error {
 		c := cliutils.GetCliClient().Channels()
 		// unmarshal into a channel
-		channel, err := utils.YamlToChannel(data)
+		channel, err := metautils.YamlToChannel(data)
 		if err != nil {
 			return err
 		}

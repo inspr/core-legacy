@@ -8,7 +8,6 @@ import (
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
 )
 
 // NewApplyAlias receives a controller AliasInterface and calls it's methods
@@ -17,7 +16,7 @@ func NewApplyAlias() RunMethod {
 	return func(data []byte, out io.Writer) error {
 		c := cliutils.GetCliClient().Alias()
 		// unmarshal into a channel
-		alias, err := utils.YamlToAlias(data)
+		alias, err := metautils.YamlToAlias(data)
 		if err != nil {
 			return err
 		}
