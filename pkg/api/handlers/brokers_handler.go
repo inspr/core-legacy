@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
+	"github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
 )
@@ -48,25 +49,27 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// HandlerCreate handles the creation of brokers in the insprd/cluster
-func (bh *BrokerHandler) HandlerCreate() rest.Handler {
-	logger.Info("handling Brokers' create request")
+// KafkaHandler is the functions that processes requests at the /brokers/kafka endpoint
+func (bh *BrokerHandler) KafkaHandler() rest.Handler {
+	logger.Info("handling the brokers' kafka route request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		var data models.BrokerDataDI
-
-		err := json.NewDecoder(r.Body).Decode(&data)
+		// decode into the bytes of yaml file
+		var content models.BrokerDataDI
+		err := json.NewDecoder(r.Body).Decode(&content)
 		if err != nil {
-			logger.Error("Unable to read body from request")
 			rest.ERROR(w, err)
 		}
 
-		// parsing the bytes to specific handler config
-
-		// err := bh.Brokers.Create(brokers.BrokerStatus(data.BrokerName), // TODO config parsed from the []bytes in data.FileContents)
+		// parsing the bytes into a Kafka config structure
+		kafkaConfig, err := utils.YamlToKafkaConfig(content.FileContents)
 		if err != nil {
-			logger.Error("Unable to create broker with passed data")
 			rest.ERROR(w, err)
 		}
+
+		// TODO apply kafkaConfig
+		_ = kafkaConfig
+
+		rest.JSON(w, http.StatusOK, nil)
 	}
 	return rest.Handler(handler)
 }

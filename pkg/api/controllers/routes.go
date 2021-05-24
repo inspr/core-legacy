@@ -18,15 +18,15 @@ func (s *Server) initRoutes() {
 	chandler := h.NewChannelHandler()
 	s.Mux.Handle("/channels", rest.HandleCRUD(chandler))
 
-	cthandler := h.NewTypeHandler()
-	s.Mux.Handle("/types", rest.HandleCRUD(cthandler))
+	thandler := h.NewTypeHandler()
+	s.Mux.Handle("/types", rest.HandleCRUD(thandler))
 
 	aliasHandler := h.NewAliasHandler()
 	s.Mux.Handle("/alias", rest.HandleCRUD(aliasHandler))
 
 	brokersHandler := h.NewBrokerHandler()
-	s.Mux.Handle("/brokers", brokersHandler.HandleGet())
-	// TODO add the /brokers/kafka here with its handler
+	s.Mux.Handle("/brokers", brokersHandler.HandleGet().Get().JSON())
+	s.Mux.Handle("/brokers/kafka", brokersHandler.KafkaHandler().Post().JSON())
 
 	s.Mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
 	s.Mux.Handle("/refreshController", h.ControllerRefreshHandler())
