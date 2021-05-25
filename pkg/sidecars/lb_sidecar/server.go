@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
+	"go.uber.org/zap"
 )
 
 // Server is a struct that contains the variables necessary
@@ -17,16 +17,12 @@ type Server struct {
 	readAddr  string
 }
 
-// NewServer returns a new sidecar server
-func NewServer() *Server {
-	return &Server{}
-}
-
-// Init - configures the server
-func (s *Server) Init(r models.Reader, w models.Writer) {
-	// server requests related
+// Init - initializes a new configured server
+func Init() *Server {
+	s := Server{}
 	s.writeAddr = fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"))
 	s.readAddr = fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT"))
+	return &s
 }
 
 // Run starts the server on the port given in addr
@@ -37,23 +33,25 @@ func (s *Server) Run(ctx context.Context) {
 		Handler: s.writeMessageHandler().Post().JSON(),
 		Addr:    s.writeAddr,
 	}
-	go func(ctx context.Context) {
+	go func() {
 		if err := writeServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
-			logger.Sugar().Fatalf("listen:%v", err)
+			logger.Error("an error ocurred in LB Sidecar write server",
+				zap.Error(err))
 		}
-	}(ctx)
+	}()
 
 	readServer := &http.Server{
 		Handler: s.readMessageHandler().Post().JSON(),
 		Addr:    s.readAddr,
 	}
-	go func(ctx context.Context) {
+	go func() {
 		if err := readServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
-			logger.Sugar().Fatalf("listen:%v", err)
+			logger.Error("an error ocurred in LB Sidecar read server",
+				zap.Error(err))
 		}
-	}(ctx)
+	}()
 
 	logger.Info("LB Sidecar listener is up...")
 
@@ -63,7 +61,6 @@ func (s *Server) Run(ctx context.Context) {
 	case errRead := <-errCh:
 		gracefulShutdown(writeServer, readServer, errRead)
 	}
-
 }
 
 func gracefulShutdown(w, r *http.Server, err error) {
@@ -76,15 +73,18 @@ func gracefulShutdown(w, r *http.Server, err error) {
 	defer cancel()
 
 	if err != nil {
-		logger.Sugar().Fatalf(err.Error())
+		logger.Error("an error occured in LB Sidecar",
+			zap.Error(err))
 	}
 
 	// has to be the last method called in the shutdown
 	if err = w.Shutdown(ctxShutdown); err != nil {
-		logger.Sugar().Fatalf("error shutting down server")
+		logger.Fatal("error while shutting down LB Sidecar write server",
+			zap.Error(err))
 	}
 
 	if err = r.Shutdown(ctxShutdown); err != nil {
-		logger.Sugar().Fatalf("error shutting down server")
+		logger.Fatal("error while shutting down LB Sidecar read server",
+			zap.Error(err))
 	}
 }
