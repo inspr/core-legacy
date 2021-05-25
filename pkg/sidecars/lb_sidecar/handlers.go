@@ -1,6 +1,8 @@
-package sidecarserv
+package lbsidecar
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,6 +12,7 @@ import (
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 	"go.uber.org/zap"
 )
 
@@ -43,6 +46,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			logger.Error("unable to get channel broker",
 				zap.String("channel", channel),
 				zap.Any("error", err))
+
 			rest.ERROR(w, err)
 			return
 		}
@@ -52,14 +56,27 @@ func (s *Server) writeMessageHandler() rest.Handler {
 
 		reqAddress := fmt.Sprintf("%s:%s/%s", sidecarAddress, sidecarWritePort, channel)
 
+		logger.Debug("encoding message to Avro schema")
+
+		encodedMsg, err := encodeToAvro(channel, r.Body)
+		if err != nil {
+			logger.Error("unable to encode message to Avro schema",
+				zap.String("channel", channel),
+				zap.Any("error", err))
+
+			rest.ERROR(w, err)
+			return
+		}
+
 		logger.Info("sending message to broker",
 			zap.String("broker", channelBroker),
 			zap.String("channel", channel))
 
-		resp, err := sendRequest(reqAddress, r.Body)
+		resp, err := sendRequest(reqAddress, encodedMsg)
 		if err != nil {
 			logger.Error("unable to send request to "+channelBroker+" sidecar",
 				zap.Any("error", err))
+
 			rest.ERROR(w, err)
 			return
 		}
@@ -97,10 +114,22 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
 
-		logger.Info("sending message to node from: ",
+		logger.Debug("decoding message from Avro schema")
+
+		decodedMsg, err := decodeFromAvro(channel, r.Body)
+		if err != nil {
+			logger.Error("unable to decode message from Avro schema",
+				zap.String("channel", channel),
+				zap.Any("error", err))
+
+			rest.ERROR(w, err)
+			return
+		}
+
+		logger.Info("sending message to node through: ",
 			zap.String("channel", channel))
 
-		resp, err := sendRequest(reqAddress, r.Body)
+		resp, err := sendRequest(reqAddress, decodedMsg)
 		if err != nil {
 			logger.Error("unable to send request to from sidecar to node",
 				zap.Any("error", err))
@@ -124,17 +153,46 @@ func getChannelBroker(channel string) (string, error) {
 	return channelBroker, nil
 }
 
-func sendRequest(addr string, body io.Reader) (*http.Response, error) {
-	req := http.Client{}
-	reqInfo, err := http.NewRequest(http.MethodPost, addr, body)
+func sendRequest(addr string, body []byte) (*http.Response, error) {
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodPost, addr, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := req.Do(reqInfo)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
 	return resp, nil
+}
+
+func encodeToAvro(channel string, body io.Reader) ([]byte, error) {
+	var receivedMsg models.BrokerMessage
+	json.NewDecoder(body).Decode(&receivedMsg)
+
+	encodedAvroMsg, err := encode(channel, receivedMsg.Message)
+	if err != nil {
+		return nil, err
+	}
+
+	return encodedAvroMsg, nil
+}
+
+func decodeFromAvro(channel string, body io.Reader) ([]byte, error) {
+	var receivedMsg []byte
+	json.NewDecoder(body).Decode(&receivedMsg)
+
+	decodedAvroMsg, err := readMessage(channel, receivedMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonEncodedMsg, err := json.Marshal(decodedAvroMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonEncodedMsg, nil
 }

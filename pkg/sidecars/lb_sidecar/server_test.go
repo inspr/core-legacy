@@ -1,4 +1,4 @@
-package sidecarserv
+package lbsidecar
 
 import (
 	"context"
