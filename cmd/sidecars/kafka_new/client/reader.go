@@ -12,16 +12,9 @@ import (
 
 const pollTimeout = 100
 
-// Consumer interface
-type Consumer interface {
-	Poll(int) kafka.Event
-	Commit() ([]kafka.TopicPartition, error)
-	Close() (err error)
-}
-
 // Reader reads/commit messages from the channels defined in the env
 type Reader struct {
-	consumers map[string]Consumer
+	consumers map[string]models.Consumer
 }
 
 // NewReader return a new Reader
@@ -34,7 +27,7 @@ func NewReader() (models.Reader, error) {
 		return nil, ierrors.NewError().Message("INSPR_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
 
-	reader.consumers = make(map[string]Consumer)
+	reader.consumers = make(map[string]models.Consumer)
 
 	for idx, ch := range channelsList {
 		if err := reader.newSingleChannelConsumer(ch, resolvedChList[idx]); err != nil {
@@ -42,6 +35,10 @@ func NewReader() (models.Reader, error) {
 		}
 	}
 	return &reader, nil
+}
+
+func (reader *Reader) Consumers() map[string]models.Consumer {
+	return reader.consumers
 }
 
 /*

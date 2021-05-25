@@ -34,19 +34,19 @@ func TestNewWriter(t *testing.T) {
 				t.Error(err)
 			}
 			defer got.Close()
-			if tt.wantErr && (got.producer.GetFatalError() != nil) {
+			if tt.wantErr && (got.Producer().GetFatalError() != nil) {
 				t.Errorf("NewWriter() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got.producer == nil {
+			if got.Producer() == nil {
 				t.Errorf("NewWriter() = %v, want %v", got, tt.want)
 			}
 		})
 	}
-}
+} // story/CORE-415 OK
 
 func TestWriter_WriteMessage(t *testing.T) {
-	mProd, _ := NewWriter()
+	mProd, _ := newMockWriter()
 	defer mProd.Close()
 	createMockEnv()
 	os.Setenv("INSPR_APP_CTX", "")
@@ -57,7 +57,7 @@ func TestWriter_WriteMessage(t *testing.T) {
 	}
 	type args struct {
 		channel string
-		message interface{}
+		message []byte
 	}
 	tests := []struct {
 		name    string
@@ -68,22 +68,22 @@ func TestWriter_WriteMessage(t *testing.T) {
 		{
 			name: "Invalid channel",
 			fields: fields{
-				producer: mProd.producer,
+				producer: mProd.Producer(),
 			},
 			args: args{
 				channel: "invalid",
-				message: "testMessageWriterTest",
+				message: []byte("testMessageWriterTest"),
 			},
 			wantErr: true,
 		},
 		{
 			name: "Valid message writing",
 			fields: fields{
-				producer: mProd.producer,
+				producer: mProd.Producer(),
 			},
 			args: args{
 				channel: "ch1",
-				message: "testMessageWriterTest",
+				message: []byte("testMessageWriterTest"),
 			},
 			wantErr: false,
 		},
@@ -98,10 +98,10 @@ func TestWriter_WriteMessage(t *testing.T) {
 			}
 		})
 	}
-}
+} // story/CORE-415 OK
 
 func TestWriter_produceMessage(t *testing.T) {
-	mProd, _ := NewWriter(true)
+	mProd, _ := newMockWriter()
 	defer mProd.Close()
 	createMockEnv()
 	os.Setenv("INSPR_APP_CTX", "")
@@ -111,8 +111,8 @@ func TestWriter_produceMessage(t *testing.T) {
 		producer *kafka.Producer
 	}
 	type args struct {
-		message interface{}
-		channel kafkaTopic
+		message []byte
+		channel string
 	}
 	tests := []struct {
 		name    string
@@ -123,24 +123,13 @@ func TestWriter_produceMessage(t *testing.T) {
 		{
 			name: "Valid production of given message",
 			fields: fields{
-				producer: mProd.producer,
+				producer: mProd.Producer(),
 			},
 			args: args{
-				message: "testProducingMessage",
+				message: []byte("testProducingMessage"),
 				channel: "ch1_resolved",
 			},
 			wantErr: false,
-		},
-		{
-			name: "Invalid production - encode error",
-			fields: fields{
-				producer: mProd.producer,
-			},
-			args: args{
-				message: "testProducingMessage",
-				channel: "invalid",
-			},
-			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -153,4 +142,4 @@ func TestWriter_produceMessage(t *testing.T) {
 			}
 		})
 	}
-}
+} // story/CORE-415 OK

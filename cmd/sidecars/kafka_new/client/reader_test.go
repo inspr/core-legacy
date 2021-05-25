@@ -9,6 +9,7 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
 func TestNewReader(t *testing.T) {
@@ -21,14 +22,14 @@ func TestNewReader(t *testing.T) {
 		name          string
 		want          *Reader
 		wantErr       bool
-		checkFunction func(t *testing.T, reader *Reader)
+		checkFunction func(t *testing.T, reader models.Reader)
 		before        func()
 	}{
 		{
 			name:    "It should return a new Reader",
 			wantErr: false,
-			checkFunction: func(t *testing.T, reader *Reader) {
-				if !(reader.consumers != nil && len(reader.consumers) > 0) {
+			checkFunction: func(t *testing.T, reader models.Reader) {
+				if !(reader.Consumers() != nil && len(reader.Consumers()) > 0) {
 					t.Errorf("check function error = Reader not created successfully")
 				}
 			},
@@ -60,7 +61,7 @@ func TestNewReader(t *testing.T) {
 			}
 		})
 	}
-}
+} // story/CORE-415 OK
 
 func TestReader_ReadMessage(t *testing.T) {
 	createMockEnv()
@@ -69,7 +70,7 @@ func TestReader_ReadMessage(t *testing.T) {
 	RefreshEnviromentVariables()
 
 	type fields struct {
-		consumers   map[string]Consumer
+		consumers   map[string]models.Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
@@ -78,14 +79,14 @@ func TestReader_ReadMessage(t *testing.T) {
 		before        func()
 		uniqueChannel string
 		want          string
-		want1         interface{}
+		want1         []byte
 		wantErr       bool
 		event         kafka.Event
 	}{
 		{
 			name: "It should read a message",
 			fields: fields{
-				consumers: map[string]Consumer{
+				consumers: map[string]models.Consumer{
 					"ch1_resolved": &MockConsumer{
 						events:        make(chan kafka.Event, 2),
 						err:           false,
@@ -100,13 +101,13 @@ func TestReader_ReadMessage(t *testing.T) {
 			wantErr:       false,
 			uniqueChannel: "ch1_resolved",
 			want:          "ch1_resolved",
-			want1:         "Hello World!",
+			want1:         []byte("Hello World!"),
 			event:         &kafka.Message{},
 		},
 		{
 			name: "It should return a message poll error",
 			fields: fields{
-				consumers: map[string]Consumer{
+				consumers: map[string]models.Consumer{
 					"ch1_resolved": &MockConsumer{
 						events:        make(chan kafka.Event, 2),
 						err:           true,
@@ -114,24 +115,6 @@ func TestReader_ReadMessage(t *testing.T) {
 						topic:         "ch1_resolved",
 						errCode:       0,
 						senderChannel: "ch1_resolved",
-					},
-				},
-				lastMessage: nil,
-			},
-			uniqueChannel: "ch1_resolved",
-			wantErr:       true,
-		},
-		{
-			name: "It should return a decode error (sender channel invalid)",
-			fields: fields{
-				consumers: map[string]Consumer{
-					"ch1_resolved": &MockConsumer{
-						events:        make(chan kafka.Event, 2),
-						err:           false,
-						pollMsg:       "Hello World!",
-						topic:         "ch1_resolved",
-						errCode:       0,
-						senderChannel: "ch2",
 					},
 				},
 				lastMessage: nil,
@@ -151,7 +134,7 @@ func TestReader_ReadMessage(t *testing.T) {
 
 			reader.consumers[tt.uniqueChannel].(*MockConsumer).CreateMessage()
 			bData, err := reader.ReadMessage(ctx, tt.uniqueChannel)
-			got1 := bData.Message
+			got1 := bData
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Reader.ReadMessage() error = %v, wantErr %v", err, tt.wantErr)
@@ -162,11 +145,11 @@ func TestReader_ReadMessage(t *testing.T) {
 			}
 		})
 	}
-}
+} // story/CORE-415 OK
 
 func TestReader_Commit(t *testing.T) {
 	type fields struct {
-		consumers   map[string]Consumer
+		consumers   map[string]models.Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
@@ -178,7 +161,7 @@ func TestReader_Commit(t *testing.T) {
 		{
 			name: "It should not return a error since the message was committed",
 			fields: fields{
-				consumers: map[string]Consumer{
+				consumers: map[string]models.Consumer{
 					"ch1": &MockConsumer{
 						events: make(chan kafka.Event, 2),
 						err:    false,
@@ -192,7 +175,7 @@ func TestReader_Commit(t *testing.T) {
 		{
 			name: "It should return a error since the message was not committed",
 			fields: fields{
-				consumers: map[string]Consumer{
+				consumers: map[string]models.Consumer{
 					"ch1": &MockConsumer{
 						events: make(chan kafka.Event, 2),
 						err:    true,
@@ -216,11 +199,11 @@ func TestReader_Commit(t *testing.T) {
 			}
 		})
 	}
-}
+} // story/CORE-415 OK
 
 func TestReader_Close(t *testing.T) {
 	type fields struct {
-		consumers   map[string]Consumer
+		consumers   map[string]models.Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
@@ -232,7 +215,7 @@ func TestReader_Close(t *testing.T) {
 		{
 			name: "Close the consumer",
 			fields: fields{
-				consumers: map[string]Consumer{
+				consumers: map[string]models.Consumer{
 					"ch1": &MockConsumer{
 						events: make(chan kafka.Event, 2),
 						err:    false,
@@ -245,7 +228,7 @@ func TestReader_Close(t *testing.T) {
 		{
 			name: "Error when trying to close the consumer",
 			fields: fields{
-				consumers: map[string]Consumer{
+				consumers: map[string]models.Consumer{
 					"ch1": &MockConsumer{
 						err: true,
 					},
@@ -265,4 +248,4 @@ func TestReader_Close(t *testing.T) {
 			}
 		})
 	}
-}
+} // story/CORE-415 OK

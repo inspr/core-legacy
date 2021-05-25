@@ -31,6 +31,21 @@ func NewWriter() (models.Writer, error) {
 	return &Writer{kProd}, nil
 }
 
+func newMockWriter() (models.Writer, error) {
+	var kProd *kafka.Producer
+
+	kProd, _ = kafka.NewProducer(&kafka.ConfigMap{
+		"test.mock.num.brokers": 3,
+	})
+
+	return &Writer{kProd}, nil
+}
+
+// Producer
+func (writer *Writer) Producer() *kafka.Producer {
+	return writer.producer
+}
+
 // WriteMessage receives a message and sends it to the topic defined by the given channel
 func (writer *Writer) WriteMessage(channel string, message []byte) error {
 	outputChan := environment.GetOutputChannels()
