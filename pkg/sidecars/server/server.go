@@ -34,14 +34,14 @@ func (s *Server) Init(r models.Reader, w models.Writer, vars models.ConnectionVa
 
 	// server fetches required addresses from deployment.
 
-	wAddr, ok := os.LookupEnv(vars.WriteVar)
+	wAddr, ok := os.LookupEnv(vars.WriteEnvVar)
 	if !ok {
-		panic(fmt.Sprintf("[ENV VAR] %s not found", vars.WriteVar))
+		panic(fmt.Sprintf("[ENV VAR] %s not found", vars.WriteEnvVar))
 	}
 
-	rAddr, ok := os.LookupEnv(vars.ReadVar)
+	rAddr, ok := os.LookupEnv(vars.ReadEnvVar)
 	if !ok {
-		panic(fmt.Sprintf("[ENV VAR] %s not found", vars.ReadVar))
+		panic(fmt.Sprintf("[ENV VAR] %s not found", vars.ReadEnvVar))
 	}
 
 	s.writeAddr = fmt.Sprintf(":%s", wAddr)

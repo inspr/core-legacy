@@ -14,7 +14,7 @@ import (
 
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
 // createMockEnvVars - sets up the env values to be used in the tests functions
@@ -24,6 +24,8 @@ func createMockEnvVars() {
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_UNIX_SOCKET", unixSocketAddr)
+	os.Setenv("INSPR_SIDECAR_READ_PORT", "8020")
+	os.Setenv("INSPR_SIDECAR_WRITE_PORT", "8021")
 	os.Setenv("INSPR_APP_CTX", "random.ctx")
 	os.Setenv("INSPR_ENV", "test")
 	os.Setenv("INSPR_APP_ID", "appid")
@@ -40,14 +42,14 @@ func deleteMockEnvVars() {
 }
 
 type mockReader struct {
-	readMessage func(ctx context.Context, channel string) (models.BrokerData, error)
+	readMessage func(ctx context.Context, channel string) (models.BrokerMessage, error)
 	commit      func(ctx context.Context, channel string) error
 }
 
 func (m mockReader) Commit(ctx context.Context, channel string) error {
 	return m.commit(ctx, channel)
 }
-func (m mockReader) ReadMessage(ctx context.Context, channel string) (models.BrokerData, error) {
+func (m mockReader) ReadMessage(ctx context.Context, channel string) (models.BrokerMessage, error) {
 	return m.readMessage(ctx, channel)
 }
 
@@ -154,22 +156,22 @@ func TestServer_readMessageRoutine(t *testing.T) {
 	}
 	readerFuncErr := func(t *testing.T) mockReader {
 		return mockReader{
-			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
-				return models.BrokerData{}, errors.New("this is an error")
+			readMessage: func(ctx context.Context, channel string) (models.BrokerMessage, error) {
+				return models.BrokerMessage{}, errors.New("this is an error")
 			},
 		}
 	}
 	readerFunc := func(t *testing.T) mockReader {
 		return mockReader{
-			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
+			readMessage: func(ctx context.Context, channel string) (models.BrokerMessage, error) {
 				var msg interface{}
 				select {
 
 				case msg = <-channels[channel]:
 				case <-ctx.Done():
-					return models.BrokerData{}, ctx.Err()
+					return models.BrokerMessage{}, ctx.Err()
 				}
-				return models.BrokerData{
+				return models.BrokerMessage{
 					Message: msg,
 				}, nil
 			},

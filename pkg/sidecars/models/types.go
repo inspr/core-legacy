@@ -7,6 +7,6 @@ type BrokerMessage struct {
 
 // ConnectionVariables
 type ConnectionVariables struct {
-	ReadVar  string
-	WriteVar string
+	ReadEnvVar  string
+	WriteEnvVar string
 }

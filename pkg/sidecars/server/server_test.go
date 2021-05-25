@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
 func TestNewServer(t *testing.T) {
@@ -48,8 +48,8 @@ func TestServer_Init(t *testing.T) {
 			writeAddr: test.addr,
 		}
 		r := mockReader{
-			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
-				return models.BrokerData{}, nil
+			readMessage: func(ctx context.Context, channel string) (models.BrokerMessage, error) {
+				return models.BrokerMessage{}, nil
 			},
 			commit: func(ctx context.Context, channel string) error {
 				return nil
@@ -60,7 +60,10 @@ func TestServer_Init(t *testing.T) {
 				return nil
 			},
 		}
-		s.Init(r, w)
+		s.Init(r, w, models.ConnectionVariables{
+			ReadEnvVar:  "INSPR_SIDECAR_READ_PORT",
+			WriteEnvVar: "INSPR_SIDECAR_WRITE_PORT",
+		})
 
 		// checking reader methods
 		if got := s.Reader.Commit(context.Background(), test.channel); got != nil {
@@ -80,11 +83,11 @@ func TestServer_Run(t *testing.T) {
 	defer cancel()
 	environment.SetMockEnv()
 	server := &Server{
-		writeAddr: ":3000",
+		writeAddr: ":3001",
 		Reader: mockReader{
-			readMessage: func(ctx context.Context, channel string) (models.BrokerData, error) {
+			readMessage: func(ctx context.Context, channel string) (models.BrokerMessage, error) {
 				<-ctx.Done()
-				return models.BrokerData{}, ctx.Err()
+				return models.BrokerMessage{}, ctx.Err()
 			},
 			commit: func(ctx context.Context, channel string) error {
 				return nil

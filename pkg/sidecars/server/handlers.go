@@ -10,7 +10,7 @@ import (
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 	"go.uber.org/zap"
 )
 
@@ -32,7 +32,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger.Info("handling message write")
 
-		body := models.BrokerData{}
+		body := models.BrokerMessage{}
 		channel := strings.TrimPrefix(r.URL.Path, "/")
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -75,7 +75,7 @@ func (s *Server) writeWithRetry(ctx context.Context, channel string, data interf
 	}
 }
 
-func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerResp models.BrokerData, err error) {
+func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerResp models.BrokerMessage, err error) {
 	for i := 0; ; i++ {
 		brokerResp, err = s.Reader.ReadMessage(ctx, channel)
 		if err != nil {
@@ -100,7 +100,7 @@ func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) 
 			return ctx.Err()
 		default:
 			var err error
-			var brokerResp models.BrokerData
+			var brokerResp models.BrokerMessage
 
 			brokerResp, err = s.readWithRetry(ctx, channel)
 			if err != nil {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
+	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka_new/client"
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 	sidecarserv "github.com/inspr/inspr/pkg/sidecars/server"
@@ -14,8 +14,8 @@ import (
 var logger *zap.Logger
 
 var envars models.ConnectionVariables = models.ConnectionVariables{
-	ReadVar:  "INSPR_SIDECAR_KAFKA_READ_PORT",
-	WriteVar: "INSPR_SIDECAR_KAFKA_WRITE_PORT",
+	ReadEnvVar:  "INSPR_SIDECAR_KAFKA_READ_PORT",
+	WriteEnvVar: "INSPR_SIDECAR_KAFKA_WRITE_PORT",
 }
 
 // init is called after all the variable declarations in the package have evaluated
