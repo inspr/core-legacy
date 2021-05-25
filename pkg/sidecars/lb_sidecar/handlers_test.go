@@ -28,6 +28,8 @@ func createMockEnvVars() {
 	os.Setenv("chan5_RESOLVED_SCOPE", "app1.chan5")
 	os.Setenv("INSPR_SIDECAR_INVBROKER2_WRITE_PORT", "123")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT", "1107")
+	os.Setenv("INSPR_LBSIDECAR_WRITE_PORT", "1127")
+	os.Setenv("INSPR_LBSIDECAR_READ_PORT", "1137")
 }
 
 func deleteMockEnvVars() {
@@ -39,6 +41,8 @@ func deleteMockEnvVars() {
 	os.Unsetenv("chan5_RESOLVED_SCOPE")
 	os.Unsetenv("INSPR_SIDECAR_INVBROKER2_WRITE_PORT")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT")
+	os.Unsetenv("INSPR_LBSIDECAR_WRITE_PORT")
+	os.Unsetenv("INSPR_LBSIDECAR_READ_PORT")
 }
 
 func createMockedApp() *meta.App {
@@ -124,7 +128,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 
 	treeRoot := createMockedApp()
 
-	wServer := httptest.NewServer(NewServer().writeMessageHandler())
+	wServer := httptest.NewServer(Init().writeMessageHandler())
 	req := http.Client{}
 
 	tests := []struct {
@@ -210,7 +214,7 @@ func TestServer_readMessageHandler(t *testing.T) {
 
 	treeRoot := createMockedApp()
 
-	rServer := httptest.NewServer(NewServer().readMessageHandler())
+	rServer := httptest.NewServer(Init().readMessageHandler())
 	req := http.Client{}
 
 	tests := []struct {

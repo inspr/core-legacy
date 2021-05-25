@@ -2,81 +2,107 @@ package sidecarserv
 
 import (
 	"context"
-	"net/http"
+	"fmt"
+	"os"
 	"reflect"
+	"strings"
 	"testing"
-
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
 )
 
-func TestNewServer(t *testing.T) {
+// The environment variables used here are declared in handlers_test.go
+
+func TestInit(t *testing.T) {
+	createMockEnvVars()
+	defer deleteMockEnvVars()
+
 	tests := []struct {
 		name string
 		want *Server
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Initializes a new server",
+			want: &Server{
+				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
+				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewServer(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewServer() = %v, want %v", got, tt.want)
+			if got := Init(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Init() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestServer_Init(t *testing.T) {
-	type args struct {
-		r models.Reader
-		w models.Writer
-	}
-	tests := []struct {
-		name string
-		s    *Server
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.s.Init(tt.args.r, tt.args.w)
-		})
-	}
-}
-
 func TestServer_Run(t *testing.T) {
-	type args struct {
-		ctx context.Context
-	}
-	tests := []struct {
-		name string
-		s    *Server
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.s.Run(tt.args.ctx)
-		})
-	}
-}
+	createMockEnvVars()
+	defer deleteMockEnvVars()
 
-func Test_gracefulShutdown(t *testing.T) {
-	type args struct {
-		w   *http.Server
-		r   *http.Server
-		err error
+	type fields struct {
+		writeAddr string
+		readAddr  string
 	}
 	tests := []struct {
-		name string
-		args args
+		name         string
+		fields       fields
+		requestWrite bool
+		requestRead  bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Runs server and cancel its context afterwards",
+			fields: fields{
+				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
+				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+			},
+		},
+		{
+			name: "Tries to create read server on already-used port",
+			fields: fields{
+				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
+				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+			},
+			requestRead: true,
+		},
+		{
+			name: "Tries to create read server on already-used port",
+			fields: fields{
+				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
+				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+			},
+			requestWrite: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gracefulShutdown(tt.args.w, tt.args.r, tt.args.err)
+			s := &Server{
+				writeAddr: tt.fields.writeAddr,
+				readAddr:  tt.fields.readAddr,
+			}
+
+			if tt.requestRead && tt.requestWrite {
+				t.Error("for testing purposes, choose only one of 'requestRead' and 'requestWrite'")
+				return
+			} else if !tt.requestRead && !tt.requestWrite {
+				ctx, cancel := context.WithCancel(context.Background())
+				go func() { s.Run(ctx) }()
+				cancel()
+			} else if tt.requestRead {
+				port := strings.Split(tt.fields.readAddr, ":")[1]
+				auxServer := createMockedServer(port, "randCh", "randMsg")
+				auxServer.Start()
+				defer auxServer.Close()
+
+				s.Run(context.Background())
+			} else {
+				port := strings.Split(tt.fields.writeAddr, ":")[1]
+				auxServer := createMockedServer(port, "randCh", "randMsg")
+				auxServer.Start()
+				defer auxServer.Close()
+
+				s.Run(context.Background())
+			}
 		})
 	}
 }
