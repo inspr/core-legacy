@@ -104,7 +104,8 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 			UUID: "channel1_UUID",
 		},
 		Spec: meta.ChannelSpec{
-			Type: "channel1type",
+			Type:           "channel1type",
+			SelectedBroker: "someBroker",
 		},
 	})
 	mem.Channels().Create("", &meta.Channel{
@@ -113,7 +114,8 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 			UUID: "channel2_UUID",
 		},
 		Spec: meta.ChannelSpec{
-			Type: "channel2type",
+			Type:           "channel2type",
+			SelectedBroker: "someBroker",
 		},
 	})
 
@@ -165,9 +167,11 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Channels: map[string]*meta.Channel{
 							"channel1": {
 								Meta: meta.Metadata{Name: "channel1"},
+								Spec: meta.ChannelSpec{SelectedBroker: "someBroker"},
 							},
 							"channel2": {
 								Meta: meta.Metadata{Name: "channel2"},
+								Spec: meta.ChannelSpec{SelectedBroker: "someBroker"},
 							},
 						},
 					},
@@ -192,8 +196,8 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Value: "INSPR_channel1_UUID",
 					},
 					{
-						Name:  "channel1_RESOLVED_SCOPE",
-						Value: "channel1_resolved",
+						Name:  "channel1_BROKER",
+						Value: "someBroker",
 					},
 					{
 						Name:  "INSPR_channel2_UUID_SCHEMA",
@@ -204,8 +208,8 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Value: "INSPR_channel2_UUID",
 					},
 					{
-						Name:  "channel2_RESOLVED_SCOPE",
-						Value: "channel2_resolved",
+						Name:  "channel2_BROKER",
+						Value: "someBroker",
 					},
 				},
 			},
@@ -231,9 +235,11 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Channels: map[string]*meta.Channel{
 							"channel1": {
 								Meta: meta.Metadata{Name: "channel1"},
+								Spec: meta.ChannelSpec{SelectedBroker: "someBroker"},
 							},
 							"channel2": {
 								Meta: meta.Metadata{Name: "channel2"},
+								Spec: meta.ChannelSpec{SelectedBroker: "someBroker"},
 							},
 						},
 					},
@@ -258,8 +264,8 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Value: "INSPR_channel1_UUID",
 					},
 					{
-						Name:  "channel1_RESOLVED_SCOPE",
-						Value: "channel1_resolved",
+						Name:  "channel1_BROKER",
+						Value: "someBroker",
 					},
 					{
 						Name:  "INSPR_channel2_UUID_SCHEMA",
@@ -270,8 +276,8 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Value: "INSPR_channel2_UUID",
 					},
 					{
-						Name:  "channel2_RESOLVED_SCOPE",
-						Value: "channel2_resolved",
+						Name:  "channel2_BROKER",
+						Value: "someBroker",
 					},
 				},
 			},

@@ -7,10 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
 )
@@ -54,7 +52,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			logger.Error("unable to get broker " + channelBroker + " port")
 			insprError := ierrors.NewError().
 				NotFound().
-				Message("[ENV VAR] INSPR_SIDECAR_%s_WRITE_PORT not found", channelBroker)
+				Message("[ENV VAR] INSPR_SIDECAR_%s_WRITE_PORT not found", strings.ToUpper(channelBroker))
 
 			rest.ERROR(w, insprError.Build())
 			return
@@ -123,25 +121,15 @@ func (s *Server) readMessageHandler() rest.Handler {
 }
 
 func getChannelBroker(channel string) (string, error) {
-	pathToChannel := os.Getenv(channel + "_RESOLVED_SCOPE")
-	if pathToChannel == "" {
+	channelBroker := os.Getenv(channel + "_BROKER")
+	if channelBroker == "" {
 		return "", ierrors.NewError().
 			NotFound().
-			Message("[ENV VAR] %s_RESOLVED_SCOPE not found", channel).
+			Message("[ENV VAR] %v_BROKER not found", channel).
 			Build()
 	}
 
-	scope, chName, err := metautils.RemoveLastPartInScope(pathToChannel)
-	if err != nil {
-		return "", err
-	}
-
-	chStructure, err := tree.GetTreeMemory().Channels().Get(scope, chName)
-	if err != nil {
-		return "", err
-	}
-
-	return chStructure.Spec.SelectedBroker, nil
+	return channelBroker, nil
 }
 
 func sendRequest(addr string, body io.Reader) (*http.Response, error) {

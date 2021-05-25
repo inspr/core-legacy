@@ -98,7 +98,7 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 			parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 			ch, _ := no.memory.Channels().Get(parent, chName)
 			ct, _ := no.memory.Types().Get(parent, ch.Spec.Type)
-			env[boundary+"_RESOLVED_SCOPE"] = resolved
+			env[boundary+"_BROKER"] = no.returnChannelBroker(resolved)
 			resolved = "INSPR_" + ch.Meta.UUID
 			env[resolved+"_SCHEMA"] = ct.Schema
 			env[boundary+"_RESOLVED"] = resolved
@@ -260,4 +260,16 @@ func toAppID(app *meta.App) string {
 func intToint32(v int) *int32 {
 	t := int32(v)
 	return &t
+}
+
+func (no *NodeOperator) returnChannelBroker(pathToChannel string) string {
+	scope, chName, err := metautils.RemoveLastPartInScope(pathToChannel)
+	if err != nil {
+		return ""
+	}
+	channel, err := no.memory.Channels().Get(scope, chName)
+	if err != nil {
+		return ""
+	}
+	return channel.Spec.SelectedBroker
 }

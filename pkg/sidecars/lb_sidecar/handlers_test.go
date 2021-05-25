@@ -22,11 +22,9 @@ func createMockEnvVars() {
 	customEnvValues := "chan1;chan2;chan3;chan4;chan5"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
-	os.Setenv("chan1_RESOLVED_SCOPE", "app1.chan1")
-	os.Setenv("chan3_RESOLVED_SCOPE", "chan3")
-	os.Setenv("chan4_RESOLVED_SCOPE", "app1.chan4")
-	os.Setenv("chan5_RESOLVED_SCOPE", "app1.chan5")
-	os.Setenv("INSPR_SIDECAR_INVBROKER2_WRITE_PORT", "123")
+	os.Setenv("chan1_BROKER", "invBroker2")
+	os.Setenv("chan5_BROKER", "randBroker1")
+	os.Setenv("INSPR_SIDECAR_INVBROKER2_WRITE_PORT", "")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT", "1107")
 	os.Setenv("INSPR_LBSIDECAR_WRITE_PORT", "1127")
 	os.Setenv("INSPR_LBSIDECAR_READ_PORT", "1137")
@@ -35,10 +33,8 @@ func createMockEnvVars() {
 func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
 	os.Unsetenv("INSPR_INPUT_CHANNELS")
-	os.Unsetenv("chan1_RESOLVED_SCOPE")
-	os.Unsetenv("chan3_RESOLVED_SCOPE")
-	os.Unsetenv("chan4_RESOLVED_SCOPE")
-	os.Unsetenv("chan5_RESOLVED_SCOPE")
+	os.Unsetenv("chan1_BROKER")
+	os.Unsetenv("chan5_BROKER")
 	os.Unsetenv("INSPR_SIDECAR_INVBROKER2_WRITE_PORT")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT")
 	os.Unsetenv("INSPR_LBSIDECAR_WRITE_PORT")
@@ -144,13 +140,8 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:    "Env var '<chan>_RESOLVED_SCOPE' doesn't exist",
+			name:    "Env var '<chan>_BROKER' doesn't exist",
 			channel: "chan2",
-			wantErr: true,
-		},
-		{
-			name:    "Error when getting channel from tree memory",
-			channel: "chan3",
 			wantErr: true,
 		},
 		{
