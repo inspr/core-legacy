@@ -26,6 +26,7 @@ func createMockEnvVars() {
 	os.Setenv("chan5_BROKER", "randBroker1")
 	os.Setenv("INSPR_SIDECAR_INVBROKER2_WRITE_PORT", "")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT", "1107")
+	os.Setenv("INSPR_SIDECAR_RANDBROKER1_ADDR", "http://localhost")
 	os.Setenv("INSPR_LBSIDECAR_WRITE_PORT", "1127")
 	os.Setenv("INSPR_LBSIDECAR_READ_PORT", "1137")
 }
@@ -142,11 +143,6 @@ func TestServer_writeMessageHandler(t *testing.T) {
 		{
 			name:    "Env var '<chan>_BROKER' doesn't exist",
 			channel: "chan2",
-			wantErr: true,
-		},
-		{
-			name:    "Channel has invalid broker (port envvar not found)",
-			channel: "chan1",
 			wantErr: true,
 		},
 		{

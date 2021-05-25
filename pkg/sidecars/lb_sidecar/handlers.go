@@ -29,7 +29,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		channel := strings.TrimPrefix(r.URL.Path, "/")
 
 		if !environment.OutputChannnelList().Contains(channel) {
-			logger.Error("channel " + channel + " not found in output channel list")
+			logger.Error(fmt.Sprintf("channel %s not found in output channel list", channel))
 			insprError := ierrors.NewError().
 				BadRequest().
 				Message("channel '%s' not found", channel)
@@ -47,18 +47,10 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		sidecarWritePort := os.Getenv("INSPR_SIDECAR_" + strings.ToUpper(channelBroker) + "_WRITE_PORT")
-		if sidecarWritePort == "" {
-			logger.Error("unable to get broker " + channelBroker + " port")
-			insprError := ierrors.NewError().
-				NotFound().
-				Message("[ENV VAR] INSPR_SIDECAR_%s_WRITE_PORT not found", strings.ToUpper(channelBroker))
+		sidecarAddress := environment.GetBrokerSpecificSidecarAddr(strings.ToUpper(channelBroker))
+		sidecarWritePort := environment.GetBrokerWritePort(strings.ToUpper(channelBroker))
 
-			rest.ERROR(w, insprError.Build())
-			return
-		}
-
-		reqAddress := fmt.Sprintf("http://localhost:%v/%v", sidecarWritePort, channel)
+		reqAddress := fmt.Sprintf("%s:%s/%s", sidecarAddress, sidecarWritePort, channel)
 
 		logger.Info("sending message to broker",
 			zap.String("broker", channelBroker),
