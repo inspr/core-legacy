@@ -2,15 +2,14 @@ package sidecarserv
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/sidecars/models"
 	"go.uber.org/zap"
 )
 
@@ -24,7 +23,6 @@ const maxBrokerRetries = 5
 
 var (
 	writeMessageErr = ierrors.NewError().InternalServer().Message("broker's writeMessage failed")
-	decodingErr     = ierrors.NewError().BadRequest().Message("couldn't parse body")
 )
 
 // handles the /message route in the server
@@ -32,15 +30,15 @@ func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger.Info("handling message write")
 
-		body := models.BrokerMessage{}
 		channel := strings.TrimPrefix(r.URL.Path, "/")
 
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			rest.ERROR(w, decodingErr.InnerError(err).Build())
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			rest.ERROR(w, err)
 			return
 		}
 
-		if !environment.OutputChannnelList().Contains(channel) { // OutputChannnelList must be checked for obtaining the right list
+		if !environment.OutputChannnelList(s.broker).Contains(channel) { // OutputChannnelList must be checked for obtaining the right list
 			insprError := ierrors.
 				NewError().
 				BadRequest().
@@ -54,7 +52,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		}
 
 		logger.Info("writing message to broker", zap.String("channel", channel))
-		if err := s.Writer.WriteMessage(channel, body.Message); err != nil {
+		if err := s.Writer.WriteMessage(channel, body); err != nil {
 			rest.ERROR(w, writeMessageErr.InnerError(err).Build())
 			return
 		}
@@ -62,7 +60,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 	}
 }
 
-func (s *Server) writeWithRetry(ctx context.Context, channel string, data interface{}) (resp response, err error) {
+func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte) (resp response, err error) {
 	for i := 0; ; i++ {
 		err = s.client.Send(ctx, "/"+channel, http.MethodPost, data, &resp)
 		if err != nil {
@@ -75,9 +73,9 @@ func (s *Server) writeWithRetry(ctx context.Context, channel string, data interf
 	}
 }
 
-func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerResp models.BrokerMessage, err error) {
+func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerMsg []byte, err error) {
 	for i := 0; ; i++ {
-		brokerResp, err = s.Reader.ReadMessage(ctx, channel)
+		brokerMsg, err = s.Reader.ReadMessage(ctx, channel)
 		if err != nil {
 			if i == maxBrokerRetries {
 				return
@@ -93,23 +91,22 @@ type response struct {
 }
 
 func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) error {
-
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
 			var err error
-			var brokerResp models.BrokerMessage
+			var brokerMsg []byte
 
-			brokerResp, err = s.readWithRetry(ctx, channel)
+			brokerMsg, err = s.readWithRetry(ctx, channel)
 			if err != nil {
 				return err
 			}
 
 			fmt.Println("trying to send requess")
 
-			resp, err := s.writeWithRetry(ctx, channel, brokerResp)
+			resp, err := s.writeWithRetry(ctx, channel, brokerMsg)
 			if err != nil || resp.Status != "OK" {
 				return err
 			}
@@ -126,7 +123,7 @@ func (s *Server) readMessageRoutine(ctx context.Context) error {
 	newCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	for _, channel := range environment.InputChannelList() {
+	for _, channel := range environment.InputChannelList(s.broker) { // InputChannelList retorna todods os canais de input do node invess de todos aqueles que sao do broker especifico
 		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel) // separates several trhead for each channel of this broker
 	}
 

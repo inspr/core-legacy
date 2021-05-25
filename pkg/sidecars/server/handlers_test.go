@@ -54,12 +54,14 @@ func (m mockReader) ReadMessage(ctx context.Context, channel string) (models.Bro
 }
 
 type mockWriter struct {
-	writeMessage func(channel string, message interface{}) error
+	writeMessage func(channel string, message []byte) error
 }
 
-func (m mockWriter) WriteMessage(channel string, message interface{}) error {
+func (m mockWriter) WriteMessage(channel string, message []byte) error {
 	return m.writeMessage(channel, message)
 }
+
+func (m mockWriter) Close() {}
 func TestServer_writeMessageHandler(t *testing.T) {
 	createMockEnvVars()
 	defer deleteMockEnvVars()
@@ -101,7 +103,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			wantErr: true,
 			writerFunc: func(t *testing.T) mockWriter {
 				return mockWriter{
-					writeMessage: func(channel string, message interface{}) error {
+					writeMessage: func(channel string, message []byte) error {
 						return errors.New("this is an error")
 					},
 				}
@@ -113,7 +115,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			if tt.writerFunc == nil {
 				tt.writerFunc = func(t *testing.T) mockWriter {
 					return mockWriter{
-						writeMessage: func(channel string, message interface{}) error {
+						writeMessage: func(channel string, message []byte) error {
 							if !reflect.DeepEqual(message, tt.message.(struct {
 								Message interface{} `json:"message"`
 							}).Message) {

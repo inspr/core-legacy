@@ -56,7 +56,7 @@ func TestServer_Init(t *testing.T) {
 			},
 		}
 		w := mockWriter{
-			writeMessage: func(channel string, message interface{}) error {
+			writeMessage: func(channel string, message []byte) error {
 				return nil
 			},
 		}

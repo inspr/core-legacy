@@ -15,6 +15,7 @@ import (
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
+	broker       string
 	Reader       models.Reader
 	Writer       models.Writer
 	writeAddr    string
@@ -29,9 +30,9 @@ func NewServer() *Server {
 }
 
 // Init - configures the server
-func (s *Server) Init(r models.Reader, w models.Writer, vars models.ConnectionVariables) { // transformar isso emn uma factory?
-	// init receberia um
+func (s *Server) Init(r models.Reader, w models.Writer, vars models.ConnectionVariables) {
 
+	// transformei em estrutura generica de (broker specific sidecar)'s - OK
 	// server fetches required addresses from deployment.
 
 	wAddr, ok := os.LookupEnv(vars.WriteEnvVar)
@@ -55,7 +56,7 @@ func (s *Server) Init(r models.Reader, w models.Writer, vars models.ConnectionVa
 // Run starts the server on the port given in addr
 func (s *Server) Run(ctx context.Context) {
 	server := &http.Server{
-		Handler: s.writeMessageHandler().Post().JSON(), // look writeMessageHandler
+		Handler: s.writeMessageHandler().Post().JSON(), // look writeMessageHandler - OK
 		Addr:    s.writeAddr,
 	}
 	errCh := make(chan error)
@@ -75,8 +76,10 @@ func (s *Server) Run(ctx context.Context) {
 
 	select {
 	case <-ctx.Done():
+		s.Writer.Close()
 		gracefulShutdown(server, err)
 	case errRead := <-errCh:
+		s.Writer.Close()
 		gracefulShutdown(server, err)
 		if errRead != nil {
 			log.Fatalln(err)
@@ -92,6 +95,7 @@ func gracefulShutdown(server *http.Server, err error) {
 		context.Background(),
 		time.Now().Add(time.Second*5),
 	)
+
 	defer cancel()
 
 	if err != nil {
