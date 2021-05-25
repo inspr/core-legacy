@@ -2,7 +2,6 @@ package sidecarserv
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -38,7 +37,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		if !environment.OutputChannnelList(s.broker).Contains(channel) { // OutputChannnelList must be checked for obtaining the right list
+		if !environment.OutputBrokerChannnels(s.broker).Contains(channel) { // OutputChannnelList must be checked for obtaining the right list
 			insprError := ierrors.
 				NewError().
 				BadRequest().
@@ -104,7 +103,7 @@ func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) 
 				return err
 			}
 
-			fmt.Println("trying to send requess")
+			logger.Debug("trying to send request to loadbalancer")
 
 			resp, err := s.writeWithRetry(ctx, channel, brokerMsg)
 			if err != nil || resp.Status != "OK" {
@@ -123,7 +122,7 @@ func (s *Server) readMessageRoutine(ctx context.Context) error {
 	newCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	for _, channel := range environment.InputChannelList(s.broker) { // InputChannelList retorna todods os canais de input do node invess de todos aqueles que sao do broker especifico
+	for _, channel := range environment.InputBrokerChannels(s.broker) { // InputChannelList retorna todods os canais de input do node invess de todos aqueles que sao do broker especifico
 		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel) // separates several trhead for each channel of this broker
 	}
 

@@ -41,12 +41,22 @@ func GetSchema(channel string) (string, error) {
 }
 
 // OutputChannnelList returns a list of input channels
-func OutputChannnelList(broker string) utils.StringArray {
-	return GetChannelBoundaryList(GetOutputChannels()) // WRONG IMPLEMENTATION
+func OutputChannnelList() utils.StringArray {
+	return GetChannelBoundaryList(GetOutputChannels())
 }
 
 // InputChannelList returns a list of input channels
-func InputChannelList(broker string) utils.StringArray {
+func InputChannelList() utils.StringArray {
+	return GetChannelBoundaryList(GetInputChannels())
+}
+
+// OutputBrokerChannnels returns a list of input channels
+func OutputBrokerChannnels(broker string) utils.StringArray {
+	return GetChannelBoundaryList(GetOutputChannels()) // WRONG IMPLEMENTATION
+}
+
+// InputBrokerChannels returns a list of input channels
+func InputBrokerChannels(broker string) utils.StringArray {
 	return GetChannelBoundaryList(GetInputChannels()) // WRONG IMPLEMENTATION
 }
 
