@@ -30,19 +30,24 @@ func NewServer() *Server {
 }
 
 // Init - configures the server
-func (s *Server) Init(r models.Reader, w models.Writer, vars models.ConnectionVariables) {
+func (s *Server) Init(r models.Reader, w models.Writer, broker string) {
 
-	// transformei em estrutura generica de (broker specific sidecar)'s - OK
+	// server fetches addresses variable names from models.
+	envVars := models.GetSidecarConnectionVars(broker)
+	if envVars == nil {
+		panic(fmt.Sprintf("%s broker's enviroment variables not configured", broker))
+	}
+	s.broker = broker
+
 	// server fetches required addresses from deployment.
-
-	wAddr, ok := os.LookupEnv(vars.WriteEnvVar)
+	wAddr, ok := os.LookupEnv(envVars.WriteEnvVar)
 	if !ok {
-		panic(fmt.Sprintf("[ENV VAR] %s not found", vars.WriteEnvVar))
+		panic(fmt.Sprintf("[ENV VAR] %s not found", envVars.WriteEnvVar))
 	}
 
-	rAddr, ok := os.LookupEnv(vars.ReadEnvVar)
+	rAddr, ok := os.LookupEnv(envVars.ReadEnvVar)
 	if !ok {
-		panic(fmt.Sprintf("[ENV VAR] %s not found", vars.ReadEnvVar))
+		panic(fmt.Sprintf("[ENV VAR] %s not found", envVars.ReadEnvVar))
 	}
 
 	s.writeAddr = fmt.Sprintf(":%s", wAddr)

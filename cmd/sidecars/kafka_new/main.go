@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka_new/client"
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/sidecars/models"
@@ -12,11 +13,6 @@ import (
 )
 
 var logger *zap.Logger
-
-var envars models.ConnectionVariables = models.ConnectionVariables{
-	ReadEnvVar:  "INSPR_SIDECAR_KAFKA_READ_PORT",
-	WriteEnvVar: "INSPR_SIDECAR_KAFKA_WRITE_PORT",
-}
 
 // init is called after all the variable declarations in the package have evaluated
 // their initializers, and those are evaluated only after all the imported packages
@@ -55,7 +51,7 @@ func main() {
 	s := sidecarserv.NewServer()
 
 	logger.Info("initializing Kafka Sidecar server")
-	s.Init(reader, writer, envars)
+	s.Init(reader, writer, brokers.Kafka)
 
 	logger.Info("running Kafka Sidecar server")
 	s.Run(ctx)
