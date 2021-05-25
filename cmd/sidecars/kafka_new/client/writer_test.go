@@ -11,35 +11,25 @@ import (
 func TestNewWriter(t *testing.T) {
 	createMockEnv()
 	defer deleteMockEnv()
-	type args struct {
-		mock bool
-	}
 	tests := []struct {
 		name    string
-		args    args
 		want    *Writer
 		wantErr bool
 	}{
 		{
-			name: "Valid writer creation",
-			args: args{
-				mock: true,
-			},
+			name:    "Valid writer creation",
 			wantErr: false,
 			want:    &Writer{},
 		},
 		{
-			name: "Invalid writer creation - not mocked (without kafka server up)",
-			args: args{
-				mock: false,
-			},
+			name:    "Invalid writer creation - not mocked (without kafka server up)",
 			wantErr: true,
 			want:    &Writer{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewWriter(tt.args.mock)
+			got, err := NewWriter()
 			if err != nil {
 				t.Error(err)
 			}
@@ -56,7 +46,7 @@ func TestNewWriter(t *testing.T) {
 }
 
 func TestWriter_WriteMessage(t *testing.T) {
-	mProd, _ := NewWriter(true)
+	mProd, _ := NewWriter()
 	defer mProd.Close()
 	createMockEnv()
 	os.Setenv("INSPR_APP_CTX", "")

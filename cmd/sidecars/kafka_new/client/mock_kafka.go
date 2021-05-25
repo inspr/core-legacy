@@ -4,7 +4,72 @@ import (
 	"os"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
+	"go.uber.org/zap"
 )
+
+// MockWriter mocks an interface for writing messages
+type MockWriter struct {
+	producer *kafka.Producer
+}
+
+func newMockKafka() (models.Writer, error) {
+	var kProd *kafka.Producer
+
+	kProd, _ = kafka.NewProducer(&kafka.ConfigMap{
+		"test.mock.num.brokers": 3,
+	})
+
+	return &MockWriter{kProd}, nil
+}
+
+// WriteMessage receives a message and sends it to the topic defined by the given channel
+func (writer *MockWriter) WriteMessage(channel string, message []byte) error {
+	outputChan := environment.GetOutputChannels()
+
+	resolvedCh, err := environment.GetResolvedChannel(channel, "", outputChan)
+	if err != nil {
+		return err
+	}
+
+	logger.Info("trying to write message in topic",
+		zap.String("channel", channel),
+		zap.String("resolved channel", resolvedCh))
+
+	if errProduceMessage := writer.produceMessage(message, resolvedCh); errProduceMessage != nil {
+		logger.Error("error while producing message",
+			zap.Any("error", errProduceMessage))
+		return errProduceMessage
+	}
+
+	logger.Info("flushing the producer")
+	writer.producer.Flush(flushTimeout)
+	logger.Info("flushed")
+	return nil
+}
+
+// creates a Kafka message and sends it through the ProduceChannel
+func (writer *MockWriter) produceMessage(message []byte, resolvedChannel string) error {
+
+	logger.Debug("writing message into Kafka Topic",
+		zap.String("topic", resolvedChannel))
+
+	return writer.producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{
+			Topic:     &resolvedChannel,
+			Partition: kafka.PartitionAny,
+		},
+		Value: message,
+	}, nil)
+
+}
+
+// Close closes the kafka producer
+func (writer *MockWriter) Close() {
+	logger.Debug("closing Kafka producer")
+	writer.producer.Close()
+}
 
 //MockConsumer mock
 type MockConsumer struct {
@@ -48,8 +113,7 @@ func (mc *MockConsumer) CreateMessage() {
 		mc.events <- kafka.NewError(kafka.ErrAllBrokersDown, "", false)
 	}
 
-	ch := kafkaTopic(mc.senderChannel)
-	msg, _ := ch.encode(mc.pollMsg)
+	msg := []byte(mc.pollMsg)
 	mc.events <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic: &mc.topic,

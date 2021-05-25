@@ -3,6 +3,7 @@ package kafkasc
 import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 	"go.uber.org/zap"
 )
 
@@ -14,64 +15,59 @@ type Writer struct {
 }
 
 // NewWriter creates a new writer/kafka producer
-func NewWriter(mock bool) (*Writer, error) {
+func NewWriter() (models.Writer, error) {
 	var kProd *kafka.Producer
 	var err error
-	if mock {
-		kProd, _ = kafka.NewProducer(&kafka.ConfigMap{
-			"test.mock.num.brokers": 3,
-		})
-	} else {
-		bootstrapServers := GetEnvironment().KafkaBootstrapServers
-		kProd, err = kafka.NewProducer(&kafka.ConfigMap{
-			"bootstrap.servers": bootstrapServers,
-		})
-		if err != nil {
-			return nil, kafka.NewError(kafka.ErrInvalidArg, err.Error(), false)
-		}
+
+	bootstrapServers := GetEnvironment().KafkaBootstrapServers
+	kProd, err = kafka.NewProducer(&kafka.ConfigMap{
+		"bootstrap.servers": bootstrapServers,
+	})
+
+	if err != nil {
+		return nil, kafka.NewError(kafka.ErrInvalidArg, err.Error(), false)
 	}
 
 	return &Writer{kProd}, nil
 }
 
 // WriteMessage receives a message and sends it to the topic defined by the given channel
-func (writer *Writer) WriteMessage(channel string, message interface{}) error {
+func (writer *Writer) WriteMessage(channel string, message []byte) error {
 	outputChan := environment.GetOutputChannels()
 
-	resolvedCh, _ := environment.GetResolvedChannel(channel, "", outputChan)
+	resolvedCh, err := environment.GetResolvedChannel(channel, "", outputChan)
+	if err != nil {
+		return err
+	}
 
 	logger.Info("trying to write message in topic",
 		zap.String("channel", channel),
 		zap.String("resolved channel", resolvedCh))
 
-	if errProduceMessage := writer.produceMessage(message, kafkaTopic(resolvedCh)); errProduceMessage != nil {
+	if errProduceMessage := writer.produceMessage(message, resolvedCh); errProduceMessage != nil {
 		logger.Error("error while producing message",
 			zap.Any("error", errProduceMessage))
 		return errProduceMessage
 	}
 
-	logger.Info("flusing the producer")
+	logger.Info("flushing the producer")
 	writer.producer.Flush(flushTimeout)
 	logger.Info("flushed")
 	return nil
 }
 
 // creates a Kafka message and sends it through the ProduceChannel
-func (writer *Writer) produceMessage(message interface{}, resolvedChannel kafkaTopic) error {
-	messageEncoded, errorEncode := resolvedChannel.encode(message)
-	if errorEncode != nil {
-		return errorEncode
-	}
+func (writer *Writer) produceMessage(message []byte, resolvedChannel string) error {
 
 	logger.Debug("writing message into Kafka Topic",
-		zap.String("topic", string(resolvedChannel)))
+		zap.String("topic", resolvedChannel))
 
 	return writer.producer.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{
-			Topic:     (*string)(&resolvedChannel),
+			Topic:     &resolvedChannel,
 			Partition: kafka.PartitionAny,
 		},
-		Value: messageEncoded,
+		Value: message,
 	}, nil)
 
 }
