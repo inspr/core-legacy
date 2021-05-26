@@ -10,7 +10,7 @@ import (
 // KafkaConfig configurations used to create the KafkaSidecar
 type KafkaConfig struct {
 	BootstrapServers string `yaml:"bootstrapServers"`
-	AutoOffsetReset  string `yaml:"autoPffsetReset"`
+	AutoOffsetReset  string `yaml:"autoOffsetReset"`
 	SidecarImage     string `yaml:"sidecarImage"`
 	// insprdPort is the port used in the insprd service of your cluster
 	KafkaInsprPort string `yaml:"kafkaInsprPort"`
