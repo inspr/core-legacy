@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -112,8 +113,6 @@ func (s *Server) readMessageHandler() rest.Handler {
 			return
 		}
 
-		reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
-
 		logger.Debug("decoding message from Avro schema")
 
 		decodedMsg, err := decodeFromAvro(channel, r.Body)
@@ -128,6 +127,8 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		logger.Info("sending message to node through: ",
 			zap.String("channel", channel))
+
+		reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
 
 		resp, err := sendRequest(reqAddress, decodedMsg)
 		if err != nil {
@@ -181,8 +182,10 @@ func encodeToAvro(channel string, body io.Reader) ([]byte, error) {
 }
 
 func decodeFromAvro(channel string, body io.Reader) ([]byte, error) {
-	var receivedMsg []byte
-	json.NewDecoder(body).Decode(&receivedMsg)
+	receivedMsg, err := ioutil.ReadAll(body)
+	if err != nil {
+		return nil, err
+	}
 
 	decodedAvroMsg, err := readMessage(channel, receivedMsg)
 	if err != nil {
