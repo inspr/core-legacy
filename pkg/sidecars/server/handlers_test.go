@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/inspr/inspr/pkg/sidecars/models"
@@ -42,67 +43,67 @@ func deleteMockEnvVars() {
 }
 
 type mockReader struct {
-	readMessage func(ctx context.Context, channel string) (models.BrokerMessage, error)
+	readMessage func(ctx context.Context, channel string) ([]byte, error)
 	commit      func(ctx context.Context, channel string) error
 }
 
-func (m mockReader) Commit(ctx context.Context, channel string) error {
+func (m *mockReader) Commit(ctx context.Context, channel string) error {
 	return m.commit(ctx, channel)
 }
-func (m mockReader) ReadMessage(ctx context.Context, channel string) (models.BrokerMessage, error) {
+func (m *mockReader) ReadMessage(ctx context.Context, channel string) ([]byte, error) {
 	return m.readMessage(ctx, channel)
 }
+
+func (m *mockReader) Close() error { return nil }
+
+func (m *mockReader) Consumers() map[string]models.Consumer { return nil }
 
 type mockWriter struct {
 	writeMessage func(channel string, message []byte) error
 }
 
-func (m mockWriter) WriteMessage(channel string, message []byte) error {
+func (m *mockWriter) WriteMessage(channel string, message []byte) error {
 	return m.writeMessage(channel, message)
 }
 
-func (m mockWriter) Close() {}
+func (m *mockWriter) Close() {}
+
+func (m *mockWriter) Producer() *kafka.Producer { return nil }
 func TestServer_writeMessageHandler(t *testing.T) {
 	createMockEnvVars()
 	defer deleteMockEnvVars()
 	tests := []struct {
-		readerFunc func(t *testing.T) mockReader
-		writerFunc func(t *testing.T) mockWriter
+		readerFunc func(t *testing.T) models.Reader
+		writerFunc func(t *testing.T) models.Writer
 		channel    string
 		name       string
 		wantErr    bool
-		message    interface{}
+		message    []byte
 	}{
 		{
 			name:    "correct behaviour test",
 			channel: "chan",
-			message: struct {
-				Message interface{} `json:"message"`
-			}{"lofi nordeste"},
+			message: []byte("lofi nordeste"),
 		},
 		{
 			name:    "invalid channel",
 			channel: "invalid",
-			message: struct {
-				Message interface{} `json:"message"`
-			}{"lofi nordeste"},
+			message: []byte("lofi nordeste"),
 			wantErr: true,
 		},
 		{
 			name:    "invalid data for marshalling",
 			channel: "chan",
-			message: "invalid message",
+			message: []byte("invalid message"),
 			wantErr: true,
 		},
 		{
 			name:    "invalid broker response",
 			channel: "chan",
-			message: struct {
-				Message interface{} `json:"message"`
-			}{"this is an invalid message"},
+			message: []byte("this is an invalid message"),
 			wantErr: true,
-			writerFunc: func(t *testing.T) mockWriter {
-				return mockWriter{
+			writerFunc: func(t *testing.T) models.Writer {
+				return &mockWriter{
 					writeMessage: func(channel string, message []byte) error {
 						return errors.New("this is an error")
 					},
@@ -113,14 +114,11 @@ func TestServer_writeMessageHandler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.writerFunc == nil {
-				tt.writerFunc = func(t *testing.T) mockWriter {
-					return mockWriter{
+				tt.writerFunc = func(t *testing.T) models.Writer {
+					return &mockWriter{
 						writeMessage: func(channel string, message []byte) error {
-							if !reflect.DeepEqual(message, tt.message.(struct {
-								Message interface{} `json:"message"`
-							}).Message) {
-
-								t.Errorf("Server_writeMessageHandler message = %v, want = %v", message, tt.message)
+							if !reflect.DeepEqual(message, tt.message) {
+								t.Errorf("Server_writeMessageHandler message = %v, want = %v", string(message), string(tt.message))
 							}
 
 							return nil
@@ -151,31 +149,29 @@ func TestServer_writeMessageHandler(t *testing.T) {
 func TestServer_readMessageRoutine(t *testing.T) {
 	createMockEnvVars()
 	defer deleteMockEnvVars()
-	channels := map[string]chan interface{}{
-		"chan":    make(chan interface{}, 2),
-		"banana":  make(chan interface{}, 2),
-		"testing": make(chan interface{}, 2),
+	channels := map[string]chan []byte{
+		"chan":    make(chan []byte, 2),
+		"banana":  make(chan []byte, 2),
+		"testing": make(chan []byte, 2),
 	}
-	readerFuncErr := func(t *testing.T) mockReader {
-		return mockReader{
-			readMessage: func(ctx context.Context, channel string) (models.BrokerMessage, error) {
-				return models.BrokerMessage{}, errors.New("this is an error")
+	readerFuncErr := func(t *testing.T) models.Reader {
+		return &mockReader{
+			readMessage: func(ctx context.Context, channel string) ([]byte, error) {
+				return nil, errors.New("this is an error")
 			},
 		}
 	}
-	readerFunc := func(t *testing.T) mockReader {
-		return mockReader{
-			readMessage: func(ctx context.Context, channel string) (models.BrokerMessage, error) {
-				var msg interface{}
+	readerFunc := func(t *testing.T) models.Reader {
+		return &mockReader{
+			readMessage: func(ctx context.Context, channel string) ([]byte, error) {
+				var msg []byte
 				select {
 
 				case msg = <-channels[channel]:
 				case <-ctx.Done():
-					return models.BrokerMessage{}, ctx.Err()
+					return nil, ctx.Err()
 				}
-				return models.BrokerMessage{
-					Message: msg,
-				}, nil
+				return msg, nil
 			},
 			commit: func(ctx context.Context, channel string) error {
 				return nil
@@ -183,12 +179,12 @@ func TestServer_readMessageRoutine(t *testing.T) {
 		}
 	}
 	tests := []struct {
-		readerFunc func(t *testing.T) mockReader
-		writerFunc func(t *testing.T) mockWriter
+		readerFunc func(t *testing.T) models.Reader
+		writerFunc func(t *testing.T) models.Writer
 		channel    string
 		name       string
 		wantErr    bool
-		message    interface{}
+		message    []byte
 	}{
 
 		{

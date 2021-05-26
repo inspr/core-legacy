@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
 func TestNewServer(t *testing.T) {
@@ -45,25 +45,22 @@ func TestServer_Init(t *testing.T) {
 
 	t.Run("basic init test", func(t *testing.T) {
 		s := &Server{
-			writeAddr: test.addr,
+			inAddr: test.addr,
 		}
-		r := mockReader{
-			readMessage: func(ctx context.Context, channel string) (models.BrokerMessage, error) {
-				return models.BrokerMessage{}, nil
+		r := &mockReader{
+			readMessage: func(ctx context.Context, channel string) ([]byte, error) {
+				return nil, nil
 			},
 			commit: func(ctx context.Context, channel string) error {
 				return nil
 			},
 		}
-		w := mockWriter{
+		w := &mockWriter{
 			writeMessage: func(channel string, message []byte) error {
 				return nil
 			},
 		}
-		s.Init(r, w, models.ConnectionVariables{
-			ReadEnvVar:  "INSPR_SIDECAR_READ_PORT",
-			WriteEnvVar: "INSPR_SIDECAR_WRITE_PORT",
-		})
+		s.Init(r, w, brokers.Kafka)
 
 		// checking reader methods
 		if got := s.Reader.Commit(context.Background(), test.channel); got != nil {
@@ -72,7 +69,7 @@ func TestServer_Init(t *testing.T) {
 		if _, got := s.Reader.ReadMessage(context.Background(), test.channel); got != nil {
 			t.Errorf("expected CommitMessage() == nil, received %v", got)
 		}
-		if got := s.Writer.WriteMessage("channel", "msg"); got != nil {
+		if got := s.Writer.WriteMessage("channel", []byte("msg*")); got != nil {
 			t.Errorf("expected CommitMessage() == nil, received %v", got)
 		}
 	})
@@ -83,11 +80,11 @@ func TestServer_Run(t *testing.T) {
 	defer cancel()
 	environment.SetMockEnv()
 	server := &Server{
-		writeAddr: ":3001",
-		Reader: mockReader{
-			readMessage: func(ctx context.Context, channel string) (models.BrokerMessage, error) {
+		inAddr: ":3001",
+		Reader: &mockReader{
+			readMessage: func(ctx context.Context, channel string) ([]byte, error) {
 				<-ctx.Done()
-				return models.BrokerMessage{}, ctx.Err()
+				return nil, ctx.Err()
 			},
 			commit: func(ctx context.Context, channel string) error {
 				return nil

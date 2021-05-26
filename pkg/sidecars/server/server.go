@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
@@ -18,8 +17,9 @@ type Server struct {
 	broker       string
 	Reader       models.Reader
 	Writer       models.Writer
-	writeAddr    string
-	client       *request.Client
+	inAddr       string
+	outAddr      string
+	client       *http.Client
 	runningRead  bool
 	runningWrite bool
 }
@@ -50,8 +50,9 @@ func (s *Server) Init(r models.Reader, w models.Writer, broker string) {
 		panic(fmt.Sprintf("[ENV VAR] %s not found", envVars.ReadEnvVar))
 	}
 
-	s.writeAddr = fmt.Sprintf(":%s", wAddr)
-	s.client = request.NewJSONClient(fmt.Sprintf("http://localhost:%v", rAddr))
+	s.inAddr = fmt.Sprintf(":%s", wAddr)
+	s.outAddr = fmt.Sprintf("http://localhost:%v", rAddr)
+	s.client = &http.Client{}
 
 	// implementations of write and read for a specific sidecar
 	s.Reader = r
@@ -62,7 +63,7 @@ func (s *Server) Init(r models.Reader, w models.Writer, broker string) {
 func (s *Server) Run(ctx context.Context) {
 	server := &http.Server{
 		Handler: s.writeMessageHandler().Post().JSON(), // look writeMessageHandler - OK
-		Addr:    s.writeAddr,
+		Addr:    s.inAddr,
 	}
 	errCh := make(chan error)
 	// create read message routine and captures its error
