@@ -6,7 +6,7 @@ func GetSidecarConnectionVars(broker string) *ConnectionVariables {
 	switch broker {
 	case brokers.Kafka:
 		return &ConnectionVariables{
-			ReadEnvVar:  "INSPR_SIDECAR_KAFKA_READ_PORT",
+			ReadEnvVar:  "INSPR_LB_SIDECAR_READ_PORT",
 			WriteEnvVar: "INSPR_SIDECAR_KAFKA_WRITE_PORT",
 		}
 	default:

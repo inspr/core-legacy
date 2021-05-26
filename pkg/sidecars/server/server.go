@@ -40,18 +40,18 @@ func (s *Server) Init(r models.Reader, w models.Writer, broker string) {
 	s.broker = broker
 
 	// server fetches required addresses from deployment.
-	wAddr, ok := os.LookupEnv(envVars.WriteEnvVar)
+	inAddr, ok := os.LookupEnv(envVars.WriteEnvVar)
 	if !ok {
 		panic(fmt.Sprintf("[ENV VAR] %s not found", envVars.WriteEnvVar))
 	}
 
-	rAddr, ok := os.LookupEnv(envVars.ReadEnvVar)
+	outAddr, ok := os.LookupEnv(envVars.ReadEnvVar)
 	if !ok {
 		panic(fmt.Sprintf("[ENV VAR] %s not found", envVars.ReadEnvVar))
 	}
 
-	s.inAddr = fmt.Sprintf(":%s", wAddr)
-	s.outAddr = fmt.Sprintf("http://localhost:%v", rAddr)
+	s.inAddr = fmt.Sprintf(":%s", inAddr)
+	s.outAddr = fmt.Sprintf("http://localhost:%v", outAddr)
 	s.client = &http.Client{}
 
 	// implementations of write and read for a specific sidecar
