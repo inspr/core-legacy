@@ -90,6 +90,7 @@ func TestServer_Run(t *testing.T) {
 				return nil
 			},
 		},
+		Writer: &mockWriter{},
 	}
 	done := make(chan struct{})
 	go func() { server.Run(ctx); done <- struct{}{} }()

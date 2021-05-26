@@ -1,9 +1,11 @@
 package sidecarserv
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -14,7 +16,6 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
@@ -34,7 +35,14 @@ func createMockEnvVars() {
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
 func deleteMockEnvVars() {
-	os.Clearenv()
+	os.Unsetenv("INSPR_INPUT_CHANNELS")
+	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
+	os.Unsetenv("INSPR_UNIX_SOCKET")
+	os.Unsetenv("INSPR_LB_SIDECAR_READ_PORT")
+	os.Unsetenv("INSPR_SIDECAR_KAFKA_WRITE_PORT")
+	os.Unsetenv("INSPR_APP_CTX")
+	os.Unsetenv("INSPR_ENV")
+	os.Unsetenv("INSPR_APP_ID")
 }
 
 type mockReader struct {
@@ -126,17 +134,15 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			}
 			server := httptest.NewServer(s.writeMessageHandler())
 			defer server.Close()
-			client := request.NewJSONClient(server.URL)
+			client := &http.Client{}
 
-			rest := struct {
-				Status string `json:"status"`
-			}{}
-
-			err := client.Send(context.Background(), tt.channel, "POST", tt.message, &rest)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Server_writeMessageHandler err = %v, wantErr = %v", err, tt.wantErr)
+			resp, err := client.Post(fmt.Sprintf("%s/%s", server.URL, tt.channel), "application/octet-stream", bytes.NewBuffer(tt.message))
+			if err != nil || resp.StatusCode != http.StatusOK {
+				err = rest.UnmarshalERROR(resp.Body)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("Server_writeMessageHandler err = %v, wantErr = %v", err, tt.wantErr)
+				}
 			}
-
 		})
 	}
 }
