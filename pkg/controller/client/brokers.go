@@ -31,7 +31,6 @@ func (bc *BrokersClient) Create(ctx context.Context, brokerName string, config [
 		BrokerName:   brokerName,
 		FileContents: config,
 	}
-	// TODO: how should i receive messages from this request? what composes the response body
 	err := bc.reqClient.Send(
 		ctx,
 		"/brokers/"+brokerName,

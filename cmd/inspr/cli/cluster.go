@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -79,22 +80,31 @@ func clusterConfig(c context.Context, args []string) error {
 		"brokerName": brokerName,
 		"filePath":   filePath,
 	}); err != nil {
+		fmt.Fprintf(output, err.Error())
 		return err
 	}
 
 	// check if file exists and if it is a yaml file
 	if _, err := os.Stat(filePath); os.IsNotExist(err) || !isYaml(filePath) {
-		return err
+		if err != nil {
+			fmt.Fprintf(output, err.Error())
+			return err
+		}
+
+		fmt.Fprintf(output, "not a yaml file")
+		return errors.New("not a yaml file")
 	}
 
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {
+		fmt.Fprintf(output, err.Error())
 		return err
 	}
 
 	// do a request to the kafka route /brokers/<broker_name>
 	err = client.Brokers().Create(context.Background(), brokerName, bytes)
 	if err != nil {
+		fmt.Fprintf(output, err.Error())
 		return err
 	}
 
