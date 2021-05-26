@@ -61,22 +61,19 @@ func (s *Server) writeMessageHandler() rest.Handler {
 	}
 }
 
-func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte) (status response, err error) {
+func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte) (status int, err error) {
 	var resp *http.Response
-	for i := 0; ; i++ {
+	for i := 0; i <= maxBrokerRetries; i++ {
 		resp, err = s.client.Post(s.outAddr, "application/octet-stream", bytes.NewBuffer(data))
-		if err != nil {
+		status = resp.StatusCode
+		if err == nil && status == http.StatusOK {
 			decoder := json.NewDecoder(resp.Body)
 			err = decoder.Decode(&status)
+			return
 		}
-		if err != nil {
-			if i == maxBrokerRetries {
-				return
-			}
-			continue
-		}
-		return
+		err = rest.UnmarshalERROR(resp.Body)
 	}
+	return
 }
 
 func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerMsg []byte, err error) {
@@ -90,10 +87,6 @@ func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerMsg [
 		}
 		return
 	}
-}
-
-type response struct {
-	Status string
 }
 
 func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) error {
@@ -112,8 +105,8 @@ func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) 
 
 			logger.Debug("trying to send request to loadbalancer")
 
-			resp, err := s.writeWithRetry(ctx, channel, brokerMsg)
-			if err != nil || resp.Status != "OK" {
+			status, err := s.writeWithRetry(ctx, channel, brokerMsg)
+			if err != nil || status != http.StatusOK {
 				return err
 			}
 			s.Reader.Commit(ctx, channel)
