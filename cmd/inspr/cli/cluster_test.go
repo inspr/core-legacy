@@ -3,8 +3,6 @@ package cli
 import (
 	"bytes"
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -89,16 +87,11 @@ func Test_getBrokers(t *testing.T) {
 
 			defer server.Close()
 
-			bufResp := bytes.NewBufferString("")
-			fmt.Fprint(bufResp, tt.expectedOutput)
-
-			outResp, _ := ioutil.ReadAll(bufResp)
-
 			cmd.Execute()
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 
-			if !reflect.DeepEqual(got, outResp) {
-				t.Errorf("getBrokers() = %v, want %v", string(got), string(outResp))
+			if !reflect.DeepEqual(got, tt.expectedOutput) {
+				t.Errorf("getBrokers() = %v, want %v", got, tt.expectedOutput)
 			}
 		})
 	}
@@ -147,16 +140,11 @@ func Test_authInit(t *testing.T) {
 
 			defer server.Close()
 
-			bufResp := bytes.NewBufferString("")
-			fmt.Fprint(bufResp, tt.expectedOutput)
-
-			outResp, _ := ioutil.ReadAll(bufResp)
-
 			cmd.Execute()
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 
-			if !reflect.DeepEqual(got, outResp) {
-				t.Errorf("authInit() = %v, want %v", string(got), string(outResp))
+			if !reflect.DeepEqual(got, tt.expectedOutput) {
+				t.Errorf("authInit() = %v, want %v", got, tt.expectedOutput)
 			}
 
 		})
