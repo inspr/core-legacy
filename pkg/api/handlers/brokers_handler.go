@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/rest"
@@ -66,8 +67,8 @@ func (bh *BrokerHandler) KafkaHandler() rest.Handler {
 			rest.ERROR(w, err)
 		}
 
-		// TODO apply kafkaConfig
-		_ = kafkaConfig
+		// TODO k8s usage of this section, how to deploy it from here
+		sidecars.KafkaToDeployment(kafkaConfig)
 
 		rest.JSON(w, http.StatusOK, nil)
 	}
