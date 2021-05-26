@@ -37,6 +37,7 @@ func NewReader() (models.Reader, error) {
 	return &reader, nil
 }
 
+// Consumers returns a Reader's consumers
 func (reader *Reader) Consumers() map[string]models.Consumer {
 	return reader.consumers
 }

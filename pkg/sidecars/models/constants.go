@@ -2,6 +2,8 @@ package models
 
 import "github.com/inspr/inspr/cmd/insprd/memory/brokers"
 
+// GetSidecarConnectionVars returns port enviroment variable
+// names for each possible broker
 func GetSidecarConnectionVars(broker string) *ConnectionVariables {
 	switch broker {
 	case brokers.Kafka:

@@ -41,7 +41,7 @@ func newMockWriter() (models.Writer, error) {
 	return &Writer{kProd}, nil
 }
 
-// Producer
+// Producer returns a Writer's producer
 func (writer *Writer) Producer() *kafka.Producer {
 	return writer.producer
 }

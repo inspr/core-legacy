@@ -5,7 +5,8 @@ type BrokerMessage struct {
 	Message interface{} `json:"message"`
 }
 
-// ConnectionVariables
+// ConnectionVariables is the structure resposible for storing
+// enviroment variable names regarding connection ports for sidecars
 type ConnectionVariables struct {
 	ReadEnvVar  string
 	WriteEnvVar string
