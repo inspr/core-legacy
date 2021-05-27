@@ -52,8 +52,8 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		sidecarAddress := environment.GetBrokerSpecificSidecarAddr(strings.ToUpper(channelBroker))
-		sidecarWritePort := environment.GetBrokerWritePort(strings.ToUpper(channelBroker))
+		sidecarAddress := environment.GetBrokerSpecificSidecarAddr(channelBroker)
+		sidecarWritePort := environment.GetBrokerWritePort(channelBroker)
 
 		reqAddress := fmt.Sprintf("%s:%s/%s", sidecarAddress, sidecarWritePort, channel)
 
@@ -173,7 +173,7 @@ func encodeToAvro(channel string, body io.Reader) ([]byte, error) {
 	var receivedMsg models.BrokerMessage
 	json.NewDecoder(body).Decode(&receivedMsg)
 
-	encodedAvroMsg, err := encode(channel, receivedMsg.Message)
+	encodedAvroMsg, err := encode(channel, receivedMsg.Data)
 	if err != nil {
 		return nil, err
 	}
