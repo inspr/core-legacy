@@ -43,3 +43,29 @@ const (
 
 	CreateToken string = "create:token"
 )
+
+var AdminPermissions = map[string][]string{
+	"": {
+		CreateDapp,
+		CreateChannel,
+		CreateType,
+		CreateAlias,
+
+		GetDapp,
+		GetChannel,
+		GetType,
+		GetAlias,
+
+		UpdateDapp,
+		UpdateChannel,
+		UpdateType,
+		UpdateAlias,
+
+		DeleteDapp,
+		DeleteChannel,
+		DeleteType,
+		DeleteAlias,
+
+		CreateToken,
+	},
+}

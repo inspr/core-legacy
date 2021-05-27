@@ -32,7 +32,7 @@ type Client struct {
 func (c *Client) initAdminUser() error {
 	adminUser := User{
 		UID:         "admin",
-		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Permissions: auth.AdminPermissions,
 		Password:    os.Getenv("ADMIN_PASSWORD"),
 	}
 	payload, _ := c.encrypt(adminUser)
