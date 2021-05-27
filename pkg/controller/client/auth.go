@@ -2,8 +2,11 @@ package client
 
 import (
 	"context"
+	"io/ioutil"
+	"os"
 
 	"github.com/inspr/inspr/pkg/auth"
+	"github.com/inspr/inspr/pkg/cmd"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 )
@@ -38,7 +41,13 @@ func (ac *AuthClient) Init(ctx context.Context, key string) (string, error) {
 	authDO := struct{ Key string }{key}
 	authDI := auth.JwtDO{}
 
-	err := ac.reqClient.Send(ctx, "/init", "POST", authDO, &authDI)
+	tokenPath := cmd.InsprOptions.Token
+	err := ioutil.WriteFile(tokenPath, []byte(""), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	err = ac.reqClient.Send(ctx, "/init", "POST", authDO, &authDI)
 	if err != nil {
 		return "", err
 	}
