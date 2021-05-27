@@ -16,8 +16,8 @@ type NodePort struct {
 
 // SidecarPort represents the port for communication between node and sidecar
 type SidecarPort struct {
-	LBRead  int `json:"read"`
-	LBWrite int `json:"write"`
+	LBRead  int `json:"lbRead"`
+	LBWrite int `json:"lbWrite"`
 }
 
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.

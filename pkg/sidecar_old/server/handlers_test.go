@@ -257,8 +257,6 @@ func TestServer_readMessageRoutine(t *testing.T) {
 				if received == tt.wantErr {
 					t.Errorf("Server_readMessageRoutine received = %v, wantErr = %v", received, tt.wantErr)
 				}
-			default:
-				return
 			}
 		})
 	}

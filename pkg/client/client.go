@@ -42,7 +42,7 @@ func NewAppClient() *Client {
 // WriteMessage receives a channel and a message and sends it in a request to the sidecar server
 func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface{}) error {
 	data := models.BrokerMessage{
-		Message: msg,
+		Data: msg,
 	}
 
 	var resp interface{}

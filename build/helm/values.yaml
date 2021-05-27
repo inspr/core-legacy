@@ -58,11 +58,11 @@ affinity: {}
 
 sidecarClient:
   readPort: 3046
+  writePort: 3048
 
 lbSidecar:
   port: 3051
   readPort: 3047
-  writePort: 3048
 
 sidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
 
