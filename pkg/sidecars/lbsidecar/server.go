@@ -36,7 +36,7 @@ func Init() *Server {
 }
 
 // Run starts the server on the port given in addr
-func (s *Server) Run(ctx context.Context) {
+func (s *Server) Run(ctx context.Context) error {
 	errCh := make(chan error)
 
 	writeServer := &http.Server{
@@ -68,8 +68,10 @@ func (s *Server) Run(ctx context.Context) {
 	select {
 	case <-ctx.Done():
 		gracefulShutdown(writeServer, readServer, nil)
+		return ctx.Err()
 	case errRead := <-errCh:
 		gracefulShutdown(writeServer, readServer, errRead)
+		return errRead
 	}
 }
 

@@ -23,5 +23,7 @@ func main() {
 	lbServer := lbsidecar.Init()
 
 	logger.Info("running LB Sidecar server")
-	lbServer.Run(ctx)
+	if err := lbServer.Run(ctx); err != nil {
+		panic(err.Error())
+	}
 }

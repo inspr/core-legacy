@@ -85,23 +85,33 @@ func TestServer_Run(t *testing.T) {
 				t.Error("for testing purposes, choose only one of 'requestRead' and 'requestWrite'")
 				return
 			} else if !tt.requestRead && !tt.requestWrite {
+				errChan := make(chan error)
 				ctx, cancel := context.WithCancel(context.Background())
-				go func() { s.Run(ctx) }()
+
+				go func() { errChan <- s.Run(ctx) }()
 				cancel()
+
+				if err := <-errChan; err.Error() != "context canceled" {
+					t.Errorf("expected 'context canceled', got '%v'", err)
+				}
 			} else if tt.requestRead {
 				port := strings.Split(tt.fields.readAddr, ":")[1]
 				auxServer := createMockedServer(port, "randCh", "randMsg")
 				auxServer.Start()
 				defer auxServer.Close()
 
-				s.Run(context.Background())
+				if err := s.Run(context.Background()); err.Error() != "listen tcp :1137: bind: address already in use" {
+					t.Errorf("expected bind address error, got '%v'", err.Error())
+				}
 			} else {
 				port := strings.Split(tt.fields.writeAddr, ":")[1]
 				auxServer := createMockedServer(port, "randCh", "randMsg")
 				auxServer.Start()
 				defer auxServer.Close()
 
-				s.Run(context.Background())
+				if err := s.Run(context.Background()); err.Error() != "listen tcp :1127: bind: address already in use" {
+					t.Errorf("expected bind address error, got '%v'", err.Error())
+				}
 			}
 		})
 	}
