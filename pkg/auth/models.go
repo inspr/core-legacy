@@ -44,6 +44,8 @@ const (
 	CreateToken string = "create:token"
 )
 
+// AdminPermissions defines all the permissions that the admin user have
+// when the cluster is initialized
 var AdminPermissions = map[string][]string{
 	"": {
 		CreateDapp,
