@@ -30,7 +30,7 @@ func createMockedServer(port, ch string, msg interface{}) *httptest.Server {
 			var receivedData models.BrokerMessage
 			json.NewDecoder(r.Body).Decode(&receivedData)
 
-			if (ch != channel) || (msg != receivedData.Message) {
+			if (ch != channel) || (msg != receivedData.Data) {
 				rest.ERROR(w, fmt.Errorf("invalid channel or message"))
 				return
 			}
@@ -85,7 +85,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			name:    "Invalid message given schema",
 			channel: "chan3",
 			msg: models.BrokerMessage{
-				Message: randomStruct{},
+				Data: randomStruct{},
 			},
 			wantErr: true,
 		},
@@ -93,7 +93,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			name:    "Invalid request address",
 			channel: "chan6",
 			msg: models.BrokerMessage{
-				Message: "randomMessage",
+				Data: "randomMessage",
 			},
 			wantErr: true,
 		},
@@ -101,7 +101,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			name:    "Valid write request",
 			channel: "chan5",
 			msg: models.BrokerMessage{
-				Message: "randomMessage",
+				Data: "randomMessage",
 			},
 			port: "1107",
 		},
@@ -181,7 +181,7 @@ func TestServer_readMessageHandler(t *testing.T) {
 			name:    "Invalid message given schema",
 			channel: "chan3",
 			msg: models.BrokerMessage{
-				Message: randomStruct{},
+				Data: randomStruct{},
 			},
 			wantErr:       true,
 			setClientPort: true,
@@ -190,7 +190,7 @@ func TestServer_readMessageHandler(t *testing.T) {
 			name:    "Invalid request address",
 			channel: "chan6",
 			msg: models.BrokerMessage{
-				Message: "randomMessage",
+				Data: "randomMessage",
 			},
 			wantErr:       true,
 			setClientPort: true,
@@ -199,7 +199,7 @@ func TestServer_readMessageHandler(t *testing.T) {
 			name:    "Valid write request",
 			channel: "chan5",
 			msg: models.BrokerMessage{
-				Message: "randomMessage",
+				Data: "randomMessage",
 			},
 			port:          "1117",
 			setClientPort: true,
@@ -213,12 +213,12 @@ func TestServer_readMessageHandler(t *testing.T) {
 			}
 			var testServer *httptest.Server
 			if tt.port != "" {
-				testServer = createMockedServer(tt.port, tt.channel, tt.msg.Message.(string))
+				testServer = createMockedServer(tt.port, tt.channel, tt.msg.Data.(string))
 				testServer.Start()
 				defer testServer.Close()
 			}
 
-			buf, err := encode(tt.channel, tt.msg.Message)
+			buf, err := encode(tt.channel, tt.msg.Data)
 			if err != nil && !tt.wantErr {
 				t.Errorf("Unable to encode request: %v", err)
 				return

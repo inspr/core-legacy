@@ -15,12 +15,12 @@ func readMessage(ch string, value []byte) (models.BrokerMessage, error) {
 		zap.String("channel", ch))
 
 	// Decoding Message
-	message, err := decode(ch, value)
+	data, err := decode(ch, value)
 	if err != nil {
 		return models.BrokerMessage{}, err
 	}
 
-	return models.BrokerMessage{Message: message}, nil
+	return models.BrokerMessage{Data: data}, nil
 }
 
 func encode(ch string, message interface{}) ([]byte, error) {
