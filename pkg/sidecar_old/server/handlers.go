@@ -10,7 +10,7 @@ import (
 	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 	"go.uber.org/zap"
 )
 

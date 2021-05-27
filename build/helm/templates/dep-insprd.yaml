@@ -37,7 +37,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           envFrom:
             - configMapRef:
-                name: inspr-sidecar-configuration
+                name: inspr-lbsidecar-configuration
             - configMapRef:
                 name: inspr-kafka-configuration
           env:
