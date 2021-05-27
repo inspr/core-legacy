@@ -30,8 +30,8 @@ func Init() *Server {
 		panic("[ENV VAR] INSPR_LBSIDECAR_READ_PORT not found")
 	}
 
-	s.writeAddr = fmt.Sprintf(":%s", os.Getenv(wAddr))
-	s.readAddr = fmt.Sprintf(":%s", os.Getenv(rAddr))
+	s.writeAddr = fmt.Sprintf(":%s", wAddr)
+	s.readAddr = fmt.Sprintf(":%s", rAddr)
 	return &s
 }
 
