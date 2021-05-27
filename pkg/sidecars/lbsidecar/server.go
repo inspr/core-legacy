@@ -20,8 +20,18 @@ type Server struct {
 // Init - initializes a new configured server
 func Init() *Server {
 	s := Server{}
-	s.writeAddr = fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"))
-	s.readAddr = fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT"))
+
+	wAddr, exists := os.LookupEnv("INSPR_LBSIDECAR_WRITE_PORT")
+	if !exists {
+		panic("[ENV VAR] INSPR_LBSIDECAR_WRITE_PORT not found")
+	}
+	rAddr, exists := os.LookupEnv("INSPR_LBSIDECAR_READ_PORT")
+	if !exists {
+		panic("[ENV VAR] INSPR_LBSIDECAR_READ_PORT not found")
+	}
+
+	s.writeAddr = fmt.Sprintf(":%s", os.Getenv(wAddr))
+	s.readAddr = fmt.Sprintf(":%s", os.Getenv(rAddr))
 	return &s
 }
 
