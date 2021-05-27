@@ -1,6 +1,46 @@
 
 # Changelog
 
+### #60 Story CORE-419 | Create Kafka sidecar Factory
+- features:
+    - developed a function that returns a `SidecarFactory` type, responsible for
+      the sidecar deployment configuration in the k8s.
+    - opted for the implementation of the sidecar factory to be in the
+      `sidecars` pkg.
+    - created the utils file containing small functions and mocks of functions
+      to be, these functions should be able to be used by other sidecars.
+---
+
+
+### # 64 Tech CORE-448 | Unification of inspr cluster commands
+- fixes:
+    - tested cluster commands `brokers` and `init`
+- refactors:
+    - changed `cluster` command to follow pattern of inspr commands
+    - changed WithAliases method from command builder to receive a variadic parameter
+---
+
+### #62 Story CORE-413 | Modify Channel structure
+- features
+    - Added SelectedBroker and BrokerPriorityList to Channel structure
+    - Create a function that sets the SelectedBroker of a Channel based on the BrokerPriorityList and the available brokers
+    - Call the function above in create App and Channel
+    - Added a function in brokers that resets the manager (for tests)
+---
+
+### #61 Story CORE-428 | CLI get installed brokers command
+- features:
+    - added a Brokers method and Brokers interface to controllers interface
+    - changed controller client to comply with new interface
+    - implemented a broker data interface (DI)
+    - changed insprd's server struct, http client, handler structure, and their mocks to include a BrokerManager
+    - created a handler to get broker data from insprd
+    - implemented cli command for getting broker data
+-  tests:
+    - unit tested handler
+    - integration test succeeded on cluster
+---
+
 ### #58  Story CORE-418 | Create Sidecar Factory
 - features:
     - developed a function type to represent sidecar factories
@@ -11,11 +51,14 @@
     - tested previously mentioned methods
 - fixes:
     - moved broker management interfaces and structures to a more appropriate directory
+---
+
 ### #57 Tech CORE-426 | Review Permissions
 - features:
     - created functions in the UIDP client that make sure when creating a token, it’s permissions should be the same as the creator’s permissions (or have less permissions).
 - fixes:
     - all functions of the get command. For example, if you're trying to get channels, before calling the getDapp directly it will call the getChannels to check if the user have the right permissions.
+---
 
 ### #59 - Fix: CORE-310 | Automatic Helm chart tags update
 - fixes:

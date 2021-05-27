@@ -33,3 +33,7 @@ spec:
             backend:
               serviceName: {{ .Values.service.insprdName }}
               servicePort: {{ .Values.service.insprdPort }}
+          - path: /brokers
+            backend:
+              serviceName: {{ .Values.service.insprdName }}
+              servicePort: {{ .Values.service.insprdPort }}

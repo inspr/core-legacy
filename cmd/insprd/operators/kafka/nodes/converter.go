@@ -153,6 +153,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 		"inspr-app": toAppID(app),
 	}
 	log.Println("constructing deployment")
+
 	return (*kubeDeploy)(
 		k8s.NewDeployment(
 			appDeployName,

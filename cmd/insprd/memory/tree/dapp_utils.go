@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/utils"
+	"go.uber.org/zap"
 )
 
 // Auxiliar dapp unexported functions
@@ -167,6 +169,13 @@ func checkAndUpdates(app *meta.App) (bool, string) {
 				chTypes[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
 			}
 
+			broker, err := SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList)
+			if err != nil {
+				return false, err.Error()
+			}
+
+			channel.Spec.SelectedBroker = broker
+
 		}
 		if len(boundaries) > 0 && boundaries.Contains(channelName) {
 			return false, "channel and boundary with same name: " + channelName + ";"
@@ -301,4 +310,30 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 	}
 
 	return nil
+}
+
+// SelectBrokerFromPriorityList takes a broker priority list and returns the first
+// broker that is available
+func SelectBrokerFromPriorityList(brokerList []string) (string, error) {
+	bmm := brokers.GetBrokerMemory()
+	availableBrokers, err := bmm.GetAll()
+	if err != nil {
+		return "", err
+	}
+
+	for _, broker := range brokerList {
+		if utils.Includes(availableBrokers, broker) {
+			logger.Debug("selected broker: ", zap.String("broker", broker))
+			return broker, nil
+		}
+	}
+
+	def, err := bmm.GetDefault()
+	if err != nil {
+		return "", err
+	}
+	defBroker := string(*def)
+	logger.Debug("selected the default broker: ", zap.String("broker", defBroker))
+
+	return defBroker, nil
 }
