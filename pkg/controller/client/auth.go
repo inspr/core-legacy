@@ -28,7 +28,7 @@ func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (
 		*reqClient = reqClient.Header(rest.HeaderScopeKey, k)
 	}
 
-	err := reqClient.Send(ctx, "/auth", "POST", payload, &authDI)
+	err := reqClient.Send(ctx, "/auth", http.MethodPost, payload, &authDI)
 	if err != nil {
 		return "", err
 	}

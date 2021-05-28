@@ -508,7 +508,6 @@ func (change *Change) diffTypes(from, to metautils.MTypes) error {
 }
 
 func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, to meta.Metadata, ctx string) error {
-	var errs string
 
 	if from.Name != to.Name {
 		change.Diff = append(change.Diff, Difference{
@@ -537,7 +536,6 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 	}
 
 	if from.Parent != to.Parent {
-		errs += fmt.Sprintf("on %s Metadata: Different parent", ctx)
 		change.Diff = append(change.Diff, Difference{
 			Field:     ctx + "Meta.Parent",
 			From:      from.Parent,

@@ -15,8 +15,8 @@ import (
 
 func main() {
 	dapp := meta.App{}
-	yaml.Unmarshal([]byte(yamls.PingPongYAML), &dapp)
-	dapp.Meta.Name = "controllerpingpong"
+	yaml.Unmarshal([]byte(yamls.PrimesYAML), &dapp)
+	dapp.Meta.Name = "controllerprimes"
 	config, err := client.GetInClusterConfigs()
 	if err != nil {
 		panic(err)
@@ -42,7 +42,7 @@ func main() {
 		}
 	})
 	mux.HandleFunc("/delete", func(rw http.ResponseWriter, r *http.Request) {
-		diff, err := c.Apps().Delete(context.Background(), "controllerpingpong", false)
+		diff, err := c.Apps().Delete(context.Background(), "controllerprimes", false)
 		diff.Print(os.Stdout)
 		if err != nil {
 			rest.ERROR(rw, err)

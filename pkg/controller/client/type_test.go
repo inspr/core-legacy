@@ -59,7 +59,7 @@ func TestTypeClient_Delete(t *testing.T) {
 					t.Errorf("path is not types")
 				}
 
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 
@@ -144,7 +144,7 @@ func TestTypeClient_Get(t *testing.T) {
 					t.Errorf("path is not types")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 
@@ -233,7 +233,7 @@ func TestTypeClient_Create(t *testing.T) {
 					t.Errorf("path is not types")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 
@@ -317,7 +317,7 @@ func TestTypeClient_Update(t *testing.T) {
 					t.Errorf("path is not types")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

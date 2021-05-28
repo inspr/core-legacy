@@ -35,7 +35,7 @@ func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
 	}
 }
 
-// KafkaEnvConfig adds teh necessary env variables to configure kafka
+// KafkaEnvConfig adds the necessary env variables to configure kafka
 func KafkaEnvConfig(config KafkaConfig) k8s.ContainerOption {
 	return k8s.ContainerWithEnv(
 		corev1.EnvVar{

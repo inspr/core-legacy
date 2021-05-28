@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/rest/request"
@@ -16,7 +17,7 @@ type BrokersClient struct {
 func (cc *BrokersClient) Get(ctx context.Context) (*models.BrokersDI, error) {
 	resp := &models.BrokersDI{}
 
-	err := cc.reqClient.Send(ctx, "/brokers", "GET", nil, resp)
+	err := cc.reqClient.Send(ctx, "/brokers", http.MethodGet, nil, resp)
 	if err != nil {
 		return nil, err
 	}

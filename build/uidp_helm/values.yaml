@@ -41,8 +41,8 @@ secretRepository: gcr.io/red-inspr/uidp/redis/secret
 secret:
   privateKeyName: redisprivatekey
   adminPassword: "123456"
-  adminToken: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIxMzY4MjcsInBheWxvYWQiOnsidWlkIjoiIiwicGVybWlzc2lvbnMiOnsiIjpbImNyZWF0ZTp0b2tlbiJdfSwicmVmcmVzaCI6bnVsbCwicmVmcmVzaHVybCI6IiJ9fQ.ZHhaiTYjza_wSVnXMhlKp_cWdDVNWon82lat5oeQ3Zp35CLxVAf2lFuet0zt70KRz8iJY7Ls9xag0ApDQFFvZw
- # set this admin token from a token that contains full power over the cluster
+  adminToken: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyMTEyOTgsInBheWxvYWQiOnsidWlkIjoiIiwicGVybWlzc2lvbnMiOnsiIjpbImNyZWF0ZTp0b2tlbiJdfSwicmVmcmVzaCI6bnVsbCwicmVmcmVzaHVybCI6IiJ9fQ.fBw__G1U_fw9A-lckqVwlxDyyj6YxHme-QUSDhvSeGLP5iFy_qiSDMgf9d_Wz547OICw-mawwzJGTMljpzQRcQ
+  # set this admin token from a token that contains full power over the cluster
 
 statefulset:
   uidpName: uidp-stset
@@ -65,7 +65,7 @@ deployment:
 
 ingress:
   name: uidp-ingress
-  host: "inspr.com"
+  host: inspr.com
 
 redis:
   password: ""

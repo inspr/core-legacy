@@ -1,14 +1,14 @@
-uid: name
-password: password
+uid: bugtest
+password: "123"
 permissions:
   "":
     - "create:token"
-    
+
     - "create:dapp"
     - "create:channel"
     - "create:type"
     - "create:alias"
-    
+
     - "get:dapp"
     - "get:channel"
     - "get:type"

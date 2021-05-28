@@ -42,12 +42,12 @@ func (bmm *BrokerMemoryManager) Create(broker brokers.BrokerStatus, config broke
 		return ierrors.NewError().Message("broker %s is already configured on memory", broker).Build()
 	}
 	//configure the sidecarFactory for the given broker
-	//if succesful:
+	//if successful:
 	mem.Available[string(broker)] = true
 	return nil
 }
 
-// SetDefault sets a previoulsy configured broker as insprd's default broker
+// SetDefault sets a previously configured broker as insprd's default broker
 func (bmm *BrokerMemoryManager) SetDefault(broker brokers.BrokerStatus) error {
 	mem, err := bmm.get()
 	if err != nil {

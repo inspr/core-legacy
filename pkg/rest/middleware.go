@@ -91,7 +91,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 
 		// error management
 		if err != nil {
-			// check for invalid error or non Existant
+			// check for invalid error or non existent
 			if ierrors.HasCode(err, ierrors.InvalidToken) {
 
 				ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token").Build())
@@ -153,7 +153,8 @@ func getOperation(r *http.Request) string {
 }
 
 // getTarget isolates the area that is being requested, for example the request
-// URL is https://example.org:8000/channels, the getTarget removes the base of the url and some unecessary '/' and returns only 'channels'
+// URL is https://example.org:8000/channels, the getTarget removes the base of the url
+// and some unnecessary '/' and returns only 'channels'
 func getTarget(r *http.Request) string {
 	route := strings.TrimSuffix(r.URL.Path, "/")
 	route = strings.TrimPrefix(route, r.URL.Host)

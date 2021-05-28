@@ -135,7 +135,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 				Status string `json:"status"`
 			}{}
 
-			err := client.Send(context.Background(), tt.channel, "POST", tt.message, &rest)
+			err := client.Send(context.Background(), tt.channel, http.MethodPost, tt.message, &rest)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Server_writeMessageHandler err = %v, wantErr = %v", err, tt.wantErr)
 			}
