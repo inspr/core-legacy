@@ -23,6 +23,7 @@ type Server struct {
 // Init - configures the server
 func (s *Server) Init() {
 	var err error
+	s.logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "auth-provider")))
 
 	keyPem, ok := os.LookupEnv("JWT_PRIVATE_KEY")
 	if !ok {
@@ -42,34 +43,35 @@ func (s *Server) Init() {
 	var parsedKey interface{}
 	if parsedKey, err = x509.ParsePKCS1PrivateKey(privPemBytes); err != nil {
 		if parsedKey, err = x509.ParsePKCS8PrivateKey(privPemBytes); err != nil { // note this returns type `interface{}`
-			s.logger.Error("Unable to parse RSA private key")
-			err = ierrors.NewError().InternalServer().Message("Unable to parse RSA private key").Build()
+			s.logger.Error("unable to parse RSA private key",
+				zap.Any("error", err))
+
+			err = ierrors.NewError().InternalServer().Message("error parsing RSA private key: %v", err).Build()
 			panic(err)
 		}
 	}
 
 	privateKey, ok := parsedKey.(*rsa.PrivateKey)
 	if !ok {
-		s.logger.Error("Unable to parse RSA private key")
-		err = ierrors.NewError().InternalServer().Message("Unable to parse RSA private key").Build()
+		s.logger.Error("unable to parse RSA private key")
+		err = ierrors.NewError().InternalServer().Message("unable to parse RSA private key").Build()
 		panic(err)
 	}
 
 	err = privateKey.Validate()
 	if err != nil {
-		s.logger.Error("Unable to validate private key", zap.Any("error", err))
-		err = ierrors.NewError().InternalServer().Message("Unable to validate private key").Build()
+		s.logger.Error("unable to validate private key", zap.Any("error", err))
+		err = ierrors.NewError().InternalServer().Message("unable to validate private key").Build()
 		panic(err)
 	}
 
 	s.privKey = privateKey
 	s.Mux = http.NewServeMux()
-	s.logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "Auth-provider")))
 	s.initRoutes()
 }
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
 	fmt.Printf("authsvc rest api is up! Listening on port: %s\n", addr)
-	s.logger.Fatal("Authsvc crashed: ", zap.Any("error", http.ListenAndServe(addr, s.Mux)))
+	s.logger.Fatal("authsvc crashed: ", zap.Any("error", http.ListenAndServe(addr, s.Mux)))
 }

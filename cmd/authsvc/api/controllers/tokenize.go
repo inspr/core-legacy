@@ -17,10 +17,15 @@ import (
 func (server *Server) Tokenize() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := auth.Payload{}
+
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
-			server.logger.Error("unable to decode ")
-			err = ierrors.NewError().BadRequest().Message("invalid body, error: %s", err.Error()).Build()
+			server.logger.Error("unable to decode payload",
+				zap.Any("error", err))
+
+			err = ierrors.NewError().BadRequest().
+				Message("invalid body, error: %s", err.Error()).Build()
+
 			rest.ERROR(w, err)
 			return
 		}

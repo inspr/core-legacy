@@ -57,8 +57,7 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 					ierrors.
 						NewError().
 						InternalServer().
-						InnerError(err).
-						Message("error refreshing token").
+						Message("error refreshing token: %v", err).
 						Build()
 			}
 			token = newToken
