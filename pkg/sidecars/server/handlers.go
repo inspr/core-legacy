@@ -16,10 +16,6 @@ import (
 
 const maxBrokerRetries = 5
 
-var (
-	writeMessageErr = ierrors.NewError().InternalServer().Message("broker's writeMessage failed")
-)
-
 // handles the /message route in the server
 func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -55,32 +51,25 @@ func (s *Server) writeMessageHandler() rest.Handler {
 	}
 }
 
-func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte) (status int, err error) {
-	var resp *http.Response
-	for i := 0; i <= maxBrokerRetries; i++ {
-		resp, err = s.client.Post(s.outAddr, "application/octet-stream", bytes.NewBuffer(data))
-		status = resp.StatusCode
-		if err == nil && status == http.StatusOK {
-			decoder := json.NewDecoder(resp.Body)
-			err = decoder.Decode(&status)
-			return
-		}
-		err = rest.UnmarshalERROR(resp.Body)
-	}
-	return
-}
+func (s *Server) readMessageRoutine(ctx context.Context) error {
+	s.runningRead = true
+	defer func() { s.runningRead = false }()
 
-func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerMsg []byte, err error) {
-	for i := 0; ; i++ {
-		brokerMsg, err = s.Reader.ReadMessage(ctx, channel)
-		if err != nil {
-			if i == maxBrokerRetries {
-				return
-			}
-			continue
-		}
-		return
+	errch := make(chan error)
+	newCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	for _, channel := range environment.InputBrokerChannels(s.broker) { // InputChannelList retorna todods os canais de input do node invess de todos aqueles que sao do broker especifico
+		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel) // separates several trhead for each channel of this broker
 	}
+
+	select {
+	case err := <-errch:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+
 }
 
 func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) error {
@@ -108,23 +97,30 @@ func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) 
 	}
 }
 
-func (s *Server) readMessageRoutine(ctx context.Context) error {
-	s.runningRead = true
-	defer func() { s.runningRead = false }()
-
-	errch := make(chan error)
-	newCtx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	for _, channel := range environment.InputBrokerChannels(s.broker) { // InputChannelList retorna todods os canais de input do node invess de todos aqueles que sao do broker especifico
-		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel) // separates several trhead for each channel of this broker
+func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerMsg []byte, err error) {
+	for i := 0; ; i++ {
+		brokerMsg, err = s.Reader.ReadMessage(ctx, channel)
+		if err != nil {
+			if i == maxBrokerRetries {
+				return
+			}
+			continue
+		}
+		return
 	}
+}
 
-	select {
-	case err := <-errch:
-		return err
-	case <-ctx.Done():
-		return ctx.Err()
+func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte) (status int, err error) {
+	var resp *http.Response
+	for i := 0; i <= maxBrokerRetries; i++ {
+		resp, err = s.client.Post(s.outAddr, "application/octet-stream", bytes.NewBuffer(data))
+		status = resp.StatusCode
+		if err == nil && status == http.StatusOK {
+			decoder := json.NewDecoder(resp.Body)
+			err = decoder.Decode(&status)
+			return
+		}
+		err = rest.UnmarshalERROR(resp.Body)
 	}
-
+	return
 }
