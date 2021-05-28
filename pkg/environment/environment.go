@@ -87,6 +87,19 @@ func GetInputBrokerChannels(broker string) utils.StringArray {
 	return filterChannelsByBroker(broker, channels)
 }
 
+func GetChannelBroker(channel string) (string, error) {
+	boundaries := append(GetInputChannels(), GetOutputChannels()...)
+	for _, boundary := range boundaries {
+		if boundary.ChName == channel {
+			return boundary.Broker, nil
+		}
+	}
+	return "", ierrors.NewError().
+		NotFound().
+		Message("[ENV VAR] %v_BROKER not found", channel).
+		Build()
+}
+
 // GetOutputBrokerChannels returns environment variable which contains the output channels
 func GetOutputBrokerChannels(broker string) utils.StringArray {
 	channels := getChannelList(getRawOutputChannels())

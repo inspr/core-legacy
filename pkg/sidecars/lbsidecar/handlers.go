@@ -42,7 +42,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		channelBroker, err := getChannelBroker(channel)
+		channelBroker, err := environment.GetChannelBroker(channel)
 		if err != nil {
 			logger.Error("unable to get channel broker",
 				zap.String("channel", channel),
@@ -140,18 +140,6 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		rest.JSON(w, resp.StatusCode, resp.Body)
 	}
-}
-
-func getChannelBroker(channel string) (string, error) {
-	channelBroker := os.Getenv(channel + "_BROKER")
-	if channelBroker == "" {
-		return "", ierrors.NewError().
-			NotFound().
-			Message("[ENV VAR] %v_BROKER not found", channel).
-			Build()
-	}
-
-	return channelBroker, nil
 }
 
 func sendRequest(addr string, body []byte) (*http.Response, error) {

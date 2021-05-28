@@ -21,7 +21,7 @@ import (
 
 // createMockEnvVars - sets up the env values to be used in the tests functions
 func createMockEnvVars() {
-	customEnvValues := "chan;testing;banana"
+	customEnvValues := "chan_someBroker;testing_someBroker;banana_someBroker"
 	var unixSocketAddr = "/tmp/insprd.sock"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
@@ -248,6 +248,7 @@ func TestServer_readMessageRoutine(t *testing.T) {
 
 			s.outAddr = server.URL
 			s.client = &http.Client{}
+			s.broker = "someBroker"
 			ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*300)
 			defer cancel()
 			go s.readMessageRoutine(ctx)

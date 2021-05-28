@@ -4,7 +4,7 @@ import "os"
 
 // SetMockEnv - sets the environment variables to specific values
 func SetMockEnv() {
-	channelsValues := "chan;chan1;chan2;chan3"
+	channelsValues := "chan_someBroker;chan1_someBroker;chan2_someBroker;chan3_someBroker"
 	os.Setenv("INSPR_LBSIDECAR_PORT", "8888")
 	os.Setenv("INSPR_INPUT_CHANNELS", channelsValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", channelsValues)

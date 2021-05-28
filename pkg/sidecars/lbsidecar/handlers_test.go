@@ -160,11 +160,7 @@ func TestServer_readMessageHandler(t *testing.T) {
 			channel: "invalidChan1",
 			wantErr: true,
 		},
-		{
-			name:    "Env var 'INSPR_SCCLIENT_READ_PORT' doesn't exist",
-			channel: "chan2",
-			wantErr: true,
-		},
+
 		{
 			name:          "Channel avro schema not defined",
 			channel:       "chan4",
@@ -249,33 +245,28 @@ func TestServer_readMessageHandler(t *testing.T) {
 type randomStruct struct{}
 
 func createMockEnvVars() {
-	customEnvValues := "chan1;chan2;chan3;chan4;chan5;chan6"
+	customEnvValues := "chan1_randBroker3;chan3_randBroker4;chan4_randBroker2;chan5_randBroker1;chan6_randBroker5"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
 
 	os.Setenv("INSPR_LBSIDECAR_WRITE_PORT", "1127")
 	os.Setenv("INSPR_LBSIDECAR_READ_PORT", "1137")
 
-	os.Setenv("chan4_BROKER", "randBroker2")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER2_WRITE_PORT", "somePort1")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER2_ADDR", "someAddr1")
 
-	os.Setenv("chan1_BROKER", "randBroker3")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER3_WRITE_PORT", "somePort1")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER3_ADDR", "someAddr1")
 	os.Setenv("chan1_SCHEMA", "someSchema")
 
-	os.Setenv("chan3_BROKER", "randBroker4")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER4_WRITE_PORT", "somePort1")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER4_ADDR", "someAddr1")
 	os.Setenv("chan3_SCHEMA", `{"type":"string"}`)
 
-	os.Setenv("chan6_BROKER", "randBroker5")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER5_WRITE_PORT", "somePort1")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER5_ADDR", "someAddr1")
 	os.Setenv("chan6_SCHEMA", `{"type":"string"}`)
 
-	os.Setenv("chan5_BROKER", "randBroker1")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT", "1107")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER1_ADDR", "http://localhost")
 	os.Setenv("chan5_SCHEMA", `{"type":"string"}`)
@@ -287,22 +278,17 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
 	os.Unsetenv("INSPR_LBSIDECAR_WRITE_PORT")
 	os.Unsetenv("INSPR_LBSIDECAR_READ_PORT")
-	os.Unsetenv("chan4_BROKER")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER2_WRITE_PORT")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER2_ADDR")
-	os.Unsetenv("chan1_BROKER")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER3_WRITE_PORT")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER3_ADDR")
 	os.Unsetenv("chan1_SCHEMA")
-	os.Unsetenv("chan3_BROKER")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER4_WRITE_PORT")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER4_ADDR")
 	os.Unsetenv("chan3_SCHEMA")
-	os.Unsetenv("chan6_BROKER")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER5_WRITE_PORT")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER5_ADDR")
 	os.Unsetenv("chan6_SCHEMA")
-	os.Unsetenv("chan5_BROKER")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER1_ADDR")
 	os.Unsetenv("chan5_SCHEMA")

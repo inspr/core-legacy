@@ -77,8 +77,8 @@ func (mc *MockConsumer) Close() (err error) {
 // createMockEnvVars - sets up the env values to be used in the tests functions
 // createMockEnvVars - sets up the env values to be used in the tests functions
 func createMockEnv() {
-	os.Setenv("INSPR_INPUT_CHANNELS", "ch1;ch2")
-	os.Setenv("INSPR_OUTPUT_CHANNELS", "ch1;ch2")
+	os.Setenv("INSPR_INPUT_CHANNELS", "ch1_someBroker;ch2_someBroker")
+	os.Setenv("INSPR_OUTPUT_CHANNELS", "ch1_someBroker;ch2_someBroker")
 	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
 	os.Setenv("INSPR_APP_CTX", "")
 	os.Setenv("INSPR_ENV", "random")
@@ -86,7 +86,7 @@ func createMockEnv() {
 	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "latest")
 	os.Setenv("ch1_resolved_SCHEMA", `{"type":"string"}`)
 	os.Setenv("ch2_resolved_SCHEMA", "hellotest")
-	os.Setenv("ch1_RESOLVED", `ch1_resolved`)
+	os.Setenv("ch1_RESOLVED", "ch1_resolved")
 	os.Setenv("ch2_RESOLVED", "ch2_resolved")
 	os.Setenv("INSPR_APP_ID", "testappid1")
 	os.Setenv("INSPR_SIDECAR_IMAGE", "random-sidecar-image")
