@@ -20,7 +20,7 @@ func (server *Server) Refresh() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		headerContent := r.Header["Authorization"]
 
-		server.logger.Info("headerContent:", zap.Any("content", headerContent))
+		server.logger.Debug("headerContent:", zap.Any("content", headerContent))
 		if len(headerContent) != 1 ||
 			!strings.HasPrefix(headerContent[0], "Bearer ") {
 			err := ierrors.NewError().Unauthorized().Message("bad Request, expected: Authorization: Bearer <token>").Build()
@@ -29,9 +29,9 @@ func (server *Server) Refresh() rest.Handler {
 		}
 
 		token := []byte(strings.TrimPrefix(headerContent[0], "Bearer "))
-		server.logger.Info("bearer token", zap.String("value", string(token)))
+		server.logger.Debug("bearer token", zap.String("value", string(token)))
 
-		server.logger.Debug("parsing received bearer token")
+		server.logger.Info("parsing received bearer token")
 		_, err := jwt.Parse(
 			token,
 			jwt.WithValidate(true),
@@ -45,7 +45,7 @@ func (server *Server) Refresh() rest.Handler {
 			return
 		}
 
-		server.logger.Debug("deserializing parsed token")
+		server.logger.Info("deserializing parsed token")
 		load, err := auth.Desserialize(token)
 		if err != nil {
 			err := ierrors.NewError().Forbidden().
@@ -55,9 +55,9 @@ func (server *Server) Refresh() rest.Handler {
 			return
 		}
 
-		server.logger.Info("received payload", zap.Any("content", load))
+		server.logger.Debug("received payload", zap.Any("content", load))
 
-		server.logger.Debug("refreshing old payload")
+		server.logger.Info("refreshing old payload")
 		payload, err := refreshPayload(load.Refresh, load.RefreshURL)
 		if err != nil {
 			err := ierrors.NewError().InternalServer().
@@ -67,7 +67,7 @@ func (server *Server) Refresh() rest.Handler {
 			return
 		}
 
-		server.logger.Info("refreshed payload", zap.Any("content", payload))
+		server.logger.Debug("refreshed payload", zap.Any("content", payload))
 
 		signed, err := server.tokenize(*payload, time.Now().Add(time.Minute*8))
 		if err != nil {
@@ -77,7 +77,7 @@ func (server *Server) Refresh() rest.Handler {
 			return
 		}
 
-		server.logger.Info("new token", zap.String("value", string(signed)))
+		server.logger.Debug("new token", zap.String("value", string(signed)))
 
 		respBody := auth.JwtDO{
 			Token: signed,

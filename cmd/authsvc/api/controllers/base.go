@@ -23,7 +23,7 @@ type Server struct {
 // Init - configures the server
 func (s *Server) Init() {
 	var err error
-	s.logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "auth-provider")))
+	s.logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "auth-provider")))
 
 	keyPem, ok := os.LookupEnv("JWT_PRIVATE_KEY")
 	if !ok {
