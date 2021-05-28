@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"io/ioutil"
+	"net/http"
 	"os"
 
 	"github.com/inspr/inspr/pkg/auth"
@@ -47,7 +48,7 @@ func (ac *AuthClient) Init(ctx context.Context, key string) (string, error) {
 		return "", err
 	}
 
-	err = ac.reqClient.Send(ctx, "/init", "POST", authDO, &authDI)
+	err = ac.reqClient.Send(ctx, "/init", http.MethodPost, authDO, &authDI)
 	if err != nil {
 		return "", err
 	}
