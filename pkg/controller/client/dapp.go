@@ -106,7 +106,7 @@ func (ac *AppClient) Update(ctx context.Context, scope string, app *meta.App, dr
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/apps", "PUT", adi, &resp)
+		Send(ctx, "/apps", http.MethodPut, adi, &resp)
 	if err != nil {
 		return nil, err
 	}

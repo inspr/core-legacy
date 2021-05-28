@@ -243,7 +243,7 @@ func TestClient_UpdatePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

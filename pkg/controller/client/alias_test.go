@@ -313,7 +313,7 @@ func TestAliasClient_Update(t *testing.T) {
 					t.Errorf("path is not alias")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

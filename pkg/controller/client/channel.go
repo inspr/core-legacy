@@ -109,7 +109,7 @@ func (cc *ChannelClient) Update(ctx context.Context, scope string, ch *meta.Chan
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", "PUT", cdi, &resp)
+		Send(ctx, "/channels", http.MethodPut, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}

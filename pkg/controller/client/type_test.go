@@ -317,7 +317,7 @@ func TestTypeClient_Update(t *testing.T) {
 					t.Errorf("path is not types")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

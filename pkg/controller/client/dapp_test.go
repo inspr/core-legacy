@@ -340,7 +340,7 @@ func TestAppClient_Update(t *testing.T) {
 					t.Errorf("path is not apps")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

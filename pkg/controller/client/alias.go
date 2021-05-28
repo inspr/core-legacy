@@ -112,7 +112,7 @@ func (ac *AliasClient) Update(ctx context.Context, scope string, target string, 
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", "PUT", aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodPut, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}

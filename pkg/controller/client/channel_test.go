@@ -339,7 +339,7 @@ func TestChannelClient_Update(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

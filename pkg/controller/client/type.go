@@ -109,7 +109,7 @@ func (tc *TypeClient) Update(ctx context.Context, scope string, ch *meta.Type, d
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "PUT", tdi, &resp)
+		Send(ctx, "/types", http.MethodPut, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
