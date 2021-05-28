@@ -3,7 +3,7 @@
 
 ### #67 Tech CORE-429 | Change the inspr cmd cluster command to ignore the .inspr/token
 - features:
-    - Updated the Init function in the auth package, now it writes a empty token file
+    - Updated the Init function in the auth package so now it creates .inspr/token if it doesn't exist
     - Added the admin permissions in auth models
     - When initializing the admin, now using the admin permissions above
 
