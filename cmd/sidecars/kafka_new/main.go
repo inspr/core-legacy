@@ -48,10 +48,9 @@ func main() {
 			return
 		}
 	}
-	s := sidecarserv.NewServer()
 
 	logger.Info("initializing Kafka Sidecar server")
-	s.Init(reader, writer, brokers.Kafka)
+	s := sidecarserv.Init(reader, writer, brokers.Kafka)
 
 	logger.Info("running Kafka Sidecar server")
 	s.Run(ctx)
