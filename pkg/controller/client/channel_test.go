@@ -59,7 +59,7 @@ func TestChannelClient_Delete(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 

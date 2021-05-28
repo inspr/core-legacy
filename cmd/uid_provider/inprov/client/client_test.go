@@ -176,7 +176,7 @@ func TestClient_DeleteUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 

@@ -58,7 +58,7 @@ func TestAppClient_Delete(t *testing.T) {
 					t.Errorf("path is not apps")
 				}
 
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 

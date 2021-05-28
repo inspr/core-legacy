@@ -83,7 +83,7 @@ func (tc *TypeClient) Delete(ctx context.Context, scope string, name string, dry
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "DELETE", tdi, &resp)
+		Send(ctx, "/types", http.MethodDelete, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}

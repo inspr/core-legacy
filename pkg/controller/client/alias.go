@@ -85,7 +85,7 @@ func (ac *AliasClient) Delete(ctx context.Context, scope, key string, dryRun boo
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", "DELETE", aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodDelete, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}

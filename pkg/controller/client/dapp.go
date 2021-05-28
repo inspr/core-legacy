@@ -79,7 +79,7 @@ func (ac *AppClient) Delete(ctx context.Context, scope string, dryRun bool) (dif
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/apps", "DELETE", adi, &resp)
+		Send(ctx, "/apps", http.MethodDelete, adi, &resp)
 	if err != nil {
 		return nil, err
 	}

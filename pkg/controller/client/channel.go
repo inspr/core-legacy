@@ -83,7 +83,7 @@ func (cc *ChannelClient) Delete(ctx context.Context, scope string, name string, 
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", "DELETE", cdi, &resp)
+		Send(ctx, "/channels", http.MethodDelete, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
