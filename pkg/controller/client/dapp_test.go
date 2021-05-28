@@ -150,7 +150,7 @@ func TestAppClient_Get(t *testing.T) {
 					t.Errorf("path is not apps")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 

@@ -48,7 +48,7 @@ func TestHandler_JSON(t *testing.T) {
 
 	for _, tt := range tests {
 		// sets up the test server
-		req, err := http.NewRequest("GET", tt.routeName, nil)
+		req, err := http.NewRequest(http.MethodGet, tt.routeName, nil)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -66,7 +66,7 @@ func TestAliasClient_Get(t *testing.T) {
 					t.Errorf("path is not alias")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 

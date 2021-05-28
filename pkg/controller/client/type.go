@@ -31,7 +31,7 @@ func (tc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "GET", tdi, &resp)
+		Send(ctx, "/types", http.MethodGet, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}

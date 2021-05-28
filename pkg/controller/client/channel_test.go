@@ -150,7 +150,7 @@ func TestChannelClient_Get(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 

@@ -144,7 +144,7 @@ func TestTypeClient_Get(t *testing.T) {
 					t.Errorf("path is not types")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 

@@ -31,7 +31,7 @@ func (cc *ChannelClient) Get(ctx context.Context, scope string, name string) (*m
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", "GET", cdi, &resp)
+		Send(ctx, "/channels", http.MethodGet, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}

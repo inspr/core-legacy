@@ -32,7 +32,7 @@ func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias,
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", "GET", aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodGet, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}

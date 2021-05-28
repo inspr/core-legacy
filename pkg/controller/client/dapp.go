@@ -29,7 +29,7 @@ func (ac *AppClient) Get(ctx context.Context, scope string) (*meta.App, error) {
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/apps", "GET", adi, &resp)
+		Send(ctx, "/apps", http.MethodGet, adi, &resp)
 	if err != nil {
 		return nil, err
 	}
