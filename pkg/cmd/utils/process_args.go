@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -16,9 +15,10 @@ func CheckEmptyArgs(args map[string]string) error {
 		if v == "" {
 			errorMessage := fmt.Sprintf("arg '%v' is empty", k)
 			if err == nil {
-				err = errors.New(errorMessage)
+				err = ierrors.NewError().Message(errorMessage).InvalidArgs().Build()
 			} else {
-				err = fmt.Errorf("%v, %w", errorMessage, err)
+				ierr := err.(*ierrors.InsprError)
+				ierr.Wrap(errorMessage)
 			}
 		}
 	}

@@ -1,8 +1,9 @@
 package utils
 
 import (
-	"errors"
 	"testing"
+
+	"github.com/inspr/inspr/pkg/ierrors"
 )
 
 func TestCheckEmptyArgs(t *testing.T) {
@@ -45,7 +46,7 @@ func TestCheckEmptyArgs(t *testing.T) {
 				t.Errorf("CheckEmptyArgs() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if tt.wantWrapper && errors.Unwrap(err) == nil {
+			if tt.wantWrapper && ierrors.Unwrap(err) == nil {
 				t.Errorf("CheckEmptyArgs() multiple errors, wanted wrapper")
 			}
 		})

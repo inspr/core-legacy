@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/rest"
 
 	handler "github.com/inspr/inspr/pkg/api/handlers"
@@ -26,7 +27,7 @@ func (s *Server) initRoutes() {
 
 	brokersHandler := h.NewBrokerHandler()
 	s.Mux.Handle("/brokers", brokersHandler.HandleGet().Get().JSON())
-	s.Mux.Handle("/brokers/kafka", brokersHandler.KafkaHandler().Post().JSON())
+	s.Mux.Handle("/brokers/"+brokers.Kafka, brokersHandler.KafkaCreateHandler().Post().JSON())
 
 	s.Mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
 	s.Mux.Handle("/refreshController", h.ControllerRefreshHandler())

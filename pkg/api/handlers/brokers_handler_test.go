@@ -120,7 +120,7 @@ func TestBrokerHandler_HandleGet(t *testing.T) {
 func TestBrokerHandler_KafkaHandler(t *testing.T) {
 	type fields struct {
 		Handler     *Handler
-		bodyContent models.BrokerDataDI
+		bodyContent models.BrokerConfigDI
 	}
 	tests := []struct {
 		name     string
@@ -142,7 +142,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 				Handler: &Handler{
 					Brokers: fake.MockBrokerManager(nil),
 				},
-				bodyContent: models.BrokerDataDI{
+				bodyContent: models.BrokerConfigDI{
 					FileContents: []byte{1}, // throws error at the yaml parser
 				},
 			},
@@ -156,7 +156,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			}
 
 			// creating the test server
-			handlerFunc := bh.KafkaHandler().HTTPHandlerFunc()
+			handlerFunc := bh.KafkaCreateHandler().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 

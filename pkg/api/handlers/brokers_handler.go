@@ -50,12 +50,12 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 	return rest.Handler(handler)
 }
 
-// KafkaHandler is the functions that processes requests at the /brokers/kafka endpoint
-func (bh *BrokerHandler) KafkaHandler() rest.Handler {
+// KafkaCreateHandler is the function that processes requests at the /brokers/kafka endpoint
+func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 	logger.Info("handling the brokers' kafka route request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		// decode into the bytes of yaml file
-		var content models.BrokerDataDI
+		var content models.BrokerConfigDI
 		err := json.NewDecoder(r.Body).Decode(&content)
 		if err != nil {
 			rest.ERROR(w, err)

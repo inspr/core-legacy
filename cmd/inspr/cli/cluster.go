@@ -2,13 +2,13 @@ package cli
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 
 	"github.com/inspr/inspr/pkg/cmd"
 	"github.com/inspr/inspr/pkg/cmd/utils"
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/spf13/cobra"
 )
 
@@ -21,19 +21,18 @@ func NewClusterCommand() *cobra.Command {
 		NoArgs(getBrokers)
 	authInit := cmd.NewCmd("init").
 		WithDescription("Init configures insprd's default token").
-		WithExample("init insprd as admin", " cluster init <admin_password>").
+		WithExample("init insprd as admin", "cluster init <admin_password>").
 		WithCommonFlags().
 		ExactArgs(1, authInit)
 	configCmd := cmd.NewCmd("config").
-		WithDescription("obtains the broker and yaml file and tries to install it on the insprd server").
+		WithDescription("obtains the broker and yaml file and tries to install it on the insprd").
 		WithExample("config kafka kafka.yaml", "cluster config <broker> <file>").
-		WithCommonFlags().
 		ExactArgs(2, clusterConfig)
 	return cmd.NewCmd("cluster").
 		WithDescription("Configure aspects of your inspr cluster").
 		WithLongDescription("Cluster takes a subcommand of (brokers | init)").
 		WithExample("get cluster's brokers", "cluster brokers").
-		WithExample("init insprd as admin", " cluster init <admin_password>").
+		WithExample("init insprd as admin", "cluster init <admin_password>").
 		AddSubCommand(getBrokers, authInit, configCmd).
 		Super()
 }
@@ -92,7 +91,7 @@ func clusterConfig(c context.Context, args []string) error {
 		}
 
 		fmt.Fprintf(output, "not a yaml file")
-		return errors.New("not a yaml file")
+		return ierrors.NewError().Message("not a yaml file").InvalidFile().Build()
 	}
 
 	bytes, err := os.ReadFile(filePath)
@@ -108,6 +107,6 @@ func clusterConfig(c context.Context, args []string) error {
 		return err
 	}
 
-	fmt.Fprintln(output, "applied the broker configuration to the insprd in the cluster")
+	fmt.Fprintln(output, "successfully installed broker on insprd")
 	return nil
 }

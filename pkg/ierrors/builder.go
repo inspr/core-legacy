@@ -88,6 +88,18 @@ func (b *ErrBuilder) InvalidType() *ErrBuilder {
 	return b
 }
 
+// InvalidFile adds Invalid Args code to Inspr Error
+func (b *ErrBuilder) InvalidFile() *ErrBuilder {
+	b.err.Code = InvalidFile
+	return b
+}
+
+// InvalidArgs adds Invalid Args code to Inspr Error
+func (b *ErrBuilder) InvalidArgs() *ErrBuilder {
+	b.err.Code = InvalidFile
+	return b
+}
+
 // Forbidden adds Forbidden code to Inspr Error
 func (b *ErrBuilder) Forbidden() *ErrBuilder {
 	b.err.Code = Forbidden

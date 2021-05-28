@@ -224,7 +224,7 @@ func Test_clusterConfig(t *testing.T) {
 		{
 			name:    "working",
 			args:    []string{"config", "kafka", kafkaFile},
-			wantMsg: "applied the broker configuration to the insprd in the cluster\n",
+			wantMsg: "successfully installed broker on insprd\n",
 			wantErr: false,
 		},
 	}
