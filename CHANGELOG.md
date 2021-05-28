@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #67 Tech CORE-429 | Change the inspr cmd cluster command to ignore the .inspr/token
+- features:
+    - Updated the Init function in the auth package so now it creates .inspr/token if it doesn't exist
+    - Added the admin permissions in auth models
+    - The admin user is now initialized with the admin permissions created in auth models
+
 ### #63 Story CORE-414 | Adapt the current sidecar to a load balancer sidecar
 - features:
     - implemented the new LB sidecar

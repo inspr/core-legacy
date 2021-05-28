@@ -43,3 +43,31 @@ const (
 
 	CreateToken string = "create:token"
 )
+
+// AdminPermissions defines all the permissions that the admin user have
+// when the cluster is initialized
+var AdminPermissions = map[string][]string{
+	"": {
+		CreateDapp,
+		CreateChannel,
+		CreateType,
+		CreateAlias,
+
+		GetDapp,
+		GetChannel,
+		GetType,
+		GetAlias,
+
+		UpdateDapp,
+		UpdateChannel,
+		UpdateType,
+		UpdateAlias,
+
+		DeleteDapp,
+		DeleteChannel,
+		DeleteType,
+		DeleteAlias,
+
+		CreateToken,
+	},
+}
