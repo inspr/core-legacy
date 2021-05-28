@@ -2,32 +2,12 @@ package sidecarserv
 
 import (
 	"context"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/environment"
 )
-
-func TestNewServer(t *testing.T) {
-	tests := []struct {
-		name string
-		want *Server
-	}{
-		{
-			name: "test_basic_server_creation",
-			want: &Server{},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewServer(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewServer() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func TestServer_Init(t *testing.T) {
 	test := struct {
@@ -44,9 +24,7 @@ func TestServer_Init(t *testing.T) {
 	defer deleteMockEnvVars()
 
 	t.Run("basic init test", func(t *testing.T) {
-		s := &Server{
-			inAddr: test.addr,
-		}
+
 		r := &mockReader{
 			readMessage: func(ctx context.Context, channel string) ([]byte, error) {
 				return nil, nil
@@ -60,7 +38,7 @@ func TestServer_Init(t *testing.T) {
 				return nil
 			},
 		}
-		s.Init(r, w, brokers.Kafka)
+		s := Init(r, w, brokers.Kafka)
 
 		// checking reader methods
 		if got := s.Reader.Commit(context.Background(), test.channel); got != nil {

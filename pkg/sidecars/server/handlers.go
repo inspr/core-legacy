@@ -14,12 +14,6 @@ import (
 	"go.uber.org/zap"
 )
 
-var logger *zap.Logger
-
-func init() {
-	logger, _ = zap.NewProduction()
-}
-
 const maxBrokerRetries = 5
 
 var (
@@ -54,7 +48,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 
 		logger.Info("writing message to broker", zap.String("channel", channel))
 		if err := s.Writer.WriteMessage(channel, body); err != nil {
-			rest.ERROR(w, writeMessageErr.InnerError(err).Build())
+			rest.ERROR(w, ierrors.NewError().Message("broker's writeMessage failed, %s", err.Error()).Build())
 			return
 		}
 		rest.JSON(w, 200, struct{ Status string }{"OK"})
