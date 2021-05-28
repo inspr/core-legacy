@@ -93,3 +93,13 @@ func getChannelList(channelList string) []brokers.ChannelBroker {
 	})
 	return channels
 }
+
+func filterChannelsByBroker(broker string, channels []brokers.ChannelBroker) utils.StringArray {
+	brokerChannels := utils.StringArray{}
+	for _, channel := range channels {
+		if channel.Broker == broker {
+			brokerChannels = append(brokerChannels, channel.ChName)
+		}
+	}
+	return brokerChannels
+}

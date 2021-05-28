@@ -7,6 +7,7 @@ import (
 
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta/brokers"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 // InsprEnvVars represents the current inspr environment
@@ -70,14 +71,26 @@ func RecoverEnvironmentErrors(errch chan<- error) {
 	errch <- nil
 }
 
-// GetInputChannels returns environment variable which contains the input channels
+// GetInputChannels returns the input channels
 func GetInputChannels() []brokers.ChannelBroker {
 	return getChannelList(getRawInputChannels())
 }
 
-// GetOutputChannels returns environment variable which contains the output channels
+// GetOutputChannels returns the output channels
 func GetOutputChannels() []brokers.ChannelBroker {
 	return getChannelList(getRawOutputChannels())
+}
+
+// GetInputBrokerChannels returns environment variable which contains the input channels
+func GetInputBrokerChannels(broker string) utils.StringArray {
+	channels := getChannelList(getRawInputChannels())
+	return filterChannelsByBroker(broker, channels)
+}
+
+// GetOutputBrokerChannels returns environment variable which contains the output channels
+func GetOutputBrokerChannels(broker string) utils.StringArray {
+	channels := getChannelList(getRawOutputChannels())
+	return filterChannelsByBroker(broker, channels)
 }
 
 // getRawInputChannels returns environment variable which contains the input channels
