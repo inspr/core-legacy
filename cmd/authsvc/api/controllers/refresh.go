@@ -20,7 +20,6 @@ func (server *Server) Refresh() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		headerContent := r.Header["Authorization"]
 
-		server.logger.Debug("headerContent:", zap.Any("content", headerContent))
 		if len(headerContent) != 1 ||
 			!strings.HasPrefix(headerContent[0], "Bearer ") {
 			err := ierrors.NewError().Unauthorized().Message("bad Request, expected: Authorization: Bearer <token>").Build()
@@ -29,7 +28,6 @@ func (server *Server) Refresh() rest.Handler {
 		}
 
 		token := []byte(strings.TrimPrefix(headerContent[0], "Bearer "))
-		server.logger.Debug("bearer token", zap.String("value", string(token)))
 
 		server.logger.Info("parsing received bearer token")
 		_, err := jwt.Parse(
