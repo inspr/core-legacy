@@ -18,7 +18,7 @@ type Reader struct {
 }
 
 // NewReader return a new Reader
-func NewReader() (models.Reader, error) {
+func NewReader() (*Reader, error) {
 	var reader Reader
 	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannels())
 

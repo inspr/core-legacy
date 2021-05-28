@@ -15,7 +15,6 @@ type Consumer interface {
 
 // Reader reads from a message broker
 type Reader interface {
-	Consumers() map[string]Consumer
 	ReadMessage(ctx context.Context, channel string) ([]byte, error)
 	Commit(ctx context.Context, channel string) error
 	Close() error
@@ -23,7 +22,6 @@ type Reader interface {
 
 // Writer writes messages in a message broker
 type Writer interface {
-	Producer() *kafka.Producer
 	WriteMessage(channel string, msg []byte) error
 	Close()
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/operators"
 	"github.com/inspr/inspr/cmd/insprd/operators/kafka/channels"
-	"github.com/inspr/inspr/cmd/insprd/operators/kafka/nodes"
+	"github.com/inspr/inspr/cmd/insprd/operators/nodes"
 	"github.com/inspr/inspr/pkg/auth"
 )
 

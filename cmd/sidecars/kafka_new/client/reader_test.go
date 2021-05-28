@@ -22,13 +22,13 @@ func TestNewReader(t *testing.T) {
 		name          string
 		want          *Reader
 		wantErr       bool
-		checkFunction func(t *testing.T, reader models.Reader)
+		checkFunction func(t *testing.T, reader *Reader)
 		before        func()
 	}{
 		{
 			name:    "It should return a new Reader",
 			wantErr: false,
-			checkFunction: func(t *testing.T, reader models.Reader) {
+			checkFunction: func(t *testing.T, reader *Reader) {
 				if !(reader.Consumers() != nil && len(reader.Consumers()) > 0) {
 					t.Errorf("check function error = Reader not created successfully")
 				}

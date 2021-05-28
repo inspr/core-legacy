@@ -3,7 +3,6 @@ package kafkasc
 import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/sidecars/models"
 	"go.uber.org/zap"
 )
 
@@ -15,7 +14,7 @@ type Writer struct {
 }
 
 // NewWriter creates a new writer/kafka producer
-func NewWriter() (models.Writer, error) {
+func NewWriter() (*Writer, error) {
 	var kProd *kafka.Producer
 	var err error
 
@@ -31,7 +30,7 @@ func NewWriter() (models.Writer, error) {
 	return &Writer{kProd}, nil
 }
 
-func newMockWriter() (models.Writer, error) {
+func newMockWriter() (*Writer, error) {
 	var kProd *kafka.Producer
 
 	kProd, _ = kafka.NewProducer(&kafka.ConfigMap{
