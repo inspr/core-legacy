@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta/brokers"
 )
 
 // InsprEnvVars represents the current inspr environment
@@ -25,8 +26,8 @@ var env *InsprEnvVars
 func GetEnvironment() *InsprEnvVars {
 	if env == nil {
 		env = &InsprEnvVars{
-			InputChannels:    GetInputChannels(),
-			OutputChannels:   GetOutputChannels(),
+			InputChannels:    getRawInputChannels(),
+			OutputChannels:   getRawInputChannels(),
 			SidecarImage:     GetSidecarImage(),
 			InsprAppContext:  GetInsprAppContext(),
 			InsprEnvironment: GetInsprEnvironment(),
@@ -47,8 +48,8 @@ func getEnv(name string) string {
 // This was develop for testing and probably sholdn't be used in other cases.
 func RefreshEnviromentVariables() *InsprEnvVars {
 	env = &InsprEnvVars{
-		InputChannels:    GetInputChannels(),
-		OutputChannels:   GetOutputChannels(),
+		InputChannels:    getRawInputChannels(),
+		OutputChannels:   getRawOutputChannels(),
 		SidecarImage:     GetSidecarImage(),
 		InsprAppContext:  GetInsprAppContext(),
 		InsprEnvironment: GetInsprEnvironment(),
@@ -70,12 +71,22 @@ func RecoverEnvironmentErrors(errch chan<- error) {
 }
 
 // GetInputChannels returns environment variable which contains the input channels
-func GetInputChannels() string {
-	return getEnv("INSPR_INPUT_CHANNELS")
+func GetInputChannels() []brokers.ChannelBroker {
+	return getChannelList(getRawInputChannels())
 }
 
 // GetOutputChannels returns environment variable which contains the output channels
-func GetOutputChannels() string {
+func GetOutputChannels() []brokers.ChannelBroker {
+	return getChannelList(getRawOutputChannels())
+}
+
+// getRawInputChannels returns environment variable which contains the input channels
+func getRawInputChannels() string {
+	return getEnv("INSPR_INPUT_CHANNELS")
+}
+
+// getRawOutputChannels returns environment variable which contains the output channels
+func getRawOutputChannels() string {
 	return getEnv("INSPR_OUTPUT_CHANNELS")
 }
 

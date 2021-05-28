@@ -11,6 +11,12 @@ type Brokers struct {
 	Available utils.StrSet
 }
 
+// ChannelBroker associates channels names with their brokers, used to recover data from enviroment
+type ChannelBroker struct {
+	ChName string
+	Broker string
+}
+
 // BrokerConfiguration generic interface type
 type BrokerConfiguration interface{}
 
