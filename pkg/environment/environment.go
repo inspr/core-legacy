@@ -1,7 +1,9 @@
 package environment
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/inspr/inspr/pkg/ierrors"
 )
@@ -77,11 +79,6 @@ func GetOutputChannels() string {
 	return getEnv("INSPR_OUTPUT_CHANNELS")
 }
 
-// GetUnixSocketAddress returns environment variable which contains the unix socket address
-func GetUnixSocketAddress() string {
-	return getEnv("INSPR_UNIX_SOCKET")
-}
-
 // GetSidecarImage returns environment variable which contains the sidecar image reference
 func GetSidecarImage() string {
 	return getEnv("INSPR_SIDECAR_IMAGE")
@@ -100,4 +97,20 @@ func GetInsprEnvironment() string {
 // GetInsprAppID returns environment variable which contains the current dApp's ID
 func GetInsprAppID() string {
 	return getEnv("INSPR_APP_ID")
+}
+
+// GetBrokerWritePort returns environment variable that contains given broker's write port
+func GetBrokerWritePort(broker string) string {
+	return getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_WRITE_PORT", strings.ToUpper(broker)))
+}
+
+// GetBrokerReadPort returns environment variable that contains given broker's read port
+func GetBrokerReadPort(broker string) string {
+	return getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_READ_PORT", strings.ToUpper(broker)))
+}
+
+// GetBrokerSpecificSidecarAddr returns environment variable that contains given broker's
+// sidecar address
+func GetBrokerSpecificSidecarAddr(broker string) string {
+	return getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_ADDR", strings.ToUpper(broker)))
 }

@@ -205,7 +205,6 @@ func TestClient_WriteMessage(t *testing.T) {
 
 func TestClient_HandleChannel(t *testing.T) {
 	type fields struct {
-		readAddr string
 	}
 	type args struct {
 		channel string

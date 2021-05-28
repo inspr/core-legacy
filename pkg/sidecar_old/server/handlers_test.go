@@ -14,32 +14,8 @@ import (
 
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 )
-
-// sendInRequest is a struct used for all the testing files in this package
-// it's contents is a simple { body []byte }
-type sendInRequest struct{ body []byte }
-
-// expectedResponse is a struct used for all the testing files in this package
-// it's contents is a simple { status int }
-type wantedResponse struct{ status int }
-
-// args is a struct to setup the values to be sent and the ones
-// that are expected in the request
-type args struct {
-	send sendInRequest
-	want wantedResponse
-}
-
-// testCaseStruct stores the complete struct used in testing
-// containing all the structs defined in the testing file
-// sets the name of the test, it's handler and it's args
-type testCaseStruct struct {
-	name string
-	ch   *Server
-	args args
-}
 
 // createMockEnvVars - sets up the env values to be used in the tests functions
 func createMockEnvVars() {
@@ -85,8 +61,6 @@ func (m mockWriter) WriteMessage(channel string, message interface{}) error {
 func TestServer_writeMessageHandler(t *testing.T) {
 	createMockEnvVars()
 	defer deleteMockEnvVars()
-	type fields struct {
-	}
 	tests := []struct {
 		readerFunc func(t *testing.T) mockReader
 		writerFunc func(t *testing.T) mockWriter
@@ -283,7 +257,6 @@ func TestServer_readMessageRoutine(t *testing.T) {
 				if received == tt.wantErr {
 					t.Errorf("Server_readMessageRoutine received = %v, wantErr = %v", received, tt.wantErr)
 				}
-
 			}
 		})
 	}

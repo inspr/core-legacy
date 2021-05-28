@@ -6,6 +6,16 @@
     - Updated the Init function in the auth package, now it writes a empty token file
     - Added the admin permissions in auth models
     - When initializing the admin, now using the admin permissions above
+
+### #63 Story CORE-414 | Adapt the current sidecar to a load balancer sidecar
+- features:
+    - implemented the new LB sidecar
+    - created new functions to retrieve sidecar's env vars
+    - updated the converter to generate new env vars used by the LB sidecar
+    - changed the env vars associated with the old sidecar so they are now used by the LB sidecar
+- refactors:
+    - renamed the old sidecar structure to `sidecar_old` and fixed where it was imported. This structure will be maintained while the multibroker sidecar isn't released
+    - renamed some variables/parameters so they make more sense
 ---
 
 ### #60 Story CORE-419 | Create Kafka sidecar Factory
@@ -17,7 +27,6 @@
     - created the utils file containing small functions and mocks of functions
       to be, these functions should be able to be used by other sidecars.
 ---
-
 
 ### # 64 Tech CORE-448 | Unification of inspr cluster commands
 - fixes:

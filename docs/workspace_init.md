@@ -149,7 +149,7 @@ import (
 	"fmt"
 
 	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 	"golang.org/x/net/context"
 )
 
@@ -207,7 +207,7 @@ import (
 	"fmt"
 
 	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 	"golang.org/x/net/context"
 )
 

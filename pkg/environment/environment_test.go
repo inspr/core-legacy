@@ -174,3 +174,19 @@ func TestRecoverEnvironmentErrors(t *testing.T) {
 		})
 	}
 }
+
+func TestSidecarEnvVarsMethods(t *testing.T) {
+	SetMockEnv()
+	defer UnsetMockEnv()
+
+	t.Run("Get Broker-specific sidecars env vars", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("Recovered in 'TestSidecarEnvVarsMethods': %v", r)
+			}
+		}()
+		GetBrokerReadPort("TEST")
+		GetBrokerWritePort("TEST")
+		GetBrokerSpecificSidecarAddr("TEST")
+	})
+}

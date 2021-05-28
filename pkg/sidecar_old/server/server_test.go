@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecar_old/models"
 )
 
 func TestNewServer(t *testing.T) {
