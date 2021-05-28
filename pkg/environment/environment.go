@@ -87,6 +87,7 @@ func GetInputBrokerChannels(broker string) utils.StringArray {
 	return filterChannelsByBroker(broker, channels)
 }
 
+// GetChannelBroker returns a channels selected broker
 func GetChannelBroker(channel string) (string, error) {
 	boundaries := append(GetInputChannels(), GetOutputChannels()...)
 	for _, boundary := range boundaries {
