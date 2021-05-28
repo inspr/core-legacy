@@ -5,21 +5,34 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/utils"
 )
 
 func TestIsInChannelBoundary(t *testing.T) {
 	type fields struct {
-		InputChannels  string
-		OutputChannels string
+		InputChannels  []brokers.ChannelBroker
+		OutputChannels []brokers.ChannelBroker
 		UnixSocketAddr string
 	}
 	type args struct {
 		channel string
 	}
 	defaultFields := fields{
-		InputChannels:  "a;b;c;d;e",
-		OutputChannels: "1;2;3;4;5",
+		InputChannels: []brokers.ChannelBroker{
+			{ChName: "a"},
+			{ChName: "b"},
+			{ChName: "c"},
+			{ChName: "d"},
+			{ChName: "e"},
+		},
+		OutputChannels: []brokers.ChannelBroker{
+			{ChName: "1"},
+			{ChName: "2"},
+			{ChName: "3"},
+			{ChName: "4"},
+			{ChName: "5"},
+		},
 		UnixSocketAddr: "socket",
 	}
 
@@ -71,7 +84,7 @@ func TestGetChannelBoundaryList(t *testing.T) {
 		{
 			name: "It should get all the channels in the InputChannels env",
 			fields: fields{
-				InputChannels:    "ch1;ch2;ch3;ch4",
+				InputChannels:    "ch1_b;ch2_b;ch3_b;ch4_b",
 				OutputChannels:   "",
 				UnixSocketAddr:   "",
 				InsprAppContext:  "",
@@ -93,7 +106,7 @@ func TestGetChannelBoundaryList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetChannelBoundaryList(tt.fields.InputChannels); !reflect.DeepEqual(got, tt.want) {
+			if got := GetChannelBoundaryList(getChannelList(tt.fields.InputChannels)); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("InsprEnvVars.GetInputChannelList() = %v, want %v", got, tt.want)
 			}
 		})
@@ -174,14 +187,14 @@ func TestGetResolvedBoundaryChannelList(t *testing.T) {
 		{
 			name: "Returns resolved boundary",
 			args: args{
-				boundary: "ch1;ch2",
+				boundary: "ch1_b;ch2_b",
 			},
 			want: utils.StringArray{"channel1_resolved", "channel2_resolved"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetResolvedBoundaryChannelList(tt.args.boundary); !reflect.DeepEqual(got, tt.want) {
+			if got := GetResolvedBoundaryChannelList(getChannelList(tt.args.boundary)); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetResolvedBoundaryChannelList() = %v, want %v", got, tt.want)
 			}
 		})
@@ -206,7 +219,7 @@ func TestGetResolvedChannel(t *testing.T) {
 			name: "Returns resolved channel",
 			args: args{
 				channel:   "ch1",
-				inputChan: "ch1;ch2",
+				inputChan: "ch1_b;ch2_b",
 			},
 			wantErr: false,
 			want:    "channel1_resolved",
@@ -215,7 +228,7 @@ func TestGetResolvedChannel(t *testing.T) {
 			name: "Invalid channel",
 			args: args{
 				channel:   "ch3",
-				inputChan: "ch1;ch2",
+				inputChan: "ch1_b;ch2_b",
 			},
 			wantErr: true,
 			want:    "",
@@ -223,7 +236,7 @@ func TestGetResolvedChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetResolvedChannel(tt.args.channel, tt.args.inputChan, tt.args.outputChan)
+			got, err := GetResolvedChannel(tt.args.channel, getChannelList(tt.args.inputChan), getChannelList(tt.args.outputChan))
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetResolvedChannel() error = %v, wantErr %v", err, tt.wantErr)
 				return

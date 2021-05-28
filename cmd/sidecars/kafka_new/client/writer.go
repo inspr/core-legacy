@@ -50,7 +50,7 @@ func (writer *Writer) Producer() *kafka.Producer {
 func (writer *Writer) WriteMessage(channel string, message []byte) error {
 	outputChan := environment.GetOutputChannels()
 
-	resolvedCh, err := environment.GetResolvedChannel(channel, "", outputChan)
+	resolvedCh, err := environment.GetResolvedChannel(channel, nil, outputChan)
 	if err != nil {
 		return err
 	}

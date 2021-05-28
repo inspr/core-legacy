@@ -38,7 +38,7 @@ func NewWriter(mock bool) (*Writer, error) {
 func (writer *Writer) WriteMessage(channel string, message interface{}) error {
 	outputChan := environment.GetOutputChannels()
 
-	resolvedCh, _ := environment.GetResolvedChannel(channel, "", outputChan)
+	resolvedCh, _ := environment.GetResolvedChannel(channel, nil, outputChan)
 
 	logger.Info("trying to write message in topic",
 		zap.String("channel", channel),

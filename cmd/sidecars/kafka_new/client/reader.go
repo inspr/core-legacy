@@ -47,7 +47,7 @@ ReadMessage reads message by message. Returns channel the message belongs to,
 the message and an error if any occurred.
 */
 func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, error) {
-	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannels(), "")
+	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannels(), nil)
 
 	logger.Info("trying to read message from topic",
 		zap.String("channel", channel),
