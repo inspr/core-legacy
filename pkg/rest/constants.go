@@ -9,7 +9,7 @@ const (
 	HeaderScopeKey = "Scope"
 )
 
-// operationTranslator receives a http.Method and proceedes to translate into a
+// operationTranslator receives a http.Method and proceeds to translate into a
 // string that represents the operation that will be done in the insprd
 var operationTranslator = map[string]string{
 	http.MethodGet:    "get",

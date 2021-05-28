@@ -10,11 +10,11 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// GetPublicKey resolves the rssa public key from the enviroment variable.
+// GetPublicKey resolves the rsa public key from the environment variable
 func GetPublicKey() (*rsa.PublicKey, error) {
 	pubBytes, ok := os.LookupEnv("JWT_PUBLIC_KEY")
 	if !ok {
-		err := ierrors.NewError().Message("JWT_PUBLIC_KEY unavailible").Build()
+		err := ierrors.NewError().Message("JWT_PUBLIC_KEY unavailable").Build()
 		return nil, err
 	}
 	fmt.Printf("%s\n", pubBytes)

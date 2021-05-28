@@ -601,7 +601,7 @@ func Test_hasPermission(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "User has admin permisson",
+			name: "User has admin permission",
 			args: args{
 				uid: "user1",
 				pwd: "none",

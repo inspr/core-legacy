@@ -40,7 +40,7 @@ func ContainerWithEnv(env ...corev1.EnvVar) ContainerOption {
 	}
 }
 
-// ContainerWithEnvFrom adds envirnoment variables from a source to a container
+// ContainerWithEnvFrom adds environment variables from a source to a container
 func ContainerWithEnvFrom(env ...corev1.EnvFromSource) ContainerOption {
 	return func(c *corev1.Container) {
 		c.EnvFrom = append(c.EnvFrom, env...)
