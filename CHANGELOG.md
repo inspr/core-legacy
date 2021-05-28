@@ -5,7 +5,7 @@
 - features:
     - Updated the Init function in the auth package so now it creates .inspr/token if it doesn't exist
     - Added the admin permissions in auth models
-    - When initializing the admin, now using the admin permissions above
+    - The admin user is now initialized with the admin permissions created in auth models
 
 ### #63 Story CORE-414 | Adapt the current sidecar to a load balancer sidecar
 - features:
