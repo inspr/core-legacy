@@ -249,7 +249,7 @@ func TestChannelClient_Create(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 

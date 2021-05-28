@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
@@ -56,7 +57,7 @@ func (tc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, d
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "POST", tdi, &resp)
+		Send(ctx, "/types", http.MethodPost, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}

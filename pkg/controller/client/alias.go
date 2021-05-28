@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
@@ -58,7 +59,7 @@ func (ac *AliasClient) Create(ctx context.Context, scope string, target string, 
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", "POST", aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodPost, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}

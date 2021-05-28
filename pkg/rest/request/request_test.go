@@ -49,7 +49,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "POST",
+				method: http.MethodPost,
 				body:   "hello",
 			},
 			wantErr: false,
@@ -120,7 +120,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "POST",
+				method: http.MethodPost,
 				body:   "hello",
 			},
 			wantErr: true,
@@ -138,7 +138,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "POST",
+				method: http.MethodPost,
 				body:   "hello",
 			},
 			wantErr: true,

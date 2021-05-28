@@ -154,7 +154,7 @@ func TestAliasClient_Create(t *testing.T) {
 					t.Errorf("path is not alias")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 

@@ -233,7 +233,7 @@ func TestTypeClient_Create(t *testing.T) {
 					t.Errorf("path is not types")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 

@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
@@ -55,7 +56,7 @@ func (ac *AppClient) Create(ctx context.Context, scope string, app *meta.App, dr
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/apps", "POST", adi, &resp)
+		Send(ctx, "/apps", http.MethodPost, adi, &resp)
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
@@ -56,7 +57,7 @@ func (cc *ChannelClient) Create(ctx context.Context, scope string, ch *meta.Chan
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", "POST", cdi, &resp)
+		Send(ctx, "/channels", http.MethodPost, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}

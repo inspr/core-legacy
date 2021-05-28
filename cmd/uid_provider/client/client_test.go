@@ -813,7 +813,7 @@ func mockRedis() *miniredis.Miniredis {
 }
 
 func insprServerHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		rest.ERROR(w, fmt.Errorf("method should be POST"))
 	}
 	data := auth.Payload{}
