@@ -71,25 +71,25 @@ func RecoverEnvironmentErrors(errch chan<- error) {
 	errch <- nil
 }
 
-// GetInputChannels returns the input channels
-func GetInputChannels() []brokers.ChannelBroker {
-	return getChannelList(getRawInputChannels())
+// GetInputChannelsData returns the input channels
+func GetInputChannelsData() []brokers.ChannelBroker {
+	return getChannelData(getRawInputChannels())
 }
 
-// GetOutputChannels returns the output channels
-func GetOutputChannels() []brokers.ChannelBroker {
-	return getChannelList(getRawOutputChannels())
+// GetOutputChannelsData returns the output channels
+func GetOutputChannelsData() []brokers.ChannelBroker {
+	return getChannelData(getRawOutputChannels())
 }
 
 // GetInputBrokerChannels returns environment variable which contains the input channels
 func GetInputBrokerChannels(broker string) utils.StringArray {
-	channels := getChannelList(getRawInputChannels())
+	channels := getChannelData(getRawInputChannels())
 	return filterChannelsByBroker(broker, channels)
 }
 
 // GetChannelBroker returns a channels selected broker
 func GetChannelBroker(channel string) (string, error) {
-	boundaries := append(GetInputChannels(), GetOutputChannels()...)
+	boundaries := append(GetInputChannelsData(), GetOutputChannelsData()...)
 	for _, boundary := range boundaries {
 		if boundary.ChName == channel {
 			return boundary.Broker, nil
@@ -103,7 +103,7 @@ func GetChannelBroker(channel string) (string, error) {
 
 // GetOutputBrokerChannels returns environment variable which contains the output channels
 func GetOutputBrokerChannels(broker string) utils.StringArray {
-	channels := getChannelList(getRawOutputChannels())
+	channels := getChannelData(getRawOutputChannels())
 	return filterChannelsByBroker(broker, channels)
 }
 

@@ -20,9 +20,9 @@ type Reader struct {
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
 	var reader Reader
-	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannels())
+	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannelsData())
 
-	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannels())
+	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannelsData())
 	if len(resolvedChList) == 0 {
 		return nil, ierrors.NewError().Message("INSPR_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
@@ -47,7 +47,7 @@ ReadMessage reads message by message. Returns channel the message belongs to,
 the message and an error if any occurred.
 */
 func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, error) {
-	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannels(), nil)
+	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannelsData(), nil)
 
 	logger.Info("trying to read message from topic",
 		zap.String("channel", channel),

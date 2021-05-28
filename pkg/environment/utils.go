@@ -47,22 +47,22 @@ func GetSchema(channel string) (string, error) {
 
 // OutputChannnelList returns a list of input channels
 func OutputChannnelList() utils.StringArray {
-	return GetChannelBoundaryList(GetOutputChannels())
+	return GetChannelBoundaryList(GetOutputChannelsData())
 }
 
 // InputChannelList returns a list of input channels
 func InputChannelList() utils.StringArray {
-	return GetChannelBoundaryList(GetInputChannels())
+	return GetChannelBoundaryList(GetInputChannelsData())
 }
 
 // OutputBrokerChannnels returns a list of input channels
 func OutputBrokerChannnels(broker string) utils.StringArray {
-	return GetChannelBoundaryList(GetOutputChannels()) // WRONG IMPLEMENTATION
+	return GetChannelBoundaryList(GetOutputChannelsData()) // WRONG IMPLEMENTATION
 }
 
 // InputBrokerChannels returns a list of input channels
 func InputBrokerChannels(broker string) utils.StringArray {
-	return GetChannelBoundaryList(GetInputChannels()) // WRONG IMPLEMENTATION
+	return GetChannelBoundaryList(GetInputChannelsData()) // WRONG IMPLEMENTATION
 }
 
 // GetResolvedChannel gets a resolved channel from a channel name
@@ -76,7 +76,7 @@ func GetResolvedChannel(channel string, inputChan, outputChan []brokers.ChannelB
 		Build()
 }
 
-func getChannelList(channelList string) []brokers.ChannelBroker {
+func getChannelData(channelList string) []brokers.ChannelBroker {
 	if channelList == "" {
 		return nil
 	}
@@ -84,11 +84,11 @@ func getChannelList(channelList string) []brokers.ChannelBroker {
 	channels := []brokers.ChannelBroker{}
 	channelBrokers.Map(func(channel string) string {
 		data := strings.Split(channel, "_")
-		bla := brokers.ChannelBroker{
+		channelData := brokers.ChannelBroker{
 			ChName: data[0],
 			Broker: data[1],
 		}
-		channels = append(channels, bla)
+		channels = append(channels, channelData)
 		return ""
 	})
 	return channels

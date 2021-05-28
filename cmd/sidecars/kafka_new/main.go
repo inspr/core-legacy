@@ -28,7 +28,7 @@ func main() {
 	var err error
 
 	logger.Info("instantiating Kafka Sidecar reader")
-	if len(environment.GetInputChannels()) != 0 {
+	if len(environment.GetInputChannelsData()) != 0 {
 		reader, err = kafkasc.NewReader() // alterar metodo para comply a nova interface
 		if err != nil {
 			logger.Error("unable to instantiate Kafka Sidecar reader")
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	logger.Info("instantiating Kafka Sidecar writer")
-	if len(environment.GetOutputChannels()) != 0 {
+	if len(environment.GetOutputChannelsData()) != 0 {
 		writer, err = kafkasc.NewWriter()
 		if err != nil {
 			logger.Error("unable to instantiate Kafka Sidecar writer")

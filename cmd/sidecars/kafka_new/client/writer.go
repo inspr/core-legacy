@@ -47,7 +47,7 @@ func (writer *Writer) Producer() *kafka.Producer {
 
 // WriteMessage receives a message and sends it to the topic defined by the given channel
 func (writer *Writer) WriteMessage(channel string, message []byte) error {
-	outputChan := environment.GetOutputChannels()
+	outputChan := environment.GetOutputChannelsData()
 
 	resolvedCh, err := environment.GetResolvedChannel(channel, nil, outputChan)
 	if err != nil {

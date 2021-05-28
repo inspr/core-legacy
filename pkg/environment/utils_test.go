@@ -106,7 +106,7 @@ func TestGetChannelBoundaryList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetChannelBoundaryList(getChannelList(tt.fields.InputChannels)); !reflect.DeepEqual(got, tt.want) {
+			if got := GetChannelBoundaryList(getChannelData(tt.fields.InputChannels)); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("InsprEnvVars.GetInputChannelList() = %v, want %v", got, tt.want)
 			}
 		})
@@ -194,7 +194,7 @@ func TestGetResolvedBoundaryChannelList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetResolvedBoundaryChannelList(getChannelList(tt.args.boundary)); !reflect.DeepEqual(got, tt.want) {
+			if got := GetResolvedBoundaryChannelList(getChannelData(tt.args.boundary)); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetResolvedBoundaryChannelList() = %v, want %v", got, tt.want)
 			}
 		})
@@ -236,7 +236,7 @@ func TestGetResolvedChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetResolvedChannel(tt.args.channel, getChannelList(tt.args.inputChan), getChannelList(tt.args.outputChan))
+			got, err := GetResolvedChannel(tt.args.channel, getChannelData(tt.args.inputChan), getChannelData(tt.args.outputChan))
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetResolvedChannel() error = %v, wantErr %v", err, tt.wantErr)
 				return
