@@ -43,7 +43,7 @@ func TestNewWriter(t *testing.T) {
 			}
 		})
 	}
-} // story/CORE-415 OK
+}
 
 func TestWriter_WriteMessage(t *testing.T) {
 	mProd, _ := newMockWriter()
@@ -98,7 +98,7 @@ func TestWriter_WriteMessage(t *testing.T) {
 			}
 		})
 	}
-} // story/CORE-415 OK
+}
 
 func TestWriter_produceMessage(t *testing.T) {
 	mProd, _ := newMockWriter()
@@ -142,4 +142,4 @@ func TestWriter_produceMessage(t *testing.T) {
 			}
 		})
 	}
-} // story/CORE-415 OK
+}

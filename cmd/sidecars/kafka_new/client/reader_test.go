@@ -60,7 +60,7 @@ func TestNewReader(t *testing.T) {
 			}
 		})
 	}
-} // story/CORE-415 OK
+}
 
 func TestReader_ReadMessage(t *testing.T) {
 	createMockEnv()
@@ -144,7 +144,7 @@ func TestReader_ReadMessage(t *testing.T) {
 			}
 		})
 	}
-} // story/CORE-415 OK
+}
 
 func TestReader_Commit(t *testing.T) {
 	type fields struct {
@@ -198,7 +198,7 @@ func TestReader_Commit(t *testing.T) {
 			}
 		})
 	}
-} // story/CORE-415 OK
+}
 
 func TestReader_Close(t *testing.T) {
 	type fields struct {
@@ -247,4 +247,4 @@ func TestReader_Close(t *testing.T) {
 			}
 		})
 	}
-} // story/CORE-415 OK
+}

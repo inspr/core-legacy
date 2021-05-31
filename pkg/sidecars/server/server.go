@@ -60,17 +60,17 @@ func Init(r models.Reader, w models.Writer, broker string) *Server {
 	server.Reader = r
 	server.Writer = w
 	return server
-} // looked
+}
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(ctx context.Context) error {
 	server := &http.Server{
-		Handler: s.writeMessageHandler().Post().JSON(), // look writeMessageHandler - OK
+		Handler: s.writeMessageHandler().Post().JSON(),
 		Addr:    s.inAddr,
 	}
 	errCh := make(chan error)
 	// create read message routine and captures its error
-	go func() { errCh <- s.readMessageRoutine(ctx) }() // readMessageRoutine
+	go func() { errCh <- s.readMessageRoutine(ctx) }()
 
 	var err error
 	go func() {

@@ -29,7 +29,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		if !environment.OutputBrokerChannnels(s.broker).Contains(channel) { // OutputChannnelList must be checked for obtaining the right list
+		if !environment.OutputBrokerChannnels(s.broker).Contains(channel) {
 			insprError := ierrors.
 				NewError().
 				BadRequest().
@@ -59,8 +59,9 @@ func (s *Server) readMessageRoutine(ctx context.Context) error {
 	newCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	for _, channel := range environment.InputBrokerChannels(s.broker) { // InputChannelList retorna todods os canais de input do node invess de todos aqueles que sao do broker especifico
-		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel) // separates several trhead for each channel of this broker
+	for _, channel := range environment.InputBrokerChannels(s.broker) {
+		// separates several trhead for each channel of this broker
+		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel)
 	}
 
 	select {
