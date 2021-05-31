@@ -53,5 +53,8 @@ func main() {
 	s := sidecarserv.Init(reader, writer, brokers.Kafka)
 
 	logger.Info("running Kafka Sidecar server")
-	s.Run(ctx)
+	err = s.Run(ctx)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
 }
