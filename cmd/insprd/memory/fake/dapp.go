@@ -88,7 +88,7 @@ func (a *Apps) Update(context string, ct *meta.App) error {
 func (*Apps) ResolveBoundary(app *meta.App) (map[string]string, error) {
 	ret := map[string]string{}
 	for _, ch := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
-		ret[ch] = ch + "_resolved"
+		ret[ch] = ch
 	}
 	return ret, nil
 }

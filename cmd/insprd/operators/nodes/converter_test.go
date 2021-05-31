@@ -100,7 +100,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 	mem.InitTransaction()
 	mem.Channels().Create("", &meta.Channel{
 		Meta: meta.Metadata{
-			Name: "channel1_resolved",
+			Name: "channel1",
 			UUID: "channel1_UUID",
 		},
 		Spec: meta.ChannelSpec{
@@ -110,7 +110,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 	})
 	mem.Channels().Create("", &meta.Channel{
 		Meta: meta.Metadata{
-			Name: "channel2_resolved",
+			Name: "channel2",
 			UUID: "channel2_UUID",
 		},
 		Spec: meta.ChannelSpec{
@@ -167,7 +167,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Channels: map[string]*meta.Channel{
 							"channel1": {
 								Meta: meta.Metadata{Name: "channel1"},
-								Spec: meta.ChannelSpec{SelectedBroker: "someBroker"},
+								Spec: meta.ChannelSpec{SelectedBroker: "*"},
 							},
 							"channel2": {
 								Meta: meta.Metadata{Name: "channel2"},
@@ -181,7 +181,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 				Env: []kubeCore.EnvVar{
 					{
 						Name:  "INSPR_INPUT_CHANNELS",
-						Value: "channel1;channel2",
+						Value: "channel1_someBroker;channel2_someBroker",
 					},
 					{
 						Name:  "INSPR_OUTPUT_CHANNELS",
@@ -196,20 +196,12 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Value: "INSPR_channel1_UUID",
 					},
 					{
-						Name:  "channel1_BROKER",
-						Value: "someBroker",
-					},
-					{
 						Name:  "INSPR_channel2_UUID_SCHEMA",
 						Value: "channel2type",
 					},
 					{
 						Name:  "channel2_RESOLVED",
 						Value: "INSPR_channel2_UUID",
-					},
-					{
-						Name:  "channel2_BROKER",
-						Value: "someBroker",
 					},
 				},
 			},
@@ -249,7 +241,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 				Env: []kubeCore.EnvVar{
 					{
 						Name:  "INSPR_OUTPUT_CHANNELS",
-						Value: "channel1;channel2",
+						Value: "channel1_someBroker;channel2_someBroker",
 					},
 					{
 						Name:  "INSPR_INPUT_CHANNELS",
@@ -264,20 +256,12 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 						Value: "INSPR_channel1_UUID",
 					},
 					{
-						Name:  "channel1_BROKER",
-						Value: "someBroker",
-					},
-					{
 						Name:  "INSPR_channel2_UUID_SCHEMA",
 						Value: "channel2type",
 					},
 					{
 						Name:  "channel2_RESOLVED",
 						Value: "INSPR_channel2_UUID",
-					},
-					{
-						Name:  "channel2_BROKER",
-						Value: "someBroker",
 					},
 				},
 			},

@@ -46,7 +46,7 @@ func (s *Server) Run(ctx context.Context) error {
 	go func() {
 		if err := writeServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
-			logger.Error("an error ocurred in LB Sidecar write server",
+			logger.Error("an error occurred in LB Sidecar write server",
 				zap.Error(err))
 		}
 	}()

@@ -1,6 +1,17 @@
 
 # Changelog
 
+### #66 Story CORE-415 | Kafka Sidecar redesign
+- features:
+    - sidecar generic structure reconfigured to support broker specific sidecars
+    - new kafka sidecar created
+    - kafka sidecar image created for broker specific structure
+    - node operator reconfigured to work with broker specific sidecar
+    - environment methods reconfigured to fetch node data in new format
+- fixes:
+    - rest error unmarshaler method fixed and tested
+---
+
 ### #68 Bugfix CORE-431 | UIDP Refresh token crash
 - refactors:
     - Improved some error's messages, most of them in `cmd/authsvc`

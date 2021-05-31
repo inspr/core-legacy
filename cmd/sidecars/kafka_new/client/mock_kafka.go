@@ -48,8 +48,7 @@ func (mc *MockConsumer) CreateMessage() {
 		mc.events <- kafka.NewError(kafka.ErrAllBrokersDown, "", false)
 	}
 
-	ch := kafkaTopic(mc.senderChannel)
-	msg, _ := ch.encode(mc.pollMsg)
+	msg := []byte(mc.pollMsg)
 	mc.events <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic: &mc.topic,
@@ -108,19 +107,12 @@ func deleteMockEnv() {
 	os.Unsetenv("ch2_RESOLVED")
 }
 
-// mockMessageSender sends two messages to a kafka producer
-func mockMessageSender(writer *kafka.Producer, topic *string) {
-	// Valid message
-	writer.ProduceChannel() <- &kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     topic,
-			Partition: kafka.PartitionAny,
-		},
-		Value: []byte("msgTest"),
-	}
-	// Invalid message
-	writer.ProduceChannel() <- &kafka.Message{
-		TopicPartition: kafka.TopicPartition{},
-		Value:          []byte("msgTest"),
-	}
+func newMockWriter() (*Writer, error) {
+	var kProd *kafka.Producer
+
+	kProd, _ = kafka.NewProducer(&kafka.ConfigMap{
+		"test.mock.num.brokers": 3,
+	})
+
+	return &Writer{kProd}, nil
 }

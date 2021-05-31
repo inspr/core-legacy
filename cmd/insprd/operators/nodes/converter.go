@@ -78,12 +78,6 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 		channels := input.Union(output)
 
 		// label name to be used in the service
-		inputEnv := input.Join(";")
-		outputEnv := output.Join(";")
-		env := utils.EnvironmentMap{
-			"INSPR_INPUT_CHANNELS":  inputEnv,
-			"INSPR_OUTPUT_CHANNELS": outputEnv,
-		}
 
 		resolves, err := no.memory.Apps().ResolveBoundary(app)
 		if err != nil {
@@ -92,13 +86,25 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 			panic(err)
 		}
 
+		inputEnv := input.Map(func(boundary string) string {
+			return no.returnChannelBroker(resolves[boundary])
+		})
+
+		outputEnv := output.Map(func(boundary string) string {
+			return no.returnChannelBroker(resolves[boundary])
+		})
+
+		env := utils.EnvironmentMap{
+			"INSPR_INPUT_CHANNELS":  inputEnv.Join(";"),
+			"INSPR_OUTPUT_CHANNELS": outputEnv.Join(";"),
+		}
+
 		logger.Debug("resolving Node Boundary in the cluster")
 		channels.Map(func(boundary string) string {
 			resolved := resolves[boundary]
 			parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 			ch, _ := no.memory.Channels().Get(parent, chName)
 			ct, _ := no.memory.Types().Get(parent, ch.Spec.Type)
-			env[boundary+"_BROKER"] = no.returnChannelBroker(resolved)
 			resolved = "INSPR_" + ch.Meta.UUID
 			env[resolved+"_SCHEMA"] = ct.Schema
 			env[boundary+"_RESOLVED"] = resolved
@@ -272,5 +278,5 @@ func (no *NodeOperator) returnChannelBroker(pathToChannel string) string {
 	if err != nil {
 		return ""
 	}
-	return channel.Spec.SelectedBroker
+	return fmt.Sprintf("%s_%s", chName, channel.Spec.SelectedBroker)
 }

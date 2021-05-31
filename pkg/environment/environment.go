@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta/brokers"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 // InsprEnvVars represents the current inspr environment
@@ -25,8 +27,8 @@ var env *InsprEnvVars
 func GetEnvironment() *InsprEnvVars {
 	if env == nil {
 		env = &InsprEnvVars{
-			InputChannels:    GetInputChannels(),
-			OutputChannels:   GetOutputChannels(),
+			InputChannels:    getRawInputChannels(),
+			OutputChannels:   getRawInputChannels(),
 			SidecarImage:     GetSidecarImage(),
 			InsprAppContext:  GetInsprAppContext(),
 			InsprEnvironment: GetInsprEnvironment(),
@@ -47,8 +49,8 @@ func getEnv(name string) string {
 // This was develop for testing and probably sholdn't be used in other cases.
 func RefreshEnviromentVariables() *InsprEnvVars {
 	env = &InsprEnvVars{
-		InputChannels:    GetInputChannels(),
-		OutputChannels:   GetOutputChannels(),
+		InputChannels:    getRawInputChannels(),
+		OutputChannels:   getRawOutputChannels(),
 		SidecarImage:     GetSidecarImage(),
 		InsprAppContext:  GetInsprAppContext(),
 		InsprEnvironment: GetInsprEnvironment(),
@@ -69,13 +71,49 @@ func RecoverEnvironmentErrors(errch chan<- error) {
 	errch <- nil
 }
 
-// GetInputChannels returns environment variable which contains the input channels
-func GetInputChannels() string {
+// GetInputChannelsData returns the input channels
+func GetInputChannelsData() []brokers.ChannelBroker {
+	return getChannelData(getRawInputChannels())
+}
+
+// GetOutputChannelsData returns the output channels
+func GetOutputChannelsData() []brokers.ChannelBroker {
+	return getChannelData(getRawOutputChannels())
+}
+
+// GetInputBrokerChannels returns environment variable which contains the input channels
+func GetInputBrokerChannels(broker string) utils.StringArray {
+	channels := getChannelData(getRawInputChannels())
+	return filterChannelsByBroker(broker, channels)
+}
+
+// GetChannelBroker returns a channels selected broker
+func GetChannelBroker(channel string) (string, error) {
+	boundaries := append(GetInputChannelsData(), GetOutputChannelsData()...)
+	for _, boundary := range boundaries {
+		if boundary.ChName == channel {
+			return boundary.Broker, nil
+		}
+	}
+	return "", ierrors.NewError().
+		NotFound().
+		Message("[ENV VAR] %v_BROKER not found", channel).
+		Build()
+}
+
+// GetOutputBrokerChannels returns environment variable which contains the output channels
+func GetOutputBrokerChannels(broker string) utils.StringArray {
+	channels := getChannelData(getRawOutputChannels())
+	return filterChannelsByBroker(broker, channels)
+}
+
+// getRawInputChannels returns environment variable which contains the input channels
+func getRawInputChannels() string {
 	return getEnv("INSPR_INPUT_CHANNELS")
 }
 
-// GetOutputChannels returns environment variable which contains the output channels
-func GetOutputChannels() string {
+// getRawOutputChannels returns environment variable which contains the output channels
+func getRawOutputChannels() string {
 	return getEnv("INSPR_OUTPUT_CHANNELS")
 }
 
