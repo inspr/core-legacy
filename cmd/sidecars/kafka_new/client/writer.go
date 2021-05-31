@@ -3,6 +3,7 @@ package kafkasc
 import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/ierrors"
 	"go.uber.org/zap"
 )
 
@@ -24,7 +25,7 @@ func NewWriter() (*Writer, error) {
 	})
 
 	if err != nil {
-		return nil, kafka.NewError(kafka.ErrInvalidArg, err.Error(), false)
+		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
 
 	return &Writer{kProd}, nil
