@@ -87,15 +87,11 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 		}
 
 		inputEnv := input.Map(func(boundary string) string {
-			resolved := resolves[boundary]
-			channelBroker := no.returnChannelBroker(resolved)
-			return channelBroker
+			return no.returnChannelBroker(resolves[boundary])
 		})
 
 		outputEnv := output.Map(func(boundary string) string {
-			resolved := resolves[boundary]
-			channelBroker := no.returnChannelBroker(resolved)
-			return channelBroker
+			return no.returnChannelBroker(resolves[boundary])
 		})
 
 		env := utils.EnvironmentMap{
