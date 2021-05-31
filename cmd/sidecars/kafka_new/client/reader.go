@@ -6,15 +6,21 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	globalEnv "github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/sidecars/models"
 	"go.uber.org/zap"
 )
 
 const pollTimeout = 100
 
+// Consumer interface
+type Consumer interface {
+	Poll(int) kafka.Event
+	Commit() ([]kafka.TopicPartition, error)
+	Close() (err error)
+}
+
 // Reader reads/commit messages from the channels defined in the env
 type Reader struct {
-	consumers map[string]models.Consumer
+	consumers map[string]Consumer
 }
 
 // NewReader return a new Reader
@@ -27,7 +33,7 @@ func NewReader() (*Reader, error) {
 		return nil, ierrors.NewError().Message("INSPR_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
 
-	reader.consumers = make(map[string]models.Consumer)
+	reader.consumers = make(map[string]Consumer)
 
 	for idx, ch := range channelsList {
 		if err := reader.newSingleChannelConsumer(ch, resolvedChList[idx]); err != nil {
@@ -38,7 +44,7 @@ func NewReader() (*Reader, error) {
 }
 
 // Consumers returns a Reader's consumers
-func (reader *Reader) Consumers() map[string]models.Consumer {
+func (reader *Reader) Consumers() map[string]Consumer {
 	return reader.consumers
 }
 

@@ -2,16 +2,7 @@ package models
 
 import (
 	"context"
-
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
-
-// Consumer interface
-type Consumer interface {
-	Poll(int) kafka.Event
-	Commit() ([]kafka.TopicPartition, error)
-	Close() (err error)
-}
 
 // Reader reads from a message broker
 type Reader interface {

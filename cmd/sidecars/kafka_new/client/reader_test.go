@@ -9,7 +9,6 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
 func TestNewReader(t *testing.T) {
@@ -70,7 +69,7 @@ func TestReader_ReadMessage(t *testing.T) {
 	RefreshEnviromentVariables()
 
 	type fields struct {
-		consumers   map[string]models.Consumer
+		consumers   map[string]Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
@@ -86,7 +85,7 @@ func TestReader_ReadMessage(t *testing.T) {
 		{
 			name: "It should read a message",
 			fields: fields{
-				consumers: map[string]models.Consumer{
+				consumers: map[string]Consumer{
 					"ch1_resolved": &MockConsumer{
 						events:        make(chan kafka.Event, 2),
 						err:           false,
@@ -107,7 +106,7 @@ func TestReader_ReadMessage(t *testing.T) {
 		{
 			name: "It should return a message poll error",
 			fields: fields{
-				consumers: map[string]models.Consumer{
+				consumers: map[string]Consumer{
 					"ch1_resolved": &MockConsumer{
 						events:        make(chan kafka.Event, 2),
 						err:           true,
@@ -149,7 +148,7 @@ func TestReader_ReadMessage(t *testing.T) {
 
 func TestReader_Commit(t *testing.T) {
 	type fields struct {
-		consumers   map[string]models.Consumer
+		consumers   map[string]Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
@@ -161,7 +160,7 @@ func TestReader_Commit(t *testing.T) {
 		{
 			name: "It should not return a error since the message was committed",
 			fields: fields{
-				consumers: map[string]models.Consumer{
+				consumers: map[string]Consumer{
 					"ch1": &MockConsumer{
 						events: make(chan kafka.Event, 2),
 						err:    false,
@@ -175,7 +174,7 @@ func TestReader_Commit(t *testing.T) {
 		{
 			name: "It should return a error since the message was not committed",
 			fields: fields{
-				consumers: map[string]models.Consumer{
+				consumers: map[string]Consumer{
 					"ch1": &MockConsumer{
 						events: make(chan kafka.Event, 2),
 						err:    true,
@@ -203,7 +202,7 @@ func TestReader_Commit(t *testing.T) {
 
 func TestReader_Close(t *testing.T) {
 	type fields struct {
-		consumers   map[string]models.Consumer
+		consumers   map[string]Consumer
 		lastMessage *kafka.Message
 	}
 	tests := []struct {
@@ -215,7 +214,7 @@ func TestReader_Close(t *testing.T) {
 		{
 			name: "Close the consumer",
 			fields: fields{
-				consumers: map[string]models.Consumer{
+				consumers: map[string]Consumer{
 					"ch1": &MockConsumer{
 						events: make(chan kafka.Event, 2),
 						err:    false,
@@ -228,7 +227,7 @@ func TestReader_Close(t *testing.T) {
 		{
 			name: "Error when trying to close the consumer",
 			fields: fields{
-				consumers: map[string]models.Consumer{
+				consumers: map[string]Consumer{
 					"ch1": &MockConsumer{
 						err: true,
 					},

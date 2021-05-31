@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka_new/client"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 )
@@ -59,7 +60,7 @@ func (m *mockReader) ReadMessage(ctx context.Context, channel string) ([]byte, e
 
 func (m *mockReader) Close() error { return nil }
 
-func (m *mockReader) Consumers() map[string]models.Consumer { return nil }
+func (m *mockReader) Consumers() map[string]kafkasc.Consumer { return nil }
 
 type mockWriter struct {
 	writeMessage func(channel string, message []byte) error
