@@ -27,8 +27,8 @@ type Server struct {
 var logger *zap.Logger
 
 func init() {
-	logger = zap.NewNop()
-	// logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
+	// logger = zap.NewNop()
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "sidecar")))
 }
 
 // Init - configures the server
@@ -78,18 +78,17 @@ func (s *Server) Run(ctx context.Context) error {
 		defer func() { s.runningWrite = false }()
 		if err = server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Error("listen:%v", zap.Error(err))
+			errCh <- err
 		}
 	}()
 
-	logger.Info("sideCar listener is up...")
+	logger.Sugar().Infof("%s sideCar listener is up...", s.broker)
 
 	select {
 	case <-ctx.Done():
-		s.Writer.Close()
 		s.gracefulShutdown(server, ctx.Err())
 		return ctx.Err()
 	case errRead := <-errCh:
-		s.Writer.Close()
 		s.gracefulShutdown(server, errRead)
 		return errRead
 	}
@@ -109,6 +108,8 @@ func (s *Server) gracefulShutdown(server *http.Server, err error) {
 	if err != nil {
 		logger.Error("an error occurred on sidecar", zap.Any("broker", s.broker), zap.Error(err))
 	}
+
+	s.Writer.Close()
 
 	// has to be the last method called in the shutdown
 	if err = server.Shutdown(ctxShutdown); err != nil {

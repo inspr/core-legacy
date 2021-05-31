@@ -16,7 +16,7 @@ import (
 
 const maxBrokerRetries = 5
 
-// handles the /message route in the server
+// handles the messages route in the server
 func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger.Info("handling message write")
@@ -47,7 +47,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			rest.ERROR(w, ierrors.NewError().Message("broker's writeMessage failed, %s", err.Error()).Build())
 			return
 		}
-		rest.JSON(w, 200, struct{ Status string }{"OK"})
+		rest.JSON(w, 200, nil)
 	}
 }
 
