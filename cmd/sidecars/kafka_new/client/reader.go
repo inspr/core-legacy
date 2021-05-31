@@ -21,11 +21,13 @@ type Consumer interface {
 // Reader reads/commit messages from the channels defined in the env
 type Reader struct {
 	consumers map[string]Consumer
+	kafkaEnv  *Environment
 }
 
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
 	var reader Reader
+	reader.kafkaEnv = GetEnvironment()
 	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannelsData())
 
 	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannelsData())
@@ -132,11 +134,11 @@ func (reader *Reader) Close() error {
 
 //newSingleChannelConsumer creates a consumer for a single Kafka channel on the reader's consumers map.
 func (reader *Reader) newSingleChannelConsumer(channel, resolved string) error {
-	kafkaEnv := GetEnvironment()
+
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
+		"bootstrap.servers":  reader.kafkaEnv.KafkaBootstrapServers,
 		"group.id":           globalEnv.GetInsprAppID(),
-		"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
+		"auto.offset.reset":  reader.kafkaEnv.KafkaAutoOffsetReset,
 		"enable.auto.commit": false,
 	})
 	if errKafkaConsumer != nil {
