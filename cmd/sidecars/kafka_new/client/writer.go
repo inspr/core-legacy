@@ -55,9 +55,9 @@ func (writer *Writer) WriteMessage(channel string, message []byte) error {
 		return errProduceMessage
 	}
 
-	logger.Info("flushing the producer")
+	logger.Debug("flushing the producer")
 	writer.producer.Flush(flushTimeout)
-	logger.Info("flushed")
+	logger.Debug("flushed")
 	return nil
 }
 
