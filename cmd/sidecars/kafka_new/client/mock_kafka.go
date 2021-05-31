@@ -106,3 +106,13 @@ func deleteMockEnv() {
 	os.Unsetenv("ch1_RESOLVED")
 	os.Unsetenv("ch2_RESOLVED")
 }
+
+func newMockWriter() (*Writer, error) {
+	var kProd *kafka.Producer
+
+	kProd, _ = kafka.NewProducer(&kafka.ConfigMap{
+		"test.mock.num.brokers": 3,
+	})
+
+	return &Writer{kProd}, nil
+}

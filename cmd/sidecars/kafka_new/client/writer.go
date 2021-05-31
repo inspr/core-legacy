@@ -30,16 +30,6 @@ func NewWriter() (*Writer, error) {
 	return &Writer{kProd}, nil
 }
 
-func newMockWriter() (*Writer, error) {
-	var kProd *kafka.Producer
-
-	kProd, _ = kafka.NewProducer(&kafka.ConfigMap{
-		"test.mock.num.brokers": 3,
-	})
-
-	return &Writer{kProd}, nil
-}
-
 // Producer returns a Writer's producer
 func (writer *Writer) Producer() *kafka.Producer {
 	return writer.producer

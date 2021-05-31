@@ -85,7 +85,7 @@ func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, 
 						InternalServer().
 						Build()
 				}
-				logger.Error("error in reading kafka message", zap.String("error", ev.Error()))
+				logger.Error("error while reading kafka message ...", zap.String("error", ev.Error()))
 				return nil, ierrors.NewError().
 					Message("%v", ev).
 					Build()
@@ -111,8 +111,7 @@ func (reader *Reader) Commit(ctx context.Context, channel string) error {
 		if errCommit != nil {
 			return ierrors.
 				NewError().
-				InnerError(errCommit).
-				Message("failed to commit last message").
+				Message("failed to commit last message: %s", errCommit.Error()).
 				InternalServer().
 				Build()
 		}
