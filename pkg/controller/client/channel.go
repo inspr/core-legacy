@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
@@ -30,7 +31,7 @@ func (cc *ChannelClient) Get(ctx context.Context, scope string, name string) (*m
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", "GET", cdi, &resp)
+		Send(ctx, "/channels", http.MethodGet, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +57,7 @@ func (cc *ChannelClient) Create(ctx context.Context, scope string, ch *meta.Chan
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", "POST", cdi, &resp)
+		Send(ctx, "/channels", http.MethodPost, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +83,7 @@ func (cc *ChannelClient) Delete(ctx context.Context, scope string, name string, 
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", "DELETE", cdi, &resp)
+		Send(ctx, "/channels", http.MethodDelete, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +109,7 @@ func (cc *ChannelClient) Update(ctx context.Context, scope string, ch *meta.Chan
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", "PUT", cdi, &resp)
+		Send(ctx, "/channels", http.MethodPut, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}

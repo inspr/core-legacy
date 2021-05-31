@@ -280,7 +280,7 @@ func TestClient_HandleChannel(t *testing.T) {
 			response := struct {
 				Status string `json:"status"`
 			}{}
-			err := client.Send(context.Background(), tt.args.channel, "POST", struct{ Message interface{} }{tt.message}, &response)
+			err := client.Send(context.Background(), tt.args.channel, http.MethodPost, struct{ Message interface{} }{tt.message}, &response)
 			if (response.Status != "OK") != tt.wantErr {
 				t.Errorf("Client_HandleChannel response.Status = %v, wantErr = %v", response.Status, tt.wantErr)
 			}
@@ -354,7 +354,7 @@ func TestClient_Run(t *testing.T) {
 			var response struct {
 				Status string `json:"status"`
 			}
-			err := c.Send(ctx, tt.channel, "POST", tt.message, &response)
+			err := c.Send(ctx, tt.channel, http.MethodPost, tt.message, &response)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client_Run err = %v, wantErr = %v", err, tt.wantErr)
 			}

@@ -20,9 +20,7 @@ import (
 var logger *zap.Logger
 
 func init() {
-	logger = zap.NewNop()
-
-	// logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
+	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
 }
 
 // writeMessageHandler handles requests sent to the write message server

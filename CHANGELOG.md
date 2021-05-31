@@ -12,6 +12,22 @@
     - rest error unmarshaler method fixed and tested
 ---
 
+### #68 Bugfix CORE-431 | UIDP Refresh token crash
+- refactors:
+    - Improved some error's messages, most of them in `cmd/authsvc`
+    - Changed some logs so they use `zap.logger` instead of `log` and improved their messages
+    - Fixed misspelings pointed out by Go Report
+    - Changed "POST", "GET", "DELETE" and "PUT" to use `net/http` constants instead
+    - Renamed the embed file used in `examples/controller`
+---
+
+### #67 Tech CORE-429 | Change the inspr cmd cluster command to ignore the .inspr/token
+- features:
+    - Updated the Init function in the auth package so now it creates .inspr/token if it doesn't exist
+    - Added the admin permissions in auth models
+    - The admin user is now initialized with the admin permissions created in auth models
+---
+
 ### #63 Story CORE-414 | Adapt the current sidecar to a load balancer sidecar
 - features:
     - implemented the new LB sidecar

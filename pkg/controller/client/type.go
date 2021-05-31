@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
@@ -30,7 +31,7 @@ func (tc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "GET", tdi, &resp)
+		Send(ctx, "/types", http.MethodGet, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +57,7 @@ func (tc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, d
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "POST", tdi, &resp)
+		Send(ctx, "/types", http.MethodPost, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +83,7 @@ func (tc *TypeClient) Delete(ctx context.Context, scope string, name string, dry
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "DELETE", tdi, &resp)
+		Send(ctx, "/types", http.MethodDelete, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +109,7 @@ func (tc *TypeClient) Update(ctx context.Context, scope string, ch *meta.Type, d
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "PUT", tdi, &resp)
+		Send(ctx, "/types", http.MethodPut, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
