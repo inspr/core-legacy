@@ -1,6 +1,16 @@
 
 # Changelog
 
+### #66 Story CORE-415 | Kafka Sidecar redesign
+- features:
+    - sidecar generic structure reconfigured to support broker specific sidecars
+    - kafka sidecar image created for broker specific structure
+    - node operator reconfigured to work with broker specific sidecar
+    - environment methods reconfigured to fetch node data in new format
+- fixes:
+    - rest error unmarshaler method fixed and tested
+---
+
 ### #63 Story CORE-414 | Adapt the current sidecar to a load balancer sidecar
 - features:
     - implemented the new LB sidecar
