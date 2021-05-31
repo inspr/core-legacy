@@ -50,10 +50,8 @@ func (reader *Reader) Consumers() map[string]Consumer {
 	return reader.consumers
 }
 
-/*
-ReadMessage reads message by message. Returns channel the message belongs to,
-the message and an error if any occurred.
-*/
+// ReadMessage reads message by message. Returns channel the message belongs to,
+// the message and an error if any occurred.
 func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, error) {
 	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannelsData(), nil)
 
