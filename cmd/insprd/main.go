@@ -7,7 +7,6 @@ import (
 	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/cmd/insprd/memory/tree"
 	"github.com/inspr/inspr/cmd/insprd/operators"
-	kafka "github.com/inspr/inspr/cmd/insprd/operators/kafka"
 	"github.com/inspr/inspr/pkg/api"
 	"github.com/inspr/inspr/pkg/auth"
 	jwtauth "github.com/inspr/inspr/pkg/auth/jwt"
@@ -25,7 +24,7 @@ func main() {
 		authenticator = authmock.NewMockAuth(nil)
 		brokerManager = brokers.GetBrokerMemory()
 		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator(memoryManager, authenticator)
+		operator, err = operators.NewOperator(memoryManager, authenticator, brokerManager)
 		if err != nil {
 			panic(err)
 		}
@@ -37,7 +36,7 @@ func main() {
 		authenticator = jwtauth.NewJWTauth(pubKey)
 		brokerManager = brokers.GetBrokerMemory()
 		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator(memoryManager, authenticator)
+		operator, err = operators.NewOperator(memoryManager, authenticator, brokerManager)
 		if err != nil {
 			panic(err)
 		}

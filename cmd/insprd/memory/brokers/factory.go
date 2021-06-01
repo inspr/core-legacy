@@ -2,8 +2,6 @@ package brokers
 
 import (
 	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/operator/k8s"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
@@ -37,24 +35,4 @@ func (abf *AbstractBrokerFactory) Get(broker string) (models.SidecarFactory, err
 		return factory, nil
 	}
 	return nil, ierrors.NewError().Message("%s broker not allowed", broker).Build()
-}
-
-func getAvailiblePorts() *models.SidecarConnections {
-	return nil
-}
-
-func getAllSidecarNames(app *meta.App) []string {
-	return nil
-}
-
-func getAllSidecarsDeployments(app *meta.App) []k8s.DeploymentOption {
-	var ret []k8s.DeploymentOption
-	for _, broker := range getAllSidecarNames(app) {
-		if option, ok := factories[broker]; ok {
-			ret = append(ret, option(app, getAvailiblePorts()))
-		} else {
-			panic("broker not allowed")
-		}
-	}
-	return ret
 }
