@@ -11,6 +11,7 @@ import (
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/operator/k8s"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
 
@@ -182,6 +183,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 					withNodeID(app),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
 				),
+				// no.brokers.Factory().
 			),
 		))
 }
@@ -278,4 +280,49 @@ func (no *NodeOperator) returnChannelBroker(pathToChannel string) string {
 		return ""
 	}
 	return fmt.Sprintf("%s_%s", chName, channel.Spec.SelectedBroker)
+}
+
+func getAvailiblePorts() *models.SidecarConnections {
+	return &models.SidecarConnections{
+		InPort:  42069,
+		OutPort: 42070,
+	}
+}
+
+func (no *NodeOperator) getAllSidecarNames(app *meta.App) utils.StringArray {
+	input := app.Spec.Boundary.Input
+	output := app.Spec.Boundary.Output
+	channels := input.Union(output)
+
+	resolves, err := no.memory.Apps().ResolveBoundary(app)
+	if err != nil {
+		logger.Error("unable to resolve Node boundaries",
+			zap.Any("boundaries", app.Spec.Boundary))
+		panic(err)
+	}
+
+	logger.Debug("resolving Node Boundary in the cluster")
+
+	set, _ := metautils.MakeStrSet(channels.Map(func(boundary string) string {
+		resolved := resolves[boundary]
+		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
+		ch, _ := no.memory.Channels().Get(parent, chName)
+		return ch.Spec.SelectedBroker
+	}))
+	return set.ToArray()
+}
+
+func (no *NodeOperator) withAllSidecarsContainers(app *meta.App) []corev1.Container {
+	var ret []corev1.Container
+	for _, broker := range no.getAllSidecarNames(app) {
+
+		factory, err := no.brokers.Factory().Get(broker)
+
+		if err != nil {
+			panic("broker not allowed")
+		}
+
+		ret = append(ret, factory(app, getAvailiblePorts()))
+	}
+	return ret
 }

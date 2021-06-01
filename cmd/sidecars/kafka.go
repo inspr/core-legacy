@@ -19,18 +19,16 @@ type KafkaConfig struct {
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
 // SidecarFactory function that is used to subscribe to the sidecarFactory
 func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
-	return func(app *meta.App, conn *models.SidecarConnections) k8s.DeploymentOption {
-		return k8s.WithContainer(
-			k8s.NewContainer(
-				"sidecar-kafka-"+app.Meta.UUID, // deployment name
-				config.SidecarImage,            // image url
+	return func(app *meta.App, conn *models.SidecarConnections) corev1.Container {
+		return k8s.NewContainer(
+			"sidecar-kafka-"+app.Meta.UUID, // deployment name
+			config.SidecarImage,            // image url
 
-				// label to the dApp associated with it
-				InsprAppIDConfig(app),
-				KafkaEnvConfig(config),
-				KafkaSidecarConfig(config, conn),
-				k8s.ContainerWithPullPolicy(corev1.PullAlways),
-			),
+			// label to the dApp associated with it
+			InsprAppIDConfig(app),
+			KafkaEnvConfig(config),
+			KafkaSidecarConfig(config, conn),
+			k8s.ContainerWithPullPolicy(corev1.PullAlways),
 		)
 	}
 }
