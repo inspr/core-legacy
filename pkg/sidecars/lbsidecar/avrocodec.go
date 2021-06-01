@@ -73,7 +73,7 @@ func decode(ch string, messageEncoded []byte) (interface{}, error) {
 func getSchema(ch string) (string, error) {
 	logger.Debug("getting channel schema")
 
-	schema, err := environment.GetSchema(string(ch))
+	schema, err := environment.GetSchema(ch)
 	if err != nil {
 		logger.Error("unable to get channel schema", zap.Any("error", err))
 

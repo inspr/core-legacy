@@ -30,7 +30,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 
 		channel := strings.TrimPrefix(r.URL.Path, "/")
 
-		if !environment.OutputChannnelList().Contains(channel) {
+		if !environment.OutputChannelList().Contains(channel) {
 			logger.Error(fmt.Sprintf("channel %s not found in output channel list", channel))
 			insprError := ierrors.NewError().
 				BadRequest().
@@ -159,10 +159,24 @@ func encodeToAvro(channel string, body io.Reader) ([]byte, error) {
 	var receivedMsg models.BrokerMessage
 	json.NewDecoder(body).Decode(&receivedMsg)
 
-	encodedAvroMsg, err := encode(channel, receivedMsg.Data)
+	fmt.Printf("received message: %v\n", receivedMsg)
+
+	resolvedCh, ok := os.LookupEnv(channel + "_RESOLVED")
+	if !ok {
+		logger.Error(fmt.Sprintf("couldn't find resolution for channel %s", channel))
+		insprError := ierrors.NewError().
+			BadRequest().
+			Message("resolution for channel '%s' not found", channel)
+
+		return nil, insprError.Build()
+	}
+
+	encodedAvroMsg, err := encode(resolvedCh, receivedMsg.Data)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("encoded message: %v\n", encodedAvroMsg)
 
 	return encodedAvroMsg, nil
 }

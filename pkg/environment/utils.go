@@ -45,8 +45,8 @@ func GetSchema(channel string) (string, error) {
 	return schema, nil
 }
 
-// OutputChannnelList returns a list of input channels
-func OutputChannnelList() utils.StringArray {
+// OutputChannelList returns a list of input channels
+func OutputChannelList() utils.StringArray {
 	return GetChannelBoundaryList(GetOutputChannelsData())
 }
 

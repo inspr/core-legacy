@@ -2,7 +2,6 @@ package nodes
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -21,10 +20,10 @@ import (
 )
 
 func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
-	log.Println("creating secret")
+	logger.Info("creating secret")
 	scope, err := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
 	if err != nil {
-		log.Printf("err = %+v\n", err)
+		logger.Error("invalid scope", zap.Any("error", err))
 		return nil
 	}
 
@@ -39,7 +38,7 @@ func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
 
 	token, err := no.auth.Tokenize(payload)
 	if err != nil {
-		log.Printf("err = %+v\n", err)
+		logger.Error("unable to tokenize", zap.Any("error", err))
 		return nil
 	}
 
@@ -122,9 +121,9 @@ func withNodeID(app *meta.App) k8s.ContainerOption {
 	})
 }
 
-// withSidecarPorts adds the sidecar ports if they are defined in the dApp definitions.
+// withLBSidecarPorts adds the load balancer sidecar ports if they are defined in the dApp definitions.
 // On kubernetes, this overrides the defined configuration on the configmap
-func withSidecarPorts(app *meta.App) k8s.ContainerOption {
+func withLBSidecarPorts(app *meta.App) k8s.ContainerOption {
 	return func(c *corev1.Container) {
 		lbWritePort := app.Spec.Node.Spec.SidecarPort.LBWrite
 		lbReadPort := app.Spec.Node.Spec.SidecarPort.LBRead
@@ -145,8 +144,8 @@ func withSidecarPorts(app *meta.App) k8s.ContainerOption {
 	}
 }
 
-// withSidecarImage adds the sidecar image to the dApp
-func (no *NodeOperator) withSidecarImage(app *meta.App) k8s.ContainerOption {
+// withLBSidecarImage adds the sidecar image to the dApp
+func (no *NodeOperator) withLBSidecarImage(app *meta.App) k8s.ContainerOption {
 	return func(c *corev1.Container) {
 		c.Image = environment.GetSidecarImage()
 	}
@@ -158,7 +157,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 	appLabels := map[string]string{
 		"inspr-app": toAppID(app),
 	}
-	log.Println("constructing deployment")
+	logger.Info("constructing deployment")
 
 	return (*kubeDeploy)(
 		k8s.NewDeployment(
@@ -168,18 +167,18 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 				k8s.NewContainer(
 					appDeployName,
 					app.Spec.Node.Spec.Image,
-					withSidecarPorts(app),
+					withLBSidecarPorts(app),
 					withSecretDefinition(app),
-					withSidecarConfiguration(),
+					withLBSidecarConfiguration(),
 				),
 				k8s.NewContainer(
-					appDeployName+"-sidecar",
+					appDeployName+"-lbsidecar",
 					"",
-					no.withSidecarImage(app),
+					no.withLBSidecarImage(app),
 					no.withBoundary(app),
-					withSidecarPorts(app),
-					withKafkaConfiguration(),
-					withSidecarConfiguration(),
+					withLBSidecarPorts(app),
+					// withKafkaConfiguration(),
+					withLBSidecarConfiguration(),
 					withNodeID(app),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
 				),
@@ -187,21 +186,19 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 		))
 }
 
-var sidecarPort int32
+// func withKafkaConfiguration() k8s.ContainerOption {
+// 	return k8s.ContainerWithEnvFrom(
+// 		corev1.EnvFromSource{
+// 			ConfigMapRef: &corev1.ConfigMapEnvSource{
+// 				LocalObjectReference: corev1.LocalObjectReference{
+// 					Name: "inspr-kafka-configuration",
+// 				},
+// 			},
+// 		},
+// 	)
+// }
 
-func withKafkaConfiguration() k8s.ContainerOption {
-	return k8s.ContainerWithEnvFrom(
-		corev1.EnvFromSource{
-			ConfigMapRef: &corev1.ConfigMapEnvSource{
-				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "inspr-kafka-configuration",
-				},
-			},
-		},
-	)
-}
-
-func withSidecarConfiguration() k8s.ContainerOption {
+func withLBSidecarConfiguration() k8s.ContainerOption {
 	return k8s.ContainerWithEnvFrom(
 		corev1.EnvFromSource{
 			ConfigMapRef: &corev1.ConfigMapEnvSource{
@@ -213,9 +210,11 @@ func withSidecarConfiguration() k8s.ContainerOption {
 	)
 }
 
+var lbsidecarPort int32
+
 func dappToService(app *meta.App) *kubeService {
 	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_PORT"))
-	sidecarPort = int32(temp)
+	lbsidecarPort = int32(temp)
 	appID := toAppID(app)
 	appDeployName := toDeploymentName(app)
 	appLabels := map[string]string{"inspr-app": appID}
@@ -234,9 +233,9 @@ func dappToService(app *meta.App) *kubeService {
 					})
 				}
 				ports = append(ports, corev1.ServicePort{
-					Name:       "sidecar-port",
-					Port:       sidecarPort,
-					TargetPort: intstr.FromInt(int(sidecarPort)),
+					Name:       "lbsidecar-port",
+					Port:       lbsidecarPort,
+					TargetPort: intstr.FromInt(int(lbsidecarPort)),
 				})
 				return
 			}(),
