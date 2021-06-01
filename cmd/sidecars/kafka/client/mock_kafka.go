@@ -48,8 +48,7 @@ func (mc *MockConsumer) CreateMessage() {
 		mc.events <- kafka.NewError(kafka.ErrAllBrokersDown, "", false)
 	}
 
-	ch := kafkaTopic(mc.senderChannel)
-	msg, _ := ch.encode(mc.pollMsg)
+	msg := []byte(mc.pollMsg)
 	mc.events <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic: &mc.topic,
@@ -89,7 +88,7 @@ func createMockEnv() {
 	os.Setenv("ch1_RESOLVED", "ch1_resolved")
 	os.Setenv("ch2_RESOLVED", "ch2_resolved")
 	os.Setenv("INSPR_APP_ID", "testappid1")
-	os.Setenv("INSPR_SIDECAR_IMAGE", "random-sidecar-image")
+	os.Setenv("INSPR_LBSIDECAR_IMAGE", "random-sidecar-image")
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
@@ -102,25 +101,18 @@ func deleteMockEnv() {
 	os.Unsetenv("KAFKA_BOOTSTRAP_SERVERS")
 	os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
 	os.Unsetenv("INSPR_APP_ID")
-	os.Unsetenv("INSPR_SIDECAR_IMAGE")
+	os.Unsetenv("INSPR_LBSIDECAR_IMAGE")
 
 	os.Unsetenv("ch1_RESOLVED")
 	os.Unsetenv("ch2_RESOLVED")
 }
 
-// mockMessageSender sends two messages to a kafka producer
-func mockMessageSender(writer *kafka.Producer, topic *string) {
-	// Valid message
-	writer.ProduceChannel() <- &kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     topic,
-			Partition: kafka.PartitionAny,
-		},
-		Value: []byte("msgTest"),
-	}
-	// Invalid message
-	writer.ProduceChannel() <- &kafka.Message{
-		TopicPartition: kafka.TopicPartition{},
-		Value:          []byte("msgTest"),
-	}
+func newMockWriter() (*Writer, error) {
+	var kProd *kafka.Producer
+
+	kProd, _ = kafka.NewProducer(&kafka.ConfigMap{
+		"test.mock.num.brokers": 3,
+	})
+
+	return &Writer{kProd}, nil
 }

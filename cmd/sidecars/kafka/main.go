@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
 	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
-	sidecarserv "github.com/inspr/inspr/pkg/sidecar_old/server"
+	"github.com/inspr/inspr/pkg/sidecars/models"
+	sidecarserv "github.com/inspr/inspr/pkg/sidecars/server"
 	"go.uber.org/zap"
 )
 
@@ -28,7 +29,7 @@ func main() {
 
 	logger.Info("instantiating Kafka Sidecar reader")
 	if len(environment.GetInputChannelsData()) != 0 {
-		reader, err = kafkasc.NewReader()
+		reader, err = kafkasc.NewReader() // alterar metodo para comply a nova interface
 		if err != nil {
 			logger.Error("unable to instantiate Kafka Sidecar reader")
 
@@ -39,7 +40,7 @@ func main() {
 
 	logger.Info("instantiating Kafka Sidecar writer")
 	if len(environment.GetOutputChannelsData()) != 0 {
-		writer, err = kafkasc.NewWriter(false)
+		writer, err = kafkasc.NewWriter()
 		if err != nil {
 			logger.Error("unable to instantiate Kafka Sidecar writer")
 
@@ -47,11 +48,13 @@ func main() {
 			return
 		}
 	}
-	s := sidecarserv.NewServer()
 
 	logger.Info("initializing Kafka Sidecar server")
-	s.Init(reader, writer)
+	s := sidecarserv.Init(reader, writer, brokers.Kafka)
 
 	logger.Info("running Kafka Sidecar server")
-	s.Run(ctx)
+	err = s.Run(ctx)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
 }

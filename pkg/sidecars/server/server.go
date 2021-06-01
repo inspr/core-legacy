@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 	"go.uber.org/zap"
 )
@@ -34,7 +35,7 @@ func init() {
 func Init(r models.Reader, w models.Writer, broker string) *Server {
 	server := &Server{}
 	// server fetches addresses variable names from models.
-	envVars := models.GetSidecarConnectionVars(broker)
+	envVars := brokers.GetSidecarConnectionVars(broker)
 	if envVars == nil {
 		panic(fmt.Sprintf("%s broker's enviroment variables not configured", broker))
 	}

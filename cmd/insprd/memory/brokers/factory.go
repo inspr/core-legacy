@@ -4,7 +4,7 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/operator/k8s"
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
 type brokerFactory map[string]models.SidecarFactory

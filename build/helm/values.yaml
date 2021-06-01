@@ -64,7 +64,7 @@ lbSidecar:
   port: 3051
   readPort: 3047
 
-sidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
+lbsidecarImage: gcr.io/red-inspr/inspr/sidecar/lbsidecar
 
 kafka:
   bootstrap: kafka.default.svc:9092

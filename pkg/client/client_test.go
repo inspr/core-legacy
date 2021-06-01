@@ -78,7 +78,7 @@ func createMockEnvVars() {
 	os.Setenv("ch1_SCHEMA", `{"type":"string"}`)
 	os.Setenv("ch2_SCHEMA", "hellotest")
 	os.Setenv("INSPR_APP_ID", "testappid1")
-	os.Setenv("INSPR_SIDECAR_IMAGE", "random-sidecar-image")
+	os.Setenv("INSPR_LBSIDECAR_IMAGE", "random-sidecar-image")
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
@@ -91,7 +91,7 @@ func deleteMockEnvVars() {
 	os.Unsetenv("KAFKA_BOOTSTRAP_SERVERS")
 	os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
 	os.Unsetenv("INSPR_APP_ID")
-	os.Unsetenv("INSPR_SIDECAR_IMAGE")
+	os.Unsetenv("INSPR_LBSIDECAR_IMAGE")
 }
 
 func TestNewAppClient(t *testing.T) {
