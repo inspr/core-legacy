@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: dapp
+
+meta:
+  name: "multibrokerexample"
+spec:
+  node:
+    meta:
+      name: multibrokerexample
+    spec:
+      image: gcr.io/red-inspr/examples/mbtest:latest
+      replicas: 1
+
+  boundary:
+    output:
+      - mbch1
