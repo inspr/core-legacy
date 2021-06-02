@@ -42,7 +42,9 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		logger.Info("writing message to broker", zap.String("channel", channel))
+		logger.Info("writing message to broker",
+			zap.String("channel", channel),
+			zap.Any("message", body))
 		if err := s.Writer.WriteMessage(channel, body); err != nil {
 			rest.ERROR(w, ierrors.NewError().Message("broker's writeMessage failed, %s", err.Error()).Build())
 			return
@@ -60,7 +62,7 @@ func (s *Server) readMessageRoutine(ctx context.Context) error {
 	defer cancel()
 
 	for _, channel := range environment.InputBrokerChannels(s.broker) {
-		// separates several trhead for each channel of this broker
+		// separates several threads for each channel of this broker
 		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel)
 	}
 
@@ -87,7 +89,9 @@ func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) 
 				return err
 			}
 
-			logger.Debug("trying to send request to loadbalancer")
+			logger.Debug("trying to send request to loadbalancer",
+				zap.String("channel", channel),
+				zap.Any("message", brokerMsg))
 
 			status, err := s.writeWithRetry(ctx, channel, brokerMsg)
 			if err != nil || status != http.StatusOK {
@@ -114,7 +118,7 @@ func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerMsg [
 func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte) (status int, err error) {
 	var resp *http.Response
 	for i := 0; i <= maxBrokerRetries; i++ {
-		resp, err = s.client.Post(s.outAddr, "application/octet-stream", bytes.NewBuffer(data))
+		resp, err = s.client.Post(s.outAddr+"/"+channel, "application/octet-stream", bytes.NewBuffer(data))
 		status = resp.StatusCode
 		if err == nil && status == http.StatusOK {
 			decoder := json.NewDecoder(resp.Body)
@@ -123,5 +127,8 @@ func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte
 		}
 		err = rest.UnmarshalERROR(resp.Body)
 	}
+
+	logger.Debug("unable to send message to lbsidecar",
+		zap.Error(err))
 	return
 }
