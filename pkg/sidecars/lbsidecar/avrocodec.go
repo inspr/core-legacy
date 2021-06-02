@@ -71,7 +71,8 @@ func decode(ch string, messageEncoded []byte) (interface{}, error) {
 
 // returns the channel type's schema
 func getSchema(ch string) (string, error) {
-	logger.Debug("getting channel schema")
+	logger.Debug("getting channel schema",
+		zap.String("channel", ch))
 
 	schema, err := environment.GetSchema(ch)
 	if err != nil {
