@@ -19,7 +19,7 @@ func NewWriter() (*Writer, error) {
 	var kProd *kafka.Producer
 	var err error
 
-	bootstrapServers := GetEnvironment().KafkaBootstrapServers
+	bootstrapServers := GetKafkaEnvironment().KafkaBootstrapServers
 	kProd, err = kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers": bootstrapServers,
 	})

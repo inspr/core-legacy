@@ -27,7 +27,7 @@ type Reader struct {
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
 	var reader Reader
-	reader.kafkaEnv = GetEnvironment()
+	reader.kafkaEnv = GetKafkaEnvironment()
 	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannelsData())
 
 	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannelsData())

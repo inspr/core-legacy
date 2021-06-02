@@ -32,7 +32,7 @@ type kafkaEnv struct {
 }
 
 func getEnv() (env kafkaEnv) {
-	boot := os.Getenv("KAFKA_BOOTSTRAP_SERVERS")
+	boot := os.Getenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS") // HELL, this must inherit configs from the instanciation of a new kafka broker
 	env.kafkaBootstrapServers = boot
 	return
 }
@@ -48,9 +48,9 @@ func NewOperator(mem memory.Manager) (*ChannelOperator, error) {
 		adminClient = &mockAdminClient{}
 	} else {
 		logger.Info("initializing kafka admin with production configs",
-			zap.String("kafka bootstrap servers", getEnv().kafkaBootstrapServers))
+			zap.String("kafka bootstrap servers", "kafka.default.svc:9092"))
 		config = &kafka.ConfigMap{
-			"bootstrap.servers": getEnv().kafkaBootstrapServers,
+			"bootstrap.servers": "kafka.default.svc:9092",
 		}
 
 		adminClient, err = kafka.NewAdminClient(config)
