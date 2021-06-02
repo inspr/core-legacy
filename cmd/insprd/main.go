@@ -46,7 +46,7 @@ func main() {
 	config := sidecars.KafkaConfig{
 		BootstrapServers: "kafka.default.svc:9092",
 		AutoOffsetReset:  "earliest",
-		KafkaInsprPort:   "0",
+		KafkaInsprAddr:   "http://localhost",
 		SidecarImage:     "gcr.io/red-inspr/inspr/sidecar/kafka:latest",
 	}
 

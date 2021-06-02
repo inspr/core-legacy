@@ -28,7 +28,7 @@ type Server struct {
 var logger *zap.Logger
 
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "sidecar")))
+	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "sidecar")))
 }
 
 // Init - configures the server

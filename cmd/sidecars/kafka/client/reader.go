@@ -83,7 +83,7 @@ func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, 
 						InternalServer().
 						Build()
 				}
-				logger.Error("error while reading kafka message ...", zap.String("error", ev.Error()))
+				logger.Error("error while reading kafka message", zap.String("error", ev.Error()))
 				return nil, ierrors.NewError().
 					Message("%v", ev).
 					Build()
