@@ -15,7 +15,7 @@ const (
 	testBootstrap      = "bootstrap"
 	testAutoOff        = "autooff"
 	testSidecarImage   = "image"
-	testKafkaInsprPort = "insprdPort"
+	testKafkaInsprAddr = "insprdPort"
 )
 
 var testPorts = models.SidecarConnections{
@@ -28,7 +28,7 @@ func TestKafkaToDeployment(t *testing.T) {
 		BootstrapServers: testBootstrap,
 		AutoOffsetReset:  testAutoOff,
 		SidecarImage:     testSidecarImage,
-		KafkaInsprPort:   testKafkaInsprPort,
+		KafkaInsprAddr:   testKafkaInsprAddr,
 	}
 	deploymentDApp := meta.App{
 		Meta: meta.Metadata{
@@ -54,7 +54,7 @@ func TestKafkaToDeployment(t *testing.T) {
 					BootstrapServers: testBootstrap,
 					AutoOffsetReset:  testAutoOff,
 					SidecarImage:     testSidecarImage,
-					KafkaInsprPort:   testKafkaInsprPort,
+					KafkaInsprAddr:   testKafkaInsprAddr,
 				},
 				dapp: meta.App{},
 			},
@@ -146,7 +146,7 @@ func Test_kafkaSidecarConfig(t *testing.T) {
 				BootstrapServers: testBootstrap,
 				AutoOffsetReset:  testAutoOff,
 				SidecarImage:     testSidecarImage,
-				KafkaInsprPort:   testKafkaInsprPort,
+				KafkaInsprAddr:   testKafkaInsprAddr,
 			}},
 			want: k8s.ContainerWithEnv(
 				corev1.EnvVar{
@@ -159,7 +159,7 @@ func Test_kafkaSidecarConfig(t *testing.T) {
 				},
 				corev1.EnvVar{
 					Name:  "INSPR_SIDECAR_KAFKA_PORT",
-					Value: testKafkaInsprPort,
+					Value: testKafkaInsprAddr,
 				},
 			),
 		},

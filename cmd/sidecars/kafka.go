@@ -15,13 +15,15 @@ type KafkaConfig struct {
 	AutoOffsetReset  string
 	SidecarImage     string
 	// insprdPort is the port used in the insprd service of your cluster
-	KafkaInsprPort string
+	KafkaInsprAddr string
 }
 
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
 // SidecarFactory function that is used to subscribe to the sidecarFactory
 func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
-	return func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) corev1.Container {
+	return func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) (corev1.Container, []corev1.EnvVar) {
+		envVars, kafkAddr := KafkaSidecarConfig(config, conn)
+
 		return k8s.NewContainer(
 			"sidecar-kafka-"+app.Meta.UUID, // deployment name
 			config.SidecarImage,            // image url
@@ -29,11 +31,11 @@ func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
 			// label to the dApp associated with it
 			InsprAppIDConfig(app),
 			KafkaEnvConfig(config),
-			KafkaSidecarConfig(config, conn),
+			envVars,
 			k8s.ContainerWithPullPolicy(corev1.PullAlways),
 			opts[0],
 			opts[1],
-		)
+		), kafkAddr
 	}
 }
 
@@ -52,19 +54,19 @@ func KafkaEnvConfig(config KafkaConfig) k8s.ContainerOption {
 }
 
 // KafkaSidecarConfig adds the necessary env variables to configure the sidecar in the cluster
-func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) k8s.ContainerOption {
+func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) (k8s.ContainerOption, []corev1.EnvVar) {
+	port := corev1.EnvVar{
+		Name:  "INSPR_SIDECAR_KAFKA_WRITE_PORT",
+		Value: strconv.Itoa(int(conns.InPort)),
+	}
+
+	kafkaAddr := corev1.EnvVar{
+		Name:  "INSPR_SIDECAR_KAFKA_ADDR",
+		Value: config.KafkaInsprAddr,
+	}
+
 	return k8s.ContainerWithEnv(
-		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_KAFKA_READ_PORT",
-			Value: strconv.Itoa(int(conns.OutPort)),
-		},
-		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_KAFKA_WRITE_PORT",
-			Value: strconv.Itoa(int(conns.InPort)),
-		},
-		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_KAFKA_PORT",
-			Value: config.KafkaInsprPort,
-		},
-	)
+			port,
+		),
+		[]corev1.EnvVar{port, kafkaAddr}
 }

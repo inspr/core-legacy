@@ -13,4 +13,4 @@ type SidecarConnections struct {
 }
 
 // SidecarFactory function type responsible for creating a sidecar for a broker
-type SidecarFactory func(app *meta.App, conn *SidecarConnections, opts ...k8s.ContainerOption) corev1.Container
+type SidecarFactory func(app *meta.App, conn *SidecarConnections, opts ...k8s.ContainerOption) (corev1.Container, []corev1.EnvVar)
