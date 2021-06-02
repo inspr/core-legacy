@@ -160,45 +160,18 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 	}
 	logger.Info("constructing deployment")
 
+	nodeContainer := createNodeContainer(app, appDeployName)
+	scContainers := no.withAllSidecarsContainers(app, appDeployName)
+
 	return (*kubeDeploy)(
 		k8s.NewDeployment(
 			appDeployName,
 			k8s.WithLabels(appLabels),
 			k8s.WithContainer(
-				k8s.NewContainer(
-					appDeployName,
-					app.Spec.Node.Spec.Image,
-					withLBSidecarPorts(app),
-					withSecretDefinition(app),
-					withLBSidecarConfiguration(),
-				),
-				k8s.NewContainer(
-					appDeployName+"-lbsidecar",
-					"",
-					no.withLBSidecarImage(app),
-					no.withBoundary(app),
-					withLBSidecarPorts(app),
-					// withKafkaConfiguration(),
-					withLBSidecarConfiguration(),
-					withNodeID(app),
-					k8s.ContainerWithPullPolicy(corev1.PullAlways),
-				),
-				no.withAllSidecarsContainers(app)[0],
+				append(scContainers, nodeContainer)...,
 			),
 		))
 }
-
-// func withKafkaConfiguration() k8s.ContainerOption {
-// 	return k8s.ContainerWithEnvFrom(
-// 		corev1.EnvFromSource{
-// 			ConfigMapRef: &corev1.ConfigMapEnvSource{
-// 				LocalObjectReference: corev1.LocalObjectReference{
-// 					Name: "inspr-kafka-configuration",
-// 				},
-// 			},
-// 		},
-// 	)
-// }
 
 func withLBSidecarConfiguration() k8s.ContainerOption {
 	return k8s.ContainerWithEnvFrom(
@@ -312,8 +285,9 @@ func (no *NodeOperator) getAllSidecarNames(app *meta.App) utils.StringArray {
 	return set.ToArray()
 }
 
-func (no *NodeOperator) withAllSidecarsContainers(app *meta.App) []corev1.Container {
-	var ret []corev1.Container
+func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName string) []corev1.Container {
+	var containers []corev1.Container
+	var sidecarAddrs []corev1.EnvVar
 	for _, broker := range no.getAllSidecarNames(app) {
 
 		factory, err := no.brokers.Factory().Get(broker)
@@ -322,7 +296,38 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App) []corev1.Contai
 			panic("broker not allowed")
 		}
 
-		ret = append(ret, factory(app, getAvailiblePorts(), no.withBoundary(app), withLBSidecarConfiguration()))
+		container, addrEnvVar := factory(app,
+			getAvailiblePorts(),
+			no.withBoundary(app),
+			withLBSidecarConfiguration())
+
+		containers = append(containers, container)
+		sidecarAddrs = append(sidecarAddrs, addrEnvVar...)
 	}
-	return ret
+
+	lbSidecar := k8s.NewContainer(
+		appDeployName+"-lbsidecar",
+		"",
+		no.withLBSidecarImage(app),
+		no.withBoundary(app),
+		withLBSidecarPorts(app),
+		withLBSidecarConfiguration(),
+		k8s.ContainerWithEnv(sidecarAddrs...),
+		withNodeID(app),
+		k8s.ContainerWithPullPolicy(corev1.PullAlways),
+	)
+
+	containers = append(containers, lbSidecar)
+
+	return containers
+}
+
+func createNodeContainer(app *meta.App, appDeployName string) corev1.Container {
+	return k8s.NewContainer(
+		appDeployName,
+		app.Spec.Node.Spec.Image,
+		withLBSidecarPorts(app),
+		withSecretDefinition(app),
+		withLBSidecarConfiguration(),
+	)
 }
