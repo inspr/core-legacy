@@ -6,3 +6,5 @@ meta:
   parent: ""
 spec:
   type: "mbct1"
+  brokerlist:
+    - "kafka"
