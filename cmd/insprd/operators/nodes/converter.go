@@ -183,7 +183,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 					withNodeID(app),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
 				),
-				// no.brokers.Factory().
+				no.withAllSidecarsContainers(app)[0],
 			),
 		))
 }
@@ -322,7 +322,7 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App) []corev1.Contai
 			panic("broker not allowed")
 		}
 
-		ret = append(ret, factory(app, getAvailiblePorts()))
+		ret = append(ret, factory(app, getAvailiblePorts(), no.withBoundary(app), withLBSidecarConfiguration()))
 	}
 	return ret
 }

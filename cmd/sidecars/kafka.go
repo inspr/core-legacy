@@ -1,6 +1,8 @@
 package sidecars
 
 import (
+	"strconv"
+
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/operator/k8s"
 	"github.com/inspr/inspr/pkg/sidecars/models"
@@ -19,7 +21,7 @@ type KafkaConfig struct {
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
 // SidecarFactory function that is used to subscribe to the sidecarFactory
 func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
-	return func(app *meta.App, conn *models.SidecarConnections) corev1.Container {
+	return func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) corev1.Container {
 		return k8s.NewContainer(
 			"sidecar-kafka-"+app.Meta.UUID, // deployment name
 			config.SidecarImage,            // image url
@@ -29,6 +31,8 @@ func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
 			KafkaEnvConfig(config),
 			KafkaSidecarConfig(config, conn),
 			k8s.ContainerWithPullPolicy(corev1.PullAlways),
+			opts[0],
+			opts[1],
 		)
 	}
 }
@@ -52,11 +56,11 @@ func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) k8
 	return k8s.ContainerWithEnv(
 		corev1.EnvVar{
 			Name:  "INSPR_SIDECAR_KAFKA_READ_PORT",
-			Value: string(conns.OutPort),
+			Value: strconv.Itoa(int(conns.OutPort)),
 		},
 		corev1.EnvVar{
 			Name:  "INSPR_SIDECAR_KAFKA_WRITE_PORT",
-			Value: string(conns.InPort),
+			Value: strconv.Itoa(int(conns.InPort)),
 		},
 		corev1.EnvVar{
 			Name:  "INSPR_SIDECAR_KAFKA_PORT",
