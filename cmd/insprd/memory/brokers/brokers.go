@@ -1,8 +1,10 @@
 package brokers
 
 import (
+	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta/brokers"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 )
 
 // GetAll returns an array containing all currently configured brokers
@@ -41,8 +43,21 @@ func (bmm *BrokerMemoryManager) Create(broker brokers.BrokerStatus, config broke
 	if ok := mem.Available[string(broker)]; ok {
 		return ierrors.NewError().Message("broker %s is already configured on memory", broker).Build()
 	}
-	//configure the sidecarFactory for the given broker
-	//if successful:
+
+	var factory models.SidecarFactory
+	switch string(broker) {
+	case Kafka:
+		factory = sidecars.KafkaToDeployment(config.(sidecars.KafkaConfig))
+	default:
+		return ierrors.NewError().Message("broker %s is not valid", broker).Build()
+	}
+
+	err = bmm.Factory().Subscribe(string(broker), factory)
+
+	if err != nil {
+		return err
+	}
+
 	mem.Available[string(broker)] = true
 	return nil
 }
