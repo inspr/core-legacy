@@ -3,7 +3,7 @@ package sidecarserv
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -118,11 +118,12 @@ func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerMsg [
 func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte) (status int, err error) {
 	var resp *http.Response
 	for i := 0; i <= maxBrokerRetries; i++ {
-		resp, err = s.client.Post(s.outAddr+"/"+channel, "application/octet-stream", bytes.NewBuffer(data))
+		writeAddr := fmt.Sprintf("%s/%s", s.outAddr, channel)
+		logger.Debug("WriteWRetry", zap.Any("WRITINGON", writeAddr))
+		fmt.Printf("WRITINGON:%s", writeAddr)
+		resp, err = s.client.Post(writeAddr, "application/octet-stream", bytes.NewBuffer(data))
 		status = resp.StatusCode
 		if err == nil && status == http.StatusOK {
-			decoder := json.NewDecoder(resp.Body)
-			err = decoder.Decode(&status)
 			return
 		}
 		err = rest.UnmarshalERROR(resp.Body)
