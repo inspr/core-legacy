@@ -3,7 +3,6 @@ package environment
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/inspr/inspr/pkg/ierrors"
@@ -152,18 +151,4 @@ func GetBrokerReadPort(broker string) string {
 // sidecar address
 func GetBrokerSpecificSidecarAddr(broker string) string {
 	return getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_ADDR", strings.ToUpper(broker)))
-}
-
-// SetBrokerSpecificSidecarAddr returns environment variable that contains given broker's
-// sidecar address
-func SetBrokerSpecificSidecarPort(broker string, port int) {
-	os.Setenv(fmt.Sprintf("INSPR_SIDECAR_%s_PORT", strings.ToUpper(broker)), strconv.Itoa(port))
-}
-
-// GetBrokerSpecificSidecarAddr returns environment variable that contains given broker's
-// sidecar address
-func GetBrokerSpecificSidecarPort(broker string) int32 {
-	portString := getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_PORT", strings.ToUpper(broker)))
-	temp, _ := strconv.Atoi(portString)
-	return int32(temp)
 }

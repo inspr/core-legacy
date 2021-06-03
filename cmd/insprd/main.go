@@ -48,7 +48,6 @@ func main() {
 		AutoOffsetReset:  "earliest",
 		KafkaInsprAddr:   "http://localhost",
 		SidecarImage:     "gcr.io/red-inspr/inspr/sidecar/kafka:latest",
-		KafkaInsprPort:   3069,
 	}
 
 	brokerManager.Create(metabrokers.BrokerStatus(metabrokers.Kafka), config)
