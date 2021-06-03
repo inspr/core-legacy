@@ -187,7 +187,7 @@ func withLBSidecarConfiguration() k8s.ContainerOption {
 
 var lbsidecarPort int32
 
-func dappToService(app *meta.App) *kubeService {
+func (no *NodeOperator) dappToService(app *meta.App) *kubeService {
 	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_PORT"))
 	lbsidecarPort = int32(temp)
 	appID := toAppID(app)
@@ -212,6 +212,14 @@ func dappToService(app *meta.App) *kubeService {
 					Port:       lbsidecarPort,
 					TargetPort: intstr.FromInt(int(lbsidecarPort)),
 				})
+				// for _, broker := range no.getAllSidecarBrokers(app) {
+				// 	brokerPort := environment.GetBrokerSpecificSidecarPort(broker)
+				// 	ports = append(ports, corev1.ServicePort{
+				// 		Name:       fmt.Sprintf("sidecar-%s-port", broker),
+				// 		Port:       brokerPort,
+				// 		TargetPort: intstr.FromInt(int(brokerPort)),
+				// 	})
+				// }
 				return
 			}(),
 			Selector: appLabels,
@@ -262,7 +270,7 @@ func getAvailiblePorts() *models.SidecarConnections {
 	}
 }
 
-func (no *NodeOperator) getAllSidecarNames(app *meta.App) utils.StringArray {
+func (no *NodeOperator) getAllSidecarBrokers(app *meta.App) utils.StringArray {
 	input := app.Spec.Boundary.Input
 	output := app.Spec.Boundary.Output
 	channels := input.Union(output)
@@ -288,7 +296,7 @@ func (no *NodeOperator) getAllSidecarNames(app *meta.App) utils.StringArray {
 func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName string) []corev1.Container {
 	var containers []corev1.Container
 	var sidecarAddrs []corev1.EnvVar
-	for _, broker := range no.getAllSidecarNames(app) {
+	for _, broker := range no.getAllSidecarBrokers(app) {
 
 		factory, err := no.brokers.Factory().Get(broker)
 
