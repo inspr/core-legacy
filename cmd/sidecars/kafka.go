@@ -34,14 +34,8 @@ func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
 		return k8s.NewContainer(
 			"sidecar-kafka-"+app.Meta.UUID, // deployment name
 			config.SidecarImage,            // image url
-
 			// label to the dApp associated with it
-			InsprAppIDConfig(app),
-			KafkaEnvConfig(config),
-			envVars,
-			k8s.ContainerWithPullPolicy(corev1.PullAlways),
-			opts[0],
-			opts[1],
+			returnKafkaContainerOptions(app, config, envVars, opts)...,
 		), kafkAddr
 	}
 }
@@ -76,4 +70,17 @@ func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) (k
 			port,
 		),
 		[]corev1.EnvVar{port, kafkaAddr}
+}
+
+func returnKafkaContainerOptions(app *meta.App, config KafkaConfig, envVars k8s.ContainerOption,
+	opts []k8s.ContainerOption) []k8s.ContainerOption {
+
+	stdOptions := []k8s.ContainerOption{
+		InsprAppIDConfig(app),
+		KafkaEnvConfig(config),
+		envVars,
+		k8s.ContainerWithPullPolicy(corev1.PullAlways),
+	}
+
+	return append(stdOptions, opts...)
 }
