@@ -38,8 +38,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: inspr-lbsidecar-configuration
-            - configMapRef:
-                name: inspr-kafka-configuration
           env:
             - name: AUTH_PATH
               value: http://{{ .Values.service.authName }}.{{ .Release.Namespace }}.svc

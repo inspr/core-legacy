@@ -481,39 +481,6 @@ func TestNodeOperator_withLBSidecarImage(t *testing.T) {
 	}
 }
 
-// func Test_withKafkaConfiguration(t *testing.T) {
-// 	tests := []struct {
-// 		name string
-// 		want *kubeCore.Container
-// 	}{
-// 		{
-// 			name: "correct configmap configuration",
-// 			want: &kubeCore.Container{
-// 				EnvFrom: []kubeCore.EnvFromSource{
-// 					{
-// 						ConfigMapRef: &kubeCore.ConfigMapEnvSource{
-// 							LocalObjectReference: kubeCore.LocalObjectReference{
-// 								Name: "inspr-kafka-configuration",
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			option := withKafkaConfiguration()
-// 			got := &kubeCore.Container{}
-// 			option(got)
-
-// 			if !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("withKafkaConfiguration() got = %v, want = %v", got, tt.want)
-// 			}
-// 		})
-// 	}
-// }
-
 func Test_withLBSidecarConfiguration(t *testing.T) {
 	tests := []struct {
 		name string

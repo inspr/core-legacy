@@ -66,8 +66,4 @@ lbSidecar:
 
 lbsidecarImage: gcr.io/red-inspr/inspr/sidecar/lbsidecar
 
-kafka:
-  bootstrap: kafka.default.svc:9092
-  offsetReset: earliest
-
 insprAppsNamespace: inspr-apps
