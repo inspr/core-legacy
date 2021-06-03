@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/meta/brokers"
 )
 
 func TestServer_Init(t *testing.T) {

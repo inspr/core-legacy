@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
 	"github.com/inspr/inspr/pkg/environment"
+	"github.com/inspr/inspr/pkg/meta/brokers"
+
 	"github.com/inspr/inspr/pkg/sidecars/models"
 	sidecarserv "github.com/inspr/inspr/pkg/sidecars/server"
 	"go.uber.org/zap"

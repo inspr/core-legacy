@@ -46,8 +46,9 @@ func (bmm *BrokerMemoryManager) Create(broker brokers.BrokerStatus, config broke
 
 	var factory models.SidecarFactory
 	switch string(broker) {
-	case Kafka:
+	case brokers.Kafka:
 		factory = sidecars.KafkaToDeployment(config.(sidecars.KafkaConfig))
+		sidecars.ConfigureGlobalKafka(config.(sidecars.KafkaConfig))
 	default:
 		return ierrors.NewError().Message("broker %s is not valid", broker).Build()
 	}
