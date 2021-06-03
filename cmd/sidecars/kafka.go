@@ -3,7 +3,9 @@ package sidecars
 import (
 	"strconv"
 
+	"github.com/inspr/inspr/pkg/environment"
 	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/operator/k8s"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 	corev1 "k8s.io/api/core/v1"
@@ -16,6 +18,11 @@ type KafkaConfig struct {
 	SidecarImage     string
 	// insprdPort is the port used in the insprd service of your cluster
 	KafkaInsprAddr string
+	KafkaInsprPort int
+}
+
+func ConfigureGlobalKafka(config KafkaConfig) {
+	environment.SetBrokerSpecificSidecarPort(brokers.Kafka, config.KafkaInsprPort)
 }
 
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
