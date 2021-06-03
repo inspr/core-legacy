@@ -141,7 +141,6 @@ func withLBSidecarPorts(app *meta.App) k8s.ContainerOption {
 				Value: strconv.Itoa(lbReadPort),
 			})
 		}
-		// The Sidecar Client read port must be added here
 	}
 }
 
@@ -264,9 +263,17 @@ func (no *NodeOperator) returnChannelBroker(pathToChannel string) string {
 }
 
 func getAvailiblePorts() *models.SidecarConnections {
+	ports, err := utils.GetFreePorts(2)
+	if err != nil {
+		logger.Error("unable to get free ports for broker sidecar: %v",
+			zap.Any("error", err))
+
+		panic(fmt.Sprintf("error while getting free ports: %v", err))
+
+	}
 	return &models.SidecarConnections{
-		InPort:  42069,
-		OutPort: 42070,
+		InPort:  int32(ports[0]),
+		OutPort: int32(ports[1]),
 	}
 }
 
@@ -301,7 +308,7 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 		factory, err := no.brokers.Factory().Get(broker)
 
 		if err != nil {
-			panic("broker not allowed")
+			panic(fmt.Sprintf("broker %v not allowed: %v", broker, err))
 		}
 
 		container, addrEnvVar := factory(app,
