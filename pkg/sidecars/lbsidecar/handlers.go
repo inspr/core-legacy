@@ -20,7 +20,7 @@ import (
 var logger *zap.Logger
 
 func init() {
-	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
 }
 
 // writeMessageHandler handles requests sent to the write message server
@@ -159,8 +159,6 @@ func encodeToAvro(channel string, body io.Reader) ([]byte, error) {
 	var receivedMsg models.BrokerMessage
 	json.NewDecoder(body).Decode(&receivedMsg)
 
-	fmt.Printf("received message: %v\n", receivedMsg)
-
 	resolvedCh, err := getResolvedChannel(channel)
 	if err != nil {
 		return nil, err
@@ -170,8 +168,6 @@ func encodeToAvro(channel string, body io.Reader) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("encoded message: %v\n", encodedAvroMsg)
 
 	return encodedAvroMsg, nil
 }

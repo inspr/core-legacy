@@ -19,7 +19,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "kafka-sidecar")))
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "kafka-sidecar")))
 }
 
 // GetKafkaEnvironment returns the current inspr environment

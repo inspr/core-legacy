@@ -95,7 +95,7 @@ func generatePublicKey(publicKey *rsa.PublicKey) ([]byte, error) {
 }
 
 func main() {
-	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "Auth-provider")))
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "Auth-provider")))
 
 	namespace := os.Getenv("K8S_NAMESPACE")
 

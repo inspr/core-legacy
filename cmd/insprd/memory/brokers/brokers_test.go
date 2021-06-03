@@ -4,9 +4,17 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/meta/brokers"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 )
+
+var kafkaStructMock = sidecars.KafkaConfig{
+	BootstrapServers: "",
+	AutoOffsetReset:  "",
+	KafkaInsprAddr:   "",
+	SidecarImage:     "",
+}
 
 func TestBrokersMemoryManager_GetAll(t *testing.T) {
 	tests := []struct {
@@ -121,95 +129,63 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 	}
 }
 
-func TestBrokersMemoryManager_Create(t *testing.T) {
-	type args struct {
-		broker brokers.BrokerStatus
-		config brokers.BrokerConfiguration
-	}
+func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
+	resetBrokers()
+
 	tests := []struct {
 		name    string
 		bmm     *BrokerMemoryManager
-		args    args
-		exec    func(bmm Manager)
+		exec    func(bmm Manager) error
 		wantErr bool
 	}{
 		{
-			name: "valid create",
-			args: args{
-				broker: "brk1",
-				config: nil,
-			},
-			exec: func(bmm Manager) {
-
-			},
-			bmm:     &BrokerMemoryManager{},
-			wantErr: false,
-		},
-		{
-			name: "invalid create",
-			args: args{
-				broker: "brk1",
-				config: nil,
-			},
-			bmm: &BrokerMemoryManager{},
-			exec: func(bmm Manager) {
-				bmm.Create("brk1", nil)
+			name: "invalid create - broker not supported",
+			bmm:  &BrokerMemoryManager{},
+			exec: func(bmm Manager) error {
+				return bmm.Create("brk1", nil)
 			},
 			wantErr: true,
 		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			resetBrokers()
-			bmm := GetBrokerMemory()
-			tt.exec(bmm)
-			if err := bmm.Create(tt.args.broker, tt.args.config); (err != nil) != tt.wantErr {
-				t.Errorf("BrokersMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestBrokersMemoryManager_SetDefault(t *testing.T) {
-	type args struct {
-		broker brokers.BrokerStatus
-	}
-	tests := []struct {
-		name    string
-		bmm     *BrokerMemoryManager
-		args    args
-		exec    func(bmm Manager)
-		wantErr bool
-	}{
+		{
+			name: "valid create",
+			bmm:  &BrokerMemoryManager{},
+			exec: func(bmm Manager) error {
+				return bmm.Create(brokers.BrokerStatus(brokers.Kafka), kafkaStructMock)
+			},
+		},
+		{
+			name: "invalid create - broker already exists",
+			bmm:  &BrokerMemoryManager{},
+			exec: func(bmm Manager) error {
+				return bmm.Create(brokers.BrokerStatus(brokers.Kafka), kafkaStructMock)
+			},
+			wantErr: true,
+		},
 		{
 			name: "invalid setdefault",
-			args: args{
-				broker: "brk1",
+			bmm:  &BrokerMemoryManager{},
+			exec: func(bmm Manager) error {
+				return bmm.SetDefault("brk1")
 			},
-			exec: func(bmm Manager) {
-			},
-			bmm:     &BrokerMemoryManager{},
 			wantErr: true,
 		},
 		{
 			name: "valid setdefault",
-			args: args{
-				broker: "brk1",
+			bmm:  &BrokerMemoryManager{},
+			exec: func(bmm Manager) error {
+				return bmm.SetDefault(brokers.BrokerStatus(brokers.Kafka))
 			},
-			exec: func(bmm Manager) {
-				bmm.Create("brk1", nil)
-			},
-			bmm:     &BrokerMemoryManager{},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetBrokers()
 			bmm := GetBrokerMemory()
-			tt.exec(bmm)
-			if err := bmm.SetDefault(tt.args.broker); (err != nil) != tt.wantErr {
-				t.Errorf("BrokersMemoryManager.SetDefault() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.exec != nil {
+				if err := tt.exec(bmm); (err != nil) != tt.wantErr {
+					t.Errorf("BrokersMemoryManager method error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
 			}
 		})
 	}
