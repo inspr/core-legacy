@@ -12,14 +12,12 @@ import (
 )
 
 func main() {
-	counter := 5
-	i := 0
+	maxIterations := 500
+	counter := 0
 	// sets up client for sidecar
 	c := dappclient.NewAppClient()
 
 	ctx, cancel := context.WithCancel(context.Background())
-
-	message := 1234
 
 	c.HandleChannel("mbch1", func(ctx context.Context, body io.Reader) error {
 		decoder := json.NewDecoder(body)
@@ -28,14 +26,14 @@ func main() {
 		if err != nil {
 			return err
 		}
-		i++
+		counter++
 		fmt.Println(testMsg)
-		if i >= counter {
+		if counter >= maxIterations {
 			cancel()
 			return nil
 		}
-		time.Sleep(time.Second * 10)
-		err = c.WriteMessage(context.Background(), "mbch1", message)
+		time.Sleep(time.Second * 5)
+		err = c.WriteMessage(context.Background(), "mbch1", counter)
 		if err != nil {
 			fmt.Printf("an error occurred: %v", err)
 			return err
@@ -45,7 +43,7 @@ func main() {
 
 	go c.Run(ctx)
 
-	err := c.WriteMessage(context.Background(), "mbch1", message)
+	err := c.WriteMessage(context.Background(), "mbch1", counter)
 	if err != nil {
 		fmt.Printf("an error occurred: %v", err)
 		return
@@ -53,5 +51,4 @@ func main() {
 
 	<-ctx.Done()
 	fmt.Println("Done w/ exec")
-	fmt.Scan()
 }
