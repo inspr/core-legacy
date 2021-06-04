@@ -77,12 +77,12 @@ func (s *Server) Run(ctx context.Context) error {
 		s.runningWrite = true
 		defer func() { s.runningWrite = false }()
 		if err = server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Error("listen:%v", zap.Error(err))
+			logger.Error(fmt.Sprintf("an error ocurred in %v sidecar: %v", s.broker, err))
 			errCh <- err
 		}
 	}()
 
-	logger.Sugar().Infof("%s sideCar listener is up...", s.broker)
+	logger.Info(fmt.Sprintf("%s sidecar listener is up...", s.broker))
 
 	select {
 	case <-ctx.Done():
@@ -106,7 +106,8 @@ func (s *Server) gracefulShutdown(server *http.Server, err error) {
 	defer cancel()
 
 	if err != nil {
-		logger.Error("an error occurred on sidecar", zap.Any("broker", s.broker), zap.Error(err))
+		logger.Error("an error occurred on sidecar",
+			zap.Any("broker", s.broker), zap.Error(err))
 	}
 
 	s.Writer.Close()

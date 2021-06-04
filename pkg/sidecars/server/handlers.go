@@ -33,20 +33,16 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			insprError := ierrors.
 				NewError().
 				BadRequest().
-				Message(
-					"channel '%s' not found",
-					channel,
-				)
+				Message("channel '%s' not found", channel)
 
 			rest.ERROR(w, insprError.Build())
 			return
 		}
 
 		logger.Info("writing message to broker",
-			zap.String("channel", channel),
-			zap.Any("message", body))
+			zap.String("channel", channel))
 		if err := s.Writer.WriteMessage(channel, body); err != nil {
-			rest.ERROR(w, ierrors.NewError().Message("broker's writeMessage failed, %s", err.Error()).Build())
+			rest.ERROR(w, ierrors.NewError().Message("broker's WriteMessage failed, %s", err.Error()).Build())
 			return
 		}
 		rest.JSON(w, 200, nil)
@@ -119,8 +115,10 @@ func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte
 	var resp *http.Response
 	for i := 0; i <= maxBrokerRetries; i++ {
 		writeAddr := fmt.Sprintf("%s/%s", s.outAddr, channel)
-		logger.Debug("WriteWRetry", zap.Any("WRITINGON", writeAddr))
-		fmt.Printf("WRITINGON:%s", writeAddr)
+		logger.Debug("writing with retry",
+			zap.Any("addr", writeAddr),
+			zap.Any("write conter", i))
+
 		resp, err = s.client.Post(writeAddr, "application/octet-stream", bytes.NewBuffer(data))
 		status = resp.StatusCode
 		if err == nil && status == http.StatusOK {
