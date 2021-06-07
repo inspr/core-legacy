@@ -601,7 +601,7 @@ func Test_hasPermission(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "User has admin permisson",
+			name: "User has admin permission",
 			args: args{
 				uid: "user1",
 				pwd: "none",
@@ -813,7 +813,7 @@ func mockRedis() *miniredis.Miniredis {
 }
 
 func insprServerHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		rest.ERROR(w, fmt.Errorf("method should be POST"))
 	}
 	data := auth.Payload{}

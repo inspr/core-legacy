@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	"github.com/inspr/inspr/cmd/insprd/operators/kafka/nodes"
+	"github.com/inspr/inspr/cmd/insprd/operators/nodes"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/utils"
 )
@@ -67,7 +67,7 @@ func main() {
 		panic(err)
 	}
 
-	op, err := nodes.NewOperator(tree.GetTreeMemory(), nil)
+	op, err := nodes.NewNodeOperator(tree.GetTreeMemory(), nil, nil)
 	if err != nil {
 		panic(err)
 	}

@@ -59,7 +59,7 @@ func TestChannelClient_Delete(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 
@@ -150,7 +150,7 @@ func TestChannelClient_Get(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 
@@ -249,7 +249,7 @@ func TestChannelClient_Create(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 
@@ -339,7 +339,7 @@ func TestChannelClient_Update(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/rest"
+	"go.uber.org/zap"
 )
 
 var initialized bool
@@ -21,17 +21,22 @@ func (server *Server) HandleInit() rest.Handler {
 			Key string
 			auth.Payload
 		}
+
 		decoder := json.NewDecoder(r.Body)
 		decoder.Decode(&data)
 		if initialized {
 			rest.ERROR(w, ierrors.NewError().Message("already initialized").Build())
 			return
 		}
-		log.Printf("data = %+v\n", data)
+
+		server.logger.Debug("received data to initialize auth service",
+			zap.Any("data: ", data))
+
 		if data.Key != os.Getenv("INSPR_INIT_KEY") {
 			rest.ERROR(w, ierrors.NewError().Message("invalid key").Forbidden().Build())
 			return
 		}
+
 		initialized = true
 		token, err := server.tokenize(data.Payload, time.Now().Add(time.Minute*30))
 		if err != nil {

@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
@@ -28,7 +29,7 @@ func (ac *AppClient) Get(ctx context.Context, scope string) (*meta.App, error) {
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/apps", "GET", adi, &resp)
+		Send(ctx, "/apps", http.MethodGet, adi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +56,7 @@ func (ac *AppClient) Create(ctx context.Context, scope string, app *meta.App, dr
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/apps", "POST", adi, &resp)
+		Send(ctx, "/apps", http.MethodPost, adi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (ac *AppClient) Delete(ctx context.Context, scope string, dryRun bool) (dif
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/apps", "DELETE", adi, &resp)
+		Send(ctx, "/apps", http.MethodDelete, adi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +106,7 @@ func (ac *AppClient) Update(ctx context.Context, scope string, app *meta.App, dr
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/apps", "PUT", adi, &resp)
+		Send(ctx, "/apps", http.MethodPut, adi, &resp)
 	if err != nil {
 		return nil, err
 	}

@@ -33,7 +33,7 @@ func (bks *BrokersMock) Create(broker brokers.BrokerStatus, config brokers.Broke
 	return nil
 }
 
-// SetDefault sets a previoulsy mocked broker as the fake's default broker
+// SetDefault sets a previously mocked broker as the fake's default broker
 func (bks *BrokersMock) SetDefault(broker brokers.BrokerStatus) error {
 	if bks.fail != nil {
 		return bks.fail

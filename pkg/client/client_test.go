@@ -73,12 +73,12 @@ func createMockEnvVars() {
 	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
 	os.Setenv("INSPR_APP_CTX", "random.ctx")
 	os.Setenv("INSPR_ENV", "test")
-	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka")
-	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "latest")
+	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", "kafka")
+	os.Setenv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET", "latest")
 	os.Setenv("ch1_SCHEMA", `{"type":"string"}`)
 	os.Setenv("ch2_SCHEMA", "hellotest")
 	os.Setenv("INSPR_APP_ID", "testappid1")
-	os.Setenv("INSPR_SIDECAR_IMAGE", "random-sidecar-image")
+	os.Setenv("INSPR_LBSIDECAR_IMAGE", "random-sidecar-image")
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
@@ -88,10 +88,10 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_UNIX_SOCKET")
 	os.Unsetenv("INSPR_APP_CTX")
 	os.Unsetenv("INSPR_ENV")
-	os.Unsetenv("KAFKA_BOOTSTRAP_SERVERS")
-	os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
+	os.Unsetenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS")
+	os.Unsetenv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET")
 	os.Unsetenv("INSPR_APP_ID")
-	os.Unsetenv("INSPR_SIDECAR_IMAGE")
+	os.Unsetenv("INSPR_LBSIDECAR_IMAGE")
 }
 
 func TestNewAppClient(t *testing.T) {
@@ -205,7 +205,6 @@ func TestClient_WriteMessage(t *testing.T) {
 
 func TestClient_HandleChannel(t *testing.T) {
 	type fields struct {
-		readAddr string
 	}
 	type args struct {
 		channel string
@@ -281,10 +280,8 @@ func TestClient_HandleChannel(t *testing.T) {
 			response := struct {
 				Status string `json:"status"`
 			}{}
-			err := client.Send(context.Background(), tt.args.channel, "POST", struct{ Message interface{} }{tt.message}, &response)
-			if (response.Status != "OK") != tt.wantErr {
-				t.Errorf("Client_HandleChannel response.Status = %v, wantErr = %v", response.Status, tt.wantErr)
-			}
+			err := client.Send(context.Background(), tt.args.channel, http.MethodPost, struct{ Message interface{} }{tt.message}, &response)
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client_HandleChannel response.Status = %v, wantErr = %v", response.Status, tt.wantErr)
 			}
@@ -355,7 +352,7 @@ func TestClient_Run(t *testing.T) {
 			var response struct {
 				Status string `json:"status"`
 			}
-			err := c.Send(ctx, tt.channel, "POST", tt.message, &response)
+			err := c.Send(ctx, tt.channel, http.MethodPost, tt.message, &response)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client_Run err = %v, wantErr = %v", err, tt.wantErr)
 			}

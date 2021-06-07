@@ -127,7 +127,7 @@ func TestHandler_DeleteUserHandler(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			req, _ := http.NewRequest("DELETE", ts.URL, bytes.NewBuffer(body))
+			req, _ := http.NewRequest(http.MethodDelete, ts.URL, bytes.NewBuffer(body))
 			res, err := client.Do(req)
 			if err != nil {
 				t.Log("error making a PUT in the httptest server")
@@ -176,7 +176,7 @@ func TestHandler_UpdatePasswordHandler(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			req, _ := http.NewRequest("PUT", ts.URL, bytes.NewBuffer(body))
+			req, _ := http.NewRequest(http.MethodPut, ts.URL, bytes.NewBuffer(body))
 			res, err := client.Do(req)
 			if err != nil {
 				t.Log("error making a PUT in the httptest server")

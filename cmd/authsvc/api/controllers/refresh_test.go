@@ -88,7 +88,7 @@ func TestServer_Refresh(t *testing.T) {
 	// Private key in PEM format
 	privPEM := pem.EncodeToMemory(&privBlock)
 
-	// Configuring enviroment for tests
+	// Configuring environment for tests
 	os.Setenv("JWT_PRIVATE_KEY", string(privPEM))
 
 	server.Init()

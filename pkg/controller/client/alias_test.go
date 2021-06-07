@@ -66,7 +66,7 @@ func TestAliasClient_Get(t *testing.T) {
 					t.Errorf("path is not alias")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 
@@ -154,7 +154,7 @@ func TestAliasClient_Create(t *testing.T) {
 					t.Errorf("path is not alias")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 
@@ -230,7 +230,7 @@ func TestAliasClient_Delete(t *testing.T) {
 					t.Errorf("path is not alias")
 				}
 
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 
@@ -313,7 +313,7 @@ func TestAliasClient_Update(t *testing.T) {
 					t.Errorf("path is not alias")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

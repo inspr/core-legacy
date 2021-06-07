@@ -1,0 +1,4 @@
+*/**
+!pkg
+!go.mod
+!examples/primes

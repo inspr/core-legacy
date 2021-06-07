@@ -6,7 +6,7 @@ import (
 
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/operator/k8s"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -15,7 +15,7 @@ const (
 	testBootstrap      = "bootstrap"
 	testAutoOff        = "autooff"
 	testSidecarImage   = "image"
-	testKafkaInsprPort = "insprdPort"
+	testKafkaInsprAddr = "insprdPort"
 )
 
 var testPorts = models.SidecarConnections{
@@ -23,12 +23,17 @@ var testPorts = models.SidecarConnections{
 	OutPort: 01,
 }
 
+func extractContainerOpts(opts k8s.ContainerOption, envvars []corev1.EnvVar) k8s.ContainerOption {
+	return opts
+}
+
+// This test covers all kafka.go methods
 func TestKafkaToDeployment(t *testing.T) {
 	deploymentKafkaConfig := KafkaConfig{
 		BootstrapServers: testBootstrap,
 		AutoOffsetReset:  testAutoOff,
 		SidecarImage:     testSidecarImage,
-		KafkaInsprPort:   testKafkaInsprPort,
+		KafkaInsprAddr:   testKafkaInsprAddr,
 	}
 	deploymentDApp := meta.App{
 		Meta: meta.Metadata{
@@ -54,7 +59,7 @@ func TestKafkaToDeployment(t *testing.T) {
 					BootstrapServers: testBootstrap,
 					AutoOffsetReset:  testAutoOff,
 					SidecarImage:     testSidecarImage,
-					KafkaInsprPort:   testKafkaInsprPort,
+					KafkaInsprAddr:   testKafkaInsprAddr,
 				},
 				dapp: meta.App{},
 			},
@@ -64,7 +69,7 @@ func TestKafkaToDeployment(t *testing.T) {
 					testSidecarImage,
 					InsprAppIDConfig(&deploymentDApp),
 					KafkaEnvConfig(deploymentKafkaConfig),
-					KafkaSidecarConfig(deploymentKafkaConfig, &testPorts),
+					extractContainerOpts(KafkaSidecarConfig(deploymentKafkaConfig, &testPorts)),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
 				),
 			),
@@ -74,106 +79,14 @@ func TestKafkaToDeployment(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := KafkaToDeployment(tt.args.config)
 
-			gotDepOption := got(&deploymentDApp, &testPorts)
+			gotDepOption, _ := got(&deploymentDApp, &testPorts, nil)
 
-			gotDeploy := k8s.NewDeployment("", gotDepOption)
+			gotDeploy := k8s.NewDeployment("", k8s.WithContainer(gotDepOption))
 			wantDeploy := k8s.NewDeployment("", tt.want)
 
 			if !reflect.DeepEqual(gotDeploy, wantDeploy) {
 				t.Errorf("KafkaToDeployment() = %v, want %v",
 					gotDeploy, wantDeploy)
-			}
-		})
-	}
-}
-
-func Test_kafkaEnvConfig(t *testing.T) {
-	type args struct {
-		config KafkaConfig
-	}
-	tests := []struct {
-		name string
-		args args
-		want k8s.ContainerOption
-	}{
-		{
-			name: "kafkaConfig_base_testing",
-			args: args{config: KafkaConfig{
-				BootstrapServers: testBootstrap,
-				AutoOffsetReset:  testAutoOff,
-				SidecarImage:     testSidecarImage,
-			}},
-			want: k8s.ContainerWithEnv(
-				corev1.EnvVar{
-					Name:  "INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS",
-					Value: testBootstrap,
-				},
-				corev1.EnvVar{
-					Name:  "INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET",
-					Value: testAutoOff,
-				},
-			),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := KafkaEnvConfig(tt.args.config)
-
-			gotContainer := k8s.NewContainer("", "", got)
-			wantContainer := k8s.NewContainer("", "", tt.want)
-
-			if !reflect.DeepEqual(gotContainer, wantContainer) {
-				t.Errorf("kafkaConfig() = %v, want %v",
-					gotContainer,
-					wantContainer)
-			}
-		})
-	}
-}
-
-func Test_kafkaSidecarConfig(t *testing.T) {
-	type args struct {
-		config KafkaConfig
-	}
-	tests := []struct {
-		name string
-		args args
-		want k8s.ContainerOption
-	}{
-		{
-			name: "kafkaConfig_base_testing",
-			args: args{config: KafkaConfig{
-				BootstrapServers: testBootstrap,
-				AutoOffsetReset:  testAutoOff,
-				SidecarImage:     testSidecarImage,
-				KafkaInsprPort:   testKafkaInsprPort,
-			}},
-			want: k8s.ContainerWithEnv(
-				corev1.EnvVar{
-					Name:  "INSPR_SIDECAR_KAFKA_READ_PORT",
-					Value: string(testPorts.OutPort),
-				},
-				corev1.EnvVar{
-					Name:  "INSPR_SIDECAR_KAFKA_WRITE_PORT",
-					Value: string(testPorts.InPort),
-				},
-				corev1.EnvVar{
-					Name:  "INSPR_SIDECAR_KAFKA_PORT",
-					Value: testKafkaInsprPort,
-				},
-			),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := KafkaSidecarConfig(tt.args.config, &testPorts)
-
-			gotContainer := k8s.NewContainer("", "", got)
-			wantContainer := k8s.NewContainer("", "", tt.want)
-
-			if !reflect.DeepEqual(gotContainer, wantContainer) {
-				t.Errorf("sidecarConfig() = %v, want %v",
-					gotContainer, wantContainer)
 			}
 		})
 	}

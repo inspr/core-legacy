@@ -32,7 +32,7 @@ type Client struct {
 func (c *Client) initAdminUser() error {
 	adminUser := User{
 		UID:         "admin",
-		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Permissions: auth.AdminPermissions,
 		Password:    os.Getenv("ADMIN_PASSWORD"),
 	}
 	payload, _ := c.encrypt(adminUser)
@@ -55,9 +55,9 @@ func NewRedisClient() *Client {
 		refreshKey:    getEnv("REFRESH_KEY"),
 		insprdAddress: getEnv("INSPR_CLUSTER_ADDR"),
 	}
+
 	err := c.initAdminUser()
 	if err != nil {
-		fmt.Println("ERROR CREATING REDIS-CLIENT", err.Error())
 		log.Println("ERROR CREATING REDIS-CLIENT", err.Error())
 		panic(err)
 	}

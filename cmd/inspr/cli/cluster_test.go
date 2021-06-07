@@ -163,7 +163,7 @@ func Test_clusterConfig(t *testing.T) {
 		BootstrapServers: "mock_bootstrap",
 		AutoOffsetReset:  "mock_autooffset",
 		SidecarImage:     "mock_sidecarimg",
-		KafkaInsprPort:   "mock_kafkainsprport",
+		KafkaInsprAddr:   "mock_kafkaInsprAddr",
 	})
 	os.WriteFile(kafkaFile, kafkaConfigBytes, 0777)
 	defer os.Remove(kafkaFile)

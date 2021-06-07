@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/meta"
@@ -31,7 +32,7 @@ func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias,
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", "GET", aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodGet, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,7 @@ func (ac *AliasClient) Create(ctx context.Context, scope string, target string, 
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", "POST", aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodPost, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func (ac *AliasClient) Delete(ctx context.Context, scope, key string, dryRun boo
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", "DELETE", aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodDelete, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +112,7 @@ func (ac *AliasClient) Update(ctx context.Context, scope string, target string, 
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", "PUT", aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodPut, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}

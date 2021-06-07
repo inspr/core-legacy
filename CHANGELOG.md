@@ -14,6 +14,64 @@
     - removed the `parser` package in the directory `meta/utils/parser`, all of its contents can now be found on the `yaml_parser.go` file in the `meta/utils` pkg.
     - removed the []byte to []byte comparison in the inspr cli testing since it can be just a direct comparison between two strings. No need for adding extra buffers 
 ---
+### #69 Story CORE-416 | k8s operator different sidecar injection
+- features:
+    - operator now deploys a node, it's LB sidecar and all of it's broker-specific sidecars
+    - updated Insprd's broker creation method
+    - updated how kafka sidecar is configured to k8s deployment
+    - updated Sidecar Factory so now it can receive more container options, and it returns that sidecar's environment variables (such as it's port and address)
+    - created utils method that returns free/available tcp ports
+    - added LB sidecar to Helm Chart and Skaffold
+- fixes:
+    - removed old sidecar structures
+    - removed kafka configurations from Helm Chart and Skaffold
+    - removed odd structure that was being return by sidecar client channel handler
+    - fixed some comments, logs and funcion names misspells
+    - fixed LB Sidecars handlers that weren't getting the schema from the resolved channel
+    - fixed broker-specific sidecar read handler (it wasn't using a channel as path when sending request to lb sidecar)
+- refactors:
+    - moved brokers constants from `cmd/insprd/memory/brokers` into `pkg/meta/brokers`
+- misc:
+    - created new example to test multibroker architecture using Kafka
+---
+
+### #66 Story CORE-415 | Kafka Sidecar redesign
+- features:
+    - sidecar generic structure reconfigured to support broker specific sidecars
+    - new kafka sidecar created
+    - kafka sidecar image created for broker specific structure
+    - node operator reconfigured to work with broker specific sidecar
+    - environment methods reconfigured to fetch node data in new format
+- fixes:
+    - rest error unmarshaler method fixed and tested
+---
+
+### #68 Bugfix CORE-431 | UIDP Refresh token crash
+- refactors:
+    - Improved some error's messages, most of them in `cmd/authsvc`
+    - Changed some logs so they use `zap.logger` instead of `log` and improved their messages
+    - Fixed misspelings pointed out by Go Report
+    - Changed "POST", "GET", "DELETE" and "PUT" to use `net/http` constants instead
+    - Renamed the embed file used in `examples/controller`
+---
+
+### #67 Tech CORE-429 | Change the inspr cmd cluster command to ignore the .inspr/token
+- features:
+    - Updated the Init function in the auth package so now it creates .inspr/token if it doesn't exist
+    - Added the admin permissions in auth models
+    - The admin user is now initialized with the admin permissions created in auth models
+---
+
+### #63 Story CORE-414 | Adapt the current sidecar to a load balancer sidecar
+- features:
+    - implemented the new LB sidecar
+    - created new functions to retrieve sidecar's env vars
+    - updated the converter to generate new env vars used by the LB sidecar
+    - changed the env vars associated with the old sidecar so they are now used by the LB sidecar
+- refactors:
+    - renamed the old sidecar structure to `sidecar_old` and fixed where it was imported. This structure will be maintained while the multibroker sidecar isn't released
+    - renamed some variables/parameters so they make more sense
+---
 
 ### #60 Story CORE-419 | Create Kafka sidecar Factory
 - features:
@@ -24,7 +82,6 @@
     - created the utils file containing small functions and mocks of functions
       to be, these functions should be able to be used by other sidecars.
 ---
-
 
 ### # 64 Tech CORE-448 | Unification of inspr cluster commands
 - fixes:
