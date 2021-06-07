@@ -96,7 +96,7 @@ func (b *ErrBuilder) InvalidFile() *ErrBuilder {
 
 // InvalidArgs adds Invalid Args code to Inspr Error
 func (b *ErrBuilder) InvalidArgs() *ErrBuilder {
-	b.err.Code = InvalidFile
+	b.err.Code = InvalidArgs
 	return b
 }
 

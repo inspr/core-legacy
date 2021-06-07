@@ -6,9 +6,9 @@ import (
 
 	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
 )
 
 // BrokerHandler - contains handlers that uses the BrokerManager interface methods
@@ -61,8 +61,9 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 			rest.ERROR(w, err)
 		}
 
+		var kafkaConfig sidecars.KafkaConfig
 		// parsing the bytes into a Kafka config structure
-		kafkaConfig, err := utils.YamlToKafkaConfig(content.FileContents)
+		err = yaml.Unmarshal(content.FileContents, &kafkaConfig)
 		if err != nil {
 			rest.ERROR(w, err)
 		}

@@ -6,8 +6,10 @@ import (
 
 	"github.com/inspr/inspr/pkg/cmd"
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"gopkg.in/yaml.v2"
 )
 
 // NewApplyAlias receives a controller AliasInterface and calls it's methods
@@ -15,8 +17,10 @@ import (
 func NewApplyAlias() RunMethod {
 	return func(data []byte, out io.Writer) error {
 		c := cliutils.GetCliClient().Alias()
+		var alias meta.Alias
+
 		// unmarshal into a channel
-		alias, err := metautils.YamlToAlias(data)
+		err := yaml.Unmarshal(data, &alias)
 		if err != nil {
 			return err
 		}
@@ -38,9 +42,9 @@ func NewApplyAlias() RunMethod {
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentPath, alias.Meta.Name, alias, flagDryRun)
+			log, err = c.Update(context.Background(), parentPath, alias.Meta.Name, &alias, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), parentPath, alias.Meta.Name, alias, flagDryRun)
+			log, err = c.Create(context.Background(), parentPath, alias.Meta.Name, &alias, flagDryRun)
 		}
 
 		if err != nil {

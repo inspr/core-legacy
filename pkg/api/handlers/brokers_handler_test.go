@@ -146,7 +146,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 					FileContents: []byte{1}, // throws error at the yaml parser
 				},
 			},
-			wantCode: http.StatusForbidden, // ierror Forbidden translates to this code
+			wantCode: http.StatusInternalServerError, // yaml pkg error translates to this code
 		},
 	}
 	for _, tt := range tests {
