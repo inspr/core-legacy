@@ -6,6 +6,7 @@ import (
 
 	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/api/models"
+	metabrokers "github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
@@ -68,8 +69,12 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 			rest.ERROR(w, err)
 		}
 
-		// TODO k8s usage of this section, how to deploy it from here
-		sidecars.KafkaToDeployment(kafkaConfig)
+		if err = bh.Brokers.Create(
+			metabrokers.BrokerStatus(metabrokers.Kafka),
+			kafkaConfig,
+		); err != nil {
+			rest.ERROR(w, err)
+		}
 
 		rest.JSON(w, http.StatusOK, nil)
 	}

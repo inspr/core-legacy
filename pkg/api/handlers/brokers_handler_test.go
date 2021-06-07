@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -123,9 +124,10 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 		bodyContent models.BrokerConfigDI
 	}
 	tests := []struct {
-		name     string
-		fields   fields
-		wantCode int
+		name      string
+		fields    fields
+		brokerErr error
+		wantCode  int
 	}{
 		{
 			name: "error_reading_body",
@@ -134,7 +136,8 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 					Brokers: fake.MockBrokerManager(nil),
 				},
 			},
-			wantCode: http.StatusInternalServerError,
+			brokerErr: nil,
+			wantCode:  http.StatusInternalServerError,
 		},
 		{
 			name: "error_parsing_to_kafka_config",
@@ -146,7 +149,27 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 					FileContents: []byte{1}, // throws error at the yaml parser
 				},
 			},
-			wantCode: http.StatusInternalServerError, // yaml pkg error translates to this code
+			brokerErr: nil,
+			wantCode:  http.StatusInternalServerError, // yaml pkg error translates to this code
+		},
+		{
+			name: "broker error",
+			fields: fields{
+				Handler: &Handler{
+					Brokers: fake.MockBrokerManager(
+						errors.New("brokerManager_error")),
+				},
+			},
+			wantCode: http.StatusInternalServerError,
+		},
+		{
+			name: "working",
+			fields: fields{
+				Handler: &Handler{
+					Brokers: fake.MockBrokerManager(nil),
+				},
+			},
+			wantCode: http.StatusOK,
 		},
 	}
 	for _, tt := range tests {

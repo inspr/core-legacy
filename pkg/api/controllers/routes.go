@@ -4,9 +4,11 @@ import (
 	"github.com/inspr/inspr/pkg/rest"
 
 	handler "github.com/inspr/inspr/pkg/api/handlers"
+	metabrokers "github.com/inspr/inspr/pkg/meta/brokers"
 )
 
 func (s *Server) initRoutes() {
+
 	logger.Debug("initializing Insprd server routes")
 	h := handler.NewHandler(
 		s.MemoryManager, s.op, s.auth, s.BrokerManager,
@@ -26,7 +28,10 @@ func (s *Server) initRoutes() {
 
 	brokersHandler := h.NewBrokerHandler()
 	s.Mux.Handle("/brokers", brokersHandler.HandleGet().Get().JSON())
-	s.Mux.Handle("/brokers/kafka", brokersHandler.KafkaCreateHandler().Post().JSON())
+	s.Mux.Handle(
+		"/brokers/"+metabrokers.Kafka,
+		brokersHandler.KafkaCreateHandler().Post().JSON(),
+	)
 
 	s.Mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
 	s.Mux.Handle("/refreshController", h.ControllerRefreshHandler())
