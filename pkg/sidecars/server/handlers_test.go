@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka_new/client"
+	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
 	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 )

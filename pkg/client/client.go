@@ -62,8 +62,7 @@ func (c *Client) HandleChannel(channel string, handler func(ctx context.Context,
 			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Build())
 			return
 		}
-		rest.JSON(w, 200, struct{ Status string }{"OK"})
-
+		rest.JSON(w, 200, nil)
 	})
 }
 

@@ -102,7 +102,7 @@ func TestRefreshEnviromentVariables(t *testing.T) {
 	os.Setenv("INSPR_APP_CTX", "four")
 	os.Setenv("INSPR_ENV", "five")
 	os.Setenv("INSPR_APP_ID", "six")
-	os.Setenv("INSPR_SIDECAR_IMAGE", "seven")
+	os.Setenv("INSPR_LBSIDECAR_IMAGE", "seven")
 	tests := []struct {
 		name    string
 		refresh bool

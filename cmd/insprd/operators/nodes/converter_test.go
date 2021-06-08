@@ -347,7 +347,7 @@ func Test_withNodeID(t *testing.T) {
 	}
 }
 
-func Test_withSidecarPorts(t *testing.T) {
+func Test_withLBSidecarPorts(t *testing.T) {
 	type args struct {
 		app *meta.App
 	}
@@ -436,18 +436,18 @@ func Test_withSidecarPorts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := withSidecarPorts(tt.args.app)
+			option := withLBSidecarPorts(tt.args.app)
 			got := &kubeCore.Container{}
 			option(got)
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("withSidecarPorts() got = %v, want = %v", got, tt.want)
+				t.Errorf("withLBSidecarPorts() got = %v, want = %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestNodeOperator_withSidecarImage(t *testing.T) {
+func TestNodeOperator_withLBSidecarImage(t *testing.T) {
 	type args struct {
 		app *meta.App
 	}
@@ -467,54 +467,21 @@ func TestNodeOperator_withSidecarImage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Setenv("INSPR_SIDECAR_IMAGE", tt.env)
-			defer os.Unsetenv("INSPR_SIDECAR_IMAGE")
+			os.Setenv("INSPR_LBSIDECAR_IMAGE", tt.env)
+			defer os.Unsetenv("INSPR_LBSIDECAR_IMAGE")
 			no := &NodeOperator{}
-			option := no.withSidecarImage(tt.args.app)
+			option := no.withLBSidecarImage(tt.args.app)
 			got := &kubeCore.Container{}
 			option(got)
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("withSidecarPorts() got = %v, want = %v", got, tt.want)
+				t.Errorf("withLBSidecarPorts() got = %v, want = %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_withKafkaConfiguration(t *testing.T) {
-	tests := []struct {
-		name string
-		want *kubeCore.Container
-	}{
-		{
-			name: "correct configmap configuration",
-			want: &kubeCore.Container{
-				EnvFrom: []kubeCore.EnvFromSource{
-					{
-						ConfigMapRef: &kubeCore.ConfigMapEnvSource{
-							LocalObjectReference: kubeCore.LocalObjectReference{
-								Name: "inspr-kafka-configuration",
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			option := withKafkaConfiguration()
-			got := &kubeCore.Container{}
-			option(got)
-
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("withKafkaConfiguration() got = %v, want = %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_withSidecarConfiguration(t *testing.T) {
+func Test_withLBSidecarConfiguration(t *testing.T) {
 	tests := []struct {
 		name string
 		want *kubeCore.Container
@@ -536,12 +503,12 @@ func Test_withSidecarConfiguration(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := withSidecarConfiguration()
+			option := withLBSidecarConfiguration()
 			got := &kubeCore.Container{}
 			option(got)
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("withSidecarConfiguration() got = %v, want = %v", got, tt.want)
+				t.Errorf("withLBSidecarConfiguration() got = %v, want = %v", got, tt.want)
 			}
 		})
 	}

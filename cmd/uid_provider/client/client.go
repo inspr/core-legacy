@@ -55,9 +55,9 @@ func NewRedisClient() *Client {
 		refreshKey:    getEnv("REFRESH_KEY"),
 		insprdAddress: getEnv("INSPR_CLUSTER_ADDR"),
 	}
+
 	err := c.initAdminUser()
 	if err != nil {
-		fmt.Println("ERROR CREATING REDIS-CLIENT", err.Error())
 		log.Println("ERROR CREATING REDIS-CLIENT", err.Error())
 		panic(err)
 	}
