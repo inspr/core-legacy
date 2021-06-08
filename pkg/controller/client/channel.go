@@ -23,7 +23,7 @@ type ChannelClient struct {
 //
 // The name is the name of the channel. So to search for a channel inside app1 with the name channel1 you
 // would call cc.Get(context.Background(), "app1", "channel1")
-func (cc *ChannelClient) Get(ctx context.Context, scope string, name string) (*meta.Channel, error) {
+func (cc *ChannelClient) Get(ctx context.Context, scope, name string) (*meta.Channel, error) {
 	cdi := models.ChannelQueryDI{
 		ChName: name,
 	}
@@ -74,7 +74,7 @@ func (cc *ChannelClient) Create(ctx context.Context, scope string, ch *meta.Chan
 //
 // So to delete a channel inside app1 with the name channel1 you
 // would call cc.Delete(context.Background(), "app1", "channel1")
-func (cc *ChannelClient) Delete(ctx context.Context, scope string, name string, dryRun bool) (diff.Changelog, error) {
+func (cc *ChannelClient) Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error) {
 	cdi := models.ChannelQueryDI{
 		ChName: name,
 		DryRun: dryRun,

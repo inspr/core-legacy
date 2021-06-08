@@ -49,7 +49,7 @@ func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias,
 //
 // So to create a alias inside app1 with the name aliasOne you
 // would call ctc.Create(context.Background(), "app1", &meta.Alias{...})
-func (ac *AliasClient) Create(ctx context.Context, scope string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+func (ac *AliasClient) Create(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasDI{
 		Target: target,
 		Alias:  *alias,
@@ -102,7 +102,7 @@ func (ac *AliasClient) Delete(ctx context.Context, scope, key string, dryRun boo
 //
 // So to update a alias inside app1 with the key myalias you
 // would call ac.Create(context.Background(), "app1", &meta.Alias{...})
-func (ac *AliasClient) Update(ctx context.Context, scope string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+func (ac *AliasClient) Update(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasDI{
 		Target: target,
 		Alias:  *alias,

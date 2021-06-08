@@ -23,7 +23,7 @@ type TypeClient struct {
 //
 // The name is the name of the channel type. So to search for a channel type inside app1 with the name type1 you
 // would call tc.Get(context.Background(), "app1", "type1")
-func (tc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta.Type, error) {
+func (tc *TypeClient) Get(ctx context.Context, scope, name string) (*meta.Type, error) {
 	tdi := models.TypeQueryDI{
 		TypeName: name,
 	}
@@ -48,9 +48,9 @@ func (tc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta
 //
 // So to create a channel type inside app1 with the name type1 you
 // would call tc.Create(context.Background(), "app1", &meta.Type{...})
-func (tc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
+func (tc *TypeClient) Create(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error) {
 	tdi := models.TypeDI{
-		Type:   *ch,
+		Type:   *t,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
@@ -74,7 +74,7 @@ func (tc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, d
 //
 // So to delete a channel type inside app1 with the name type1 you
 // would call tc.Delete(context.Background(), "app1", "type1")
-func (tc *TypeClient) Delete(ctx context.Context, scope string, name string, dryRun bool) (diff.Changelog, error) {
+func (tc *TypeClient) Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error) {
 	tdi := models.TypeQueryDI{
 		TypeName: name,
 		DryRun:   dryRun,
@@ -100,9 +100,9 @@ func (tc *TypeClient) Delete(ctx context.Context, scope string, name string, dry
 //
 // So to update a channel type inside app1 with the name type1 you
 // would call tc.Create(context.Background(), "app1", &meta.Type{...})
-func (tc *TypeClient) Update(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
+func (tc *TypeClient) Update(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error) {
 	tdi := models.TypeDI{
-		Type:   *ch,
+		Type:   *t,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
