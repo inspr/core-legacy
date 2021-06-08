@@ -27,14 +27,8 @@ type ChannelOperator struct {
 	mem    memory.Manager
 }
 
-type kafkaEnv struct {
-	kafkaBootstrapServers string
-}
-
-func getEnv() (env kafkaEnv) {
-	boot := os.Getenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS")
-	env.kafkaBootstrapServers = boot
-	return
+func getKafkaBootstrap() string {
+	return os.Getenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS")
 }
 
 // NewOperator returns an initialized operator from the environment variables
@@ -47,10 +41,11 @@ func NewOperator(mem memory.Manager) (*ChannelOperator, error) {
 		logger.Info("initializing kafka admin with debug configs")
 		adminClient = &mockAdminClient{}
 	} else {
+		bootstrap := getKafkaBootstrap()
 		logger.Info("initializing kafka admin with production configs",
-			zap.String("kafka bootstrap servers", "kafka.default.svc:9092"))
+			zap.String("kafka bootstrap servers", bootstrap))
 		config = &kafka.ConfigMap{
-			"bootstrap.servers": "kafka.default.svc:9092",
+			"bootstrap.servers": bootstrap,
 		}
 
 		adminClient, err = kafka.NewAdminClient(config)

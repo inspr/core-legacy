@@ -1,6 +1,7 @@
 package sidecars
 
 import (
+	"os"
 	"strconv"
 
 	"github.com/inspr/inspr/pkg/meta"
@@ -21,6 +22,7 @@ type KafkaConfig struct {
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
 // SidecarFactory function that is used to subscribe to the sidecarFactory
 func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
+	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", config.BootstrapServers)
 	return func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) (corev1.Container, []corev1.EnvVar) {
 		envVars, kafkAddr := KafkaSidecarConfig(config, conn)
 
