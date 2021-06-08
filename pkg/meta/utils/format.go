@@ -43,6 +43,10 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 	}
 	if app.Spec.Node.Spec.Image != "" {
 		node := spec.Add("Node")
+
+		nodeMeta := node.Add("Meta")
+		populateMeta(nodeMeta, &app.Spec.Node.Meta)
+
 		nodeSpec := node.Add("Spec")
 
 		nodeSpec.Add("Image: " + app.Spec.Node.Spec.Image)
