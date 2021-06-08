@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #70 Tech CORE-442 | Inspr CLI describe command outdated
+- features:
+    - PrintAppTree function now prints the Node Meta, the Node Ports, the Node Sidecar LBRead and LBWrite port and the new Auth structure.
+    - PrintChannelTree function now prints the ConnectedAliases, the PriorityBrokerList and the SelectedBroker
+---
+
 ### #66 Story CORE-415 | Kafka Sidecar redesign
 - features:
     - sidecar generic structure reconfigured to support broker specific sidecars
