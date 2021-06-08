@@ -20,12 +20,14 @@ var (
 		"\n│       └── mock_key: mock_val" +
 		"\n└── Spec" +
 		"\n    └── Boundary" +
-		"\n        └── Input" +
-		"\n        │   ├── input1" +
-		"\n        │   ├── input2" +
-		"\n        └── Output" +
-		"\n            └── output1" +
-		"\n            └── output2" +
+		"\n    │   ├── Input" +
+		"\n    │   │   ├── input1" +
+		"\n    │   │   ├── input2" +
+		"\n    │   ├── Output" +
+		"\n    │       └── output1" +
+		"\n    │       └── output2" +
+		"\n    └── Auth" +
+		"\n        └── Scope: " +
 		"\n\n"
 
 	channelTree = "channel_name" +
@@ -33,6 +35,7 @@ var (
 		"\n│   ├── Name: channel_name" +
 		"\n└── Spec" +
 		"\n│   ├── Type: ct_meta" +
+		"\n│   ├── SelectedBroker: " +
 		"\n└── ConnectedApps" +
 		"\n    └── a" +
 		"\n    └── b" +
