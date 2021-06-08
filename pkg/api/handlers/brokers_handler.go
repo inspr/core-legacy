@@ -40,7 +40,7 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 			Installed: available,
 			Default:   string(*def),
 		}
-		logger.Debug("current brokers:", zap.Any("brokers", brokers.Default))
+		logger.Debug("current brokers:", zap.Any("brokers", brokers.Installed))
 
 		rest.JSON(w, http.StatusOK, brokers)
 	}
