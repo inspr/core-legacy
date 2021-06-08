@@ -64,10 +64,6 @@ lbSidecar:
   port: 3051
   readPort: 3047
 
-sidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
-
-kafka:
-  bootstrap: kafka.default.svc:9092
-  offsetReset: earliest
+lbsidecarImage: gcr.io/red-inspr/inspr/sidecar/lbsidecar
 
 insprAppsNamespace: inspr-apps

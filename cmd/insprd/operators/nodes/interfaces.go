@@ -64,6 +64,6 @@ func (no *NodeOperator) dappApplications(app *meta.App) []applyable {
 	return []applyable{
 		no.toSecret(app),
 		no.dAppToDeployment(app),
-		dappToService(app),
+		no.dappToService(app),
 	}
 }

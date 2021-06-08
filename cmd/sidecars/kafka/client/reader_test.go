@@ -28,7 +28,7 @@ func TestNewReader(t *testing.T) {
 			name:    "It should return a new Reader",
 			wantErr: false,
 			checkFunction: func(t *testing.T, reader *Reader) {
-				if !(reader.consumers != nil && len(reader.consumers) > 0) {
+				if !(reader.Consumers() != nil && len(reader.Consumers()) > 0) {
 					t.Errorf("check function error = Reader not created successfully")
 				}
 			},
@@ -78,7 +78,7 @@ func TestReader_ReadMessage(t *testing.T) {
 		before        func()
 		uniqueChannel string
 		want          string
-		want1         interface{}
+		want1         []byte
 		wantErr       bool
 		event         kafka.Event
 	}{
@@ -100,7 +100,7 @@ func TestReader_ReadMessage(t *testing.T) {
 			wantErr:       false,
 			uniqueChannel: "ch1_resolved",
 			want:          "ch1_resolved",
-			want1:         "Hello World!",
+			want1:         []byte("Hello World!"),
 			event:         &kafka.Message{},
 		},
 		{
@@ -121,24 +121,6 @@ func TestReader_ReadMessage(t *testing.T) {
 			uniqueChannel: "ch1_resolved",
 			wantErr:       true,
 		},
-		{
-			name: "It should return a decode error (sender channel invalid)",
-			fields: fields{
-				consumers: map[string]Consumer{
-					"ch1_resolved": &MockConsumer{
-						events:        make(chan kafka.Event, 2),
-						err:           false,
-						pollMsg:       "Hello World!",
-						topic:         "ch1_resolved",
-						errCode:       0,
-						senderChannel: "ch2",
-					},
-				},
-				lastMessage: nil,
-			},
-			uniqueChannel: "ch1_resolved",
-			wantErr:       true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -151,15 +133,11 @@ func TestReader_ReadMessage(t *testing.T) {
 
 			reader.consumers[tt.uniqueChannel].(*MockConsumer).CreateMessage()
 			bData, err := reader.ReadMessage(ctx, tt.uniqueChannel)
-			got := bData.Channel
-			got1 := bData.Message
+			got1 := bData
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Reader.ReadMessage() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if got != tt.want {
-				t.Errorf("Reader.ReadMessage() got = %v, want %v", got, tt.want)
 			}
 			if !reflect.DeepEqual(got1, tt.want1) {
 				t.Errorf("Reader.ReadMessage() got1 = %v, want %v", got1, tt.want1)

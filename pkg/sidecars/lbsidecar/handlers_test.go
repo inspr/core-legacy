@@ -133,7 +133,6 @@ func TestServer_writeMessageHandler(t *testing.T) {
 
 			if !tt.wantErr && (resp.StatusCode != http.StatusOK) {
 				t.Errorf("Received status %v, wanted %v", resp.StatusCode, http.StatusOK)
-				fmt.Printf("Response body: %v", resp.Body)
 				return
 			}
 		})
@@ -270,6 +269,7 @@ func createMockEnvVars() {
 	os.Setenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT", "1107")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER1_ADDR", "http://localhost")
 	os.Setenv("chan5_SCHEMA", `{"type":"string"}`)
+	os.Setenv("chan5_RESOLVED", "chan5")
 
 }
 
@@ -292,4 +292,5 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT")
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER1_ADDR")
 	os.Unsetenv("chan5_SCHEMA")
+	os.Unsetenv("chan5_RESOLVED")
 }

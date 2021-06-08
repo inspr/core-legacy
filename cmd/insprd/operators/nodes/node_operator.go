@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/auth"
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/meta/utils"
@@ -21,6 +22,7 @@ import (
 type NodeOperator struct {
 	clientSet kubernetes.Interface
 	memory    memory.Manager
+	brokers   brokers.Manager
 	auth      auth.Auth
 }
 
@@ -99,11 +101,12 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 	return nil
 }
 
-// NewOperator initializes a k8s based kafka node operator with in cluster configuration
-func NewOperator(memory memory.Manager, a auth.Auth) (nop *NodeOperator, err error) {
+// NewNodeOperator initializes a k8s based node operator with in cluster configuration
+func NewNodeOperator(memory memory.Manager, authenticator auth.Auth, broker brokers.Manager) (nop *NodeOperator, err error) {
 	nop = &NodeOperator{
-		memory: memory,
-		auth:   a,
+		memory:  memory,
+		auth:    authenticator,
+		brokers: broker,
 	}
 	if _, exists := os.LookupEnv("DEBUG"); exists {
 		logger.Info("initializing node operator with debug configs")

@@ -7,7 +7,7 @@ import (
 	"log"
 
 	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 	"golang.org/x/net/context"
 )
 
@@ -21,14 +21,14 @@ func main() {
 
 	client.HandleChannel(checkChannel, func(ctx context.Context, body io.Reader) error {
 		decoder := json.NewDecoder(body)
-		var checkMsg models.BrokerData
+		var checkMsg models.BrokerMessage
 		err := decoder.Decode(&checkMsg)
 		if err != nil {
 			return err
 		}
 
 		log.Println("Check received")
-		log.Println(checkMsg.Message)
+		log.Println(checkMsg.Data)
 		return nil
 	})
 

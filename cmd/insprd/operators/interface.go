@@ -6,6 +6,14 @@ import (
 	"github.com/inspr/inspr/pkg/meta"
 )
 
+// NodeOperatorInterface is the interface that allows to obtain or change
+// node information inside a deployment
+type NodeOperatorInterface interface {
+	CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error)
+	UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error)
+	DeleteNode(ctx context.Context, nodeContext string, nodeName string) error
+}
+
 // ChannelOperatorInterface is responsible for handling the following methods
 //
 // 	- `Get`: returns a channel from the DApp of the given context
@@ -19,4 +27,15 @@ type ChannelOperatorInterface interface {
 	Create(ctx context.Context, context string, channel *meta.Channel) error
 	Update(ctx context.Context, context string, channel *meta.Channel) error
 	Delete(ctx context.Context, context string, name string) error
+}
+
+// OperatorInterface is an interface for inspr runtime operators
+//
+// To implement the interface you need to create two implementations,
+// a node implementation, that creates nodes from inspr in the given runtime
+// and a channel implementation, that creates channels from inspr in the given
+// runtime.
+type OperatorInterface interface {
+	Nodes() NodeOperatorInterface
+	Channels() ChannelOperatorInterface
 }
