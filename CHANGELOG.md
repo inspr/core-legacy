@@ -7,6 +7,27 @@
     - PrintChannelTree function now prints the ConnectedAliases, the PriorityBrokerList and the SelectedBroker
 ---
 
+### #69 Story CORE-416 | k8s operator different sidecar injection
+- features:
+    - operator now deploys a node, its LB sidecar and all of its broker-specific sidecars
+    - updated Insprd's broker creation method
+    - updated how kafka sidecar is configured to k8s deployment
+    - updated Sidecar Factory so now it can receive more container options, and it returns that sidecar's environment variables (such as its port and address)
+    - created utils method that returns free/available tcp ports
+    - added LB sidecar to Helm Chart and Skaffold
+- fixes:
+    - removed old sidecar structures
+    - removed kafka configurations from Helm Chart and Skaffold
+    - removed odd structure that was being return by sidecar client channel handler
+    - fixed some comments, logs and funcion names misspells
+    - fixed LB Sidecars handlers that weren't getting the schema from the resolved channel
+    - fixed broker-specific sidecar read handler (it wasn't using a channel as path when sending request to lb sidecar)
+- refactors:
+    - moved brokers constants from `cmd/insprd/memory/brokers` into `pkg/meta/brokers`
+- misc:
+    - created new example to test multibroker architecture using Kafka
+---
+
 ### #66 Story CORE-415 | Kafka Sidecar redesign
 - features:
     - sidecar generic structure reconfigured to support broker specific sidecars

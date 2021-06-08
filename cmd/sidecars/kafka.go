@@ -1,9 +1,12 @@
 package sidecars
 
 import (
+	"os"
+	"strconv"
+
 	"github.com/inspr/inspr/pkg/meta"
 	"github.com/inspr/inspr/pkg/operator/k8s"
-	"github.com/inspr/inspr/pkg/sidecar_old/models"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -13,25 +16,21 @@ type KafkaConfig struct {
 	AutoOffsetReset  string
 	SidecarImage     string
 	// insprdPort is the port used in the insprd service of your cluster
-	KafkaInsprPort string
+	KafkaInsprAddr string
 }
 
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
 // SidecarFactory function that is used to subscribe to the sidecarFactory
 func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
-	return func(app *meta.App, conn *models.SidecarConnections) k8s.DeploymentOption {
-		return k8s.WithContainer(
-			k8s.NewContainer(
-				"sidecar-kafka-"+app.Meta.UUID, // deployment name
-				config.SidecarImage,            // image url
+	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", config.BootstrapServers)
+	return func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) (corev1.Container, []corev1.EnvVar) {
+		envVars, kafkAddr := KafkaSidecarConfig(config, conn)
 
-				// label to the dApp associated with it
-				InsprAppIDConfig(app),
-				KafkaEnvConfig(config),
-				KafkaSidecarConfig(config, conn),
-				k8s.ContainerWithPullPolicy(corev1.PullAlways),
-			),
-		)
+		return k8s.NewContainer(
+			"sidecar-kafka-"+app.Meta.UUID, // deployment name
+			config.SidecarImage,            // image url
+			getKafkaContainerOptions(app, config, envVars, opts)...,
+		), kafkAddr
 	}
 }
 
@@ -50,19 +49,32 @@ func KafkaEnvConfig(config KafkaConfig) k8s.ContainerOption {
 }
 
 // KafkaSidecarConfig adds the necessary env variables to configure the sidecar in the cluster
-func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) k8s.ContainerOption {
+func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) (k8s.ContainerOption, []corev1.EnvVar) {
+	port := corev1.EnvVar{
+		Name:  "INSPR_SIDECAR_KAFKA_WRITE_PORT",
+		Value: strconv.Itoa(int(conns.InPort)),
+	}
+
+	kafkaAddr := corev1.EnvVar{
+		Name:  "INSPR_SIDECAR_KAFKA_ADDR",
+		Value: config.KafkaInsprAddr,
+	}
+
 	return k8s.ContainerWithEnv(
-		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_KAFKA_READ_PORT",
-			Value: string(conns.OutPort),
-		},
-		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_KAFKA_WRITE_PORT",
-			Value: string(conns.InPort),
-		},
-		corev1.EnvVar{
-			Name:  "INSPR_SIDECAR_KAFKA_PORT",
-			Value: config.KafkaInsprPort,
-		},
-	)
+			port,
+		),
+		[]corev1.EnvVar{port, kafkaAddr}
+}
+
+func getKafkaContainerOptions(app *meta.App, config KafkaConfig, envVars k8s.ContainerOption,
+	opts []k8s.ContainerOption) []k8s.ContainerOption {
+
+	stdOptions := []k8s.ContainerOption{
+		InsprAppIDConfig(app),
+		KafkaEnvConfig(config),
+		envVars,
+		k8s.ContainerWithPullPolicy(corev1.PullAlways),
+	}
+
+	return append(stdOptions, opts...)
 }

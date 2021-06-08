@@ -20,7 +20,7 @@ import (
 var logger *zap.Logger
 
 func init() {
-	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
 }
 
 // writeMessageHandler handles requests sent to the write message server
@@ -30,7 +30,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 
 		channel := strings.TrimPrefix(r.URL.Path, "/")
 
-		if !environment.OutputChannnelList().Contains(channel) {
+		if !environment.OutputChannelList().Contains(channel) {
 			logger.Error(fmt.Sprintf("channel %s not found in output channel list", channel))
 			insprError := ierrors.NewError().
 				BadRequest().
@@ -159,7 +159,12 @@ func encodeToAvro(channel string, body io.Reader) ([]byte, error) {
 	var receivedMsg models.BrokerMessage
 	json.NewDecoder(body).Decode(&receivedMsg)
 
-	encodedAvroMsg, err := encode(channel, receivedMsg.Data)
+	resolvedCh, err := getResolvedChannel(channel)
+	if err != nil {
+		return nil, err
+	}
+
+	encodedAvroMsg, err := encode(resolvedCh, receivedMsg.Data)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +178,12 @@ func decodeFromAvro(channel string, body io.Reader) ([]byte, error) {
 		return nil, err
 	}
 
-	decodedAvroMsg, err := readMessage(channel, receivedMsg)
+	resolvedCh, err := getResolvedChannel(channel)
+	if err != nil {
+		return nil, err
+	}
+
+	decodedAvroMsg, err := readMessage(resolvedCh, receivedMsg)
 	if err != nil {
 		return nil, err
 	}
@@ -184,4 +194,17 @@ func decodeFromAvro(channel string, body io.Reader) ([]byte, error) {
 	}
 
 	return jsonEncodedMsg, nil
+}
+
+func getResolvedChannel(channel string) (string, error) {
+	resolvedCh, ok := os.LookupEnv(channel + "_RESOLVED")
+	if !ok {
+		logger.Error(fmt.Sprintf("couldn't find resolution for channel %s", channel))
+		insprError := ierrors.NewError().
+			BadRequest().
+			Message("resolution for channel '%s' not found", channel)
+
+		return "", insprError.Build()
+	}
+	return resolvedCh, nil
 }

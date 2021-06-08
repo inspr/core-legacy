@@ -119,7 +119,7 @@ func getRawOutputChannels() string {
 
 // GetSidecarImage returns environment variable which contains the sidecar image reference
 func GetSidecarImage() string {
-	return getEnv("INSPR_SIDECAR_IMAGE")
+	return getEnv("INSPR_LBSIDECAR_IMAGE")
 }
 
 // GetInsprAppContext returns environment variable which contains the current dApp context

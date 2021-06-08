@@ -2,7 +2,6 @@ package nodes
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/operator/k8s"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
 
@@ -20,49 +20,121 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
-	log.Println("creating secret")
-	scope, err := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
-	if err != nil {
-		log.Printf("err = %+v\n", err)
-		return nil
-	}
+var lbsidecarPort int32
 
-	payload := auth.Payload{
-		UID: app.Meta.UUID,
-		Permissions: map[string][]string{
-			app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
-		},
-		Refresh:    []byte(scope),
-		RefreshURL: fmt.Sprintf("%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
-	}
+func (no *NodeOperator) dappToService(app *meta.App) *kubeService {
+	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_PORT"))
+	lbsidecarPort = int32(temp)
+	appID := toAppID(app)
+	appDeployName := toDeploymentName(app)
+	appLabels := map[string]string{"inspr-app": appID}
 
-	token, err := no.auth.Tokenize(payload)
-	if err != nil {
-		log.Printf("err = %+v\n", err)
-		return nil
-	}
-
-	return &kubeSecret{
+	svc := &kubeService{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: toDeploymentName(app),
+			Name: appDeployName,
 		},
-		Data: map[string][]byte{
-			"INSPR_CONTROLLER_TOKEN": token,
-			"INSPR_CONTROLLER_SCOPE": []byte(app.Spec.Auth.Scope),
+		Spec: corev1.ServiceSpec{
+			Ports: func() (ports []corev1.ServicePort) {
+				for i, port := range app.Spec.Node.Spec.Ports {
+					ports = append(ports, corev1.ServicePort{
+						Name:       fmt.Sprintf("port%v", i),
+						Port:       int32(port.Port),
+						TargetPort: intstr.FromInt(port.TargetPort),
+					})
+				}
+				ports = append(ports, corev1.ServicePort{
+					Name:       "lbsidecar-port",
+					Port:       lbsidecarPort,
+					TargetPort: intstr.FromInt(int(lbsidecarPort)),
+				})
+				return
+			}(),
+			Selector: appLabels,
 		},
 	}
+
+	return svc
 }
 
-func withSecretDefinition(app *meta.App) k8s.ContainerOption {
-	env := corev1.EnvFromSource{
-		SecretRef: &corev1.SecretEnvSource{
-			LocalObjectReference: corev1.LocalObjectReference{
-				Name: toDeploymentName(app),
-			},
-		},
+// dAppToDeployment translates the DApp to a k8s deployment
+func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
+	appDeployName := toDeploymentName(app)
+	appLabels := map[string]string{
+		"inspr-app": toAppID(app),
 	}
-	return k8s.ContainerWithEnvFrom(env)
+	logger.Info("constructing deployment")
+
+	nodeContainer := createNodeContainer(app, appDeployName)
+	scContainers := no.withAllSidecarsContainers(app, appDeployName)
+
+	return (*kubeDeploy)(
+		k8s.NewDeployment(
+			appDeployName,
+			k8s.WithLabels(appLabels),
+			k8s.WithContainer(
+				append(scContainers, nodeContainer)...,
+			),
+		))
+}
+
+func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName string) []corev1.Container {
+	var containers []corev1.Container
+	var sidecarAddrs []corev1.EnvVar
+	for _, broker := range no.getAllSidecarBrokers(app) {
+
+		factory, err := no.brokers.Factory().Get(broker)
+
+		if err != nil {
+			panic(fmt.Sprintf("broker %v not allowed: %v", broker, err))
+		}
+
+		container, addrEnvVar := factory(app,
+			getAvailiblePorts(),
+			no.withBoundary(app),
+			withLBSidecarConfiguration())
+
+		containers = append(containers, container)
+		sidecarAddrs = append(sidecarAddrs, addrEnvVar...)
+	}
+
+	lbSidecar := k8s.NewContainer(
+		appDeployName+"-lbsidecar",
+		"",
+		no.withLBSidecarImage(app),
+		no.withBoundary(app),
+		withLBSidecarPorts(app),
+		withLBSidecarConfiguration(),
+		k8s.ContainerWithEnv(sidecarAddrs...),
+		withNodeID(app),
+		k8s.ContainerWithPullPolicy(corev1.PullAlways),
+	)
+
+	containers = append(containers, lbSidecar)
+
+	return containers
+}
+
+func (no *NodeOperator) getAllSidecarBrokers(app *meta.App) utils.StringArray {
+	input := app.Spec.Boundary.Input
+	output := app.Spec.Boundary.Output
+	channels := input.Union(output)
+
+	resolves, err := no.memory.Apps().ResolveBoundary(app)
+	if err != nil {
+		logger.Error("unable to resolve Node boundaries",
+			zap.Any("boundaries", app.Spec.Boundary))
+		panic(err)
+	}
+
+	logger.Debug("resolving Node Boundary in the cluster")
+
+	set, _ := metautils.MakeStrSet(channels.Map(func(boundary string) string {
+		resolved := resolves[boundary]
+		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
+		ch, _ := no.memory.Channels().Get(parent, chName)
+		return ch.Spec.SelectedBroker
+	}))
+	return set.ToArray()
 }
 
 // withBoundary adds the boundary configuration to the kubernetes' deployment environment variables
@@ -76,8 +148,6 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 		input := app.Spec.Boundary.Input
 		output := app.Spec.Boundary.Output
 		channels := input.Union(output)
-
-		// label name to be used in the service
 
 		resolves, err := no.memory.Apps().ResolveBoundary(app)
 		if err != nil {
@@ -115,16 +185,112 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 	}
 }
 
-func withNodeID(app *meta.App) k8s.ContainerOption {
-	return k8s.ContainerWithEnv(corev1.EnvVar{
-		Name:  "INSPR_APP_ID",
-		Value: toAppID(app),
-	})
+// withLBSidecarImage adds the sidecar image to the dApp
+func (no *NodeOperator) withLBSidecarImage(app *meta.App) k8s.ContainerOption {
+	return func(c *corev1.Container) {
+		c.Image = environment.GetSidecarImage()
+	}
 }
 
-// withSidecarPorts adds the sidecar ports if they are defined in the dApp definitions.
+func (no *NodeOperator) returnChannelBroker(pathToChannel string) string {
+	scope, chName, err := metautils.RemoveLastPartInScope(pathToChannel)
+	if err != nil {
+		return ""
+	}
+	channel, err := no.memory.Channels().Get(scope, chName)
+	if err != nil {
+		return ""
+	}
+	return fmt.Sprintf("%s_%s", chName, channel.Spec.SelectedBroker)
+}
+
+func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
+	logger.Info("creating secret")
+	scope, err := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+	if err != nil {
+		logger.Error("invalid scope", zap.Any("error", err))
+		return nil
+	}
+
+	payload := auth.Payload{
+		UID: app.Meta.UUID,
+		Permissions: map[string][]string{
+			app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
+		},
+		Refresh:    []byte(scope),
+		RefreshURL: fmt.Sprintf("%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
+	}
+
+	token, err := no.auth.Tokenize(payload)
+	if err != nil {
+		logger.Error("unable to tokenize", zap.Any("error", err))
+		return nil
+	}
+
+	return &kubeSecret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: toDeploymentName(app),
+		},
+		Data: map[string][]byte{
+			"INSPR_CONTROLLER_TOKEN": token,
+			"INSPR_CONTROLLER_SCOPE": []byte(app.Spec.Auth.Scope),
+		},
+	}
+}
+
+// Auxiliar methods
+
+func withSecretDefinition(app *meta.App) k8s.ContainerOption {
+	env := corev1.EnvFromSource{
+		SecretRef: &corev1.SecretEnvSource{
+			LocalObjectReference: corev1.LocalObjectReference{
+				Name: toDeploymentName(app),
+			},
+		},
+	}
+	return k8s.ContainerWithEnvFrom(env)
+}
+
+func createNodeContainer(app *meta.App, appDeployName string) corev1.Container {
+	return k8s.NewContainer(
+		appDeployName,
+		app.Spec.Node.Spec.Image,
+		withLBSidecarPorts(app),
+		withSecretDefinition(app),
+		withLBSidecarConfiguration(),
+	)
+}
+
+func getAvailiblePorts() *models.SidecarConnections {
+	ports, err := utils.GetFreePorts(2)
+	if err != nil {
+		logger.Error("unable to get free ports for broker sidecar: %v",
+			zap.Any("error", err))
+
+		panic(fmt.Sprintf("error while getting free ports: %v", err))
+
+	}
+	return &models.SidecarConnections{
+		InPort:  int32(ports[0]),
+		OutPort: int32(ports[1]),
+	}
+}
+
+func withLBSidecarConfiguration() k8s.ContainerOption {
+	return k8s.ContainerWithEnvFrom(
+		corev1.EnvFromSource{
+			ConfigMapRef: &corev1.ConfigMapEnvSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: "inspr-lbsidecar-configuration",
+				},
+			},
+		},
+	)
+}
+
+// withLBSidecarPorts adds the load balancer sidecar ports if they are defined in the dApp definitions.
 // On kubernetes, this overrides the defined configuration on the configmap
-func withSidecarPorts(app *meta.App) k8s.ContainerOption {
+func withLBSidecarPorts(app *meta.App) k8s.ContainerOption {
 	return func(c *corev1.Container) {
 		lbWritePort := app.Spec.Node.Spec.SidecarPort.LBWrite
 		lbReadPort := app.Spec.Node.Spec.SidecarPort.LBRead
@@ -141,110 +307,14 @@ func withSidecarPorts(app *meta.App) k8s.ContainerOption {
 				Value: strconv.Itoa(lbReadPort),
 			})
 		}
-		// The Sidecar Client read port must be added here
 	}
 }
 
-// withSidecarImage adds the sidecar image to the dApp
-func (no *NodeOperator) withSidecarImage(app *meta.App) k8s.ContainerOption {
-	return func(c *corev1.Container) {
-		c.Image = environment.GetSidecarImage()
-	}
-}
-
-// dAppToDeployment translates the DApp
-func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
-	appDeployName := toDeploymentName(app)
-	appLabels := map[string]string{
-		"inspr-app": toAppID(app),
-	}
-	log.Println("constructing deployment")
-
-	return (*kubeDeploy)(
-		k8s.NewDeployment(
-			appDeployName,
-			k8s.WithLabels(appLabels),
-			k8s.WithContainer(
-				k8s.NewContainer(
-					appDeployName,
-					app.Spec.Node.Spec.Image,
-					withSidecarPorts(app),
-					withSecretDefinition(app),
-					withSidecarConfiguration(),
-				),
-				k8s.NewContainer(
-					appDeployName+"-sidecar",
-					"",
-					no.withSidecarImage(app),
-					no.withBoundary(app),
-					withSidecarPorts(app),
-					withKafkaConfiguration(),
-					withSidecarConfiguration(),
-					withNodeID(app),
-					k8s.ContainerWithPullPolicy(corev1.PullAlways),
-				),
-			),
-		))
-}
-
-var sidecarPort int32
-
-func withKafkaConfiguration() k8s.ContainerOption {
-	return k8s.ContainerWithEnvFrom(
-		corev1.EnvFromSource{
-			ConfigMapRef: &corev1.ConfigMapEnvSource{
-				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "inspr-kafka-configuration",
-				},
-			},
-		},
-	)
-}
-
-func withSidecarConfiguration() k8s.ContainerOption {
-	return k8s.ContainerWithEnvFrom(
-		corev1.EnvFromSource{
-			ConfigMapRef: &corev1.ConfigMapEnvSource{
-				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "inspr-lbsidecar-configuration",
-				},
-			},
-		},
-	)
-}
-
-func dappToService(app *meta.App) *kubeService {
-	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_PORT"))
-	sidecarPort = int32(temp)
-	appID := toAppID(app)
-	appDeployName := toDeploymentName(app)
-	appLabels := map[string]string{"inspr-app": appID}
-
-	svc := &kubeService{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: appDeployName,
-		},
-		Spec: corev1.ServiceSpec{
-			Ports: func() (ports []corev1.ServicePort) {
-				for i, port := range app.Spec.Node.Spec.Ports {
-					ports = append(ports, corev1.ServicePort{
-						Name:       fmt.Sprintf("port%v", i),
-						Port:       int32(port.Port),
-						TargetPort: intstr.FromInt(port.TargetPort),
-					})
-				}
-				ports = append(ports, corev1.ServicePort{
-					Name:       "sidecar-port",
-					Port:       sidecarPort,
-					TargetPort: intstr.FromInt(int(sidecarPort)),
-				})
-				return
-			}(),
-			Selector: appLabels,
-		},
-	}
-
-	return svc
+func withNodeID(app *meta.App) k8s.ContainerOption {
+	return k8s.ContainerWithEnv(corev1.EnvVar{
+		Name:  "INSPR_APP_ID",
+		Value: toAppID(app),
+	})
 }
 
 // toDeployment - creates the kubernetes deployment name from the app
@@ -267,16 +337,4 @@ func toAppID(app *meta.App) string {
 func intToint32(v int) *int32 {
 	t := int32(v)
 	return &t
-}
-
-func (no *NodeOperator) returnChannelBroker(pathToChannel string) string {
-	scope, chName, err := metautils.RemoveLastPartInScope(pathToChannel)
-	if err != nil {
-		return ""
-	}
-	channel, err := no.memory.Channels().Get(scope, chName)
-	if err != nil {
-		return ""
-	}
-	return fmt.Sprintf("%s_%s", chName, channel.Spec.SelectedBroker)
 }
