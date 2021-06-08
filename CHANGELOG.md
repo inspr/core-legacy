@@ -3,10 +3,10 @@
 
 ### #69 Story CORE-416 | k8s operator different sidecar injection
 - features:
-    - operator now deploys a node, it's LB sidecar and all of it's broker-specific sidecars
+    - operator now deploys a node, its LB sidecar and all of its broker-specific sidecars
     - updated Insprd's broker creation method
     - updated how kafka sidecar is configured to k8s deployment
-    - updated Sidecar Factory so now it can receive more container options, and it returns that sidecar's environment variables (such as it's port and address)
+    - updated Sidecar Factory so now it can receive more container options, and it returns that sidecar's environment variables (such as its port and address)
     - created utils method that returns free/available tcp ports
     - added LB sidecar to Helm Chart and Skaffold
 - fixes:
