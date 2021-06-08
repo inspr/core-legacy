@@ -32,7 +32,7 @@ type kafkaEnv struct {
 }
 
 func getEnv() (env kafkaEnv) {
-	boot := os.Getenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS") // HELL, this must inherit configs from the instanciation of a new kafka broker
+	boot := os.Getenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS")
 	env.kafkaBootstrapServers = boot
 	return
 }
