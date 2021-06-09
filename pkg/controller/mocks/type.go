@@ -19,33 +19,33 @@ func NewTypeMock(err error) controller.TypeInterface {
 }
 
 // Get is the TypeMock Get
-func (cm *TypeMock) Get(ctx context.Context, context string, ctName string) (*meta.Type, error) {
-	if cm.err != nil {
-		return &meta.Type{}, cm.err
+func (tm *TypeMock) Get(ctx context.Context, scope, ctName string) (*meta.Type, error) {
+	if tm.err != nil {
+		return &meta.Type{}, tm.err
 	}
 	return &meta.Type{}, nil
 }
 
 // Create is the TypeMock Create
-func (cm *TypeMock) Create(ctx context.Context, context string, ct *meta.Type, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
+func (tm *TypeMock) Create(ctx context.Context, scope string, ct *meta.Type, dryRun bool) (diff.Changelog, error) {
+	if tm.err != nil {
+		return diff.Changelog{}, tm.err
 	}
 	return diff.Changelog{}, nil
 }
 
 // Delete is the TypeMock Delete
-func (cm *TypeMock) Delete(ctx context.Context, context string, ctName string, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
+func (tm *TypeMock) Delete(ctx context.Context, scope, ctName string, dryRun bool) (diff.Changelog, error) {
+	if tm.err != nil {
+		return diff.Changelog{}, tm.err
 	}
 	return diff.Changelog{}, nil
 }
 
 // Update is the TypeMock Update
-func (cm *TypeMock) Update(ctx context.Context, context string, ct *meta.Type, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
+func (tm *TypeMock) Update(ctx context.Context, scope string, ct *meta.Type, dryRun bool) (diff.Changelog, error) {
+	if tm.err != nil {
+		return diff.Changelog{}, tm.err
 	}
 	return diff.Changelog{}, nil
 }

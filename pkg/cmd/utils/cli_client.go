@@ -85,9 +85,9 @@ func RequestErrorMessage(err error, w io.Writer) {
 		case ierrors.Forbidden:
 			fmt.Fprintf(w, "forbidden operation, please check for the scope.\n")
 		default:
-			fmt.Fprintf(w, "unexpected inspr error, the message is: %v\n", err.Error())
+			fmt.Fprintf(w, "unexpected inspr error: %v\n", err.Error())
 		}
 	} else {
-		fmt.Fprintf(w, "non inspr error, the message is: %v\n", err.Error())
+		fmt.Fprintf(w, "non inspr error: %v\n", err.Error())
 	}
 }

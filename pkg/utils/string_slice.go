@@ -2,7 +2,7 @@
 // in multiple places of the inspr packages, contains operations
 // such as:
 //
-// 	- go-cmp: "comparators and evaluator for slices and maps"
+// 	- compare_options: "comparators and evaluator for slices and maps"
 // 	- string_slice: "set of operations of custom string slice"
 package utils
 

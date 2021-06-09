@@ -20,9 +20,9 @@ func NewBrokersMock(err error) controller.BrokersInterface {
 }
 
 // Get is the BrokersMock Get
-func (cm *BrokersMock) Get(ctx context.Context) (*models.BrokersDI, error) {
-	if cm.err != nil {
-		return &models.BrokersDI{}, cm.err
+func (bm *BrokersMock) Get(ctx context.Context) (*models.BrokersDI, error) {
+	if bm.err != nil {
+		return &models.BrokersDI{}, bm.err
 	}
 	return &models.BrokersDI{}, nil
 }

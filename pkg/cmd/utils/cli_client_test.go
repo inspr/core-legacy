@@ -215,7 +215,7 @@ func TestRequestErrorMessage(t *testing.T) {
 			args: args{
 				err: errors.New("mock-error"),
 			},
-			wantW: "non inspr error, the message is: mock-error\n",
+			wantW: "non inspr error: mock-error\n",
 		},
 	}
 	for _, tt := range tests {

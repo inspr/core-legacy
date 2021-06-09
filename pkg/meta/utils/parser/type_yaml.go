@@ -17,7 +17,7 @@ func YamlToType(bytes []byte) (meta.Type, error) {
 			ierrors.
 				NewError().
 				InvalidType().
-				Message("Error parsing the file").
+				Message("error parsing type yaml file").
 				Build()
 	}
 

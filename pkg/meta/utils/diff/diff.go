@@ -37,11 +37,9 @@ const (
 	Create
 )
 
-/*
-Difference is the most basic diff structure, it represents a difference between two apps.
-The object carries information abaout what field differs from one app to another,
-the value of that field on the original app and the value of that field on the current app.
-*/
+// Difference is the most basic diff structure, it represents a difference between two apps.
+// The object carries information abaout what field differs from one app to another,
+// the value of that field on the original app and the value of that field on the current app.
 type Difference struct {
 	Field     string `json:"field"`
 	From      string `json:"from"`
@@ -51,10 +49,8 @@ type Difference struct {
 	Operation Operation
 }
 
-/*
-Change encapsulates all differences between two apps and carries the
-information about the context those apps exist in the app tree.
-*/
+// Change encapsulates all differences between two apps and carries the
+// information about the context those apps exist in the app tree.
 type Change struct {
 	Context   string       `json:"context"`
 	Diff      []Difference `json:"diff"`

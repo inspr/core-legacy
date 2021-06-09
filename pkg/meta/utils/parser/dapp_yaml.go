@@ -13,7 +13,7 @@ func YamlToApp(bytes []byte) (*meta.App, error) {
 	}
 
 	if err := yaml.Unmarshal(bytes, &app); err != nil {
-		return app, ierrors.NewError().Message("Error parsing the file").Build()
+		return app, ierrors.NewError().Message("error parsing dapp yaml file").Build()
 	}
 
 	if app.Meta.Name == "" {
