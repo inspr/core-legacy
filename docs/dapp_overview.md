@@ -11,7 +11,7 @@ A dApp can also be a Node, which is basically the same as a normal dApp but has 
 - All structures created by the user are (directly or not) inside of a **root dApp**.  
 - A dApp **can't** contain other dApps if it is a Node, and vice versa.
 - Boundary defines by which Channels a dApp exchanges information with it's parent dApp.
-    - Aliases can be used to implement a multi-layer communication.
+    - Aliases can be used to implement a multi-layer communication with Channels.
 - The global dApps organization is a tree-like structure:  
 
 ![tree](img/dapp-tree.png)  
@@ -26,7 +26,7 @@ The unique characteristics of a Node are defined by three structures set by the 
 **Nodes are created inside a Kubernetes cluster as Deployments.**  
 As described previously in "What are dApps?", a dApp that is a Node can't have child dApps. This means that:
 1) A Node is a dApp that has a Node structure defined in it.
-    - This implies that Nodes make use of all the structures defined within it's parent (Channels, Types, Boundaries and Aliases)
+    - This implies that Nodes make use of all the structures defined within it's parent (Channels, Routes, Types, Boundaries and Aliases)
 2) In the tree-like organization, Nodes are always leaves.
 
 
@@ -40,7 +40,7 @@ Channels are created to receive and send a specific kind of information. This sp
 - A Channel only carries a specific kind of data (such as *int*, *string*, or a structure defined by the user).
 - A Channel can't exist without a Type associated to it.  
 
-In a more detailed explanation, the cluster's structures communication can be done through a [Message Broker](https://en.wikipedia.org/wiki/Message_broker) (such as Apache Kafka, RabbitMQ, etc.). So what a Channel really does is to define from which part of the broker (which topic) a Node should read a message, or to which part it should write a message.  
+In a more detailed explanation, the cluster's structures communication can be done through a [Message Broker](https://en.wikipedia.org/wiki/Message_broker) (such as Apache Kafka, RabbitMQ, etc.). So what a Channel really does is define from which part of the broker (which topic) a Node should read a message, or to which part it should write a message.  
 It's relevant to point out that **a Channel can be associated with only one message broker**. That is, if the implementation of a Node that communicate with Kafka and Redis is desired, for example, two (or more) different Channels must be created, so one of them is related to Kafka and the other one to Redis.
 
 ![chan-topic](img/chan-topic.jpg)
@@ -72,19 +72,19 @@ The LB Sidecar is used for communication via message brokers (Channels), via HTT
 If all [Message Brokers](https://en.wikipedia.org/wiki/Message_broker) had the same architecture, it'd be simple to make Nodes exchange information: they would just write or read messages from where their Channels are pointing to.  
 Unfortunately, different Message Brokers demand different configurations, and changing an application that uses Kafka to use RabbitMQ, for example, can be very costly.  
 
-To resolve this issue, **Inspr implements Channels agnostic to runtime**. That is, Inspr users are able to create applications at a high level without the need of knowing the runtime (unless the code is very specific), so that their dApps can run in many systems and need not to worry about Broker configurations.  
+To solve this issue, **Inspr implements Channels agnostic to runtime**. That is, Inspr users are able to create applications at a high level without the need of knowing the runtime (unless the code is very specific), so that their dApps can run in many systems and need not to worry about Broker configurations.  
 In Inspr, each Node can have multiple **broker-specific Sidecars** "attached" to it's Load Balancer Sidecar. A broker-specific Sidecar is the structure that translates a Node's read/write commands to a specific Message Broker, so users don't have to worry about it!  
 
 ![sidecar](img/sidecar.jpg)  
 
-As it's shown above, dApp/Node1 uses the Message Broker X, so the Sidecar attached to the Node is the Sidecar for Broker X. If the user decides to change the Broker to Message Broker Y, all that's needed to be done is replace the Sidecar X for Broker's Y Sidecar. This is done automatically by Inspr once the Channels are modified to be associated with Message Broker Y and the Node is re-deployed. 
+As it's shown above, dApp/Node1 uses the Message Broker X, so the Broker-specific Sidecar "attached" to it is the Sidecar for Broker X. If the user decides to change the Broker to Message Broker Y, all that's needed to be done is replace the Sidecar X for Broker's Y Sidecar. This is done automatically by Inspr once the Channels are modified to be associated with Message Broker Y and the Node is re-deployed. 
 
 The overall communication in between Nodes can be seen as going up or down the tree of dApps:
 
 ![node-communication](img/node-comm.jpg)
 
 ## What are Aliases?
-As shown in the image above, Nodes communicate with each other through its parent dApp Channels. This implies that the communication is one-layered only, because the parent dApp, by definition, isn't a Node and therefore isn't able to send or receive messages (it only defines where it's child Nodes can read and write from):
+As shown in the image above, Nodes can communicate with each other through its parent dApp Channels. This implies that the communication by Channels is one-layered only, because the parent dApp, by definition, isn't a Node and therefore isn't able to send or receive messages (it only defines where it's child Nodes can read and write from):
 
 ![without-alias](img/no-alias.jpg)  
 
