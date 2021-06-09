@@ -8,24 +8,23 @@ spec:
       image: "gcr.io/red-inspr/operator:latest"
       imagePullPolicy: Always
       env:
-      - name: INSPR_APP_CTX
-        value: ""
-      - name: INSPR_ENV
-        value: "test"
-      - name: KAFKA_BOOTSTRAP_SERVERS
-        value: "kafka.default.svc:9092"
-      - name: KAFKA_AUTO_OFFSET_RESET
-        value: "earliest"
-      - name: INSPR_SIDECAR_IMAGE
-        value: "gcr.io/red-inspr/inspr/sidecar/kafka:3610a43-dirty"
-      - name: INSPR_APP_ID
-        value: "abcdef"
-      - name: "NODES_APPS_NAMESPACE"
-        value: "default"
-      - name: "INSPR_INPUT_CHANNELS"
-        value: "default"
-      - name: "INSPR_OUTPUT_CHANNELS"
-        value: "default"
-      - name: "INSPR_UNIX_SOCKET"
-        value: "default"
-    
+        - name: INSPR_APP_SCOPE
+          value: ""
+        - name: INSPR_ENV
+          value: "test"
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka.default.svc:9092"
+        - name: KAFKA_AUTO_OFFSET_RESET
+          value: "earliest"
+        - name: INSPR_SIDECAR_IMAGE
+          value: "gcr.io/red-inspr/inspr/sidecar/kafka:3610a43-dirty"
+        - name: INSPR_APP_ID
+          value: "abcdef"
+        - name: "NODES_APPS_NAMESPACE"
+          value: "default"
+        - name: "INSPR_INPUT_CHANNELS"
+          value: "default"
+        - name: "INSPR_OUTPUT_CHANNELS"
+          value: "default"
+        - name: "INSPR_UNIX_SOCKET"
+          value: "default"
