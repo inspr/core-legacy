@@ -49,7 +49,7 @@ func (bmm *BrokerMemoryManager) Create(broker brokers.BrokerStatus, config broke
 	case brokers.Kafka:
 		factory = sidecars.KafkaToDeployment(config.(sidecars.KafkaConfig))
 	default:
-		return ierrors.NewError().Message("broker %s is not valid", broker).Build()
+		return ierrors.NewError().Message("broker %s is not supported", broker).Build()
 	}
 
 	err = bmm.Factory().Subscribe(string(broker), factory)

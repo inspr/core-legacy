@@ -14,12 +14,18 @@
     - removed the `parser` package in the directory `meta/utils/parser`, all of its contents can now be found on the `yaml_parser.go` file in the `meta/utils` pkg.
     - removed the []byte to []byte comparison in the inspr cli testing since it can be just a direct comparison between two strings. No need for adding extra buffers 
 ---
+### #70 Tech CORE-442 | Inspr CLI describe command outdated
+- features:
+    - PrintAppTree function now prints the Node Meta, the Node Ports, the Node Sidecar LBRead and LBWrite port and the new Auth structure.
+    - PrintChannelTree function now prints the ConnectedAliases, the PriorityBrokerList and the SelectedBroker
+---
+
 ### #69 Story CORE-416 | k8s operator different sidecar injection
 - features:
-    - operator now deploys a node, it's LB sidecar and all of it's broker-specific sidecars
+    - operator now deploys a node, its LB sidecar and all of its broker-specific sidecars
     - updated Insprd's broker creation method
     - updated how kafka sidecar is configured to k8s deployment
-    - updated Sidecar Factory so now it can receive more container options, and it returns that sidecar's environment variables (such as it's port and address)
+    - updated Sidecar Factory so now it can receive more container options, and it returns that sidecar's environment variables (such as its port and address)
     - created utils method that returns free/available tcp ports
     - added LB sidecar to Helm Chart and Skaffold
 - fixes:

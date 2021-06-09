@@ -1,6 +1,7 @@
 package sidecars
 
 import (
+	"os"
 	"strconv"
 
 	"github.com/inspr/inspr/pkg/meta"
@@ -21,14 +22,14 @@ type KafkaConfig struct {
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
 // SidecarFactory function that is used to subscribe to the sidecarFactory
 func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
+	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", config.BootstrapServers)
 	return func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) (corev1.Container, []corev1.EnvVar) {
 		envVars, kafkAddr := KafkaSidecarConfig(config, conn)
 
 		return k8s.NewContainer(
 			"sidecar-kafka-"+app.Meta.UUID, // deployment name
 			config.SidecarImage,            // image url
-			// label to the dApp associated with it
-			returnKafkaContainerOptions(app, config, envVars, opts)...,
+			getKafkaContainerOptions(app, config, envVars, opts)...,
 		), kafkAddr
 	}
 }
@@ -65,7 +66,7 @@ func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) (k
 		[]corev1.EnvVar{port, kafkaAddr}
 }
 
-func returnKafkaContainerOptions(app *meta.App, config KafkaConfig, envVars k8s.ContainerOption,
+func getKafkaContainerOptions(app *meta.App, config KafkaConfig, envVars k8s.ContainerOption,
 	opts []k8s.ContainerOption) []k8s.ContainerOption {
 
 	stdOptions := []k8s.ContainerOption{

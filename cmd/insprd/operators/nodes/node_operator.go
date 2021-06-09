@@ -101,7 +101,7 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 	return nil
 }
 
-// NewNodeOperator initializes a k8s based kafka node operator with in cluster configuration
+// NewNodeOperator initializes a k8s based node operator with in cluster configuration
 func NewNodeOperator(memory memory.Manager, authenticator auth.Auth, broker brokers.Manager) (nop *NodeOperator, err error) {
 	nop = &NodeOperator{
 		memory:  memory,

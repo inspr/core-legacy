@@ -11,12 +11,12 @@ func GetFreePorts(count int) ([]int, error) {
 			return nil, err
 		}
 
-		l, err := net.ListenTCP("tcp", addr)
+		listener, err := net.ListenTCP("tcp", addr)
 		if err != nil {
 			return nil, err
 		}
-		defer l.Close()
-		ports = append(ports, l.Addr().(*net.TCPAddr).Port)
+		defer listener.Close()
+		ports = append(ports, listener.Addr().(*net.TCPAddr).Port)
 	}
 	return ports, nil
 }
