@@ -3,6 +3,7 @@ package fake
 import (
 	"github.com/inspr/inspr/cmd/insprd/operators"
 	"github.com/inspr/inspr/pkg/meta"
+	metabrokers "github.com/inspr/inspr/pkg/meta/brokers"
 )
 
 // Operator mock
@@ -19,6 +20,10 @@ func (f *Operator) Channels() operators.ChannelOperatorInterface {
 // Nodes mock
 func (f *Operator) Nodes() operators.NodeOperatorInterface {
 	return f.nodes
+}
+
+func (f *Operator) SetBrokerOperator(config metabrokers.BrokerConfiguration) error {
+	return nil
 }
 
 // NewFakeOperator creates a simple operator that only acts in memory
