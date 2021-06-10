@@ -182,7 +182,7 @@ func Test_doApply(t *testing.T) {
 	outResp, _ := ioutil.ReadAll(bufResp)
 
 	bufResp2 := bytes.NewBufferString("")
-	fmt.Fprintln(bufResp2, "Invalid command call\nFor help, type 'inspr apply --help'")
+	fmt.Fprintln(bufResp2, "Invalid command call\nFor help, type 'insprctl apply --help'")
 	outResp2, _ := ioutil.ReadAll(bufResp2)
 
 	bufResp3 := bytes.NewBufferString("")
@@ -338,7 +338,7 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.NewError().Message("unauthorized").Unauthorized().Build(),
-			errMsg:  "We couldn't authenticate with the cluster. Is your token configured correctly?\n",
+			errMsg:  "we couldn't authenticate with the cluster. Is your token configured correctly?\n",
 		},
 		{
 			name: "forbidden_error",

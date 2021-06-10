@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/inspr/inspr/cmd/inspr/cli"
+	"github.com/inspr/inspr/cmd/insprctl/cli"
 	"github.com/spf13/cobra/doc"
 )
 

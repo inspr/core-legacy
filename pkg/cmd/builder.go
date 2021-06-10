@@ -61,12 +61,12 @@ func (b *builder) WithLongDescription(long string) Builder {
 
 // WithExample - adds and example of how to use the command
 //
-// it will show ' #comment_given inspr  #subcommand_example '
+// it will show ' #comment_given insprctl  #subcommand_example '
 func (b *builder) WithExample(comment, command string) Builder {
 	if b.cmd.Example != "" {
 		b.cmd.Example += "\n"
 	}
-	b.cmd.Example += fmt.Sprintf("  # %s\n inspr %s\n", comment, command)
+	b.cmd.Example += fmt.Sprintf("  # %s\n insprctl %s\n", comment, command)
 	return b
 }
 
