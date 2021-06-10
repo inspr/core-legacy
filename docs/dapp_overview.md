@@ -36,7 +36,7 @@ A dApp/Node inputs and outputs are defined by it's Boundary. The Boundary, on th
 
 ![channel](img/chan-func.png)  
 
-Channels are created to receive and send a specific kind of information. This specification is defined by it's **Type**, which is a reference to a Type structure defined in the same context (in the same dApp) as the Channel. In other words:
+Channels are created to receive and send a specific kind of information. This specification is defined by its **Type**, which is a reference to a Type structure defined in the same context (in the same dApp) as the Channel. In other words:
 - A Channel only carries a specific kind of data (such as *int*, *string*, or a structure defined by the user).
 - A Channel can't exist without a Type associated to it.  
 
