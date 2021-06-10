@@ -1,6 +1,13 @@
 
 # Changelog
 
+### #73 Tech CORE-461 | Rename inspr CLI as insprctl
+- misc:
+    - Renamed folder `cmd/inspr` to `cmd/insprctl`
+    - Modified commands and command descriptions in `pkg/cmd` and `cmd/insprctl`
+    - Fixed tests that were broken after the main command change
+---
+
 ### #72 Tech CORE-400 | Revaluate nomenclature of scope
 - refactors:
     - Renamed comments, func params and variables from "context" to "scope"
