@@ -18,7 +18,9 @@ type ChannelBroker struct {
 }
 
 // BrokerConfiguration generic interface type
-type BrokerConfiguration interface{}
+type BrokerConfiguration interface {
+	Broker() string
+}
 
 // BrokerStatus generiic status type for brokers, used as parameters and returns
 type BrokerStatus string

@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/inspr/inspr/pkg/meta"
+	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/operator/k8s"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 	corev1 "k8s.io/api/core/v1"
@@ -15,8 +16,12 @@ type KafkaConfig struct {
 	BootstrapServers string
 	AutoOffsetReset  string
 	SidecarImage     string
-	// insprdPort is the port used in the insprd service of your cluster
+	// KafkaInsprAddr is the port used in the insprd service of your cluster
 	KafkaInsprAddr string
+}
+
+func (kc KafkaConfig) Broker() string {
+	return brokers.Kafka
 }
 
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
