@@ -81,7 +81,7 @@ func RequestErrorMessage(err error, w io.Writer) {
 	if ok {
 		switch ierr.Code {
 		case ierrors.Unauthorized:
-			fmt.Fprintf(w, "we couldn't authenticate with the cluster. Is your token configured correctly?\n")
+			fmt.Fprintf(w, "failed to authenticate with the cluster. Is your token configured correctly?\n")
 		case ierrors.Forbidden:
 			fmt.Fprintf(w, "forbidden operation, please check for the scope.\n")
 		default:

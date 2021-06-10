@@ -201,7 +201,7 @@ func TestRequestErrorMessage(t *testing.T) {
 			args: args{
 				ierrors.NewError().Unauthorized().Build(),
 			},
-			wantW: "we couldn't authenticate with the cluster. Is your token configured correctly?\n",
+			wantW: "failed to authenticate with the cluster. Is your token configured correctly?\n",
 		},
 		{
 			name: "ierror-forbidden",

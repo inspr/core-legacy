@@ -338,7 +338,7 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.NewError().Message("unauthorized").Unauthorized().Build(),
-			errMsg:  "we couldn't authenticate with the cluster. Is your token configured correctly?\n",
+			errMsg:  "failed to authenticate with the cluster. Is your token configured correctly?\n",
 		},
 		{
 			name: "forbidden_error",
