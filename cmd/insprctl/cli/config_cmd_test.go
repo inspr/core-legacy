@@ -10,7 +10,6 @@ import (
 
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
 
@@ -167,15 +166,4 @@ func Test_doListConfig(t *testing.T) {
 
 		})
 	}
-}
-
-func mockViper() {
-	viper.SetConfigFile("test_config_cmd")
-	viper.SetConfigType("yaml")
-	viper.SetDefault("key_example", "value_example")
-	viper.WriteConfig()
-}
-
-func deleteMockViper() {
-	os.Remove("test_config_cmd")
 }
