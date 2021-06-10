@@ -1,4 +1,4 @@
-package channels
+package kafka
 
 import (
 	"strconv"
