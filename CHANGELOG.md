@@ -1,6 +1,14 @@
 
 # Changelog
 
+### #72 Tech CORE-400 | Revaluate nomenclature of scope
+- refactors:
+    - Renamed comments, func params and variables from "context" to "scope"
+    - Refactored some error messages (better messages and use sprintf)
+    - Renamed env var "INSPR_APP_CTX" to "INSPR_APP_SCOPE"
+    - Moved "InitDO" to models file in pkg/auth
+---
+
 ### #70 Tech CORE-442 | Inspr CLI describe command outdated
 - features:
     - PrintAppTree function now prints the Node Meta, the Node Ports, the Node Sidecar LBRead and LBWrite port and the new Auth structure.
