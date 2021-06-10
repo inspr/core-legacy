@@ -47,7 +47,7 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 			logger.Error("unable to create Alias",
 				zap.Any("alias", data.Alias),
 				zap.String("targed", data.Target),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -110,7 +110,7 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 		if err != nil {
 			logger.Error("unable to get Alias",
 				zap.String("alias key", data.Key),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -148,7 +148,7 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 			logger.Error("unable to update Alias",
 				zap.Any("alias", data.Alias),
 				zap.String("targed", data.Target),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -210,7 +210,7 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 		if err != nil {
 			logger.Error("unable to delete Alias",
 				zap.String("alias key", data.Key),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()

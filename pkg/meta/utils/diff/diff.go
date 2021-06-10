@@ -50,9 +50,9 @@ type Difference struct {
 }
 
 // Change encapsulates all differences between two apps and carries the
-// information about the context those apps exist in the app tree.
+// information about the scope those apps exist in the app tree.
 type Change struct {
-	Context   string       `json:"context"`
+	Scope     string       `json:"scope"`
 	Diff      []Difference `json:"diff"`
 	Kind      Kind
 	Operation Operation
@@ -75,7 +75,7 @@ func (cl Changelog) Print(out io.Writer) {
 	var w *tabwriter.Writer
 
 	for _, change := range cl {
-		fmt.Fprintln(out, "On:", change.Context)
+		fmt.Fprintln(out, "On:", change.Scope)
 		w = tabwriter.NewWriter(out, 12, 0, 3, ' ', tabwriter.Debug)
 		fmt.Fprintln(w, "Field\t From\t To")
 		for _, diff := range change.Diff {
@@ -94,7 +94,7 @@ func (cl Changelog) Print(out io.Writer) {
 func (cl *Changelog) diff(from, to *meta.App, ctx string) (Changelog, error) {
 
 	change := Change{
-		Context:   ctx,
+		Scope:     ctx,
 		changelog: cl,
 	}
 
@@ -355,7 +355,7 @@ func (change *Change) diffApps(from, to metautils.MApps) {
 		} else {
 			toStr = "{...}"
 			op = Create
-			newScope, _ := metautils.JoinScopes(change.Context, k)
+			newScope, _ := metautils.JoinScopes(change.Scope, k)
 			*change.changelog, _ = change.changelog.diff(&meta.App{}, to[k], newScope)
 		}
 
@@ -377,7 +377,7 @@ func (change *Change) diffApps(from, to metautils.MApps) {
 		fromApp := from[app]
 		toApp := to[app]
 
-		newScope, _ := metautils.JoinScopes(change.Context, fromApp.Meta.Name)
+		newScope, _ := metautils.JoinScopes(change.Scope, fromApp.Meta.Name)
 		change.changelog.diff(fromApp, toApp, newScope)
 	}
 
