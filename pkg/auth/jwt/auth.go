@@ -49,7 +49,7 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 	)
 	if err != nil {
 		if err.Error() == errors.New(`exp not satisfied`).Error() {
-
+			// token expired
 			newToken, err := JA.Refresh(token)
 			if err != nil {
 				return nil,
@@ -66,8 +66,6 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 		}
 	}
 
-	// expired
-
 	// gets payload from token
 	payload, err := auth.Desserialize(token)
 	if err != nil {
@@ -83,15 +81,9 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 	return payload, token, nil
 }
 
-// InitDO  structure for initialization requests
-type InitDO struct {
-	auth.Payload
-	Key string
-}
-
 // Init receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
-	initDO := InitDO{
+	initDO := auth.InitDO{
 		Key:     key,
 		Payload: load,
 	}
