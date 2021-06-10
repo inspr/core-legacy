@@ -99,7 +99,7 @@ func TestRefreshEnviromentVariables(t *testing.T) {
 	os.Setenv("INSPR_INPUT_CHANNELS", "one")
 	os.Setenv("INSPR_OUTPUT_CHANNELS", "two")
 	os.Setenv("INSPR_UNIX_SOCKET", "three")
-	os.Setenv("INSPR_APP_CTX", "four")
+	os.Setenv("INSPR_APP_SCOPE", "four")
 	os.Setenv("INSPR_ENV", "five")
 	os.Setenv("INSPR_APP_ID", "six")
 	os.Setenv("INSPR_LBSIDECAR_IMAGE", "seven")

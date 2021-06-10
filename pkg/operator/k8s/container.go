@@ -76,7 +76,7 @@ func WithVolumeMounts(mounts ...corev1.VolumeMount) ContainerOption {
 }
 
 // NewContainer creates a new kubernetes containers with the given options applied to it
-func NewContainer(name string, image string, options ...ContainerOption) corev1.Container {
+func NewContainer(name, image string, options ...ContainerOption) corev1.Container {
 	cont := corev1.Container{
 		Name:  name,
 		Image: image,

@@ -16,21 +16,21 @@ import (
 // NewDeleteCmd creates delete command for Inspr CLI
 func NewDeleteCmd() *cobra.Command {
 	deleteApps := cmd.NewCmd("apps").
-		WithDescription("Delete apps from context ").
+		WithDescription("Delete apps from scope").
 		WithAliases("a").
 		WithExample("Delete app from the default scope", "delete apps <appname> ").
 		WithExample("Delete app from a custom scope", "delete apps <appname> --scope app1.app2").
 		WithCommonFlags().
 		MinimumArgs(1, deleteApps)
 	deleteChannels := cmd.NewCmd("channels").
-		WithDescription("Delete channels from context").
+		WithDescription("Delete channels from scope").
 		WithExample("Delete channel from the default scope", "delete channels <channelname>").
 		WithExample("Delete channels from a custom scope", "delete channels <channelname> --scope app1.app2").
 		WithAliases("ch").
 		WithCommonFlags().
 		MinimumArgs(1, deleteChannels)
 	deleteTypes := cmd.NewCmd("types").
-		WithDescription("Delete types from context").
+		WithDescription("Delete types from scope").
 		WithExample("Delete type from the default scope", "delete types <typename>").
 		WithExample("Delete type from a custom scope", "delete types <typename> --scope app1.app2").
 		WithAliases("t").
@@ -38,7 +38,7 @@ func NewDeleteCmd() *cobra.Command {
 		MinimumArgs(1, deleteTypes)
 
 	deleteAlias := cmd.NewCmd("alias").
-		WithDescription("Delete alias from context").
+		WithDescription("Delete alias from scope").
 		WithExample("Delete alias from default scope", "delete alias <aliaskey>").
 		WithExample("Delete alias from a custom scope", "delete alias <aliaskey> --scope app1.app2").
 		WithAliases("al").

@@ -7,7 +7,7 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
-// Desserialize converts a interface to a Payload model
+// Desserialize converts a token to a Payload model
 func Desserialize(tokenBytes []byte) (*Payload, error) {
 
 	token, err := jwt.Parse(tokenBytes)

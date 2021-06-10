@@ -5,13 +5,13 @@ import (
 	pkgutils "github.com/inspr/inspr/pkg/utils"
 )
 
-// Brokers define all Available brokers on insprd and its default broker.
+// Brokers define all Available brokers on Insprd and its default broker
 type Brokers struct {
 	Default   BrokerStatus
 	Available utils.StrSet
 }
 
-// ChannelBroker associates channels names with their brokers, used to recover data from enviroment
+// ChannelBroker associates channel names with their brokers, used to recover data from enviroment
 type ChannelBroker struct {
 	ChName string
 	Broker string
