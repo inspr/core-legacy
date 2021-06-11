@@ -202,7 +202,7 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query '%v'", query).Build()
 
 	nextApp := amm.tree
 	if nextApp != nil {

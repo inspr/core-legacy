@@ -10,6 +10,7 @@ import (
 // IsValidScope checks if the given scope is of the type
 // 'name1.name2.name3'
 func IsValidScope(scope string) bool {
+	// len of "" is 0 and the scope of the root dApp
 	if len(scope) == 0 {
 		return true
 	}

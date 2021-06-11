@@ -1,6 +1,15 @@
 
 # Changelog
 
+### #74 Tech CORE-430 | Refactor memory dApp section 
+- refactors:
+    - Update error messages so they use Sprintf structure and aren't duplicated in `dapp_utils.go`
+    - Methods in `dapp_utils.go` now use multi-error structure
+    - Removed unused methods in `dapp_utils.go`
+- fixes
+    - Added LB Sidecar, Authsvc and Secretgen images tag update in Helm Chart update script
+---
+
 ### #73 Tech CORE-461 | Rename inspr CLI as insprctl
 - misc:
     - Renamed folder `cmd/inspr` to `cmd/insprctl`
