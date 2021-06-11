@@ -38,7 +38,7 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 		}
 		brokers := &models.BrokersDI{
 			Installed: available,
-			Default:   string(*def),
+			Default:   def,
 		}
 		logger.Debug("current brokers:", zap.Any("brokers", brokers.Default))
 
