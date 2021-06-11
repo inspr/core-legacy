@@ -50,7 +50,7 @@ func main() {
 		SidecarImage:     "gcr.io/red-inspr/inspr/sidecar/kafka:latest",
 	}
 
-	brokerManager.Create(metabrokers.BrokerStatus(metabrokers.Kafka), config)
+	brokerManager.Create(metabrokers.Kafka, &config)
 
 	api.Run(memoryManager, operator, authenticator, brokerManager)
 }
