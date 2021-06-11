@@ -3,38 +3,38 @@ package fake
 import (
 	memory "github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/meta/brokers"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 // GetAll returns an array containing all currently mocked brokers
-func (bks *BrokersMock) GetAll() (brokers.BrokerStatusArray, error) {
+func (bks *BrokersMock) GetAll() (utils.StringArray, error) {
 	if bks.fail != nil {
 		return nil, bks.fail
 	}
 
-	return brokers.BrokerStatusArray(bks.broker.Available.ToArray()), nil
+	return bks.broker.Available.Brokers(), nil
 }
 
 // GetDefault returns the broker mocked as default
-func (bks *BrokersMock) GetDefault() (*brokers.BrokerStatus, error) {
+func (bks *BrokersMock) GetDefault() (string, error) {
 	if bks.fail != nil {
-		return nil, bks.fail
+		return "", bks.fail
 	}
-	var status brokers.BrokerStatus = bks.broker.Default
-	return &status, nil
+	return bks.broker.Default, nil
 }
 
 // Create mocks a new broker on insprd
-func (bks *BrokersMock) Create(broker brokers.BrokerStatus, config brokers.BrokerConfiguration) error {
+func (bks *BrokersMock) Create(broker string, config brokers.BrokerConfiguration) error {
 	if bks.fail != nil {
 		return bks.fail
 	}
 
-	bks.broker.Available[string(broker)] = true
+	bks.broker.Available[string(broker)] = config
 	return nil
 }
 
 // SetDefault sets a previously mocked broker as the fake's default broker
-func (bks *BrokersMock) SetDefault(broker brokers.BrokerStatus) error {
+func (bks *BrokersMock) SetDefault(broker string) error {
 	if bks.fail != nil {
 		return bks.fail
 	}
