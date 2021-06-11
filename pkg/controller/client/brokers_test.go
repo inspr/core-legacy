@@ -10,8 +10,8 @@ import (
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/rest/request"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 func TestBrokersClient_Get(t *testing.T) {
@@ -30,7 +30,7 @@ func TestBrokersClient_Get(t *testing.T) {
 				ctx: context.Background(),
 			},
 			want: &models.BrokersDI{
-				Installed: brokers.BrokerStatusArray{"mock_broker"},
+				Installed: utils.StringArray{"mock_broker"},
 				Default:   "mock_broker",
 			},
 			wantErr: false,
@@ -63,7 +63,7 @@ func TestBrokersClient_Get(t *testing.T) {
 				}
 
 				di := models.BrokersDI{
-					Installed: brokers.BrokerStatusArray{"mock_broker"},
+					Installed: utils.StringArray{"mock_broker"},
 					Default:   "mock_broker",
 				}
 
