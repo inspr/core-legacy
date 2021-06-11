@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/brokers"
 )
 
 // NodeOperatorInterface is the interface that allows to obtain or change
@@ -38,5 +37,4 @@ type ChannelOperatorInterface interface {
 type OperatorInterface interface {
 	Nodes() NodeOperatorInterface
 	Channels() ChannelOperatorInterface
-	SetBrokerOperator(config brokers.BrokerConfiguration) error
 }
