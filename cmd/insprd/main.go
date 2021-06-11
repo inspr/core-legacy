@@ -12,7 +12,6 @@ import (
 	"github.com/inspr/inspr/pkg/auth"
 	jwtauth "github.com/inspr/inspr/pkg/auth/jwt"
 	authmock "github.com/inspr/inspr/pkg/auth/mocks"
-	metabrokers "github.com/inspr/inspr/pkg/meta/brokers"
 )
 
 func main() {
@@ -50,7 +49,7 @@ func main() {
 		SidecarImage:     "gcr.io/red-inspr/inspr/sidecar/kafka:latest",
 	}
 
-	brokerManager.Create(metabrokers.Kafka, &config)
+	brokerManager.Create(&config)
 
 	api.Run(memoryManager, operator, authenticator, brokerManager)
 }
