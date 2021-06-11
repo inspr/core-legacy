@@ -47,7 +47,6 @@ func (bmm *BrokerMemoryManager) Create(broker string, config brokers.BrokerConfi
 	var factory models.SidecarFactory
 	switch string(broker) {
 	case brokers.Kafka:
-		// bmm.
 		factory = sidecars.KafkaToDeployment(config.(sidecars.KafkaConfig))
 	default:
 		return ierrors.NewError().Message("broker %s is not supported", broker).Build()
@@ -81,4 +80,18 @@ func (bmm *BrokerMemoryManager) SetDefault(broker string) error {
 // Factory provides the struct implementation for Sidecarfactory
 func (bmm *BrokerMemoryManager) Factory() SidecarManager {
 	return bmm.factory
+}
+
+func (bmm *BrokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
+	mem, err := bmm.get()
+	if err != nil {
+		return nil, err
+	}
+
+	config, ok := mem.Available[broker]
+	if !ok {
+		return nil, ierrors.NewError().Message("broker %s is not configured on memory", broker).Build()
+	}
+
+	return config, nil
 }

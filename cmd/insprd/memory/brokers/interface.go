@@ -17,6 +17,7 @@ type Manager interface {
 	Create(broker string, config brokers.BrokerConfiguration) error
 	SetDefault(broker string) error
 	Factory() SidecarManager
+	Configs(broker string) (brokers.BrokerConfiguration, error)
 }
 
 // SidecarManager is the interface that allows the build and deployment of
