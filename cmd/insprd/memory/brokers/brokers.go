@@ -49,7 +49,8 @@ func (bmm *BrokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 	var factory models.SidecarFactory
 	switch broker {
 	case brokers.Kafka:
-		factory = sidecars.KafkaToDeployment(config.(sidecars.KafkaConfig))
+		obj, _ := config.(*sidecars.KafkaConfig)
+		factory = sidecars.KafkaToDeployment(*obj)
 	default:
 		return ierrors.NewError().Message("broker %s is not supported", broker).Build()
 	}

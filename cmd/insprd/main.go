@@ -42,14 +42,14 @@ func main() {
 			panic(err)
 		}
 	}
-	config := sidecars.KafkaConfig{
+	config := &sidecars.KafkaConfig{
 		BootstrapServers: "kafka.default.svc:9092",
 		AutoOffsetReset:  "earliest",
 		KafkaInsprAddr:   "http://localhost",
 		SidecarImage:     "gcr.io/red-inspr/inspr/sidecar/kafka:latest",
 	}
 
-	brokerManager.Create(&config)
+	brokerManager.Create(config)
 
 	api.Run(memoryManager, operator, authenticator, brokerManager)
 }
