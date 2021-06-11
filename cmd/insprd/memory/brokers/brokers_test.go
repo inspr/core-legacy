@@ -6,7 +6,7 @@ import (
 
 	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/meta/brokers"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 var kafkaStructMock = sidecars.KafkaConfig{
@@ -19,12 +19,12 @@ var kafkaStructMock = sidecars.KafkaConfig{
 func TestBrokersMemoryManager_GetAll(t *testing.T) {
 	tests := []struct {
 		name    string
-		want    brokers.BrokerStatusArray
+		want    utils.StringArray
 		wantErr bool
 	}{
 		{
 			name:    "getall from empty brokerMM",
-			want:    brokers.BrokerStatusArray{},
+			want:    utils.StringArray{},
 			wantErr: false,
 		},
 	}
@@ -38,10 +38,10 @@ func TestBrokersMemoryManager_GetAll(t *testing.T) {
 				t.Errorf("BrokersMemoryManager.GetAll() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("BrokersMemoryManager.GetAll() = %v, want %v", got, tt.want)
 			}
-
 		})
 	}
 }
@@ -50,7 +50,7 @@ func TestBrokersMemoryManager_GetDefault(t *testing.T) {
 	tests := []struct {
 		name    string
 		bmm     *BrokerMemoryManager
-		want    brokers.BrokerStatus
+		want    string
 		wantErr bool
 	}{
 		{
@@ -69,7 +69,7 @@ func TestBrokersMemoryManager_GetDefault(t *testing.T) {
 				t.Errorf("BrokersMemoryManager.GetDefault() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if *got != tt.want {
+			if got != tt.want {
 				t.Errorf("BrokersMemoryManager.GetDefault() = %v, want %v", got, tt.want)
 			}
 		})
@@ -87,19 +87,19 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 			name: "get from instanciated singleton",
 			bmm: &BrokerMemoryManager{
 				broker: &brokers.Brokers{
-					Available: metautils.StrSet{
-						"brk1": true,
-						"brk2": true,
-						"brk3": true,
+					Available: brokers.BrokerStatusArray{
+						"brk1": nil,
+						"brk2": nil,
+						"brk3": nil,
 					},
 					Default: "brk1",
 				},
 			},
 			want: &brokers.Brokers{
-				Available: metautils.StrSet{
-					"brk1": true,
-					"brk2": true,
-					"brk3": true,
+				Available: brokers.BrokerStatusArray{
+					"brk1": nil,
+					"brk2": nil,
+					"brk3": nil,
 				},
 				Default: "brk1",
 			},
@@ -150,14 +150,14 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 			name: "valid create",
 			bmm:  &BrokerMemoryManager{},
 			exec: func(bmm Manager) error {
-				return bmm.Create(brokers.BrokerStatus(brokers.Kafka), kafkaStructMock)
+				return bmm.Create(brokers.Kafka, kafkaStructMock)
 			},
 		},
 		{
 			name: "invalid create - broker already exists",
 			bmm:  &BrokerMemoryManager{},
 			exec: func(bmm Manager) error {
-				return bmm.Create(brokers.BrokerStatus(brokers.Kafka), kafkaStructMock)
+				return bmm.Create(brokers.Kafka, kafkaStructMock)
 			},
 			wantErr: true,
 		},
@@ -173,7 +173,7 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 			name: "valid setdefault",
 			bmm:  &BrokerMemoryManager{},
 			exec: func(bmm Manager) error {
-				return bmm.SetDefault(brokers.BrokerStatus(brokers.Kafka))
+				return bmm.SetDefault(brokers.Kafka)
 			},
 			wantErr: false,
 		},
