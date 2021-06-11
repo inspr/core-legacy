@@ -24,12 +24,12 @@ func (bks *BrokersMock) GetDefault() (string, error) {
 }
 
 // Create mocks a new broker on insprd
-func (bks *BrokersMock) Create(broker string, config brokers.BrokerConfiguration) error {
+func (bks *BrokersMock) Create(config brokers.BrokerConfiguration) error {
 	if bks.fail != nil {
 		return bks.fail
 	}
 
-	bks.broker.Available[string(broker)] = config
+	bks.broker.Available[config.Broker()] = config
 	return nil
 }
 
@@ -54,5 +54,5 @@ func (bks *BrokersMock) Configs(broker string) (brokers.BrokerConfiguration, err
 		return nil, bks.fail
 	}
 
-	return nil, nil
+	return bks.broker.Available[broker], nil
 }

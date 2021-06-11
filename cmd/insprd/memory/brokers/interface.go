@@ -14,7 +14,7 @@ import (
 type Manager interface {
 	GetAll() (utils.StringArray, error)
 	GetDefault() (string, error)
-	Create(broker string, config brokers.BrokerConfiguration) error
+	Create(config brokers.BrokerConfiguration) error
 	SetDefault(broker string) error
 	Factory() SidecarManager
 	Configs(broker string) (brokers.BrokerConfiguration, error)

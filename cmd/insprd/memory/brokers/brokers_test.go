@@ -129,6 +129,14 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 	}
 }
 
+type mockedConfigs struct {
+	broker string
+}
+
+func (mb mockedConfigs) Broker() string {
+	return mb.broker
+}
+
 func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 	resetBrokers()
 
@@ -142,7 +150,7 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 			name: "invalid create - broker not supported",
 			bmm:  &BrokerMemoryManager{},
 			exec: func(bmm Manager) error {
-				return bmm.Create("brk1", nil)
+				return bmm.Create(mockedConfigs{broker: "brk1"})
 			},
 			wantErr: true,
 		},
@@ -150,14 +158,14 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 			name: "valid create",
 			bmm:  &BrokerMemoryManager{},
 			exec: func(bmm Manager) error {
-				return bmm.Create(brokers.Kafka, kafkaStructMock)
+				return bmm.Create(kafkaStructMock)
 			},
 		},
 		{
 			name: "invalid create - broker already exists",
 			bmm:  &BrokerMemoryManager{},
 			exec: func(bmm Manager) error {
-				return bmm.Create(brokers.Kafka, kafkaStructMock)
+				return bmm.Create(kafkaStructMock)
 			},
 			wantErr: true,
 		},

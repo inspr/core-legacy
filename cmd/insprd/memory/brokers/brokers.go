@@ -34,31 +34,33 @@ func (bmm *BrokerMemoryManager) get() (*brokers.Brokers, error) {
 }
 
 // Create configures a new broker on insprd
-func (bmm *BrokerMemoryManager) Create(broker string, config brokers.BrokerConfiguration) error {
+func (bmm *BrokerMemoryManager) Create(config brokers.BrokerConfiguration) error {
 	mem, err := bmm.get()
 	if err != nil {
 		return err
 	}
 
-	if _, ok := mem.Available[string(broker)]; ok {
+	broker := config.Broker()
+
+	if _, ok := mem.Available[broker]; ok {
 		return ierrors.NewError().Message("broker %s is already configured on memory", broker).Build()
 	}
 
 	var factory models.SidecarFactory
-	switch string(broker) {
+	switch broker {
 	case brokers.Kafka:
 		factory = sidecars.KafkaToDeployment(config.(sidecars.KafkaConfig))
 	default:
 		return ierrors.NewError().Message("broker %s is not supported", broker).Build()
 	}
 
-	err = bmm.Factory().Subscribe(string(broker), factory)
+	err = bmm.Factory().Subscribe(broker, factory)
 
 	if err != nil {
 		return err
 	}
 
-	mem.Available[string(broker)] = config
+	mem.Available[broker] = config
 	return nil
 }
 
@@ -69,7 +71,7 @@ func (bmm *BrokerMemoryManager) SetDefault(broker string) error {
 		return err
 	}
 
-	if _, ok := mem.Available[string(broker)]; !ok {
+	if _, ok := mem.Available[broker]; !ok {
 		return ierrors.NewError().Message("broker %s is not configured on memory", broker).Build()
 	}
 
