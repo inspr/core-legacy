@@ -332,8 +332,7 @@ func SelectBrokerFromPriorityList(brokerList []string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defBroker := string(*def)
-	logger.Debug("selected the default broker: ", zap.String("broker", defBroker))
+	logger.Debug("selected the default broker: ", zap.String("broker", def))
 
-	return defBroker, nil
+	return def, nil
 }
