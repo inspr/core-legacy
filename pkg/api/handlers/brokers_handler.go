@@ -33,12 +33,14 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 			logger.Error("unable to obtain currently available brokers on cluster",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
+			return
 		}
 		def, err := bh.Brokers.GetDefault()
 		if err != nil {
 			logger.Error("unable to obtain currently default brokers on cluster",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
+			return
 		}
 		brokers := &models.BrokersDI{
 			Installed: available,
@@ -60,6 +62,7 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 		err := json.NewDecoder(r.Body).Decode(&content)
 		if err != nil {
 			rest.ERROR(w, err)
+			return
 		}
 
 		var kafkaConfig sidecars.KafkaConfig
@@ -67,6 +70,7 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 		err = yaml.Unmarshal(content.FileContents, &kafkaConfig)
 		if err != nil {
 			rest.ERROR(w, err)
+			return
 		}
 
 		if err = bh.Brokers.Create(
@@ -74,6 +78,7 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 			kafkaConfig,
 		); err != nil {
 			rest.ERROR(w, err)
+			return
 		}
 
 		rest.JSON(w, http.StatusOK, nil)
