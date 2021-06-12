@@ -30,7 +30,7 @@ func GetEnvironment() *InsprEnvVars {
 			InputChannels:    getRawInputChannels(),
 			OutputChannels:   getRawInputChannels(),
 			SidecarImage:     GetSidecarImage(),
-			InsprAppContext:  GetInsprAppContext(),
+			InsprAppContext:  GetInsprAppScope(),
 			InsprEnvironment: GetInsprEnvironment(),
 			InsprAppID:       GetInsprAppID(),
 		}
@@ -52,7 +52,7 @@ func RefreshEnviromentVariables() *InsprEnvVars {
 		InputChannels:    getRawInputChannels(),
 		OutputChannels:   getRawOutputChannels(),
 		SidecarImage:     GetSidecarImage(),
-		InsprAppContext:  GetInsprAppContext(),
+		InsprAppContext:  GetInsprAppScope(),
 		InsprEnvironment: GetInsprEnvironment(),
 		InsprAppID:       GetInsprAppID(),
 	}
@@ -122,9 +122,9 @@ func GetSidecarImage() string {
 	return getEnv("INSPR_LBSIDECAR_IMAGE")
 }
 
-// GetInsprAppContext returns environment variable which contains the current dApp context
-func GetInsprAppContext() string {
-	return getEnv("INSPR_APP_CTX")
+// GetInsprAppScope returns environment variable which contains the current dApp context
+func GetInsprAppScope() string {
+	return getEnv("INSPR_APP_SCOPE")
 }
 
 // GetInsprEnvironment returns Inspr's current environment (test, production, qa, etc.)

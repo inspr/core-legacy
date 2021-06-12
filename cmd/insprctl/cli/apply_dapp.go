@@ -40,19 +40,19 @@ func NewApplyApp() RunMethod {
 		flagIsUpdate := cmd.InsprOptions.Update
 
 		var log diff.Changelog
-		query, err := metautils.JoinScopes(cmd.InsprOptions.Scope, app.Meta.Parent)
+		scope, err := metautils.JoinScopes(cmd.InsprOptions.Scope, app.Meta.Parent)
 		if err != nil {
 			return err
 		}
 		// creates or updates it
 		if flagIsUpdate {
-			updateQuery, errQuery := metautils.JoinScopes(query, app.Meta.Name)
+			updateQuery, errQuery := metautils.JoinScopes(scope, app.Meta.Name)
 			if errQuery != nil {
 				return errQuery
 			}
 			log, err = c.Update(context.Background(), updateQuery, &app, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), query, &app, flagDryRun)
+			log, err = c.Create(context.Background(), scope, &app, flagDryRun)
 		}
 
 		if err != nil {

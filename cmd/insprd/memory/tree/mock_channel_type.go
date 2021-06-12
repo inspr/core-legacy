@@ -10,17 +10,17 @@ type TypeMockManager struct {
 }
 
 // Create mocks a Type method for testing
-func (ctm *TypeMockManager) Create(context string, ct *meta.Type) error {
+func (ctm *TypeMockManager) Create(scope string, ct *meta.Type) error {
 	return nil
 }
 
 // Get mocks a Type method for testing
-func (ctm *TypeMockManager) Get(context string, ctName string) (*meta.Type, error) {
+func (ctm *TypeMockManager) Get(scope, name string) (*meta.Type, error) {
 	return nil, nil
 }
 
 // Delete mocks a Type method for testing
-func (ctm *TypeMockManager) Delete(context string, ctName string) error {
+func (ctm *TypeMockManager) Delete(scope, name string) error {
 	return nil
 }
 

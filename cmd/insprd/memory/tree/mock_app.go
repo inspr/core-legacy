@@ -9,7 +9,7 @@ type MockAppManager struct {
 }
 
 // Get Mock
-func (mock *MockAppManager) Get(query string) (*meta.App, error) {
+func (mock *MockAppManager) Get(scope string) (*meta.App, error) {
 	if mock.err != nil {
 		return nil, mock.err
 	}
@@ -17,17 +17,17 @@ func (mock *MockAppManager) Get(query string) (*meta.App, error) {
 }
 
 // Create Mock
-func (mock *MockAppManager) Create(context string, app *meta.App) error {
+func (mock *MockAppManager) Create(scope string, app *meta.App) error {
 	return nil
 }
 
 // Delete Mock
-func (mock *MockAppManager) Delete(query string) error {
+func (mock *MockAppManager) Delete(scope string) error {
 	return nil
 }
 
 // Update Mock
-func (mock *MockAppManager) Update(query string, app *meta.App) error {
+func (mock *MockAppManager) Update(scope string, app *meta.App) error {
 	return nil
 }
 

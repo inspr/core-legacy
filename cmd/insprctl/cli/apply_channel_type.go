@@ -51,16 +51,16 @@ func NewApplyType() RunMethod {
 			return err
 		}
 
-		parentPath, err := metautils.JoinScopes(scope, insprType.Meta.Parent)
+		parentScope, err := metautils.JoinScopes(scope, insprType.Meta.Parent)
 		if err != nil {
 			return err
 		}
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentPath, &insprType, flagDryRun)
+			log, err = c.Update(context.Background(), parentScope, &insprType, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), parentPath, &insprType, flagDryRun)
+			log, err = c.Create(context.Background(), parentScope, &insprType, flagDryRun)
 		}
 
 		if err != nil {

@@ -13,14 +13,14 @@ import (
 type ChannelMemory interface {
 	TransactionInterface
 	ChannelGetInterface
-	Create(context string, ch *meta.Channel) error
-	Delete(context string, chName string) error
-	Update(context string, ch *meta.Channel) error
+	Create(scope string, ch *meta.Channel) error
+	Delete(scope, name string) error
+	Update(scope string, ch *meta.Channel) error
 }
 
 // ChannelGetInterface is an interface to get channels from memory
 type ChannelGetInterface interface {
-	Get(context string, name string) (*meta.Channel, error)
+	Get(scope, name string) (*meta.Channel, error)
 }
 
 // AppMemory is the interface that allows to obtain or
@@ -29,7 +29,7 @@ type ChannelGetInterface interface {
 type AppMemory interface {
 	TransactionInterface
 	AppGetInterface
-	Create(context string, app *meta.App) error
+	Create(scope string, app *meta.App) error
 	Delete(query string) error
 	Update(query string, app *meta.App) error
 	ResolveBoundary(app *meta.App) (map[string]string, error)
@@ -46,28 +46,28 @@ type AppGetInterface interface {
 type TypeMemory interface {
 	TransactionInterface
 	TypeGetInterface
-	Create(context string, ct *meta.Type) error
-	Delete(context string, ctName string) error
-	Update(context string, ct *meta.Type) error
+	Create(scope string, ct *meta.Type) error
+	Delete(scope, name string) error
+	Update(scope string, ct *meta.Type) error
 }
 
 // TypeGetInterface is an interface to get Types from memory
 type TypeGetInterface interface {
-	Get(context string, ctName string) (*meta.Type, error)
+	Get(scope, name string) (*meta.Type, error)
 }
 
 // AliasMemory is an interface to get alias types from memory
 type AliasMemory interface {
 	TransactionInterface
 	AliasGetInterface
-	Create(query string, targetBoundary string, alias *meta.Alias) error
-	Update(context string, aliasKey string, alias *meta.Alias) error
-	Delete(context string, aliasKey string) error
+	Create(scope, targetBoundary string, alias *meta.Alias) error
+	Update(scope, aliasKey string, alias *meta.Alias) error
+	Delete(scope, aliasKey string) error
 }
 
 // AliasGetInterface is an interface to get alias types from memory
 type AliasGetInterface interface {
-	Get(context string, aliasKey string) (*meta.Alias, error)
+	Get(scope, aliasKey string) (*meta.Alias, error)
 }
 
 // Manager is the interface that allows the management

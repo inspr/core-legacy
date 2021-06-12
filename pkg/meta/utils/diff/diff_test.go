@@ -28,7 +28,7 @@ func TestDiff(t *testing.T) {
 			},
 			want: Changelog{
 				{
-					Context:   "app2.app3",
+					Scope:     "app2.app3",
 					Kind:      NodeKind,
 					Operation: Update,
 					Diff: []Difference{
@@ -42,7 +42,7 @@ func TestDiff(t *testing.T) {
 					},
 				},
 				{
-					Context:   "",
+					Scope:     "",
 					Kind:      MetaKind | AnnotationKind | AppKind | ChannelKind | TypeKind,
 					Operation: Create | Update | Delete,
 					Diff: []Difference{
@@ -126,8 +126,8 @@ func TestDiff(t *testing.T) {
 
 func TestChange_diffAppSpec(t *testing.T) {
 	type fields struct {
-		Context string
-		Diff    []Difference
+		Scope string
+		Diff  []Difference
 	}
 	type args struct {
 		specOrig meta.AppSpec
@@ -153,7 +153,7 @@ func TestChange_diffAppSpec(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context:   tt.fields.Context,
+				Scope:     tt.fields.Scope,
 				Diff:      tt.fields.Diff,
 				changelog: &Changelog{},
 			}
@@ -170,8 +170,8 @@ func TestChange_diffAppSpec(t *testing.T) {
 
 func TestChange_diffNodes(t *testing.T) {
 	type fields struct {
-		Context string
-		Diff    []Difference
+		Scope string
+		Diff  []Difference
 	}
 	type args struct {
 		nodeOrig meta.Node
@@ -275,8 +275,8 @@ func TestChange_diffNodes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context: tt.fields.Context,
-				Diff:    tt.fields.Diff,
+				Scope: tt.fields.Scope,
+				Diff:  tt.fields.Diff,
 			}
 			if err := change.diffNodes(tt.args.nodeOrig, tt.args.nodeCurr); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffNodes() error = %v, wantErr %v", err, tt.wantErr)
@@ -289,8 +289,8 @@ func TestChange_diffNodes(t *testing.T) {
 }
 func TestChange_diffBoudaries(t *testing.T) {
 	type fields struct {
-		Context string
-		Diff    []Difference
+		Scope string
+		Diff  []Difference
 	}
 	type args struct {
 		boundOrig meta.AppBoundary
@@ -405,8 +405,8 @@ func TestChange_diffBoudaries(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context: tt.fields.Context,
-				Diff:    tt.fields.Diff,
+				Scope: tt.fields.Scope,
+				Diff:  tt.fields.Diff,
 			}
 			change.diffBoudaries(tt.args.boundOrig, tt.args.boundCurr)
 			if !equalChanges(*change, tt.want) {
@@ -418,8 +418,8 @@ func TestChange_diffBoudaries(t *testing.T) {
 
 func TestChange_diffApps(t *testing.T) {
 	type fields struct {
-		Context string
-		Diff    []Difference
+		Scope string
+		Diff  []Difference
 	}
 	type args struct {
 		appsOrig metautils.MApps
@@ -516,7 +516,7 @@ func TestChange_diffApps(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context:   tt.fields.Context,
+				Scope:     tt.fields.Scope,
 				Diff:      tt.fields.Diff,
 				changelog: &Changelog{},
 			}
@@ -530,8 +530,8 @@ func TestChange_diffApps(t *testing.T) {
 
 func TestChange_diffChannels(t *testing.T) {
 	type fields struct {
-		Context string
-		Diff    []Difference
+		Scope string
+		Diff  []Difference
 	}
 	type args struct {
 		chOrig metautils.MChannels
@@ -669,8 +669,8 @@ func TestChange_diffChannels(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context: tt.fields.Context,
-				Diff:    tt.fields.Diff,
+				Scope: tt.fields.Scope,
+				Diff:  tt.fields.Diff,
 			}
 			if err := change.diffChannels(tt.args.chOrig, tt.args.chCurr); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffChannels() error = %v, wantErr %v", err, tt.wantErr)
@@ -684,8 +684,8 @@ func TestChange_diffChannels(t *testing.T) {
 
 func TestChange_diffTypes(t *testing.T) {
 	type fields struct {
-		Context string
-		Diff    []Difference
+		Scope string
+		Diff  []Difference
 	}
 	type args struct {
 		chtOrig metautils.MTypes
@@ -835,8 +835,8 @@ func TestChange_diffTypes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context: tt.fields.Context,
-				Diff:    tt.fields.Diff,
+				Scope: tt.fields.Scope,
+				Diff:  tt.fields.Diff,
 			}
 			if err := change.diffTypes(tt.args.chtOrig, tt.args.chtCurr); (err != nil) != tt.wantErr {
 				t.Errorf("Change.diffTypes() error = %v, wantErr %v", err, tt.wantErr)
@@ -850,8 +850,8 @@ func TestChange_diffTypes(t *testing.T) {
 
 func TestChange_diffMetadata(t *testing.T) {
 	type fields struct {
-		Context string
-		Diff    []Difference
+		Scope string
+		Diff  []Difference
 	}
 	type args struct {
 		parentKind    Kind
@@ -870,7 +870,7 @@ func TestChange_diffMetadata(t *testing.T) {
 		{
 			name: "Ucnhanged Metadata",
 			fields: fields{
-				Context: "",
+				Scope: "",
 			},
 			args: args{
 				metaOrig: meta.Metadata{
@@ -894,7 +894,7 @@ func TestChange_diffMetadata(t *testing.T) {
 		{
 			name: "Valid changed Metadata",
 			fields: fields{
-				Context: "",
+				Scope: "",
 			},
 			args: args{
 				metaOrig: meta.Metadata{
@@ -941,7 +941,7 @@ func TestChange_diffMetadata(t *testing.T) {
 		{
 			name: "Change parent Metadata error",
 			fields: fields{
-				Context: "",
+				Scope: "",
 			},
 			args: args{
 				metaOrig: meta.Metadata{
@@ -977,7 +977,7 @@ func TestChange_diffMetadata(t *testing.T) {
 		{
 			name: "Change name Metadata error",
 			fields: fields{
-				Context: "",
+				Scope: "",
 			},
 			args: args{
 				metaOrig: meta.Metadata{
@@ -1013,7 +1013,7 @@ func TestChange_diffMetadata(t *testing.T) {
 		{
 			name: "delete annotation update",
 			fields: fields{
-				Context: "",
+				Scope: "",
 			},
 			args: args{
 				metaOrig: meta.Metadata{
@@ -1058,7 +1058,7 @@ func TestChange_diffMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context:   tt.fields.Context,
+				Scope:     tt.fields.Scope,
 				Diff:      tt.fields.Diff,
 				changelog: &Changelog{},
 			}
@@ -1074,7 +1074,7 @@ func TestChange_diffMetadata(t *testing.T) {
 
 func TestChange_diffAliases(t *testing.T) {
 	type fields struct {
-		Context   string
+		Scope     string
 		Diff      []Difference
 		Kind      Kind
 		Operation Operation
@@ -1094,7 +1094,7 @@ func TestChange_diffAliases(t *testing.T) {
 			name: "no changes in aliases",
 			fields: fields{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff:      []Difference{},
 			},
 			args: args{
@@ -1116,7 +1116,7 @@ func TestChange_diffAliases(t *testing.T) {
 				},
 			},
 			want: Change{
-				Context:   "context",
+				Scope:     "context",
 				changelog: &Changelog{},
 				Diff:      []Difference{},
 			},
@@ -1125,7 +1125,7 @@ func TestChange_diffAliases(t *testing.T) {
 			name: "updated aliases",
 			fields: fields{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff:      []Difference{},
 			},
 			args: args{
@@ -1147,7 +1147,7 @@ func TestChange_diffAliases(t *testing.T) {
 				},
 			},
 			want: Change{
-				Context:   "context",
+				Scope:     "context",
 				changelog: &Changelog{},
 				Diff: []Difference{
 					{
@@ -1167,7 +1167,7 @@ func TestChange_diffAliases(t *testing.T) {
 			name: "created alias",
 			fields: fields{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff:      []Difference{},
 			},
 			args: args{
@@ -1186,7 +1186,7 @@ func TestChange_diffAliases(t *testing.T) {
 				},
 			},
 			want: Change{
-				Context:   "context",
+				Scope:     "context",
 				changelog: &Changelog{},
 				Diff: []Difference{
 					{
@@ -1206,7 +1206,7 @@ func TestChange_diffAliases(t *testing.T) {
 			name: "deleted alias",
 			fields: fields{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff:      []Difference{},
 			},
 			args: args{
@@ -1226,7 +1226,7 @@ func TestChange_diffAliases(t *testing.T) {
 				},
 			},
 			want: Change{
-				Context:   "context",
+				Scope:     "context",
 				changelog: &Changelog{},
 				Diff: []Difference{
 					{
@@ -1246,7 +1246,7 @@ func TestChange_diffAliases(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context:   tt.fields.Context,
+				Scope:     tt.fields.Scope,
 				Diff:      tt.fields.Diff,
 				Kind:      tt.fields.Kind,
 				Operation: tt.fields.Operation,
@@ -1262,7 +1262,7 @@ func TestChange_diffAliases(t *testing.T) {
 
 func TestChange_diffEnv(t *testing.T) {
 	type fields struct {
-		Context   string
+		Scope     string
 		Diff      []Difference
 		Kind      Kind
 		Operation Operation
@@ -1282,7 +1282,7 @@ func TestChange_diffEnv(t *testing.T) {
 			name: "updated environment variable",
 			fields: fields{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff:      []Difference{},
 			},
 			args: args{
@@ -1297,7 +1297,7 @@ func TestChange_diffEnv(t *testing.T) {
 			},
 			want: Change{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff: []Difference{
 					{
 						Field:     "Spec.Node.Spec.Environment[ENVIRONMENT1]",
@@ -1316,7 +1316,7 @@ func TestChange_diffEnv(t *testing.T) {
 			name: "deleted environment variable",
 			fields: fields{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff:      []Difference{},
 			},
 			args: args{
@@ -1330,7 +1330,7 @@ func TestChange_diffEnv(t *testing.T) {
 			},
 			want: Change{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff: []Difference{
 					{
 						Field:     "Spec.Node.Spec.Environment[ENVIRONMENT2]",
@@ -1350,7 +1350,7 @@ func TestChange_diffEnv(t *testing.T) {
 			name: "created environment variable",
 			fields: fields{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff:      []Difference{},
 			},
 			args: args{
@@ -1364,7 +1364,7 @@ func TestChange_diffEnv(t *testing.T) {
 			},
 			want: Change{
 				changelog: &Changelog{},
-				Context:   "context",
+				Scope:     "context",
 				Diff: []Difference{
 					{
 						Field:     "Spec.Node.Spec.Environment[ENVIRONMENT2]",
@@ -1383,7 +1383,7 @@ func TestChange_diffEnv(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			change := &Change{
-				Context:   tt.fields.Context,
+				Scope:     tt.fields.Scope,
 				Diff:      tt.fields.Diff,
 				Kind:      tt.fields.Kind,
 				Operation: tt.fields.Operation,
@@ -1676,16 +1676,16 @@ func equalChangelogs(changelog1 Changelog, changelog2 Changelog) bool {
 	map1 := make(map[string]map[Difference]int)
 	map2 := make(map[string]map[Difference]int)
 	for _, change := range changelog1 {
-		map1[change.Context] = make(map[Difference]int)
+		map1[change.Scope] = make(map[Difference]int)
 		for _, diff := range change.Diff {
-			map1[change.Context][diff]++
+			map1[change.Scope][diff]++
 		}
 	}
 
 	for _, change := range changelog2 {
-		map2[change.Context] = make(map[Difference]int)
+		map2[change.Scope] = make(map[Difference]int)
 		for _, diff := range change.Diff {
-			map2[change.Context][diff]++
+			map2[change.Scope][diff]++
 		}
 	}
 
@@ -1704,7 +1704,7 @@ func equalChangelogs(changelog1 Changelog, changelog2 Changelog) bool {
 }
 
 func equalChanges(change1 Change, change2 Change) bool {
-	if change1.Context != change2.Context {
+	if change1.Scope != change2.Scope {
 		return false
 	}
 	if change1.Kind != change2.Kind {

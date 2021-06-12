@@ -40,16 +40,16 @@ func NewApplyChannel() RunMethod {
 			return err
 		}
 
-		parentPath, err := metautils.JoinScopes(scope, channel.Meta.Parent)
+		parentScope, err := metautils.JoinScopes(scope, channel.Meta.Parent)
 		if err != nil {
 			return err
 		}
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentPath, &channel, flagDryRun)
+			log, err = c.Update(context.Background(), parentScope, &channel, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), parentPath, &channel, flagDryRun)
+			log, err = c.Create(context.Background(), parentScope, &channel, flagDryRun)
 		}
 
 		if err != nil {

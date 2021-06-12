@@ -12,8 +12,8 @@ import (
 
 // NewInsprCommand - returns a root command associated with inspr cli
 func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
-	rootCmd := cmd.NewCmd("inspr").
-		WithDescription("main command of the inspr cli").
+	rootCmd := cmd.NewCmd("insprctl").
+		WithDescription("main command of the insprctl cli").
 		WithCommonFlags().
 		AddSubCommand(NewGetCmd(),
 			NewDeleteCmd(),
@@ -24,7 +24,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 			initCommand,
 		).
 		Version(version).
-		WithLongDescription("main command of the inspr cli, to see the full list of subcommands existent please use 'inspr help'").
+		WithLongDescription("main command of the inspr cli, to see the full list of subcommands existent please use 'insprctl help'").
 		Super()
 
 	rootCmd.PersistentPreRunE = mainCmdPreRun
@@ -34,7 +34,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 }
 
 func mainCmdPreRun(cm *cobra.Command, args []string) error {
-	if cm.Name() == "init" && cm.Parent().Name() == "inspr" {
+	if cm.Name() == "init" && cm.Parent().Name() == "insprctl" {
 		return nil
 	}
 	cm.Root().SilenceErrors = false
@@ -48,7 +48,7 @@ func mainCmdPreRun(cm *cobra.Command, args []string) error {
 		err = utils.ReadConfigFromFile(cmd.InsprOptions.Config)
 	}
 	if err != nil {
-		fmt.Fprintln(utils.GetCliOutput(), "Invalid config file! Did you run inspr init?")
+		fmt.Fprintln(utils.GetCliOutput(), "Invalid config file! Did you run insprctl init?")
 	}
 	return err
 }

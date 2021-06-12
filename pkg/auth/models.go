@@ -10,6 +10,12 @@ type JwtDO struct {
 	Token []byte `json:"token"`
 }
 
+// InitDO  structure for initialization requests
+type InitDO struct {
+	Payload
+	Key string
+}
+
 //Payload is information caried by a Inspr acceess token
 type Payload struct {
 	UID string `json:"uid"`
