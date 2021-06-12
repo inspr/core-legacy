@@ -196,7 +196,7 @@ func Test_doApply(t *testing.T) {
 		{
 			name:           "Too many flags, should raise an error",
 			flagsAndArgs:   []string{"-f", "example", "-k", "example"},
-			expectedOutput: "Invalid command call\nFor help, type 'inspr apply --help'\n",
+			expectedOutput: "Invalid command call\nFor help, type 'insprctl apply --help'\n",
 		},
 		{
 			name:           "No files applied",

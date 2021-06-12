@@ -113,7 +113,7 @@
       to be, these functions should be able to be used by other sidecars.
 ---
 
-### # 64 Tech CORE-448 | Unification of inspr cluster commands
+### # 64 Tech CORE-448 | Unification of insprctl cluster commands
 - fixes:
     - tested cluster commands `brokers` and `init`
 - refactors:

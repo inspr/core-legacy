@@ -8,7 +8,7 @@ inspr\-describe\-alias \- Retrieves the full state of the alias from a given nam
 
 .SH SYNOPSIS
 .PP
-\fBinspr describe alias  [flags]\fP
+\fBinsprctl describe alias  [flags]\fP
 
 
 .SH DESCRIPTION
@@ -32,13 +32,13 @@ Retrieves the full state of the alias from a given namespace
 
 .nf
   # Display the state of the given alias on the default scope
- inspr describe alias myalias
+ insprctl describe alias myalias
 
   # Display the state of the given alias on a custom scope
- inspr describe alias \-\-scope app1.app2 myalias
+ insprctl describe alias \-\-scope app1.app2 myalias
 
   # Display the state of the given alias by the path
- inspr describe alias app1.app2.myalias
+ insprctl describe alias app1.app2.myalias
 
 
 .fi

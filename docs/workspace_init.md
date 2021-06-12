@@ -597,7 +597,7 @@ Finally, now that we have Ping and Pong images in the cluster and all Inspr work
 First of all, we need to check if **Inspr CLI** is referring to the [cluster ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) address, so we're able to send requests to it. To do so, run the command:
 
 ```zsh
-inspr config list
+insprctl config list
 ```
 
 And something similar to the following should be shown:
@@ -611,13 +611,13 @@ Available configurations:
 If the `serverip` is not your cluster ingress host, such as the example above, you must change it:
 
 ```zsh
-inspr config serverip "CLUSTER_INGRESS_HOST"
+insprctl config serverip "CLUSTER_INGRESS_HOST"
 ```
 
 And this will be printed in the terminal:
 
 ```zsh
-Success: inspr config [serverip] changed to 'CLUSTER_INGRESS_HOST'
+Success: insprctl config [serverip] changed to 'CLUSTER_INGRESS_HOST'
 ```
 
 Now, from within "/pingpong_demo" folder, we apply the YAML files by using Inspr CLIs commands. The files should be applied in the following order:
@@ -630,10 +630,10 @@ Now, from within "/pingpong_demo" folder, we apply the YAML files by using Inspr
 You can do so by running the following commands from within "/pingpong_demo" folder:
 
 ```
-inspr apply -k yamls/types
-inspr apply -k yamls/channels
-inspr apply -f yamls/table.yaml
-inspr apply -k yamls/nodes
+insprctl apply -k yamls/types
+insprctl apply -k yamls/channels
+insprctl apply -f yamls/table.yaml
+insprctl apply -k yamls/nodes
 ```
 
 To learn more about Inspr CLI, check [this](cli/inspr.md) documentation.
@@ -641,7 +641,7 @@ To learn more about Inspr CLI, check [this](cli/inspr.md) documentation.
 If everything worked fine, the Inspr deamon will have printed a changelog similar to the following for each command written in your terminal:
 
 ```zsh
-➜  pingpong_demo ✗ inspr apply -k yamls/types
+➜  pingpong_demo ✗ insprctl apply -k yamls/types
 ct1.yaml
 On:
 Field                         | From       | To
@@ -650,7 +650,7 @@ Spec.Types[pptype1]   | <nil>      | {...}
 Applied:
 ct1.yaml | Type | v1
 
-➜  pingpong_demo ✗ inspr apply -k yamls/channels
+➜  pingpong_demo ✗ insprctl apply -k yamls/channels
 ch1.yaml
 On:
 Field                       | From       | To
@@ -664,7 +664,7 @@ Applied:
 ch1.yaml | channel | v1
 ch2.yaml | channel | v1
 
-➜  pingpong_demo ✗ inspr apply -f yamls/table.yaml
+➜  pingpong_demo ✗ insprctl apply -f yamls/table.yaml
 yamls/table.yaml
 On: pptable
 Field                           | From       | To
@@ -682,7 +682,7 @@ Spec.Apps[pptable]   | <nil>      | {...}
 Applied:
 yamls/table.yaml | dapp | v1
 
-➜  pingpong_demo ✗ inspr apply -k yamls/nodes
+➜  pingpong_demo ✗ insprctl apply -k yamls/nodes
 ping.app.yaml
 On: pptable.ping
 Field                                           | From       | To

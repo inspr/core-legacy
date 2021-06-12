@@ -29,7 +29,7 @@ func NewClusterCommand() *cobra.Command {
 		WithExample("config kafka kafka.yaml", "cluster config <broker> <file>").
 		ExactArgs(2, clusterConfig)
 	return cmd.NewCmd("cluster").
-		WithDescription("Configure aspects of your inspr cluster").
+		WithDescription("Configure aspects of your insprctl cluster").
 		WithLongDescription("Cluster takes a subcommand of (brokers | init)").
 		WithExample("get cluster's brokers", "cluster brokers").
 		WithExample("init insprd as admin", "cluster init <admin_password>").

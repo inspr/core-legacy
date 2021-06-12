@@ -263,7 +263,7 @@ Ingress:
 
 ## Publishing it
 
-Your app is now done, but before publishing it first you must build it. Inspr requires code to be built into an accessible Docker image in order for it to be deployed on the cluster. There is an example for building on the [pingpong example](../examples/pingpong_demo/README.md). You should create simple Dockerfiles to build your dApps and push them to any storage were they are accessible your cluster. That being done is finally time to publish your Pub/Sub application. Publishing it to your Inspr cluster is easy, but first make sure your files look something like this:
+Your app is now done, but before publishing it first you must build it. Inspr requires code to be built into an accessible Docker image in order for it to be deployed on the cluster. There is an example for building on the [pingpong example](../examples/pingpong_demo/README.md). You should create simple Dockerfiles to build your dApps and push them to any storage were they are accessible your cluster. That being done is finally time to publish your Pub/Sub application. Publishing it to your insprctl cluster is easy, but first make sure your files look something like this:
 
 ```tree
    pubsub
@@ -299,7 +299,7 @@ Keep in mind Slack an Discord are only examples.
 
 Deployment:
 You have to apply every yaml we created, dApps Channels and Types can be done by running:
-inspr apply -k yamls
+insprctl apply -k yamls
 
 Your ingress and service have to be deployed as well, run:
 kubectl apply -f k8s/ingress.yaml

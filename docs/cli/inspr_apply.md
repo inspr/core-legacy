@@ -1,4 +1,4 @@
-## inspr apply
+## insprctl apply
 
 Applies changes to the connected cluster
 
@@ -13,20 +13,20 @@ It can be called with the flag --dry-run so the changes that would be made are s
 		
 
 ```
-inspr apply [flags]
+insprctl apply [flags]
 ```
 
 ### Examples
 
 ```
   # Applies a structure component defined in a file
- inspr apply -f app.yaml
+ insprctl apply -f app.yaml
 
   # Applies components defined in a specific folder
- inspr apply -k randfolder/
+ insprctl apply -k randfolder/
 
   # Applies a structure component defined in a specific scope
- inspr apply -f app.yaml --scope app1.app2
+ insprctl apply -f app.yaml --scope app1.app2
 
 ```
 
@@ -34,11 +34,11 @@ inspr apply [flags]
 
 ```
   -d, --dry-run         inspr <command> --dry-run
-  -f, --file string     inspr apply -f type.yaml
-  -k, --folder string   inspr apply -k randfolder/
+  -f, --file string     insprctl apply -f type.yaml
+  -k, --folder string   insprctl apply -k randfolder/
   -h, --help            help for apply
   -s, --scope string    inspr <command> --scope app1.app2
-  -u, --update          inspr apply (-f FILENAME | -k DIRECTORY) --update
+  -u, --update          insprctl apply (-f FILENAME | -k DIRECTORY) --update
 ```
 
 ### SEE ALSO
