@@ -60,15 +60,15 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	return nil, err
 }
 
-// Create instantiates a new dApp in the given context.
-// If the dApp's information is invalid, returns an error. The same goes for an invalid context.
-// In case of context being an empty string, the dApp is created inside the root dApp.
-func (amm *AppMemoryManager) Create(context string, app *meta.App) error {
+// Create instantiates a new dApp in the given scope.
+// If the dApp's information is invalid, returns an error. The same goes for an invalid scope.
+// In case of scope being an empty string, the dApp is created inside the root dApp.
+func (amm *AppMemoryManager) Create(scope string, app *meta.App) error {
 	logger.Info("trying to create a dApp",
 		zap.String("dApp", app.Meta.Name),
-		zap.String("context", context))
+		zap.String("scope", scope))
 
-	parentApp, err := amm.Get(context)
+	parentApp, err := amm.Get(scope)
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (amm *AppMemoryManager) Delete(query string) error {
 func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
 	logger.Info("trying to update a dApp",
 		zap.String("dApp", app.Meta.Name),
-		zap.String("in context", query))
+		zap.String("in scope", query))
 
 	logger.Debug("getting dApp to be updated")
 	currentApp, err := amm.Get(query)
@@ -202,7 +202,7 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query '%v'", query).Build()
 
 	nextApp := amm.tree
 	if nextApp != nil {

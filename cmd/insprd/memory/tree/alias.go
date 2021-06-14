@@ -23,21 +23,21 @@ func (tmm *MemoryManager) Alias() memory.AliasMemory {
 	}
 }
 
-// Get receives a context and an alias key. The context defines
+// Get receives a scope and an alias key. The scope defines
 // the path to a dApp. If this dApp has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
-func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error) {
+func (amm *AliasMemoryManager) Get(scope, aliasKey string) (*meta.Alias, error) {
 	logger.Info("trying to get an Alias",
 		zap.String("alias", aliasKey),
-		zap.String("context", context))
+		zap.String("scope", scope))
 
-	app, err := GetTreeMemory().Apps().Get(context)
+	app, err := GetTreeMemory().Apps().Get(scope)
 	if err != nil {
 		logger.Error("unable to get Alias")
 		return nil, err
 	}
 
-	// check if alias key exist in context
+	// check if alias key exist in scope
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
 		return nil, ierrors.
 			NewError().
@@ -50,14 +50,14 @@ func (amm *AliasMemoryManager) Get(context, aliasKey string) (*meta.Alias, error
 	return app.Spec.Aliases[aliasKey], nil
 }
 
-// Create receives a context that defines a path to the dApp.
+// Create receives a scope that defines a path to the dApp.
 // The new alias will be created inside this dApp's parent.
-func (amm *AliasMemoryManager) Create(context, targetBoundary string, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.Alias) error {
 	logger.Info("trying to create an Alias",
 		zap.Any("alias", alias),
-		zap.String("context", context))
-	// get app from context
-	app, err := GetTreeMemory().Apps().Get(context)
+		zap.String("scope", scope))
+	// get app from scope
+	app, err := GetTreeMemory().Apps().Get(scope)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (amm *AliasMemoryManager) Create(context, targetBoundary string, alias *met
 	}
 
 	// get parentApp of app
-	parentApp, _ := getParentApp(context)
+	parentApp, _ := getParentApp(scope)
 
 	targetChannel := alias.Target
 
@@ -109,27 +109,27 @@ func (amm *AliasMemoryManager) Create(context, targetBoundary string, alias *met
 
 }
 
-// Update receives a context a alias key and a alias. The context
+// Update receives a scope a alias key and a alias. The scope
 // defines the path to the dApp that contains the Alias. If the dApp has
 // a alias that has the given alias key passed as an argument,
 // that alias will be replaced by the new alias
-func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) Update(scope, aliasKey string, alias *meta.Alias) error {
 	logger.Info("trying to update an Alias",
 		zap.Any("alias", alias),
-		zap.String("context", context))
+		zap.String("scope", scope))
 
-	logger.Debug("checking if Alias to be updated exists in given context")
-	// check if alias key exist in context
-	oldAlias, err := amm.Get(context, aliasKey)
+	logger.Debug("checking if Alias to be updated exists in given scope")
+	// check if alias key exist in scope
+	oldAlias, err := amm.Get(scope, aliasKey)
 	if err != nil {
 		newError := ierrors.NewError().
 			InnerError(err).
 			NotFound().
-			Message("alias '%s' not found on context '%s'", aliasKey, context).
+			Message("alias '%s' not found on scope '%s'", aliasKey, scope).
 			Build()
 		return newError
 	}
-	parentApp, _ := GetTreeMemory().Apps().Get(context)
+	parentApp, _ := GetTreeMemory().Apps().Get(scope)
 
 	logger.Debug("validating Alias")
 	// valid target channel
@@ -152,22 +152,22 @@ func (amm *AliasMemoryManager) Update(context, aliasKey string, alias *meta.Alia
 	return nil
 }
 
-// Delete receives a context and a alias key. The context
+// Delete receives a scope and a alias key. The scope
 // defines the path to the dApp that cointains the Alias to be deleted. If the dApp
 // has an alias that has the same key as the key passed as an argument, that alias
 // is removed from the dApp Aliases only if it's not being used
-func (amm *AliasMemoryManager) Delete(context, aliasKey string) error {
+func (amm *AliasMemoryManager) Delete(scope, aliasKey string) error {
 	logger.Info("trying to delete an Alias",
 		zap.Any("alias", aliasKey),
-		zap.String("context", context))
-	// get app from context
-	app, err := GetTreeMemory().Apps().Get(context)
+		zap.String("scope", scope))
+	// get app from scope
+	app, err := GetTreeMemory().Apps().Get(scope)
 	if err != nil {
 		return err
 	}
 
-	logger.Debug("checking if Alias to be deleted exists in given context")
-	// check if alias key exist in context
+	logger.Debug("checking if Alias to be deleted exists in given scope")
+	// check if alias key exist in scope
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
 		return ierrors.
 			NewError().
@@ -204,22 +204,22 @@ func (amm *AliasMemoryManager) Delete(context, aliasKey string) error {
 type AliasRootGetter struct {
 }
 
-// Get receives a context and a alias key. The context defines
+// Get receives a scope and a alias key. The scope defines
 // the path to an App. If this App has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (amm *AliasRootGetter) Get(context, aliasKey string) (*meta.Alias, error) {
+func (amm *AliasRootGetter) Get(scope, aliasKey string) (*meta.Alias, error) {
 	logger.Info("trying to get an Alias (Root Getter)",
 		zap.String("alias", aliasKey),
-		zap.String("context", context))
-	// get app from context
-	app, err := GetTreeMemory().Apps().Get(context)
+		zap.String("scope", scope))
+	// get app from scope
+	app, err := GetTreeMemory().Apps().Get(scope)
 	if err != nil {
 		logger.Error("unable to get Alias (Root Getter)")
 		return nil, err
 	}
 
-	// check if alias key exist in context
+	// check if alias key exist in scope
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
 		logger.Error("alias doesn't exists (Root Getter)")
 		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()

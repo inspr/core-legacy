@@ -12,8 +12,6 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-const fileNameAlias = "alias_test.yaml"
-
 func TestYamlToAlias(t *testing.T) {
 	yamlString, mockAlias := createAliasYaml()
 	// creates a file with the expected syntax

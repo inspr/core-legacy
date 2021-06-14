@@ -15,11 +15,11 @@ type Channels struct {
 }
 
 // Get - simple mock
-func (ch *Channels) Get(context string, name string) (*meta.Channel, error) {
+func (ch *Channels) Get(scope, name string) (*meta.Channel, error) {
 	if ch.fail != nil {
 		return nil, ch.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, name)
+	query := fmt.Sprintf("%s.%s", scope, name)
 	ct, ok := ch.channels[query]
 	if !ok {
 		return nil, ierrors.
@@ -32,11 +32,11 @@ func (ch *Channels) Get(context string, name string) (*meta.Channel, error) {
 }
 
 // Create - simple mock
-func (ch *Channels) Create(context string, ct *meta.Channel) error {
+func (ch *Channels) Create(scope string, channel *meta.Channel) error {
 	if ch.fail != nil {
 		return ch.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
+	query := fmt.Sprintf("%s.%s", scope, channel.Meta.Name)
 	_, ok := ch.channels[query]
 	if ok {
 		return ierrors.
@@ -45,16 +45,16 @@ func (ch *Channels) Create(context string, ct *meta.Channel) error {
 			Message("channel %s already exists", query).
 			Build()
 	}
-	ch.channels[query] = ct
+	ch.channels[query] = channel
 	return nil
 }
 
 // Delete - simple mock
-func (ch *Channels) Delete(context string, name string) error {
+func (ch *Channels) Delete(scope, name string) error {
 	if ch.fail != nil {
 		return ch.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, name)
+	query := fmt.Sprintf("%s.%s", scope, name)
 	_, ok := ch.channels[query]
 	if !ok {
 		return ierrors.
@@ -69,11 +69,11 @@ func (ch *Channels) Delete(context string, name string) error {
 }
 
 // Update - simple mock
-func (ch *Channels) Update(context string, ct *meta.Channel) error {
+func (ch *Channels) Update(scope string, channel *meta.Channel) error {
 	if ch.fail != nil {
 		return ch.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
+	query := fmt.Sprintf("%s.%s", scope, channel.Meta.Name)
 	_, ok := ch.channels[query]
 	if !ok {
 		return ierrors.
@@ -82,6 +82,6 @@ func (ch *Channels) Update(context string, ct *meta.Channel) error {
 			Message("channel %s not found", query).
 			Build()
 	}
-	ch.channels[query] = ct
+	ch.channels[query] = channel
 	return nil
 }

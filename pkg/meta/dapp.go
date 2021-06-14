@@ -14,7 +14,7 @@ type NodePort struct {
 	TargetPort int `yaml:"targetPort" json:"targetPort"`
 }
 
-// SidecarPort represents the port for communication between node and sidecar
+// SidecarPort represents the port for communication between node and load balancer sidecar
 type SidecarPort struct {
 	LBRead  int `json:"lbRead"`
 	LBWrite int `json:"lbWrite"`
@@ -29,7 +29,7 @@ type NodeSpec struct {
 	SidecarPort SidecarPort          `yaml:"sidecar_port,omitempty" json:"sidecar_port"`
 }
 
-// App is an inspr component that represents an App. An App can contain other apps, channels and other components.
+// App is an inspr component that represents an dApp. An App can contain other apps, channels and other components.
 type App struct {
 	Meta Metadata `yaml:"meta,omitempty" json:"meta"`
 	Spec AppSpec  `yaml:"spec,omitempty" json:"spec"`
@@ -44,9 +44,6 @@ type AppBoundary struct {
 
 // AppSpec represents the configuration of an App.
 //
-// The app contains a list of apps and a list of nodes. The apps and nodes can be dereferenced by it's metadata
-// reference, at CLI time.
-//
 // The boundary represent the possible connections to other apps, and the fields that can be overriten when instantiating the app.
 type AppSpec struct {
 	Node     Node                `yaml:"node,omitempty"   json:"node"`
@@ -58,7 +55,7 @@ type AppSpec struct {
 	Auth     AppAuth             `yaml:"auth"  json:"auth"`
 }
 
-// AppAuth represents the permissions that a dApp (and its sons) contains
+// AppAuth represents the permissions that a dApp (and its children) contains
 type AppAuth struct {
 	Scope       string            `yaml:"scope"  json:"scope"`
 	Permissions utils.StringArray `yaml:"permissions"  json:"permissions"`

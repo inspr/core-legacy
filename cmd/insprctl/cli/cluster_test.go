@@ -68,7 +68,7 @@ func Test_getBrokers(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.NewError().Message("error").Build())
 			},
-			expectedOutput: "unexpected inspr error, the message is: error\n",
+			expectedOutput: "unexpected inspr error: error\n",
 		},
 	}
 	for _, tt := range tests {
@@ -126,7 +126,7 @@ func Test_authInit(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.NewError().Message("error").Build())
 			},
-			expectedOutput: "unexpected inspr error, the message is: error\n",
+			expectedOutput: "unexpected inspr error: error\n",
 		},
 	}
 	for _, tt := range tests {

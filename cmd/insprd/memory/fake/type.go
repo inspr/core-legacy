@@ -15,11 +15,11 @@ type Types struct {
 }
 
 // Get - simple mock
-func (t *Types) Get(context string, ctName string) (*meta.Type, error) {
+func (t *Types) Get(scope, name string) (*meta.Type, error) {
 	if t.fail != nil {
 		return nil, t.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, ctName)
+	query := fmt.Sprintf("%s.%s", scope, name)
 	ct, ok := t.insprTypes[query]
 	if !ok {
 		return nil, ierrors.
@@ -32,11 +32,11 @@ func (t *Types) Get(context string, ctName string) (*meta.Type, error) {
 }
 
 // Create - simple mock
-func (t *Types) Create(context string, ct *meta.Type) error {
+func (t *Types) Create(scope string, tp *meta.Type) error {
 	if t.fail != nil {
 		return t.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
+	query := fmt.Sprintf("%s.%s", scope, tp.Meta.Name)
 	_, ok := t.insprTypes[query]
 	if ok {
 		return ierrors.
@@ -45,16 +45,16 @@ func (t *Types) Create(context string, ct *meta.Type) error {
 			Message("type %s already exists", query).
 			Build()
 	}
-	t.insprTypes[query] = ct
+	t.insprTypes[query] = tp
 	return nil
 }
 
 // Delete - simple mock
-func (t *Types) Delete(context string, ctName string) error {
+func (t *Types) Delete(scope, name string) error {
 	if t.fail != nil {
 		return t.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, ctName)
+	query := fmt.Sprintf("%s.%s", scope, name)
 	_, ok := t.insprTypes[query]
 	if !ok {
 		return ierrors.
@@ -69,11 +69,11 @@ func (t *Types) Delete(context string, ctName string) error {
 }
 
 // Update - simple mock
-func (t *Types) Update(context string, ct *meta.Type) error {
+func (t *Types) Update(scope string, tp *meta.Type) error {
 	if t.fail != nil {
 		return t.fail
 	}
-	query := fmt.Sprintf("%s.%s", context, ct.Meta.Name)
+	query := fmt.Sprintf("%s.%s", scope, tp.Meta.Name)
 	_, ok := t.insprTypes[query]
 	if !ok {
 		return ierrors.
@@ -82,6 +82,6 @@ func (t *Types) Update(context string, ct *meta.Type) error {
 			Message("type %s not found", query).
 			Build()
 	}
-	t.insprTypes[query] = ct
+	t.insprTypes[query] = tp
 	return nil
 }

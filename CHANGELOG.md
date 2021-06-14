@@ -1,6 +1,30 @@
 
 # Changelog
 
+### #74 Tech CORE-430 | Refactor memory dApp section 
+- refactors:
+    - Update error messages so they use Sprintf structure and aren't duplicated in `dapp_utils.go`
+    - Methods in `dapp_utils.go` now use multi-error structure
+    - Removed unused methods in `dapp_utils.go`
+- fixes
+    - Added LB Sidecar, Authsvc and Secretgen images tag update in Helm Chart update script
+---
+
+### #73 Tech CORE-461 | Rename inspr CLI as insprctl
+- misc:
+    - Renamed folder `cmd/inspr` to `cmd/insprctl`
+    - Modified commands and command descriptions in `pkg/cmd` and `cmd/insprctl`
+    - Fixed tests that were broken after the main command change
+---
+
+### #72 Tech CORE-400 | Revaluate nomenclature of scope
+- refactors:
+    - Renamed comments, func params and variables from "context" to "scope"
+    - Refactored some error messages (better messages and use sprintf)
+    - Renamed env var "INSPR_APP_CTX" to "INSPR_APP_SCOPE"
+    - Moved "InitDO" to models file in pkg/auth
+---
+
 ### #70 Tech CORE-442 | Inspr CLI describe command outdated
 - features:
     - PrintAppTree function now prints the Node Meta, the Node Ports, the Node Sidecar LBRead and LBWrite port and the new Auth structure.

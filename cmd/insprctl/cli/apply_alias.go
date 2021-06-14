@@ -11,13 +11,13 @@ import (
 	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
 )
 
-// NewApplyChannel receives a controller ChannelInterface and calls it's methods
+// NewApplyAlias receives a controller AliasInterface and calls it's methods
 // depending on the flags values
-func NewApplyChannel() RunMethod {
+func NewApplyAlias() RunMethod {
 	return func(data []byte, out io.Writer) error {
-		c := cliutils.GetCliClient().Channels()
+		c := cliutils.GetCliClient().Alias()
 		// unmarshal into a channel
-		channel, err := utils.YamlToChannel(data)
+		alias, err := utils.YamlToAlias(data)
 		if err != nil {
 			return err
 		}
@@ -32,16 +32,16 @@ func NewApplyChannel() RunMethod {
 			return err
 		}
 
-		parentPath, err := metautils.JoinScopes(scope, channel.Meta.Parent)
+		parentScope, err := metautils.JoinScopes(scope, alias.Meta.Parent)
 		if err != nil {
 			return err
 		}
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentPath, &channel, flagDryRun)
+			log, err = c.Update(context.Background(), parentScope, alias.Meta.Name, alias, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), parentPath, &channel, flagDryRun)
+			log, err = c.Create(context.Background(), parentScope, alias.Meta.Name, alias, flagDryRun)
 		}
 
 		if err != nil {

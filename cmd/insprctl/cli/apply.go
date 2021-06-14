@@ -36,7 +36,7 @@ It can be called with the flag --dry-run so the changes that would be made are s
 			{
 				Name:          "file",
 				Shorthand:     "f",
-				Usage:         "inspr apply -f type.yaml",
+				Usage:         "insprctl apply -f type.yaml",
 				Value:         &cmd.InsprOptions.AppliedFileStructure,
 				DefValue:      "",
 				FlagAddMethod: "",
@@ -45,7 +45,7 @@ It can be called with the flag --dry-run so the changes that would be made are s
 			{
 				Name:          "folder",
 				Shorthand:     "k",
-				Usage:         "inspr apply -k randfolder/",
+				Usage:         "insprctl apply -k randfolder/",
 				Value:         &cmd.InsprOptions.AppliedFolderStructure,
 				DefValue:      "",
 				FlagAddMethod: "",
@@ -54,7 +54,7 @@ It can be called with the flag --dry-run so the changes that would be made are s
 			{
 				Name:          "update",
 				Shorthand:     "u",
-				Usage:         "inspr apply (-f FILENAME | -k DIRECTORY) --update",
+				Usage:         "insprctl apply (-f FILENAME | -k DIRECTORY) --update",
 				Value:         &cmd.InsprOptions.Update,
 				DefValue:      false,
 				FlagAddMethod: "BoolVar",
@@ -85,7 +85,7 @@ func doApply(_ context.Context) error {
 	if hasFileFlag == hasFolderFlag {
 		fmt.Fprintln(
 			out,
-			"Invalid command call\nFor help, type 'inspr apply --help'",
+			"Invalid command call\nFor help, type 'insprctl apply --help'",
 		)
 		return ierrors.NewError().Message("invalid flag arguments").Build()
 	}
