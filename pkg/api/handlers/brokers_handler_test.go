@@ -17,8 +17,8 @@ import (
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/auth"
 	authmock "github.com/inspr/inspr/pkg/auth/mocks"
-	metabroker "github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"github.com/inspr/inspr/pkg/utils"
 )
 
 func TestHandler_NewBrokerHandler(t *testing.T) {
@@ -89,7 +89,7 @@ func TestBrokerHandler_HandleGet(t *testing.T) {
 			},
 			want: 200,
 			wantData: &models.BrokersDI{
-				Installed: metabroker.BrokerStatusArray{"default_mock"},
+				Installed: utils.StringArray{"default_mock"},
 				Default:   "default_mock",
 			},
 		},

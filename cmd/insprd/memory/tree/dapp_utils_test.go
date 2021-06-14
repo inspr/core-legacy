@@ -1265,8 +1265,8 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 			want: metabrokers.Kafka,
 			before: func() {
 				bmm := brokers.GetBrokerMemory()
-				bmm.Create(metabrokers.BrokerStatus(metabrokers.Kafka), kafkaStructMock)
-				bmm.SetDefault(metabrokers.BrokerStatus(metabrokers.Kafka))
+				bmm.Create(&kafkaStructMock)
+				bmm.SetDefault(metabrokers.Kafka)
 			},
 		},
 		// {
