@@ -55,23 +55,21 @@ func (g GenOp) getOperator(scope string, name string) (ChannelOperatorInterface,
 
 func (g GenOp) setOperator(config metabrokers.BrokerConfiguration) error {
 	var err error
-	if obj, ok := g.configs[config.Broker()]; !reflect.DeepEqual(obj.config, config) || !ok {
-		switch config.Broker() {
-		case "kafka":
-			kafkaConfig := config.(*sidecars.KafkaConfig)
-			operator, err := kafka.NewOperator(g.memory, *kafkaConfig)
-			if err == nil {
-				g.configs[config.Broker()] = struct {
-					config metabrokers.BrokerConfiguration
-					op     ChannelOperatorInterface
-				}{
-					config: config,
-					op:     operator,
-				}
+	switch config.Broker() {
+	case "kafka":
+		kafkaConfig := config.(*sidecars.KafkaConfig)
+		operator, err := kafka.NewOperator(g.memory, *kafkaConfig)
+		if err == nil {
+			g.configs[config.Broker()] = struct {
+				config metabrokers.BrokerConfiguration
+				op     ChannelOperatorInterface
+			}{
+				config: config,
+				op:     operator,
 			}
-		default:
-			err = ierrors.NewError().Message("").Build()
 		}
+	default:
+		err = ierrors.NewError().Message("").Build()
 	}
 	return err
 }
