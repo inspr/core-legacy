@@ -48,7 +48,7 @@ func (bks *BrokersMock) Factory() memory.SidecarManager {
 	return bks.factory
 }
 
-//Config mock of configuration for broker
+//Configs mock of configuration for broker
 func (bks *BrokersMock) Configs(broker string) (brokers.BrokerConfiguration, error) {
 	if bks.fail != nil {
 		return nil, bks.fail

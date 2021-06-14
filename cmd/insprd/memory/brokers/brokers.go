@@ -85,6 +85,7 @@ func (bmm *BrokerMemoryManager) Factory() SidecarManager {
 	return bmm.factory
 }
 
+//Configs returns the configurations for a given broker
 func (bmm *BrokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
 	mem, err := bmm.get()
 	if err != nil {
