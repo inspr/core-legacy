@@ -19,7 +19,6 @@ inspr [flags]
 ### SEE ALSO
 
 * [insprctl apply](inspr_apply.md)	 - Applies changes to the connected cluster
-* [inspr auth](inspr_auth.md)	 - 
 * [insprctl config](inspr_config.md)	 - Change the values stored in the insprctl config
 * [insprctl delete](inspr_delete.md)	 - Delete component of object type
 * [insprctl describe](inspr_describe.md)	 - Retrieves the full state of a component from a given namespace
