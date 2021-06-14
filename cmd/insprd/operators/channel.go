@@ -6,7 +6,7 @@ import (
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
 	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	"github.com/inspr/inspr/cmd/insprd/operators/kafka"
+	kafkaop "github.com/inspr/inspr/cmd/insprd/operators/kafka"
 	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
@@ -35,7 +35,7 @@ func NewGeneralOperator(brokers brokers.Manager, memory memory.Manager) *GenOp {
 	}
 }
 
-func (g GenOp) getOperator(scope string, name string) (ChannelOperatorInterface, error) {
+func (g GenOp) getOperator(scope, name string) (ChannelOperatorInterface, error) {
 	channel, _ := g.memory.Channels().Get(scope, name)
 	broker := channel.Spec.SelectedBroker
 
@@ -58,7 +58,7 @@ func (g GenOp) setOperator(config metabrokers.BrokerConfiguration) error {
 	switch config.Broker() {
 	case "kafka":
 		kafkaConfig := config.(*sidecars.KafkaConfig)
-		operator, err := kafka.NewOperator(g.memory, *kafkaConfig)
+		operator, err := kafkaop.NewOperator(g.memory, *kafkaConfig)
 		if err == nil {
 			g.configs[config.Broker()] = struct {
 				config metabrokers.BrokerConfiguration
@@ -75,7 +75,7 @@ func (g GenOp) setOperator(config metabrokers.BrokerConfiguration) error {
 }
 
 //Get executes Get method of correct operator given the desired channel's broker
-func (g GenOp) Get(ctx context.Context, scope string, name string) (*meta.Channel, error) {
+func (g GenOp) Get(ctx context.Context, scope, name string) (*meta.Channel, error) {
 	op, err := g.getOperator(scope, name)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (g GenOp) Update(ctx context.Context, scope string, channel *meta.Channel) 
 }
 
 //Delete executes Delete method of correct operator given the desired channel's broker
-func (g GenOp) Delete(ctx context.Context, scope string, name string) error {
+func (g GenOp) Delete(ctx context.Context, scope, name string) error {
 	op, err := g.getOperator(scope, name)
 	if err != nil {
 		return err
