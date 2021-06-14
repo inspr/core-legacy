@@ -1,6 +1,15 @@
 
 # Changelog
 
+### #75 Story CORE-467 | Modify operator structure to handle multibrokers
+- features:
+   - configured broker memory structure do store configurations
+   - configured operator manager to import configurations dynamically so that operator always work with broker configured
+- fix:
+    - fixed tests
+    - removed unnecessary connection port from broker-specific sidecars
+---
+
 ### #74 Tech CORE-430 | Refactor memory dApp section 
 - refactors:
     - Update error messages so they use Sprintf structure and aren't duplicated in `dapp_utils.go`
