@@ -34,7 +34,7 @@ func NewGeneralOperator(brokers brokers.Manager, memory memory.Manager) *GenOp {
 }
 
 func (g GenOp) getOperator(scope string, name string) (ChannelOperatorInterface, error) {
-	channel, _ := g.memory.Root().Channels().Get(scope, name)
+	channel, _ := g.memory.Channels().Get(scope, name)
 	broker := channel.Spec.SelectedBroker
 
 	config, err := g.brokers.Configs(broker)
@@ -56,7 +56,8 @@ func (g GenOp) setOperator(config metabrokers.BrokerConfiguration) error {
 	if obj, ok := g.configs[config.Broker()]; !reflect.DeepEqual(obj.config, config) || !ok {
 		switch config.Broker() {
 		case "kafka":
-			operator, err := kafka.NewOperator(g.memory, config.(sidecars.KafkaConfig))
+			kafkaConfig := config.(*sidecars.KafkaConfig)
+			operator, err := kafka.NewOperator(g.memory, *kafkaConfig)
 			if err == nil {
 				g.configs[config.Broker()] = struct {
 					config metabrokers.BrokerConfiguration
