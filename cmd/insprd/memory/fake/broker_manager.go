@@ -3,7 +3,6 @@ package fake
 import (
 	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	metabroker "github.com/inspr/inspr/pkg/meta/brokers"
-	"github.com/inspr/inspr/pkg/meta/utils"
 )
 
 // BrokersMock is the struct with the necessary implementations
@@ -16,12 +15,13 @@ type BrokersMock struct {
 
 // MockBrokerManager mock exported with propagated error through the functions
 func MockBrokerManager(failErr error) brokers.Manager {
-	availibe, _ := utils.MakeStrSet([]string{"default_mock"})
 	return &BrokersMock{
 		fail: failErr,
 		broker: &metabroker.Brokers{
-			Default:   "default_mock",
-			Available: availibe,
+			Default: "default_mock",
+			Available: metabroker.BrokerStatusArray{
+				"default_mock": nil,
+			},
 		},
 	}
 }

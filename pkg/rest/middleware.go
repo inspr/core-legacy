@@ -122,6 +122,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 
 				if strings.HasPrefix(rs, scope) &&
 					utils.Includes(payload.Permissions[scope], perm) {
+					log.Printf("permission granted")
 					// token and context are valid
 					h(w, r)
 					return

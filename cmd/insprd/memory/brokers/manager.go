@@ -2,7 +2,6 @@ package brokers
 
 import (
 	"github.com/inspr/inspr/pkg/meta/brokers"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
 )
 
 // BrokerManager implements broker's Manager interface,
@@ -21,7 +20,7 @@ func GetBrokerMemory() Manager {
 	if brokerMemory == nil {
 		brokerMemory = &BrokerMemoryManager{
 			broker: &brokers.Brokers{
-				Available: make(metautils.StrSet),
+				Available: make(brokers.BrokerStatusArray),
 			},
 			factory: &AbstractBrokerFactory{},
 		}

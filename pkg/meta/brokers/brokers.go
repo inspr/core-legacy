@@ -1,14 +1,11 @@
 package brokers
 
-import (
-	"github.com/inspr/inspr/pkg/meta/utils"
-	pkgutils "github.com/inspr/inspr/pkg/utils"
-)
+import "github.com/inspr/inspr/pkg/utils"
 
 // Brokers define all Available brokers on Insprd and its default broker
 type Brokers struct {
-	Default   BrokerStatus
-	Available utils.StrSet
+	Default   string
+	Available BrokerStatusArray
 }
 
 // ChannelBroker associates channel names with their brokers, used to recover data from enviroment
@@ -18,10 +15,18 @@ type ChannelBroker struct {
 }
 
 // BrokerConfiguration generic interface type
-type BrokerConfiguration interface{}
-
-// BrokerStatus generiic status type for brokers, used as parameters and returns
-type BrokerStatus string
+type BrokerConfiguration interface {
+	Broker() string
+}
 
 // BrokerStatusArray generic status array, used to return brokers data
-type BrokerStatusArray pkgutils.StringArray
+type BrokerStatusArray map[string]BrokerConfiguration
+
+//Brokers returns an array containing the name of all availible brokers
+func (bsa *BrokerStatusArray) Brokers() utils.StringArray {
+	arr := utils.StringArray{}
+	for k := range *bsa {
+		arr = append(arr, k)
+	}
+	return arr
+}

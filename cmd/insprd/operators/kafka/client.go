@@ -1,4 +1,4 @@
-package channels
+package kafkaop
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	"go.uber.org/zap"
@@ -27,28 +28,23 @@ type ChannelOperator struct {
 	mem    memory.Manager
 }
 
-func getKafkaBootstrap() string {
-	return os.Getenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS")
-}
-
 // NewOperator returns an initialized operator from the environment variables
-func NewOperator(mem memory.Manager) (*ChannelOperator, error) {
-
-	var config *kafka.ConfigMap
+func NewOperator(mem memory.Manager, config sidecars.KafkaConfig) (*ChannelOperator, error) {
+	var kafkaConfig *kafka.ConfigMap
 	var err error
 	var adminClient kafkaAdminClient
 	if _, exists := os.LookupEnv("DEBUG"); exists {
 		logger.Info("initializing kafka admin with debug configs")
 		adminClient = &mockAdminClient{}
 	} else {
-		bootstrap := getKafkaBootstrap()
+		bootstrap := config.BootstrapServers
 		logger.Info("initializing kafka admin with production configs",
 			zap.String("kafka bootstrap servers", bootstrap))
-		config = &kafka.ConfigMap{
+		kafkaConfig = &kafka.ConfigMap{
 			"bootstrap.servers": bootstrap,
 		}
 
-		adminClient, err = kafka.NewAdminClient(config)
+		adminClient, err = kafka.NewAdminClient(kafkaConfig)
 		if err != nil {
 			logger.Error("unable to create kafka admin client", zap.Any("error", err))
 			return nil, err
