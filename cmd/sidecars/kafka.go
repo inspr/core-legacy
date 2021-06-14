@@ -20,6 +20,7 @@ type KafkaConfig struct {
 	KafkaInsprAddr string
 }
 
+//Broker is a BrokerConfiguration interface method, it returns the broker name for this config type
 func (kc KafkaConfig) Broker() string {
 	return brokers.Kafka
 }

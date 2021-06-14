@@ -22,6 +22,7 @@ type BrokerConfiguration interface {
 // BrokerStatusArray generic status array, used to return brokers data
 type BrokerStatusArray map[string]BrokerConfiguration
 
+//Brokers returns an array containing the name of all availible brokers
 func (bsa *BrokerStatusArray) Brokers() utils.StringArray {
 	arr := utils.StringArray{}
 	for k := range *bsa {

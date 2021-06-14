@@ -18,5 +18,5 @@ func (f *Factory) Get(broker string) (models.SidecarFactory, error) {
 	if f.fail != nil {
 		return nil, f.fail
 	}
-	return nil, nil
+	return f.abstract[broker], nil
 }

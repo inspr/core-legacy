@@ -13,6 +13,7 @@ import (
 	metabrokers "github.com/inspr/inspr/pkg/meta/brokers"
 )
 
+//GenOp is a general channel operator for dinamically selecting required operator
 type GenOp struct {
 	brokers brokers.Manager
 	memory  memory.Manager
@@ -22,6 +23,7 @@ type GenOp struct {
 	}
 }
 
+//NewGeneralOperator creates an instance of GenOp for a given broker and memory manager
 func NewGeneralOperator(brokers brokers.Manager, memory memory.Manager) *GenOp {
 	return &GenOp{
 		brokers: brokers,
@@ -74,6 +76,7 @@ func (g GenOp) setOperator(config metabrokers.BrokerConfiguration) error {
 	return err
 }
 
+//Get executes Get method of correct operator given the desired channel's broker
 func (g GenOp) Get(ctx context.Context, scope string, name string) (*meta.Channel, error) {
 	op, err := g.getOperator(scope, name)
 	if err != nil {
@@ -82,6 +85,7 @@ func (g GenOp) Get(ctx context.Context, scope string, name string) (*meta.Channe
 	return op.Get(ctx, scope, name)
 }
 
+//Create executes Create method of correct operator given the desired channel's broker
 func (g GenOp) Create(ctx context.Context, scope string, channel *meta.Channel) error {
 	op, err := g.getOperator(scope, channel.Meta.Name)
 	if err != nil {
@@ -90,6 +94,7 @@ func (g GenOp) Create(ctx context.Context, scope string, channel *meta.Channel) 
 	return op.Create(ctx, scope, channel)
 }
 
+//Update executes Update method of correct operator given the desired channel's broker
 func (g GenOp) Update(ctx context.Context, scope string, channel *meta.Channel) error {
 	op, err := g.getOperator(scope, channel.Meta.Name)
 	if err != nil {
@@ -98,6 +103,7 @@ func (g GenOp) Update(ctx context.Context, scope string, channel *meta.Channel) 
 	return op.Update(ctx, scope, channel)
 }
 
+//Delete executes Delete method of correct operator given the desired channel's broker
 func (g GenOp) Delete(ctx context.Context, scope string, name string) error {
 	op, err := g.getOperator(scope, name)
 	if err != nil {
