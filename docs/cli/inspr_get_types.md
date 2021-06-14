@@ -1,19 +1,19 @@
-## inspr get apps
+## inspr get types
 
-Get apps from context 
+Get types from context
 
 ```
-inspr get apps [flags]
+inspr get types [flags]
 ```
 
 ### Examples
 
 ```
-  # Get apps from the default scope
- inspr get apps 
+  # Get types from the default scope
+ inspr get types 
 
-  # Get apps from a custom scope
- inspr get apps --scope app1.app2
+  # Get types from a custom scope
+ inspr get types --scope app1.app2
 
 ```
 
@@ -21,7 +21,7 @@ inspr get apps [flags]
 
 ```
   -c, --config string   set the config file for the command
-  -h, --help            help for apps
+  -h, --help            help for types
   -s, --scope string    inspr <command> --scope app1.app2
   -t, --token string    set the token for the command
 ```

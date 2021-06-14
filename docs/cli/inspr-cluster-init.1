@@ -3,17 +3,17 @@
 
 .SH NAME
 .PP
-inspr\-get\-alias \- Get alias from context
+inspr\-cluster\-init \- Init configures insprd's default token
 
 
 .SH SYNOPSIS
 .PP
-\fBinspr get alias [flags]\fP
+\fBinspr cluster init [flags]\fP
 
 
 .SH DESCRIPTION
 .PP
-Get alias from context
+Init configures insprd's default token
 
 
 .SH OPTIONS
@@ -23,7 +23,7 @@ Get alias from context
 
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
-	help for alias
+	help for init
 
 .PP
 \fB\-s\fP, \fB\-\-scope\fP=""
@@ -39,11 +39,8 @@ Get alias from context
 .RS
 
 .nf
-  # Get alias from the default scope
- inspr get alias 
-
-  # Get alias from a custom scope
- inspr get alias \-\-scope app1.app2
+  # init insprd as admin
+ inspr  inspr cluster init <admin\_password>
 
 
 .fi
@@ -52,7 +49,7 @@ Get alias from context
 
 .SH SEE ALSO
 .PP
-\fBinspr\-get(1)\fP
+\fBinspr\-cluster(1)\fP
 
 
 .SH HISTORY

@@ -1,19 +1,19 @@
-## inspr delete apps
+## inspr delete types
 
-Delete apps from context 
+Delete types from context
 
 ```
-inspr delete apps [flags]
+inspr delete types [flags]
 ```
 
 ### Examples
 
 ```
-  # Delete app from the default scope
- inspr delete apps <appname> 
+  # Delete type from the default scope
+ inspr delete types <typename>
 
-  # Delete app from a custom scope
- inspr delete apps <appname> --scope app1.app2
+  # Delete type from a custom scope
+ inspr delete types <typename> --scope app1.app2
 
 ```
 
@@ -21,7 +21,7 @@ inspr delete apps [flags]
 
 ```
   -c, --config string   set the config file for the command
-  -h, --help            help for apps
+  -h, --help            help for types
   -s, --scope string    inspr <command> --scope app1.app2
   -t, --token string    set the token for the command
 ```
