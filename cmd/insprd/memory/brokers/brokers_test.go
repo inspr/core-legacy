@@ -158,14 +158,14 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 			name: "valid create",
 			bmm:  &BrokerMemoryManager{},
 			exec: func(bmm Manager) error {
-				return bmm.Create(kafkaStructMock)
+				return bmm.Create(&kafkaStructMock)
 			},
 		},
 		{
 			name: "invalid create - broker already exists",
 			bmm:  &BrokerMemoryManager{},
 			exec: func(bmm Manager) error {
-				return bmm.Create(kafkaStructMock)
+				return bmm.Create(&kafkaStructMock)
 			},
 			wantErr: true,
 		},
