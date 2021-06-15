@@ -100,7 +100,7 @@ func clusterConfig(c context.Context, args []string) error {
 		return err
 	}
 
-	// do a request to the kafka route /brokers/<broker_name>
+	// do a request to the broker route /brokers/<broker_name>
 	err = client.Brokers().Create(context.Background(), brokerName, bytes)
 	if err != nil {
 		fmt.Fprintf(output, err.Error())
