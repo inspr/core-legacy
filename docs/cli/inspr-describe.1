@@ -8,7 +8,7 @@ inspr\-describe \- Retrieves the full state of a component from a given namespac
 
 .SH SYNOPSIS
 .PP
-\fBinspr describe [flags]\fP
+\fBinsprctl describe [flags]\fP
 
 
 .SH DESCRIPTION
@@ -28,16 +28,16 @@ describe takes a component type (apps | channels | types | alias) plus the name 
 
 .nf
   # Describes the app component type
- inspr describe apps <namespace>
+ insprctl describe apps <namespace>
 
   # Describes the app component type
- inspr describe a <namespace> \-\-scope <specific\-scope>
+ insprctl describe a <namespace> \-\-scope <specific\-scope>
 
   # Describes the channel component type
- inspr describe ch <namespace>
+ insprctl describe ch <namespace>
 
   # Describes the alias component type
- inspr describe al <namespace>
+ insprctl describe al <namespace>
 
 
 .fi

@@ -8,7 +8,7 @@ inspr\-describe\-apps \- Retrieves the full state of the app from a given namesp
 
 .SH SYNOPSIS
 .PP
-\fBinspr describe apps  [flags]\fP
+\fBinsprctl describe apps  [flags]\fP
 
 
 .SH DESCRIPTION
@@ -32,13 +32,13 @@ Retrieves the full state of the app from a given namespace
 
 .nf
   # Display the state of the given app on the default scope
- inspr describe apps hello\_world
+ insprctl describe apps hello\_world
 
   # Display the state of the given app on a custom scope
- inspr describe apps \-\-scope app1.app2 hello\_world
+ insprctl describe apps \-\-scope app1.app2 hello\_world
 
   # Display the state of the given app by the path
- inspr describe apps app1.app2.hello\_world
+ insprctl describe apps app1.app2.hello\_world
 
 
 .fi

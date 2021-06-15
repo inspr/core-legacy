@@ -6,6 +6,7 @@ import (
 	"github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/sidecars/models"
 	"github.com/inspr/inspr/pkg/utils"
+	"go.uber.org/zap"
 )
 
 // GetAll returns an array containing all currently configured brokers
@@ -35,12 +36,16 @@ func (bmm *BrokerMemoryManager) get() (*brokers.Brokers, error) {
 
 // Create configures a new broker on insprd
 func (bmm *BrokerMemoryManager) Create(config brokers.BrokerConfiguration) error {
+	logger.Info("creating new broker")
 	mem, err := bmm.get()
 	if err != nil {
 		return err
 	}
 
 	broker := config.Broker()
+	logger.Debug("broker to be created",
+		zap.String("broker", broker),
+		zap.Any("configs", config))
 
 	if _, ok := mem.Available[broker]; ok {
 		return ierrors.NewError().Message("broker %s is already configured on memory", broker).Build()
@@ -55,18 +60,24 @@ func (bmm *BrokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 		return ierrors.NewError().Message("broker %s is not supported", broker).Build()
 	}
 
+	logger.Debug("subscribing broker to sidecar factory")
 	err = bmm.Factory().Subscribe(broker, factory)
-
 	if err != nil {
+		logger.Error("unable to subscribe broker")
 		return err
 	}
 
 	mem.Available[broker] = config
+	if mem.Default == "" {
+		bmm.SetDefault(broker)
+	}
 	return nil
 }
 
 // SetDefault sets a previously configured broker as insprd's default broker
 func (bmm *BrokerMemoryManager) SetDefault(broker string) error {
+	logger.Debug("setting new default broker",
+		zap.String("broker", broker))
 	mem, err := bmm.get()
 	if err != nil {
 		return err
@@ -76,7 +87,7 @@ func (bmm *BrokerMemoryManager) SetDefault(broker string) error {
 		return ierrors.NewError().Message("broker %s is not configured on memory", broker).Build()
 	}
 
-	mem.Default = (broker)
+	mem.Default = broker
 	return nil
 }
 
@@ -87,6 +98,9 @@ func (bmm *BrokerMemoryManager) Factory() SidecarManager {
 
 //Configs returns the configurations for a given broker
 func (bmm *BrokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
+	logger.Info("getting config for broker sidecar",
+		zap.String("broker", broker))
+
 	mem, err := bmm.get()
 	if err != nil {
 		return nil, err

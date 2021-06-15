@@ -8,7 +8,7 @@ inspr\-get \- Retrieves the components from a given namespace
 
 .SH SYNOPSIS
 .PP
-\fBinspr get [flags]\fP
+\fBinsprctl get [flags]\fP
 
 
 .SH DESCRIPTION
@@ -28,19 +28,19 @@ get takes a component type (apps | channels | types | nodes | alias) and display
 
 .nf
   # gets apps from cluster
- inspr get apps \-\-scope <scope>
+ insprctl get apps \-\-scope <scope>
 
   # gets channels from cluster
- inspr get ch \-\-scope <scope>
+ insprctl get ch \-\-scope <scope>
 
   # gets channel\_types from cluster
- inspr get ct \-\-scope <scope>
+ insprctl get ct \-\-scope <scope>
 
   # gets nodes from cluster
- inspr get nodes \-\-scope <scope>
+ insprctl get nodes \-\-scope <scope>
 
   # gets alias from cluster
- inspr get alias \-\-scope <scope>
+ insprctl get alias \-\-scope <scope>
 
 
 .fi

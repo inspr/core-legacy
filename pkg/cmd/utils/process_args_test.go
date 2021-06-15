@@ -2,7 +2,56 @@ package utils
 
 import (
 	"testing"
+
+	"github.com/inspr/inspr/pkg/ierrors"
 )
+
+func TestCheckEmptyArgs(t *testing.T) {
+	tests := []struct {
+		name        string
+		args        map[string]string
+		wantErr     bool
+		wantWrapper bool
+	}{
+		{
+			name: "no_errors",
+			args: map[string]string{
+				"test": "value",
+			},
+			wantErr: false,
+		},
+		{
+			name: "one_error",
+			args: map[string]string{
+				"test": "",
+			},
+			wantErr: true,
+		},
+		{
+			name: "multiple_errors",
+			args: map[string]string{
+				"A": "",
+				"B": "",
+				"C": "",
+			},
+			wantErr:     true,
+			wantWrapper: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := CheckEmptyArgs(tt.args)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CheckEmptyArgs() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if tt.wantWrapper && ierrors.Unwrap(err) == nil {
+				t.Errorf("CheckEmptyArgs() multiple errors, wanted wrapper")
+			}
+		})
+	}
+}
 
 func TestProcessArg(t *testing.T) {
 	type args struct {

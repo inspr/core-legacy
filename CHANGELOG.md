@@ -1,6 +1,20 @@
 
 # Changelog
 
+### #65 Story CORE-401 | CLI create new broker command
+- features:
+    - developed the inspr cli subcommand for reading a yaml file and trying to create a broker in the cluster
+    - created the interface method in the controller interface
+    - implemented the create broker method
+    - added the `/brokers/kafka` endpoint in the insprd routes
+    - added the handler for the `/brokers/kafka` endpoint
+- fixes:
+    - added the simple test of the `/brokers` routes.go in the api/controller pkg
+    - changed from `inspr` to `insprctl` in docs that referenced the CLI command
+- refactors:
+    - removed the `parser` package in the directory `meta/utils/parser`, all of its contents can now be found on the `yaml_parser.go` file in the `meta/utils` pkg.
+    - removed the []byte to []byte comparison in the inspr cli testing since it can be just a direct comparison between two strings. No need for adding extra buffers 
+---
 ### #75 Story CORE-467 | Modify operator structure to handle multibrokers
 - features:
    - configured broker memory structure do store configurations
@@ -109,7 +123,7 @@
       to be, these functions should be able to be used by other sidecars.
 ---
 
-### # 64 Tech CORE-448 | Unification of inspr cluster commands
+### # 64 Tech CORE-448 | Unification of insprctl cluster commands
 - fixes:
     - tested cluster commands `brokers` and `init`
 - refactors:

@@ -9,9 +9,11 @@ import (
 
 	"github.com/inspr/inspr/pkg/cmd"
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
+	"gopkg.in/yaml.v2"
 )
 
 // NewApplyType receives a controller TypeInterface and calls it's methods
@@ -19,17 +21,24 @@ import (
 func NewApplyType() RunMethod {
 	return func(data []byte, out io.Writer) error {
 		c := cliutils.GetCliClient().Types()
+		var insprType meta.Type = meta.Type{
+			Meta: meta.Metadata{Annotations: make(map[string]string)},
+		}
+
 		// unmarshal into a Type
-		insprType, err := utils.YamlToType(data)
-		if err != nil {
+		if err := yaml.Unmarshal(data, &insprType); err != nil {
 			return err
+		}
+		if insprType.Meta.Name == "" {
+			return ierrors.NewError().Message("type without name").Build()
 		}
 
 		if schemaNeedsInjection(insprType.Schema) {
+			var err error
 			insprType.Schema, err = injectedSchema(insprType.Schema)
-		}
-		if err != nil {
-			return err
+			if err != nil {
+				return err
+			}
 		}
 
 		flagDryRun := cmd.InsprOptions.DryRun

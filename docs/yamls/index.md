@@ -2,7 +2,7 @@
 
 The creation of YAML files allows the proper usage of the Inspr CLI.
 
-In this way, when the file is written in one of the formats described below it can be processed and applied to the cluster through the CLI commands `inspr apply -f <file_path>` or `inspr apply -k <files_dir>`.
+In this way, when the file is written in one of the formats described below it can be processed and applied to the cluster through the CLI commands `insprctl apply -f <file_path>` or `insprctl apply -k <files_dir>`.
 
 
 ## dApps

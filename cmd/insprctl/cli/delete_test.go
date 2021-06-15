@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -347,11 +346,10 @@ func TestNewDeleteCmd(t *testing.T) {
 func Test_deleteApps(t *testing.T) {
 	prepareToken(t)
 	defer restartScopeFlag()
+
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutApp1())
-
 	changelog.Print(bufResp)
-	outResp, _ := ioutil.ReadAll(bufResp)
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
@@ -375,31 +373,31 @@ func Test_deleteApps(t *testing.T) {
 		name           string
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
-		expectedOutput []byte
+		expectedOutput string
 	}{
 		{
 			name:           "Should delete the app and return the diff",
 			flagsAndArgs:   []string{"a", "appParent.app1"},
 			handlerFunc:    handler,
-			expectedOutput: outResp,
+			expectedOutput: bufResp.String(),
 		},
 		{
 			name:           "Invalid scope flag, should not print",
 			flagsAndArgs:   []string{"a", "appParent", "--scope", "invalid..scope"},
 			handlerFunc:    handler,
-			expectedOutput: []byte(""),
+			expectedOutput: "",
 		},
 		{
 			name:           "Valid scope flag",
 			flagsAndArgs:   []string{"a", "", "--scope", "appParent.app1"},
 			handlerFunc:    handler,
-			expectedOutput: outResp,
+			expectedOutput: bufResp.String(),
 		},
 		{
 			name:           "Invalid arg",
 			flagsAndArgs:   []string{"a", "invalid..args", "--scope", "appParent"},
 			handlerFunc:    handler,
-			expectedOutput: []byte("invalid args\n"),
+			expectedOutput: "invalid args\n",
 		},
 	}
 	for _, tt := range tests {
@@ -416,10 +414,10 @@ func Test_deleteApps(t *testing.T) {
 			defer server.Close()
 
 			cmd.Execute()
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("deleteApps() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf("deleteApps() = %v, want %v", got, tt.expectedOutput)
 			}
 		})
 	}
@@ -428,11 +426,10 @@ func Test_deleteApps(t *testing.T) {
 func Test_deleteChannels(t *testing.T) {
 	prepareToken(t)
 	defer restartScopeFlag()
+
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutCh1())
-
 	changelog.Print(bufResp)
-	outResp, _ := ioutil.ReadAll(bufResp)
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.ChannelQueryDI{}
@@ -456,31 +453,31 @@ func Test_deleteChannels(t *testing.T) {
 		name           string
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
-		expectedOutput []byte
+		expectedOutput string
 	}{
 		{
 			name:           "Should delete the channel and return the diff",
 			flagsAndArgs:   []string{"ch", "appParent.ch1"},
 			handlerFunc:    handler,
-			expectedOutput: outResp,
+			expectedOutput: bufResp.String(),
 		},
 		{
 			name:           "Invalid scope flag, should not print",
 			flagsAndArgs:   []string{"ch", "appParent.ch1", "--scope", "invalid..scope"},
 			handlerFunc:    handler,
-			expectedOutput: []byte(""),
+			expectedOutput: "",
 		},
 		{
 			name:           "Valid scope flag",
 			flagsAndArgs:   []string{"ch", "ch1", "--scope", "appParent"},
 			handlerFunc:    handler,
-			expectedOutput: outResp,
+			expectedOutput: bufResp.String(),
 		},
 		{
 			name:           "Invalid arg",
 			flagsAndArgs:   []string{"ch", "invalid..args", "--scope", "appParent.ch1"},
 			handlerFunc:    handler,
-			expectedOutput: []byte(""),
+			expectedOutput: "",
 		},
 	}
 	for _, tt := range tests {
@@ -497,10 +494,10 @@ func Test_deleteChannels(t *testing.T) {
 			defer server.Close()
 
 			cmd.Execute()
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("deleteChannels() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf("deleteChannels() = %v, want %v", got, tt.expectedOutput)
 			}
 		})
 	}
@@ -513,7 +510,6 @@ func Test_deletetypes(t *testing.T) {
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutCt1())
 
 	changelog.Print(bufResp)
-	outResp, _ := ioutil.ReadAll(bufResp)
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.TypeQueryDI{}
@@ -537,31 +533,31 @@ func Test_deletetypes(t *testing.T) {
 		name           string
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
-		expectedOutput []byte
+		expectedOutput string
 	}{
 		{
 			name:           "Should delete the type and return the diff",
 			flagsAndArgs:   []string{"t", "appParent.t1"},
 			handlerFunc:    handler,
-			expectedOutput: outResp,
+			expectedOutput: bufResp.String(),
 		},
 		{
 			name:           "Invalid scope flag, should not print",
 			flagsAndArgs:   []string{"t", "appParent.ct1", "--scope", "invalid..scope"},
 			handlerFunc:    handler,
-			expectedOutput: []byte(""),
+			expectedOutput: "",
 		},
 		{
 			name:           "Valid scope flag",
 			flagsAndArgs:   []string{"t", "t1", "--scope", "appParent"},
 			handlerFunc:    handler,
-			expectedOutput: outResp,
+			expectedOutput: bufResp.String(),
 		},
 		{
 			name:           "Invalid arg",
 			flagsAndArgs:   []string{"t", "invalid..args", "--scope", "appParent.t1"},
 			handlerFunc:    handler,
-			expectedOutput: []byte(""),
+			expectedOutput: "",
 		},
 	}
 	for _, tt := range tests {
@@ -578,10 +574,10 @@ func Test_deletetypes(t *testing.T) {
 			defer server.Close()
 
 			cmd.Execute()
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("deletetypes() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf("deletetypes() = %v, want %v", got, tt.expectedOutput)
 			}
 		})
 	}
@@ -590,11 +586,10 @@ func Test_deletetypes(t *testing.T) {
 func Test_deleteAlias(t *testing.T) {
 	prepareToken(t)
 	defer restartScopeFlag()
+
 	bufResp := bytes.NewBufferString("")
 	changelog, _ := diff.Diff(getMockApp(), getMockAppWithoutAlias())
-
 	changelog.Print(bufResp)
-	outResp, _ := ioutil.ReadAll(bufResp)
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AliasQueryDI{}
@@ -619,31 +614,31 @@ func Test_deleteAlias(t *testing.T) {
 		name           string
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
-		expectedOutput []byte
+		expectedOutput string
 	}{
 		{
 			name:           "Should delete the alias and return the diff",
 			flagsAndArgs:   []string{"al", "appParent.alias_name"},
 			handlerFunc:    handler,
-			expectedOutput: outResp,
+			expectedOutput: bufResp.String(),
 		},
 		{
 			name:           "Invalid scope flag, should not print",
 			flagsAndArgs:   []string{"al", "appParent.alias_name", "--scope", "invalid..scope"},
 			handlerFunc:    handler,
-			expectedOutput: []byte(""),
+			expectedOutput: "",
 		},
 		{
 			name:           "Valid scope flag",
 			flagsAndArgs:   []string{"al", "alias_name", "--scope", "appParent"},
 			handlerFunc:    handler,
-			expectedOutput: outResp,
+			expectedOutput: bufResp.String(),
 		},
 		{
 			name:           "Invalid arg",
 			flagsAndArgs:   []string{"al", "invalid..args", "--scope", "appParent.ct1"},
 			handlerFunc:    handler,
-			expectedOutput: []byte(""),
+			expectedOutput: "",
 		},
 	}
 	for _, tt := range tests {
@@ -660,10 +655,10 @@ func Test_deleteAlias(t *testing.T) {
 			defer server.Close()
 
 			cmd.Execute()
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("deleteAlias() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf("deleteAlias() = %v, want %v", got, tt.expectedOutput)
 			}
 		})
 	}

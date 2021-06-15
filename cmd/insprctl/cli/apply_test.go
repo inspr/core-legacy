@@ -3,7 +3,6 @@ package cli
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -177,18 +176,6 @@ func Test_doApply(t *testing.T) {
 	defer os.Remove(filePath)
 	yamlString := createDAppYaml()
 
-	bufResp := bytes.NewBufferString("")
-	fmt.Fprintf(bufResp, "\nApplied:\nfiletest.yaml | dapp | v1\n")
-	outResp, _ := ioutil.ReadAll(bufResp)
-
-	bufResp2 := bytes.NewBufferString("")
-	fmt.Fprintln(bufResp2, "Invalid command call\nFor help, type 'insprctl apply --help'")
-	outResp2, _ := ioutil.ReadAll(bufResp2)
-
-	bufResp3 := bytes.NewBufferString("")
-	fmt.Fprint(bufResp3, "No files were applied\nFiles to be applied must be .yaml or .yml\n")
-	outResp3, _ := ioutil.ReadAll(bufResp3)
-
 	// creates a file with the expected syntax
 	ioutil.WriteFile(
 		filePath,
@@ -199,22 +186,22 @@ func Test_doApply(t *testing.T) {
 	tests := []struct {
 		name           string
 		flagsAndArgs   []string
-		expectedOutput []byte
+		expectedOutput string
 	}{
 		{
 			name:           "Should apply the file",
 			flagsAndArgs:   []string{"-f", "filetest.yaml"},
-			expectedOutput: outResp,
+			expectedOutput: "\nApplied:\nfiletest.yaml | dapp | v1\n",
 		},
 		{
 			name:           "Too many flags, should raise an error",
 			flagsAndArgs:   []string{"-f", "example", "-k", "example"},
-			expectedOutput: outResp2,
+			expectedOutput: "Invalid command call\nFor help, type 'insprctl apply --help'\n",
 		},
 		{
 			name:           "No files applied",
 			flagsAndArgs:   []string{"-f", "example.yaml"},
-			expectedOutput: outResp3,
+			expectedOutput: "No files were applied\nFiles to be applied must be .yaml or .yml\n",
 		},
 	}
 	for _, tt := range tests {
@@ -234,13 +221,13 @@ func Test_doApply(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			cmd.Execute()
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
 				t.Errorf(
 					"doApply() = %v, want\n%v",
-					string(got),
-					string(tt.expectedOutput),
+					got,
+					tt.expectedOutput,
 				)
 			}
 		})

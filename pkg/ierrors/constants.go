@@ -12,6 +12,8 @@ const (
 	InvalidApp
 	InvalidChannel
 	InvalidType
+	InvalidFile
+	InvalidArgs
 	BadRequest
 	InvalidToken
 	ExpiredToken

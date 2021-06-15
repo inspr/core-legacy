@@ -8,7 +8,7 @@ inspr\-describe\-types \- Retrieves the full state of the type from a given name
 
 .SH SYNOPSIS
 .PP
-\fBinspr describe types  [flags]\fP
+\fBinsprctl describe types  [flags]\fP
 
 
 .SH DESCRIPTION
@@ -32,13 +32,13 @@ Retrieves the full state of the type from a given namespace
 
 .nf
   # Display the state of the given type on the default scope
- inspr describe types hello\_world
+ insprctl describe types hello\_world
 
   # Display the state of the given type on a custom scope
- inspr describe types \-\-scope app1.app2 hello\_world
+ insprctl describe types \-\-scope app1.app2 hello\_world
 
   # Display the state of the given type by the path
- inspr describe types app1.app2.hello\_world
+ insprctl describe types app1.app2.hello\_world
 
 
 .fi

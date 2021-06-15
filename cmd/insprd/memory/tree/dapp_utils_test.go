@@ -12,13 +12,6 @@ import (
 	"github.com/inspr/inspr/pkg/utils"
 )
 
-var kafkaStructMock = sidecars.KafkaConfig{
-	BootstrapServers: "",
-	AutoOffsetReset:  "",
-	KafkaInsprAddr:   "",
-	SidecarImage:     "",
-}
-
 func Test_validAppStructure(t *testing.T) {
 	type args struct {
 		app       meta.App
@@ -1247,15 +1240,23 @@ func Test_validAliases(t *testing.T) {
 	}
 }
 
+var kafkaStructMock = sidecars.KafkaConfig{
+	BootstrapServers: "",
+	AutoOffsetReset:  "",
+	KafkaInsprAddr:   "",
+	SidecarImage:     "",
+}
+
 func TestSelectBrokerFromPriorityList(t *testing.T) {
 	type args struct {
 		brokerList []string
 	}
 	tests := []struct {
-		name   string
-		args   args
-		want   string
-		before func()
+		name    string
+		args    args
+		want    string
+		wantErr bool
+		before  func()
 	}{
 		{
 			name: "Should return the first available broker",
@@ -1267,6 +1268,18 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 				bmm := brokers.GetBrokerMemory()
 				bmm.Create(&kafkaStructMock)
 				bmm.SetDefault(metabrokers.Kafka)
+			},
+		},
+		{
+			name: "Invalid - Brokers in broker list are no supported",
+			args: args{
+				brokerList: []string{"fakeBroker"},
+			},
+			want:    metabrokers.Kafka,
+			wantErr: true,
+			before: func() {
+				bmm := brokers.GetBrokerMemory()
+				bmm.Create(&kafkaStructMock)
 			},
 		},
 		// {
@@ -1299,8 +1312,20 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 			if tt.before != nil {
 				tt.before()
 			}
-			if got, _ := SelectBrokerFromPriorityList(tt.args.brokerList); got != tt.want {
-				t.Errorf("SelectBrokerFromPriorityList() = %v, want %v", got, tt.want)
+			got, err := SelectBrokerFromPriorityList(tt.args.brokerList)
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("SelectBrokerFromPriorityList() error %v", err)
+				return
+			}
+
+			if !tt.wantErr && (got != tt.want) {
+				t.Errorf("SelectBrokerFromPriorityList() got %v, want %v", got, tt.want)
+			}
+
+			if tt.wantErr && (err == nil) {
+				t.Errorf("SelectBrokerFromPriorityList() wanted error but got 'nil'")
+				return
 			}
 			brokers.ResetBrokerMemory()
 		})

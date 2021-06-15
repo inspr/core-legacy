@@ -119,11 +119,11 @@ curl -s https://storage.googleapis.com/inspr-cli/install_cli.sh | bash
 You can check if the installation was successful by typing `inspr -h` on your terminal.  
 Before starting to use the CLI, be sure to check that it is referencing your cluster. First check the current config using: 
 ```bash
-inspr config list
+insprctl config list
 ```
 And if the `serverip` is not the hostname currently being used to access the cluster IP, it must be modified:
 ```bash
-inspr config serverip http://<your_domain>.com
+insprctl config serverip http://<your_domain>.com
 ```
 
 And now you're good to go!  
