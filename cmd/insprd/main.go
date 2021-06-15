@@ -7,7 +7,6 @@ import (
 	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/cmd/insprd/memory/tree"
 	"github.com/inspr/inspr/cmd/insprd/operators"
-	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/api"
 	"github.com/inspr/inspr/pkg/auth"
 	jwtauth "github.com/inspr/inspr/pkg/auth/jwt"
@@ -42,14 +41,6 @@ func main() {
 			panic(err)
 		}
 	}
-	config := &sidecars.KafkaConfig{
-		BootstrapServers: "kafka.default.svc:9092",
-		AutoOffsetReset:  "earliest",
-		KafkaInsprAddr:   "http://localhost",
-		SidecarImage:     "gcr.io/red-inspr/inspr/sidecar/kafka:latest",
-	}
-
-	brokerManager.Create(config)
 
 	api.Run(memoryManager, operator, authenticator, brokerManager)
 }

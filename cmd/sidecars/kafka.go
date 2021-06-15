@@ -17,7 +17,7 @@ type KafkaConfig struct {
 	AutoOffsetReset  string `yaml:"autoOffsetReset"`
 	SidecarImage     string `yaml:"sidecarImage"`
 	// KafkaInsprAddr is the port used in the insprd service of your cluster
-	KafkaInsprAddr string
+	KafkaInsprAddr string `yaml:"sidecarAddr"`
 }
 
 //Broker is a BrokerConfiguration interface method, it returns the broker name for this config type

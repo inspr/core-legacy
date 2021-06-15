@@ -6,7 +6,6 @@ import (
 
 	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/api/models"
-	metabrokers "github.com/inspr/inspr/pkg/meta/brokers"
 	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
@@ -74,8 +73,7 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 		}
 
 		if err = bh.Brokers.Create(
-			metabrokers.BrokerStatus(metabrokers.Kafka),
-			kafkaConfig,
+			&kafkaConfig,
 		); err != nil {
 			rest.ERROR(w, err)
 			return
