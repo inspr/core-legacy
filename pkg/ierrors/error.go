@@ -59,6 +59,26 @@ func (ierror *InsprError) Wrapf(format string, values ...interface{}) {
 	ierror.Wrap(message)
 }
 
+// Unwrap is a ierror function that is capable of handling both the standard golang error
+// as well as the insprError structure, it removes the last wrap done to the err stack
+// and if that was the last error in the stack it will return nil.
+func Unwrap(err error) error {
+	ierr, ok := err.(*InsprError)
+	if !ok {
+		return errors.Unwrap(err)
+	}
+
+	// unwraps the insprError
+	ierr.Err = errors.Unwrap(ierr.Err)
+
+	// if there is no other error inside the inspr stack, returns nil
+	if ierr.Err == nil {
+		return nil
+	}
+
+	return ierr
+}
+
 // MarshalJSON a struct function that allows for operations to be done
 // before or after the json.Marshal procedure
 func (ierror *InsprError) MarshalJSON() ([]byte, error) {

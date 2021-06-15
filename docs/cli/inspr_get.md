@@ -1,4 +1,4 @@
-## inspr get
+## insprctl get
 
 Retrieves the components from a given namespace
 
@@ -7,26 +7,26 @@ Retrieves the components from a given namespace
 get takes a component type (apps | channels | types | nodes | alias) and displays names for those components is a scope)
 
 ```
-inspr get [flags]
+insprctl get [flags]
 ```
 
 ### Examples
 
 ```
   # gets apps from cluster
- inspr get apps --scope <scope>
+ insprctl get apps --scope <scope>
 
   # gets channels from cluster
- inspr get ch --scope <scope>
+ insprctl get ch --scope <scope>
 
   # gets types from cluster
  inspr get t --scope <scope>
 
   # gets nodes from cluster
- inspr get nodes --scope <scope>
+ insprctl get nodes --scope <scope>
 
   # gets alias from cluster
- inspr get alias --scope <scope>
+ insprctl get alias --scope <scope>
 
 ```
 

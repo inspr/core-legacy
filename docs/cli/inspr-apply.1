@@ -8,7 +8,7 @@ inspr\-apply \- Applies changes to the connected cluster
 
 .SH SYNOPSIS
 .PP
-\fBinspr apply [flags]\fP
+\fBinsprctl apply [flags]\fP
 
 
 .SH DESCRIPTION
@@ -33,11 +33,11 @@ It can be called with the flag \-\-dry\-run so the changes that would be made ar
 
 .PP
 \fB\-f\fP, \fB\-\-file\fP=""
-	inspr apply \-f type.yaml
+	insprctl apply \-f type.yaml
 
 .PP
 \fB\-k\fP, \fB\-\-folder\fP=""
-	inspr apply \-k randfolder/
+	insprctl apply \-k randfolder/
 
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
@@ -53,7 +53,7 @@ It can be called with the flag \-\-dry\-run so the changes that would be made ar
 
 .PP
 \fB\-u\fP, \fB\-\-update\fP[=false]
-	inspr apply (\-f FILENAME | \-k DIRECTORY) \-\-update
+	insprctl apply (\-f FILENAME | \-k DIRECTORY) \-\-update
 
 
 .SH EXAMPLE
@@ -62,13 +62,13 @@ It can be called with the flag \-\-dry\-run so the changes that would be made ar
 
 .nf
   # Applies a structure component defined in a file
- inspr apply \-f app.yaml
+ insprctl apply \-f app.yaml
 
   # Applies components defined in a specific folder
- inspr apply \-k randfolder/
+ insprctl apply \-k randfolder/
 
   # Applies a structure component defined in a specific scope
- inspr apply \-f app.yaml \-\-scope app1.app2
+ insprctl apply \-f app.yaml \-\-scope app1.app2
 
 
 .fi

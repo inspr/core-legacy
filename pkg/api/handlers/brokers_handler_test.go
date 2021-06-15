@@ -1,6 +1,10 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
@@ -109,6 +113,106 @@ func TestBrokerHandler_HandleGet(t *testing.T) {
 
 			if res.StatusCode != tt.want {
 				t.Errorf("AppHandler.HandleCreate() = %v, want %v", res.StatusCode, tt.want)
+			}
+		})
+	}
+}
+
+func TestBrokerHandler_KafkaHandler(t *testing.T) {
+	type fields struct {
+		Handler     *Handler
+		bodyContent models.BrokerConfigDI
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		brokerErr error
+		wantCode  int
+	}{
+		{
+			name: "error_reading_body",
+			fields: fields{
+				Handler: &Handler{
+					Brokers: fake.MockBrokerManager(nil),
+				},
+			},
+			brokerErr: nil,
+			wantCode:  http.StatusInternalServerError,
+		},
+		{
+			name: "error_parsing_to_kafka_config",
+			fields: fields{
+				Handler: &Handler{
+					Brokers: fake.MockBrokerManager(nil),
+				},
+				bodyContent: models.BrokerConfigDI{
+					FileContents: []byte{1}, // throws error at the yaml parser
+				},
+			},
+			brokerErr: nil,
+			wantCode:  http.StatusInternalServerError, // yaml pkg error translates to this code
+		},
+		{
+			name: "broker error",
+			fields: fields{
+				Handler: &Handler{
+					Brokers: fake.MockBrokerManager(
+						errors.New("brokerManager_error")),
+				},
+			},
+			wantCode: http.StatusInternalServerError,
+		},
+		{
+			name: "working",
+			fields: fields{
+				Handler: &Handler{
+					Brokers: fake.MockBrokerManager(nil),
+				},
+			},
+			wantCode: http.StatusOK,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bh := &BrokerHandler{
+				Handler: tt.fields.Handler,
+			}
+
+			// creating the test server
+			handlerFunc := bh.KafkaCreateHandler().HTTPHandlerFunc()
+			ts := httptest.NewServer(handlerFunc)
+			defer ts.Close()
+
+			// marshalling the body content of the http post
+			bodyBytes, err := json.Marshal(tt.fields.bodyContent)
+			if err != nil {
+				t.Errorf("when passing a test field arg there was an error")
+			}
+
+			if tt.name == "error_reading_body" {
+				bodyBytes = []byte{1} // throws error when decoding error
+			}
+
+			// request
+			req, err := http.NewRequest(http.MethodPost,
+				ts.URL,
+				bytes.NewBuffer(bodyBytes))
+			if err != nil {
+				t.Errorf("Failed to created request for the test")
+			}
+
+			client := ts.Client()
+			res, err := client.Do(req)
+			if err != nil {
+				t.Log("error making a POST in the httptest server")
+				return
+			}
+			defer res.Body.Close()
+
+			if res.StatusCode != tt.wantCode {
+				t.Errorf("BrokerHandler.KafkaHandler() = %v, want %v",
+					res.StatusCode,
+					tt.wantCode)
 			}
 		})
 	}

@@ -1,4 +1,4 @@
-## inspr delete
+## insprctl delete
 
 Delete component of object type
 
@@ -7,23 +7,23 @@ Delete component of object type
 Delete takes a component type (apps | channels | types | alias) its scope and name, and deletes it from the cluster
 
 ```
-inspr delete [flags]
+insprctl delete [flags]
 ```
 
 ### Examples
 
 ```
   # deletes app
- inspr delete apps <app_name>
+ insprctl delete apps <app_name>
 
   # deletes channel
- inspr delete ch <channel_name>
+ insprctl delete ch <channel_name>
 
   # deletes type
- inspr delete t <type_name>
+ insprctl delete t <type_name>
 
   # deletes alias
- inspr delete al <alias_key>
+ insprctl delete al <alias_key>
 
 ```
 

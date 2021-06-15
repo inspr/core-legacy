@@ -13,11 +13,11 @@ import (
 
 // KafkaConfig configurations used to create the KafkaSidecar
 type KafkaConfig struct {
-	BootstrapServers string
-	AutoOffsetReset  string
-	SidecarImage     string
+	BootstrapServers string `yaml:"bootstrapServers"`
+	AutoOffsetReset  string `yaml:"autoOffsetReset"`
+	SidecarImage     string `yaml:"sidecarImage"`
 	// KafkaInsprAddr is the port used in the insprd service of your cluster
-	KafkaInsprAddr string
+	KafkaInsprAddr string `yaml:"sidecarAddr"`
 }
 
 //Broker is a BrokerConfiguration interface method, it returns the broker name for this config type
@@ -28,6 +28,11 @@ func (kc KafkaConfig) Broker() string {
 // KafkaToDeployment receives a the KafkaConfig variable as a parameter and returns a
 // SidecarFactory function that is used to subscribe to the sidecarFactory
 func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
+	// Handles defaults values in case any of the kafkaConfig variables are empty
+	if config.KafkaInsprAddr == "" {
+		config.KafkaInsprAddr = "http://localhost"
+	}
+
 	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", config.BootstrapServers)
 	return func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) (corev1.Container, []corev1.EnvVar) {
 		envVars, kafkAddr := KafkaSidecarConfig(config, conn)

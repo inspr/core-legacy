@@ -8,7 +8,7 @@ inspr\-delete \- Delete component of object type
 
 .SH SYNOPSIS
 .PP
-\fBinspr delete [flags]\fP
+\fBinsprctl delete [flags]\fP
 
 
 .SH DESCRIPTION
@@ -28,16 +28,16 @@ Delete takes a component type (apps | channels | types | alias) its scope and na
 
 .nf
   # deletes app
- inspr delete apps <app\_name>
+ insprctl delete apps <app\_name>
 
   # deletes channel
- inspr delete ch <channel\_name>
+ insprctl delete ch <channel\_name>
 
   # deletes type
  inspr delete t <type\_name>
 
   # deletes alias
- inspr delete al <alias\_key>
+ insprctl delete al <alias\_key>
 
 
 .fi

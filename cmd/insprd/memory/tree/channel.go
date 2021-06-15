@@ -106,10 +106,14 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel) error {
 		parentApp.Spec.Types[ch.Spec.Type].ConnectedChannels = connectedChannels
 	}
 
+	logger.Debug("channel broker priority list", zap.Any("list", ch.Spec.BrokerPriorityList))
+
 	broker, err := SelectBrokerFromPriorityList(ch.Spec.BrokerPriorityList)
 	if err != nil {
 		return err
 	}
+
+	logger.Debug("channel selected broker", zap.Any("broker", broker))
 	ch.Spec.SelectedBroker = broker
 
 	logger.Debug("adding Channel to dApp",

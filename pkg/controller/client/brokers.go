@@ -24,3 +24,18 @@ func (bc *BrokersClient) Get(ctx context.Context) (*models.BrokersDI, error) {
 
 	return resp, nil
 }
+
+// Create creates a broker into the cluster via insprd
+func (bc *BrokersClient) Create(ctx context.Context, brokerName string, config []byte) error {
+	dataBody := models.BrokerConfigDI{
+		BrokerName:   brokerName,
+		FileContents: config,
+	}
+	err := bc.reqClient.Send(
+		ctx,
+		"/brokers/"+brokerName,
+		http.MethodPost,
+		dataBody,
+		nil)
+	return err
+}

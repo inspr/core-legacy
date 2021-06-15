@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -54,7 +53,7 @@ func Test_getApps(t *testing.T) {
 	fmt.Fprint(tabWriter, "app1\n")
 	fmt.Fprint(tabWriter, "thenewapp\n")
 	tabWriter.Flush()
-	outResp, _ := ioutil.ReadAll(bufResp)
+
 	type args struct {
 		in0 context.Context
 	}
@@ -62,7 +61,7 @@ func Test_getApps(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
-		tab     []byte
+		tab     string
 		handler func(w http.ResponseWriter, r *http.Request)
 	}{
 		{
@@ -71,7 +70,7 @@ func Test_getApps(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: false,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				data := models.AppQueryDI{}
 				decoder := json.NewDecoder(r.Body)
@@ -92,7 +91,7 @@ func Test_getApps(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: true,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.NewError().Message("error").Build())
 			},
@@ -105,12 +104,12 @@ func Test_getApps(t *testing.T) {
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getApps(tt.args.in0)
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getApps() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(got, tt.tab) {
-				t.Errorf("getApps() error = %v, want %v", string(got), string(tt.tab))
+				t.Errorf("getApps() error = %v, want %v", got, tt.tab)
 			}
 		})
 	}
@@ -124,7 +123,7 @@ func Test_getChannels(t *testing.T) {
 	fmt.Fprint(tabWriter, "ch1\n")
 	fmt.Fprint(tabWriter, "ch1app1\n")
 	tabWriter.Flush()
-	outResp, _ := ioutil.ReadAll(bufResp)
+
 	type args struct {
 		in0 context.Context
 	}
@@ -132,7 +131,7 @@ func Test_getChannels(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
-		tab     []byte
+		tab     string
 		handler func(w http.ResponseWriter, r *http.Request)
 	}{
 		{
@@ -141,7 +140,7 @@ func Test_getChannels(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: false,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				data := models.AppQueryDI{}
 				decoder := json.NewDecoder(r.Body)
@@ -162,7 +161,7 @@ func Test_getChannels(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: true,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.NewError().Message("error").Build())
 			},
@@ -175,12 +174,12 @@ func Test_getChannels(t *testing.T) {
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getChannels(tt.args.in0)
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getChannels() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(got, tt.tab) {
-				t.Errorf("getChannels() error = %v, want %v", string(got), string(tt.tab))
+				t.Errorf("getChannels() error = %v, want %v", got, tt.tab)
 			}
 		})
 	}
@@ -193,7 +192,7 @@ func Test_gettypes(t *testing.T) {
 	fmt.Fprint(tabWriter, "NAME\n")
 	fmt.Fprint(tabWriter, "ct1\n")
 	tabWriter.Flush()
-	outResp, _ := ioutil.ReadAll(bufResp)
+
 	type args struct {
 		in0 context.Context
 	}
@@ -201,7 +200,7 @@ func Test_gettypes(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
-		tab     []byte
+		tab     string
 		handler func(w http.ResponseWriter, r *http.Request)
 	}{
 		{
@@ -210,7 +209,7 @@ func Test_gettypes(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: false,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				data := models.AppQueryDI{}
 				decoder := json.NewDecoder(r.Body)
@@ -231,7 +230,7 @@ func Test_gettypes(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: true,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.NewError().Message("error").Build())
 			},
@@ -244,12 +243,12 @@ func Test_gettypes(t *testing.T) {
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getTypes(tt.args.in0)
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("gettypes() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(got, tt.tab) {
-				t.Errorf("gettypes() error = %v, want %v", string(got), string(tt.tab))
+				t.Errorf("gettypes() error = %v, want %v", got, tt.tab)
 			}
 		})
 	}
@@ -263,7 +262,7 @@ func Test_getNodes(t *testing.T) {
 	fmt.Fprint(tabWriter, "NAME\n")
 	fmt.Fprint(tabWriter, "thenewapp\n")
 	tabWriter.Flush()
-	outResp, _ := ioutil.ReadAll(bufResp)
+
 	type args struct {
 		in0 context.Context
 	}
@@ -271,7 +270,7 @@ func Test_getNodes(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
-		tab     []byte
+		tab     string
 		handler func(w http.ResponseWriter, r *http.Request)
 	}{
 		{
@@ -280,7 +279,7 @@ func Test_getNodes(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: false,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				data := models.AppQueryDI{}
 				decoder := json.NewDecoder(r.Body)
@@ -301,7 +300,7 @@ func Test_getNodes(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: true,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.NewError().Message("error").Build())
 			},
@@ -314,12 +313,12 @@ func Test_getNodes(t *testing.T) {
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getNodes(tt.args.in0)
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getNodes() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(got, tt.tab) {
-				t.Errorf("getNodes() error = %v, want %v", string(got), string(tt.tab))
+				t.Errorf("getNodes() error = %v, want %v", got, tt.tab)
 			}
 		})
 	}
@@ -578,22 +577,20 @@ func Test_printTab(t *testing.T) {
 	fmt.Fprint(tabWriter, "line\n")
 	tabWriter.Flush()
 
-	outResp, _ := ioutil.ReadAll(bufResp)
-
 	type args struct {
 		lines *[]string
 	}
 	tests := []struct {
 		name string
 		args args
-		tab  []byte
+		tab  string
 	}{
 		{
 			name: "printtab test",
 			args: args{
 				lines: &[]string{"line\n"},
 			},
-			tab: outResp,
+			tab: bufResp.String(),
 		},
 	}
 	for _, tt := range tests {
@@ -601,10 +598,10 @@ func Test_printTab(t *testing.T) {
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			printTab(tt.args.lines)
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 
 			if !reflect.DeepEqual(got, tt.tab) {
-				t.Errorf("printTab() error = %v, want %v", string(got), string(tt.tab))
+				t.Errorf("printTab() error = %v, want %v", got, tt.tab)
 			}
 		})
 	}
@@ -647,7 +644,7 @@ func Test_getAlias(t *testing.T) {
 	fmt.Fprint(tabWriter, "NAME\n")
 	fmt.Fprint(tabWriter, "alias.name\n")
 	tabWriter.Flush()
-	outResp, _ := ioutil.ReadAll(bufResp)
+
 	type args struct {
 		in0 context.Context
 	}
@@ -655,7 +652,7 @@ func Test_getAlias(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
-		tab     []byte
+		tab     string
 		handler func(w http.ResponseWriter, r *http.Request)
 	}{
 		{
@@ -664,7 +661,7 @@ func Test_getAlias(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: false,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				data := models.AppQueryDI{}
 				decoder := json.NewDecoder(r.Body)
@@ -685,7 +682,7 @@ func Test_getAlias(t *testing.T) {
 				in0: context.Background(),
 			},
 			wantErr: true,
-			tab:     outResp,
+			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.NewError().Message("error").Build())
 			},
@@ -698,12 +695,12 @@ func Test_getAlias(t *testing.T) {
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getAlias(tt.args.in0)
-			got, _ := ioutil.ReadAll(buf)
+			got := buf.String()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getAlias() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(got, tt.tab) {
-				t.Errorf("getAlias() error = %v, want %v", string(got), string(tt.tab))
+				t.Errorf("getAlias() error = %v, want %v", got, tt.tab)
 			}
 		})
 	}

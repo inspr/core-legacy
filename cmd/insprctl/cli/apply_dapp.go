@@ -6,10 +6,11 @@ import (
 
 	"github.com/inspr/inspr/pkg/cmd"
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	utils "github.com/inspr/inspr/pkg/meta/utils/parser"
+	"gopkg.in/yaml.v2"
 )
 
 // NewApplyApp receives a controller AppInterface and calls it's methods
@@ -17,13 +18,20 @@ import (
 func NewApplyApp() RunMethod {
 	return func(data []byte, out io.Writer) error {
 		c := cliutils.GetCliClient().Apps()
-		// unmarshal into an app
-		app, err := utils.YamlToApp(data)
-		if err != nil {
-			return err
+		var app meta.App = meta.App{
+			Meta: meta.Metadata{Annotations: make(map[string]string)},
 		}
 
-		err = recursiveSchemaInjection(app)
+		// unmarshal into an app
+
+		if err := yaml.Unmarshal(data, &app); err != nil {
+			return err
+		}
+		if app.Meta.Name == "" {
+			return ierrors.NewError().Message("dapp without name").Build()
+		}
+
+		err := recursiveSchemaInjection(&app)
 		if err != nil {
 			return err
 		}
@@ -42,9 +50,9 @@ func NewApplyApp() RunMethod {
 			if errQuery != nil {
 				return errQuery
 			}
-			log, err = c.Update(context.Background(), updateQuery, app, flagDryRun)
+			log, err = c.Update(context.Background(), updateQuery, &app, flagDryRun)
 		} else {
-			log, err = c.Create(context.Background(), scope, app, flagDryRun)
+			log, err = c.Create(context.Background(), scope, &app, flagDryRun)
 		}
 
 		if err != nil {

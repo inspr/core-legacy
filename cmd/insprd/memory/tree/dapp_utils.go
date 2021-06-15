@@ -14,10 +14,18 @@ import (
 // SelectBrokerFromPriorityList takes a broker priority list and returns the first
 // broker that is available
 func SelectBrokerFromPriorityList(brokerList []string) (string, error) {
+	logger.Info("selecting broker from priority list")
 	bmm := brokers.GetBrokerMemory()
 	availableBrokers, err := bmm.GetAll()
 	if err != nil {
 		return "", err
+	}
+
+	logger.Debug("available brokers", zap.Any("brokers", availableBrokers))
+	if len(availableBrokers) == 0 {
+		return "", ierrors.NewError().
+			Message("there are no brokers installed in insprd").
+			Build()
 	}
 
 	for _, broker := range brokerList {

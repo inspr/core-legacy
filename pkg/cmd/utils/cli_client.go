@@ -36,7 +36,7 @@ func GetCliOutput() io.Writer {
 	return defaults.out
 }
 
-//SetDefaultClient creates cli's controller client from viper's configured serverIp
+//setGlobalClient creates cli's controller client from viper's configured serverIp
 func setGlobalClient() {
 	url := GetConfiguredServerIP()
 	SetClient(url)

@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/inspr/inspr/pkg/api/models"
 	"github.com/inspr/inspr/pkg/ierrors"
+	"github.com/inspr/inspr/pkg/rest"
 	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/inspr/inspr/pkg/utils"
 )
@@ -55,7 +57,7 @@ func TestBrokersClient_Get(t *testing.T) {
 				}
 
 				if r.URL.Path != "/brokers" {
-					t.Errorf("path is not channels")
+					t.Errorf("path is not brokers")
 				}
 
 				if r.Method != http.MethodGet {
@@ -81,6 +83,81 @@ func TestBrokersClient_Get(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("BrokersClient.Get() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBrokersClient_Create(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		brokerName string
+		config     []byte
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "send_request_to_route",
+			args: args{
+				ctx:        context.Background(),
+				brokerName: "kafka",
+				config:     []byte{},
+			},
+			want: "",
+		},
+		{
+			name: "failed_to_send_request_to_route",
+			args: args{
+				ctx:        context.Background(),
+				brokerName: "kafka",
+				config:     []byte{},
+			},
+			want: "error_on_request",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			handler := func(w http.ResponseWriter, r *http.Request) {
+				if tt.want != "" {
+					w.WriteHeader(http.StatusBadRequest)
+					rest.ERROR(w, ierrors.NewError().
+						Message(tt.want).
+						BadRequest().
+						Build())
+					return
+				}
+
+				if r.URL.Path != "/brokers/"+tt.args.brokerName {
+					t.Errorf("path is not brokers/" + tt.args.brokerName)
+				}
+
+				if r.Method != http.MethodPost {
+					t.Errorf("method is not " + http.MethodPost)
+				}
+				rest.JSON(w, http.StatusOK, nil)
+			}
+
+			s := httptest.NewServer(http.HandlerFunc(handler))
+			defer s.Close()
+
+			bc := &BrokersClient{
+				reqClient: request.NewJSONClient(s.URL),
+			}
+
+			err := bc.Create(tt.args.ctx, tt.args.brokerName, tt.args.config)
+
+			fmt.Println(err, tt.want)
+
+			var got string
+			if err != nil {
+				got = err.Error()
+			}
+
+			if got != tt.want {
+				t.Errorf("BrokersClient.Create() error = %v, want %v", err, tt.want)
 			}
 		})
 	}
