@@ -1,5 +1,5 @@
-kind: type
 apiVersion: v1
+kind: type
 
 meta:
   name: pptype1

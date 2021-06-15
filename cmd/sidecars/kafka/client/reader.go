@@ -26,22 +26,32 @@ type Reader struct {
 
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
+	logger.Info("creating new kafka reader")
 	var reader Reader
 	reader.kafkaEnv = GetKafkaEnvironment()
 	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannelsData())
 
+	logger.Debug("getting resolved channels list")
 	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannelsData())
 	if len(resolvedChList) == 0 {
+		logger.Error("invalid resolved channel list")
 		return nil, ierrors.NewError().Message("INSPR_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
 
 	reader.consumers = make(map[string]Consumer)
 
+	logger.Debug("creating new consumer for each channel")
 	for idx, ch := range channelsList {
 		if err := reader.newSingleChannelConsumer(ch, resolvedChList[idx]); err != nil {
+			logger.Error("unable to create consumer for channel",
+				zap.String("channel", ch),
+				zap.String("error", err.Error()))
+
 			return nil, err
 		}
 	}
+
+	logger.Debug("new reader created!")
 	return &reader, nil
 }
 
@@ -131,6 +141,10 @@ func (reader *Reader) Close() error {
 
 //newSingleChannelConsumer creates a consumer for a single Kafka channel on the reader's consumers map.
 func (reader *Reader) newSingleChannelConsumer(channel, resolved string) error {
+	logger.Debug("creating single consumer with configs",
+		zap.String("bootstrap", reader.kafkaEnv.KafkaBootstrapServers),
+		zap.String("groupid", globalEnv.GetInsprAppID()),
+		zap.String("autooff", reader.kafkaEnv.KafkaAutoOffsetReset))
 
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  reader.kafkaEnv.KafkaBootstrapServers,
@@ -142,9 +156,13 @@ func (reader *Reader) newSingleChannelConsumer(channel, resolved string) error {
 		return ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
 	}
 
+	logger.Debug("subscribing new consumer")
+
 	if err := newConsumer.Subscribe(resolved, nil); err != nil {
 		return err
 	}
+
+	logger.Debug("done subscribing consumer")
 	reader.consumers[channel] = newConsumer
 	return nil
 }

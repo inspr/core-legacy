@@ -41,7 +41,7 @@ secretRepository: gcr.io/red-inspr/uidp/redis/secret
 secret:
   privateKeyName: redisprivatekey
   adminPassword: "123456"
-  adminToken: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjM2NzE5MDIsInBheWxvYWQiOnsidWlkIjoiIiwicGVybWlzc2lvbnMiOnsiIjpbImNyZWF0ZTp0b2tlbiJdfSwicmVmcmVzaCI6bnVsbCwicmVmcmVzaHVybCI6IiJ9fQ.rcTaL8QfU7ZDq6wvmoeQm5aojTxdkgaCgJh3wOx3NNpD-mgUv4r4neFNorze6QN4OYwbmoHe-1GKlUvjeVx8nw
+  adminToken: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjM3ODM3NDEsInBheWxvYWQiOnsidWlkIjoiIiwicGVybWlzc2lvbnMiOnsiIjpbImNyZWF0ZTp0b2tlbiJdfSwicmVmcmVzaCI6bnVsbCwicmVmcmVzaHVybCI6IiJ9fQ.dbAWoTSBJco9BFuagnoLNPyYzDg7gryHkIO2rmdKqFxzLsRT1UOQ5lWxf9xYN-IB_QkbFngqvBQevJYKqsR6vg
   # set this admin token from a token that contains full power over the cluster
 
 statefulset:

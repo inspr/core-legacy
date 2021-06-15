@@ -1,5 +1,5 @@
-kind: dapp
 apiVersion: v1
+kind: dapp
 
 meta:
   name: pong
@@ -7,6 +7,7 @@ meta:
 spec:
   node:
     spec:
+      replicas: 1
       image: gcr.io/red-inspr/inspr/example/pong:latest
   boundary:
     input:

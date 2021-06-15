@@ -1,5 +1,5 @@
-kind: dapp
 apiVersion: v1
+kind: dapp
 
 meta:
   name: pptable
