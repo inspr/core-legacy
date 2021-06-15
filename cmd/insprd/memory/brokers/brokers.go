@@ -68,6 +68,9 @@ func (bmm *BrokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 	}
 
 	mem.Available[broker] = config
+	if mem.Default == "" {
+		mem.Default = broker
+	}
 	return nil
 }
 
@@ -84,7 +87,9 @@ func (bmm *BrokerMemoryManager) SetDefault(broker string) error {
 		return ierrors.NewError().Message("broker %s is not configured on memory", broker).Build()
 	}
 
-	mem.Default = (broker)
+	logger.Info("SETTING BROKER TO DEFAULT BROKER", zap.String("BROKER", broker))
+
+	mem.Default = broker
 	return nil
 }
 

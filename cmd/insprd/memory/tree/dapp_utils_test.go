@@ -1282,18 +1282,6 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 				bmm.Create(&kafkaStructMock)
 			},
 		},
-		{
-			name: "Invalid - Broker in broker list not installed",
-			args: args{
-				brokerList: []string{metabrokers.Kafka},
-			},
-			want:    metabrokers.Kafka,
-			wantErr: true,
-			before: func() {
-				bmm := brokers.GetBrokerMemory()
-				bmm.Create(&kafkaStructMock)
-			},
-		},
 		// {
 		// 	name: "Should return the default broker",
 		// 	args: args{
