@@ -2,7 +2,18 @@ package brokers
 
 import (
 	"github.com/inspr/inspr/pkg/meta/brokers"
+	"go.uber.org/zap"
 )
+
+var logger *zap.Logger
+
+// init is called after all the variable declarations in the package have evaluated
+// their initializers, and those are evaluated only after all the imported packages
+// have been initialized
+func init() {
+	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "broker-memory")))
+	// logger = zap.NewNop()
+}
 
 // BrokerManager implements broker's Manager interface,
 // allows for management of the system's message brokers
