@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/cmd/insprd/memory"
+	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
+	"github.com/inspr/inspr/cmd/sidecars"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
@@ -145,6 +147,10 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 }
 
 func TestChannelMemoryManager_Create(t *testing.T) {
+	kafkaConfig := sidecars.KafkaConfig{}
+	bmm := brokers.GetBrokerMemory()
+	bmm.Create(&kafkaConfig)
+
 	type fields struct {
 		root   *meta.App
 		appErr error

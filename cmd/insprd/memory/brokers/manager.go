@@ -11,7 +11,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "broker-memory")))
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "broker-memory")))
 	// logger = zap.NewNop()
 }
 
