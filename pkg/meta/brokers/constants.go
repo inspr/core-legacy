@@ -5,7 +5,7 @@ const (
 	Kafka string = "kafka"
 )
 
-// List of supported brokers
+// SupportedBrokers is a list of all supported brokers
 var SupportedBrokers = []string{
 	Kafka,
 }
