@@ -51,7 +51,7 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("dApp", data.App.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -150,7 +150,7 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 		if err != nil {
 			logger.Error("unable to update dApp",
 				zap.String("dApp", data.App.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()

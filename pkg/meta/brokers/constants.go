@@ -1,6 +1,6 @@
 package brokers
 
-// All possible broker names on Inspr
+// All possible broker names supported by Inspr
 const (
 	Kafka string = "kafka"
 )

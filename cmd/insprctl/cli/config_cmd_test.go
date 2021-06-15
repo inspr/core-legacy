@@ -10,7 +10,6 @@ import (
 
 	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
 
@@ -72,11 +71,11 @@ func Test_doConfigChange(t *testing.T) {
 	cliutils.ReadDefaultConfig()
 
 	bufResp := bytes.NewBufferString("")
-	fmt.Fprintf(bufResp, "Success: inspr config [%v] changed to '%v'\n", "key_example", "new_value")
+	fmt.Fprintf(bufResp, "Success: insprctl config [%v] changed to '%v'\n", "key_example", "new_value")
 	outResp, _ := ioutil.ReadAll(bufResp)
 
 	bufResp2 := bytes.NewBufferString("")
-	fmt.Fprintf(bufResp2, "error: key inserted does not exist in the inspr config\n")
+	fmt.Fprintf(bufResp2, "error: key inserted does not exist in the insprctl config\n")
 	cliutils.SetOutput(bufResp2)
 	printExistingKeys()
 	outResp2, _ := ioutil.ReadAll(bufResp2)
@@ -167,15 +166,4 @@ func Test_doListConfig(t *testing.T) {
 
 		})
 	}
-}
-
-func mockViper() {
-	viper.SetConfigFile("test_config_cmd")
-	viper.SetConfigType("yaml")
-	viper.SetDefault("key_example", "value_example")
-	viper.WriteConfig()
-}
-
-func deleteMockViper() {
-	os.Remove("test_config_cmd")
 }

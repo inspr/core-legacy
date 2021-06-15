@@ -115,7 +115,7 @@ func Test_builder_WithExample(t *testing.T) {
 				command: "mock_command",
 			},
 			want: &builder{cmd: cobra.Command{
-				Example: fmt.Sprintf("  # %s\n inspr %s\n", "mock_comment", "mock_command"),
+				Example: fmt.Sprintf("  # %s\n insprctl %s\n", "mock_comment", "mock_command"),
 			}},
 		},
 	}
@@ -134,7 +134,7 @@ func Test_builder_WithExamples(t *testing.T) {
 			WithExample("comment1", "run --flag1").
 			WithExample("comment2", "run --flag2").
 			NoArgs(nil)
-		expected := "  # comment1\n inspr run --flag1\n\n  # comment2\n inspr run --flag2\n"
+		expected := "  # comment1\n insprctl run --flag1\n\n  # comment2\n insprctl run --flag2\n"
 
 		if !reflect.DeepEqual(cmd.Example, expected) {
 			t.Errorf(

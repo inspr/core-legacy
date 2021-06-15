@@ -45,7 +45,7 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("channel", data.Channel.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -107,7 +107,7 @@ func (ch *ChannelHandler) HandleGet() rest.Handler {
 		if err != nil {
 			logger.Error("unable to get Channel",
 				zap.String("channel", data.ChName),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -144,7 +144,7 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 		if err != nil {
 			logger.Error("unable to update Channel",
 				zap.String("channel", data.Channel.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -206,7 +206,7 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 		if err != nil {
 			logger.Error("unable to delete Channel",
 				zap.String("channel", data.ChName),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()

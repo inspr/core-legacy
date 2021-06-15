@@ -12,10 +12,10 @@ import (
 	"github.com/inspr/inspr/pkg/ierrors"
 )
 
-// NewConfigChangeCmd - responsible for changing the values of the inspr's viper config
+// NewConfigChangeCmd - responsible for changing the values of the insprctl's viper config
 func NewConfigChangeCmd() *cobra.Command {
 	return cmd.NewCmd("config <key> <value>").
-		WithDescription("Change the values stored in the inspr config").
+		WithDescription("Change the values stored in the insprctl config").
 		WithExample("Changing IP config", "config serverip http://127.0.0.1:8080").
 		WithExample("Changing scope config", "config scope app1.app2").
 		AddSubCommand(NewListConfig()).
@@ -39,7 +39,7 @@ func doConfigChange(_ context.Context, args []string) error {
 
 	// key doesn't exist
 	if !cliutils.ExistsKey(key) {
-		errMsg := "error: key inserted does not exist in the inspr config"
+		errMsg := "error: key inserted does not exist in the insprctl config"
 		fmt.Fprintln(out, errMsg)
 		printExistingKeys()
 		return ierrors.NewError().Message(errMsg).Build()
@@ -50,7 +50,7 @@ func doConfigChange(_ context.Context, args []string) error {
 		return err
 	}
 
-	fmt.Fprintf(out, "Success: inspr config [%v] changed to '%v'\n", key, value)
+	fmt.Fprintf(out, "Success: insprctl config [%v] changed to '%v'\n", key, value)
 	return nil
 }
 

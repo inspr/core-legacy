@@ -32,10 +32,10 @@ func GetPublicKey() (*rsa.PublicKey, error) {
 
 	parsedCryptoKey := parsed.(ssh.CryptoPublicKey)
 
-	// Then, we can call CryptoPublicKey() to get the actual crypto.PublicKey
+	// Then, CryptoPublicKey() is called to get the actual crypto.PublicKey
 	pubCrypto := parsedCryptoKey.CryptoPublicKey()
 
-	// Finally, we can convert back to an *rsa.PublicKey
+	// Finally, the result is converted back to a *rsa.PublicKey
 	pub := pubCrypto.(*rsa.PublicKey)
 	return pub, nil
 }

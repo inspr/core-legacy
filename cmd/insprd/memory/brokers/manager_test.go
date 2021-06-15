@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/inspr/inspr/pkg/meta/brokers"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
 )
 
 func TestGetBrokerMemory(t *testing.T) {
@@ -18,7 +17,7 @@ func TestGetBrokerMemory(t *testing.T) {
 			name: "GetManager from nil pointer",
 			want: &BrokerMemoryManager{
 				broker: &brokers.Brokers{
-					Available: make(metautils.StrSet),
+					Available: make(brokers.BrokerStatusArray),
 				},
 				factory: &AbstractBrokerFactory{},
 			},
@@ -30,7 +29,7 @@ func TestGetBrokerMemory(t *testing.T) {
 			name: "GetManager from intanced pointer",
 			want: &BrokerMemoryManager{
 				broker: &brokers.Brokers{
-					Available: make(metautils.StrSet),
+					Available: make(brokers.BrokerStatusArray),
 				},
 				factory: &AbstractBrokerFactory{},
 			},

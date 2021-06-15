@@ -49,7 +49,7 @@ func TestWriter_WriteMessage(t *testing.T) {
 	mProd, _ := newMockWriter()
 	defer mProd.Close()
 	createMockEnv()
-	os.Setenv("INSPR_APP_CTX", "")
+	os.Setenv("INSPR_APP_SCOPE", "")
 	environment.RefreshEnviromentVariables()
 	defer deleteMockEnv()
 	type fields struct {
@@ -104,7 +104,7 @@ func TestWriter_produceMessage(t *testing.T) {
 	mProd, _ := newMockWriter()
 	defer mProd.Close()
 	createMockEnv()
-	os.Setenv("INSPR_APP_CTX", "")
+	os.Setenv("INSPR_APP_SCOPE", "")
 	environment.RefreshEnviromentVariables()
 	defer deleteMockEnv()
 	type fields struct {

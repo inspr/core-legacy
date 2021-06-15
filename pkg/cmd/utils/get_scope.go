@@ -6,8 +6,8 @@ import (
 	"github.com/inspr/inspr/pkg/meta/utils"
 )
 
-//GetScope retreives a path for use as base on insprd request.
-//Takes into consideration viper config and scope flag.
+// GetScope retreives the path to be used as base scope for an Insprd request.
+// Takes into consideration viper config and scope flag.
 func GetScope() (string, error) {
 	defaultScope := GetConfiguredScope()
 	scope := defaultScope
