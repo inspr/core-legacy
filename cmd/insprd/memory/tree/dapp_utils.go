@@ -6,6 +6,7 @@ import (
 	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
 	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/inspr/inspr/pkg/meta"
+	metabrokers "github.com/inspr/inspr/pkg/meta/brokers"
 	metautils "github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
@@ -14,10 +15,25 @@ import (
 // SelectBrokerFromPriorityList takes a broker priority list and returns the first
 // broker that is available
 func SelectBrokerFromPriorityList(brokerList []string) (string, error) {
+	logger.Info("selecting broker from priority list")
 	bmm := brokers.GetBrokerMemory()
 	availableBrokers, err := bmm.GetAll()
 	if err != nil {
 		return "", err
+	}
+
+	logger.Debug("available brokers",
+		zap.Any("brokers", availableBrokers))
+	if len(availableBrokers) == 0 {
+		broker, err := getFirstSupportedBroker(brokerList)
+		if err != nil {
+			return "", err
+		}
+
+		err = bmm.SetDefault(broker)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	for _, broker := range brokerList {
@@ -34,6 +50,18 @@ func SelectBrokerFromPriorityList(brokerList []string) (string, error) {
 	logger.Debug("selected the default broker: ", zap.String("broker", def))
 
 	return def, nil
+}
+
+func getFirstSupportedBroker(brokerList []string) (string, error) {
+	logger.Debug("supported brokers", zap.Any("list", metabrokers.SupportedBrokers))
+	for _, broker := range brokerList {
+		if utils.Includes(metabrokers.SupportedBrokers, broker) {
+			logger.Debug("selected broker: ", zap.String("broker", broker))
+			return broker, nil
+		}
+	}
+
+	return "", ierrors.NewError().Message("no brokers in broker list are supported").Build()
 }
 
 // Auxiliar dApp  functions

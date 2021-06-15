@@ -4,3 +4,8 @@ package brokers
 const (
 	Kafka string = "kafka"
 )
+
+// List of supported brokers
+var SupportedBrokers = []string{
+	Kafka,
+}
