@@ -144,7 +144,7 @@ func (reader *Reader) newSingleChannelConsumer(channel, resolved string) error {
 	logger.Debug("creating single consumer with configs",
 		zap.String("bootstrap", reader.kafkaEnv.KafkaBootstrapServers),
 		zap.String("groupid", globalEnv.GetInsprAppID()),
-		zap.String("autooff", reader.kafkaEnv.KafkaAutoOffsetReset))
+		zap.String("autooffset", reader.kafkaEnv.KafkaAutoOffsetReset))
 
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  reader.kafkaEnv.KafkaBootstrapServers,
@@ -156,7 +156,8 @@ func (reader *Reader) newSingleChannelConsumer(channel, resolved string) error {
 		return ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
 	}
 
-	logger.Debug("subscribing new consumer")
+	logger.Debug("subscribing new consumer",
+		zap.String("resolved channel", resolved))
 
 	if err := newConsumer.Subscribe(resolved, nil); err != nil {
 		return err
