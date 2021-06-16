@@ -157,11 +157,11 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 		}
 
 		inputEnv := input.Map(func(boundary string) string {
-			return no.returnChannelBroker(resolves[boundary])
+			return no.returnChannelBroker(boundary, resolves[boundary])
 		})
 
 		outputEnv := output.Map(func(boundary string) string {
-			return no.returnChannelBroker(resolves[boundary])
+			return no.returnChannelBroker(boundary, resolves[boundary])
 		})
 
 		env := utils.EnvironmentMap{
@@ -192,16 +192,16 @@ func (no *NodeOperator) withLBSidecarImage(app *meta.App) k8s.ContainerOption {
 	}
 }
 
-func (no *NodeOperator) returnChannelBroker(pathToChannel string) string {
-	scope, chName, err := metautils.RemoveLastPartInScope(pathToChannel)
+func (no *NodeOperator) returnChannelBroker(channel, pathToResolvedChannel string) string {
+	scope, chName, err := metautils.RemoveLastPartInScope(pathToResolvedChannel)
 	if err != nil {
 		return ""
 	}
-	channel, err := no.memory.Channels().Get(scope, chName)
+	resolvedCh, err := no.memory.Channels().Get(scope, chName)
 	if err != nil {
 		return ""
 	}
-	return fmt.Sprintf("%s_%s", chName, channel.Spec.SelectedBroker)
+	return fmt.Sprintf("%s_%s", channel, resolvedCh.Spec.SelectedBroker)
 }
 
 func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
