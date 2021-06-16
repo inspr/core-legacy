@@ -9,8 +9,6 @@ spec:
     spec:
       replicas: 1
       image: gcr.io/red-inspr/inspr/example/ping:latest
-      environment:
-        SUPER_SECRET_0001: "false"
   boundary:
     input:
       - pinginput
