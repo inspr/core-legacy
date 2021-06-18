@@ -2,8 +2,8 @@
 # Changelog
 
 ### #77 Story CORE-463 | Create documentation for Auth
-- doc:
-    - authentication
+- features:
+    - authentication doc
 ---
 
 ### #71 Story CORE-462 | Update old docs
