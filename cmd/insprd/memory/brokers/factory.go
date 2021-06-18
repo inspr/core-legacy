@@ -1,8 +1,8 @@
 package brokers
 
 import (
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 type brokerFactory map[string]models.SidecarFactory

@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 func TestAbstractBrokerFactory_Subscribe(t *testing.T) {

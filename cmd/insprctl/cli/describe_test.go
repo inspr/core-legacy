@@ -12,13 +12,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/cmd"
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/rest"
 	"github.com/spf13/cobra"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/cmd"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 func restartScopeFlag() {

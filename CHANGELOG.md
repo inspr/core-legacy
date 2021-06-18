@@ -1,6 +1,10 @@
 
 # Changelog
 
+### #76 Tech CORE-360 | vanity url
+- fix:
+  - changed the `module` name in the `go mod` of the project, that allows the vanity url in the productions cluster to obtain the package properly
+---
 ### #65 Story CORE-401 | CLI create new broker command
 - features:
     - developed the inspr cli subcommand for reading a yaml file and trying to create a broker in the cluster

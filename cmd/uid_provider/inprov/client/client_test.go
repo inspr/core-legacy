@@ -8,10 +8,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/uid_provider/api/models"
-	"github.com/inspr/inspr/cmd/uid_provider/client"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/cmd/uid_provider/api/models"
+	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // Response Codes

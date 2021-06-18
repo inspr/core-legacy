@@ -4,13 +4,13 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	kafkaop "github.com/inspr/inspr/cmd/insprd/operators/kafka"
-	"github.com/inspr/inspr/cmd/sidecars"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	metabrokers "github.com/inspr/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	kafkaop "inspr.dev/inspr/cmd/insprd/operators/kafka"
+	"inspr.dev/inspr/cmd/sidecars"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	metabrokers "inspr.dev/inspr/pkg/meta/brokers"
 )
 
 //GenOp is a general channel operator for dinamically selecting required operator

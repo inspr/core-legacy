@@ -1,8 +1,8 @@
 package fake
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // Operator mock

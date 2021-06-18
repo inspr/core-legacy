@@ -8,9 +8,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/uid_provider/client"
-	"github.com/inspr/inspr/pkg/auth"
 	"gopkg.in/yaml.v2"
+	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/auth"
 )
 
 type mockCl struct {

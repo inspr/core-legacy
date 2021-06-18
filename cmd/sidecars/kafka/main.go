@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/meta/brokers"
+	kafkasc "inspr.dev/inspr/cmd/sidecars/kafka/client"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/meta/brokers"
 
-	"github.com/inspr/inspr/pkg/sidecars/models"
-	sidecarserv "github.com/inspr/inspr/pkg/sidecars/server"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/sidecars/models"
+	sidecarserv "inspr.dev/inspr/pkg/sidecars/server"
 )
 
 var logger *zap.Logger

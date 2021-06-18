@@ -13,7 +13,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/auth"
 )
 
 const bitSize = 512

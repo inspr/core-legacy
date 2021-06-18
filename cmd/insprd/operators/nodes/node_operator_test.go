@@ -6,10 +6,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	authmock "github.com/inspr/inspr/pkg/auth/mocks"
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	authmock "inspr.dev/inspr/pkg/auth/mocks"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"k8s.io/client-go/kubernetes"

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/cmd/utils"
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
-	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/spf13/cobra"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/cmd/utils"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // NewClusterCommand creates cluster command for Inspr CLI

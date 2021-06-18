@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/ierrors"
 	"gopkg.in/yaml.v2"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 type insprConfiguration struct {

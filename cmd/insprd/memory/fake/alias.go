@@ -1,8 +1,8 @@
 package fake
 
 import (
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // Alias - mocks the implementation of the AppMemory interface methods

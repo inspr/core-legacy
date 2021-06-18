@@ -13,10 +13,10 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 var redisServer *miniredis.Miniredis

@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/cmd/utils"
 	"gopkg.in/yaml.v2"
+	"inspr.dev/inspr/pkg/cmd/utils"
 )
 
 // TestNewInsprCommand is mainly for improving test coverage,

@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/inspr/inspr/cmd/uid_provider/client"
-	"github.com/inspr/inspr/pkg/cmd"
-	build "github.com/inspr/inspr/pkg/cmd"
+	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/cmd"
+	build "inspr.dev/inspr/pkg/cmd"
 )
 
 var cl client.UIDClient
