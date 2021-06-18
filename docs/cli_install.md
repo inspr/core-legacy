@@ -13,7 +13,7 @@ curl -s https://storage.googleapis.com/inspr-cli/install_cli.sh | bash
 To uninstall Inspr's CLI :
 
 ```
-sudo rm /usr/local/bin/inspr
+sudo rm /usr/local/bin/insprctl
 ```
 
 ## Other OS
@@ -22,7 +22,7 @@ To get other Inspr CLI versions, download the binary file from the GitHub reposi
 
 ## After installing
 
-You can check if the installation was successful by typing `inspr -h` on your terminal.
+You can check if the installation was successful by typing `insprctl -h` on your terminal.
 
 It's important to remember that if you already have a server with all the necessary helm configuration, you **have** to set the Inspr's **serverip** to your cluster.
 

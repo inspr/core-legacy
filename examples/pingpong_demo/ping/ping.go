@@ -7,6 +7,7 @@ import (
 	"log"
 
 	dappclient "github.com/inspr/inspr/pkg/client"
+	"github.com/inspr/inspr/pkg/sidecars/models"
 	"golang.org/x/net/context"
 )
 
@@ -16,19 +17,20 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	sentMsg := "ping"
+	sentMsg := "Ping!"
 	if err := client.WriteMessage(ctx, "pingoutput", sentMsg); err != nil {
-		fmt.Println(err)
+		fmt.Printf("an error occurred: %v", err)
 		return
 	}
-	client.HandleChannel("pinginput", func(_ context.Context, r io.Reader) error {
-		decoder := json.NewDecoder(r)
-		var ret struct{ Message string }
-		err := decoder.Decode(&ret.Message)
+	client.HandleChannel("pinginput", func(ctx context.Context, body io.Reader) error {
+		var ret models.BrokerMessage
 
-		if err != nil {
+		decoder := json.NewDecoder(body)
+		if err := decoder.Decode(&ret); err != nil {
 			return err
 		}
+
+		fmt.Println(ret)
 
 		if err := client.WriteMessage(ctx, "pingoutput", sentMsg); err != nil {
 			fmt.Println(err)

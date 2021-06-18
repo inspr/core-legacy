@@ -58,7 +58,7 @@ func (s *Server) Run(ctx context.Context) error {
 	go func() {
 		if err := readServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
-			logger.Error("an error ocurred in LB Sidecar read server",
+			logger.Error("an error occurred in LB Sidecar read server",
 				zap.Error(err))
 		}
 	}()
@@ -85,7 +85,7 @@ func gracefulShutdown(w, r *http.Server, err error) {
 	defer cancel()
 
 	if err != nil {
-		logger.Error("an error occured in LB Sidecar",
+		logger.Error("an error occurred in LB Sidecar",
 			zap.Error(err))
 	}
 
