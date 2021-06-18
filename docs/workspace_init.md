@@ -312,7 +312,7 @@ make
 
 ## Creating Inspr Workspace
 
-Now that we have our applications implemented and their Docker images available in the cluster, we're good to go and build the Inspr structures to run the applications we created.
+Now that we have our applications implemented and their Docker images available in the cluster, we're good to build the Inspr structures to run the applications we created.
 
 ### YAML Files
 
@@ -321,7 +321,7 @@ First of all, from "/pingpong_demo" we access the folder "/yamls" created previo
 cd yamls
 ```
 
-And within this folder we will create the `.yaml` files which describe each of the Inspr structures that will be built inside the cluster. This part of the tutorial wont take a closer look at every minimum detail on how to write the YAML files, but you can find more information about it [here](yamls/index.md).
+And within this folder we will create the `.yaml` files which describe each of the Inspr structures that will be built inside the cluster. This part of the tutorial won't take a closer look at every minimum detail on how to write the YAML files, but you can find more information about it [here](yamls/index.md).
 
 **1) dApp YAMLs**  
 The first file to be created is `table.yaml`, which is the dApp that will contain Ping and Pong Nodes:
@@ -362,7 +362,7 @@ mkdir nodes
 touch nodes/ping.app.yaml
 ```
 
-Then, insite of `ping.app.yaml` we must specify the kind, apiVersion and then the Node information (such as name, boundaries, image, etc.).  
+Then, inside of `ping.app.yaml` we must specify the kind, apiVersion and then the Node information (such as name, boundaries, image, etc.).  
 It should look like this:
 ```yaml
 apiVersion: v1
@@ -473,7 +473,7 @@ schema: yamls/ctypes/schema.avsc
 ```
 
 Notice that the `schema` field is actually a reference to an **Avro Schema** file. By defining it like this, when a Type is created Inspr searches for the file and injects its value into the `schema` field. You can find more information on how schemas should be created to be used in Inspr [here](schemas_and_types.md).  
-To make everythink work properly, let's create `schema.avsc`:
+To make everything work properly, let's create `schema.avsc`:
 ```zsh
 touch types/schema.avsc
 ```
@@ -564,7 +564,7 @@ Once this is done we need to install our **UID Provider**, so we're able to crea
 
 ### UID Provider installation
 
-First of all, we must retrieve the **root token for authentication**. This is the [JWT](https://jwt.io/) token that will be used to establish the first connection between Insprd and the UID Provider, generating an Admin user that will be able to create new users, as well as to manipulate Inspr's structures inside Insprd.
+First of all, we must retrieve the **root token for authentication**. This is the [JWT](https://jwt.io/) token that will be used to establish the first connection between Insprd and the UID Provider, generating an Admin user which will be able to create new users, as well as to manipulate Inspr's structures inside Insprd.
 
 If when installing Inspr's Helm Chart you didn't change the variable `deployment.initKey`, it's default value is "1234567890" (if you did change, use the value you inserted). Run the following command replacing `<key>` with the `initKey`'s value:  
 ```zsh
