@@ -1,6 +1,11 @@
 
 # Changelog
 
+### #77 Story CORE-463 | Create documentation for Auth
+- doc:
+    - authentication
+---
+
 ### #71 Story CORE-462 | Update old docs
 - features:
     - Updated most of the files in /docs folder
