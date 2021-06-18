@@ -56,7 +56,7 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 
 ## Exposing Inspr via NGINX
 
-Insprd will be exposed via NGINX by default, so you just need to have NGINX installed. Follow the instructions in the [official NGINX documentation](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/) to install it.
+Insprd will be exposed via NGINX by default, so you just need to have NGINX installed. Follow the instructions in the [official NGINX documentation](https://kubernetes.github.io/ingress-nginx/deploy/) to install it.
 
 
 ### Hostname
