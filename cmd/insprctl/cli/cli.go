@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/cmd/utils"
 
 	"github.com/spf13/cobra"
 )

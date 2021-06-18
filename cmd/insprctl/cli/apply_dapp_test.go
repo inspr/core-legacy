@@ -4,11 +4,11 @@ import (
 	"errors"
 	"testing"
 
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
 	"gopkg.in/yaml.v2"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 func TestNewApplyApp(t *testing.T) {

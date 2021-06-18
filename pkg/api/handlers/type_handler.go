@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // TypeHandler - contains handlers that uses the

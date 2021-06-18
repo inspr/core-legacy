@@ -12,19 +12,19 @@
 <p align="center">Describe, connect, secure, test and deploy distributed applications with less effort.</p>
 
 <p align="center">
-    <a href="https://godoc.org/github.com/inspr/inspr">
-        <img src="https://godoc.org/github.com/inspr/inspr?status.svg">
+    <a href="https://godoc.org/inspr.dev/inspr">
+        <img src="https://godoc.org/inspr.dev/inspr?status.svg">
     </a>
-    <a href="https://goreportcard.com/badge/github.com/inspr/inspr">
-        <img src="https://goreportcard.com/badge/github.com/inspr/inspr">
+    <a href="https://goreportcard.com/badge/inspr.dev/inspr">
+        <img src="https://goreportcard.com/badge/inspr.dev/inspr">
     </a>
-    <a href="https://pkg.go.dev/github.com/inspr/inspr">
+    <a href="https://pkg.go.dev/inspr.dev/inspr">
         <img src="https://img.shields.io/static/v1?label=godoc&message=reference&color=blue">
     </a>
     <a href="https://codecov.io/gh/inspr/inspr">
         <img src="https://codecov.io/gh/inspr/inspr/branch/develop/graph/badge.svg?token=C8SPTHPXMG&">
     </a>
-    <a href="https://github.com/inspr/inspr/blob/develop/LICENSE.md">
+    <a href="https://inspr.dev/inspr/blob/develop/LICENSE.md">
         <img src="https://img.shields.io/badge/license-MIT-blue.svg">
     </a>
     <a href="http://makeapullrequest.com">
@@ -110,7 +110,7 @@ They are included in the `build/helm` folder and can be edited for further refin
 ### CLI
 After installing Insprd in the cluster, the Inspr CLI must be installed so that it is possible to create and manage Inspr structures in the cluster. 
 
-To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.  
+To install the CLI get the latest release for your architecture from the [`releases`](https://inspr.dev/inspr/releases) page and add it to your PATH.  
 For **Linux / Mac** you can install the latest version by running the following command on the terminal:
 ```bash
 curl -s https://storage.googleapis.com/inspr-cli/install_cli.sh | bash
@@ -127,7 +127,7 @@ insprctl config serverip http://<your_domain>.com
 ```
 
 And now you're good to go!  
-To follow a step-by-step tutorial on how to implement your first Inspr application, [click here!](https://github.com/inspr/inspr/blob/develop/docs/workspace_init.md)
+To follow a step-by-step tutorial on how to implement your first Inspr application, [click here!](https://inspr.dev/inspr/blob/develop/docs/workspace_init.md)
 
 ## Documentation
 

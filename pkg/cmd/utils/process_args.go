@@ -3,8 +3,8 @@ package utils
 import (
 	"fmt"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/utils"
 )
 
 // CheckEmptyArgs receives the args of a cli command and returns a error in case any

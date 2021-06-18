@@ -1,11 +1,11 @@
 package lbsidecar
 
 import (
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/sidecars/models"
 	"github.com/linkedin/goavro"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 // readMessage receives an Avro-encoded message and returns a models.BrokerMessage

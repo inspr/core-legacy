@@ -15,9 +15,9 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	kafkasc "inspr.dev/inspr/cmd/sidecars/kafka/client"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 // createMockEnvVars - sets up the env values to be used in the tests functions

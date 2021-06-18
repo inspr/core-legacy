@@ -12,8 +12,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 func createMockedServer(port, ch string, msg interface{}) *httptest.Server {

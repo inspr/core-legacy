@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 var logger *zap.Logger

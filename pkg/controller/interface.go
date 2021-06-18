@@ -3,10 +3,10 @@ package controller
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 // ChannelInterface is the interface that allows to obtain

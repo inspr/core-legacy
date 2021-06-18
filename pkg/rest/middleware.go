@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // CRUDHandler handles crud requests to a given resource

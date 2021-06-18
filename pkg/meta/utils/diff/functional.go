@@ -1,7 +1,7 @@
 package diff
 
 import (
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // FilterDiffsByKind filters the changelog by changes of a spefific kind or combination of kinds.

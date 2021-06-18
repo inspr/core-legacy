@@ -1,8 +1,8 @@
 package brokers
 
 import (
-	"github.com/inspr/inspr/pkg/meta/brokers"
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	"inspr.dev/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 // GetSidecarConnectionVars returns port enviroment variable

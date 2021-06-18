@@ -4,10 +4,10 @@ import (
 	"errors"
 	"testing"
 
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
 	"gopkg.in/yaml.v2"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 func TestNewApplyAlias(t *testing.T) {

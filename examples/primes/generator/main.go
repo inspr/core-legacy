@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
+	dappclient "inspr.dev/inspr/pkg/client"
 )
 
 const defaultMOD = 100

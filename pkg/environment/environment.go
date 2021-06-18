@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/brokers"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // InsprEnvVars represents the current inspr environment

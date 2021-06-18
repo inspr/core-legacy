@@ -3,8 +3,8 @@ package mocks
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/controller"
 )
 
 // BrokersMock mock structure for the operations of the controller.Brokerss()

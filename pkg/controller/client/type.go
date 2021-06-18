@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // TypeClient is a client for manipulating Type structures in Insprd

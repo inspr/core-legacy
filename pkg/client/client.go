@@ -10,10 +10,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 // Client is the struct which implements the methods of AppClient interface

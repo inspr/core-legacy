@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 const maxBrokerRetries = 5

@@ -3,8 +3,8 @@ package auth
 import (
 	"encoding/json"
 
-	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/lestrrat-go/jwx/jwt"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // Desserialize converts a token to a Payload model

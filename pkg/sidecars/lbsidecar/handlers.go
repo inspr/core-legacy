@@ -10,11 +10,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/sidecars/models"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 var logger *zap.Logger

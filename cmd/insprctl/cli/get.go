@@ -8,12 +8,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
-	"github.com/inspr/inspr/pkg/controller"
-	"github.com/inspr/inspr/pkg/ierrors"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/ierrors"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // NewGetCmd creates get command for Inspr CLI

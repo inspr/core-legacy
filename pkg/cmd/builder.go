@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // Builder is used to build cobra commands.

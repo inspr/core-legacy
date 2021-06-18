@@ -6,10 +6,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/cmd"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/utils"
 )
 
 // NewDescribeCmd creates describe command for Inspr CLI

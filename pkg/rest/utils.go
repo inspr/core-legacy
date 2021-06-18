@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // RecoverFromPanic will handle panic

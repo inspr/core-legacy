@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/meta/brokers"
 )
 
 func TestGetBrokerMemory(t *testing.T) {

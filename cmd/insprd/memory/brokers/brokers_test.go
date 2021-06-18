@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/sidecars"
-	"github.com/inspr/inspr/pkg/meta/brokers"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/cmd/sidecars"
+	"inspr.dev/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 var kafkaStructMock = sidecars.KafkaConfig{

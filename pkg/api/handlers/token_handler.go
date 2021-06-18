@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // ControllerRefreshHandler handles requests for token refresing on inspr controllers on Insprd

@@ -9,12 +9,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/cmd"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/ierrors"
 
-	"github.com/inspr/inspr/pkg/meta"
 	"gopkg.in/yaml.v2"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // NewApplyCmd - mock subcommand

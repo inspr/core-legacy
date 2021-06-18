@@ -3,8 +3,8 @@ package mocks
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/controller"
 )
 
 // AuthMock mock structure for the operations of the controller.Authorization()

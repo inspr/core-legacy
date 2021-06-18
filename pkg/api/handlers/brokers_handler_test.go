@@ -9,16 +9,16 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	"github.com/inspr/inspr/cmd/insprd/memory/fake"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	ofake "github.com/inspr/inspr/cmd/insprd/operators/fake"
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/auth"
-	authmock "github.com/inspr/inspr/pkg/auth/mocks"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	ofake "inspr.dev/inspr/cmd/insprd/operators/fake"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/auth"
+	authmock "inspr.dev/inspr/pkg/auth/mocks"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestHandler_NewBrokerHandler(t *testing.T) {

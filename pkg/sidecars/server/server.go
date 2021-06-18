@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	"github.com/inspr/inspr/pkg/sidecars/models"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 // Server is a struct that contains the variables necessary

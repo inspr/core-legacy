@@ -6,8 +6,8 @@ import (
 	"io"
 	"log"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
 	"golang.org/x/net/context"
+	dappclient "inspr.dev/inspr/pkg/client"
 )
 
 func main() {

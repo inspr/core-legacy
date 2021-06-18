@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // AuthClient is a client for getting auth information from Insprd

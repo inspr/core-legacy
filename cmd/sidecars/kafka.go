@@ -4,10 +4,10 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/brokers"
-	"github.com/inspr/inspr/pkg/operator/k8s"
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/operator/k8s"
+	"inspr.dev/inspr/pkg/sidecars/models"
 	corev1 "k8s.io/api/core/v1"
 )
 

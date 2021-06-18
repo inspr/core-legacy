@@ -9,13 +9,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/rest"
 	"github.com/spf13/cobra"
+	"inspr.dev/inspr/pkg/api/models"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 func getMockAppWithoutApp1() *meta.App {

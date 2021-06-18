@@ -1,6 +1,6 @@
 package models
 
-import "github.com/inspr/inspr/cmd/uid_provider/client"
+import "inspr.dev/inspr/cmd/uid_provider/client"
 
 // ReceivedDataCreate defines the expected data structure to be
 // received as a response when calling the method Create(...)

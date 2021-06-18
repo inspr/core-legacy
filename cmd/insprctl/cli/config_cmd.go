@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // NewConfigChangeCmd - responsible for changing the values of the insprctl's viper config

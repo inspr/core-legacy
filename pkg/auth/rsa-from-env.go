@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/inspr/inspr/pkg/ierrors"
 	"golang.org/x/crypto/ssh"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // GetPublicKey resolves the rsa public key from the environment variable
