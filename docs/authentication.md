@@ -9,6 +9,8 @@ Each cluster is responsible for managing the access to its resources based on th
 When performing any request to your Inspr deployment the `insprctl` CLI sends an authentication token to insprd. This token is validated for expiration and for permission to perform the requested action on the specified scope. If the token is expired the system then sends a refreshing request to the Identity provider that updates that user's permissions according to it's latest information.
  
 The authentication on an inspr cluster is handled by a service of its own, `auth-svc` which is deployed right before the insprd deployment goes up.
+
+![Auth](./img/auth.jpg)
  
 ### Init
 When first deploying inpr the user must define an initialization key for his insprd, this can be done by overwriting helm chart's value "deployment.initKey". Once the helm chart has been installed it triggers a pre-installation hook that creates 512 bytes encryption and decryption keys on kubernetes secrets, if these don't exist already. These secrets are protected by kubernetes and made available only to `auth-service` and `insprd` respectively.
@@ -18,7 +20,7 @@ After the deployment is done the user must execute the cluster init command: `in
  
 ### Validation
  
-The validation process used on inspr is aligned with most modern systems, the Jason Web Token, which must be provided on the request's header using the "Authorization" key, caries a payload of informations including a set of scopes, each one associated with a list of permissions that define what actions the token's bearer can perform per scope. Every time the system receives a request the token's signature is validated using the public key to guarantee Authenticity and Integrity. Once validated, the token payload is verified to assure that the user can perform the request action on the target scope.
+The validation process used on inspr is aligned with most modern systems, the Json Web Token, which must be provided on the request's header using the "Authorization" key, caries a payload of informations including a set of scopes, each one associated with a list of permissions that define what actions the token's bearer can perform per scope. Every time the system receives a request the token's signature is validated using the public key to guarantee Authenticity and Integrity. Once validated, the token payload is verified to assure that the user can perform the request action on the target scope.
  
 ### Refresh
  
