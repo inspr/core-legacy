@@ -7,7 +7,6 @@ meta:
 spec:
   node:
     spec:
-      replicas: 1
       image: gcr.io/red-inspr/inspr/example/pong:latest
   boundary:
     input:

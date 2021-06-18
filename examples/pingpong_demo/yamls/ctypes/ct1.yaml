@@ -3,4 +3,4 @@ kind: type
 
 meta:
   name: pptype1
-schema: examples/pingpong_demo/yamls/ctypes/schema.avsc
+schema: yamls/ctypes/schema.avsc

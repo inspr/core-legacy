@@ -17,7 +17,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	sentMsg := "pong"
+	sentMsg := "Pong!"
 	if err := client.WriteMessage(ctx, "pongoutput", sentMsg); err != nil {
 		fmt.Printf("an error occurred: %v", err)
 		return
