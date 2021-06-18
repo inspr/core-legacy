@@ -1,7 +1,7 @@
 # Authentication
 Inspr's CLI requires permission to access the cluster and perform commands. We can rely on the Kubernetes model where authentication is done through a context. You can run multiple Inspr instances from your local machine, all that is required is to be authenticated with each cluster.
  
-Each cluster is responsible for managing the access to its resources based on these permissions, validating each request it receives for an access token. This is responsible for the access control on Inspr, however it does not provide user identity. Inspr's authentication was designed to work with third party identity providers, much like how Kubernetes does it.  
+Each cluster is responsible for managing the access to its resources based on these permissions, validating each request it receives with an access token. This is responsible for the access control on Inspr, however it does not provide user identity. Inspr's authentication was designed to work with third party identity providers, much like how Kubernetes does it.  
  
 ## Authentication Architecture
  
