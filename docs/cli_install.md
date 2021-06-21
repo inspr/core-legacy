@@ -18,7 +18,7 @@ sudo rm /usr/local/bin/inspr
 
 ## Other OS
 
-To get other Inspr CLI versions, download the binary file from the GitHub repository [here](https://inspr.dev/inspr/releases).
+To get other Inspr CLI versions, download the binary file from the GitHub repository [here](https://github.com/inspr/inspr/releases).
 
 ## After installing
 
