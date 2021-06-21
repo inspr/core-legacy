@@ -42,15 +42,15 @@ jobs:
         env:
           GCR_KEY: ${{ secrets.GCR_ACCOUNT_KEY }}
 
+      - name: Configure GCR service account
+        run: |
+          gcloud auth activate-service-account ${{ secrets.GCR_ACCOUNT }} --key-file=$GCR_FILENAME.json
+
       - name: Build CLI
         run: bash .github/scripts/buildcli.sh
 
       - name: Push CLI
         run: bash .github/scripts/pushcli.sh
-
-      - name: Configure GCR service account
-        run: |
-          gcloud auth activate-service-account ${{ secrets.GCR_ACCOUNT }} --key-file=$GCR_FILENAME.json
 
       - name: Create temp file to store skaffold build return
         run: |
