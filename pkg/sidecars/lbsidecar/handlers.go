@@ -20,7 +20,7 @@ import (
 var logger *zap.Logger
 
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalencer-sidecar")))
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalancer-sidecar")))
 }
 
 // writeMessageHandler handles requests sent to the write message server
@@ -130,7 +130,7 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		resp, err := sendRequest(reqAddress, decodedMsg)
 		if err != nil {
-			logger.Error("unable to send request to from sidecar to node",
+			logger.Error("unable to send request from lbsidecar to node",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			return

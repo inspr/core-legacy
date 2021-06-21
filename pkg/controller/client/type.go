@@ -38,9 +38,9 @@ func (tc *TypeClient) Get(ctx context.Context, scope, name string) (*meta.Type, 
 // Create creates given Type inside of Insprd
 // The scope refers to the dApp in which the Type will be in, represented with a dot separated query
 // such as app1.app2
-func (tc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
+func (tc *TypeClient) Create(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error) {
 	tdi := models.TypeDI{
-		Type:   *ch,
+		Type:   *t,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
@@ -78,9 +78,9 @@ func (tc *TypeClient) Delete(ctx context.Context, scope, name string, dryRun boo
 // Update updates given Type in Insprd, if it exists.
 // The scope refers to the dApp in which the Type is in, represented with a dot separated query
 // such asapp1.app2
-func (tc *TypeClient) Update(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
+func (tc *TypeClient) Update(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error) {
 	tdi := models.TypeDI{
-		Type:   *ch,
+		Type:   *t,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog

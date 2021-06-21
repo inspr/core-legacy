@@ -34,9 +34,9 @@ type AppInterface interface {
 // state of the Types in the cluster
 type TypeInterface interface {
 	Get(ctx context.Context, scope, name string) (*meta.Type, error)
-	Create(ctx context.Context, scope string, ct *meta.Type, dryRun bool) (diff.Changelog, error)
+	Create(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error)
 	Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error)
-	Update(ctx context.Context, scope string, ct *meta.Type, dryRun bool) (diff.Changelog, error)
+	Update(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error)
 }
 
 // AuthorizationInterface is the interface that allows to

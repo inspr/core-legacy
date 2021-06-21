@@ -37,8 +37,9 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 	}
 	if len(app.Spec.Aliases) > 0 {
 		aliases := spec.Add("Aliases")
-		for aliasKey := range app.Spec.Aliases {
-			aliases.Add(aliasKey)
+		for aliasKey, alias := range app.Spec.Aliases {
+			aliasTree := aliases.Add(aliasKey)
+			aliasTree.Add("Target: " + alias.Target)
 		}
 	}
 	if app.Spec.Node.Spec.Image != "" {

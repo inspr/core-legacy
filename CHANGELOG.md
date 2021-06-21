@@ -5,6 +5,25 @@
 - fix:
   - changed the `module` name in the `go mod` of the project, that allows the vanity url in the productions cluster to obtain the package properly
 ---
+
+### #77 Story CORE-463 | Create documentation for Auth
+- features:
+    - authentication doc
+---
+
+### #71 Story CORE-462 | Update old docs
+- features:
+    - Updated most of the files in /docs folder
+    - Updated scripts that build and install Inspr CLI
+    - Updated release cretion GitHub Action so it pushes the CLI once it's build
+- fixes:
+    - Fixed Ping Pong example
+    - Fixed resolved channel env var injection in converter.go so it injects the original channel to reference the resolved one
+- misc:
+    - Renamed folder from apply_channel_type.go to apply_type.go in `cmd/insprctl/`
+    - Added/updated some logs, error messages and method comments all around
+---
+
 ### #65 Story CORE-401 | CLI create new broker command
 - features:
     - developed the inspr cli subcommand for reading a yaml file and trying to create a broker in the cluster

@@ -221,7 +221,8 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	return nil, err
 }
 
-//ResolveBoundary is the recursive method that resolves connections for dApp boundaries
+// ResolveBoundary is the recursive method that resolves connections for dApp boundaries
+// returns a map of boundary to  their respective resolved channel query
 func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
 	logger.Debug("resolving dApp boundary",
 		zap.String("dApp", app.Meta.Name))
