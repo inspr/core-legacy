@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"github.com/inspr/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest"
 
-	handler "github.com/inspr/inspr/pkg/api/handlers"
-	metabrokers "github.com/inspr/inspr/pkg/meta/brokers"
+	handler "inspr.dev/inspr/pkg/api/handlers"
+	metabrokers "inspr.dev/inspr/pkg/meta/brokers"
 )
 
 func (s *Server) initRoutes() {

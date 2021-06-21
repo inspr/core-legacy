@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/inspr/inspr/pkg/controller/client"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/controller/client"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // BrokersDI data interface to provide broker information

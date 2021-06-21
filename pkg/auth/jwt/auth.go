@@ -12,11 +12,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // JWTauth implements the Auth interface for jwt authetication provider

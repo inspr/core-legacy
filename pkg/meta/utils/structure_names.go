@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // StructureNameIsValid checks if the given name is valid for naming Channels, types and dApps

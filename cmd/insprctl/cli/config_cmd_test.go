@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
 )
 
 func TestNewConfigChangeCmd(t *testing.T) {

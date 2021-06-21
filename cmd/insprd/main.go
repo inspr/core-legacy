@@ -3,14 +3,14 @@ package main
 import (
 	"os"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	"github.com/inspr/inspr/pkg/api"
-	"github.com/inspr/inspr/pkg/auth"
-	jwtauth "github.com/inspr/inspr/pkg/auth/jwt"
-	authmock "github.com/inspr/inspr/pkg/auth/mocks"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/pkg/api"
+	"inspr.dev/inspr/pkg/auth"
+	jwtauth "inspr.dev/inspr/pkg/auth/jwt"
+	authmock "inspr.dev/inspr/pkg/auth/mocks"
 )
 
 func main() {

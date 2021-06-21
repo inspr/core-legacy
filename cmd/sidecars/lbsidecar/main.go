@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/sidecars/lbsidecar"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/sidecars/lbsidecar"
 )
 
 var logger *zap.Logger

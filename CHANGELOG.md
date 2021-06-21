@@ -1,6 +1,11 @@
 
 # Changelog
 
+### #76 Tech CORE-360 | vanity url
+- fix:
+  - changed the `module` name in the `go mod` of the project, that allows the vanity url in the productions cluster to obtain the package properly
+---
+
 ### #77 Story CORE-463 | Create documentation for Auth
 - features:
     - authentication doc

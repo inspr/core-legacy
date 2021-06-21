@@ -1,6 +1,6 @@
 package brokers
 
-import "github.com/inspr/inspr/pkg/utils"
+import "inspr.dev/inspr/pkg/utils"
 
 // Brokers define all Available brokers on Insprd and its default broker
 type Brokers struct {

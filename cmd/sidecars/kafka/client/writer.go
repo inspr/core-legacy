@@ -2,9 +2,9 @@ package kafkasc
 
 import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/ierrors"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 const flushTimeout = 1000

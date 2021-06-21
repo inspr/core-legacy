@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/cmd/uid_provider/api/models"
-	"github.com/inspr/inspr/cmd/uid_provider/client"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/cmd/uid_provider/api/models"
+	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // Client is the client for communicating with the in-cluster uidp

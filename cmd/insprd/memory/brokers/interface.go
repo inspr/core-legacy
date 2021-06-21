@@ -1,9 +1,9 @@
 package brokers
 
 import (
-	"github.com/inspr/inspr/pkg/meta/brokers"
-	"github.com/inspr/inspr/pkg/sidecars/models"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/sidecars/models"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // Manager is the interface that allows the management

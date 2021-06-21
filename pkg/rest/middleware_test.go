@@ -12,9 +12,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/auth"
-	authMock "github.com/inspr/inspr/pkg/auth/mocks"
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/auth"
+	authMock "inspr.dev/inspr/pkg/auth/mocks"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // emptyHandler - to be used in testing of the package

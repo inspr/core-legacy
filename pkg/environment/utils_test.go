@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/meta/brokers"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestIsInChannelBoundary(t *testing.T) {

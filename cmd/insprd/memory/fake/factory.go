@@ -1,6 +1,6 @@
 package fake
 
-import "github.com/inspr/inspr/pkg/sidecars/models"
+import "inspr.dev/inspr/pkg/sidecars/models"
 
 // Factory mock of AbsstractBrokersFactory
 type Factory struct {

@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/inspr/inspr/pkg/controller"
+import "inspr.dev/inspr/pkg/controller"
 
 //ClientMock test asset for mocking a controller
 type ClientMock struct {

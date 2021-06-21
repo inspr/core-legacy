@@ -1,9 +1,9 @@
 package fake
 
 import (
-	memory "github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	"github.com/inspr/inspr/pkg/meta/brokers"
-	"github.com/inspr/inspr/pkg/utils"
+	memory "inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // GetAll returns an array containing all currently mocked brokers

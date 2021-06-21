@@ -119,8 +119,8 @@ import (
 	"io"
 	"log"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecars/models"
 	"golang.org/x/net/context"
 )
 
@@ -170,8 +170,8 @@ import (
 	"io"
 	"log"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecars/models"
 	"golang.org/x/net/context"
 )
 

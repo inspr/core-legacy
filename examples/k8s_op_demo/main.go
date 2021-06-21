@@ -4,10 +4,10 @@ import (
 	"context"
 	"log"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	"github.com/inspr/inspr/cmd/insprd/operators/nodes"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	"inspr.dev/inspr/cmd/insprd/operators/nodes"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package nodes
 import (
 	"log"
 
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 )

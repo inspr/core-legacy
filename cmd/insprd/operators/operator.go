@@ -1,10 +1,10 @@
 package operators
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	"github.com/inspr/inspr/cmd/insprd/operators/nodes"
-	"github.com/inspr/inspr/pkg/auth"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/operators/nodes"
+	"inspr.dev/inspr/pkg/auth"
 )
 
 // Operator is an operator for creating channels and nodes inside kubernetes

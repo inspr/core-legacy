@@ -3,7 +3,7 @@ package operators
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // NodeOperatorInterface is the interface that allows to obtain or change

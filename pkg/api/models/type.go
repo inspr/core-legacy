@@ -1,6 +1,6 @@
 package models
 
-import "github.com/inspr/inspr/pkg/meta"
+import "inspr.dev/inspr/pkg/meta"
 
 // TypeDI - Data Input format for requests that pass the Type data
 type TypeDI struct {

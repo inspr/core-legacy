@@ -12,13 +12,13 @@
 <p align="center">Describe, connect, secure, test and deploy distributed applications with less effort.</p>
 
 <p align="center">
-    <a href="https://godoc.org/github.com/inspr/inspr">
-        <img src="https://godoc.org/github.com/inspr/inspr?status.svg">
+    <a href="https://godoc.org/inspr.dev/inspr">
+        <img src="https://godoc.org/inspr.dev/inspr?status.svg">
     </a>
-    <a href="https://goreportcard.com/badge/github.com/inspr/inspr">
-        <img src="https://goreportcard.com/badge/github.com/inspr/inspr">
+    <a href="https://goreportcard.com/badge/inspr.dev/inspr">
+        <img src="https://goreportcard.com/badge/inspr.dev/inspr">
     </a>
-    <a href="https://pkg.go.dev/github.com/inspr/inspr">
+    <a href="https://pkg.go.dev/inspr.dev/inspr">
         <img src="https://img.shields.io/static/v1?label=godoc&message=reference&color=blue">
     </a>
     <a href="https://codecov.io/gh/inspr/inspr">

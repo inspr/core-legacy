@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/inspr/inspr/cmd/insprctl/cli"
 	"github.com/spf13/cobra/doc"
+	"inspr.dev/inspr/cmd/insprctl/cli"
 )
 
 var version string

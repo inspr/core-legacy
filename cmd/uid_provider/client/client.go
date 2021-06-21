@@ -14,11 +14,11 @@ import (
 	"strings"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/controller/client"
-	"github.com/inspr/inspr/pkg/ierrors"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/controller/client"
+	"inspr.dev/inspr/pkg/ierrors"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // Client defines a Redis client, which has the interface methods

@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/rest"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // Server is a struct that contains the variables necessary

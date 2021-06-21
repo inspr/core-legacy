@@ -1,4 +1,4 @@
-module github.com/inspr/inspr
+module inspr.dev/inspr
 
 go 1.16
 

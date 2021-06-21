@@ -1,12 +1,12 @@
 package brokers
 
 import (
-	"github.com/inspr/inspr/cmd/sidecars"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/brokers"
-	"github.com/inspr/inspr/pkg/sidecars/models"
-	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/cmd/sidecars"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/sidecars/models"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // GetAll returns an array containing all currently configured brokers

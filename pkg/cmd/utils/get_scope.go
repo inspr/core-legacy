@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/utils"
 )
 
 // GetScope retreives the path to be used as base scope for an Insprd request.

@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // Tokenize receives a token's payload and encodes it in a jwt

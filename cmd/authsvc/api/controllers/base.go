@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/pkg/ierrors"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // Server is a struct that contains the variables necessary

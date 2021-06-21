@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/inspr/inspr/pkg/controller"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 const inClusterEnviromentError = "authentication as controller failed. controllers requires following " +

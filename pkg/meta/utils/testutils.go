@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // CompareWithoutUUID compares two components without comparing their UUID.

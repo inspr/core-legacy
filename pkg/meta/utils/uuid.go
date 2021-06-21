@@ -2,7 +2,7 @@ package utils
 
 import (
 	"github.com/google/uuid"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // InjectUUID injects a new UUID on a metadata

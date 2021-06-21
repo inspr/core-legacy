@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 
-	build "github.com/inspr/inspr/pkg/cmd"
+	build "inspr.dev/inspr/pkg/cmd"
 )
 
 type deleteUsrOptionsDT struct {

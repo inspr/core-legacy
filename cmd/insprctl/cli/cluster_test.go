@@ -9,14 +9,14 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/sidecars"
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/auth"
-	cliutils "github.com/inspr/inspr/pkg/cmd/utils"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
+	"inspr.dev/inspr/cmd/sidecars"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/auth"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 func TestNewClusterCommand(t *testing.T) {

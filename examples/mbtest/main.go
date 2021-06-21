@@ -7,8 +7,8 @@ import (
 	"io"
 	"time"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecars/models"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 func main() {

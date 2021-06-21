@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	globalEnv "github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/ierrors"
 	"go.uber.org/zap"
+	globalEnv "inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 const pollTimeout = 100

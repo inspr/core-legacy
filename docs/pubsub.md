@@ -105,7 +105,7 @@ API (api/main.go) : Entry point for the server, must be a `package main` so that
    package main
 
    import (
-       controller "github.com/inspr/inspr/examples/pubsub/api/controller"
+       controller "inspr.dev/inspr/examples/pubsub/api/controller"
    )
 
    var server controller.Server

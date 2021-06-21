@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/cmd/sidecars"
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
+	"inspr.dev/inspr/cmd/sidecars"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // BrokerHandler - contains handlers that uses the BrokerManager interface methods

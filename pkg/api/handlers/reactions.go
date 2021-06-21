@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 var createdNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {

@@ -9,11 +9,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestBrokersClient_Get(t *testing.T) {

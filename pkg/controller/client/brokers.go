@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // BrokersClient interacts with Brokers on the Insprd

@@ -1,8 +1,8 @@
 package fake
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	metabroker "github.com/inspr/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	metabroker "inspr.dev/inspr/pkg/meta/brokers"
 )
 
 // BrokersMock is the struct with the necessary implementations

@@ -4,12 +4,12 @@ import (
 	"context"
 	"os"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/brokers"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils"
 	"k8s.io/client-go/rest"
 
 	"k8s.io/client-go/kubernetes"

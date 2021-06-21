@@ -1,8 +1,8 @@
 package brokers
 
 import (
-	"github.com/inspr/inspr/pkg/meta/brokers"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/meta/brokers"
 )
 
 var logger *zap.Logger

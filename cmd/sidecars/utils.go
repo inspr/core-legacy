@@ -3,9 +3,9 @@ package sidecars
 import (
 	"strings"
 
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/operator/k8s"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/operator/k8s"
+	"inspr.dev/inspr/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 )
 

@@ -9,8 +9,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/controller"
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 func TestGetCliClient(t *testing.T) {

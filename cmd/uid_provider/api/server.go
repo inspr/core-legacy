@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 
-	"github.com/inspr/inspr/cmd/uid_provider/api/controller"
-	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uid_provider/api/controller"
+	"inspr.dev/inspr/cmd/uid_provider/client"
 )
 
 var server controller.Server

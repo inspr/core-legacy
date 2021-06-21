@@ -6,10 +6,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 var initialized bool

@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uid_provider/client"
 )
 
 var redisServer *miniredis.Miniredis
