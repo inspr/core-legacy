@@ -2,7 +2,6 @@ package operators
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 
 	"inspr.dev/inspr/cmd/insprd/memory"
@@ -120,11 +119,9 @@ func (g GenOp) Update(ctx context.Context, scope string, channel *meta.Channel) 
 
 //Delete executes Delete method of correct operator given the desired channel's broker
 func (g GenOp) Delete(ctx context.Context, scope, name string) error {
-	fmt.Println("ABLUBLEBLEBLABLUBLABLE")
 	op, err := g.getOperator(scope, name, true)
 	if err != nil {
 		return err
 	}
-	fmt.Println("XABLABLEXABLWXABLU")
 	return op.Delete(ctx, scope, name)
 }

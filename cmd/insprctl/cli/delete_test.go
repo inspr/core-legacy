@@ -602,7 +602,9 @@ func Test_deleteAlias(t *testing.T) {
 		}
 
 		fmt.Println(scope)
-		if scope != "appParent" || data.Key != "alias_name" {
+		if (scope != "appParent" && scope != "") ||
+			(data.Key != "alias.name" && data.Key != "appParent.alias.name") {
+
 			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
 			return
 		}
@@ -618,19 +620,19 @@ func Test_deleteAlias(t *testing.T) {
 	}{
 		{
 			name:           "Should delete the alias and return the diff",
-			flagsAndArgs:   []string{"al", "appParent.alias_name"},
+			flagsAndArgs:   []string{"al", "appParent.alias.name"},
 			handlerFunc:    handler,
 			expectedOutput: bufResp.String(),
 		},
 		{
 			name:           "Invalid scope flag, should not print",
-			flagsAndArgs:   []string{"al", "appParent.alias_name", "--scope", "invalid..scope"},
+			flagsAndArgs:   []string{"al", "appParent.alias.name", "--scope", "invalid..scope"},
 			handlerFunc:    handler,
 			expectedOutput: "",
 		},
 		{
 			name:           "Valid scope flag",
-			flagsAndArgs:   []string{"al", "alias_name", "--scope", "appParent"},
+			flagsAndArgs:   []string{"al", "alias.name", "--scope", "appParent"},
 			handlerFunc:    handler,
 			expectedOutput: bufResp.String(),
 		},
@@ -655,6 +657,7 @@ func Test_deleteAlias(t *testing.T) {
 			defer server.Close()
 
 			cmd.Execute()
+
 			got := buf.String()
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
