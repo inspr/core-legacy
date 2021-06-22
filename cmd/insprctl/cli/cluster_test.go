@@ -194,31 +194,31 @@ func Test_clusterConfig(t *testing.T) {
 		{
 			name:    "filePath_empty",
 			args:    []string{"config", "kafka", ""},
-			wantMsg: "arg 'filePath' is empty",
+			wantMsg: "invalid args: arg 'filePath' is empty\n",
 			wantErr: true,
 		},
 		{
 			name:    "configName_empty",
 			args:    []string{"config", "", invalidFile},
-			wantMsg: "arg 'brokerName' is empty",
+			wantMsg: "invalid args: arg 'brokerName' is empty\n",
 			wantErr: true,
 		},
 		{
 			name:    "non_existant_config_file",
 			args:    []string{"config", "kafka", dir + "nonExistantFile.yml"},
-			wantMsg: nonExistantMessage,
+			wantMsg: "unable to find file: " + nonExistantMessage + "\n",
 			wantErr: true,
 		},
 		{
 			name:    "non_yaml_config_file",
 			args:    []string{"config", "kafka", nonYamlFile},
-			wantMsg: "not a yaml file",
+			wantMsg: "not a yaml file\n",
 			wantErr: true,
 		},
 		{
 			name:    "failed_client_create",
 			args:    []string{"config", "kafka", kafkaFile},
-			wantMsg: clientMockErr.Error(),
+			wantMsg: "unable to create broker: " + clientMockErr.Error() + "\n",
 			wantErr: true,
 		},
 		{
