@@ -106,7 +106,7 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Alias get transaction")
 		ah.Memory.InitTransaction()
 
-		app, err := ah.Memory.Root().Alias().Get(scope, data.Key)
+		app, err := ah.Memory.Tree().Alias().Get(scope, data.Key)
 		if err != nil {
 			logger.Error("unable to get Alias",
 				zap.String("alias key", data.Key),

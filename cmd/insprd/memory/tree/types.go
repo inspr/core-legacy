@@ -181,7 +181,7 @@ func (trg *TypeRootGetter) Get(scope, name string) (*meta.Type, error) {
 		zap.String("type", name),
 		zap.String("scope", scope))
 
-	parentApp, err := GetTreeMemory().Root().Apps().Get(scope)
+	parentApp, err := GetTreeMemory().Tree().Apps().Get(scope)
 	if err != nil {
 		return nil, ierrors.
 			NewError().

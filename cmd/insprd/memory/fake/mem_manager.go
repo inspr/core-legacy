@@ -62,7 +62,7 @@ func MockMemoryManager(failErr error) memory.Manager {
 }
 
 // Root mocks a root getter interface
-func (mm *MemManager) Root() memory.GetInterface {
+func (mm *MemManager) Tree() memory.GetInterface {
 	return (*LookupMemManager)(mm)
 }
 

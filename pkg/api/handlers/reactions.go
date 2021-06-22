@@ -11,7 +11,7 @@ import (
 var createdNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {
 	return diff.NewChangeReaction(
 		func(c diff.Change) bool {
-			_, errFrom := handler.Memory.Root().Apps().Get(c.Scope)
+			_, errFrom := handler.Memory.Tree().Apps().Get(c.Scope)
 			to, errTo := handler.Memory.Apps().Get(c.Scope)
 			return (errFrom != nil && errTo == nil && to.Spec.Node.Spec.Image != "")
 		},
@@ -60,7 +60,7 @@ var deletedApps func(handler *Handler) diff.DifferenceReaction = func(handler *H
 		},
 		func(scope string, d diff.Difference) error {
 			scope, _ = utils.JoinScopes(scope, d.Name)
-			app, err := handler.Memory.Root().Apps().Get(scope) // get the app definition from the cluster
+			app, err := handler.Memory.Tree().Apps().Get(scope) // get the app definition from the cluster
 			if err != nil {
 				return err
 			}
@@ -145,7 +145,7 @@ var updatedChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 var updatedNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {
 	return diff.NewChangeReaction(
 		func(c diff.Change) bool {
-			from, _ := handler.Memory.Root().Apps().Get(c.Scope)
+			from, _ := handler.Memory.Tree().Apps().Get(c.Scope)
 			// if there is a change in a given scope and that scope is a node
 			return from != nil && from.Spec.Node.Spec.Image != ""
 		},
