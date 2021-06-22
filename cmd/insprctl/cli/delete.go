@@ -161,7 +161,7 @@ func deleteAlias(_ context.Context, args []string) error {
 	}
 
 	for _, arg := range args {
-		path, aliasKey, err := cliutils.ProcessArg(arg, scope)
+		path, aliasKey, err := cliutils.ProcessAliasArg(arg, scope)
 		if err != nil {
 			return err
 		}
