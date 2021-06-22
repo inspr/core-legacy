@@ -17,9 +17,9 @@ import (
 func NewDeleteCmd() *cobra.Command {
 	deleteApps := cmd.NewCmd("apps").
 		WithDescription("Delete apps from scope").
-		WithAliases("a").
 		WithExample("Delete app from the default scope", "delete apps <appname> ").
 		WithExample("Delete app from a custom scope", "delete apps <appname> --scope app1.app2").
+		WithAliases("a").
 		WithCommonFlags().
 		MinimumArgs(1, deleteApps)
 	deleteChannels := cmd.NewCmd("channels").
@@ -36,7 +36,6 @@ func NewDeleteCmd() *cobra.Command {
 		WithAliases("t").
 		WithCommonFlags().
 		MinimumArgs(1, deleteTypes)
-
 	deleteAlias := cmd.NewCmd("alias").
 		WithDescription("Delete alias from scope").
 		WithExample("Delete alias from default scope", "delete alias <aliaskey>").
@@ -46,6 +45,7 @@ func NewDeleteCmd() *cobra.Command {
 		MinimumArgs(1, deleteAlias)
 
 	return cmd.NewCmd("delete").
+		WithCommonFlags().
 		WithDescription("Delete component of object type").
 		WithLongDescription("Delete takes a component type (apps | channels | types | alias) its scope and name, and deletes it from the cluster").
 		WithExample("deletes app", "delete apps <app_name>").
@@ -63,7 +63,6 @@ func NewDeleteCmd() *cobra.Command {
 func deleteApps(_ context.Context, args []string) error {
 	client := cliutils.GetCliClient()
 	out := cliutils.GetCliOutput()
-
 	scope, err := cliutils.GetScope()
 	if err != nil {
 		return err
@@ -72,7 +71,7 @@ func deleteApps(_ context.Context, args []string) error {
 	for _, arg := range args {
 		if !utils.IsValidScope(arg) {
 			fmt.Fprint(out, "invalid args\n")
-			return ierrors.NewError().Message("Invalid args").BadRequest().Build()
+			return ierrors.NewError().Message("invalid args").BadRequest().Build()
 		}
 		path, _ := utils.JoinScopes(scope, arg)
 

@@ -51,7 +51,8 @@ var flagRegistry = []Flag{
 		Value:         &InsprOptions.DryRun,
 		DefValue:      false,
 		FlagAddMethod: "BoolVar",
-		DefinedOn:     []string{"apply"},
+		DefinedOn: []string{"apply", "delete", "apps", "channels",
+			"types", "alias"},
 	},
 	{
 		Name:      "token",
