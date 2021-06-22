@@ -113,7 +113,7 @@ func (t *RootGetter) Alias() memory.AliasGetInterface {
 	return &AliasRootGetter{}
 }
 
-// Root returns a getter for objects on the tree without the current changes.
+// Tree returns a getter for objects on the tree without the current changes.
 func (mm *MemoryManager) Tree() memory.GetInterface {
 	return &RootGetter{
 		tree: mm.tree,
