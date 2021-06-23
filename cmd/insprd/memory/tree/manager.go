@@ -86,36 +86,36 @@ func (mm *MemoryManager) GetTransactionChanges() (diff.Changelog, error) {
 	return cl, err
 }
 
-// TreeGetter is a structure that gets components from the root, without the current changes.
-type TreeGetter struct {
+// PermTreeGetter is a structure that gets components from the root, without the current changes.
+type PermTreeGetter struct {
 	tree *meta.App
 }
 
 // Apps returns a getter for apps on the root.
-func (t *TreeGetter) Apps() memory.AppGetInterface {
-	return &AppTreeGetter{
+func (t *PermTreeGetter) Apps() memory.AppGetInterface {
+	return &AppPermTreeGetter{
 		tree: t.tree,
 	}
 }
 
 // Channels returns a getter for channels on the root.
-func (t *TreeGetter) Channels() memory.ChannelGetInterface {
-	return &ChannelTreeGetter{}
+func (t *PermTreeGetter) Channels() memory.ChannelGetInterface {
+	return &ChannelPermTreeGetter{}
 }
 
 // Types returns a getter for Types on the root
-func (t *TreeGetter) Types() memory.TypeGetInterface {
-	return &TypeTreeGetter{}
+func (t *PermTreeGetter) Types() memory.TypeGetInterface {
+	return &TypePermTreeGetter{}
 }
 
 // Alias returns a getter for alias on the root
-func (t *TreeGetter) Alias() memory.AliasGetInterface {
-	return &AliasTreeGetter{}
+func (t *PermTreeGetter) Alias() memory.AliasGetInterface {
+	return &AliasPermTreeGetter{}
 }
 
 // Tree returns a getter for objects on the tree without the current changes.
 func (mm *MemoryManager) Tree() memory.GetInterface {
-	return &TreeGetter{
+	return &PermTreeGetter{
 		tree: mm.tree,
 	}
 }

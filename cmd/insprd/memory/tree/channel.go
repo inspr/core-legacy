@@ -229,16 +229,16 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	return nil
 }
 
-// ChannelTreeGetter returns a getter that gets channels from the root structure of the app, without the current changes.
+// ChannelPermTreeGetter returns a getter that gets channels from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
-type ChannelTreeGetter struct {
+type ChannelPermTreeGetter struct {
 }
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the Channel which name is equal to the last query element.
 // If the specified Channel is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (cmm *ChannelTreeGetter) Get(scope, name string) (*meta.Channel, error) {
+func (cmm *ChannelPermTreeGetter) Get(scope, name string) (*meta.Channel, error) {
 	logger.Info("trying to get a Channel (Root Getter)",
 		zap.String("channel", name),
 		zap.String("scope", scope))

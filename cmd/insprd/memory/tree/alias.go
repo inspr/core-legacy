@@ -199,16 +199,16 @@ func (amm *AliasMemoryManager) Delete(scope, aliasKey string) error {
 	return nil
 }
 
-// AliasTreeGetter returns a getter that gets alias from the root structure of the app, without the current changes.
+// AliasPermTreeGetter returns a getter that gets alias from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
-type AliasTreeGetter struct {
+type AliasPermTreeGetter struct {
 }
 
 // Get receives a scope and a alias key. The scope defines
 // the path to an App. If this App has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (amm *AliasTreeGetter) Get(scope, aliasKey string) (*meta.Alias, error) {
+func (amm *AliasPermTreeGetter) Get(scope, aliasKey string) (*meta.Alias, error) {
 	logger.Info("trying to get an Alias (Root Getter)",
 		zap.String("alias", aliasKey),
 		zap.String("scope", scope))
