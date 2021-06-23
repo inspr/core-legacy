@@ -27,7 +27,7 @@ func (h *Handler) ControllerRefreshHandler() rest.Handler {
 		// this is the path to the app
 		appQuery := string(received.RefreshToken)
 
-		app, err := h.Memory.Root().Apps().Get(appQuery)
+		app, err := h.Memory.Tree().Apps().Get(appQuery)
 		if err != nil {
 			log.Printf("err = %+v\n", err)
 			rest.ERROR(w, err)

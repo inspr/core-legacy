@@ -35,8 +35,24 @@ func NewGeneralOperator(brokers brokers.Manager, memory memory.Manager) *GenOp {
 	}
 }
 
-func (g GenOp) getOperator(scope, name string) (ChannelOperatorInterface, error) {
-	channel, _ := g.memory.Channels().Get(scope, name)
+func (g GenOp) getOperator(scope, name string, deleteCmd bool) (ChannelOperatorInterface, error) {
+	var channel *meta.Channel
+	var err error
+
+	// delete should get it's channel information from the unaltered tree,
+	// otherwise the channel wouldnt be found
+	if deleteCmd {
+		channel, err = g.memory.Tree().Channels().Get(scope, name)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		channel, err = g.memory.Channels().Get(scope, name)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	broker := channel.Spec.SelectedBroker
 
 	config, err := g.brokers.Configs(broker)
@@ -76,7 +92,7 @@ func (g GenOp) setOperator(config metabrokers.BrokerConfiguration) error {
 
 //Get executes Get method of correct operator given the desired channel's broker
 func (g GenOp) Get(ctx context.Context, scope, name string) (*meta.Channel, error) {
-	op, err := g.getOperator(scope, name)
+	op, err := g.getOperator(scope, name, false)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +101,7 @@ func (g GenOp) Get(ctx context.Context, scope, name string) (*meta.Channel, erro
 
 //Create executes Create method of correct operator given the desired channel's broker
 func (g GenOp) Create(ctx context.Context, scope string, channel *meta.Channel) error {
-	op, err := g.getOperator(scope, channel.Meta.Name)
+	op, err := g.getOperator(scope, channel.Meta.Name, false)
 	if err != nil {
 		return err
 	}
@@ -94,7 +110,7 @@ func (g GenOp) Create(ctx context.Context, scope string, channel *meta.Channel) 
 
 //Update executes Update method of correct operator given the desired channel's broker
 func (g GenOp) Update(ctx context.Context, scope string, channel *meta.Channel) error {
-	op, err := g.getOperator(scope, channel.Meta.Name)
+	op, err := g.getOperator(scope, channel.Meta.Name, false)
 	if err != nil {
 		return err
 	}
@@ -103,7 +119,7 @@ func (g GenOp) Update(ctx context.Context, scope string, channel *meta.Channel) 
 
 //Delete executes Delete method of correct operator given the desired channel's broker
 func (g GenOp) Delete(ctx context.Context, scope, name string) error {
-	op, err := g.getOperator(scope, name)
+	op, err := g.getOperator(scope, name, true)
 	if err != nil {
 		return err
 	}

@@ -183,9 +183,9 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
 	return nil
 }
 
-// AppRootGetter returns a getter that gets apps from the root structure of the app, without the current changes.
+// AppPermTreeGetter returns a getter that gets apps from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
-type AppRootGetter struct {
+type AppPermTreeGetter struct {
 	tree *meta.App
 }
 
@@ -194,7 +194,7 @@ type AppRootGetter struct {
 // The tree root dApp is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
+func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
 	logger.Info("trying to get a dApp (Root Getter)", zap.String("dApp", query))
 
 	if query == "" {

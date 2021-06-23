@@ -103,7 +103,7 @@ func (ch *ChannelHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Channel get transaction")
 		ch.Memory.InitTransaction()
 
-		channel, err := ch.Memory.Root().Channels().Get(scope, data.ChName)
+		channel, err := ch.Memory.Tree().Channels().Get(scope, data.ChName)
 		if err != nil {
 			logger.Error("unable to get Channel",
 				zap.String("channel", data.ChName),
@@ -213,7 +213,7 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 			return
 		}
 
-		changes, err := ch.Memory.Channels().GetTransactionChanges()
+		changes, err := ch.Memory.GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Channel delete request changes",
 				zap.Any("error", err))
@@ -233,10 +233,10 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 				return
 			}
 
-			logger.Info("committing Channel create changes")
+			logger.Info("committing Channel delete changes")
 			defer ch.Memory.Commit()
 		} else {
-			logger.Info("cancelling Channel create changes")
+			logger.Info("cancelling Channel delete changes")
 			defer ch.Memory.Cancel()
 		}
 
