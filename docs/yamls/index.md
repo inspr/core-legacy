@@ -24,7 +24,7 @@ In this way, when the file is written in one of the formats described below it c
 [definitions and examples](type.md)
 
 ## Aliases
-> Responsible for defining an alternative name for a channel, useful when you want to make a channel's name distinct in a single dApp or set of dApps
+> Responsible for defining an alternative name for a Channel, useful when you want to make a Channel's name distinct in a single dApp or set of dApps
 > 
 [definitions and examples](alias.md)
 
