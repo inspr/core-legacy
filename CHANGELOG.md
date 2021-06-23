@@ -1,6 +1,14 @@
 
 # Changelog
 
+
+### #79 Story CORE-481 | Adding fields descriptions to the documentations in docs/yamls 
+- misc:
+    - created the alias doc
+    - added fields to the node documentation
+    - checked index and added the alias section to it
+---
+
 ### #78 Bug CORE-475 | Deletion of multiple channels not working  
 - fixes:
     - Altered the Channel Operator when handling delete to get the channel from `tree` instead of `root`
