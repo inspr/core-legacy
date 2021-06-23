@@ -18,10 +18,10 @@ import (
 // the requests
 func TestServer_initRoutes(t *testing.T) {
 	testServer := &Server{
-		Mux:               http.NewServeMux(),
-		TreeMemoryManager: fake.MockMemoryManager(nil),
+		mux:               http.NewServeMux(),
+		treeMemoryManager: fake.MockMemoryManager(nil),
 		auth:              authmock.NewMockAuth(errors.New("unauthorized")),
-		BrokerManager:     fake.MockBrokerManager(nil),
+		brokerManager:     fake.MockBrokerManager(nil),
 	}
 	testServer.initRoutes()
 	defaultMethods := [...]string{
@@ -108,7 +108,7 @@ func TestServer_initRoutes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ts := httptest.NewServer(testServer.Mux)
+			ts := httptest.NewServer(testServer.mux)
 			defer ts.Close()
 			client := ts.Client()
 			for i, statusCodeResult := range tt.want {

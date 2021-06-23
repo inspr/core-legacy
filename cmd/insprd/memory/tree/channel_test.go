@@ -29,7 +29,7 @@ func TestMemoryManager_Channels(t *testing.T) {
 				root: getMockChannels(),
 			},
 			want: &ChannelMemoryManager{
-				&TreeMemoryManager{
+				&treeMemoryManager{
 					root: getMockChannels(),
 				},
 			},
@@ -37,7 +37,7 @@ func TestMemoryManager_Channels(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmm := &TreeMemoryManager{
+			tmm := &treeMemoryManager{
 				root: tt.fields.root,
 			}
 			if got := tmm.Channels(); !reflect.DeepEqual(got, tt.want) {
@@ -125,7 +125,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				TreeMemoryManager: &TreeMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
@@ -335,7 +335,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				TreeMemoryManager: &TreeMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
@@ -466,7 +466,7 @@ func TestChannelMemoryManager_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				TreeMemoryManager: &TreeMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
@@ -600,7 +600,7 @@ func TestChannelMemoryManager_Update(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				TreeMemoryManager: &TreeMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,

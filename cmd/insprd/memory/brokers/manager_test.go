@@ -15,7 +15,7 @@ func TestGetBrokerMemory(t *testing.T) {
 	}{
 		{
 			name: "GetManager from nil pointer",
-			want: &BrokerMemoryManager{
+			want: &brokerMemoryManager{
 				broker: &brokers.Brokers{
 					Available: make(brokers.BrokerStatusArray),
 				},
@@ -27,7 +27,7 @@ func TestGetBrokerMemory(t *testing.T) {
 		},
 		{
 			name: "GetManager from intanced pointer",
-			want: &BrokerMemoryManager{
+			want: &brokerMemoryManager{
 				broker: &brokers.Brokers{
 					Available: make(brokers.BrokerStatusArray),
 				},

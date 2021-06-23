@@ -19,8 +19,8 @@ func init() {
 	// logger = zap.NewNop()
 }
 
-// TreeMemoryManager defines a memory manager interface
-type TreeMemoryManager struct {
+// treeMemoryManager defines a memory manager interface
+type treeMemoryManager struct {
 	root *meta.App
 	tree *meta.App
 	sync.Mutex
@@ -36,8 +36,8 @@ func GetTreeMemory() Manager {
 	return dapptree
 }
 
-func newTreeMemory() *TreeMemoryManager {
-	return &TreeMemoryManager{
+func newTreeMemory() *treeMemoryManager {
+	return &treeMemoryManager{
 		tree: &meta.App{
 			Meta: meta.Metadata{
 				Annotations: map[string]string{},
@@ -61,26 +61,26 @@ func setTree(tmm Manager) {
 }
 
 //InitTransaction copies and reserves the current tree structure so that changes can be reversed
-func (mm *TreeMemoryManager) InitTransaction() {
+func (mm *treeMemoryManager) InitTransaction() {
 	mm.Lock()
 	utils.DeepCopy(mm.tree, &mm.root)
 }
 
 //Commit applies changes from a transaction in to the tree structure
-func (mm *TreeMemoryManager) Commit() {
+func (mm *treeMemoryManager) Commit() {
 	defer mm.Unlock()
 	mm.tree = mm.root
 	mm.root = nil
 }
 
 //Cancel discarts changes made in the last transaction
-func (mm *TreeMemoryManager) Cancel() {
+func (mm *treeMemoryManager) Cancel() {
 	defer mm.Unlock()
 	mm.root = nil
 }
 
 //GetTransactionChanges returns the changelog resulting from the current transaction.
-func (mm *TreeMemoryManager) GetTransactionChanges() (diff.Changelog, error) {
+func (mm *treeMemoryManager) GetTransactionChanges() (diff.Changelog, error) {
 	cl, err := diff.Diff(mm.tree, mm.root)
 	return cl, err
 }
@@ -113,7 +113,7 @@ func (t *RootGetter) Alias() AliasGetInterface {
 }
 
 // Root returns a getter for objects on the root of the tree, without the current changes.
-func (mm *TreeMemoryManager) Root() GetInterface {
+func (mm *treeMemoryManager) Root() GetInterface {
 	return &RootGetter{
 		tree: mm.tree,
 	}

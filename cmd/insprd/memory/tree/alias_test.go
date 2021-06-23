@@ -23,7 +23,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 				root: getMockAlias(),
 			},
 			want: &AliasMemoryManager{
-				&TreeMemoryManager{
+				&treeMemoryManager{
 					root: getMockAlias(),
 				},
 			},
@@ -31,7 +31,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmm := &TreeMemoryManager{
+			tmm := &treeMemoryManager{
 				root: tt.fields.root,
 			}
 			if got := tmm.Alias(); !reflect.DeepEqual(got, tt.want) {
@@ -130,7 +130,7 @@ func TestAliasMemoryManager_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				TreeMemoryManager: &TreeMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -206,7 +206,7 @@ func TestAliasMemoryManager_Get(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				TreeMemoryManager: &TreeMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -304,7 +304,7 @@ func TestAliasMemoryManager_Update(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				TreeMemoryManager: &TreeMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -388,7 +388,7 @@ func TestAliasMemoryManager_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				TreeMemoryManager: &TreeMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},

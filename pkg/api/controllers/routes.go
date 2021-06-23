@@ -11,29 +11,29 @@ func (s *Server) initRoutes() {
 
 	logger.Debug("initializing Insprd server routes")
 	h := handler.NewHandler(
-		s.TreeMemoryManager, s.op, s.auth, s.BrokerManager,
+		s.treeMemoryManager, s.op, s.auth, s.brokerManager,
 	)
 
 	ahandler := h.NewAppHandler()
-	s.Mux.Handle("/apps", rest.HandleCRUD(ahandler))
+	s.mux.Handle("/apps", rest.HandleCRUD(ahandler))
 
 	chandler := h.NewChannelHandler()
-	s.Mux.Handle("/channels", rest.HandleCRUD(chandler))
+	s.mux.Handle("/channels", rest.HandleCRUD(chandler))
 
 	thandler := h.NewTypeHandler()
-	s.Mux.Handle("/types", rest.HandleCRUD(thandler))
+	s.mux.Handle("/types", rest.HandleCRUD(thandler))
 
 	aliasHandler := h.NewAliasHandler()
-	s.Mux.Handle("/alias", rest.HandleCRUD(aliasHandler))
+	s.mux.Handle("/alias", rest.HandleCRUD(aliasHandler))
 
 	brokersHandler := h.NewBrokerHandler()
-	s.Mux.Handle("/brokers", brokersHandler.HandleGet().Get().JSON())
-	s.Mux.Handle(
+	s.mux.Handle("/brokers", brokersHandler.HandleGet().Get().JSON())
+	s.mux.Handle(
 		"/brokers/"+metabrokers.Kafka,
 		brokersHandler.KafkaCreateHandler().Post().JSON(),
 	)
 
-	s.Mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
-	s.Mux.Handle("/refreshController", h.ControllerRefreshHandler())
-	s.Mux.Handle("/init", h.InitHandler())
+	s.mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
+	s.mux.Handle("/refreshController", h.ControllerRefreshHandler())
+	s.mux.Handle("/init", h.InitHandler())
 }

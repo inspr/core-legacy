@@ -7,7 +7,7 @@ import (
 
 // MockManager mocks a tree structure for testing
 type MockManager struct {
-	*TreeMemoryManager
+	*treeMemoryManager
 	appErr error
 	mockC  bool
 	mockCT bool
@@ -22,7 +22,7 @@ func (tmm *MockManager) Channels() ChannelMemory {
 		}
 	}
 	return &ChannelMemoryManager{
-		TreeMemoryManager: tmm.TreeMemoryManager,
+		treeMemoryManager: tmm.treeMemoryManager,
 	}
 }
 
@@ -34,7 +34,7 @@ func (tmm *MockManager) Types() TypeMemory {
 		}
 	}
 	return &TypeMemoryManager{
-		TreeMemoryManager: tmm.TreeMemoryManager,
+		treeMemoryManager: tmm.treeMemoryManager,
 	}
 }
 
@@ -47,7 +47,7 @@ func (tmm *MockManager) Apps() AppMemory {
 		}
 	}
 	return &AppMemoryManager{
-		TreeMemoryManager: tmm.TreeMemoryManager,
+		treeMemoryManager: tmm.treeMemoryManager,
 	}
 }
 
@@ -76,7 +76,7 @@ func (tmm *MockManager) Root() GetInterface {
 // tree structure to be mocked and used in tests where tree access is needed
 func SetMockedTree(root *meta.App, appErr error, mockC, mockA, mockT bool) {
 	setTree(&MockManager{
-		TreeMemoryManager: &TreeMemoryManager{
+		treeMemoryManager: &treeMemoryManager{
 			root: root,
 			tree: root,
 		},

@@ -18,8 +18,8 @@ func init() {
 // BrokerManager implements broker's Manager interface,
 // allows for management of the system's message brokers
 
-// BrokerMemoryManager implements the methods described by the BrokersInterface
-type BrokerMemoryManager struct {
+// brokerMemoryManager implements the methods described by the BrokersInterface
+type brokerMemoryManager struct {
 	factory SidecarManager
 	broker  *brokers.Brokers
 }
@@ -29,7 +29,7 @@ var brokerMemory Manager
 // GetBrokerMemory allows for connection with BrokersManager sigleton
 func GetBrokerMemory() Manager {
 	if brokerMemory == nil {
-		brokerMemory = &BrokerMemoryManager{
+		brokerMemory = &brokerMemoryManager{
 			broker: &brokers.Brokers{
 				Available: make(brokers.BrokerStatusArray),
 			},

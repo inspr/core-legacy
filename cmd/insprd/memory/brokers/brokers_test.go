@@ -49,13 +49,13 @@ func TestBrokersMemoryManager_GetAll(t *testing.T) {
 func TestBrokersMemoryManager_GetDefault(t *testing.T) {
 	tests := []struct {
 		name    string
-		bmm     *BrokerMemoryManager
+		bmm     *brokerMemoryManager
 		want    string
 		wantErr bool
 	}{
 		{
 			name:    "getdefault from empty brokerMM",
-			bmm:     &BrokerMemoryManager{},
+			bmm:     &brokerMemoryManager{},
 			want:    "",
 			wantErr: false,
 		},
@@ -79,13 +79,13 @@ func TestBrokersMemoryManager_GetDefault(t *testing.T) {
 func TestBrokersMemoryManager_get(t *testing.T) {
 	tests := []struct {
 		name    string
-		bmm     *BrokerMemoryManager
+		bmm     *brokerMemoryManager
 		want    *brokers.Brokers
 		wantErr bool
 	}{
 		{
 			name: "get from instanciated singleton",
-			bmm: &BrokerMemoryManager{
+			bmm: &brokerMemoryManager{
 				broker: &brokers.Brokers{
 					Available: brokers.BrokerStatusArray{
 						"brk1": nil,
@@ -107,7 +107,7 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 		},
 		{
 			name: "get from nil singleton memory",
-			bmm: &BrokerMemoryManager{
+			bmm: &brokerMemoryManager{
 				broker: nil,
 			},
 			want:    nil,
@@ -142,13 +142,13 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		bmm     *BrokerMemoryManager
+		bmm     *brokerMemoryManager
 		exec    func(bmm Manager) error
 		wantErr bool
 	}{
 		{
 			name: "invalid create - broker not supported",
-			bmm:  &BrokerMemoryManager{},
+			bmm:  &brokerMemoryManager{},
 			exec: func(bmm Manager) error {
 				return bmm.Create(mockedConfigs{broker: "brk1"})
 			},
@@ -156,14 +156,14 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 		},
 		{
 			name: "valid create",
-			bmm:  &BrokerMemoryManager{},
+			bmm:  &brokerMemoryManager{},
 			exec: func(bmm Manager) error {
 				return bmm.Create(&kafkaStructMock)
 			},
 		},
 		{
 			name: "invalid create - broker already exists",
-			bmm:  &BrokerMemoryManager{},
+			bmm:  &brokerMemoryManager{},
 			exec: func(bmm Manager) error {
 				return bmm.Create(&kafkaStructMock)
 			},
@@ -171,7 +171,7 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 		},
 		{
 			name: "invalid setdefault",
-			bmm:  &BrokerMemoryManager{},
+			bmm:  &brokerMemoryManager{},
 			exec: func(bmm Manager) error {
 				return bmm.SetDefault("brk1")
 			},
@@ -179,7 +179,7 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 		},
 		{
 			name: "valid setdefault",
-			bmm:  &BrokerMemoryManager{},
+			bmm:  &brokerMemoryManager{},
 			exec: func(bmm Manager) error {
 				return bmm.SetDefault(brokers.Kafka)
 			},
