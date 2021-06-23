@@ -23,6 +23,12 @@ In this way, when the file is written in one of the formats described below it c
 
 [definitions and examples](type.md)
 
+## Aliases
+> Responsible for defining an alternative name for a channel 
+> 
+[definitions and examples](alias.md)
+
+
 ## General file
 
 >The so called general file, or composed file, is nothing more than a YAML that congregates two or more definitions of the elements described above into a single dApp. 
