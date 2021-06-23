@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/sidecars"
 	"inspr.dev/inspr/pkg/ierrors"
@@ -22,7 +21,7 @@ func TestMemoryManager_Channels(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   memory.ChannelMemory
+		want   ChannelMemory
 	}{
 		{
 			name: "It should return a pointer to ChannelMemoryManager.",

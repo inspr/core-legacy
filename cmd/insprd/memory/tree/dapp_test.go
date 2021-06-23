@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/sidecars"
 	"inspr.dev/inspr/pkg/meta"
@@ -696,7 +695,7 @@ func TestMemoryManager_Apps(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   memory.AppMemory
+		want   AppMemory
 	}{
 		{
 			name: "creating a AppMemoryManager",

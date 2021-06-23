@@ -6,7 +6,7 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/sidecars"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
@@ -25,11 +25,11 @@ func init() {
 type ChannelOperator struct {
 	k      kafkaAdminClient
 	logger *zap.Logger
-	mem    memory.Manager
+	mem    tree.Manager
 }
 
 // NewOperator returns an initialized operator from the environment variables
-func NewOperator(mem memory.Manager, config sidecars.KafkaConfig) (*ChannelOperator, error) {
+func NewOperator(mem tree.Manager, config sidecars.KafkaConfig) (*ChannelOperator, error) {
 	var kafkaConfig *kafka.ConfigMap
 	var err error
 	var adminClient kafkaAdminClient

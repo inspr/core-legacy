@@ -2,7 +2,6 @@ package tree
 
 import (
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils"
@@ -15,7 +14,7 @@ type TypeMemoryManager struct {
 }
 
 // Types is a MemoryManager method that provides an access point for Types
-func (mm *MemoryManager) Types() memory.TypeMemory {
+func (mm *MemoryManager) Types() TypeMemory {
 	return &TypeMemoryManager{
 		MemoryManager: mm,
 	}

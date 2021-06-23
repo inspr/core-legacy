@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
@@ -17,7 +16,7 @@ func TestMemoryManager_Types(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   memory.TypeMemory
+		want   TypeMemory
 	}{
 		{
 			name: "creating a TypeMemortMannager",

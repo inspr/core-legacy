@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/meta"
 )
 
@@ -16,7 +15,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   memory.AliasMemory
+		want   AliasMemory
 	}{
 		{
 			name: "It should return a pointer to AliasMemoryManager.",

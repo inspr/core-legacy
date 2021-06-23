@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
@@ -16,7 +15,7 @@ type MockManager struct {
 }
 
 // Channels mocks a channel interface for testing
-func (tmm *MockManager) Channels() memory.ChannelMemory {
+func (tmm *MockManager) Channels() ChannelMemory {
 	if tmm.mockC {
 		return &ChannelMockManager{
 			MockManager: tmm,
@@ -28,7 +27,7 @@ func (tmm *MockManager) Channels() memory.ChannelMemory {
 }
 
 // Types mocks a Type interface for testing
-func (tmm *MockManager) Types() memory.TypeMemory {
+func (tmm *MockManager) Types() TypeMemory {
 	if tmm.mockCT {
 		return &TypeMockManager{
 			MockManager: tmm,
@@ -40,7 +39,7 @@ func (tmm *MockManager) Types() memory.TypeMemory {
 }
 
 // Apps mocks an app interface for testing
-func (tmm *MockManager) Apps() memory.AppMemory {
+func (tmm *MockManager) Apps() AppMemory {
 	if tmm.mockA {
 		return &MockAppManager{
 			MockManager: tmm,
@@ -67,7 +66,7 @@ func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
 }
 
 // Root mock interface structure
-func (tmm *MockManager) Root() memory.GetInterface {
+func (tmm *MockManager) Root() GetInterface {
 	return &RootGetter{
 		tmm.root,
 	}

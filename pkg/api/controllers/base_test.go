@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/insprd/operators"
 	ofake "inspr.dev/inspr/cmd/insprd/operators/fake"
 	"inspr.dev/inspr/pkg/auth"
@@ -15,7 +15,7 @@ import (
 
 func TestServer_Init(t *testing.T) {
 	type args struct {
-		mm      memory.Manager
+		mm      tree.Manager
 		op      operators.OperatorInterface
 		auth    auth.Auth
 		brokers brokers.Manager

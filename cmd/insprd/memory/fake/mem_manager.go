@@ -1,9 +1,9 @@
 package fake
 
 import (
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/meta"
 )
 
@@ -20,27 +20,27 @@ type MemManager struct {
 type LookupMemManager MemManager
 
 // Apps mocks an app getter
-func (l LookupMemManager) Apps() memory.AppGetInterface {
+func (l LookupMemManager) Apps() tree.AppGetInterface {
 	return &l.app
 }
 
 // Channels mocks a channel getter
-func (l LookupMemManager) Channels() memory.ChannelGetInterface {
+func (l LookupMemManager) Channels() tree.ChannelGetInterface {
 	return &l.channel
 }
 
 // Types mocks a Type getter
-func (l LookupMemManager) Types() memory.TypeGetInterface {
+func (l LookupMemManager) Types() tree.TypeGetInterface {
 	return &l.insprType
 }
 
 // Alias mocks a alias getter
-func (l LookupMemManager) Alias() memory.AliasGetInterface {
+func (l LookupMemManager) Alias() tree.AliasGetInterface {
 	return &l.alias
 }
 
 // MockMemoryManager mock exported with propagated error through the functions
-func MockMemoryManager(failErr error) memory.Manager {
+func MockMemoryManager(failErr error) tree.Manager {
 	return &MemManager{
 		insprType: Types{
 			fail:       failErr,
@@ -62,27 +62,27 @@ func MockMemoryManager(failErr error) memory.Manager {
 }
 
 // Root mocks a root getter interface
-func (mm *MemManager) Root() memory.GetInterface {
+func (mm *MemManager) Root() tree.GetInterface {
 	return (*LookupMemManager)(mm)
 }
 
 // Apps returns manager of DApps
-func (mm *MemManager) Apps() memory.AppMemory {
+func (mm *MemManager) Apps() tree.AppMemory {
 	return &mm.app
 }
 
 // Channels returns manager's DApp
-func (mm *MemManager) Channels() memory.ChannelMemory {
+func (mm *MemManager) Channels() tree.ChannelMemory {
 	return &mm.channel
 }
 
 // Types returns manager's DApp
-func (mm *MemManager) Types() memory.TypeMemory {
+func (mm *MemManager) Types() tree.TypeMemory {
 	return &mm.insprType
 }
 
 // Alias returns manager's Alias
-func (mm *MemManager) Alias() memory.AliasMemory {
+func (mm *MemManager) Alias() tree.AliasMemory {
 	return &mm.alias
 }
 

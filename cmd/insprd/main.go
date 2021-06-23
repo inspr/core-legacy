@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/insprd/operators"
@@ -14,7 +13,7 @@ import (
 )
 
 func main() {
-	var memoryManager memory.Manager
+	var memoryManager tree.Manager
 	var brokerManager brokers.Manager
 	var operator operators.OperatorInterface
 	var authenticator auth.Auth

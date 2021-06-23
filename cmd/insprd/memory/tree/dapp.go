@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
@@ -19,7 +18,7 @@ type AppMemoryManager struct {
 }
 
 // Apps is a MemoryManager method that provides an access point for Apps
-func (tmm *MemoryManager) Apps() memory.AppMemory {
+func (tmm *MemoryManager) Apps() AppMemory {
 	return &AppMemoryManager{
 		MemoryManager: tmm,
 	}

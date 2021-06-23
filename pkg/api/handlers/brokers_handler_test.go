@@ -9,9 +9,9 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/insprd/operators"
 	ofake "inspr.dev/inspr/cmd/insprd/operators/fake"
 	"inspr.dev/inspr/pkg/api/models"
@@ -23,7 +23,7 @@ import (
 
 func TestHandler_NewBrokerHandler(t *testing.T) {
 	type fields struct {
-		Memory          memory.Manager
+		Memory          tree.Manager
 		Brokers         brokers.Manager
 		Operator        operators.OperatorInterface
 		Auth            auth.Auth

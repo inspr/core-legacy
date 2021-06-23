@@ -2,7 +2,6 @@ package tree
 
 import (
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
@@ -16,7 +15,7 @@ type ChannelMemoryManager struct {
 }
 
 // Channels return a pointer to ChannelMemoryManager
-func (tmm *MemoryManager) Channels() memory.ChannelMemory {
+func (tmm *MemoryManager) Channels() ChannelMemory {
 	return &ChannelMemoryManager{
 		MemoryManager: tmm,
 	}

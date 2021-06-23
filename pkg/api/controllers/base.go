@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/insprd/operators"
 	"inspr.dev/inspr/pkg/auth"
 )
@@ -25,14 +25,14 @@ func init() {
 // to handle the necessary routes of the rest API
 type Server struct {
 	Mux           *http.ServeMux
-	MemoryManager memory.Manager
+	MemoryManager tree.Manager
 	BrokerManager brokers.Manager
 	op            operators.OperatorInterface
 	auth          auth.Auth
 }
 
 // Init - configures the server
-func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface, auth auth.Auth, bm brokers.Manager) {
+func (s *Server) Init(mm tree.Manager, op operators.OperatorInterface, auth auth.Auth, bm brokers.Manager) {
 	logger.Info("initializing Insprd server")
 
 	s.Mux = http.NewServeMux()

@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/pkg/auth"
 	authmock "inspr.dev/inspr/pkg/auth/mocks"
 	"inspr.dev/inspr/pkg/meta"
@@ -134,7 +134,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 
 	type fields struct {
 		clientSet kubernetes.Interface
-		memory    memory.Manager
+		memory    tree.Manager
 		auth      auth.Auth
 	}
 	type args struct {
@@ -518,7 +518,7 @@ func TestNodeOperator_toSecret(t *testing.T) {
 
 	type fields struct {
 		clientSet kubernetes.Interface
-		memory    memory.Manager
+		memory    tree.Manager
 		auth      auth.Auth
 	}
 	type args struct {

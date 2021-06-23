@@ -1,6 +1,6 @@
 // Package memory provides simple interfaces for the
 // in memory management of the cluster.
-package memory
+package tree
 
 import (
 	"inspr.dev/inspr/pkg/meta"

@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
@@ -27,10 +26,10 @@ type MemoryManager struct {
 	sync.Mutex
 }
 
-var dapptree memory.Manager
+var dapptree Manager
 
 // GetTreeMemory returns a memory manager interface
-func GetTreeMemory() memory.Manager {
+func GetTreeMemory() Manager {
 	if dapptree == nil {
 		setTree(newTreeMemory())
 	}
@@ -57,7 +56,7 @@ func newTreeMemory() *MemoryManager {
 	}
 }
 
-func setTree(tmm memory.Manager) {
+func setTree(tmm Manager) {
 	dapptree = tmm
 }
 
@@ -92,29 +91,29 @@ type RootGetter struct {
 }
 
 // Apps returns a getter for apps on the root.
-func (t *RootGetter) Apps() memory.AppGetInterface {
+func (t *RootGetter) Apps() AppGetInterface {
 	return &AppRootGetter{
 		tree: t.tree,
 	}
 }
 
 // Channels returns a getter for channels on the root.
-func (t *RootGetter) Channels() memory.ChannelGetInterface {
+func (t *RootGetter) Channels() ChannelGetInterface {
 	return &ChannelRootGetter{}
 }
 
 // Types returns a getter for Types on the root
-func (t *RootGetter) Types() memory.TypeGetInterface {
+func (t *RootGetter) Types() TypeGetInterface {
 	return &TypeRootGetter{}
 }
 
 // Alias returns a getter for alias on the root
-func (t *RootGetter) Alias() memory.AliasGetInterface {
+func (t *RootGetter) Alias() AliasGetInterface {
 	return &AliasRootGetter{}
 }
 
 // Root returns a getter for objects on the root of the tree, without the current changes.
-func (mm *MemoryManager) Root() memory.GetInterface {
+func (mm *MemoryManager) Root() GetInterface {
 	return &RootGetter{
 		tree: mm.tree,
 	}

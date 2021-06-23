@@ -9,8 +9,8 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	ofake "inspr.dev/inspr/cmd/insprd/operators/fake"
 	"inspr.dev/inspr/pkg/api/models"
 	authmock "inspr.dev/inspr/pkg/auth/mocks"
@@ -203,7 +203,7 @@ func TestNewAppHandler(t *testing.T) {
 		authmock.NewMockAuth(nil), nil,
 	)
 	type args struct {
-		memManager memory.Manager
+		memManager tree.Manager
 	}
 	tests := []struct {
 		name string
