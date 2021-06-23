@@ -168,15 +168,15 @@ func (tmm *TypeMemoryManager) Update(scope string, insprType *meta.Type) error {
 	return nil
 }
 
-// TypeRootGetter returns a getter that gets Types from the root structure of the app, without the current changes.
+// TypeTreeGetter returns a getter that gets Types from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
-type TypeRootGetter struct{}
+type TypeTreeGetter struct{}
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the Type which name is equal to the last query element.
 // If the specified Type is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (trg *TypeRootGetter) Get(scope, name string) (*meta.Type, error) {
+func (trg *TypeTreeGetter) Get(scope, name string) (*meta.Type, error) {
 	logger.Info("trying to get a Type (Root Getter)",
 		zap.String("type", name),
 		zap.String("scope", scope))

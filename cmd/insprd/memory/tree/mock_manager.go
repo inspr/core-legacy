@@ -68,7 +68,7 @@ func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
 
 // Tree mock interface structure
 func (tmm *MockManager) Tree() memory.GetInterface {
-	return &RootGetter{
+	return &TreeGetter{
 		tmm.root,
 	}
 }

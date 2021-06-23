@@ -7,6 +7,7 @@
     - Fixed Insprd CLI's Alias delete command (and its tests)
 - refactors:
     - In the tree memory manager renamed method Root(), which returns the tree, to Tree()
+    - In the tree memory manager, renamed "RootGetter" structures to "TreeGetter"
 - misc:
     - Updated Insprd CLI's cluster config command error messages
 ---
