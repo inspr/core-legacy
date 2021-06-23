@@ -298,7 +298,7 @@ func Test_getParentApp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -633,7 +633,7 @@ func Test_checkAndUpdates(t *testing.T) {
 
 func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 	type fields struct {
-		MemoryManager *MemoryManager
+		MemoryManager *TreeMemoryManager
 		root          *meta.App
 		appErr        error
 		mockA         bool
@@ -736,7 +736,7 @@ func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -782,7 +782,7 @@ func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 
 func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 	type fields struct {
-		MemoryManager *MemoryManager
+		MemoryManager *TreeMemoryManager
 		root          *meta.App
 		appErr        error
 		mockA         bool
@@ -816,7 +816,7 @@ func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -835,7 +835,7 @@ func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 
 func TestAppMemoryManager_addAppInTree(t *testing.T) {
 	type fields struct {
-		MemoryManager *MemoryManager
+		MemoryManager *TreeMemoryManager
 		root          *meta.App
 		appErr        error
 		mockA         bool
@@ -1013,7 +1013,7 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -1161,7 +1161,7 @@ func TestAppMemoryManager_updateUUID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			amm := &AppMemoryManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.args.tree,
 					tree: tt.args.tree,
 				},

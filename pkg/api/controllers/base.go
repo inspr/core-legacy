@@ -24,11 +24,11 @@ func init() {
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
-	Mux           *http.ServeMux
-	MemoryManager tree.Manager
-	BrokerManager brokers.Manager
-	op            operators.OperatorInterface
-	auth          auth.Auth
+	Mux               *http.ServeMux
+	TreeMemoryManager tree.Manager
+	BrokerManager     brokers.Manager
+	op                operators.OperatorInterface
+	auth              auth.Auth
 }
 
 // Init - configures the server
@@ -36,7 +36,7 @@ func (s *Server) Init(mm tree.Manager, op operators.OperatorInterface, auth auth
 	logger.Info("initializing Insprd server")
 
 	s.Mux = http.NewServeMux()
-	s.MemoryManager = mm
+	s.TreeMemoryManager = mm
 	s.BrokerManager = bm
 	s.op = op
 	s.auth = auth

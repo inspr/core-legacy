@@ -703,7 +703,7 @@ func TestMemoryManager_Apps(t *testing.T) {
 				root: getMockApp(),
 			},
 			want: &AppMemoryManager{
-				&MemoryManager{
+				&TreeMemoryManager{
 					root: getMockApp(),
 				},
 			},
@@ -711,7 +711,7 @@ func TestMemoryManager_Apps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmm := &MemoryManager{
+			tmm := &TreeMemoryManager{
 				root: tt.fields.root,
 			}
 			if got := tmm.Apps(); !metautils.CompareWithUUID(got.(*AppMemoryManager).root, tt.want.(*AppMemoryManager).root) {
@@ -803,7 +803,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -1760,7 +1760,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -1918,7 +1918,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -2396,7 +2396,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -2432,7 +2432,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 
 func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 	type fields struct {
-		MemoryManager *MemoryManager
+		MemoryManager *TreeMemoryManager
 		root          *meta.App
 		appErr        error
 		mockA         bool
@@ -2567,7 +2567,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -2647,7 +2647,7 @@ func TestAppMemoryManager_removeFromParentBoundary(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+				TreeMemoryManager: &TreeMemoryManager{
 					root: getMockApp(),
 					tree: getMockApp(),
 				},

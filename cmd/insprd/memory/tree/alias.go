@@ -12,13 +12,13 @@ import (
 // AliasMemoryManager implements the Alias interface
 // and provides methos for operating on Aliass
 type AliasMemoryManager struct {
-	*MemoryManager
+	*TreeMemoryManager
 }
 
 // Alias is a MemoryManager method that provides an access point for Alias
-func (tmm *MemoryManager) Alias() AliasMemory {
+func (tmm *TreeMemoryManager) Alias() AliasMemory {
 	return &AliasMemoryManager{
-		MemoryManager: tmm,
+		TreeMemoryManager: tmm,
 	}
 }
 

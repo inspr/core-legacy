@@ -10,13 +10,13 @@ import (
 // TypeMemoryManager implements the Type interface
 // and provides methos for operating on Types
 type TypeMemoryManager struct {
-	*MemoryManager
+	*TreeMemoryManager
 }
 
 // Types is a MemoryManager method that provides an access point for Types
-func (mm *MemoryManager) Types() TypeMemory {
+func (mm *TreeMemoryManager) Types() TypeMemory {
 	return &TypeMemoryManager{
-		MemoryManager: mm,
+		TreeMemoryManager: mm,
 	}
 }
 

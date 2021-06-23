@@ -14,13 +14,13 @@ import (
 // AppMemoryManager implements the App interface
 // and provides methos for operating on dApps
 type AppMemoryManager struct {
-	*MemoryManager
+	*TreeMemoryManager
 }
 
 // Apps is a MemoryManager method that provides an access point for Apps
-func (tmm *MemoryManager) Apps() AppMemory {
+func (tmm *TreeMemoryManager) Apps() AppMemory {
 	return &AppMemoryManager{
-		MemoryManager: tmm,
+		TreeMemoryManager: tmm,
 	}
 }
 
@@ -232,7 +232,7 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, 
 		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
 		unresolved[bound] = true
 	}
-	parentApp, err := amm.MemoryManager.Apps().Get(app.Meta.Parent)
+	parentApp, err := amm.TreeMemoryManager.Apps().Get(app.Meta.Parent)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +287,7 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 		}
 		return &merr
 	}
-	parentApp, err := amm.MemoryManager.Apps().Get(app.Meta.Parent)
+	parentApp, err := amm.TreeMemoryManager.Apps().Get(app.Meta.Parent)
 	if err != nil {
 		return err
 	}

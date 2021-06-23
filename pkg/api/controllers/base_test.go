@@ -39,8 +39,8 @@ func TestServer_Init(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.s.Init(tt.args.mm, tt.args.op, tt.args.auth, tt.args.brokers)
-			if !reflect.DeepEqual(tt.s.MemoryManager, fake.MockMemoryManager(nil)) {
-				t.Errorf("TestServer_Init() = %v, want %v", tt.s.MemoryManager, nil)
+			if !reflect.DeepEqual(tt.s.TreeMemoryManager, fake.MockMemoryManager(nil)) {
+				t.Errorf("TestServer_Init() = %v, want %v", tt.s.TreeMemoryManager, nil)
 			}
 		})
 	}

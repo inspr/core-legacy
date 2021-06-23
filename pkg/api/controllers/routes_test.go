@@ -18,10 +18,10 @@ import (
 // the requests
 func TestServer_initRoutes(t *testing.T) {
 	testServer := &Server{
-		Mux:           http.NewServeMux(),
-		MemoryManager: fake.MockMemoryManager(nil),
-		auth:          authmock.NewMockAuth(errors.New("unauthorized")),
-		BrokerManager: fake.MockBrokerManager(nil),
+		Mux:               http.NewServeMux(),
+		TreeMemoryManager: fake.MockMemoryManager(nil),
+		auth:              authmock.NewMockAuth(errors.New("unauthorized")),
+		BrokerManager:     fake.MockBrokerManager(nil),
 	}
 	testServer.initRoutes()
 	defaultMethods := [...]string{

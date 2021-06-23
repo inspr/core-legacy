@@ -11,13 +11,13 @@ import (
 // ChannelMemoryManager implements the channel interface and
 // provides methods for operating on Channels
 type ChannelMemoryManager struct {
-	*MemoryManager
+	*TreeMemoryManager
 }
 
 // Channels return a pointer to ChannelMemoryManager
-func (tmm *MemoryManager) Channels() ChannelMemory {
+func (tmm *TreeMemoryManager) Channels() ChannelMemory {
 	return &ChannelMemoryManager{
-		MemoryManager: tmm,
+		TreeMemoryManager: tmm,
 	}
 }
 
