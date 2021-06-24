@@ -15,10 +15,10 @@
 | &rarr;node           | Section describing the dApp Node                                                                                                                                                            |
 | &rarr;&rarr;meta     | Metadata of the Node                                                                                                                                                                        |
 | name                 | Defines Node name                                                                                                                                                                           |
-| reference            | String that is utilized to define certain tags to the Node in question, a way for the user to categorize the numerous Nodes in the cluster.                                                 |
+| reference            | String that contains the url to the location of the Node definition in inspr's registry                                                 |
 | annotations          | Definitions that can describe characteristics of the Node that later on can be used to process/group the Nodes in your cluster.                                                             |
 | parent               | Defines the Node context in relation to the cluster for example `app1.app2` would mean that this Node is located on the path `root->app1->app2`. It is injected by the Inspr daemon.        |
-| &rarr;&rarr; Spec    |                                                                                                                                                                                             |
+| &rarr;&rarr; spec    |                                                                                                                                                                                             |
 | ports                | array of NodePort structure, represents the connections of a node                                                                                                                           |
 | &rarr;port           | Port that is used for receiving a message in the node                                                                                                                                       |
 | &rarr;targetPort     | definition on which will be the port where the node's message is sent to                                                                                                                    |

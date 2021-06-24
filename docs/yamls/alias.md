@@ -4,7 +4,7 @@
 
 | Field             | Meaning                                                                                                                                                                                                      |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| apiVersion        | Specify what version of the API to use, for example `"v1"`                                                                                                                                                   |
+| apiVersion        | Specify what version of the API to use, for example `v1`                                                                                                                                                   |
 | kind              | Specifies which structure the file represents, in this case it would be `alias`                                                                                                                              |
 | meta              | Metadata of Alias                                                                                                                                                                                            |
 | &rarr;name        | Name of the Alias, it follows the format of `childDApp.childDAppBoundary`                                                                                                                                    |
@@ -20,7 +20,7 @@ kind: alias
 apiVersion: v1
 meta:
   name: "<dapp_name>.<boundary_name>"
-  parent: "chcheck"
+  parent: <path_to_current_dapp>
 target: <channel_name>
 ```
 

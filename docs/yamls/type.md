@@ -4,7 +4,7 @@
 
 | Field             | Meaning                                                                                                                                                            |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| apiVersion        | Specify what version of the API to use, for example `"v1"`                                                                                                         |
+| apiVersion        | Specify what version of the API to use, for example `v1`                                                                                                         |
 | kind              | Specifies which structure the file represents, in this case it would be `type`                                                                                     |
 | meta              | Metadata of Type                                                                                                                                                   |
 | &rarr;name        | Type's Name                                                                                                                                                        |

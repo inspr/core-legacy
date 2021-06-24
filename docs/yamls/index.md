@@ -11,7 +11,7 @@ In this way, when the file is written in one of the formats described below it c
 [definitions and examples](dapp.md)
 
 ## Channels
-> Responsible for creating a message broker's topic, a Channel serve as a path in which two or more dApps can exchange data. It must have a Type defined.
+> Strucutures that make it possible to establish the communication between two dApps via a message broker. It must have a Type defined.
 
 [definitions and examples](channel.md)
 
