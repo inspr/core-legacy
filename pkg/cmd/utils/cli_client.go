@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/controller"
-	"github.com/inspr/inspr/pkg/controller/client"
-	"github.com/inspr/inspr/pkg/controller/mocks"
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/controller/client"
+	"inspr.dev/inspr/pkg/controller/mocks"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 type cliGlobalStructure struct {
@@ -35,7 +36,7 @@ func GetCliOutput() io.Writer {
 	return defaults.out
 }
 
-//SetDefaultClient creates cli's controller client from viper's configured serverIp
+//setGlobalClient creates cli's controller client from viper's configured serverIp
 func setGlobalClient() {
 	url := GetConfiguredServerIP()
 	SetClient(url)
@@ -52,9 +53,19 @@ func SetOutput(out io.Writer) {
 
 // SetClient sets the default server IP of CLI
 func SetClient(url string) {
-	defaults.client = client.NewControllerClient(url, Authenticator{
-		cmd.InsprOptions.Token,
-	})
+	if cmd.InsprOptions.Token == "" {
+		dir, _ := os.UserHomeDir()
+		cmd.InsprOptions.Token = filepath.Join(dir, ".inspr/token")
+	}
+
+	config := client.ControllerConfig{
+		Auth: Authenticator{
+			cmd.InsprOptions.Token,
+		},
+		URL: url,
+	}
+
+	defaults.client = client.NewControllerClient(config)
 }
 
 //SetMockedClient configures singleton's client as a mocked client given a error
@@ -70,13 +81,13 @@ func RequestErrorMessage(err error, w io.Writer) {
 	if ok {
 		switch ierr.Code {
 		case ierrors.Unauthorized:
-			fmt.Fprintf(w, "did you login ?\n")
+			fmt.Fprintf(w, "failed to authenticate with the cluster. Is your token configured correctly?\n")
 		case ierrors.Forbidden:
 			fmt.Fprintf(w, "forbidden operation, please check for the scope.\n")
 		default:
-			fmt.Fprintf(w, "unexpected inspr error, the message is: %v\n", err.Error())
+			fmt.Fprintf(w, "unexpected inspr error: %v\n", err.Error())
 		}
 	} else {
-		fmt.Fprintf(w, "non inspr error, the message is: %v\n", err.Error())
+		fmt.Fprintf(w, "non inspr error: %v\n", err.Error())
 	}
 }

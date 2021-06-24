@@ -1,7 +1,7 @@
 package diff
 
 import (
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // FilterDiffsByKind filters the changelog by changes of a spefific kind or combination of kinds.
@@ -19,8 +19,8 @@ func (c Changelog) FilterDiffsByKind(kind Kind) Changelog {
 func (c Changelog) ForEach(f func(c Change) error) error {
 	errors := ierrors.MultiError{Errors: []error{}}
 	for _, change := range c {
-		if change.Context == "*" {
-			change.Context = ""
+		if change.Scope == "*" {
+			change.Scope = ""
 		}
 		errors.Add(f(change))
 	}
@@ -31,16 +31,16 @@ func (c Changelog) ForEach(f func(c Change) error) error {
 func (c Changelog) FilterDiffs(comp DifferenceFilter) Changelog {
 	newChangelog := Changelog{}
 	for _, change := range c {
-		if change.Context == "*" {
-			change.Context = ""
+		if change.Scope == "*" {
+			change.Scope = ""
 		}
 		hasAdded := false
 		for _, d := range change.Diff {
-			if comp(change.Context, d) {
+			if comp(change.Scope, d) {
 				if !hasAdded {
 					newChangelog = append(newChangelog, Change{
-						Context: change.Context,
-						Diff:    []Difference{},
+						Scope: change.Scope,
+						Diff:  []Difference{},
 					})
 					hasAdded = true
 				}
@@ -97,13 +97,13 @@ func (c Changelog) ForEachDiffFiltered(operations ...DifferenceReaction) error {
 		Errors: []error{},
 	}
 	for _, change := range c {
-		if change.Context == "*" {
-			change.Context = ""
+		if change.Scope == "*" {
+			change.Scope = ""
 		}
 		for _, d := range change.Diff {
 			for _, filter := range operations {
-				if filter.filter(change.Context, d) {
-					errors.Add(filter.operation(change.Context, d))
+				if filter.filter(change.Scope, d) {
+					errors.Add(filter.operation(change.Scope, d))
 				}
 			}
 		}
@@ -151,7 +151,7 @@ func NewChangeKindReaction(kind Kind, apply func(c Change) error) ChangeReaction
 
 // Filter filters the differences of the Change with the return value of the given function
 func (c Change) Filter(f func(d Difference) bool) (ret Change) {
-	ret.Context = c.Context
+	ret.Scope = c.Scope
 	ret.Kind = c.Kind
 	ret.Diff = []Difference{}
 
@@ -181,8 +181,8 @@ func (c Changelog) ForEachFiltered(operations ...ChangeReaction) error {
 		Errors: []error{},
 	}
 	for _, change := range c {
-		if change.Context == "*" {
-			change.Context = ""
+		if change.Scope == "*" {
+			change.Scope = ""
 		}
 		for _, op := range operations {
 			if op.filter(change) {
@@ -204,7 +204,7 @@ func (c Change) ForEach(f DifferenceOperation) error {
 		Errors: []error{},
 	}
 	for _, d := range c.Diff {
-		errors.Add(f(c.Context, d))
+		errors.Add(f(c.Scope, d))
 	}
 	if errors.Empty() {
 		return nil

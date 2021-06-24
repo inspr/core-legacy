@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecar/models"
 	"golang.org/x/net/context"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 func main() {
@@ -16,29 +19,23 @@ func main() {
 	testChannels := []string{"testch1", "testch2", "testch3"}
 	checkChannel := "checkch"
 
-	for {
-		for i := 0; i < 3; i++ {
-			var testMsg models.BrokerData
-			err := client.ReadMessage(ctx, testChannels[i], &testMsg)
+	for i := 0; i < 3; i++ {
+		testChannel := testChannels[i]
+		client.HandleChannel(testChannel, func(ctx context.Context, body io.Reader) error {
+			decoder := json.NewDecoder(body)
+			var testMsg models.BrokerMessage
+			err := decoder.Decode(&testMsg)
 			if err != nil {
-				fmt.Println(err)
-				continue
+				return err
 			}
 
-			fmt.Println("Test received: ")
-			fmt.Println(testMsg.Message.Data)
-
-			if err := client.CommitMessage(ctx, testChannels[i]); err != nil {
-				fmt.Println(err.Error())
+			checkMessage := fmt.Sprintf("%s Check!", testChannel)
+			if err := client.WriteMessage(ctx, checkChannel, checkMessage); err != nil {
+				return err
 			}
-			checkMsg := models.Message{
-				Data: fmt.Sprintf("%s Check!", testChannels[i]),
-			}
-			if err := client.WriteMessage(ctx, checkChannel, checkMsg); err != nil {
-				fmt.Println(err)
-				continue
-			}
-		}
+			return nil
+		})
 
 	}
+	log.Fatalln(client.Run(ctx))
 }

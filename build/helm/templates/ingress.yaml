@@ -6,48 +6,55 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-  - host: {{ .Values.insprIngress.host }}
-    http:
-      paths:
-      - path: /channels
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.service.insprdName }}
-            port:
-              number: {{ .Values.service.insprdPort }}
-      - path: /apps
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.service.insprdName }}
-            port:
-              number: {{ .Values.service.insprdPort }}
-      - path: /channeltypes
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.service.insprdName }}
-            port:
-              number: {{ .Values.service.insprdPort }}
-      - path: /alias
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.service.insprdName }}
-            port:
-              number: {{ .Values.service.insprdPort }}
-      - path: /auth
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.service.insprdName }}
-            port:
-              number: {{ .Values.service.insprdPort }}
-      - path: /init
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.service.insprdName }}
-            port:
-              number: {{ .Values.service.insprdPort }}
+    - host: {{ .Values.insprIngress.host }}
+      http:
+        paths:
+          - path: /channels
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
+          - path: /apps
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
+          - path: /types
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
+          - path: /alias
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
+          - path: /init
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
+          - path: /brokers
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}

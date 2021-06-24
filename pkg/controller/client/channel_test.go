@@ -8,19 +8,20 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 func TestChannelClient_Delete(t *testing.T) {
 
 	type args struct {
-		ctx     context.Context
-		context string
-		name    string
+		ctx   context.Context
+		scope string
+		name  string
 	}
 	tests := []struct {
 		name    string
@@ -30,16 +31,16 @@ func TestChannelClient_Delete(t *testing.T) {
 		{
 			name: "delete channel test",
 			args: args{
-				ctx:     context.Background(),
-				context: "app1.app2",
+				ctx:   context.Background(),
+				scope: "app1.app2",
 			},
 			wantErr: false,
 		},
 		{
 			name: "delete channel with error test",
 			args: args{
-				ctx:     context.Background(),
-				context: "app1.app2",
+				ctx:   context.Background(),
+				scope: "app1.app2",
 			},
 			wantErr: true,
 		},
@@ -58,11 +59,12 @@ func TestChannelClient_Delete(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 
 				var di models.ChannelQueryDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -70,8 +72,12 @@ func TestChannelClient_Delete(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.scope {
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.scope,
+					)
 				}
 				if di.ChName != tt.args.name {
 					t.Errorf("name set incorrectly. want = %v, got = %v", di.ChName, tt.args.name)
@@ -82,9 +88,9 @@ func TestChannelClient_Delete(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
-			if _, err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name, false); (err != nil) != tt.wantErr {
+			if _, err := ac.Delete(tt.args.ctx, tt.args.scope, tt.args.name, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -117,7 +123,7 @@ func TestChannelClient_Get(t *testing.T) {
 					Reference: "app1",
 				},
 				Spec: meta.ChannelSpec{
-					Type: "channeltype1",
+					Type: "type1",
 				},
 			},
 		},
@@ -144,11 +150,12 @@ func TestChannelClient_Get(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 
 				var di models.ChannelQueryDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -156,11 +163,19 @@ func TestChannelClient_Get(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 				if di.ChName != tt.args.name {
-					t.Errorf("name set incorrectly. want = %v, got = %v", di.ChName, tt.args.name)
+					t.Errorf(
+						"name set incorrectly. want = %v, got = %v",
+						di.ChName,
+						tt.args.name,
+					)
 				}
 
 				encoder.Encode(tt.want)
@@ -169,7 +184,7 @@ func TestChannelClient_Get(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			got, err := ac.Get(tt.args.ctx, tt.args.context, tt.args.name)
 			if (err != nil) != tt.wantErr {
@@ -204,7 +219,7 @@ func TestChannelClient_Create(t *testing.T) {
 						Name: "app3",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "channeltype1",
+						Type: "type1",
 					},
 				},
 			},
@@ -234,11 +249,12 @@ func TestChannelClient_Create(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 
 				var di models.ChannelDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -246,8 +262,12 @@ func TestChannelClient_Create(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 
 				if !reflect.DeepEqual(di.Channel, *tt.args.ch) {
@@ -258,7 +278,7 @@ func TestChannelClient_Create(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelClient.Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -289,7 +309,7 @@ func TestChannelClient_Update(t *testing.T) {
 						Name: "app3",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "channeltype1",
+						Type: "type1",
 					},
 				},
 			},
@@ -319,11 +339,12 @@ func TestChannelClient_Update(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 
 				var di models.ChannelDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -331,8 +352,12 @@ func TestChannelClient_Update(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 
 				if !reflect.DeepEqual(di.Channel, *tt.args.ch) {
@@ -343,7 +368,7 @@ func TestChannelClient_Update(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &ChannelClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelClient.Update() error = %v, wantErr %v", err, tt.wantErr)

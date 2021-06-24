@@ -46,10 +46,10 @@ Note that this dApp isn't a [Node](dapp_overview.md), that's because it serves a
 
 Next we have to create a Channel the publisher can write text to and the subscribers can read from. Doing so is as simple as defining the following:
 
-Channel Type (02.ct.yaml) :
+Type (02.ct.yaml) :
 
 ```yaml
-kind: channeltype
+kind: type
 apiVersion: v1
 meta:
   name: pubsubct
@@ -105,7 +105,7 @@ API (api/main.go) : Entry point for the server, must be a `package main` so that
    package main
 
    import (
-       controller "github.com/inspr/inspr/examples/pubsub/api/controller"
+       controller "inspr.dev/inspr/examples/pubsub/api/controller"
    )
 
    var server controller.Server
@@ -265,7 +265,7 @@ Ingress:
 
 ## Publishing it
 
-Your app is now done, but before publishing it first you must build it. Inspr requires code to be built into an accessible Docker image in order for it to be deployed on the cluster. There is an example for building on the [pingpong example](../examples/pingpong_demo/README.md). You should create simple Dockerfiles to build your dApps and push them to any storage were they are accessible your cluster. That being done is finally time to publish your Pub/Sub application. Publishing it to your Inspr cluster is easy, but first make sure your files look something like this:
+Your app is now done, but before publishing it first you must build it. Inspr requires code to be built into an accessible Docker image in order for it to be deployed on the cluster. There is an example for building on the [pingpong example](../examples/pingpong_demo/README.md). You should create simple Dockerfiles to build your dApps and push them to any storage were they are accessible your cluster. That being done is finally time to publish your Pub/Sub application. Publishing it to your insprctl cluster is easy, but first make sure your files look something like this:
 
 ```tree
    pubsub
@@ -300,8 +300,8 @@ Your app is now done, but before publishing it first you must build it. Inspr re
 Keep in mind Slack an Discord are only examples.
 
 Deployment:
-You have to apply every yaml we created, dApps Channels and ChannelTypes can be done by running:
-inspr apply -k yamls
+You have to apply every yaml we created, dApps Channels and Types can be done by running:
+insprctl apply -k yamls
 
 Your ingress and service have to be deployed as well, run:
 kubectl apply -f k8s/ingress.yaml

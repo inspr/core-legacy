@@ -1,9 +1,29 @@
 package utils
 
 import (
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/utils"
+	"fmt"
+
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/utils"
 )
+
+// CheckEmptyArgs receives the args of a cli command and returns a error in case any
+// of them are empty
+func CheckEmptyArgs(args map[string]string) error {
+	var err error = nil
+	for k, v := range args {
+		if v == "" {
+			errorMessage := fmt.Sprintf("arg '%v' is empty", k)
+			if err == nil {
+				err = ierrors.NewError().Message(errorMessage).InvalidArgs().Build()
+			} else {
+				ierr := err.(*ierrors.InsprError)
+				ierr.Wrap(errorMessage)
+			}
+		}
+	}
+	return err
+}
 
 //ProcessArg is responsible for separating a path into an component name and it's parent's path.
 // < path, name, error >
@@ -24,4 +44,25 @@ func ProcessArg(arg, scope string) (string, string, error) {
 		component = arg
 	}
 	return path, component, nil
+}
+
+//ProcessAliasArg is responsible for separating a path into an alias name and it's parent's path.
+// < path, name, error >
+func ProcessAliasArg(arg, scope string) (string, string, error) {
+	path := scope
+	var alias string
+
+	if err := utils.AliasNameIsValid(arg); err != nil {
+		if !utils.IsValidScope(arg) {
+			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
+		}
+
+		newScope, lastName, _ := utils.RemoveAliasInScope(arg)
+		path, _ = utils.JoinScopes(path, newScope)
+
+		alias = lastName
+	} else {
+		alias = arg
+	}
+	return path, alias, nil
 }

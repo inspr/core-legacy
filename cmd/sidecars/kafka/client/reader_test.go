@@ -1,12 +1,14 @@
 package kafkasc
 
 import (
+	"context"
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/inspr/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/environment"
 )
 
 func TestNewReader(t *testing.T) {
@@ -26,7 +28,7 @@ func TestNewReader(t *testing.T) {
 			name:    "It should return a new Reader",
 			wantErr: false,
 			checkFunction: func(t *testing.T, reader *Reader) {
-				if !(reader.consumers != nil && len(reader.consumers) > 0) {
+				if !(reader.Consumers() != nil && len(reader.Consumers()) > 0) {
 					t.Errorf("check function error = Reader not created successfully")
 				}
 			},
@@ -76,14 +78,16 @@ func TestReader_ReadMessage(t *testing.T) {
 		before        func()
 		uniqueChannel string
 		want          string
-		want1         interface{}
+		want1         []byte
 		wantErr       bool
+		event         kafka.Event
 	}{
 		{
 			name: "It should read a message",
 			fields: fields{
 				consumers: map[string]Consumer{
 					"ch1_resolved": &MockConsumer{
+						events:        make(chan kafka.Event, 2),
 						err:           false,
 						pollMsg:       "Hello World!",
 						topic:         "ch1_resolved",
@@ -96,13 +100,15 @@ func TestReader_ReadMessage(t *testing.T) {
 			wantErr:       false,
 			uniqueChannel: "ch1_resolved",
 			want:          "ch1_resolved",
-			want1:         "Hello World!",
+			want1:         []byte("Hello World!"),
+			event:         &kafka.Message{},
 		},
 		{
 			name: "It should return a message poll error",
 			fields: fields{
 				consumers: map[string]Consumer{
 					"ch1_resolved": &MockConsumer{
+						events:        make(chan kafka.Event, 2),
 						err:           true,
 						pollMsg:       "Hello World!",
 						topic:         "ch1_resolved",
@@ -115,40 +121,23 @@ func TestReader_ReadMessage(t *testing.T) {
 			uniqueChannel: "ch1_resolved",
 			wantErr:       true,
 		},
-		{
-			name: "It should return a decode error (sender channel invalid)",
-			fields: fields{
-				consumers: map[string]Consumer{
-					"ch1_resolved": &MockConsumer{
-						err:           false,
-						pollMsg:       "Hello World!",
-						topic:         "ch1_resolved",
-						errCode:       0,
-						senderChannel: "ch2",
-					},
-				},
-				lastMessage: nil,
-			},
-			uniqueChannel: "ch1_resolved",
-			wantErr:       true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*100)
+			defer cancel()
 			reader := &Reader{
+
 				consumers: tt.fields.consumers,
 			}
 
-			bData, err := reader.ReadMessage(tt.uniqueChannel)
-			got := bData.Channel
-			got1 := bData.Message.Data
+			reader.consumers[tt.uniqueChannel].(*MockConsumer).CreateMessage()
+			bData, err := reader.ReadMessage(ctx, tt.uniqueChannel)
+			got1 := bData
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Reader.ReadMessage() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if got != tt.want {
-				t.Errorf("Reader.ReadMessage() got = %v, want %v", got, tt.want)
 			}
 			if !reflect.DeepEqual(got1, tt.want1) {
 				t.Errorf("Reader.ReadMessage() got1 = %v, want %v", got1, tt.want1)
@@ -173,7 +162,8 @@ func TestReader_Commit(t *testing.T) {
 			fields: fields{
 				consumers: map[string]Consumer{
 					"ch1": &MockConsumer{
-						err: false,
+						events: make(chan kafka.Event, 2),
+						err:    false,
 					},
 				},
 				lastMessage: nil,
@@ -186,7 +176,8 @@ func TestReader_Commit(t *testing.T) {
 			fields: fields{
 				consumers: map[string]Consumer{
 					"ch1": &MockConsumer{
-						err: true,
+						events: make(chan kafka.Event, 2),
+						err:    true,
 					},
 				},
 				lastMessage: nil,
@@ -197,10 +188,12 @@ func TestReader_Commit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*100)
+			defer cancel()
 			reader := &Reader{
 				consumers: tt.fields.consumers,
 			}
-			if err := reader.Commit(tt.uniqueChannel); (err != nil) != tt.wantErr {
+			if err := reader.Commit(ctx, tt.uniqueChannel); (err != nil) != tt.wantErr {
 				t.Errorf("Reader.Commit() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -223,7 +216,8 @@ func TestReader_Close(t *testing.T) {
 			fields: fields{
 				consumers: map[string]Consumer{
 					"ch1": &MockConsumer{
-						err: false,
+						events: make(chan kafka.Event, 2),
+						err:    false,
 					},
 				},
 				lastMessage: nil,

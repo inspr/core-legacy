@@ -1,10 +1,9 @@
-kind: channel
 apiVersion: v1
+kind: channel
 
 meta:
   name: ppchannel1
-  annotations:
-    kafka.replication.factor: 1
-    kafka.partition.number: 2
 spec:
-  type: ppctype1
+  type: pptype1
+  brokerlist:
+    - kafka

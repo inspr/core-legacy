@@ -13,15 +13,15 @@ This folder contains the files necessary to run the primes example in your clust
 Make sure the latest Inspr CLI version is installed.
 
 - To get the latest version, run the following command:  
-  `go install github.com/inspr/inspr/cmd/inspr`
+  `go install inspr.dev/inspr/cmd/inspr`
 
 Before running the inspr command to create the app in your cluster be sure to set the configuration beforehand.
 
 Setting up the cluster ip is essential and it can be done using \
- `inspr config serverip <url_to_server>`.
+ `insprctl config serverip <url_to_server>`.
 
 Now that everything is set and ready, the simpler way to test it is to run \
-`inspr apply -f general.yaml`.
+`insprctl apply -f general.yaml`.
 
 Alternatively you could install the elements in a modular way using:\
-`inspr apply -k <folder_name>`
+`insprctl apply -k <folder_name>`

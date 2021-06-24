@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 
-	build "github.com/inspr/inspr/pkg/cmd"
+	build "inspr.dev/inspr/pkg/cmd"
 )
 
 type deleteUsrOptionsDT struct {
@@ -17,14 +17,14 @@ var deleteUserCmd = build.NewCmd("delete").WithDescription(
 ).WithExample(
 	"delete a user given credentials",
 	"inprov delete --username userToBeDeleted username password",
-).WithFlags([]*build.Flag{
-	{
+).WithFlags(
+	&build.Flag{
 		Name:     "username",
 		Usage:    "username of the user to be deleted",
 		Value:    &deleteUsrOptions.username,
 		DefValue: "",
 	},
-}).ExactArgs(2, deleteAction)
+).ExactArgs(2, deleteAction)
 
 func deleteAction(ctx context.Context, inputArgs []string) error {
 

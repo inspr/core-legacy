@@ -3,20 +3,20 @@ package handler
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 var createdNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {
 	return diff.NewChangeReaction(
 		func(c diff.Change) bool {
-			_, errFrom := handler.Memory.Root().Apps().Get(c.Context)
-			to, errTo := handler.Memory.Apps().Get(c.Context)
+			_, errFrom := handler.Memory.Tree().Apps().Get(c.Scope)
+			to, errTo := handler.Memory.Apps().Get(c.Scope)
 			return (errFrom != nil && errTo == nil && to.Spec.Node.Spec.Image != "")
 		},
 		func(c diff.Change) error {
-			to, _ := handler.Memory.Apps().Get(c.Context)
+			to, _ := handler.Memory.Apps().Get(c.Scope)
 			_, err := handler.Operator.Nodes().CreateNode(context.Background(), to)
 			return err
 		},
@@ -60,7 +60,7 @@ var deletedApps func(handler *Handler) diff.DifferenceReaction = func(handler *H
 		},
 		func(scope string, d diff.Difference) error {
 			scope, _ = utils.JoinScopes(scope, d.Name)
-			app, err := handler.Memory.Root().Apps().Get(scope) // get the app definition from the cluster
+			app, err := handler.Memory.Tree().Apps().Get(scope) // get the app definition from the cluster
 			if err != nil {
 				return err
 			}
@@ -69,20 +69,20 @@ var deletedApps func(handler *Handler) diff.DifferenceReaction = func(handler *H
 	)
 }
 
-// apply this on updated channel types
-var updatedChannelTypes func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
+// apply this on updated Types
+var updatedTypes func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
 	return diff.NewDifferenceReaction(
 		func(scope string, d diff.Difference) bool {
-			// if the diff is for a channel type and the channel type has been updated
-			return d.Kind&diff.ChannelTypeKind > 0 && d.Operation&diff.Update > 0
+			// if the diff is for a Type and the Type has been updated
+			return d.Kind&diff.TypeKind > 0 && d.Operation&diff.Update > 0
 		},
 		func(scope string, d diff.Difference) error {
 			errors := ierrors.MultiError{
 				Errors: []error{},
 			}
-			ct, _ := handler.Memory.ChannelTypes().Get(scope, d.Name)
+			ct, _ := handler.Memory.Types().Get(scope, d.Name)
 
-			for _, channelName := range ct.ConnectedChannels { // for each channel connected to the channel type
+			for _, channelName := range ct.ConnectedChannels { // for each channel connected to the Type
 				channel, _ := handler.Memory.Channels().Get(scope, channelName)
 
 				for _, appName := range channel.ConnectedApps { // for each app connected to each channel
@@ -145,15 +145,15 @@ var updatedChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 var updatedNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {
 	return diff.NewChangeReaction(
 		func(c diff.Change) bool {
-			from, _ := handler.Memory.Root().Apps().Get(c.Context)
-			// if there is a change in a given context and that context is a node
+			from, _ := handler.Memory.Tree().Apps().Get(c.Scope)
+			// if there is a change in a given scope and that scope is a node
 			return from != nil && from.Spec.Node.Spec.Image != ""
 		},
 		func(c diff.Change) error {
 			errs := ierrors.MultiError{
 				Errors: []error{},
 			}
-			to, _ := handler.Memory.Apps().Get(c.Context)
+			to, _ := handler.Memory.Apps().Get(c.Scope)
 			if to == nil || to.Spec.Node.Spec.Image == "" {
 				return nil
 			}
@@ -201,7 +201,7 @@ func (h *Handler) initReactions() {
 		deletedChannels(h),
 		deletedApps(h),
 		updatedChannels(h),
-		updatedChannelTypes(h),
+		updatedTypes(h),
 		updatedAliases(h),
 	)
 }

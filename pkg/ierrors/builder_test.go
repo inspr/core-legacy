@@ -379,7 +379,7 @@ func TestErrBuilder_InvalidChannel(t *testing.T) {
 	}
 }
 
-func TestErrBuilder_InvalidChannelType(t *testing.T) {
+func TestErrBuilder_InvalidType(t *testing.T) {
 	type fields struct {
 		err *InsprError
 	}
@@ -389,13 +389,13 @@ func TestErrBuilder_InvalidChannelType(t *testing.T) {
 		want   *ErrBuilder
 	}{
 		{
-			name: "It should add the code Invalid Channel Type to the new error",
+			name: "It should add the code Invalid Type to the new error",
 			fields: fields{
 				err: &InsprError{},
 			},
 			want: &ErrBuilder{
 				err: &InsprError{
-					Code: InvalidChannelType,
+					Code: InvalidType,
 				},
 			},
 		},
@@ -405,8 +405,8 @@ func TestErrBuilder_InvalidChannelType(t *testing.T) {
 			b := &ErrBuilder{
 				err: tt.fields.err,
 			}
-			if got := b.InvalidChannelType(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ErrBuilder.InvalidChannelType() = %v, want %v", got, tt.want)
+			if got := b.InvalidType(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ErrBuilder.InvalidType() = %v, want %v", got, tt.want)
 			}
 		})
 	}

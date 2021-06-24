@@ -21,21 +21,21 @@ func TestChangelog_ForEach(t *testing.T) {
 			"get context from changes",
 			Changelog{
 				Change{
-					Context: "context1",
+					Scope: "context1",
 				},
 				Change{
-					Context: "context2",
+					Scope: "context2",
 				},
 				Change{
-					Context: "context3",
+					Scope: "context3",
 				},
 				Change{
-					Context: "context4",
+					Scope: "context4",
 				},
 			},
 			args{
 				f: func(c Change) error {
-					contexts = append(contexts, c.Context)
+					contexts = append(contexts, c.Scope)
 					return nil
 				},
 			},
@@ -69,7 +69,7 @@ func TestChangelog_FilterDiffs(t *testing.T) {
 			name: "filter by operation",
 			c: Changelog{
 				Change{
-					Context: "context",
+					Scope: "context",
 					Diff: []Difference{
 						{
 							Name:      "diff1",
@@ -86,7 +86,7 @@ func TestChangelog_FilterDiffs(t *testing.T) {
 					},
 				},
 				Change{
-					Context: "context2",
+					Scope: "context2",
 					Diff: []Difference{
 						{
 							Name:      "diff4",
@@ -110,7 +110,7 @@ func TestChangelog_FilterDiffs(t *testing.T) {
 			},
 			want: Changelog{
 				Change{
-					Context: "context",
+					Scope: "context",
 					Diff: []Difference{
 						{
 							Name:      "diff2",
@@ -123,7 +123,7 @@ func TestChangelog_FilterDiffs(t *testing.T) {
 					},
 				},
 				Change{
-					Context: "context2",
+					Scope: "context2",
 					Diff: []Difference{
 						{
 							Name:      "diff6",
@@ -137,7 +137,7 @@ func TestChangelog_FilterDiffs(t *testing.T) {
 			name: "filter by name",
 			c: Changelog{
 				Change{
-					Context: "context",
+					Scope: "context",
 					Diff: []Difference{
 						{
 							Name:      "next_diff1",
@@ -154,7 +154,7 @@ func TestChangelog_FilterDiffs(t *testing.T) {
 					},
 				},
 				Change{
-					Context: "context2",
+					Scope: "context2",
 					Diff: []Difference{
 						{
 							Name:      "diff4",
@@ -178,7 +178,7 @@ func TestChangelog_FilterDiffs(t *testing.T) {
 			},
 			want: Changelog{
 				Change{
-					Context: "context",
+					Scope: "context",
 					Diff: []Difference{
 						{
 							Name:      "next_diff1",
@@ -187,7 +187,7 @@ func TestChangelog_FilterDiffs(t *testing.T) {
 					},
 				},
 				Change{
-					Context: "context2",
+					Scope: "context2",
 					Diff: []Difference{
 						{
 							Name:      "next_diff5",
@@ -221,7 +221,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 			name: "single kind",
 			c: Changelog{
 				Change{
-					Context: "context1",
+					Scope: "context1",
 					Diff: []Difference{
 						{
 							Name: "diff1",
@@ -237,12 +237,12 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff4",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
 				Change{
-					Context: "context2",
+					Scope: "context2",
 					Diff: []Difference{
 						{
 							Name: "diff5",
@@ -258,7 +258,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff8",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
@@ -268,7 +268,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 			},
 			want: Changelog{
 				Change{
-					Context: "context1",
+					Scope: "context1",
 					Diff: []Difference{
 						{
 							Name: "diff1",
@@ -280,16 +280,16 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff4",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
 				Change{
-					Context: "context2",
+					Scope: "context2",
 					Diff: []Difference{
 						{
 							Name: "diff8",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
@@ -299,7 +299,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 			name: "multiple kinds",
 			c: Changelog{
 				Change{
-					Context: "context1",
+					Scope: "context1",
 					Diff: []Difference{
 						{
 							Name: "diff1",
@@ -315,12 +315,12 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff4",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
 				Change{
-					Context: "context2",
+					Scope: "context2",
 					Diff: []Difference{
 						{
 							Name: "diff5",
@@ -336,7 +336,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 						},
 						{
 							Name: "diff8",
-							Kind: ChannelTypeKind | MetaKind,
+							Kind: TypeKind | MetaKind,
 						},
 					},
 				},
@@ -346,7 +346,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 			},
 			want: Changelog{
 				Change{
-					Context: "context1",
+					Scope: "context1",
 					Diff: []Difference{
 						{
 							Name: "diff1",
@@ -355,7 +355,7 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 					},
 				},
 				Change{
-					Context: "context2",
+					Scope: "context2",
 					Diff: []Difference{
 						{
 							Name: "diff5",

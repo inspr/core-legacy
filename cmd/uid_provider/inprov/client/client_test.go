@@ -8,10 +8,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/uid_provider/api/models"
-	"github.com/inspr/inspr/cmd/uid_provider/client"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/cmd/uid_provider/api/models"
+	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // Response Codes
@@ -45,7 +45,7 @@ func TestClient_Login(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 
@@ -104,12 +104,8 @@ func TestClient_CreateUser(t *testing.T) {
 				uid: "this is an uid",
 				pwd: "this is a password",
 				newUser: client.User{
-					UID:  "this is a new UID",
-					Role: 2,
-					Scope: []string{
-						"scope.1",
-						"scope.2",
-					},
+					UID:         "this is a new UID",
+					Permissions: nil,
 				},
 			},
 		},
@@ -117,7 +113,7 @@ func TestClient_CreateUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 
@@ -180,7 +176,7 @@ func TestClient_DeleteUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 
@@ -247,7 +243,7 @@ func TestClient_UpdatePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

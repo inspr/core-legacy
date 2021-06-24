@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/cmd/uid_provider/api/models"
-	"github.com/inspr/inspr/cmd/uid_provider/client"
-	"github.com/inspr/inspr/pkg/rest"
+	"inspr.dev/inspr/cmd/uid_provider/api/models"
+	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // Handler is a structure which cointains methods to handle

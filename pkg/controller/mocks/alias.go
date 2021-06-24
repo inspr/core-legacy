@@ -3,9 +3,9 @@ package mocks
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/controller"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 // AliasMock mock structure for the operations of the controller.Aliass()
@@ -21,33 +21,33 @@ func NewAliasMock(err error) controller.AliasInterface {
 }
 
 // Get is the AliasMock Get
-func (cm *AliasMock) Get(ctx context.Context, context, key string) (*meta.Alias, error) {
-	if cm.err != nil {
-		return &meta.Alias{}, cm.err
+func (am *AliasMock) Get(ctx context.Context, scope, key string) (*meta.Alias, error) {
+	if am.err != nil {
+		return &meta.Alias{}, am.err
 	}
 	return &meta.Alias{}, nil
 }
 
 // Create is the AliasMock Create
-func (cm *AliasMock) Create(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
+func (am *AliasMock) Create(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+	if am.err != nil {
+		return diff.Changelog{}, am.err
 	}
 	return diff.Changelog{}, nil
 }
 
 // Delete is the AliasMock Delete
-func (cm *AliasMock) Delete(ctx context.Context, context, key string, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
+func (am *AliasMock) Delete(ctx context.Context, scope, key string, dryRun bool) (diff.Changelog, error) {
+	if am.err != nil {
+		return diff.Changelog{}, am.err
 	}
 	return diff.Changelog{}, nil
 }
 
 // Update is the AliasMock Update
-func (cm *AliasMock) Update(ctx context.Context, context string, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
-	if cm.err != nil {
-		return diff.Changelog{}, cm.err
+func (am *AliasMock) Update(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+	if am.err != nil {
+		return diff.Changelog{}, am.err
 	}
 	return diff.Changelog{}, nil
 }

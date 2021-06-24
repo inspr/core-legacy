@@ -4,18 +4,18 @@ import (
 	"context"
 	"log"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	"github.com/inspr/inspr/cmd/insprd/operators/kafka/nodes"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	"inspr.dev/inspr/cmd/insprd/operators/nodes"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func main() {
 	mem := tree.GetTreeMemory()
 	mem.InitTransaction()
-	err := mem.ChannelTypes().Create("", &meta.ChannelType{
+	err := mem.Types().Create("", &meta.Type{
 		Meta: meta.Metadata{
-			Name: "channelType1",
+			Name: "type1",
 		},
 		Schema: "{\"type\":\"string\"}",
 	})
@@ -28,7 +28,7 @@ func main() {
 			Name: "ch1",
 		},
 		Spec: meta.ChannelSpec{
-			Type: "channelType1",
+			Type: "type1",
 		},
 	})
 	if err != nil {
@@ -67,7 +67,7 @@ func main() {
 		panic(err)
 	}
 
-	op, err := nodes.NewOperator(tree.GetTreeMemory())
+	op, err := nodes.NewNodeOperator(tree.GetTreeMemory(), nil, nil)
 	if err != nil {
 		panic(err)
 	}

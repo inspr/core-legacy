@@ -1,6 +1,6 @@
 package controller
 
-import handler "github.com/inspr/inspr/cmd/uid_provider/api/handlers"
+import handler "inspr.dev/inspr/cmd/uid_provider/api/handlers"
 
 // initRoutes defines which routes the UID Provider API will have
 func (s *Server) initRoutes() {

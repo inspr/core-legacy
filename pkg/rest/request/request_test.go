@@ -13,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 func TestClient_Send(t *testing.T) {
@@ -49,7 +49,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "POST",
+				method: http.MethodPost,
 				body:   "hello",
 			},
 			wantErr: false,
@@ -66,7 +66,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "GET",
+				method: http.MethodGet,
 				body:   "hello",
 			},
 			wantErr: false,
@@ -83,7 +83,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "GET",
+				method: http.MethodGet,
 				body:   "hello",
 			},
 			wantErr:    true,
@@ -93,15 +93,17 @@ func TestClient_Send(t *testing.T) {
 		{
 			name: "middleware error",
 			fields: fields{
-				c:                http.Client{},
-				middleware:       func(i interface{}) ([]byte, error) { return nil, ierrors.NewError().Build() },
+				c: http.Client{},
+				middleware: func(i interface{}) ([]byte, error) {
+					return nil, ierrors.NewError().Build()
+				},
 				decoderGenerator: JSONDecoderGenerator,
 				auth:             nil,
 			},
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "GET",
+				method: http.MethodGet,
 				body:   "hello",
 			},
 			wantErr: true,
@@ -118,7 +120,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "POST",
+				method: http.MethodPost,
 				body:   "hello",
 			},
 			wantErr: true,
@@ -136,7 +138,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "POST",
+				method: http.MethodPost,
 				body:   "hello",
 			},
 			wantErr: true,
@@ -360,70 +362,6 @@ func TestClient_handleResponseErr(t *testing.T) {
 					got,
 					tt.wantMessage,
 				)
-			}
-		})
-	}
-}
-
-func TestClient_routeToURL(t *testing.T) {
-	type args struct {
-		route string
-	}
-	tests := []struct {
-		name string
-		c    *Client
-		args args
-		want string
-	}{
-		{
-			name: "basic testing",
-			c: &Client{
-				baseURL: "http://test",
-			},
-			args: args{
-				route: "/route",
-			},
-			want: "http://test/route",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.c.routeToURL(tt.args.route); got != tt.want {
-				t.Errorf("Client.routeToURL() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestJSONDecoderGenerator(t *testing.T) {
-	type args struct {
-		value interface{}
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			name: "decoder creation",
-			args: args{
-				value: "hello",
-			},
-			want: "hello",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			encoded, _ := json.Marshal(tt.args.value)
-			gotDecoder := JSONDecoderGenerator(bytes.NewBuffer(encoded))
-			var got string
-			err := gotDecoder.Decode(&got)
-
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("JSONDecoderGenerator() = %v, want %v", got, tt.want)
-			}
-			if err != nil {
-				t.Error("error in decoding")
 			}
 		})
 	}

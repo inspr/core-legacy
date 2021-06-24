@@ -58,16 +58,16 @@ esac
 # adding the version to the curl URL
 CURL_URL=$CURL_URL"-"$CLI_VERSION
 
-echo 'Downloading the inspr cli binary'
-curl $CURL_URL -o /tmp/inspr
+echo 'Downloading the insprctl cli binary'
+curl $CURL_URL -o /tmp/insprctl
 
 ENCODING=utf-8
-if iconv --from-code="$ENCODING" --to-code="$ENCODING" /tmp/inspr > /dev/null 2>&1; then
+if iconv --from-code="$ENCODING" --to-code="$ENCODING" /tmp/insprctl > /dev/null 2>&1; then
     echo "error, coudln't find the binary, in the url used"
     echo $CURL_URL
 else    
-    chmod +x /tmp/inspr 
+    chmod +x /tmp/insprctl 
     echo 'Moving binary into /usr/local/bin, need sudo permission'
-    sudo mv /tmp/inspr /usr/local/bin
+    sudo mv /tmp/insprctl /usr/local/bin
     echo 'Files moved to to /usr/local/bin'
 fi

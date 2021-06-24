@@ -4,32 +4,32 @@ metadata:
   name: core
 build:
   artifacts:
-  - image: gcr.io/red-inspr/insprd
-    context: .
-    docker:
-      dockerfile: cmd/insprd/Dockerfile
-  - image: gcr.io/red-inspr/inspr/sidecar/kafka
-    context: .
-    docker:
-      dockerfile: cmd/sidecars/kafka/Dockerfile
-  - image: gcr.io/red-inspr/authsvc
-    context: .
-    docker:
-      dockerfile: cmd/authsvc/Dockerfile
-  - image: gcr.io/red-inspr/secretgen
-    context: .
-    docker:
-      dockerfile: cmd/authsvc/secret/Dockerfile
+    - image: gcr.io/red-inspr/insprd
+      context: .
+      docker:
+        dockerfile: cmd/insprd/Dockerfile
+    - image: gcr.io/red-inspr/inspr/sidecar/lbsidecar
+      context: .
+      docker:
+        dockerfile: cmd/sidecars/lbsidecar/Dockerfile
+    - image: gcr.io/red-inspr/authsvc
+      context: .
+      docker:
+        dockerfile: cmd/authsvc/Dockerfile
+    - image: gcr.io/red-inspr/secretgen
+      context: .
+      docker:
+        dockerfile: cmd/authsvc/secret/Dockerfile
 deploy:
   helm:
     releases:
-    - name: insprd
-      artifactOverrides:
-        insprdRepository: gcr.io/red-inspr/insprd
-        kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
-        authRepository: gcr.io/red-inspr/authsvc
-        secretRepository: gcr.io/red-inspr/secretgen
-      chartPath: build/helm
+      - name: insprd
+        artifactOverrides:
+          insprdRepository: gcr.io/red-inspr/insprd
+          lbsidecarImage: gcr.io/red-inspr/inspr/sidecar/lbsidecar
+          authRepository: gcr.io/red-inspr/authsvc
+          secretRepository: gcr.io/red-inspr/secretgen
+        chartPath: build/helm
 profiles:
   - name: uidp
     build:

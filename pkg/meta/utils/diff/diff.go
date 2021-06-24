@@ -5,9 +5,9 @@ import (
 	"io"
 	"text/tabwriter"
 
-	"github.com/inspr/inspr/pkg/meta"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/meta"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // Kind represents a kind of difference between two structures
@@ -19,7 +19,7 @@ const (
 	NodeKind
 	MetaKind
 	ChannelKind
-	ChannelTypeKind
+	TypeKind
 	BoundaryKind
 	FieldKind
 	AnnotationKind
@@ -37,11 +37,9 @@ const (
 	Create
 )
 
-/*
-Difference is the most basic diff structure, it represents a difference between two apps.
-The object carries information abaout what field differs from one app to another,
-the value of that field on the original app and the value of that field on the current app.
-*/
+// Difference is the most basic diff structure, it represents a difference between two apps.
+// The object carries information abaout what field differs from one app to another,
+// the value of that field on the original app and the value of that field on the current app.
 type Difference struct {
 	Field     string `json:"field"`
 	From      string `json:"from"`
@@ -51,12 +49,10 @@ type Difference struct {
 	Operation Operation
 }
 
-/*
-Change encapsulates all differences between two apps and carries the
-information about the context those apps exist in the app tree.
-*/
+// Change encapsulates all differences between two apps and carries the
+// information about the scope those apps exist in the app tree.
 type Change struct {
-	Context   string       `json:"context"`
+	Scope     string       `json:"scope"`
 	Diff      []Difference `json:"diff"`
 	Kind      Kind
 	Operation Operation
@@ -79,7 +75,7 @@ func (cl Changelog) Print(out io.Writer) {
 	var w *tabwriter.Writer
 
 	for _, change := range cl {
-		fmt.Fprintln(out, "On:", change.Context)
+		fmt.Fprintln(out, "On:", change.Scope)
 		w = tabwriter.NewWriter(out, 12, 0, 3, ' ', tabwriter.Debug)
 		fmt.Fprintln(w, "Field\t From\t To")
 		for _, diff := range change.Diff {
@@ -98,7 +94,7 @@ func (cl Changelog) Print(out io.Writer) {
 func (cl *Changelog) diff(from, to *meta.App, ctx string) (Changelog, error) {
 
 	change := Change{
-		Context:   ctx,
+		Scope:     ctx,
 		changelog: cl,
 	}
 
@@ -131,7 +127,7 @@ func (change *Change) diffAppSpec(from, to meta.AppSpec) error {
 		return err
 	}
 
-	err = change.diffChannelTypes(from.ChannelTypes, to.ChannelTypes)
+	err = change.diffTypes(from.Types, to.Types)
 	if err != nil {
 		return err
 	}
@@ -359,7 +355,7 @@ func (change *Change) diffApps(from, to metautils.MApps) {
 		} else {
 			toStr = "{...}"
 			op = Create
-			newScope, _ := metautils.JoinScopes(change.Context, k)
+			newScope, _ := metautils.JoinScopes(change.Scope, k)
 			*change.changelog, _ = change.changelog.diff(&meta.App{}, to[k], newScope)
 		}
 
@@ -381,7 +377,7 @@ func (change *Change) diffApps(from, to metautils.MApps) {
 		fromApp := from[app]
 		toApp := to[app]
 
-		newScope, _ := metautils.JoinScopes(change.Context, fromApp.Meta.Name)
+		newScope, _ := metautils.JoinScopes(change.Scope, fromApp.Meta.Name)
 		change.changelog.diff(fromApp, toApp, newScope)
 	}
 
@@ -445,7 +441,7 @@ func (change *Change) diffChannels(from, to metautils.MChannels) error {
 	return nil
 }
 
-func (change *Change) diffChannelTypes(from, to metautils.MTypes) error {
+func (change *Change) diffTypes(from, to metautils.MTypes) error {
 	fromSet, _ := metautils.MakeStrSet(from)
 	toSet, _ := metautils.MakeStrSet(to)
 
@@ -467,14 +463,14 @@ func (change *Change) diffChannelTypes(from, to metautils.MTypes) error {
 		}
 
 		change.Diff = append(change.Diff, Difference{
-			Field:     fmt.Sprintf("Spec.ChannelTypes[%s]", ct),
+			Field:     fmt.Sprintf("Spec.Types[%s]", ct),
 			From:      fromStr,
 			To:        toStr,
-			Kind:      ChannelTypeKind,
+			Kind:      TypeKind,
 			Operation: op,
 			Name:      ct,
 		})
-		change.Kind |= ChannelTypeKind
+		change.Kind |= TypeKind
 		change.Operation |= op
 	}
 
@@ -486,18 +482,18 @@ func (change *Change) diffChannelTypes(from, to metautils.MTypes) error {
 
 		if string(fromCT.Schema) != string(toCT.Schema) {
 			change.Diff = append(change.Diff, Difference{
-				Field:     fmt.Sprintf("Spec.ChannelTypes[%s].Spec.Schema", ct),
+				Field:     fmt.Sprintf("Spec.Types[%s].Spec.Schema", ct),
 				From:      string(fromCT.Schema),
 				To:        string(toCT.Schema),
-				Kind:      ChannelTypeKind,
+				Kind:      TypeKind,
 				Operation: Update,
 				Name:      ct,
 			})
-			change.Kind |= ChannelTypeKind
+			change.Kind |= TypeKind
 			change.Operation |= Update
 		}
 
-		err := change.diffMetadata(ct, ChannelTypeKind, fromCT.Meta, toCT.Meta, fmt.Sprintf("Spec.ChannelTypes[%s].", ct))
+		err := change.diffMetadata(ct, TypeKind, fromCT.Meta, toCT.Meta, fmt.Sprintf("Spec.Types[%s].", ct))
 		if err != nil {
 			return err
 		}
@@ -508,7 +504,6 @@ func (change *Change) diffChannelTypes(from, to metautils.MTypes) error {
 }
 
 func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, to meta.Metadata, ctx string) error {
-	var errs string
 
 	if from.Name != to.Name {
 		change.Diff = append(change.Diff, Difference{
@@ -537,7 +532,6 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 	}
 
 	if from.Parent != to.Parent {
-		errs += fmt.Sprintf("on %s Metadata: Different parent", ctx)
 		change.Diff = append(change.Diff, Difference{
 			Field:     ctx + "Meta.Parent",
 			From:      from.Parent,

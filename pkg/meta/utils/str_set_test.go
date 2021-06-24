@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestArrMakeSet(t *testing.T) {
@@ -333,9 +333,9 @@ func TestTypesMakeSet(t *testing.T) {
 		want StrSet
 	}{
 		{
-			name: "Disjuction between ctypes arrays that returns a set",
+			name: "Disjuction between types arrays that returns a set",
 			args: args{
-				types: MTypes{"ct1": &meta.ChannelType{}, "ct2": &meta.ChannelType{}},
+				types: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},
 			want: StrSet{"ct1": true, "ct2": true},
 		},
@@ -359,9 +359,9 @@ func TestStrSet_TypesAppendSet(t *testing.T) {
 		args args
 	}{
 		{
-			name: "Appends ctypes slice to a set",
+			name: "Appends types slice to a set",
 			args: args{
-				types: MTypes{"ct1": &meta.ChannelType{}, "ct2": &meta.ChannelType{}},
+				types: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},
 			set: &StrSet{"ct1": true, "ct2": true},
 		},
@@ -391,8 +391,8 @@ func TestTypesDisjuncSet(t *testing.T) {
 		{
 			name: "Disjuction between ct arrays that returns a set",
 			args: args{
-				types1: MTypes{"ct1": &meta.ChannelType{}},
-				types2: MTypes{"ct1": &meta.ChannelType{}, "ct2": &meta.ChannelType{}},
+				types1: MTypes{"ct1": &meta.Type{}},
+				types2: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},
 			want: StrSet{"ct2": true},
 		},
@@ -421,8 +421,8 @@ func TestTypesIntersecSet(t *testing.T) {
 		{
 			name: "Intersection between ct arrays that returns a set",
 			args: args{
-				types1: MTypes{"ct1": &meta.ChannelType{}},
-				types2: MTypes{"ct1": &meta.ChannelType{}, "ct2": &meta.ChannelType{}},
+				types1: MTypes{"ct1": &meta.Type{}},
+				types2: MTypes{"ct1": &meta.Type{}, "ct2": &meta.Type{}},
 			},
 			want: StrSet{"ct1": true},
 		},
@@ -572,6 +572,38 @@ func TestMakeStrSet(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MakeStrSet() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestStrSet_ToArray(t *testing.T) {
+	tests := []struct {
+		name string
+		set  *StrSet
+		want utils.StringArray
+	}{
+		{
+			name: "Empty set to array",
+			set:  &StrSet{},
+			want: utils.StringArray{},
+		},
+		{
+			name: "Filled set to array",
+			set: &StrSet{
+				"item":  exists,
+				"item2": exists,
+			},
+			want: utils.StringArray{"item", "item2"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.set.ToArray()
+			gotenSet, _ := MakeStrSet(got)
+			wantedSet, _ := MakeStrSet(tt.want)
+			if len(DisjunctSet(wantedSet, gotenSet)) > 0 {
+				t.Errorf("StrSet.ToArray() = %v, want %v", got, tt.want)
 			}
 		})
 	}

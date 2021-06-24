@@ -3,9 +3,9 @@ package mocks
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/controller"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 // AppMock mock structure for the operations of the controller.Apps()
@@ -19,7 +19,7 @@ func NewAppMock(err error) controller.AppInterface {
 }
 
 // Get is the AppMock Get
-func (am *AppMock) Get(ctx context.Context, context string) (*meta.App, error) {
+func (am *AppMock) Get(ctx context.Context, scope string) (*meta.App, error) {
 	if am.err != nil {
 		return &meta.App{}, am.err
 	}
@@ -27,7 +27,7 @@ func (am *AppMock) Get(ctx context.Context, context string) (*meta.App, error) {
 }
 
 // Create is the AppMock Create
-func (am *AppMock) Create(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+func (am *AppMock) Create(ctx context.Context, scope string, app *meta.App, dryRun bool) (diff.Changelog, error) {
 	if am.err != nil {
 		return diff.Changelog{}, am.err
 	}
@@ -35,7 +35,7 @@ func (am *AppMock) Create(ctx context.Context, context string, app *meta.App, dr
 }
 
 // Delete is the AppMock Delete
-func (am *AppMock) Delete(ctx context.Context, context string, dryRun bool) (diff.Changelog, error) {
+func (am *AppMock) Delete(ctx context.Context, scope string, dryRun bool) (diff.Changelog, error) {
 	if am.err != nil {
 		return diff.Changelog{}, am.err
 	}
@@ -43,7 +43,7 @@ func (am *AppMock) Delete(ctx context.Context, context string, dryRun bool) (dif
 }
 
 // Update is the AppMock Update
-func (am *AppMock) Update(ctx context.Context, context string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+func (am *AppMock) Update(ctx context.Context, scope string, app *meta.App, dryRun bool) (diff.Changelog, error) {
 	if am.err != nil {
 		return diff.Changelog{}, am.err
 	}

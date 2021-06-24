@@ -8,8 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	dappclient "inspr.dev/inspr/pkg/client"
 )
 
 const defaultMOD = 100
@@ -26,23 +25,21 @@ func main() {
 	}
 
 	// sets up ticker and rand
-	ticker := time.NewTicker(2 * time.Second)
 	rand.Seed(time.Now().UnixNano())
 
+	ticker := time.NewTicker(200 * time.Millisecond)
 	// sets up client for sidecar
 	c := dappclient.NewAppClient()
-	// channelName
+	// channel name
 	chName := "primes_ch1"
 	ctx := context.Background()
 	fmt.Println("starting...")
+
 	for range ticker.C {
 		randNumber := rand.Int() % mod
 		fmt.Println("random number -> ", randNumber)
-		newMsg := models.Message{
-			Data: randNumber,
-		}
-
-		err := c.WriteMessage(ctx, chName, newMsg)
+		err := c.WriteMessage(ctx, chName, randNumber)
+		fmt.Println("wrote message to insprd")
 		if err != nil {
 			fmt.Println(err.Error())
 		}

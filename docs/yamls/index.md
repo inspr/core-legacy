@@ -2,7 +2,7 @@
 
 The creation of YAML files allows the proper usage of the Inspr CLI.
 
-In this way, when the file is written in one of the formats described below it can be processed and applied to the cluster through the CLI commands `inspr apply -f <file_path>` or `inspr apply -k <files_dir>`.
+In this way, when the file is written in one of the formats described below it can be processed and applied to the cluster through the CLI commands `insprctl apply -f <file_path>` or `insprctl apply -k <files_dir>`.
 
 
 ## dApps
@@ -11,14 +11,14 @@ In this way, when the file is written in one of the formats described below it c
 [definitions and examples](dapp.md)
 
 ## Channels
-> Responsible for creating a message broker's topic, a Channel serve as a path in which two or more dApps can exchange data. It must have a Channel Type defined.
+> Responsible for creating a message broker's topic, a Channel serve as a path in which two or more dApps can exchange data. It must have a Type defined.
 
 [definitions and examples](channel.md)
 
-## Channel Types
-> Responsible for defining the message format for any Channel defined with this Channel Type.
+## Types
+> Responsible for defining the message format for any Channel defined with this Type.
 > 
-> A Channel Type must always have it's schema specified, this has to be an [avro structure](https://avro.apache.org/docs/current/).
+> A Type must always have it's schema specified, this has to be an [avro structure](https://avro.apache.org/docs/current/).
 > This would be either a string containing a json structure specifying the format of the message or a path to a file containing such information.
 
 [definitions and examples](type.md)
@@ -27,7 +27,7 @@ In this way, when the file is written in one of the formats described below it c
 
 >The so called general file, or composed file, is nothing more than a YAML that congregates two or more definitions of the elements described above into a single dApp. 
 
-For example a basic example dApp, that has a collection of other smaller dApps like number-generator and filter, plus some definitions of Channel Types and Channels.
+For example a basic example dApp, that has a collection of other smaller dApps like number-generator and filter, plus some definitions of Types and Channels.
 
 ### YAML example
 
@@ -40,7 +40,7 @@ meta:
     kafka.partition.number: 3
     kafka.replication.factor: 3
 spec:
-  channeltypes:
+  Types:
     primes_ct1:
       meta:
         name: primes_ct1

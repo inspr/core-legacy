@@ -1,6 +1,0 @@
-apiVersion: "v1"
-kind: "channeltype"
-meta:
-  name: "ct2"
-  parent: "app1"
-schema: "schema_example.schema"

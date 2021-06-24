@@ -8,11 +8,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 func TestAppClient_Delete(t *testing.T) {
@@ -57,11 +58,12 @@ func TestAppClient_Delete(t *testing.T) {
 					t.Errorf("path is not apps")
 				}
 
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 
 				var di models.AppQueryDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -69,8 +71,8 @@ func TestAppClient_Delete(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 
 				encoder.Encode(diff.Changelog{})
@@ -78,7 +80,7 @@ func TestAppClient_Delete(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AppClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Delete(tt.args.ctx, tt.args.context, false); (err != nil) != tt.wantErr {
 				t.Errorf("AppClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -148,11 +150,12 @@ func TestAppClient_Get(t *testing.T) {
 					t.Errorf("path is not apps")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 
 				var di models.AppQueryDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -160,8 +163,8 @@ func TestAppClient_Get(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 
 				encoder.Encode(tt.want)
@@ -170,7 +173,7 @@ func TestAppClient_Get(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AppClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			got, err := ac.Get(tt.args.ctx, tt.args.context)
 			if (err != nil) != tt.wantErr {
@@ -243,11 +246,12 @@ func TestAppClient_Create(t *testing.T) {
 					t.Errorf("path is not apps")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 
 				var di models.AppDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -255,8 +259,8 @@ func TestAppClient_Create(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {
@@ -267,7 +271,7 @@ func TestAppClient_Create(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AppClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AppClient.Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -336,11 +340,12 @@ func TestAppClient_Update(t *testing.T) {
 					t.Errorf("path is not apps")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 
 				var di models.AppDI
+				scope := r.Header.Get(rest.HeaderScopeKey)
 
 				decoder := request.JSONDecoderGenerator(r.Body)
 				err := decoder.Decode(&di)
@@ -348,8 +353,8 @@ func TestAppClient_Update(t *testing.T) {
 					t.Error(err)
 				}
 
-				if di.Scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", di.Scope, tt.args.context)
+				if scope != tt.args.context {
+					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
 
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {
@@ -360,7 +365,7 @@ func TestAppClient_Update(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AppClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AppClient.Update() error = %v, wantErr %v", err, tt.wantErr)

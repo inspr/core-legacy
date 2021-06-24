@@ -3,83 +3,103 @@ package dappclient
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"os"
+	"time"
 
-	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecar/models"
-	"github.com/inspr/inspr/pkg/sidecar/transports"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 // Client is the struct which implements the methods of AppClient interface
 type Client struct {
-	client *request.Client
-}
-
-// clientMessage is the struct that represents the client's request format
-type clientMessage struct {
-	Message models.Message `json:"message"`
-	Channel string         `json:"channel"`
+	client   *request.Client
+	mux      *http.ServeMux
+	readAddr string
 }
 
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
-	socket := os.Getenv("INSPR_UNIX_SOCKET")
-	if socket == "" {
-		panic("NO SOCKET ENVIRONMENT VARIABLE")
-	}
-	envAddr := "/inspr/" + socket + ".sock"
+
+	writeAddr := fmt.Sprintf("http://localhost:%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"))
+	readAddr := fmt.Sprintf(":%s", os.Getenv("INSPR_SCCLIENT_READ_PORT"))
 	return &Client{
+		readAddr: readAddr,
 		client: request.NewClient().
-			BaseURL("http://unix").
-			HTTPClient(transports.NewUnixSocketClient(envAddr)).
+			BaseURL(writeAddr).
 			Encoder(json.Marshal).
 			Decoder(request.JSONDecoderGenerator).
-			Build(),
+			Pointer(),
+		mux: http.NewServeMux(),
 	}
 }
 
 // WriteMessage receives a channel and a message and sends it in a request to the sidecar server
-func (c *Client) WriteMessage(ctx context.Context, channel string, msg models.Message) error {
-	data := clientMessage{
-		Channel: channel,
-		Message: msg,
+func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface{}) error {
+	data := models.BrokerMessage{
+		Data: msg,
 	}
 
 	var resp interface{}
-	err := c.client.Send(ctx, "/writeMessage", http.MethodPost, data, &resp)
+	log.Println("sending message to sidecar")
+	// sends a message to the corresponding channel route on the sidecar
+	err := c.client.Send(ctx, "/"+channel, http.MethodPost, data, &resp)
+	log.Println("message sent")
 	return err
 }
 
-// ReadMessage receives a channel and sends it in a request to the sidecar server
-func (c *Client) ReadMessage(
-	ctx context.Context,
-	channel string,
-	message interface{},
-) error {
-	data := clientMessage{
-		Channel: channel,
+// HandleChannel handles messages received in a given channel.
+func (c *Client) HandleChannel(channel string, handler func(ctx context.Context, body io.Reader) error) {
+	c.mux.HandleFunc("/"+channel, func(w http.ResponseWriter, r *http.Request) {
+		// user defined handler. Returns error if the user wants to return it
+		err := handler(context.Background(), r.Body)
+		if err != nil {
+			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Build())
+			return
+		}
+		rest.JSON(w, 200, nil)
+	})
+}
+
+//Run runs the server with the handlers defined in HandleChannel
+func (c *Client) Run(ctx context.Context) error {
+
+	var err error
+	server := http.Server{
+		Handler: c.mux,
+		Addr:    c.readAddr,
 	}
 
-	err := c.client.Send(
-		ctx,
-		"/readMessage",
-		http.MethodPost,
-		data,
-		message,
+	go func() {
+		if err = server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen:%v", err)
+		}
+	}()
+
+	log.Printf("sideCar listener is up...")
+
+	<-ctx.Done()
+
+	log.Println("gracefully shutting down...")
+
+	ctxShutdown, cancel := context.WithDeadline(
+		context.Background(),
+		time.Now().Add(time.Second*5),
 	)
+	defer cancel()
 
-	return err
-}
-
-// CommitMessage receives a channel and sends it in a request to the sidecar server
-func (c *Client) CommitMessage(ctx context.Context, channel string) error {
-	data := clientMessage{
-		Channel: channel,
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	var resp interface{}
-	err := c.client.Send(ctx, "/commit", http.MethodPost, data, &resp)
-
-	return err
+	// has to be the last method called in the shutdown
+	if err = server.Shutdown(ctxShutdown); err != nil {
+		return err
+	}
+	return ctx.Err()
 }

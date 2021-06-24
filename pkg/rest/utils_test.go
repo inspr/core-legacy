@@ -13,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 func TestJSON(t *testing.T) {
@@ -95,8 +95,8 @@ func TestERROR(t *testing.T) {
 			want: http.StatusForbidden,
 		},
 		{
-			name: "InsprErrors_InvalidChannelType",
-			err:  ierrors.NewError().InvalidChannelType().Build(),
+			name: "InsprErrors_InvalidType",
+			err:  ierrors.NewError().InvalidType().Build(),
 			want: http.StatusForbidden,
 		},
 		{
@@ -154,10 +154,11 @@ func TestUnmarshalERROR(t *testing.T) {
 	type args struct {
 		r io.Reader
 	}
-
-	errBody := struct {
-		Error string `json:"error"`
-	}{Error: "my_error"}
+	errBody := ierrors.
+		NewError().
+		InternalServer().
+		Message("cannot retrieve error from server").
+		Build()
 	errBytes, _ := json.Marshal(errBody)
 
 	tests := []struct {
@@ -173,7 +174,7 @@ func TestUnmarshalERROR(t *testing.T) {
 		{
 			name:    "basic_unmarshal_empty_error",
 			args:    args{r: strings.NewReader("nothing")},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
