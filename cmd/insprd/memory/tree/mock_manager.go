@@ -65,9 +65,9 @@ func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
 	return diff.Changelog{}, nil
 }
 
-// Root mock interface structure
-func (tmm *MockManager) Root() GetInterface {
-	return &RootGetter{
+// Tree mock interface structure
+func (tmm *MockManager) Tree() GetInterface {
+	return &PermTreeGetter{
 		tmm.root,
 	}
 }

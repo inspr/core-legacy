@@ -110,7 +110,7 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating dApp get transaction")
 		ah.Memory.InitTransaction()
 
-		app, err := ah.Memory.Root().Apps().Get(scope)
+		app, err := ah.Memory.Tree().Apps().Get(scope)
 		if err != nil {
 			logger.Error("unable to get dApp",
 				zap.String("dApp query", scope),
@@ -238,10 +238,10 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 				return
 			}
 
-			logger.Info("committing Channel create changes")
+			logger.Info("committing Channel delete changes")
 			defer ah.Memory.Commit()
 		} else {
-			logger.Info("cancelling Channel create changes")
+			logger.Info("cancelling Channel delete changes")
 			defer ah.Memory.Cancel()
 		}
 

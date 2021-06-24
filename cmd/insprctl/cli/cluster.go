@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 	"inspr.dev/inspr/pkg/cmd"
 	"inspr.dev/inspr/pkg/cmd/utils"
-	cliutils "inspr.dev/inspr/pkg/cmd/utils"
 	"inspr.dev/inspr/pkg/ierrors"
 )
 
@@ -71,39 +70,39 @@ func authInit(c context.Context, args []string) error {
 }
 
 func clusterConfig(c context.Context, args []string) error {
-	client := cliutils.GetCliClient()
+	client := utils.GetCliClient()
 	output := utils.GetCliOutput()
 	brokerName, filePath := args[0], args[1]
 
-	if err := cliutils.CheckEmptyArgs(map[string]string{
+	if err := utils.CheckEmptyArgs(map[string]string{
 		"brokerName": brokerName,
 		"filePath":   filePath,
 	}); err != nil {
-		fmt.Fprintf(output, err.Error())
+		fmt.Fprintf(output, "invalid args: %v\n", err.Error())
 		return err
 	}
 
 	// check if file exists and if it is a yaml file
 	if _, err := os.Stat(filePath); os.IsNotExist(err) || !isYaml(filePath) {
 		if err != nil {
-			fmt.Fprintf(output, err.Error())
+			fmt.Fprintf(output, "unable to find file: %v\n", err.Error())
 			return err
 		}
 
-		fmt.Fprintf(output, "not a yaml file")
+		fmt.Fprintf(output, "not a yaml file\n")
 		return ierrors.NewError().Message("not a yaml file").InvalidFile().Build()
 	}
 
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {
-		fmt.Fprintf(output, err.Error())
+		fmt.Fprintf(output, "unable to read file: %v\n", err.Error())
 		return err
 	}
 
 	// do a request to the broker route /brokers/<broker_name>
 	err = client.Brokers().Create(context.Background(), brokerName, bytes)
 	if err != nil {
-		fmt.Fprintf(output, err.Error())
+		fmt.Fprintf(output, "unable to create broker: %v\n", err.Error())
 		return err
 	}
 

@@ -215,7 +215,7 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 func (amm *AppMemoryManager) updateUUID(app *meta.App, parentStr string) {
 	app.Meta.Parent = parentStr
 	query, _ := metautils.JoinScopes(parentStr, app.Meta.Name)
-	oldApp, err := amm.Root().Apps().Get(query)
+	oldApp, err := amm.Tree().Apps().Get(query)
 	if err == nil {
 		app.Meta.UUID = oldApp.Meta.UUID
 		for chName, ch := range app.Spec.Channels {

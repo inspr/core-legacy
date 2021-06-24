@@ -79,7 +79,7 @@ type Manager interface {
 	Channels() ChannelMemory
 	Types() TypeMemory
 	Alias() AliasMemory
-	Root() GetInterface
+	Tree() GetInterface
 }
 
 // GetInterface is an interface to get components from memory

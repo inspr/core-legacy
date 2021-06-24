@@ -29,7 +29,7 @@ func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) 
 		zap.String("channel", name),
 		zap.String("scope", scope))
 
-	parentApp, err := GetTreeMemory().Apps().Get(scope)
+	parentApp, err := chh.Apps().Get(scope)
 	if err != nil {
 		newError := ierrors.
 			NewError().
@@ -85,7 +85,7 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel) error {
 	}
 
 	logger.Debug("getting Channel parent dApp")
-	parentApp, err := GetTreeMemory().Apps().Get(scope)
+	parentApp, err := chh.Apps().Get(scope)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).InvalidChannel().
 			Message("couldn't create channel %v : %v", ch.Meta.Name, err.Error()).
@@ -162,7 +162,7 @@ func (chh *ChannelMemoryManager) Delete(scope, name string) error {
 			Build()
 	}
 
-	parentApp, _ := GetTreeMemory().Apps().Get(scope)
+	parentApp, _ := chh.Apps().Get(scope)
 
 	insprType := parentApp.Spec.Types[channel.Spec.Type]
 
@@ -208,7 +208,7 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	ch.ConnectedAliases = oldCh.ConnectedAliases
 	ch.Meta.UUID = oldCh.Meta.UUID
 
-	parentApp, _ := GetTreeMemory().Apps().Get(scope)
+	parentApp, _ := chh.Apps().Get(scope)
 
 	logger.Debug("validating new Channel structure")
 
@@ -228,21 +228,21 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	return nil
 }
 
-// ChannelRootGetter returns a getter that gets channels from the root structure of the app, without the current changes.
+// ChannelPermTreeGetter returns a getter that gets channels from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
-type ChannelRootGetter struct {
+type ChannelPermTreeGetter struct {
 }
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the Channel which name is equal to the last query element.
 // If the specified Channel is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (amm *ChannelRootGetter) Get(scope, name string) (*meta.Channel, error) {
+func (cmm *ChannelPermTreeGetter) Get(scope, name string) (*meta.Channel, error) {
 	logger.Info("trying to get a Channel (Root Getter)",
 		zap.String("channel", name),
 		zap.String("scope", scope))
 
-	parentApp, err := GetTreeMemory().Root().Apps().Get(scope)
+	parentApp, err := GetTreeMemory().Tree().Apps().Get(scope)
 	if err != nil {
 		newError := ierrors.
 			NewError().

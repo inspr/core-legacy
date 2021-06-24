@@ -1,8 +1,26 @@
 
 # Changelog
 
+### #33 update networking from beta1 to v1 in the ingresses
+- fixes:
+  - Altered the fields of all the ingresses that used the previous version of the v1beta1 of k8s.
+  - `authsvc/secret` now passes context in the methods
+
+### #78 Bug CORE-475 | Deletion of multiple channels not working  
+- fixes:
+    - Altered the Channel Operator when handling delete to get the channel from `tree` instead of `root`
+    - Fixed Insprd CLI's Alias delete command (and its tests)
+- refactors:
+    - In the tree memory manager renamed method Root(), which returns the tree, to Tree()
+    - In the tree memory manager, renamed "RootGetter" structures to "PermTreeGetter"
+- misc:
+    - Updated Insprd CLI's cluster config command error messages
+---
+
+## Release v0.1.0
+
 ### #76 Tech CORE-360 | vanity url
-- fix:
+- fixes:
   - changed the `module` name in the `go mod` of the project, that allows the vanity url in the productions cluster to obtain the package properly
 ---
 

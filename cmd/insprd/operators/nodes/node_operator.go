@@ -87,7 +87,7 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 
 	logger.Debug("getting name of the k8s deployment to be deleted")
 	scope, _ := utils.JoinScopes(nodeContext, nodeName)
-	app, _ := no.memory.Root().Apps().Get(scope)
+	app, _ := no.memory.Tree().Apps().Get(scope)
 
 	logger.Info("deploying a Node structure in k8s",
 		zap.Any("node", app))
