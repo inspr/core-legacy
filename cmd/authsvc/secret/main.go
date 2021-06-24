@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -101,16 +102,16 @@ func main() {
 
 	initKube()
 
-	_, errPriv := clientSet.CoreV1().Secrets(namespace).Get("jwtprivatekey", v1.GetOptions{})
-	_, errPub := clientSet.CoreV1().Secrets(namespace).Get("jwtpublickey", v1.GetOptions{})
+	_, errPriv := clientSet.CoreV1().Secrets(namespace).Get(context.Background(), "jwtprivatekey", v1.GetOptions{})
+	_, errPub := clientSet.CoreV1().Secrets(namespace).Get(context.Background(), "jwtpublickey", v1.GetOptions{})
 
 	if errPriv != nil || errPub != nil {
 		if errPriv == nil {
-			clientSet.CoreV1().Secrets(namespace).Delete("jwtprivatekey", &v1.DeleteOptions{})
+			clientSet.CoreV1().Secrets(namespace).Delete(context.Background(), "jwtprivatekey", v1.DeleteOptions{})
 		}
 
 		if errPub == nil {
-			clientSet.CoreV1().Secrets(namespace).Delete("jwtpublickey", &v1.DeleteOptions{})
+			clientSet.CoreV1().Secrets(namespace).Delete(context.Background(), "jwtpublickey", v1.DeleteOptions{})
 		}
 
 		privateKey, err := generatePrivateKey()
@@ -141,11 +142,11 @@ func main() {
 				"key": publicKeyBytes,
 			},
 		}
-		_, err = clientSet.CoreV1().Secrets(namespace).Create(&privSec)
+		_, err = clientSet.CoreV1().Secrets(namespace).Create(context.Background(), &privSec, v1.CreateOptions{})
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
-		_, err = clientSet.CoreV1().Secrets(namespace).Create(&pubSec)
+		_, err = clientSet.CoreV1().Secrets(namespace).Create(context.Background(), &pubSec, v1.CreateOptions{})
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
