@@ -34,9 +34,11 @@ spec:
           - kafka
 
   aliases:
-    primes.input:
+    primes.filterinput:
       target: primesch1
-    primes.output:
+    primes.filteroutput:
+      target: primesch2
+    primes.printerinput:
       target: primesch2
 
   apps:
@@ -61,12 +63,11 @@ spec:
       spec:
         boundary:
           input:
-            - input
+            - filterinput
+            - printerinput
           output:
-            - output
-        aliases:
-          printer.input:
-            target: output
+            - filteroutput
+
         apps:
           # filters primes
           filter:
@@ -78,12 +79,12 @@ spec:
               node:
                 spec:
                   image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
-                  replicas: 2
+                  replicas: 1
               boundary:
                 input:
-                  - input
+                  - filterinput
                 output:
-                  - output
+                  - filteroutput
 
           # prints the filtered
           printer:
@@ -100,4 +101,4 @@ spec:
                   replicas: 1
               boundary:
                 input:
-                  - output
+                  - printerinput

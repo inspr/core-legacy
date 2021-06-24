@@ -1,0 +1,4 @@
+bootstrapServers: kafka.default.svc:9092
+autoOffsetReset: earliest
+sidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka:latest
+sidecarAddr: "http://localhost"

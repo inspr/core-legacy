@@ -39,7 +39,7 @@ func main() {
 		randNumber := rand.Int() % mod
 		fmt.Println("random number -> ", randNumber)
 		err := c.WriteMessage(ctx, chName, randNumber)
-		fmt.Println("wrote message to insprd")
+		fmt.Printf("wrote message to %s\n", chName)
 		if err != nil {
 			fmt.Println(err.Error())
 		}

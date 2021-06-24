@@ -16,7 +16,7 @@ func main() {
 	c := dappclient.NewAppClient()
 
 	// sets up ticker
-	chName := "input"
+	chName := "printerinput"
 	fmt.Println("starting...")
 	c.HandleChannel(chName, func(_ context.Context, r io.Reader) error {
 
