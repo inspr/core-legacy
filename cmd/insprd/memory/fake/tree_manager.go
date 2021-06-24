@@ -62,7 +62,7 @@ func MockTreeMemory(failErr error) tree.Manager {
 }
 
 // Tree mocks a root getter interface
-func (mm *MemManager) Tree() memory.GetInterface {
+func (mm *TreeMemoryMock) Tree() tree.GetInterface {
 	return (*LookupMemManager)(mm)
 }
 
