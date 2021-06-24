@@ -38,17 +38,17 @@ func TestHandler_NewBrokerHandler(t *testing.T) {
 		{
 			name: "valid new broker handler",
 			fields: fields{
-				Memory:   fake.MockMemoryManager(nil),
+				Memory:   fake.MockTreeMemory(nil),
 				Operator: ofake.NewFakeOperator(),
 				Auth:     authmock.NewMockAuth(nil),
-				Brokers:  fake.MockBrokerManager(nil),
+				Brokers:  fake.MockBrokerMemory(nil),
 			},
 			want: &BrokerHandler{
 				Handler: &Handler{
-					Memory:   fake.MockMemoryManager(nil),
+					Memory:   fake.MockTreeMemory(nil),
 					Operator: ofake.NewFakeOperator(),
 					Auth:     authmock.NewMockAuth(nil),
-					Brokers:  fake.MockBrokerManager(nil),
+					Brokers:  fake.MockBrokerMemory(nil),
 				},
 			},
 		},
@@ -84,7 +84,7 @@ func TestBrokerHandler_HandleGet(t *testing.T) {
 			name: "valid broker get test",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerManager(nil),
+					Brokers: fake.MockBrokerMemory(nil),
 				},
 			},
 			want: 200,
@@ -133,7 +133,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			name: "error_reading_body",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerManager(nil),
+					Brokers: fake.MockBrokerMemory(nil),
 				},
 			},
 			brokerErr: nil,
@@ -143,7 +143,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			name: "error_parsing_to_kafka_config",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerManager(nil),
+					Brokers: fake.MockBrokerMemory(nil),
 				},
 				bodyContent: models.BrokerConfigDI{
 					FileContents: []byte{1}, // throws error at the yaml parser
@@ -156,7 +156,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			name: "broker error",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerManager(
+					Brokers: fake.MockBrokerMemory(
 						errors.New("brokerManager_error")),
 				},
 			},
@@ -166,7 +166,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			name: "working",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerManager(nil),
+					Brokers: fake.MockBrokerMemory(nil),
 				},
 			},
 			wantCode: http.StatusOK,

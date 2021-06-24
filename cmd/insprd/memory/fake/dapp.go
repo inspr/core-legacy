@@ -8,7 +8,7 @@ import (
 
 // Apps - mocks the implementation of the AppMemory interface methods
 type Apps struct {
-	*MemManager
+	*TreeMemoryMock
 	fail error
 	apps map[string]*meta.App
 }

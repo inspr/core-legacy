@@ -96,7 +96,7 @@ func Test_intToint32(t *testing.T) {
 }
 
 func TestNodeOperator_withBoundary(t *testing.T) {
-	mem := fake.MockMemoryManager(nil)
+	mem := fake.MockTreeMemory(nil)
 	mem.InitTransaction()
 	mem.Channels().Create("", &meta.Channel{
 		Meta: meta.Metadata{

@@ -39,67 +39,67 @@ func AliasDICases(funcName string) []AliasAPITest {
 	return []AliasAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(errors.New("test_error")), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(errors.New("test_error")), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "not_found_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().NotFound().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().NotFound().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusNotFound},
 		},
 		{
 			name: "already_exists_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().AlreadyExists().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().AlreadyExists().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusConflict},
 		},
 		{
 			name: "internal_server_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InternalServer().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InternalServer().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "invalid_name_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidName().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InvalidName().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_app_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidApp().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InvalidApp().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannel().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InvalidChannel().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_type_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().BadRequest().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().BadRequest().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasDI},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -118,67 +118,67 @@ func AliasQueryDICases(funcName string) []AliasAPITest {
 	return []AliasAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(errors.New("test_error")), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(errors.New("test_error")), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: wrongFormatData},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "not_found_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().NotFound().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().NotFound().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusNotFound},
 		},
 		{
 			name: "already_exists_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().AlreadyExists().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().AlreadyExists().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusConflict},
 		},
 		{
 			name: "internal_server_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InternalServer().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InternalServer().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "invalid_name_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidName().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InvalidName().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_app_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidApp().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InvalidApp().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidChannel().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InvalidChannel().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_type_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().InvalidType().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewHandler(fake.MockMemoryManager(ierrors.NewError().BadRequest().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
+			ah:   NewHandler(fake.MockTreeMemory(ierrors.NewError().BadRequest().Build()), ofake.NewFakeOperator(), authmock.NewMockAuth(nil), nil).NewAliasHandler(),
 			send: sendInRequest{body: parsedAliasQueryDI},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -187,7 +187,7 @@ func AliasQueryDICases(funcName string) []AliasAPITest {
 
 func TestNewAliasHandler(t *testing.T) {
 	h := NewHandler(
-		fake.MockMemoryManager(nil),
+		fake.MockTreeMemory(nil),
 		ofake.NewFakeOperator(),
 		authmock.NewMockAuth(nil), nil,
 	)
@@ -203,7 +203,7 @@ func TestNewAliasHandler(t *testing.T) {
 		{
 			name: "success_CreateHandler",
 			args: args{
-				memManager: fake.MockMemoryManager(nil),
+				memManager: fake.MockTreeMemory(nil),
 				op:         ofake.NewFakeOperator(),
 			},
 			want: &AliasHandler{

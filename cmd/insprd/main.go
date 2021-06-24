@@ -3,8 +3,7 @@ package main
 import (
 	"os"
 
-	"inspr.dev/inspr/cmd/insprd/memory/brokers"
-	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/operators"
 	"inspr.dev/inspr/pkg/api"
 	"inspr.dev/inspr/pkg/auth"
@@ -13,17 +12,15 @@ import (
 )
 
 func main() {
-	var memoryManager tree.Manager
-	var brokerManager brokers.Manager
+	var memoryManager memory.Manager
 	var operator operators.OperatorInterface
 	var authenticator auth.Auth
 	var err error
 
 	if _, ok := os.LookupEnv("DEBUG"); ok {
 		authenticator = authmock.NewMockAuth(nil)
-		brokerManager = brokers.GetBrokerMemory()
-		memoryManager = tree.GetTreeMemory()
-		operator, err = operators.NewOperator(memoryManager, authenticator, brokerManager)
+		memoryManager = memory.GetMemoryManager()
+		operator, err = operators.NewOperator(memoryManager, authenticator)
 		if err != nil {
 			panic(err)
 		}
@@ -33,13 +30,12 @@ func main() {
 			panic(err)
 		}
 		authenticator = jwtauth.NewJWTauth(pubKey)
-		brokerManager = brokers.GetBrokerMemory()
-		memoryManager = tree.GetTreeMemory()
-		operator, err = operators.NewOperator(memoryManager, authenticator, brokerManager)
+		memoryManager = memory.GetMemoryManager()
+		operator, err = operators.NewOperator(memoryManager, authenticator)
 		if err != nil {
 			panic(err)
 		}
 	}
 
-	api.Run(memoryManager, operator, authenticator, brokerManager)
+	api.Run(memoryManager, operator, authenticator)
 }

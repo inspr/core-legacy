@@ -1,7 +1,7 @@
 package operators
 
 import (
-	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/insprd/operators/nodes"
 	"inspr.dev/inspr/pkg/auth"
@@ -26,12 +26,12 @@ func (op *Operator) Channels() ChannelOperatorInterface {
 }
 
 // NewOperator creates a node operator.
-func NewOperator(memory tree.Manager, authenticator auth.Auth, broker brokers.Manager) (OperatorInterface, error) {
+func NewOperator(memory memory.Manager, authenticator auth.Auth) (OperatorInterface, error) {
 	var err error
 
-	chOp := NewGeneralOperator(broker, memory)
+	chOp := NewGeneralOperator(memory.Brokers(), memory.Tree())
 
-	nOp, err := nodes.NewNodeOperator(memory, authenticator, broker)
+	nOp, err := nodes.NewNodeOperator(memory.Tree(), authenticator, memory.Brokers())
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +39,6 @@ func NewOperator(memory tree.Manager, authenticator auth.Auth, broker brokers.Ma
 	return &Operator{
 		channels: chOp,
 		nodes:    nOp,
-		mem:      memory,
+		mem:      memory.Tree(),
 	}, err
 }

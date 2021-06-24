@@ -11,7 +11,7 @@ func (s *Server) initRoutes() {
 
 	logger.Debug("initializing Insprd server routes")
 	h := handler.NewHandler(
-		s.treeMemoryManager, s.op, s.auth, s.brokerManager,
+		s.memory.Tree(), s.op, s.auth, s.memory.Brokers(),
 	)
 
 	ahandler := h.NewAppHandler()

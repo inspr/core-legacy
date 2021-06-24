@@ -340,7 +340,7 @@ func TestClient_Run(t *testing.T) {
 			defer cancel()
 			client := &Client{
 				mux:      http.NewServeMux(),
-				readAddr: ":3301",
+				readAddr: ":3303",
 			}
 			client.HandleChannel(tt.channel, handler)
 			errch := make(chan error)
@@ -348,7 +348,7 @@ func TestClient_Run(t *testing.T) {
 				errch <- client.Run(ctx)
 			}()
 
-			c := request.NewJSONClient("http://localhost:3301")
+			c := request.NewJSONClient("http://localhost:3303")
 			var response struct {
 				Status string `json:"status"`
 			}

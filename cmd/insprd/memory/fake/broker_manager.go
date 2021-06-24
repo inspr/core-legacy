@@ -13,8 +13,8 @@ type BrokersMock struct {
 	factory *Factory
 }
 
-// MockBrokerManager mock exported with propagated error through the functions
-func MockBrokerManager(failErr error) brokers.Manager {
+// MockBrokerMemory mock exported with propagated error through the functions
+func MockBrokerMemory(failErr error) brokers.Manager {
 	return &BrokersMock{
 		fail: failErr,
 		broker: &metabroker.Brokers{
