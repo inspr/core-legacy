@@ -31,7 +31,7 @@ func main() {
 	// sets up client for sidecar
 	c := dappclient.NewAppClient()
 	// channel name
-	chName := "primes_ch1"
+	chName := "primesch1"
 	ctx := context.Background()
 	fmt.Println("starting...")
 

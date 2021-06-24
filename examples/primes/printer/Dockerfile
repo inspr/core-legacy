@@ -1,13 +1,9 @@
 FROM golang:alpine as build
 WORKDIR /app
-COPY go.mod go.mod
-RUN go mod download
 COPY . . 
-WORKDIR /app/examples/primes/printer
-RUN go build
-
+RUN go build -o main examples/primes/printer/main.go
 
 FROM alpine
 WORKDIR /app
-COPY --from=build /app/examples/primes/printer/printer printer
-CMD ./printer
+COPY --from=build /app/main .
+CMD ./main

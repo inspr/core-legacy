@@ -12,11 +12,8 @@ spec:
     spec:
       image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
       replicas: 1
-      environment:
-  
   boundary:
     input:
-      - primes_ch1
+      - primesch1
     output:
-      - primes_ch2
-      
+      - primesch2

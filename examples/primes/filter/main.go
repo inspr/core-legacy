@@ -9,6 +9,7 @@ import (
 	"math/big"
 
 	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 func main() {
@@ -20,29 +21,25 @@ func main() {
 	inputChannel := "input"
 	outputChannel := "output"
 
-	type Message struct {
-		Message int    `json:"message"`
-		Channel string `json:"channel"`
-	}
-
 	fmt.Println("starting...")
 	// handles messages sent to the input channel
 	client.HandleChannel(inputChannel, func(_ context.Context, r io.Reader) error {
 		decoder := json.NewDecoder(r)
-		var msg Message
+		var msg models.BrokerMessage
 
 		err := decoder.Decode(&msg)
 		if err != nil {
 			return err
 		}
-		log.Printf("msg.Message = %+v\n", msg.Message)
-		if big.NewInt(int64(msg.Message)).ProbablyPrime(0) {
-			err = client.WriteMessage(
-				context.Background(),
-				outputChannel,
-				msg.Message,
-			)
-			if err != nil {
+
+		log.Printf("Message = %+v\n", msg.Data)
+		msgNumber, ok := msg.Data.(int64)
+		if !ok {
+			return fmt.Errorf("unable to convert '%v' to int64", msg.Data)
+		}
+
+		if big.NewInt(msgNumber).ProbablyPrime(0) {
+			if err := client.WriteMessage(context.Background(), outputChannel, msg.Data); err != nil {
 				return err
 			}
 		}

@@ -14,38 +14,36 @@ spec:
       schema: '{"type":"int"}'
 
   channels:
-    primes_ch1:
+    primesch1:
       meta:
-        name: "primes_ch1"
+        name: "primesch1"
         reference: ""
-        annotations:
-          kafka.partition.number: "10"
-          kafka.replication.factor: "3"
         parent: ""
       spec:
         type: "primes_ct1"
-    primes_ch2:
+        brokerlist:
+          - kafka
+    primesch2:
       meta:
-        name: "primes_ch2"
+        name: "primesch2"
         reference: ""
-        annotations:
-          kafka.partition.number: "3"
-          kafka.replication.factor: "3"
         parent: ""
       spec:
         type: "primes_ct2"
+        brokerlist:
+          - kafka
 
   aliases:
     primes.input:
-      target: primes_ch1
+      target: primesch1
     primes.output:
-      target: primes_ch2
+      target: primesch2
 
   apps:
     # number generators
     generator:
       meta:
-          name: generator
+        name: generator
       spec:
         node:
           spec:
@@ -55,11 +53,11 @@ spec:
               MODULE: 300
         boundary:
           output:
-            - primes_ch1
+            - primesch1
 
     primes:
       meta:
-          name: primes
+        name: primes
       spec:
         boundary:
           input:
@@ -102,4 +100,4 @@ spec:
                   replicas: 1
               boundary:
                 input:
-                  - input
+                  - output

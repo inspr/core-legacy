@@ -84,7 +84,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		token := strings.TrimPrefix(headerContent[0], "Bearer ")
 		payload, newToken, err := auth.Validate([]byte(token))
 		log.Printf("payload = %+v\n", payload)
-		log.Printf("string(newToken) = %+v\n", string(newToken))
+		// log.Printf("string(newToken) = %+v\n", string(newToken))
 
 		// returns the same token or a refreshed one in the header of the response
 		w.Header().Add("Authorization", "Bearer "+string(newToken))
