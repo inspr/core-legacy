@@ -8,7 +8,7 @@
 | kind                 | Specifies which structure the file represents, in this case it would be `dapp`                                                                                                              |
 | meta                 | Metadata of dApp                                                                                                                                                                            |
 | &rarr;name           | Defines dApp name                                                                                                                                                                           |
-| &rarr;reference      | String that is utilized to define certain tags to the dApp in question, a way for the user to categorize the numerous dApps in the cluster.                                                 |
+| &rarr;reference      | String that contains the url to the location of the DApp definition in inspr's registry                                                                                                     |
 | &rarr;annotations    | Definitions that can describe characteristics of the dApp that later on can be used to process/group the dApps in your cluster.                                                             |
 | &rarr;parent         | Defines dApp context in relation to the cluster. For example `app1.app2` would mean that this dApp is located on the path `root->app1->app2->app-name`. It is injected by the Inspr daemon. |
 | spec                 | specification of dApp                                                                                                                                                                       |

@@ -8,7 +8,7 @@
 | kind              | Specifies which structure the file represents, in this case it would be `type`                                                                                     |
 | meta              | Metadata of Type                                                                                                                                                   |
 | &rarr;name        | Type's Name                                                                                                                                                        |
-| &rarr;reference   | String that is utilized to define certain tags to the Type in question, a way for the user to categorize the numerous Types in the cluster.                        |
+| &rarr;reference   | String that contains the url to the location of the Type definition in inspr's registry                                                                            |
 | &rarr;annotations | Definitions that can describe characteristics of the Type that later on can be used to process/group the Types in your cluster.                                    |
 | &rarr;parent      | Defines the Type context in the cluster through the path of the dApp in which it is stored, for example: `app1.app2` means that the Type is defined in the `app2`. |
 |                   |
