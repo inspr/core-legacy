@@ -32,13 +32,11 @@ func (b *ErrBuilder) Build() *InsprError {
 	return b.err
 }
 
-/*
-From this point forward are the functions that uses the constants ierror values, these are merely functions that simplyfy the process of specifying the current
-type of error.
+// From this point forward are the functions that uses the constants ierror values,
+// these are merely functions that simplyfy the process of specifying the current type of error
 
-Instead of using builder.SetErrorCode(ierrors.NotFound), one could simply use
-the following builder.NotFound() which already does the process above.
-*/
+// Instead of using builder.SetErrorCode(ierrors.NotFound), one could simply use
+// the following builder.NotFound() which already does the process above.
 
 // NotFound adds Not Found code to Inspr Error
 func (b *ErrBuilder) NotFound() *ErrBuilder {
@@ -82,9 +80,21 @@ func (b *ErrBuilder) InvalidChannel() *ErrBuilder {
 	return b
 }
 
-// InvalidChannelType adds Invalid Channel Type code to Inspr Error
-func (b *ErrBuilder) InvalidChannelType() *ErrBuilder {
-	b.err.Code = InvalidChannelType
+// InvalidType adds Invalid Type code to Inspr Error
+func (b *ErrBuilder) InvalidType() *ErrBuilder {
+	b.err.Code = InvalidType
+	return b
+}
+
+// InvalidFile adds Invalid Args code to Inspr Error
+func (b *ErrBuilder) InvalidFile() *ErrBuilder {
+	b.err.Code = InvalidFile
+	return b
+}
+
+// InvalidArgs adds Invalid Args code to Inspr Error
+func (b *ErrBuilder) InvalidArgs() *ErrBuilder {
+	b.err.Code = InvalidArgs
 	return b
 }
 

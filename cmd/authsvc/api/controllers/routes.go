@@ -7,4 +7,5 @@ import (
 func (s *Server) initRoutes() {
 	s.Mux.HandleFunc("/token", s.Tokenize().Methods(http.MethodPost))
 	s.Mux.HandleFunc("/refresh", s.Refresh().Methods(http.MethodGet))
+	s.Mux.HandleFunc("/init", s.HandleInit())
 }

@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/inspr/inspr/pkg/auth/models"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 func TestNewJWTauth(t *testing.T) {
@@ -74,20 +74,19 @@ func TestJWTauth_Validate(t *testing.T) {
 	}
 	noPayloadToken := func() []byte {
 		token := jwt.New()
-		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
+		token.Set(jwt.ExpirationKey, time.Now().Add(3*time.Hour))
 		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
 		return signed
 	}
 	fineToken := func() []byte {
 		token := jwt.New()
-		token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
+		token.Set(jwt.ExpirationKey, time.Now().Add(3*time.Hour))
 
-		payload := models.Payload{
-			UID:        "mock_UID",
-			Role:       0,
-			Scope:      []string{"mock"},
-			Refresh:    []byte("mock_refresh"),
-			RefreshURL: "mock_refresh_url",
+		payload := auth.Payload{
+			UID:         "mock_UID",
+			Permissions: map[string][]string{"": {"mock"}},
+			Refresh:     []byte("mock_refresh"),
+			RefreshURL:  "mock_refresh_url",
 		}
 		token.Set("payload", payload)
 		signed, _ := jwt.Sign(token, jwa.RS256, privKey)
@@ -101,7 +100,7 @@ func TestJWTauth_Validate(t *testing.T) {
 		name    string
 		JA      *JWTauth
 		args    args
-		want    *models.Payload
+		want    *auth.Payload
 		want1   []byte
 		wantErr bool
 	}{
@@ -151,12 +150,11 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: fineToken(),
 			},
-			want: &models.Payload{
-				UID:        "mock_UID",
-				Role:       0,
-				Scope:      []string{"mock"},
-				Refresh:    []byte("mock_refresh"),
-				RefreshURL: "mock_refresh_url",
+			want: &auth.Payload{
+				UID:         "mock_UID",
+				Permissions: map[string][]string{"": {"mock"}},
+				Refresh:     []byte("mock_refresh"),
+				RefreshURL:  "mock_refresh_url",
 			},
 			want1:   fineToken(),
 			wantErr: false,
@@ -207,7 +205,7 @@ func TestJWTauth_Tokenize(t *testing.T) {
 	privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
 
 	type args struct {
-		load models.Payload
+		load auth.Payload
 	}
 	tests := []struct {
 		name    string
@@ -219,17 +217,16 @@ func TestJWTauth_Tokenize(t *testing.T) {
 		{
 			name: "Tokenize valid",
 			args: args{
-				load: models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Role:       1,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+				load: auth.Payload{
+					UID:         "u000001",
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				},
 			},
 			want: []byte("mock_token"),
 			handle: func(w http.ResponseWriter, r *http.Request) {
-				token := models.JwtDO{
+				token := auth.JwtDO{
 					Token: []byte("mock_token"),
 				}
 				rest.JSON(w, http.StatusOK, token)
@@ -239,12 +236,11 @@ func TestJWTauth_Tokenize(t *testing.T) {
 		{
 			name: "Tokenize invalid UIDP response",
 			args: args{
-				load: models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Role:       1,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+				load: auth.Payload{
+					UID:         "u000001",
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				},
 			},
 			want:    nil,
@@ -261,12 +257,11 @@ func TestJWTauth_Tokenize(t *testing.T) {
 		{
 			name: "Tokenize invalid",
 			args: args{
-				load: models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Role:       1,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+				load: auth.Payload{
+					UID:         "u000001",
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				},
 			},
 			want: nil,
@@ -314,17 +309,16 @@ func TestJWTauth_Refresh(t *testing.T) {
 		{
 			name: "Tokenize valid",
 			args: args{
-				token: mockenize(models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Role:       1,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+				token: mockenize(auth.Payload{
+					UID:         "u000001",
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				}),
 			},
 			want: []byte("mock_token"),
 			handle: func(w http.ResponseWriter, r *http.Request) {
-				token := models.JwtDO{
+				token := auth.JwtDO{
 					Token: []byte("mock_token"),
 				}
 				rest.JSON(w, http.StatusOK, token)
@@ -343,12 +337,11 @@ func TestJWTauth_Refresh(t *testing.T) {
 		{
 			name: "Tokenize invalid UID response",
 			args: args{
-				token: mockenize(models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Role:       1,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+				token: mockenize(auth.Payload{
+					UID:         "u000001",
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				}),
 			},
 			want: nil,
@@ -365,12 +358,11 @@ func TestJWTauth_Refresh(t *testing.T) {
 		{
 			name: "Tokenize invalid UID refresh",
 			args: args{
-				token: mockenize(models.Payload{
-					UID:        "u000001",
-					Scope:      []string{""},
-					Role:       1,
-					Refresh:    []byte("refreshtk"),
-					RefreshURL: "http://refresh.token",
+				token: mockenize(auth.Payload{
+					UID:         "u000001",
+					Permissions: nil,
+					Refresh:     []byte("refreshtk"),
+					RefreshURL:  "http://refresh.token",
 				}),
 			},
 			want: nil,
@@ -402,9 +394,9 @@ func TestJWTauth_Refresh(t *testing.T) {
 	}
 }
 
-func mockenize(load models.Payload) []byte {
+func mockenize(load auth.Payload) []byte {
 	token := jwt.New()
-	token.Set(jwt.ExpirationKey, time.Now().Add(30*time.Minute))
+	token.Set(jwt.ExpirationKey, time.Now().Add(3*time.Hour))
 	token.Set("payload", load)
 	key, _ := rsa.GenerateKey(rand.Reader, 512)
 	signed, _ := jwt.Sign(token, jwa.RS256, key)

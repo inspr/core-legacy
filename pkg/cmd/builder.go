@@ -4,26 +4,27 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // Builder is used to build cobra commands.
 // it contains all the methods to manipulate a command
 type Builder interface {
-	WithAliases([]string) Builder
+	WithAliases(...string) Builder
 	WithDescription(description string) Builder
 	WithLongDescription(long string) Builder
 	WithExample(comment, command string) Builder
 	WithFlagAdder(adder func(*pflag.FlagSet)) Builder
-	WithFlags([]*Flag) Builder
+	WithFlags(...*Flag) Builder
 	WithCommonFlags() Builder
 	Hidden() Builder
 	ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command
 	MinimumArgs(argCount int, action func(context.Context, []string) error) *cobra.Command
 	NoArgs(action func(context.Context) error) *cobra.Command
 	AddSubCommand(cmds ...*cobra.Command) Builder
+	Version(version string) Builder
 	Super() *cobra.Command
 }
 
@@ -41,6 +42,11 @@ func NewCmd(use string) Builder {
 	}
 }
 
+func (b *builder) Version(v string) Builder {
+	b.cmd.Version = v
+	return b
+}
+
 // WithDescription - adds a short description to the command
 func (b *builder) WithDescription(description string) Builder {
 	b.cmd.Short = description
@@ -55,12 +61,12 @@ func (b *builder) WithLongDescription(long string) Builder {
 
 // WithExample - adds and example of how to use the command
 //
-// it will show ' #comment_given inspr  #subcommand_example '
+// it will show ' #comment_given insprctl  #subcommand_example '
 func (b *builder) WithExample(comment, command string) Builder {
 	if b.cmd.Example != "" {
 		b.cmd.Example += "\n"
 	}
-	b.cmd.Example += fmt.Sprintf("  # %s\n inspr %s\n", comment, command)
+	b.cmd.Example += fmt.Sprintf("  # %s\n insprctl %s\n", comment, command)
 	return b
 }
 
@@ -83,6 +89,7 @@ func (b *builder) WithCommonFlags() Builder {
 // config.AddSetUnsetFlags(f)
 //
 // }).
+
 func (b *builder) WithFlagAdder(adder func(*pflag.FlagSet)) Builder {
 	adder(b.cmd.Flags())
 	return b
@@ -90,7 +97,7 @@ func (b *builder) WithFlagAdder(adder func(*pflag.FlagSet)) Builder {
 
 // WithFlags - receives a slice of flags (defined in the cmd pkg)
 // adds each of the flags in the command
-func (b *builder) WithFlags(flags []*Flag) Builder {
+func (b *builder) WithFlags(flags ...*Flag) Builder {
 	for _, f := range flags {
 		fl := f.Flag()
 		b.cmd.Flags().AddFlag(fl)
@@ -171,7 +178,7 @@ func handleWellKnownErrors(err error) error {
 }
 
 // WithAliases adds command aliases
-func (b *builder) WithAliases(alias []string) Builder {
+func (b *builder) WithAliases(alias ...string) Builder {
 	b.cmd.Aliases = alias
 	return b
 }

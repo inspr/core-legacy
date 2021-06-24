@@ -3,15 +3,15 @@ package client
 import (
 	"context"
 
-	"github.com/inspr/inspr/pkg/api/auth"
+	"inspr.dev/inspr/pkg/auth"
 )
 
 // User defines the information a user contains
 type User struct {
-	UID      string
-	Role     int
-	Scope    []string
-	Password string
+	UID string `json:"uid"`
+	// Permissions is a map where key is the Scope and values are permissions
+	Permissions map[string][]string `json:"permissions"`
+	Password    string              `json:"password"`
 }
 
 // RedisManager defines methods to manage Redis in the cluster

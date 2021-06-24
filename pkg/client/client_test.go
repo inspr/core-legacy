@@ -3,6 +3,8 @@ package dappclient
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -11,11 +13,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
-	"github.com/inspr/inspr/pkg/sidecar/models"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 func mockHTTPClient(addr string) *http.Client {
@@ -28,10 +29,8 @@ func mockHTTPClient(addr string) *http.Client {
 	}
 }
 
-func mockMessage() models.Message {
-	return models.Message{
-		Data: nil,
-	}
+func mockMessage() interface{} {
+	return nil
 }
 
 func mockHandlerFunc(path string, expectedData interface{}) http.HandlerFunc {
@@ -72,14 +71,14 @@ func createMockEnvVars() {
 	os.Setenv("INSPR_INPUT_CHANNELS", "inp1;inp2;inp3")
 	os.Setenv("INSPR_OUTPUT_CHANNELS", "inp1;inp2;inp3")
 	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
-	os.Setenv("INSPR_APP_CTX", "random.ctx")
+	os.Setenv("INSPR_APP_SCOPE", "random.ctx")
 	os.Setenv("INSPR_ENV", "test")
-	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "kafka")
-	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "latest")
+	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", "kafka")
+	os.Setenv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET", "latest")
 	os.Setenv("ch1_SCHEMA", `{"type":"string"}`)
 	os.Setenv("ch2_SCHEMA", "hellotest")
 	os.Setenv("INSPR_APP_ID", "testappid1")
-	os.Setenv("INSPR_SIDECAR_IMAGE", "random-sidecar-image")
+	os.Setenv("INSPR_LBSIDECAR_IMAGE", "random-sidecar-image")
 }
 
 // deleteMockEnvVars - deletes the env values used in the tests functions
@@ -87,12 +86,12 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
 	os.Unsetenv("INSPR_INPUT_CHANNELS")
 	os.Unsetenv("INSPR_UNIX_SOCKET")
-	os.Unsetenv("INSPR_APP_CTX")
+	os.Unsetenv("INSPR_APP_SCOPE")
 	os.Unsetenv("INSPR_ENV")
-	os.Unsetenv("KAFKA_BOOTSTRAP_SERVERS")
-	os.Unsetenv("KAFKA_AUTO_OFFSET_RESET")
+	os.Unsetenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS")
+	os.Unsetenv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET")
 	os.Unsetenv("INSPR_APP_ID")
-	os.Unsetenv("INSPR_SIDECAR_IMAGE")
+	os.Unsetenv("INSPR_LBSIDECAR_IMAGE")
 }
 
 func TestNewAppClient(t *testing.T) {
@@ -110,7 +109,7 @@ func TestNewAppClient(t *testing.T) {
 					HTTPClient(*mockHTTPClient("http://unix")).
 					Encoder(json.Marshal).
 					Decoder(request.JSONDecoderGenerator).
-					Build(),
+					Pointer(),
 			},
 		},
 	}
@@ -128,7 +127,7 @@ func TestNewAppClient(t *testing.T) {
 func TestClient_WriteMessage(t *testing.T) {
 	type args struct {
 		channel string
-		msg     models.Message
+		msg     interface{}
 	}
 	tests := []struct {
 		name            string
@@ -149,7 +148,7 @@ func TestClient_WriteMessage(t *testing.T) {
 			name: "Invalid request - server died",
 			args: args{
 				channel: "chan1",
-				msg:     models.Message{},
+				msg:     nil,
 			},
 			wantErr:         true,
 			interruptServer: true,
@@ -158,7 +157,7 @@ func TestClient_WriteMessage(t *testing.T) {
 			name: "Invalid request - context canceled",
 			args: args{
 				channel: "chan1",
-				msg:     models.Message{},
+				msg:     nil,
 			},
 			wantErr:       true,
 			cancelContext: true,
@@ -172,7 +171,7 @@ func TestClient_WriteMessage(t *testing.T) {
 			if tt.cancelContext {
 				handler = mockHandlerFuncTimeout()
 			} else {
-				handler = mockHandlerFunc("/writeMessage", tt.args)
+				handler = mockHandlerFunc("/chan1", tt.args)
 			}
 
 			s := httptest.NewServer(http.HandlerFunc(handler))
@@ -183,7 +182,7 @@ func TestClient_WriteMessage(t *testing.T) {
 					HTTPClient(*http.DefaultClient).
 					Encoder(json.Marshal).
 					Decoder(request.JSONDecoderGenerator).
-					Build(),
+					Pointer(),
 			}
 
 			if tt.interruptServer {
@@ -204,124 +203,165 @@ func TestClient_WriteMessage(t *testing.T) {
 	}
 }
 
-func TestClient_ReadMessage(t *testing.T) {
+func TestClient_HandleChannel(t *testing.T) {
+	type fields struct {
+	}
 	type args struct {
-		ctx     context.Context
 		channel string
+		handler func(t *testing.T) func(ctx context.Context, body io.Reader) error
 	}
 	tests := []struct {
-		name            string
-		args            args
-		want            models.Message
-		wantErr         bool
-		interruptServer bool
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+		message interface{}
 	}{
 		{
-			name: "Valid request",
+			name:    "no error on handler",
+			message: "message",
 			args: args{
-				ctx:     context.Background(),
-				channel: "chan1",
+				channel: "channel",
+				handler: func(t *testing.T) func(ctx context.Context, body io.Reader) error {
+					return func(ctx context.Context, body io.Reader) error {
+
+						message := struct {
+							Message string
+						}{}
+						decoder := json.NewDecoder(body)
+						err := decoder.Decode(&message)
+						if err != nil {
+							return err
+						}
+						if message.Message != "message" {
+							t.Errorf("Client_HandleChannel message = %v, want message", message.Message)
+						}
+
+						return nil
+					}
+				},
 			},
-			wantErr:         false,
-			interruptServer: false,
-			want:            mockMessage(),
 		},
 		{
-			name: "Invalid request",
+			name:    "error on handler",
+			message: "message",
+			wantErr: true,
 			args: args{
-				ctx:     context.Background(),
-				channel: "chan2",
+				channel: "channel",
+				handler: func(t *testing.T) func(ctx context.Context, body io.Reader) error {
+					return func(ctx context.Context, body io.Reader) error {
+
+						message := struct {
+							Message string
+						}{}
+						decoder := json.NewDecoder(body)
+						err := decoder.Decode(&message)
+						if err != nil {
+							return err
+						}
+						if message.Message != "message" {
+							t.Errorf("Client_HandleChannel message = %v, want message", message.Message)
+						}
+
+						return errors.New("Error")
+					}
+				},
 			},
-			wantErr:         true,
-			interruptServer: true,
-			want:            models.Message{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := mockHandlerFunc("/readMessage", tt.args)
-
-			s := httptest.NewServer(http.HandlerFunc(handler))
-			defer s.Close()
-			c := Client{
-				client: request.NewClient().
-					BaseURL(s.URL).
-					HTTPClient(*http.DefaultClient).
-					Encoder(json.Marshal).
-					Decoder(request.JSONDecoderGenerator).
-					Build(),
+			c := &Client{
+				mux: http.NewServeMux(),
 			}
+			c.HandleChannel(tt.args.channel, tt.args.handler(t))
+			s := httptest.NewServer(c.mux)
+			client := request.NewJSONClient(s.URL)
+			response := struct {
+				Status string `json:"status"`
+			}{}
+			err := client.Send(context.Background(), tt.args.channel, http.MethodPost, struct{ Message interface{} }{tt.message}, &response)
 
-			if tt.interruptServer {
-				s.Close()
-			}
-
-			var got models.Message
-			err := c.ReadMessage(context.Background(), "chan1", &got)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.ReadMessage() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.ReadMessage() = %v, want %v", got, tt.want)
+				t.Errorf("Client_HandleChannel response.Status = %v, wantErr = %v", response.Status, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestClient_CommitMessage(t *testing.T) {
-	type args struct {
-		ctx     context.Context
-		channel string
-	}
+func TestClient_Run(t *testing.T) {
+	environment.SetMockEnv()
+	defer environment.UnsetMockEnv()
 	tests := []struct {
-		name            string
-		args            args
-		wantErr         bool
-		interruptServer bool
+		name    string
+		message interface{}
+		wantErr bool
+		handler func(t *testing.T) func(ctx context.Context, r io.Reader) error
+		channel string
 	}{
 		{
-			name: "Valid request",
-			args: args{
-				ctx:     context.Background(),
-				channel: "chan1",
-			},
-			wantErr:         false,
-			interruptServer: false,
+			message: "this is a message",
+			name:    "correct functionality",
+			channel: "banana",
 		},
+
 		{
-			name: "Invalid request",
-			args: args{
-				ctx:     nil,
-				channel: "chan1",
+			message: "this is a message",
+			name:    "incorrect functionality",
+			channel: "banana",
+			wantErr: true,
+			handler: func(t *testing.T) func(ctx context.Context, r io.Reader) error {
+				return func(ctx context.Context, r io.Reader) error {
+					return errors.New("this is an error")
+				}
 			},
-			wantErr:         true,
-			interruptServer: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := mockHandlerFunc("/commit", tt.args)
-
-			s := httptest.NewServer(http.HandlerFunc(handler))
-			defer s.Close()
-			c := Client{
-				client: request.NewClient().
-					BaseURL(s.URL).
-					HTTPClient(*http.DefaultClient).
-					Encoder(json.Marshal).
-					Decoder(request.JSONDecoderGenerator).
-					Build(),
+			var handler func(context.Context, io.Reader) error
+			if tt.handler != nil {
+				handler = tt.handler(t)
+			} else {
+				handler = func(ctx context.Context, r io.Reader) error {
+					decoder := json.NewDecoder(r)
+					var response interface{}
+					err := decoder.Decode(&response)
+					if err != nil {
+						return err
+					}
+					if !reflect.DeepEqual(response, tt.message) {
+						t.Errorf("Client_Run response = %v, want %v", response, tt.message)
+					}
+					return nil
+				}
 			}
-
-			if tt.interruptServer {
-				s.Close()
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			client := &Client{
+				mux:      http.NewServeMux(),
+				readAddr: ":3301",
 			}
+			client.HandleChannel(tt.channel, handler)
+			errch := make(chan error)
+			go func() {
+				errch <- client.Run(ctx)
+			}()
 
-			err := c.CommitMessage(context.Background(), "chan1")
+			c := request.NewJSONClient("http://localhost:3301")
+			var response struct {
+				Status string `json:"status"`
+			}
+			err := c.Send(ctx, tt.channel, http.MethodPost, tt.message, &response)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.CommitMessage() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Client_Run err = %v, wantErr = %v", err, tt.wantErr)
 			}
+			cancel()
+			err = <-errch
+			if err != nil && err != context.Canceled {
+				t.Errorf("Client_Run error in server = %v, wantErr = %v", err, tt.wantErr)
+			}
+
 		})
 	}
 }

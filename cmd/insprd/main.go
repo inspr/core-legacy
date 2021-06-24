@@ -3,41 +3,44 @@ package main
 import (
 	"os"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	kafka "github.com/inspr/inspr/cmd/insprd/operators/kafka"
-	"github.com/inspr/inspr/pkg/api"
-	"github.com/inspr/inspr/pkg/auth"
-	jwtauth "github.com/inspr/inspr/pkg/auth/jwt"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/pkg/api"
+	"inspr.dev/inspr/pkg/auth"
+	jwtauth "inspr.dev/inspr/pkg/auth/jwt"
+	authmock "inspr.dev/inspr/pkg/auth/mocks"
 )
 
 func main() {
 	var memoryManager memory.Manager
+	var brokerManager brokers.Manager
 	var operator operators.OperatorInterface
 	var authenticator auth.Auth
 	var err error
 
-	pubKey, err := auth.GetPublicKey()
-	if err != nil {
-		panic(err)
-	}
-
 	if _, ok := os.LookupEnv("DEBUG"); ok {
-		authenticator = jwtauth.NewJWTauth(pubKey)
+		authenticator = authmock.NewMockAuth(nil)
+		brokerManager = brokers.GetBrokerMemory()
 		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator(memoryManager)
+		operator, err = operators.NewOperator(memoryManager, authenticator, brokerManager)
 		if err != nil {
 			panic(err)
 		}
 	} else {
+		pubKey, err := auth.GetPublicKey()
+		if err != nil {
+			panic(err)
+		}
 		authenticator = jwtauth.NewJWTauth(pubKey)
+		brokerManager = brokers.GetBrokerMemory()
 		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator(memoryManager)
+		operator, err = operators.NewOperator(memoryManager, authenticator, brokerManager)
 		if err != nil {
 			panic(err)
 		}
 	}
 
-	api.Run(memoryManager, operator, authenticator)
+	api.Run(memoryManager, operator, authenticator, brokerManager)
 }

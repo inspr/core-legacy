@@ -35,15 +35,14 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: inspr-lbsidecar-configuration
           env:
             - name: AUTH_PATH
-              value: {{ .Values.service.authName }}.{{ .Release.Namespace }}.svc
-            - name: "INSPR_SIDECAR_IMAGE"
-              value: {{ .Values.kafkaSidecarImage}}
-            - name: "KAFKA_BOOTSTRAP_SERVERS"
-              value: {{ .Values.kafkaBootstrap}}
-            - name: "KAFKA_AUTO_OFFSET_RESET"
-              value: {{ .Values.kafkaAutoOffsetReset}}
+              value: http://{{ .Values.service.authName }}.{{ .Release.Namespace }}.svc
+            - name: "INSPR_LBSIDECAR_IMAGE"
+              value: {{ .Values.lbsidecarImage}}
             - name: "NODES_APPS_NAMESPACE"
               value: {{ .Values.insprAppsNamespace}}
             - name: "INSPR_ENV"

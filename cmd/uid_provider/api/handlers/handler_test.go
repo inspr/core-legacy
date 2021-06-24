@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/inspr/inspr/cmd/uid_provider/api/models"
-	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uid_provider/api/models"
+	"inspr.dev/inspr/cmd/uid_provider/client"
 )
 
 var redisServer *miniredis.Miniredis
@@ -113,7 +113,7 @@ func TestHandler_DeleteUserHandler(t *testing.T) {
 				Password:        "123",
 				UserToBeDeleted: "rand2",
 			},
-			want: http.StatusForbidden,
+			want: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
@@ -127,7 +127,7 @@ func TestHandler_DeleteUserHandler(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			req, _ := http.NewRequest("DELETE", ts.URL, bytes.NewBuffer(body))
+			req, _ := http.NewRequest(http.MethodDelete, ts.URL, bytes.NewBuffer(body))
 			res, err := client.Do(req)
 			if err != nil {
 				t.Log("error making a PUT in the httptest server")
@@ -162,7 +162,7 @@ func TestHandler_UpdatePasswordHandler(t *testing.T) {
 				UserToBeUpdated: "rand2",
 				NewPassword:     "321",
 			},
-			want: http.StatusForbidden,
+			want: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
@@ -176,7 +176,7 @@ func TestHandler_UpdatePasswordHandler(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			req, _ := http.NewRequest("PUT", ts.URL, bytes.NewBuffer(body))
+			req, _ := http.NewRequest(http.MethodPut, ts.URL, bytes.NewBuffer(body))
 			res, err := client.Do(req)
 			if err != nil {
 				t.Log("error making a PUT in the httptest server")

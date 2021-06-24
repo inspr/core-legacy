@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 func TestMemoryManager_Alias(t *testing.T) {
@@ -497,7 +497,7 @@ func getMockAlias() *meta.App {
 								},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
+						Types: map[string]*meta.Type{
 							"ctUpdate1": {
 								Meta: meta.Metadata{
 									Name:        "ctUpdate1",
@@ -525,7 +525,7 @@ func getMockAlias() *meta.App {
 					},
 					ConnectedApps: []string{"app1"},
 					Spec: meta.ChannelSpec{
-						Type: "channelType1",
+						Type: "type1",
 					},
 				},
 				"channel2": {
@@ -534,14 +534,14 @@ func getMockAlias() *meta.App {
 						Parent: "",
 					},
 					Spec: meta.ChannelSpec{
-						Type: "channelType1",
+						Type: "type1",
 					},
 				},
 			},
-			ChannelTypes: map[string]*meta.ChannelType{
-				"channelType1": {
+			Types: map[string]*meta.Type{
+				"type1": {
 					Meta: meta.Metadata{
-						Name: "channelType1",
+						Name: "type1",
 					},
 					Schema: string(sha256.New().Sum([]byte("hello"))),
 				},

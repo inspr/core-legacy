@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/inspr/inspr/cmd/uid_provider/api"
-	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uid_provider/api"
+	"inspr.dev/inspr/cmd/uid_provider/client"
 )
 
 func main() {

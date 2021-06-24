@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/inspr/inspr/pkg/controller"
+import "inspr.dev/inspr/pkg/controller"
 
 //ClientMock test asset for mocking a controller
 type ClientMock struct {
@@ -24,9 +24,9 @@ func (cm *ClientMock) Channels() controller.ChannelInterface {
 	return NewChannelMock(cm.err)
 }
 
-//ChannelTypes mocks a chanl types controller
-func (cm *ClientMock) ChannelTypes() controller.ChannelTypeInterface {
-	return NewChannelTypeMock(cm.err)
+//Types mocks a chanl types controller
+func (cm *ClientMock) Types() controller.TypeInterface {
+	return NewTypeMock(cm.err)
 }
 
 //Authorization mocks a app controller
@@ -37,4 +37,9 @@ func (cm *ClientMock) Authorization() controller.AuthorizationInterface {
 //Alias mocks a alias controller
 func (cm *ClientMock) Alias() controller.AliasInterface {
 	return NewAliasMock(cm.err)
+}
+
+//Brokers mocks brokers controller
+func (cm *ClientMock) Brokers() controller.BrokersInterface {
+	return NewBrokersMock(cm.err)
 }

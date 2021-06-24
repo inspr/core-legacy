@@ -2,10 +2,12 @@ package utils
 
 import (
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 func Test_initViperConfig(t *testing.T) {
@@ -28,52 +30,13 @@ func Test_initViperConfig(t *testing.T) {
 
 			ip := viper.Get(configServerIP)
 			if ip != defaultValues[configServerIP] {
-				t.Errorf("viper's scope, expected %v, got %v",
+
+				t.Errorf("viper's serverip, expected %v, got %v",
 					ip,
 					defaultValues[configServerIP])
 			}
 		})
 	}
-}
-
-func Test_readViperConfig(t *testing.T) {
-	type args struct {
-		baseDir string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name:    "working_read",
-			args:    args{baseDir: "./test"},
-			wantErr: false,
-		},
-		{
-			name:    "not_working_read",
-			args:    args{baseDir: "1/2/3/"},
-			wantErr: true,
-		},
-	}
-
-	// sets defaults values in ./test/.inspr/config
-	setupViperTest()
-	// sets the
-	viper.SetConfigFile("./test/.inspr/config")
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := ReadViperConfig(tt.args.baseDir)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("readViperConfig() error = %v, wantErr %v",
-					err,
-					tt.wantErr)
-			}
-		})
-	}
-	os.Remove("./test/.inspr/config")
-	os.Remove("./test/.inspr")
 }
 
 func Test_changeViperValues(t *testing.T) {
@@ -113,16 +76,17 @@ func Test_changeViperValues(t *testing.T) {
 	}
 
 	// read mock config values
-	setupViperTest()
+	folder := setupViperTest(t)
+	os.Setenv("HOME", folder)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.wantErr {
-				viper.SetConfigFile("/etc/")
+				os.Setenv("HOME", "/etc/")
 			}
 
 			// reads the current values of the viper config
-			ReadViperConfig("./test")
+			ReadDefaultConfig()
 
 			err := ChangeViperValues(tt.args.key, tt.args.value)
 			if (err != nil) != tt.wantErr {
@@ -139,94 +103,21 @@ func Test_changeViperValues(t *testing.T) {
 			}
 		})
 	}
-	os.Remove("./test/.inspr/config")
-	os.Remove("./test/.inspr")
-}
-
-func Test_createViperConfig(t *testing.T) {
-	type args struct {
-		folderPath string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name:    "local_viper_config",
-			args:    args{folderPath: "./test/config"},
-			wantErr: false,
-		},
-		{
-			name:    "error_folder_location",
-			args:    args{folderPath: "/1//2/3/4/5"},
-			wantErr: true,
-		},
-	}
-
-	// read mock config values
-	setupViperTest()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			err := createViperConfig(tt.args.folderPath)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("createViperConfig() error = %v, wantErr %v",
-					err,
-					tt.wantErr)
-			}
-		})
-	}
-	os.Remove("./test/config")
-}
-
-func Test_createInsprConfigFolder(t *testing.T) {
-	type args struct {
-		folderPath string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name:    "create_folder",
-			args:    args{folderPath: "./test/inspr"},
-			wantErr: false,
-		},
-		{
-			name:    "create_folder",
-			args:    args{folderPath: "1/inspr"},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := createInsprConfigFolder(tt.args.folderPath)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("createInsprConfigFolder() error = %v, wantErr %v",
-					err,
-					tt.wantErr)
-			}
-		})
-	}
-	os.Remove("./test/inspr")
 }
 
 func Test_existingKeys(t *testing.T) {
+	InitViperConfig()
 	tests := []struct {
 		name string
 		want []string
 	}{
 		{
 			name: "all_keys",
-			want: []string{"extra", "scope", "serverip"},
+			want: []string{"scope", "serverip"},
 		},
 	}
 
 	// read mock config values
-	setupViperTest()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -251,12 +142,24 @@ func Test_existingKeys(t *testing.T) {
 
 /// test utils functions
 
-func setupViperTest() {
-	// specifies the path in which the config file present
-	viper.AddConfigPath("./test/")
-	viper.SetConfigName("viper_config")
-	viper.SetConfigType("yaml")
-
-	// contains defaults values to be used in others functions
-	viper.ReadInConfig()
+func setupViperTest(t *testing.T) string {
+	folder := t.TempDir()
+	config := struct {
+		ServerIP string `yaml:"serverip"`
+		Scope    string `yaml:"scope"`
+	}{
+		ServerIP: "http://localhost:8080",
+	}
+	mars, _ := yaml.Marshal(config)
+	err := os.MkdirAll(filepath.Join(folder, ".inspr"), 0755)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	err = os.WriteFile(filepath.Join(folder, ".inspr", "config"), mars, 0644)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	return folder
 }

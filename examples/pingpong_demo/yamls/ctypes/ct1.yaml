@@ -1,6 +1,6 @@
-kind: channeltype
 apiVersion: v1
+kind: type
 
 meta:
-  name: ppctype1
+  name: pptype1
 schema: yamls/ctypes/schema.avsc

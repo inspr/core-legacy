@@ -13,7 +13,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 func TestHandler_HTTPHandlerFunc(t *testing.T) {

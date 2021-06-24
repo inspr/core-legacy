@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 var logger *zap.Logger
@@ -15,13 +16,14 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "insprd-api-handlers")))
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "insprd-api-handlers")))
 }
 
 // Handler is a general handler for inspr routes. It contains the necessary components
 // for managing components on each route.
 type Handler struct {
 	Memory          memory.Manager
+	Brokers         brokers.Manager
 	Operator        operators.OperatorInterface
 	Auth            auth.Auth
 	diffReactions   []diff.DifferenceReaction
@@ -30,10 +32,11 @@ type Handler struct {
 
 // NewHandler creates a handler from a memory manager and an operator. It also initializes the reactors for
 // changes on the cluster.
-func NewHandler(memory memory.Manager, operator operators.OperatorInterface, auth auth.Auth) *Handler {
+func NewHandler(memory memory.Manager, operator operators.OperatorInterface, auth auth.Auth, brokers brokers.Manager) *Handler {
 	logger.Info("creating new Insprd API handler")
 	h := Handler{
 		Memory:          memory,
+		Brokers:         brokers,
 		Operator:        operator,
 		Auth:            auth,
 		diffReactions:   []diff.DifferenceReaction{},

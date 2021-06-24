@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/inspr/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uid_provider/client"
 )
 
 // Server is a struct that contains the variables necessary

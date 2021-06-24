@@ -115,7 +115,7 @@ func Test_builder_WithExample(t *testing.T) {
 				command: "mock_command",
 			},
 			want: &builder{cmd: cobra.Command{
-				Example: fmt.Sprintf("  # %s\n inspr %s\n", "mock_comment", "mock_command"),
+				Example: fmt.Sprintf("  # %s\n insprctl %s\n", "mock_comment", "mock_command"),
 			}},
 		},
 	}
@@ -134,7 +134,7 @@ func Test_builder_WithExamples(t *testing.T) {
 			WithExample("comment1", "run --flag1").
 			WithExample("comment2", "run --flag2").
 			NoArgs(nil)
-		expected := "  # comment1\n inspr run --flag1\n\n  # comment2\n inspr run --flag2\n"
+		expected := "  # comment1\n insprctl run --flag1\n\n  # comment2\n insprctl run --flag2\n"
 
 		if !reflect.DeepEqual(cmd.Example, expected) {
 			t.Errorf(
@@ -331,7 +331,7 @@ func Test_builder_WithFlagAdder(t *testing.T) {
 			}
 			_ = b.WithFlagAdder(tt.args.adder)
 
-			if !reflect.DeepEqual(bufResp.String(), tt.want) {
+			if !reflect.DeepEqual(len(bufResp.String()), len(tt.want)) {
 				t.Errorf(
 					"builder.WithFlagAdder() = %v, want %v",
 					bufResp,
@@ -396,7 +396,7 @@ func Test_builder_WithFlags(t *testing.T) {
 				)
 			}
 
-			got = b.WithFlags(tt.args.flags).NoArgs(nil)
+			got = b.WithFlags(tt.args.flags...).NoArgs(nil)
 			if got.Flags() == nil {
 				t.Errorf(
 					"builder.WithFlags() = %v, want not nil",
@@ -597,7 +597,7 @@ func Test_builder_WithAliases(t *testing.T) {
 			b := &builder{
 				cmd: tt.fields.cmd,
 			}
-			got := b.WithAliases(tt.args.alias).NoArgs(nil)
+			got := b.WithAliases(tt.args.alias...).NoArgs(nil)
 
 			if !reflect.DeepEqual(got.Aliases, tt.args.alias) {
 				t.Errorf(

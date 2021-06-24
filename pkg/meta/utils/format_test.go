@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/disiqueira/gotree"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 var (
@@ -20,12 +20,14 @@ var (
 		"\n│       └── mock_key: mock_val" +
 		"\n└── Spec" +
 		"\n    └── Boundary" +
-		"\n        └── Input" +
-		"\n        │   ├── input1" +
-		"\n        │   ├── input2" +
-		"\n        └── Output" +
-		"\n            └── output1" +
-		"\n            └── output2" +
+		"\n    │   ├── Input" +
+		"\n    │   │   ├── input1" +
+		"\n    │   │   ├── input2" +
+		"\n    │   ├── Output" +
+		"\n    │       └── output1" +
+		"\n    │       └── output2" +
+		"\n    └── Auth" +
+		"\n        └── Scope: " +
 		"\n\n"
 
 	channelTree = "channel_name" +
@@ -33,13 +35,14 @@ var (
 		"\n│   ├── Name: channel_name" +
 		"\n└── Spec" +
 		"\n│   ├── Type: ct_meta" +
+		"\n│   ├── SelectedBroker: " +
 		"\n└── ConnectedApps" +
 		"\n    └── a" +
 		"\n    └── b" +
 		"\n    └── c" +
 		"\n\n"
 
-	channelTypeTree = "ct_meta" +
+	TypeTree = "ct_meta" +
 		"\n└── Meta" +
 		"\n│   ├── Name: ct_meta" +
 		"\n└── Spec" +
@@ -76,10 +79,10 @@ func TestPrintAppTree(t *testing.T) {
 						Parent: "mock_parent",
 					},
 					Spec: meta.AppSpec{
-						Node:         meta.Node{},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Node:     meta.Node{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  utils.StringArray{"input1", "input2"},
 							Output: utils.StringArray{"output1", "output2"},
@@ -145,9 +148,9 @@ func TestPrintChannelTree(t *testing.T) {
 	}
 }
 
-func TestPrintChannelTypeTree(t *testing.T) {
+func TestPrintTypeTree(t *testing.T) {
 	type args struct {
-		ct *meta.ChannelType
+		ct *meta.Type
 	}
 	tests := []struct {
 		name    string
@@ -155,25 +158,25 @@ func TestPrintChannelTypeTree(t *testing.T) {
 		wantOut string
 	}{
 		{
-			name: "basic_channelType_tree",
+			name: "basic_Type_tree",
 			args: args{
-				ct: &meta.ChannelType{
+				ct: &meta.Type{
 					Meta: meta.Metadata{
 						Name: "ct_meta",
 					},
 					Schema: "{\"type\":\"int\"}",
 				},
 			},
-			wantOut: channelTypeTree,
+			wantOut: TypeTree,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			out := &bytes.Buffer{}
-			PrintChannelTypeTree(tt.args.ct, out)
+			PrintTypeTree(tt.args.ct, out)
 			if gotOut := out.String(); gotOut != tt.wantOut {
 				t.Errorf(
-					"PrintChannelTypeTree() = \n%v, want \n%v",
+					"PrintTypeTree() = \n%v, want \n%v",
 					gotOut,
 					tt.wantOut,
 				)

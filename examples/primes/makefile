@@ -9,7 +9,7 @@ build: ## Build the container
 	docker push gcr.io/red-inspr/inspr/examples/primes/generator:latest 
 
 	# filter
-	docker build -f ./filter/Dockerfile -t gcr.io/red-inspr/inspr/examples/primes/filter:latest $(PROJ_SRC)
+	docker build -f  ./filter/Dockerfile -t gcr.io/red-inspr/inspr/examples/primes/filter:latest $(PROJ_SRC)
 	docker push gcr.io/red-inspr/inspr/examples/primes/filter:latest 
 
 	# printer

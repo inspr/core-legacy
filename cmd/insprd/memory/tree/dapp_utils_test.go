@@ -1,11 +1,15 @@
 package tree
 
 import (
+	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/meta"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/sidecars"
+	"inspr.dev/inspr/pkg/meta"
+	metabrokers "inspr.dev/inspr/pkg/meta/brokers"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func Test_validAppStructure(t *testing.T) {
@@ -14,9 +18,9 @@ func Test_validAppStructure(t *testing.T) {
 		parentApp meta.App
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "All valid structures",
@@ -42,9 +46,9 @@ func Test_validAppStructure(t *testing.T) {
 								Image: "imageNodeApp5",
 							},
 						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2"},
 							Output: []string{"ch2app2"},
@@ -53,7 +57,6 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "",
 		},
 		{
 			name: "invalidapp name - empty",
@@ -79,9 +82,9 @@ func Test_validAppStructure(t *testing.T) {
 								Image: "imageNodeApp3",
 							},
 						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2"},
 							Output: []string{"ch2app2"},
@@ -90,7 +93,7 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "invalid dApp name;",
+			wantErr: true,
 		},
 		{
 			name: "invalidapp substructure",
@@ -119,8 +122,8 @@ func Test_validAppStructure(t *testing.T) {
 						Apps: map[string]*meta.App{
 							"invalidApp": {},
 						},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app2"},
 							Output: []string{"ch2app2"},
@@ -129,7 +132,7 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "invalid substructure;",
+			wantErr: true,
 		},
 		{
 			name: "invalidapp - parent has Node structure",
@@ -155,9 +158,9 @@ func Test_validAppStructure(t *testing.T) {
 								Image: "imageNodeApp3",
 							},
 						},
-						Apps:         map[string]*meta.App{},
-						Channels:     map[string]*meta.Channel{},
-						ChannelTypes: map[string]*meta.ChannelType{},
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
 							Input:  []string{"ch1app1"},
 							Output: []string{"ch2app1"},
@@ -166,13 +169,19 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["appNode"],
 			},
-			want: "parent has Node;",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := validAppStructure(&tt.args.app, &tt.args.parentApp); got != tt.want {
-				t.Errorf("validAppStructure() = %v, want %v", got, tt.want)
+			err := validAppStructure(&tt.args.app, &tt.args.parentApp)
+			if tt.wantErr && (err == nil) {
+				t.Errorf("validAppStructure(): wanted error but received 'nil'")
+				return
+			}
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("validAppStructure() error: %v", reflect.TypeOf(err))
 			}
 		})
 	}
@@ -217,63 +226,6 @@ func Test_nodeIsEmpty(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := nodeIsEmpty(tt.args.node); got != tt.want {
 				t.Errorf("nodeIsEmpty() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_validBoundaries(t *testing.T) {
-	type args struct {
-		appName        string
-		bound          meta.AppBoundary
-		parentChannels map[string]*meta.Channel
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			name: "Valid boundary",
-			args: args{
-				appName: "thenewapp",
-				bound: meta.AppBoundary{
-					Input:  []string{"ch1app1"},
-					Output: []string{},
-				},
-				parentChannels: getMockApp().Spec.Apps["app1"].Spec.Channels,
-			},
-			want: "",
-		},
-		{
-			name: "invalidboundary - parent without channels",
-			args: args{
-				appName: "",
-				bound: meta.AppBoundary{
-					Input:  []string{"ch1app2"},
-					Output: []string{},
-				},
-				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Apps["app3"].Spec.Channels,
-			},
-			want: "invalid app boundary - channel 'ch1app2' doesnt exist in parent app;",
-		},
-		{
-			name: "invalid input boundary",
-			args: args{
-				appName: "app3",
-				bound: meta.AppBoundary{
-					Input:  []string{"ch1app1"},
-					Output: []string{},
-				},
-				parentChannels: getMockApp().Spec.Apps["app2"].Spec.Channels,
-			},
-			want: "invalid app boundary - channel 'ch1app1' doesnt exist in parent app;",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := validBoundaries(tt.args.appName, tt.args.bound, tt.args.parentChannels); got != tt.want {
-				t.Errorf("validBoundaries() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -372,10 +324,9 @@ func Test_checkAndUpdates(t *testing.T) {
 		app *meta.App
 	}
 	tests := []struct {
-		name  string
-		args  args
-		want  bool
-		want1 string
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "valid channel structure - it shouldn't return a error",
@@ -400,9 +351,9 @@ func Test_checkAndUpdates(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -418,7 +369,7 @@ func Test_checkAndUpdates(t *testing.T) {
 								},
 								ConnectedApps: []string{"thenewapp"},
 								Spec: meta.ChannelSpec{
-									Type: "newChannelType",
+									Type: "newType",
 								},
 							},
 							"ch2app1": {
@@ -429,11 +380,11 @@ func Test_checkAndUpdates(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"newChannelType": {
+						Types: map[string]*meta.Type{
+							"newType": {
 								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
+									Name:        "newType",
+									Reference:   "app1.newType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
 									UUID:        "",
@@ -447,11 +398,9 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  true,
-			want1: "",
 		},
 		{
-			name: "invalid channel: using non-existent channel type",
+			name: "invalid channel: using non-existent type",
 			args: args{
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -473,9 +422,9 @@ func Test_checkAndUpdates(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -502,11 +451,11 @@ func Test_checkAndUpdates(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"newChannelType": {
+						Types: map[string]*meta.Type{
+							"newType": {
 								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
+									Name:        "newType",
+									Reference:   "app1.newType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
 									UUID:        "",
@@ -520,8 +469,7 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  false,
-			want1: "invalid channel: using non-existent channel type;",
+			wantErr: true,
 		},
 		{
 			name: "invalid channel structure - it should return a name channel error",
@@ -546,9 +494,9 @@ func Test_checkAndUpdates(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -564,7 +512,7 @@ func Test_checkAndUpdates(t *testing.T) {
 								},
 								ConnectedApps: []string{"thenewapp"},
 								Spec: meta.ChannelSpec{
-									Type: "newChannelType",
+									Type: "newType",
 								},
 							},
 							"ch2app1": {
@@ -575,11 +523,11 @@ func Test_checkAndUpdates(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"newChannelType": {
+						Types: map[string]*meta.Type{
+							"newType": {
 								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
+									Name:        "newType",
+									Reference:   "app1.newType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
 									UUID:        "",
@@ -593,8 +541,7 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  false,
-			want1: "invalid channel name: invalid.channel.name",
+			wantErr: true,
 		},
 		{
 			name: "valid channel structure - it shouldn't return a error",
@@ -619,9 +566,9 @@ func Test_checkAndUpdates(t *testing.T) {
 									UUID:        "",
 								},
 								Spec: meta.AppSpec{
-									Apps:         map[string]*meta.App{},
-									Channels:     map[string]*meta.Channel{},
-									ChannelTypes: map[string]*meta.ChannelType{},
+									Apps:     map[string]*meta.App{},
+									Channels: map[string]*meta.Channel{},
+									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
 										Input:  []string{"ch1app1"},
 										Output: []string{},
@@ -637,7 +584,7 @@ func Test_checkAndUpdates(t *testing.T) {
 								},
 								ConnectedApps: []string{"thenewapp"},
 								Spec: meta.ChannelSpec{
-									Type: "newChannelType",
+									Type: "newType",
 								},
 							},
 							"ch2app1": {
@@ -648,11 +595,11 @@ func Test_checkAndUpdates(t *testing.T) {
 								Spec: meta.ChannelSpec{},
 							},
 						},
-						ChannelTypes: map[string]*meta.ChannelType{
-							"invalid.channel.type": {
+						Types: map[string]*meta.Type{
+							"invalid.type": {
 								Meta: meta.Metadata{
-									Name:        "newChannelType",
-									Reference:   "app1.newChannelType",
+									Name:        "newType",
+									Reference:   "app1.newType",
 									Annotations: map[string]string{},
 									Parent:      "app1",
 									UUID:        "",
@@ -666,18 +613,19 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  false,
-			want1: "invalid channelType name: invalid.channel.type",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := checkAndUpdates(tt.args.app)
-			if got != tt.want {
-				t.Errorf("checkChannels() got = %v, want %v", got, tt.want)
+			err := checkAndUpdates(tt.args.app)
+			if tt.wantErr && (err == nil) {
+				t.Errorf("checkAndUpdates(): wanted error but received 'nil'")
+				return
 			}
-			if got1 != tt.want1 {
-				t.Errorf("checkChannels() got1 = %v, want %v", got1, tt.want1)
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("checkAndUpdates() error: %v", err)
 			}
 		})
 	}
@@ -925,6 +873,142 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 				},
 			},
 		},
+
+		{
+			name: "authentication injection",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:   "singleLevelInjection",
+						Parent: "",
+					},
+				},
+				parentApp: "",
+			},
+			fields: fields{
+				root: &meta.App{
+					Spec: meta.AppSpec{
+						Auth: meta.AppAuth{
+							Scope:       "",
+							Permissions: utils.StringArray{"permission1", "permission2"},
+						},
+					},
+				},
+			},
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:   "singleLevelInjection",
+					Parent: "",
+				},
+				Spec: meta.AppSpec{
+					Auth: meta.AppAuth{
+						Scope:       "",
+						Permissions: utils.StringArray{"permission1", "permission2"},
+					},
+				},
+			},
+		},
+		{
+			name: "authentication keeping",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:   "singleLevelInjection",
+						Parent: "",
+					},
+					Spec: meta.AppSpec{
+						Auth: meta.AppAuth{
+							Scope:       "scope",
+							Permissions: utils.StringArray{"permission12"},
+						},
+					},
+				},
+				parentApp: "",
+			},
+			fields: fields{
+				root: &meta.App{
+					Spec: meta.AppSpec{
+						Auth: meta.AppAuth{
+							Scope:       "",
+							Permissions: utils.StringArray{"permission1", "permission2"},
+						},
+					},
+				},
+			},
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:   "singleLevelInjection",
+					Parent: "",
+				},
+				Spec: meta.AppSpec{
+					Auth: meta.AppAuth{
+						Scope:       "scope",
+						Permissions: utils.StringArray{"permission12"},
+					},
+				},
+			},
+		},
+
+		{
+			name: "multilevel authentication keeping",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name:   "singleLevelInjection",
+						Parent: "",
+					},
+					Spec: meta.AppSpec{
+						Apps: map[string]*meta.App{
+							"son1": {
+								Meta: meta.Metadata{
+									Name: "son1",
+								},
+							},
+						},
+						Auth: meta.AppAuth{
+							Scope:       "scope",
+							Permissions: utils.StringArray{"permission12"},
+						},
+					},
+				},
+				parentApp: "",
+			},
+			fields: fields{
+				root: &meta.App{
+					Spec: meta.AppSpec{
+						Auth: meta.AppAuth{
+							Scope:       "",
+							Permissions: utils.StringArray{"permission1", "permission2"},
+						},
+					},
+				},
+			},
+			want: &meta.App{
+				Meta: meta.Metadata{
+					Name:   "singleLevelInjection",
+					Parent: "",
+				},
+				Spec: meta.AppSpec{
+					Auth: meta.AppAuth{
+						Scope:       "scope",
+						Permissions: utils.StringArray{"permission12"},
+					},
+					Apps: map[string]*meta.App{
+						"son1": {
+							Meta: meta.Metadata{
+								Name: "son1",
+							},
+							Spec: meta.AppSpec{
+								Auth: meta.AppAuth{
+									Scope:       "scope",
+									Permissions: utils.StringArray{"permission12"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -941,6 +1025,309 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 			amm := GetTreeMemory().Apps().(*AppMemoryManager)
 			parentApp, _ := amm.Get(tt.args.parentApp)
 			amm.addAppInTree(tt.args.app, parentApp)
+		})
+	}
+}
+
+func TestAppMemoryManager_updateUUID(t *testing.T) {
+
+	type args struct {
+		app       *meta.App
+		parentStr string
+		tree      *meta.App
+		want      *meta.App
+	}
+	tests := []struct {
+		name   string
+		args   args
+		update bool
+	}{
+		{
+			name: "new dapp",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "dapp1",
+					},
+					Spec: meta.AppSpec{
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+						Types: map[string]*meta.Type{
+							"channeltype1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+
+						Aliases: map[string]*meta.Alias{
+							"alias1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+					},
+				},
+				parentStr: "",
+				tree:      &meta.App{},
+			},
+			update: false,
+		},
+		{
+			name: "updating dapp",
+			args: args{
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "dapp1",
+					},
+					Spec: meta.AppSpec{
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+						Types: map[string]*meta.Type{
+							"channeltype1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+
+						Aliases: map[string]*meta.Alias{
+							"alias1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+					},
+				},
+				parentStr: "",
+				want: &meta.App{
+					Meta: meta.Metadata{
+						Name: "dapp1",
+						UUID: "123456",
+					},
+					Spec: meta.AppSpec{
+						Channels: map[string]*meta.Channel{
+							"channel1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+						Types: map[string]*meta.Type{
+							"channeltype1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+
+						Aliases: map[string]*meta.Alias{
+							"alias1": {
+								Meta: meta.Metadata{Name: "channel1"},
+							},
+						},
+					},
+				},
+				tree: &meta.App{
+					Spec: meta.AppSpec{
+						Apps: map[string]*meta.App{
+							"dapp1": {
+								Meta: meta.Metadata{
+									Name: "dapp1",
+									UUID: "123456",
+								},
+								Spec: meta.AppSpec{
+									Channels: map[string]*meta.Channel{
+										"channel1": {
+											Meta: meta.Metadata{Name: "channel1"},
+										},
+									},
+									Types: map[string]*meta.Type{
+										"channeltype1": {
+											Meta: meta.Metadata{Name: "channel1"},
+										},
+									},
+
+									Aliases: map[string]*meta.Alias{
+										"alias1": {
+											Meta: meta.Metadata{Name: "channel1"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			update: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			amm := &AppMemoryManager{
+				MemoryManager: &MemoryManager{
+					root: tt.args.tree,
+					tree: tt.args.tree,
+				},
+			}
+			amm.updateUUID(tt.args.app, tt.args.parentStr)
+			if !tt.update {
+				metautils.RecursiveValidateUUIDS("", tt.args.app, t)
+			} else if !reflect.DeepEqual(tt.args.app, tt.args.want) {
+				t.Error("chaged uuid")
+			}
+		})
+	}
+}
+
+func Test_validAliases(t *testing.T) {
+	appTest := meta.App{
+		Meta: meta.Metadata{
+			Name: "app",
+		},
+		Spec: meta.AppSpec{
+			Aliases: map[string]*meta.Alias{
+				"valid.alias1": {
+					Target: "ch1",
+				},
+				"valid.alias2": {
+					Target: "ch2",
+				},
+				"invalid.alias1": {
+					Target: "ch3",
+				},
+				"invalid.alias2": {
+					Target: "ch4",
+				},
+			},
+			Channels: map[string]*meta.Channel{
+				"ch1": {
+					Meta: meta.Metadata{
+						Name:   "ch1",
+						Parent: "",
+					},
+				},
+			},
+			Boundary: meta.AppBoundary{
+				Output: []string{"ch2"},
+			},
+		},
+	}
+	type args struct {
+		app *meta.App
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test alias validation",
+			args: args{
+				app: &appTest,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validAliases(tt.args.app)
+			if tt.wantErr && (err == nil) {
+				t.Errorf("validAliases(): wanted error but received 'nil'")
+				return
+			}
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("validAliases() error: %v", err)
+			}
+		})
+	}
+}
+
+var kafkaStructMock = sidecars.KafkaConfig{
+	BootstrapServers: "",
+	AutoOffsetReset:  "",
+	KafkaInsprAddr:   "",
+	SidecarImage:     "",
+}
+
+func TestSelectBrokerFromPriorityList(t *testing.T) {
+	type args struct {
+		brokerList []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+		before  func()
+	}{
+		{
+			name: "Should return the first available broker",
+			args: args{
+				brokerList: []string{metabrokers.Kafka},
+			},
+			want: metabrokers.Kafka,
+			before: func() {
+				bmm := brokers.GetBrokerMemory()
+				bmm.Create(&kafkaStructMock)
+				bmm.SetDefault(metabrokers.Kafka)
+			},
+		},
+		{
+			name: "Invalid - Brokers in broker list are no supported",
+			args: args{
+				brokerList: []string{"fakeBroker"},
+			},
+			want:    metabrokers.Kafka,
+			wantErr: true,
+			before: func() {
+				bmm := brokers.GetBrokerMemory()
+				bmm.Create(&kafkaStructMock)
+			},
+		},
+		// {
+		// 	name: "Should return the default broker",
+		// 	args: args{
+		// 		brokerList: []string{"A", "Broker_B"},
+		// 	},
+		// 	want: "Broker_A",
+		// 	before: func() {
+		// 		bmm := brokers.GetBrokerMemory()
+		// 		bmm.Create("Broker_A", nil)
+		// 		bmm.SetDefault("Broker_A")
+		// 	},
+		// },
+		// {
+		// 	name: "Should return the default broker when priority list is empty",
+		// 	args: args{
+		// 		brokerList: []string{},
+		// 	},
+		// 	want: "Broker_A",
+		// 	before: func() {
+		// 		bmm := brokers.GetBrokerMemory()
+		// 		bmm.Create("Broker_A", nil)
+		// 		bmm.SetDefault("Broker_A")
+		// 	},
+		// },
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.before != nil {
+				tt.before()
+			}
+			got, err := SelectBrokerFromPriorityList(tt.args.brokerList)
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("SelectBrokerFromPriorityList() error %v", err)
+				return
+			}
+
+			if !tt.wantErr && (got != tt.want) {
+				t.Errorf("SelectBrokerFromPriorityList() got %v, want %v", got, tt.want)
+			}
+
+			if tt.wantErr && (err == nil) {
+				t.Errorf("SelectBrokerFromPriorityList() wanted error but got 'nil'")
+				return
+			}
+			brokers.ResetBrokerMemory()
 		})
 	}
 }

@@ -1,113 +1,124 @@
 package tree
 
 import (
-	"strings"
+	"fmt"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
+	"go.uber.org/zap"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
-// Auxiliar dapp unexported functions
-func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App) string {
-	structureErrors := validAppStructure(app, parentApp)
-	for _, childApp := range app.Spec.Apps {
-		structureErrors += amm.recursiveCheckAndRefineApp(childApp, app)
+// SelectBrokerFromPriorityList takes a broker priority list and returns the first
+// broker that is available
+func SelectBrokerFromPriorityList(brokerList []string) (string, error) {
+	logger.Info("selecting broker from priority list")
+	bmm := brokers.GetBrokerMemory()
+	availableBrokers, err := bmm.GetAll()
+	if err != nil {
+		return "", err
 	}
-	return structureErrors
+
+	logger.Debug("available brokers", zap.Any("brokers", availableBrokers))
+	if len(availableBrokers) == 0 {
+		return "", ierrors.NewError().
+			Message("there are no brokers installed in insprd").
+			Build()
+	}
+
+	for _, broker := range brokerList {
+		if utils.Includes(availableBrokers, broker) {
+			logger.Debug("selected broker: ", zap.String("broker", broker))
+			return broker, nil
+		}
+	}
+
+	def, err := bmm.GetDefault()
+	if err != nil {
+		return "", err
+	}
+	logger.Debug("selected the default broker: ", zap.String("broker", def))
+
+	return def, nil
 }
 
-func validAppStructure(app, parentApp *meta.App) string {
-	errDescription := ""
-	var validSubstructure, parentWithoutNode bool
+// Auxiliar dApp  functions
 
-	parentStr := getParentString(app, parentApp)
-	app.Meta.Parent = parentStr
-	nameErr := metautils.StructureNameIsValid(app.Meta.Name)
-	appWithoutNode := nodeIsEmpty(app.Spec.Node)
-	if !appWithoutNode {
-		app.Spec.Node.Meta.Parent = parentStr
-	}
-	parentWithoutNode = nodeIsEmpty(parentApp.Spec.Node)
-	validSubstructure = appWithoutNode || (len(app.Spec.Apps) == 0)
-	validChannels, msg := checkAndUpdates(app)
-
-	if nameErr != nil {
-		errDescription = errDescription + "invalid dApp name;"
-	}
-	if !validSubstructure {
-		errDescription = errDescription + "invalid substructure;"
-	}
-	if !parentWithoutNode {
-		errDescription = errDescription + "parent has Node;"
-	}
-	if !validChannels {
-		errDescription = errDescription + msg
-	}
-
-	return errDescription
-}
-
+// checkApp is used when creating or updating dApps. It verifies if the dApp structure
+// is valid, not consideing boundary resolution.
 func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
 	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp)
-	if structureErrors != "" {
-		return ierrors.NewError().InvalidApp().Message(structureErrors).Build()
+	if structureErrors != nil {
+		return structureErrors
 	}
 	return nil
 }
 
+func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App) error {
+	merr := ierrors.MultiError{
+		Errors: []error{},
+	}
+
+	parentScope, _ := metautils.JoinScopes(parentApp.Meta.Parent, parentApp.Meta.Name)
+	app.Meta.Parent = parentScope
+	if !nodeIsEmpty(app.Spec.Node) {
+		app.Spec.Node.Meta.Parent = parentScope
+	}
+
+	merr.Add(validAppStructure(app, parentApp))
+	for _, childApp := range app.Spec.Apps {
+		merr.Add(amm.recursiveCheckAndRefineApp(childApp, app))
+	}
+
+	if !merr.Empty() {
+		return &merr
+	}
+
+	return nil
+}
+
+func validAppStructure(app, parentApp *meta.App) error {
+	merr := ierrors.MultiError{
+		Errors: []error{},
+	}
+
+	merr.Add(metautils.StructureNameIsValid(app.Meta.Name))
+
+	if !nodeIsEmpty(app.Spec.Node) && !(len(app.Spec.Apps) == 0) {
+		merr.Add(ierrors.NewError().
+			Message("a node can't contain child dApps inside of it").
+			Build())
+	}
+
+	if !nodeIsEmpty(parentApp.Spec.Node) {
+		merr.Add(ierrors.NewError().
+			Message("unable to create dApp for its parent is a Node").
+			Build())
+	}
+
+	merr.Add(checkAndUpdates(app))
+	merr.Add(validAliases(app))
+
+	if !merr.Empty() {
+		return &merr
+	}
+
+	return nil
+}
+
+// addAppInTree is used when creating or updating dApps. Once the structure is verified by
+// 'checkApp' method, the new/updated dApp is added to the current tree
 func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 	if parentApp.Spec.Apps == nil {
 		parentApp.Spec.Apps = make(map[string]*meta.App)
 	}
-	parentStr := getParentString(app, parentApp)
-
-	app.Meta.Parent = parentStr
-	query, _ := metautils.JoinScopes(parentStr, app.Meta.Name)
-	oldApp, err := amm.Root().Apps().Get(query)
-	if err == nil {
-		app.Meta.UUID = oldApp.Meta.UUID
-		for cName, ch := range app.Spec.Channels {
-			if oldApp.Spec.Channels != nil {
-				if oldCh, ok := oldApp.Spec.Channels[cName]; ok {
-					ch.Meta.UUID = oldCh.Meta.UUID
-				} else {
-					ch.Meta = metautils.InjectUUID(ch.Meta)
-				}
-			}
-		}
-		for ctName, ct := range app.Spec.ChannelTypes {
-			if oldApp.Spec.ChannelTypes != nil {
-				if oldCt, ok := oldApp.Spec.ChannelTypes[ctName]; ok {
-					ct.Meta.UUID = oldCt.Meta.UUID
-				} else {
-					ct.Meta = metautils.InjectUUID(ct.Meta)
-				}
-			}
-		}
-		for alName, al := range app.Spec.Aliases {
-			if oldApp.Spec.Aliases != nil {
-				if oldAl, ok := oldApp.Spec.Aliases[alName]; ok {
-					al.Meta.UUID = oldAl.Meta.UUID
-				} else {
-					al.Meta = metautils.InjectUUID(al.Meta)
-				}
-			}
-		}
-	} else {
-		app.Meta = metautils.InjectUUID(app.Meta)
-		for _, ch := range app.Spec.Channels {
-			ch.Meta = metautils.InjectUUID(ch.Meta)
-		}
-		for _, ct := range app.Spec.ChannelTypes {
-			ct.Meta = metautils.InjectUUID(ct.Meta)
-		}
-		for _, al := range app.Spec.Aliases {
-			al.Meta = metautils.InjectUUID(al.Meta)
-		}
+	parentStr, _ := metautils.JoinScopes(parentApp.Meta.Parent, parentApp.Meta.Name)
+	amm.updateUUID(app, parentStr)
+	if app.Spec.Auth.Permissions == nil {
+		app.Spec.Auth = parentApp.Spec.Auth
 	}
-
 	for _, child := range app.Spec.Apps {
 		amm.addAppInTree(child, app)
 	}
@@ -121,99 +132,34 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 	}
 }
 
-func checkAndUpdates(app *meta.App) (bool, string) {
-	boundaries := app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)
-	channels := app.Spec.Channels
-	chTypes := app.Spec.ChannelTypes
-	for ctName := range chTypes {
-		nameErr := metautils.StructureNameIsValid(ctName)
-		if nameErr != nil {
-			return false, "invalid channelType name: " + ctName
-		}
+// recursiveBoundaryValidation is used when creating dApps. Once the structure is added to the tree
+// by 'addAppInTree', this function verifies if the new dApps boundaries are valid
+func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
+	merr := ierrors.MultiError{
+		Errors: []error{},
 	}
-	for channelName, channel := range channels {
-		nameErr := metautils.StructureNameIsValid(channelName)
-		if nameErr != nil {
-			return false, "invalid channel name: " + channelName
-		}
-		if channel.Spec.Type != "" {
-			if _, ok := chTypes[channel.Spec.Type]; !ok {
-				return false, "invalid channel: using non-existent channel type;"
-			}
-
-			for _, appName := range channel.ConnectedApps {
-				if _, ok := app.Spec.Apps[appName]; !ok {
-					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
-				}
-				appBoundary := utils.StringSliceUnion(app.Spec.Apps[appName].Spec.Boundary.Input, app.Spec.Apps[appName].Spec.Boundary.Output)
-				if !utils.Includes(appBoundary, channelName) {
-					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
-				}
-			}
-
-			connectedChannels := chTypes[channel.Spec.Type].ConnectedChannels
-			if !utils.Includes(connectedChannels, channelName) {
-				chTypes[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
-			}
-
-		}
-		if len(boundaries) > 0 && boundaries.Contains(channelName) {
-			return false, "channel and boundary with same name: " + channelName
-		}
-	}
-	return true, ""
-}
-
-func nodeIsEmpty(node meta.Node) bool {
-	noAnnotations := node.Meta.Annotations == nil
-	noName := node.Meta.Name == ""
-	noParent := node.Meta.Parent == ""
-	noImage := node.Spec.Image == ""
-
-	return noAnnotations && noName && noParent && noImage
-}
-
-func validBoundaries(appName string, bound meta.AppBoundary, parentChannels map[string]*meta.Channel) string {
-	appBoundary := utils.StringSliceUnion(bound.Input, bound.Output)
-
-	for _, chName := range appBoundary {
-		if parentChannels[chName] == nil {
-			return "invalid app boundary - channel '" + chName + "' doesnt exist in parent app;"
-		}
-	}
-
-	return ""
-}
-
-func getParentApp(childQuery string) (*meta.App, error) {
-	var parentQuery string
-	sonRef := strings.Split(childQuery, ".")
-	if len(sonRef) == 1 {
-		parentQuery = ""
-	} else {
-		parentQuery = strings.Join(sonRef[:len(sonRef)-1], ".")
-	}
-
-	parentApp, err := GetTreeMemory().Apps().Get(parentQuery)
+	_, err := amm.ResolveBoundary(app)
 	if err != nil {
-		return nil, err
+		merr.Add(ierrors.NewError().Message(err.Error()).Build())
+		return &merr
 	}
-	if _, ok := parentApp.Spec.Apps[childQuery]; parentQuery == "" && !ok {
-		return nil, ierrors.
-			NewError().
-			NotFound().
-			Message("dApp %s doesn't exist in root", childQuery).
-			Build()
+	for _, childApp := range app.Spec.Apps {
+		err = amm.recursiveBoundaryValidation(childApp)
+		if err != nil {
+			merr.Add(ierrors.NewError().Message(err.Error()).Build())
+		}
 	}
 
-	return parentApp, err
+	if !merr.Empty() {
+		return &merr
+	}
+
+	return nil
 }
 
-func getParentString(app, parentApp *meta.App) string {
-	parentStr, _ := metautils.JoinScopes(parentApp.Meta.Parent, parentApp.Meta.Name)
-	return parentStr
-}
-
+// connectAppsBoundaries  is used when creating dApps. Once the boundaries are validated by
+// 'recursiveBoundaryValidation', the Channels are updated so that they receive their new
+// connected aliases and connected dApps
 func (amm *AppMemoryManager) connectAppsBoundaries(app *meta.App) error {
 	for _, childApp := range app.Spec.Apps {
 		amm.connectAppsBoundaries(childApp)
@@ -237,7 +183,7 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(val.Target) {
 			continue
 		}
-		merr.Add(ierrors.NewError().Message("error: %s alias: %s points to an unexisting channel", parentApp.Meta.Name, key).Build())
+		merr.Add(ierrors.NewError().Message("%s's alias %s points to an non-existent channel", parentApp.Meta.Name, key).Build())
 	}
 	if !merr.Empty() {
 		return &merr
@@ -245,8 +191,8 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 
 	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
 	for _, boundary := range appBoundary {
-		aliasQuery, _ := metautils.JoinScopes(app.Meta.Name, boundary)
-		if _, ok := parentApp.Spec.Aliases[aliasQuery]; ok {
+		aliasKey, _ := metautils.JoinScopes(app.Meta.Name, boundary)
+		if _, ok := parentApp.Spec.Aliases[aliasKey]; ok {
 			continue
 		}
 		if ch, ok := parentApp.Spec.Channels[boundary]; ok {
@@ -256,7 +202,7 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(boundary) {
 			continue
 		}
-		merr.Add(ierrors.NewError().Message("error: %s boundary: %s is invalid", parentApp.Meta.Name, boundary).Build())
+		merr.Add(ierrors.NewError().Message("%s boundary '%s' is invalid", parentApp.Meta.Name, boundary).Build())
 	}
 	if !merr.Empty() {
 		return &merr
@@ -264,24 +210,162 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 	return nil
 }
 
-func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
-	merr := ierrors.MultiError{
-		Errors: []error{},
+// updateUUID is used by 'addAppInTree' so that new dApps are injected with an UUID, or
+// dApps that are being updated remain with their older version UUID
+func (amm *AppMemoryManager) updateUUID(app *meta.App, parentStr string) {
+	app.Meta.Parent = parentStr
+	query, _ := metautils.JoinScopes(parentStr, app.Meta.Name)
+	oldApp, err := amm.Tree().Apps().Get(query)
+	if err == nil {
+		app.Meta.UUID = oldApp.Meta.UUID
+		for chName, ch := range app.Spec.Channels {
+			if oldApp.Spec.Channels != nil {
+				if oldCh, ok := oldApp.Spec.Channels[chName]; ok {
+					ch.Meta.UUID = oldCh.Meta.UUID
+				} else {
+					ch.Meta = metautils.InjectUUID(ch.Meta)
+				}
+			}
+		}
+		for ctName, ct := range app.Spec.Types {
+			if oldApp.Spec.Types != nil {
+				if oldCt, ok := oldApp.Spec.Types[ctName]; ok {
+					ct.Meta.UUID = oldCt.Meta.UUID
+				} else {
+					ct.Meta = metautils.InjectUUID(ct.Meta)
+				}
+			}
+		}
+		for alName, al := range app.Spec.Aliases {
+			if oldApp.Spec.Aliases != nil {
+				if oldAl, ok := oldApp.Spec.Aliases[alName]; ok {
+					al.Meta.UUID = oldAl.Meta.UUID
+				} else {
+					al.Meta = metautils.InjectUUID(al.Meta)
+				}
+			}
+		}
+	} else {
+		app.Meta = metautils.InjectUUID(app.Meta)
+		for _, ch := range app.Spec.Channels {
+			ch.Meta = metautils.InjectUUID(ch.Meta)
+		}
+		for _, ct := range app.Spec.Types {
+			ct.Meta = metautils.InjectUUID(ct.Meta)
+		}
+		for _, al := range app.Spec.Aliases {
+			al.Meta = metautils.InjectUUID(al.Meta)
+		}
 	}
-	_, err := amm.ResolveBoundary(app)
+}
+
+func nodeIsEmpty(node meta.Node) bool {
+	noAnnotations := node.Meta.Annotations == nil
+	noName := node.Meta.Name == ""
+	noParent := node.Meta.Parent == ""
+	noImage := node.Spec.Image == ""
+
+	return noAnnotations && noName && noParent && noImage
+}
+
+func getParentApp(childQuery string) (*meta.App, error) {
+	parentQuery, childName, err := metautils.RemoveLastPartInScope(childQuery)
 	if err != nil {
-		merr.Add(ierrors.NewError().Message(err.Error()).Build())
-		return &merr
+		return nil, err
 	}
-	for _, childApp := range app.Spec.Apps {
-		err = amm.recursiveBoundaryValidation(childApp)
-		if err != nil {
-			merr.Add(ierrors.NewError().Message(err.Error()).Build())
+
+	parentApp, err := GetTreeMemory().Apps().Get(parentQuery)
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := parentApp.Spec.Apps[childName]; !ok {
+		return nil, ierrors.
+			NewError().
+			NotFound().
+			Message("dApp %s doesn't exist in dApp %v", childName, parentApp.Meta.Name).
+			Build()
+	}
+
+	return parentApp, err
+}
+
+func checkAndUpdates(app *meta.App) error {
+	boundaries := app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)
+	channels := app.Spec.Channels
+	types := app.Spec.Types
+
+	for typeName := range types {
+		nameErr := metautils.StructureNameIsValid(typeName)
+		if nameErr != nil {
+			return ierrors.NewError().Message("invalid type name '%v'", typeName).Build()
 		}
 	}
 
-	if !merr.Empty() {
-		return &merr
+	for channelName, channel := range channels {
+		nameErr := metautils.StructureNameIsValid(channelName)
+		if nameErr != nil {
+			return ierrors.NewError().Message("invalid channel name '%v'", channelName).Build()
+		}
+
+		if channel.Spec.Type != "" {
+			if _, ok := types[channel.Spec.Type]; !ok {
+				return ierrors.NewError().
+					Message("channel '%v' using unexistent type '%v'", channelName, channel.Spec.Type).
+					Build()
+			}
+
+			for _, appName := range channel.ConnectedApps {
+				if _, ok := app.Spec.Apps[appName]; !ok {
+					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
+				}
+
+				appInputs := app.Spec.Apps[appName].Spec.Boundary.Input
+				appOutputs := app.Spec.Apps[appName].Spec.Boundary.Output
+				appBoundary := utils.StringSliceUnion(appInputs, appOutputs)
+
+				if !utils.Includes(appBoundary, channelName) {
+					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
+				}
+			}
+
+			connectedChannels := types[channel.Spec.Type].ConnectedChannels
+			if !utils.Includes(connectedChannels, channelName) {
+				types[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
+			}
+
+			broker, err := SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList)
+			if err != nil {
+				return err
+			}
+
+			channel.Spec.SelectedBroker = broker
+		}
+
+		if len(boundaries) > 0 && boundaries.Contains(channelName) {
+			return ierrors.NewError().
+				Message("channel and boundary with same name '%v'", channelName).
+				Build()
+		}
+	}
+	return nil
+}
+
+func validAliases(app *meta.App) error {
+	var msg utils.StringArray
+
+	for key, val := range app.Spec.Aliases {
+		if ch, ok := app.Spec.Channels[val.Target]; ok {
+			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
+			continue
+		}
+		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val.Target) {
+			continue
+		}
+		msg = append(msg, fmt.Sprintf("alias '%s' points to an unexistent channel '%s'", key, val.Target))
+	}
+
+	if len(msg) > 0 {
+		return ierrors.NewError().Message(msg.Join(";")).Build()
 	}
 
 	return nil

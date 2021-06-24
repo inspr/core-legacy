@@ -6,8 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/inspr/inspr/cmd/uid_provider/client"
-	build "github.com/inspr/inspr/pkg/cmd"
+	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/cmd"
+	build "inspr.dev/inspr/pkg/cmd"
 )
 
 var cl client.UIDClient
@@ -24,21 +25,21 @@ var loginCmd = build.NewCmd("login").WithDescription(
 ).WithExample(
 	"log in with your user and password",
 	"inprov login usr pwd",
-).WithFlags([]*build.Flag{
-	{
+).WithFlags(
+	&cmd.Flag{
 		Name:      "output",
 		Shorthand: "o",
 		Usage:     "set the output file for the returned token",
 		Value:     &loginOptions.output,
 		DefValue:  "",
 	},
-	{
+	&cmd.Flag{
 		Name:     "stdout",
 		Usage:    "set the output of the token to stdout",
 		Value:    &loginOptions.stdout,
 		DefValue: false,
 	},
-}).ExactArgs(2, loginAction)
+).ExactArgs(2, loginAction)
 
 func loginAction(c context.Context, s []string) error {
 

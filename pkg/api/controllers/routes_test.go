@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/fake"
-	authmock "github.com/inspr/inspr/pkg/auth/mocks"
+	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	authmock "inspr.dev/inspr/pkg/auth/mocks"
 )
 
 // TestServer_initRoutes - this test is a bit different than the one automatically
@@ -19,7 +20,8 @@ func TestServer_initRoutes(t *testing.T) {
 	testServer := &Server{
 		Mux:           http.NewServeMux(),
 		MemoryManager: fake.MockMemoryManager(nil),
-		auth:          authmock.NewMockAuth(nil),
+		auth:          authmock.NewMockAuth(errors.New("unauthorized")),
+		BrokerManager: fake.MockBrokerManager(nil),
 	}
 	testServer.initRoutes()
 	defaultMethods := [...]string{
@@ -36,40 +38,60 @@ func TestServer_initRoutes(t *testing.T) {
 		{
 			name: "apps",
 			want: [...]int{
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "channels",
 			want: [...]int{
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
-			name: "channeltypes",
+			name: "types",
 			want: [...]int{
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
 				http.StatusMethodNotAllowed,
 			},
 		},
 		{
 			name: "alias",
 			want: [...]int{
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
-				http.StatusForbidden,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusInternalServerError,
+				http.StatusMethodNotAllowed,
+			},
+		},
+		{
+			name: "brokers",
+			want: [...]int{
+				http.StatusOK,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+			},
+		},
+		{
+			name: "brokers/kafka",
+			want: [...]int{
+				http.StatusMethodNotAllowed,
+				http.StatusInternalServerError,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
 				http.StatusMethodNotAllowed,
 			},
 		},
@@ -95,7 +117,7 @@ func TestServer_initRoutes(t *testing.T) {
 				if err != nil {
 					t.Error("error creating request")
 				}
-				req.Header.Add("Authorization", "Bearer mock_tonken")
+				req.Header.Add("Authorization", "Bearer mock_token")
 				res, _ := client.Do(req)
 				if res.StatusCode != statusCodeResult {
 					t.Errorf("Method %v in url %v => got %v, wanted %v",

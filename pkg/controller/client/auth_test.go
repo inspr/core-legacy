@@ -8,10 +8,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/api/auth"
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 func TestAuthClient_GenerateToken(t *testing.T) {
@@ -30,11 +30,10 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				payload: auth.Payload{
-					UID:        "test123",
-					Role:       1,
-					Scope:      []string{"app1", "app2"},
-					Refresh:    []byte("refreshtoken1234"),
-					RefreshURL: "http://URLToUIDProvider.valid",
+					UID:         "test123",
+					Permissions: map[string][]string{"": {"app1", "app2"}},
+					Refresh:     []byte("refreshtoken1234"),
+					RefreshURL:  "http://URLToUIDProvider.valid",
 				},
 			},
 			want:    "123",
@@ -63,7 +62,7 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 					t.Errorf("path is not auth")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 
@@ -81,13 +80,13 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 				}
 
 				encoder.Encode(authDI)
-				tt.want = authDI.Token
+				tt.want = string(authDI.Token)
 			}
 
 			s := httptest.NewServer(http.HandlerFunc(handler))
 			defer s.Close()
 			ac := &AuthClient{
-				c: request.NewJSONClient(s.URL),
+				reqClient: request.NewJSONClient(s.URL),
 			}
 			got, err := ac.GenerateToken(tt.args.ctx, tt.args.payload)
 			if (err != nil) != tt.wantErr {

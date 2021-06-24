@@ -1,8 +1,9 @@
 package tree
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 // MockManager mocks a tree structure for testing
@@ -26,14 +27,14 @@ func (tmm *MockManager) Channels() memory.ChannelMemory {
 	}
 }
 
-// ChannelTypes mocks a channelType interface for testing
-func (tmm *MockManager) ChannelTypes() memory.ChannelTypeMemory {
+// Types mocks a Type interface for testing
+func (tmm *MockManager) Types() memory.TypeMemory {
 	if tmm.mockCT {
-		return &ChannelTypeMockManager{
+		return &TypeMockManager{
 			MockManager: tmm,
 		}
 	}
-	return &ChannelTypeMemoryManager{
+	return &TypeMemoryManager{
 		MemoryManager: tmm.MemoryManager,
 	}
 }
@@ -65,9 +66,24 @@ func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
 	return diff.Changelog{}, nil
 }
 
-// Root mock interface structure
-func (tmm *MockManager) Root() memory.GetInterface {
-	return &RootGetter{
+// Tree mock interface structure
+func (tmm *MockManager) Tree() memory.GetInterface {
+	return &PermTreeGetter{
 		tmm.root,
 	}
+}
+
+// SetMockedTree receives a mock manager that has the configs of the
+// tree structure to be mocked and used in tests where tree access is needed
+func SetMockedTree(root *meta.App, appErr error, mockC, mockA, mockT bool) {
+	setTree(&MockManager{
+		MemoryManager: &MemoryManager{
+			root: root,
+			tree: root,
+		},
+		appErr: appErr,
+		mockC:  mockC,
+		mockA:  mockA,
+		mockCT: mockT,
+	})
 }

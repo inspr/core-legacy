@@ -1,6 +1,8 @@
 package authmock
 
-import "github.com/inspr/inspr/pkg/auth/models"
+import (
+	"inspr.dev/inspr/pkg/auth"
+)
 
 // MockAuth is the structure to mock the auth interface
 type MockAuth struct {
@@ -13,21 +15,31 @@ func NewMockAuth(err error) *MockAuth {
 }
 
 // Validate - mock of the validate function
-func (ma *MockAuth) Validate(token []byte) (*models.Payload, []byte, error) {
+func (ma *MockAuth) Validate(token []byte) (*auth.Payload, []byte, error) {
 	if ma.Err != nil {
 		return nil, []byte{}, ma.Err
 	}
-	return &models.Payload{
-		UID:        "uid",
-		Role:       0,
-		Scope:      []string{"scope_1", "scope_2"},
+	return &auth.Payload{
+		UID: "uid",
+		Permissions: map[string][]string{
+			"scope_1": {auth.CreateChannel},
+			"scope_2": {},
+		},
 		Refresh:    []byte("refresh"),
 		RefreshURL: "refresh_url",
 	}, []byte("mock"), nil
 }
 
+// Init - mock of the tokenize function
+func (ma *MockAuth) Init(s string, load auth.Payload) ([]byte, error) {
+	if ma.Err != nil {
+		return []byte{}, ma.Err
+	}
+	return []byte("mock"), nil
+}
+
 // Tokenize - mock of the tokenize function
-func (ma *MockAuth) Tokenize(load models.Payload) ([]byte, error) {
+func (ma *MockAuth) Tokenize(load auth.Payload) ([]byte, error) {
 	if ma.Err != nil {
 		return []byte{}, ma.Err
 	}

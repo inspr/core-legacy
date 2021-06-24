@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // AppHandler - contains handlers that uses the AppMemory interface methods
@@ -33,6 +33,7 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 	logger.Info("handling dApp create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -46,11 +47,11 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 		logger.Debug("initiating dApp create transaction")
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Apps().Create(data.Ctx, &data.App)
+		err = ah.Memory.Apps().Create(scope, &data.App)
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("dApp", data.App.Meta.Name),
-				zap.String("context", data.Ctx),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -96,6 +97,7 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 	logger.Info("handling dApp get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -108,10 +110,10 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating dApp get transaction")
 		ah.Memory.InitTransaction()
 
-		app, err := ah.Memory.Root().Apps().Get(data.Ctx)
+		app, err := ah.Memory.Tree().Apps().Get(scope)
 		if err != nil {
 			logger.Error("unable to get dApp",
-				zap.String("dApp query", data.Ctx),
+				zap.String("dApp query", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -131,6 +133,7 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 	logger.Info("handling dApp update request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -143,11 +146,11 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 		logger.Debug("initiating dApp update transaction")
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Apps().Update(data.Ctx, &data.App)
+		err = ah.Memory.Apps().Update(scope, &data.App)
 		if err != nil {
 			logger.Error("unable to update dApp",
 				zap.String("dApp", data.App.Meta.Name),
-				zap.String("context", data.Ctx),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -192,6 +195,7 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 	logger.Info("handling dApp delete request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data := models.AppQueryDI{}
+		scope := r.Header.Get(rest.HeaderScopeKey)
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
@@ -204,10 +208,10 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 		logger.Debug("initiating dApp delete transaction")
 		ah.Memory.InitTransaction()
 
-		err = ah.Memory.Apps().Delete(data.Ctx)
+		err = ah.Memory.Apps().Delete(scope)
 		if err != nil {
 			logger.Error("unable to delete dApp",
-				zap.String("dApp query", data.Ctx),
+				zap.String("dApp query", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -234,10 +238,10 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 				return
 			}
 
-			logger.Info("committing Channel create changes")
+			logger.Info("committing Channel delete changes")
 			defer ah.Memory.Commit()
 		} else {
-			logger.Info("cancelling Channel create changes")
+			logger.Info("cancelling Channel delete changes")
 			defer ah.Memory.Cancel()
 		}
 

@@ -23,6 +23,7 @@ insprEnvironment: test
 deployment:
   insprdName: insprd-deployment
   authName: auth-deployment
+  initKey: "1234567890"
 
 insprdRepository: gcr.io/red-inspr/insprd
 authRepository: gcr.io/red-inspr/authsvc
@@ -36,7 +37,7 @@ service:
   insprdPort: 80
   insprdTargetport: 8080
   authPort: 80
-  authTargetPort: 8080
+  authTargetPort: 8081
 
 ingress:
   enabled: false
@@ -55,7 +56,14 @@ tolerations: []
 
 affinity: {}
 
-kafkaSidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
-kafkaBootstrap: kafka.default.svc:9092
-kafkaAutoOffsetReset: earliest
+sidecarClient:
+  readPort: 3046
+  writePort: 3048
+
+lbSidecar:
+  port: 3051
+  readPort: 3047
+
+lbsidecarImage: gcr.io/red-inspr/inspr/sidecar/lbsidecar
+
 insprAppsNamespace: inspr-apps

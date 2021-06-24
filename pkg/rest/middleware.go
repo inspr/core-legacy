@@ -1,114 +1,14 @@
 package rest
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/utils"
 )
-
-// JSON specifies in the header that the response content is a json
-func (h Handler) JSON() Handler {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		h(w, r)
-	}
-}
-
-// Validate handles the token validation of the http requests made, it receives an implementation of the auth interface as a parameter.
-func (h Handler) Validate(auth auth.Auth) Handler {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Authorization: Bearer <token>
-		headerContent := r.Header["Authorization"]
-
-		if len(headerContent) != 1 ||
-			!strings.HasPrefix(headerContent[0], "Bearer ") {
-			http.Error(
-				w,
-				"Bad Request, expected: Authorization: Bearer <token>",
-				http.StatusUnauthorized,
-			)
-			return
-		}
-
-		token := strings.TrimPrefix(headerContent[0], "Bearer ")
-		payload, newToken, err := auth.Validate([]byte(token))
-
-		// returns the same token or a refreshed one in the header of the response
-		w.Header().Add("Authorization", "Bearer "+string(newToken))
-
-		// error management
-		if err != nil {
-			// check for invalid error or non Existant
-			if ierrors.HasCode(err, ierrors.InvalidToken) {
-				http.Error(
-					w,
-					"Invalid Token",
-					http.StatusUnauthorized,
-				)
-				return
-			}
-
-			// token expired
-			if ierrors.HasCode(err, ierrors.ExpiredToken) {
-				http.Error(
-					w,
-					"Request is OK but the token is expired",
-					http.StatusOK,
-				)
-				return
-			}
-
-			// default error message
-			http.Error(
-				w,
-				"Unknown error, please check token",
-				http.StatusBadRequest,
-			)
-			return
-		}
-
-		// request scope
-		requestData := struct {
-			Scope string `json:"scope"`
-		}{}
-
-		// Read the content
-		if r.Body != nil {
-			// reads body
-			bodyBytes, _ := ioutil.ReadAll(r.Body)
-			// unmarshal into scope Data
-			json.Unmarshal(bodyBytes, &requestData)
-			// Restore the r.Body to its original state
-			r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-		}
-
-		valid := false
-		for _, scope := range payload.Scope {
-			if strings.HasPrefix(requestData.Scope, scope) {
-				// scope found
-				valid = true
-			}
-		}
-
-		// check for unauthorized error
-		if !valid {
-			http.Error(
-				w,
-				"Unauthorized to do operations in this context",
-				http.StatusForbidden,
-			)
-			return
-		}
-
-		// token and context are valid
-		h(w, r)
-	}
-}
 
 // CRUDHandler handles crud requests to a given resource
 type CRUDHandler interface {
@@ -125,20 +25,146 @@ func HandleCRUD(handler CRUDHandler) Handler {
 		switch r.Method {
 
 		case http.MethodGet:
-			handler.HandleGet().Validate(handler.GetAuth()).JSON().Recover()(w, r)
+			handler.
+				HandleGet().
+				Validate(handler.GetAuth()).
+				JSON().
+				Recover()(w, r)
 
 		case http.MethodPost:
-			handler.HandleCreate().Validate(handler.GetAuth()).JSON().Recover()(w, r)
+			handler.
+				HandleCreate().
+				Validate(handler.GetAuth()).
+				JSON().
+				Recover()(w, r)
 
 		case http.MethodPut:
-			handler.HandleUpdate().Validate(handler.GetAuth()).JSON().Recover()(w, r)
+			handler.
+				HandleUpdate().
+				Validate(handler.GetAuth()).
+				JSON().
+				Recover()(w, r)
 
 		case http.MethodDelete:
-			handler.HandleDelete().Validate(handler.GetAuth()).JSON().Recover()(w, r)
+			handler.
+				HandleDelete().
+				Validate(handler.GetAuth()).
+				JSON().
+				Recover()(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 	}
+}
+
+// JSON specifies in the header that the response content is a json
+func (h Handler) JSON() Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		h(w, r)
+	}
+}
+
+// Validate handles the token validation of the http requests made, it receives an implementation of the auth interface as a parameter.
+func (h Handler) Validate(auth auth.Auth) Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Authorization: Bearer <token>
+		headerContent := r.Header["Authorization"]
+		log.Println("validating")
+		log.Printf("headerContent = %+v\n", headerContent)
+		if (len(headerContent) == 0) ||
+			(!strings.HasPrefix(headerContent[0], "Bearer ")) {
+
+			ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token format").Build())
+			return
+		}
+
+		token := strings.TrimPrefix(headerContent[0], "Bearer ")
+		payload, newToken, err := auth.Validate([]byte(token))
+		log.Printf("payload = %+v\n", payload)
+		log.Printf("string(newToken) = %+v\n", string(newToken))
+
+		// returns the same token or a refreshed one in the header of the response
+		w.Header().Add("Authorization", "Bearer "+string(newToken))
+
+		// error management
+		if err != nil {
+			// check for invalid error or non existent
+			if ierrors.HasCode(err, ierrors.InvalidToken) {
+
+				ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token").Build())
+				return
+			}
+
+			// default error message
+			ERROR(w, ierrors.NewError().Message(err.Error()).Build())
+			return
+		}
+
+		// used for checking scope authorization
+		reqScopes := r.Header[HeaderScopeKey]
+		log.Printf("payload.Permissions = %+v\n", payload.Permissions)
+
+		// used for checking permissions
+		operation := getOperation(r)
+		target := getTarget(r)
+		perm := operation + ":" + target
+		log.Printf("reqOperation = %v\n", perm)
+
+		for scope := range payload.Permissions {
+			log.Printf("permission-scope = %+v\n", scope)
+
+			// usually the request will one have one scope
+			for _, rs := range reqScopes {
+				log.Printf("request-scope = %+v\n", rs)
+
+				if strings.HasPrefix(rs, scope) &&
+					utils.Includes(payload.Permissions[scope], perm) {
+					log.Printf("permission granted")
+					// token and context are valid
+					h(w, r)
+					return
+				}
+			}
+		}
+
+		// there were no valid operations
+		ERROR(
+			w,
+			ierrors.
+				NewError().
+				Forbidden().
+				Message("not enought permissions to perform request").
+				Build(),
+		)
+	}
+}
+
+// getOperation returns the operation being done by the Request in the cluster
+// get, create, update, delete.
+func getOperation(r *http.Request) string {
+	// some methods represent their own operation
+	operation, ok := operationTranslator[r.Method]
+	if !ok {
+		return r.Method
+	}
+	return operation
+}
+
+// getTarget isolates the area that is being requested, for example the request
+// URL is https://example.org:8000/channels, the getTarget removes the base of the url
+// and some unnecessary '/' and returns only 'channels'
+func getTarget(r *http.Request) string {
+	route := strings.TrimSuffix(r.URL.Path, "/")
+	route = strings.TrimPrefix(route, r.URL.Host)
+	route = strings.TrimPrefix(route, "/")
+
+	// some constant values differ from the url name used
+	target, ok := routeTranslator[route]
+	if !ok {
+		return route
+	}
+	return target
 }

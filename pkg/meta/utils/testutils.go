@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // CompareWithoutUUID compares two components without comparing their UUID.
@@ -46,9 +46,14 @@ func RecursiveValidateUUIDS(name string, app *meta.App, t *testing.T) {
 		}
 	}
 
-	for _, ct := range app.Spec.ChannelTypes {
-		if !ValidateUUID(ct.Meta.UUID) {
-			t.Errorf("%s invalid channel type UUID on %s, uuid = %v", name, ct.Meta.Name, ct.Meta.UUID)
+	for _, insprType := range app.Spec.Types {
+		if !ValidateUUID(insprType.Meta.UUID) {
+			t.Errorf(
+				"%s invalid Type UUID on %s, uuid = %v",
+				name,
+				insprType.Meta.Name,
+				insprType.Meta.UUID,
+			)
 		}
 	}
 

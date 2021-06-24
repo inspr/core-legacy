@@ -3,7 +3,7 @@ kind: dapp
 meta:
   name: "basicexample"
 spec:
-  channeltypes:
+  types:
     primes_ct1:
       meta:
         name: "primes_ct1"
@@ -44,6 +44,8 @@ spec:
   apps:
     # number generators
     generator:
+      meta:
+          name: generator
       spec:
         node:
           spec:
@@ -56,6 +58,8 @@ spec:
             - primes_ch1
 
     primes:
+      meta:
+          name: primes
       spec:
         boundary:
           input:
@@ -86,14 +90,13 @@ spec:
           # prints the filtered
           printer:
             meta:
-              name: "printer-primes"
+              name: "printer"
               reference: ""
               parent: ""
             spec:
               node:
                 meta:
-                  name: "node-printer"
-                  parent: "printer"
+                  name: "printer"
                 spec:
                   image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
                   replicas: 1
