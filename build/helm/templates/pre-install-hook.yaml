@@ -6,14 +6,14 @@ metadata:
     {{- include "insprd.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-install
-    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
 spec:
   template:
     spec:
       restartPolicy: Never
       containers:
       - name: pre-install-job
-        image: {{ .Values.secretRepository}}
+        image: {{ .Values.secretRepository }}
         imagePullPolicy: IfNotPresent
         env:
           - name: K8S_NAMESPACE

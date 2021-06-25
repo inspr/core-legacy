@@ -9,6 +9,12 @@
     - checked index and added the alias section to it
 ---
 
+### #33 update networking from beta1 to v1 in the ingresses
+- fixes:
+  - Altered the fields of all the ingresses that used the previous version of the v1beta1 of k8s.
+  - `authsvc/secret` now passes context in the methods
+---
+
 ### #78 Bug CORE-475 | Deletion of multiple channels not working  
 - fixes:
     - Altered the Channel Operator when handling delete to get the channel from `tree` instead of `root`
