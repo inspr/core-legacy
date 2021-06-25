@@ -1,19 +1,20 @@
 apiVersion: v1
 kind: dapp
+
 meta:
-  name: "filter"
+  name: filter
   reference: ""
-  parent: ""
+  parent: primesexample
 spec:
   node:
     meta:
-      name: "node-filter"
-      parent: "filter"
+      name: node-filter
+      parent: filter
     spec:
       image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
-      replicas: 1
+      replicas: 3
   boundary:
     input:
-      - primesch1
+      - filterinput
     output:
-      - primesch2
+      - filteroutput

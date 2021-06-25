@@ -1,10 +1,11 @@
-apiVersion: "v1"
-kind: "channel"
+apiVersion: v1
+kind: channel
+
 meta:
-  name: "primesch1"
+  name: primesch1
   reference: ""
   parent: ""
 spec:
-  type: "primes_ct1"
+  type: primes_ct1
   brokerlist:
     - kafka
