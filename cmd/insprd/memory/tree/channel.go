@@ -2,6 +2,7 @@ package tree
 
 import (
 	"go.uber.org/zap"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
@@ -60,7 +61,7 @@ func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) 
 
 // Create receives a scope that defines a path to the App
 // in which to add a pointer to the channel passed as an argument
-func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel) error {
+func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers *apimodels.BrokersDI) error {
 	logger.Info("trying to create a Channel",
 		zap.String("channel", ch.Meta.Name),
 		zap.String("scope", scope))
@@ -107,7 +108,7 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel) error {
 
 	logger.Debug("channel broker priority list", zap.Any("list", ch.Spec.BrokerPriorityList))
 
-	broker, err := SelectBrokerFromPriorityList(ch.Spec.BrokerPriorityList)
+	broker, err := SelectBrokerFromPriorityList(ch.Spec.BrokerPriorityList, brokers)
 	if err != nil {
 		return err
 	}

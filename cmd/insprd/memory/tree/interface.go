@@ -3,6 +3,7 @@
 package tree
 
 import (
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
@@ -13,7 +14,7 @@ import (
 type ChannelMemory interface {
 	TransactionInterface
 	ChannelGetInterface
-	Create(scope string, ch *meta.Channel) error
+	Create(scope string, ch *meta.Channel, brokers *apimodels.BrokersDI) error
 	Delete(scope, name string) error
 	Update(scope string, ch *meta.Channel) error
 }

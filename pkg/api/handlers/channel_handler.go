@@ -40,8 +40,14 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 
 		logger.Debug("initiating Channel create transaction")
 		ch.Memory.Tree().InitTransaction()
-
-		err = ch.Memory.Tree().Channels().Create(scope, &data.Channel)
+		brokers, err := ch.Memory.Brokers().Get()
+		if err != nil {
+			logger.Error("unable to attain inprd's Broker information",
+				zap.Any("error", err))
+			rest.ERROR(w, err)
+			return
+		}
+		err = ch.Memory.Tree().Channels().Create(scope, &data.Channel, brokers)
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("channel", data.Channel.Meta.Name),

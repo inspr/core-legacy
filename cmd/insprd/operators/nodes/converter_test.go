@@ -107,7 +107,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 			Type:           "channel1type",
 			SelectedBroker: "someBroker",
 		},
-	})
+	}, nil)
 	mem.Channels().Create("", &meta.Channel{
 		Meta: meta.Metadata{
 			Name: "channel2",
@@ -117,7 +117,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 			Type:           "channel2type",
 			SelectedBroker: "someBroker",
 		},
-	})
+	}, nil)
 
 	mem.Types().Create("", &meta.Type{
 		Meta: meta.Metadata{

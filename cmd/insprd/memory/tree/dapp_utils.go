@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
@@ -12,30 +13,26 @@ import (
 
 // SelectBrokerFromPriorityList takes a broker priority list and returns the first
 // broker that is available
-func SelectBrokerFromPriorityList(brokerList []string, availableBrokers utils.StringArray) (string, error) {
+func SelectBrokerFromPriorityList(brokerList []string, brokers *apimodels.BrokersDI) (string, error) {
 	logger.Info("selecting broker from priority list")
 
-	logger.Debug("available brokers", zap.Any("brokers", availableBrokers))
-	if len(availableBrokers) == 0 {
+	logger.Debug("available brokers", zap.Any("brokers", brokers.Available))
+	if len(brokers.Available) == 0 {
 		return "", ierrors.NewError().
 			Message("there are no brokers installed in insprd").
 			Build()
 	}
 
 	for _, broker := range brokerList {
-		if utils.Includes(availableBrokers, broker) {
+		if utils.Includes(brokers.Available, broker) {
 			logger.Debug("selected broker: ", zap.String("broker", broker))
 			return broker, nil
 		}
 	}
 
-	def, err := bmm.GetDefault()
-	if err != nil {
-		return "", err
-	}
-	logger.Debug("selected the default broker: ", zap.String("broker", def))
+	logger.Debug("selected the default broker: ", zap.String("broker", brokers.Default))
 
-	return def, nil
+	return brokers.Default, nil
 }
 
 // Auxiliar dApp  functions

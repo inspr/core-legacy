@@ -1,6 +1,7 @@
 package tree
 
 import (
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/meta"
 )
 
@@ -15,7 +16,7 @@ func (cmm *ChannelMockManager) Get(scope, name string) (*meta.Channel, error) {
 }
 
 // Create mocks a channel method for testing
-func (cmm *ChannelMockManager) Create(scope string, ch *meta.Channel) error {
+func (cmm *ChannelMockManager) Create(scope string, ch *meta.Channel, brokers *apimodels.BrokersDI) error {
 	return nil
 }
 

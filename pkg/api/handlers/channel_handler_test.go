@@ -251,8 +251,8 @@ func TestChannelHandler_HandleGet(t *testing.T) {
 			handlerFunc := tt.ch.HandleGet().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
-
-			tt.ch.Memory.Tree().Channels().Create("", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}})
+			brokers, _ := tt.ch.Memory.Brokers().Get()
+			tt.ch.Memory.Tree().Channels().Create("", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}}, brokers)
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -277,7 +277,8 @@ func TestChannelHandler_HandleUpdate(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ch.Memory.Tree().Channels().Create("", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}})
+			brokers, _ := tt.ch.Memory.Brokers().Get()
+			tt.ch.Memory.Tree().Channels().Create("", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}}, brokers)
 			tt.ch.Operator.Channels().Create(context.Background(), "", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}})
 
 			client := ts.Client()
@@ -303,7 +304,8 @@ func TestChannelHandler_HandleDelete(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ch.Memory.Tree().Channels().Create("", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}})
+			brokers, _ := tt.ch.Memory.Brokers().Get()
+			tt.ch.Memory.Tree().Channels().Create("", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}}, brokers)
 			tt.ch.Operator.Channels().Create(context.Background(), "", &meta.Channel{Meta: meta.Metadata{Name: "mock_channel"}})
 
 			client := ts.Client()
