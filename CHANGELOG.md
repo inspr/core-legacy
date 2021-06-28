@@ -276,6 +276,12 @@
     - formated the CHANGELOG.md file so all changelogs have the same format
 ---
 
+### #50 - Feature: creates git hooks scripts and pre-commit
+- feature:
+	- creates a wrapper script for git hooks
+	- creates a pre-commit script for linting files that are staged for committing
+	- creates an installation script that creates symlinks for the hooks
+
 ### #48 - Feature: adds init command to the cli
 - features:
     - creates an init command for configuration initialization
