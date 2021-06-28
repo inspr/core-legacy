@@ -500,7 +500,7 @@ So it will look like this:
 ```yaml
 bootstrapServers: <kafka service name>.default.svc:9092
 autoOffsetReset: earliest
-sidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka:latest
+sidecarImage: gcr.io/insprlabs/inspr/sidecar/kafka:latest
 sidecarAddr: "http://localhost"
 ```
 
@@ -675,7 +675,7 @@ Meta.Name                                       |            | ping
 Meta.Parent                                     |            | pptable
 Spec.Node.Meta.Name                             |            | ping
 Spec.Node.Meta.Parent                           |            | pptable
-Spec.Node.Spec.Image                            |            | gcr.io/red-inspr/inspr/example/ping:latest
+Spec.Node.Spec.Image                            |            | gcr.io/insprlabs/inspr/example/ping:latest
 Spec.Node.Spec.Replicas                         | 0          | 1
 Spec.Node.Spec.Environment[SUPER_SECRET_0001]   | <nil>      | false
 Spec.Boundary.Input                             | <nil>      | pinginput
@@ -689,7 +689,7 @@ Meta.Name               |            | pong
 Meta.Parent             |            | pptable
 Spec.Node.Meta.Name     |            | pong
 Spec.Node.Meta.Parent   |            | pptable
-Spec.Node.Spec.Image    |            | gcr.io/red-inspr/inspr/example/pong:latest
+Spec.Node.Spec.Image    |            | gcr.io/insprlabs/inspr/example/pong:latest
 Spec.Boundary.Input     | <nil>      | ponginput
 Spec.Boundary.Output    | <nil>      | pongoutput
 On: pptable

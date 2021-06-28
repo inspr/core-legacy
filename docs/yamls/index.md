@@ -72,7 +72,7 @@ spec:
             name: node-generator
             parent: generator
           spec:
-            image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
+            image: gcr.io/insprlabs/inspr/examples/primes/generator:latest
             replicas: 8
             environment:
               MODULE: 100
@@ -92,7 +92,7 @@ spec:
             name: node-printer
             parent: printer
           spec:
-            image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
+            image: gcr.io/insprlabs/inspr/examples/primes/printer:latest
             replicas: 2            
         boundary:
           input:
