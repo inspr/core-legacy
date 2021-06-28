@@ -9,7 +9,7 @@ spec:
     spec:
       replicas: 1
       environment:
-      image: gcr.io/red-inspr/inspr/example/pubsubapi:latest
+      image: gcr.io/insprlabs/inspr/example/pubsubapi:latest
   boundary:
     output:
       - pubsubch

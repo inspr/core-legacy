@@ -25,9 +25,9 @@ deployment:
   authName: auth-deployment
   initKey: "1234567890"
 
-insprdRepository: gcr.io/red-inspr/insprd
-authRepository: gcr.io/red-inspr/authsvc
-secretRepository: gcr.io/red-inspr/secretgen
+insprdRepository: gcr.io/insprlabs/insprd
+authRepository: gcr.io/insprlabs/authsvc
+secretRepository: gcr.io/insprlabs/secretgen
 
 service:
   type: ClusterIP
@@ -64,6 +64,6 @@ lbSidecar:
   port: 3051
   readPort: 3047
 
-lbsidecarImage: gcr.io/red-inspr/inspr/sidecar/lbsidecar
+lbsidecarImage: gcr.io/insprlabs/inspr/sidecar/lbsidecar
 
 insprAppsNamespace: inspr-apps

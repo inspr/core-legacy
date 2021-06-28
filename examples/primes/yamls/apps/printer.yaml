@@ -10,7 +10,7 @@ spec:
       name: "node-printer"
       parent: "printer"
     spec:
-      image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
+      image: gcr.io/insprlabs/inspr/examples/primes/printer:latest
       replicas: 3
       environment:
         teste_env: "test"
