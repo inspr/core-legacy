@@ -5,8 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory/brokers"
-	"inspr.dev/inspr/cmd/sidecars"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metabrokers "inspr.dev/inspr/pkg/meta/brokers"
@@ -147,10 +146,6 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 }
 
 func TestChannelMemoryManager_Create(t *testing.T) {
-	kafkaConfig := sidecars.KafkaConfig{}
-	bmm := brokers.GetBrokerMemory()
-	bmm.Create(&kafkaConfig)
-
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -161,6 +156,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 	type args struct {
 		context string
 		ch      *meta.Channel
+		brokers *apimodels.BrokersDI
 	}
 	tests := []struct {
 		name          string
@@ -189,6 +185,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 					Spec: meta.ChannelSpec{
 						Type: "type1",
 					},
+				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
 				},
 			},
 			wantErr: false,
@@ -221,6 +221,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 					},
 					Spec: meta.ChannelSpec{},
 				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 			},
 			wantErr: true,
 			want:    nil,
@@ -242,6 +246,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
+				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
 				},
 			},
 			wantErr: true,
@@ -267,6 +275,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Type: "ct1",
 					},
 				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 			},
 			wantErr: true,
 			want:    nil,
@@ -290,6 +302,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 					Spec: meta.ChannelSpec{
 						Type: "type1",
 					},
+				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
 				},
 			},
 			wantErr: false,
@@ -327,6 +343,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Type: "type1",
 					},
 				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 			},
 			wantErr: true,
 			want:    nil,
@@ -344,7 +364,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			chh := GetTreeMemory().Channels()
-			err := chh.Create(tt.args.context, tt.args.ch)
+			err := chh.Create(tt.args.context, tt.args.ch, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
