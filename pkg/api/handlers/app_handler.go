@@ -40,30 +40,30 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 			logger.Error("unable to decode dApp create request data",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
 		logger.Debug("initiating dApp create transaction")
-		ah.Memory.InitTransaction()
+		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Apps().Create(scope, &data.App)
+		err = ah.Memory.Tree().Apps().Create(scope, &data.App)
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("dApp", data.App.Meta.Name),
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
-		changes, err := ah.Memory.GetTransactionChanges()
+		changes, err := ah.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get dApp create request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
@@ -74,15 +74,15 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 				logger.Error("unable to apply dApp create changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				ah.Memory.Cancel()
+				ah.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing dApp create changes")
-			defer ah.Memory.Commit()
+			defer ah.Memory.Tree().Commit()
 		} else {
 			logger.Info("cancelling dApp create changes")
-			defer ah.Memory.Cancel()
+			defer ah.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
@@ -108,19 +108,19 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 		}
 
 		logger.Debug("initiating dApp get transaction")
-		ah.Memory.InitTransaction()
+		ah.Memory.Tree().InitTransaction()
 
-		app, err := ah.Memory.Tree().Apps().Get(scope)
+		app, err := ah.Memory.Tree().Tree().Apps().Get(scope)
 		if err != nil {
 			logger.Error("unable to get dApp",
 				zap.String("dApp query", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
-		defer ah.Memory.Cancel()
+		defer ah.Memory.Tree().Cancel()
 
 		rest.JSON(w, http.StatusOK, app)
 	}
@@ -144,25 +144,25 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 		}
 
 		logger.Debug("initiating dApp update transaction")
-		ah.Memory.InitTransaction()
+		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Apps().Update(scope, &data.App)
+		err = ah.Memory.Tree().Apps().Update(scope, &data.App)
 		if err != nil {
 			logger.Error("unable to update dApp",
 				zap.String("dApp", data.App.Meta.Name),
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
-		changes, err := ah.Memory.GetTransactionChanges()
+		changes, err := ah.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get dApp update request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
@@ -173,15 +173,15 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 				logger.Error("unable to apply dApp update changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				ah.Memory.Cancel()
+				ah.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing dApp update changes")
-			defer ah.Memory.Commit()
+			defer ah.Memory.Tree().Commit()
 		} else {
 			logger.Info("cancelling dApp update changes")
-			defer ah.Memory.Cancel()
+			defer ah.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
@@ -206,24 +206,24 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 		}
 
 		logger.Debug("initiating dApp delete transaction")
-		ah.Memory.InitTransaction()
+		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Apps().Delete(scope)
+		err = ah.Memory.Tree().Apps().Delete(scope)
 		if err != nil {
 			logger.Error("unable to delete dApp",
 				zap.String("dApp query", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
-		changes, err := ah.Memory.GetTransactionChanges()
+		changes, err := ah.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get dApp delete request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
@@ -234,15 +234,15 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 				logger.Error("unable to apply dApp delete changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				ah.Memory.Cancel()
+				ah.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing Channel delete changes")
-			defer ah.Memory.Commit()
+			defer ah.Memory.Tree().Commit()
 		} else {
 			logger.Info("cancelling Channel delete changes")
-			defer ah.Memory.Cancel()
+			defer ah.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)

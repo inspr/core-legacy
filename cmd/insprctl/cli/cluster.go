@@ -48,7 +48,7 @@ func getBrokers(ctx context.Context) error {
 	fmt.Fprintf(out, "DEFAULT:\n%s\n", resp.Default)
 	fmt.Fprintln(out, "AVAILABLE:")
 	lines := make([]string, 0)
-	for _, broker := range resp.Installed {
+	for _, broker := range resp.Available {
 		printLine(broker, &lines)
 	}
 	printTab(&lines)

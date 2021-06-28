@@ -3,28 +3,22 @@ package brokers
 import (
 	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/sidecars"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta/brokers"
 	"inspr.dev/inspr/pkg/sidecars/models"
-	"inspr.dev/inspr/pkg/utils"
 )
 
-// GetAll returns an array containing all currently configured brokers
-func (bmm *brokerMemoryManager) GetAll() (utils.StringArray, error) {
+// Get returns the brokers configured data
+func (bmm *brokerMemoryManager) Get() (*apimodels.BrokersDI, error) {
 	mem, err := bmm.get()
 	if err != nil {
 		return nil, err
 	}
-	return mem.Available.Brokers(), nil
-}
-
-// GetDefault returns the broker configured as default
-func (bmm *brokerMemoryManager) GetDefault() (string, error) {
-	mem, err := bmm.get()
-	if err != nil {
-		return "", err
-	}
-	return mem.Default, nil
+	return &apimodels.BrokersDI{
+		Available: mem.Available.Brokers(),
+		Default:   mem.Default,
+	}, nil
 }
 
 func (bmm *brokerMemoryManager) get() (*brokers.Brokers, error) {

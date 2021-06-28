@@ -9,9 +9,8 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/fake"
-	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/insprd/operators"
 	ofake "inspr.dev/inspr/cmd/insprd/operators/fake"
 	"inspr.dev/inspr/pkg/api/models"
@@ -23,8 +22,7 @@ import (
 
 func TestHandler_NewBrokerHandler(t *testing.T) {
 	type fields struct {
-		Memory          tree.Manager
-		Brokers         brokers.Manager
+		Memory          memory.Manager
 		Operator        operators.OperatorInterface
 		Auth            auth.Auth
 		diffReactions   []diff.DifferenceReaction
@@ -38,17 +36,15 @@ func TestHandler_NewBrokerHandler(t *testing.T) {
 		{
 			name: "valid new broker handler",
 			fields: fields{
-				Memory:   fake.MockTreeMemory(nil),
+				Memory:   fake.GetMockMemoryManager(nil, nil),
 				Operator: ofake.NewFakeOperator(),
 				Auth:     authmock.NewMockAuth(nil),
-				Brokers:  fake.MockBrokerMemory(nil),
 			},
 			want: &BrokerHandler{
 				Handler: &Handler{
-					Memory:   fake.MockTreeMemory(nil),
+					Memory:   fake.GetMockMemoryManager((nil), nil),
 					Operator: ofake.NewFakeOperator(),
 					Auth:     authmock.NewMockAuth(nil),
-					Brokers:  fake.MockBrokerMemory(nil),
 				},
 			},
 		},
@@ -57,7 +53,6 @@ func TestHandler_NewBrokerHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			handler := &Handler{
 				Memory:          tt.fields.Memory,
-				Brokers:         tt.fields.Brokers,
 				Operator:        tt.fields.Operator,
 				Auth:            tt.fields.Auth,
 				diffReactions:   tt.fields.diffReactions,
@@ -84,12 +79,12 @@ func TestBrokerHandler_HandleGet(t *testing.T) {
 			name: "valid broker get test",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerMemory(nil),
+					Memory: fake.GetMockMemoryManager(nil, nil),
 				},
 			},
 			want: 200,
 			wantData: &models.BrokersDI{
-				Installed: utils.StringArray{"default_mock"},
+				Available: utils.StringArray{"default_mock"},
 				Default:   "default_mock",
 			},
 		},
@@ -133,7 +128,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			name: "error_reading_body",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerMemory(nil),
+					Memory: fake.GetMockMemoryManager(nil, nil),
 				},
 			},
 			brokerErr: nil,
@@ -143,7 +138,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			name: "error_parsing_to_kafka_config",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerMemory(nil),
+					Memory: fake.GetMockMemoryManager(nil, nil),
 				},
 				bodyContent: models.BrokerConfigDI{
 					FileContents: []byte{1}, // throws error at the yaml parser
@@ -156,8 +151,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			name: "broker error",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerMemory(
-						errors.New("brokerManager_error")),
+					Memory: fake.GetMockMemoryManager(nil, errors.New("brokerManager_error")),
 				},
 			},
 			wantCode: http.StatusInternalServerError,
@@ -166,7 +160,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			name: "working",
 			fields: fields{
 				Handler: &Handler{
-					Brokers: fake.MockBrokerMemory(nil),
+					Memory: fake.GetMockMemoryManager(nil, nil),
 				},
 			},
 			wantCode: http.StatusOK,

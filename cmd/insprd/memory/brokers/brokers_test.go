@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"inspr.dev/inspr/cmd/sidecars"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/meta/brokers"
-	"inspr.dev/inspr/pkg/utils"
 )
 
 var kafkaStructMock = sidecars.KafkaConfig{
@@ -16,15 +16,15 @@ var kafkaStructMock = sidecars.KafkaConfig{
 	SidecarImage:     "",
 }
 
-func TestBrokersMemoryManager_GetAll(t *testing.T) {
+func TestBrokersMemoryManager_Get(t *testing.T) {
 	tests := []struct {
 		name    string
-		want    utils.StringArray
+		want    *apimodels.BrokersDI
 		wantErr bool
 	}{
 		{
 			name:    "getall from empty brokerMM",
-			want:    utils.StringArray{},
+			want:    nil,
 			wantErr: false,
 		},
 	}
@@ -32,7 +32,7 @@ func TestBrokersMemoryManager_GetAll(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			resetBrokers()
 			bmm := GetBrokerMemory()
-			got, err := bmm.GetAll()
+			got, err := bmm.Get()
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("BrokersMemoryManager.GetAll() error = %v, wantErr %v", err, tt.wantErr)
@@ -41,36 +41,6 @@ func TestBrokersMemoryManager_GetAll(t *testing.T) {
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("BrokersMemoryManager.GetAll() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestBrokersMemoryManager_GetDefault(t *testing.T) {
-	tests := []struct {
-		name    string
-		bmm     *brokerMemoryManager
-		want    string
-		wantErr bool
-	}{
-		{
-			name:    "getdefault from empty brokerMM",
-			bmm:     &brokerMemoryManager{},
-			want:    "",
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			resetBrokers()
-			bmm := GetBrokerMemory()
-			got, err := bmm.GetDefault()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("BrokersMemoryManager.GetDefault() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("BrokersMemoryManager.GetDefault() = %v, want %v", got, tt.want)
 			}
 		})
 	}

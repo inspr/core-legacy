@@ -35,14 +35,14 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 			logger.Error("unable to decode Alias create request data",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
 		logger.Debug("initiating Alias create transaction")
-		ah.Memory.InitTransaction()
+		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Alias().Create(scope, data.Target, &data.Alias)
+		err = ah.Memory.Tree().Alias().Create(scope, data.Target, &data.Alias)
 		if err != nil {
 			logger.Error("unable to create Alias",
 				zap.Any("alias", data.Alias),
@@ -50,16 +50,16 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
-		changes, err := ah.Memory.GetTransactionChanges()
+		changes, err := ah.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Alias create request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
@@ -70,15 +70,15 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 				logger.Error("unable to apply Alias create changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				ah.Memory.Cancel()
+				ah.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing Alias create changes")
-			defer ah.Memory.Commit()
+			defer ah.Memory.Tree().Commit()
 		} else {
 			logger.Info("cancelling Alias create changes")
-			defer ah.Memory.Cancel()
+			defer ah.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
@@ -99,25 +99,25 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 			logger.Error("unable to decode Alias get request data",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
 		logger.Debug("initiating Alias get transaction")
-		ah.Memory.InitTransaction()
+		ah.Memory.Tree().InitTransaction()
 
-		app, err := ah.Memory.Tree().Alias().Get(scope, data.Key)
+		app, err := ah.Memory.Tree().Tree().Alias().Get(scope, data.Key)
 		if err != nil {
 			logger.Error("unable to get Alias",
 				zap.String("alias key", data.Key),
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
-		defer ah.Memory.Cancel()
+		defer ah.Memory.Tree().Cancel()
 
 		rest.JSON(w, http.StatusOK, app)
 	}
@@ -141,9 +141,9 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 		}
 
 		logger.Debug("initiating Alias update transaction")
-		ah.Memory.InitTransaction()
+		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Alias().Update(scope, data.Target, &data.Alias)
+		err = ah.Memory.Tree().Alias().Update(scope, data.Target, &data.Alias)
 		if err != nil {
 			logger.Error("unable to update Alias",
 				zap.Any("alias", data.Alias),
@@ -151,16 +151,16 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
-		changes, err := ah.Memory.GetTransactionChanges()
+		changes, err := ah.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Alias update request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
@@ -171,15 +171,15 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 				logger.Error("unable to apply Alias update changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				ah.Memory.Cancel()
+				ah.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing Alias update changes")
-			defer ah.Memory.Commit()
+			defer ah.Memory.Tree().Commit()
 		} else {
 			logger.Info("cancelling Alias update changes")
-			defer ah.Memory.Cancel()
+			defer ah.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
@@ -204,25 +204,25 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 		}
 
 		logger.Debug("initiating Alias delete transaction")
-		ah.Memory.InitTransaction()
+		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Alias().Delete(scope, data.Key)
+		err = ah.Memory.Tree().Alias().Delete(scope, data.Key)
 		if err != nil {
 			logger.Error("unable to delete Alias",
 				zap.String("alias key", data.Key),
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
-		changes, err := ah.Memory.Alias().GetTransactionChanges()
+		changes, err := ah.Memory.Tree().Alias().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Alias delete request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ah.Memory.Cancel()
+			ah.Memory.Tree().Cancel()
 			return
 		}
 
@@ -233,15 +233,15 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 				logger.Error("unable to apply Alias delete changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				ah.Memory.Cancel()
+				ah.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing Alias create changes")
-			defer ah.Memory.Commit()
+			defer ah.Memory.Tree().Commit()
 		} else {
 			logger.Info("cancelling Alias create changes")
-			defer ah.Memory.Cancel()
+			defer ah.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)

@@ -6,7 +6,7 @@ import (
 
 // BrokersDI data interface to provide broker information
 type BrokersDI struct {
-	Installed utils.StringArray `json:"installed"`
+	Available utils.StringArray `json:"available"`
 	Default   string            `json:"default"`
 }
 

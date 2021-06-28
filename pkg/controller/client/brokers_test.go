@@ -32,7 +32,7 @@ func TestBrokersClient_Get(t *testing.T) {
 				ctx: context.Background(),
 			},
 			want: &models.BrokersDI{
-				Installed: utils.StringArray{"mock_broker"},
+				Available: utils.StringArray{"mock_broker"},
 				Default:   "mock_broker",
 			},
 			wantErr: false,
@@ -65,7 +65,7 @@ func TestBrokersClient_Get(t *testing.T) {
 				}
 
 				di := models.BrokersDI{
-					Installed: utils.StringArray{"mock_broker"},
+					Available: utils.StringArray{"mock_broker"},
 					Default:   "mock_broker",
 				}
 
