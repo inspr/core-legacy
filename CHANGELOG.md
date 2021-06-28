@@ -7,6 +7,8 @@
 	- creates a wrapper script for git hooks
 	- creates a pre-commit script for linting files that are staged for committing
 	- creates an installation script that creates symlinks for the hooks
+	- added a readme describing the process of installation
+---
   
 ### #79 Story CORE-481 | Adding fields descriptions to the documentations in docs/yamls 
 - misc:
@@ -40,8 +42,6 @@
 ---
 
 ### #77 Story CORE-463 | Create documentation for Auth
-
-### #41 - Feature: Handling invalid requests in the middleware authorization
 
 - features:
     - authentication doc
@@ -275,12 +275,6 @@
 - misc:
     - formated the CHANGELOG.md file so all changelogs have the same format
 ---
-
-### #50 - Feature: creates git hooks scripts and pre-commit
-- feature:
-	- creates a wrapper script for git hooks
-	- creates a pre-commit script for linting files that are staged for committing
-	- creates an installation script that creates symlinks for the hooks
 
 ### #48 - Feature: adds init command to the cli
 - features:
