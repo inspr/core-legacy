@@ -1,4 +1,4 @@
-FROM gcr.io/red-inspr/inspr/sidecar/kafka:build AS build-env
+FROM gcr.io/insprlabs/inspr/sidecar/kafka:build AS build-env
 
 WORKDIR /inspr
 COPY go.mod go.mod
@@ -8,7 +8,7 @@ COPY . .
 WORKDIR /inspr/cmd/insprd
 RUN go build -tags musl
 
-FROM gcr.io/red-inspr/inspr/sidecar/kafka:deploy
+FROM gcr.io/insprlabs/inspr/sidecar/kafka:deploy
 WORKDIR /deploy
 COPY --from=build-env /inspr/cmd/insprd/insprd insprd
 ENTRYPOINT ./insprd

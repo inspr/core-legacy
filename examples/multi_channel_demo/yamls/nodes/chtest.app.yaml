@@ -9,7 +9,7 @@ spec:
       replicas: 1
       environment:
         SUPER_SECRET_0001: "false"
-      image: gcr.io/red-inspr/inspr/example/chtest:latest
+      image: gcr.io/insprlabs/inspr/example/chtest:latest
   boundary:
     input:
       - checkch

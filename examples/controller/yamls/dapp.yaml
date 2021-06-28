@@ -11,5 +11,5 @@ spec:
             ports:
                 - port: 8080
                   targetPort: 8000
-            image: gcr.io/red-inspr/inspr/examples/controller:latest
+            image: gcr.io/insprlabs/examples/controller:latest
             replicas: 1

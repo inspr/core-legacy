@@ -50,7 +50,7 @@ spec:
       spec:
         node:
           spec:
-            image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
+            image: gcr.io/insprlabs/inspr/examples/primes/generator:latest
             replicas: 1
             environment:
               MODULE: 300
@@ -79,8 +79,8 @@ spec:
             spec:
               node:
                 spec:
-                  image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
-                  replicas: 1
+                  image: gcr.io/insprlabs/inspr/examples/primes/filter:latest
+                  replicas: 2
               boundary:
                 input:
                   - filterinput
@@ -98,7 +98,7 @@ spec:
                 meta:
                   name: "printer"
                 spec:
-                  image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
+                  image: gcr.io/insprlabs/inspr/examples/primes/printer:latest
                   replicas: 1
               boundary:
                 input:

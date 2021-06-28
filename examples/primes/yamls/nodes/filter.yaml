@@ -11,8 +11,9 @@ spec:
       name: node-filter
       parent: filter
     spec:
-      image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
-      replicas: 3
+      image: gcr.io/insprlabs/inspr/examples/primes/filter:latest
+      replicas: 1
+
   boundary:
     input:
       - filterinput

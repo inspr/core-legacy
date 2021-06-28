@@ -11,7 +11,7 @@ spec:
       name: node-generator
       parent: generator
     spec:
-      image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
+      image: gcr.io/insprlabs/inspr/examples/primes/generator:latest
       replicas: 3
       environment:
         MODULE: 100

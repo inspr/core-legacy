@@ -1,10 +1,23 @@
 
 # Changelog
 
+
+### #80 Story CORE-497 | Migrate cluster from "red-inspr" to "insprlabs"
+- misc:
+  - changed the tags of the dockers image, from red-inspr to insprlabs. Meaning that i changed the place in which the docker images are stored.
+
+### #79 Story CORE-481 | Adding fields descriptions to the documentations in docs/yamls 
+- misc:
+    - created the alias doc
+    - added fields to the node documentation
+    - checked index and added the alias section to it
+---
+
 ### #33 update networking from beta1 to v1 in the ingresses
 - fixes:
   - Altered the fields of all the ingresses that used the previous version of the v1beta1 of k8s.
   - `authsvc/secret` now passes context in the methods
+---
 
 ### #78 Bug CORE-475 | Deletion of multiple channels not working  
 - fixes:
