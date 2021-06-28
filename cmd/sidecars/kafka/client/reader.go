@@ -4,10 +4,9 @@ import (
 	"context"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	globalEnv "github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/sidecar/models"
 	"go.uber.org/zap"
+	globalEnv "inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 const pollTimeout = 100
@@ -22,34 +21,49 @@ type Consumer interface {
 // Reader reads/commit messages from the channels defined in the env
 type Reader struct {
 	consumers map[string]Consumer
+	kafkaEnv  *Environment
 }
 
 // NewReader return a new Reader
 func NewReader() (*Reader, error) {
+	logger.Info("creating new kafka reader")
 	var reader Reader
-	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannels())
+	reader.kafkaEnv = GetKafkaEnvironment()
+	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannelsData())
 
-	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannels())
+	logger.Debug("getting resolved channels list")
+	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannelsData())
 	if len(resolvedChList) == 0 {
-		return nil, ierrors.NewError().Message("KAFKA_INPUT_CHANNELS not specified").InvalidChannel().Build()
+		logger.Error("invalid resolved channel list")
+		return nil, ierrors.NewError().Message("INSPR_INPUT_CHANNELS not specified").InvalidChannel().Build()
 	}
 
 	reader.consumers = make(map[string]Consumer)
 
+	logger.Debug("creating new consumer for each channel")
 	for idx, ch := range channelsList {
-		if err := reader.NewSingleChannelConsumer(ch, resolvedChList[idx]); err != nil {
+		if err := reader.newSingleChannelConsumer(ch, resolvedChList[idx]); err != nil {
+			logger.Error("unable to create consumer for channel",
+				zap.String("channel", ch),
+				zap.String("error", err.Error()))
+
 			return nil, err
 		}
 	}
+
+	logger.Debug("new reader created!")
 	return &reader, nil
 }
 
-/*
-ReadMessage reads message by message. Returns channel the message belongs to,
-the message and an error if any occurred.
-*/
-func (reader *Reader) ReadMessage(ctx context.Context, channel string) (models.BrokerData, error) {
-	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannels(), "")
+// Consumers returns a Reader's consumers
+func (reader *Reader) Consumers() map[string]Consumer {
+	return reader.consumers
+}
+
+// ReadMessage reads message by message. Returns channel the message belongs to,
+// the message and an error if any occurred.
+func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, error) {
+	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannelsData(), nil)
 
 	logger.Info("trying to read message from topic",
 		zap.String("channel", channel),
@@ -60,7 +74,7 @@ func (reader *Reader) ReadMessage(ctx context.Context, channel string) (models.B
 	for {
 		select {
 		case <-ctx.Done():
-			return models.BrokerData{}, ctx.Err()
+			return nil, ctx.Err()
 		default:
 			event := consumer.Poll(pollTimeout)
 			switch ev := event.(type) {
@@ -68,19 +82,19 @@ func (reader *Reader) ReadMessage(ctx context.Context, channel string) (models.B
 				topic := *ev.TopicPartition.Topic
 				logger.Info("reading message from topic", zap.String("topic", topic))
 
-				return kafkaTopic(topic).readMessage(ev.Value)
+				return ev.Value, nil
 
 			case kafka.Error:
 				if ev.Code() == kafka.ErrAllBrokersDown {
-					return models.BrokerData{}, ierrors.
+					return nil, ierrors.
 						NewError().
 						InnerError(ev).
 						Message("kafka error = all brokers are down\n%s", ev.Error()).
 						InternalServer().
 						Build()
 				}
-				logger.Error("error in reading kafka message", zap.String("error", ev.Error()))
-				return models.BrokerData{}, ierrors.NewError().
+				logger.Error("error while reading kafka message", zap.String("error", ev.Error()))
+				return nil, ierrors.NewError().
 					Message("%v", ev).
 					Build()
 
@@ -105,8 +119,7 @@ func (reader *Reader) Commit(ctx context.Context, channel string) error {
 		if errCommit != nil {
 			return ierrors.
 				NewError().
-				InnerError(errCommit).
-				Message("failed to commit last message").
+				Message("failed to commit last message: %s", errCommit.Error()).
 				InternalServer().
 				Build()
 		}
@@ -126,22 +139,31 @@ func (reader *Reader) Close() error {
 	return nil
 }
 
-//NewSingleChannelConsumer creates a consumer for a single Kafka channel on the reader's consumers map.
-func (reader *Reader) NewSingleChannelConsumer(channel, resolved string) error {
-	kafkaEnv := GetEnvironment()
+//newSingleChannelConsumer creates a consumer for a single Kafka channel on the reader's consumers map.
+func (reader *Reader) newSingleChannelConsumer(channel, resolved string) error {
+	logger.Debug("creating single consumer with configs",
+		zap.String("bootstrap", reader.kafkaEnv.KafkaBootstrapServers),
+		zap.String("groupid", globalEnv.GetInsprAppID()),
+		zap.String("autooffset", reader.kafkaEnv.KafkaAutoOffsetReset))
+
 	newConsumer, errKafkaConsumer := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  kafkaEnv.KafkaBootstrapServers,
+		"bootstrap.servers":  reader.kafkaEnv.KafkaBootstrapServers,
 		"group.id":           globalEnv.GetInsprAppID(),
-		"auto.offset.reset":  kafkaEnv.KafkaAutoOffsetReset,
+		"auto.offset.reset":  reader.kafkaEnv.KafkaAutoOffsetReset,
 		"enable.auto.commit": false,
 	})
 	if errKafkaConsumer != nil {
 		return ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
 	}
 
+	logger.Debug("subscribing new consumer",
+		zap.String("resolved channel", resolved))
+
 	if err := newConsumer.Subscribe(resolved, nil); err != nil {
 		return err
 	}
+
+	logger.Debug("done subscribing consumer")
 	reader.consumers[channel] = newConsumer
 	return nil
 }

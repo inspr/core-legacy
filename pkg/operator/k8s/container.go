@@ -40,7 +40,7 @@ func ContainerWithEnv(env ...corev1.EnvVar) ContainerOption {
 	}
 }
 
-// ContainerWithEnvFrom adds envirnoment variables from a source to a container
+// ContainerWithEnvFrom adds environment variables from a source to a container
 func ContainerWithEnvFrom(env ...corev1.EnvFromSource) ContainerOption {
 	return func(c *corev1.Container) {
 		c.EnvFrom = append(c.EnvFrom, env...)
@@ -76,7 +76,7 @@ func WithVolumeMounts(mounts ...corev1.VolumeMount) ContainerOption {
 }
 
 // NewContainer creates a new kubernetes containers with the given options applied to it
-func NewContainer(name string, image string, options ...ContainerOption) corev1.Container {
+func NewContainer(name, image string, options ...ContainerOption) corev1.Container {
 	cont := corev1.Container{
 		Name:  name,
 		Image: image,

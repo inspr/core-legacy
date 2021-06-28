@@ -1,6 +1,6 @@
-kind: type
 apiVersion: v1
+kind: type
 
 meta:
   name: pptype1
-schema: yamls/types/schema.avsc
+schema: yamls/ctypes/schema.avsc

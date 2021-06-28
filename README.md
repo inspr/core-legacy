@@ -12,13 +12,13 @@
 <p align="center">Describe, connect, secure, test and deploy distributed applications with less effort.</p>
 
 <p align="center">
-    <a href="https://godoc.org/github.com/inspr/inspr">
-        <img src="https://godoc.org/github.com/inspr/inspr?status.svg">
+    <a href="https://godoc.org/inspr.dev/inspr">
+        <img src="https://godoc.org/inspr.dev/inspr?status.svg">
     </a>
-    <a href="https://goreportcard.com/badge/github.com/inspr/inspr">
-        <img src="https://goreportcard.com/badge/github.com/inspr/inspr">
+    <a href="https://goreportcard.com/badge/inspr.dev/inspr">
+        <img src="https://goreportcard.com/badge/inspr.dev/inspr">
     </a>
-    <a href="https://pkg.go.dev/github.com/inspr/inspr">
+    <a href="https://pkg.go.dev/inspr.dev/inspr">
         <img src="https://img.shields.io/static/v1?label=godoc&message=reference&color=blue">
     </a>
     <a href="https://codecov.io/gh/inspr/inspr">
@@ -46,7 +46,7 @@
 
 <br>
 
-[Inspr](https://inspr.com) is an agnostic application mesh for simpler, faster, and securer development of distributed applications (dApps). With it you can coordinate the application lifecycle and how the subparts of a dApp interconnect themselves.
+[Inspr](https://inspr.com) is an agnostic application mesh for simpler, faster, and more secure development of distributed applications (dApps). With it you can coordinate the application lifecycle and how the subparts of a dApp interconnect themselves.
 
 For Inspr’s point of view, a dApp is defined as an abstraction on top of the concept of a microservice. We extend the model by adding patterns of composition, communication, security, and adaptability to the application during runtime.
 
@@ -119,11 +119,11 @@ curl -s https://storage.googleapis.com/inspr-cli/install_cli.sh | bash
 You can check if the installation was successful by typing `inspr -h` on your terminal.  
 Before starting to use the CLI, be sure to check that it is referencing your cluster. First check the current config using: 
 ```bash
-inspr config list
+insprctl config list
 ```
 And if the `serverip` is not the hostname currently being used to access the cluster IP, it must be modified:
 ```bash
-inspr config serverip http://<your_domain>.com
+insprctl config serverip http://<your_domain>.com
 ```
 
 And now you're good to go!  

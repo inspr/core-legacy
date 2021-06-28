@@ -5,11 +5,14 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/sidecars"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	metabrokers "inspr.dev/inspr/pkg/meta/brokers"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestMemoryManager_Channels(t *testing.T) {
@@ -145,6 +148,10 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 }
 
 func TestChannelMemoryManager_Create(t *testing.T) {
+	kafkaConfig := sidecars.KafkaConfig{}
+	bmm := brokers.GetBrokerMemory()
+	bmm.Create(&kafkaConfig)
+
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -192,7 +199,8 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 					Parent: "",
 				},
 				Spec: meta.ChannelSpec{
-					Type: "type1",
+					Type:           "type1",
+					SelectedBroker: metabrokers.Kafka,
 				},
 			},
 		},

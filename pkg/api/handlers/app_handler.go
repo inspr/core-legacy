@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // AppHandler - contains handlers that uses the AppMemory interface methods
@@ -51,7 +51,7 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("dApp", data.App.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -110,7 +110,7 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating dApp get transaction")
 		ah.Memory.InitTransaction()
 
-		app, err := ah.Memory.Root().Apps().Get(scope)
+		app, err := ah.Memory.Tree().Apps().Get(scope)
 		if err != nil {
 			logger.Error("unable to get dApp",
 				zap.String("dApp query", scope),
@@ -150,7 +150,7 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 		if err != nil {
 			logger.Error("unable to update dApp",
 				zap.String("dApp", data.App.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -238,10 +238,10 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 				return
 			}
 
-			logger.Info("committing Channel create changes")
+			logger.Info("committing Channel delete changes")
 			defer ah.Memory.Commit()
 		} else {
-			logger.Info("cancelling Channel create changes")
+			logger.Info("cancelling Channel delete changes")
 			defer ah.Memory.Cancel()
 		}
 

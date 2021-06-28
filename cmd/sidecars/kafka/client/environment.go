@@ -22,12 +22,12 @@ func init() {
 	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "kafka-sidecar")))
 }
 
-// GetEnvironment returns the current inspr environment
-func GetEnvironment() *Environment {
+// GetKafkaEnvironment returns the current inspr environment
+func GetKafkaEnvironment() *Environment {
 	if env == nil {
 		env = &Environment{
-			KafkaBootstrapServers: getEnv("KAFKA_BOOTSTRAP_SERVERS"),
-			KafkaAutoOffsetReset:  getEnv("KAFKA_AUTO_OFFSET_RESET"),
+			KafkaBootstrapServers: getEnv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS"),
+			KafkaAutoOffsetReset:  getEnv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET"),
 		}
 	}
 	return env
@@ -44,8 +44,8 @@ func getEnv(name string) string {
 // This was develop for testing and probably sholdn't be used in other cases.
 func RefreshEnviromentVariables() *Environment {
 	env = &Environment{
-		KafkaBootstrapServers: getEnv("KAFKA_BOOTSTRAP_SERVERS"),
-		KafkaAutoOffsetReset:  getEnv("KAFKA_AUTO_OFFSET_RESET"),
+		KafkaBootstrapServers: getEnv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS"),
+		KafkaAutoOffsetReset:  getEnv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET"),
 	}
 	return env
 }

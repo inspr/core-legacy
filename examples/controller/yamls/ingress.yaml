@@ -11,13 +11,13 @@ spec:
         paths:
           - path: /update
             backend:
-              serviceName: node-393e2007-0f02-4971-80f6-3bd7af2f0463
+              serviceName: node-2cb79eff-d313-473f-8dd9-25defb1aed31
               servicePort: 8080
           - path: /delete
             backend:
-              serviceName: node-393e2007-0f02-4971-80f6-3bd7af2f0463
+              serviceName: node-2cb79eff-d313-473f-8dd9-25defb1aed31
               servicePort: 8080
           - path: /create
             backend:
-              serviceName: node-393e2007-0f02-4971-80f6-3bd7af2f0463
+              serviceName: node-2cb79eff-d313-473f-8dd9-25defb1aed31
               servicePort: 8080

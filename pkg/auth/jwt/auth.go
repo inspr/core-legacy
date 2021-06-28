@@ -12,11 +12,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // JWTauth implements the Auth interface for jwt authetication provider
@@ -49,7 +49,7 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 	)
 	if err != nil {
 		if err.Error() == errors.New(`exp not satisfied`).Error() {
-
+			// token expired
 			newToken, err := JA.Refresh(token)
 			if err != nil {
 				return nil,
@@ -57,8 +57,7 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 					ierrors.
 						NewError().
 						InternalServer().
-						InnerError(err).
-						Message("error refreshing token").
+						Message("error refreshing token: %v", err).
 						Build()
 			}
 			token = newToken
@@ -66,8 +65,6 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 			return nil, token, err
 		}
 	}
-
-	// expired
 
 	// gets payload from token
 	payload, err := auth.Desserialize(token)
@@ -84,15 +81,9 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 	return payload, token, nil
 }
 
-// InitDO  structure for initialization requests
-type InitDO struct {
-	auth.Payload
-	Key string
-}
-
 // Init receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
-	initDO := InitDO{
+	initDO := auth.InitDO{
 		Key:     key,
 		Payload: load,
 	}

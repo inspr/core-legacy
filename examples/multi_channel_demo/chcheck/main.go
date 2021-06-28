@@ -6,9 +6,9 @@ import (
 	"io"
 	"log"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/sidecar/models"
 	"golang.org/x/net/context"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 		testChannel := testChannels[i]
 		client.HandleChannel(testChannel, func(ctx context.Context, body io.Reader) error {
 			decoder := json.NewDecoder(body)
-			var testMsg models.BrokerData
+			var testMsg models.BrokerMessage
 			err := decoder.Decode(&testMsg)
 			if err != nil {
 				return err

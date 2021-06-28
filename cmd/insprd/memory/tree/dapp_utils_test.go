@@ -4,9 +4,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/meta"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/sidecars"
+	"inspr.dev/inspr/pkg/meta"
+	metabrokers "inspr.dev/inspr/pkg/meta/brokers"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func Test_validAppStructure(t *testing.T) {
@@ -15,9 +18,9 @@ func Test_validAppStructure(t *testing.T) {
 		parentApp meta.App
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "All valid structures",
@@ -54,7 +57,6 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "",
 		},
 		{
 			name: "invalidapp name - empty",
@@ -91,7 +93,7 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "invalid dApp name;",
+			wantErr: true,
 		},
 		{
 			name: "invalidapp substructure",
@@ -130,7 +132,7 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "invalid substructure;",
+			wantErr: true,
 		},
 		{
 			name: "invalidapp - parent has Node structure",
@@ -167,13 +169,19 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["appNode"],
 			},
-			want: "parent has Node;",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := validAppStructure(&tt.args.app, &tt.args.parentApp); got != tt.want {
-				t.Errorf("validAppStructure() = %v, want %v", got, tt.want)
+			err := validAppStructure(&tt.args.app, &tt.args.parentApp)
+			if tt.wantErr && (err == nil) {
+				t.Errorf("validAppStructure(): wanted error but received 'nil'")
+				return
+			}
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("validAppStructure() error: %v", reflect.TypeOf(err))
 			}
 		})
 	}
@@ -316,10 +324,9 @@ func Test_checkAndUpdates(t *testing.T) {
 		app *meta.App
 	}
 	tests := []struct {
-		name  string
-		args  args
-		want  bool
-		want1 string
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "valid channel structure - it shouldn't return a error",
@@ -391,8 +398,6 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  true,
-			want1: "",
 		},
 		{
 			name: "invalid channel: using non-existent type",
@@ -464,8 +469,7 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  false,
-			want1: "invalid channel: using non-existent type;",
+			wantErr: true,
 		},
 		{
 			name: "invalid channel structure - it should return a name channel error",
@@ -537,8 +541,7 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  false,
-			want1: "invalid channel name: invalid.channel.name",
+			wantErr: true,
 		},
 		{
 			name: "valid channel structure - it shouldn't return a error",
@@ -610,18 +613,19 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  false,
-			want1: "invalid type name: invalid.type",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := checkAndUpdates(tt.args.app)
-			if got != tt.want {
-				t.Errorf("checkChannels() got = %v, want %v", got, tt.want)
+			err := checkAndUpdates(tt.args.app)
+			if tt.wantErr && (err == nil) {
+				t.Errorf("checkAndUpdates(): wanted error but received 'nil'")
+				return
 			}
-			if got1 != tt.want1 {
-				t.Errorf("checkChannels() got1 = %v, want %v", got1, tt.want1)
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("checkAndUpdates() error: %v", err)
 			}
 		})
 	}
@@ -1209,36 +1213,121 @@ func Test_validAliases(t *testing.T) {
 		app *meta.App
 	}
 	tests := []struct {
-		name  string
-		args  args
-		valid bool
-		msg1  string
-		msg2  string
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "test alias validation",
 			args: args{
 				app: &appTest,
 			},
-			valid: false,
-			msg1:  "alias: invalid.alias2 points to an non-existent channel 'ch4'; alias: invalid.alias1 points to an non-existent channel 'ch3'",
-			msg2:  "alias: invalid.alias1 points to an non-existent channel 'ch3'; alias: invalid.alias2 points to an non-existent channel 'ch4'",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := validAliases(tt.args.app)
-			if got != tt.valid {
-				t.Errorf("validAliases() got = %v, want %v", got, tt.valid)
+			err := validAliases(tt.args.app)
+			if tt.wantErr && (err == nil) {
+				t.Errorf("validAliases(): wanted error but received 'nil'")
+				return
 			}
-			if got1 != tt.msg1 && got1 != tt.msg2 {
-				if got1 != tt.msg1 {
-					t.Errorf("validAliases() got1 = %v, want %v", got1, tt.msg1)
-				}
-				if got1 != tt.msg2 {
-					t.Errorf("validAliases() got1 = %v, want %v", got1, tt.msg2)
-				}
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("validAliases() error: %v", err)
 			}
+		})
+	}
+}
+
+var kafkaStructMock = sidecars.KafkaConfig{
+	BootstrapServers: "",
+	AutoOffsetReset:  "",
+	KafkaInsprAddr:   "",
+	SidecarImage:     "",
+}
+
+func TestSelectBrokerFromPriorityList(t *testing.T) {
+	type args struct {
+		brokerList []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+		before  func()
+	}{
+		{
+			name: "Should return the first available broker",
+			args: args{
+				brokerList: []string{metabrokers.Kafka},
+			},
+			want: metabrokers.Kafka,
+			before: func() {
+				bmm := brokers.GetBrokerMemory()
+				bmm.Create(&kafkaStructMock)
+				bmm.SetDefault(metabrokers.Kafka)
+			},
+		},
+		{
+			name: "Invalid - Brokers in broker list are no supported",
+			args: args{
+				brokerList: []string{"fakeBroker"},
+			},
+			want:    metabrokers.Kafka,
+			wantErr: true,
+			before: func() {
+				bmm := brokers.GetBrokerMemory()
+				bmm.Create(&kafkaStructMock)
+			},
+		},
+		// {
+		// 	name: "Should return the default broker",
+		// 	args: args{
+		// 		brokerList: []string{"A", "Broker_B"},
+		// 	},
+		// 	want: "Broker_A",
+		// 	before: func() {
+		// 		bmm := brokers.GetBrokerMemory()
+		// 		bmm.Create("Broker_A", nil)
+		// 		bmm.SetDefault("Broker_A")
+		// 	},
+		// },
+		// {
+		// 	name: "Should return the default broker when priority list is empty",
+		// 	args: args{
+		// 		brokerList: []string{},
+		// 	},
+		// 	want: "Broker_A",
+		// 	before: func() {
+		// 		bmm := brokers.GetBrokerMemory()
+		// 		bmm.Create("Broker_A", nil)
+		// 		bmm.SetDefault("Broker_A")
+		// 	},
+		// },
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.before != nil {
+				tt.before()
+			}
+			got, err := SelectBrokerFromPriorityList(tt.args.brokerList)
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("SelectBrokerFromPriorityList() error %v", err)
+				return
+			}
+
+			if !tt.wantErr && (got != tt.want) {
+				t.Errorf("SelectBrokerFromPriorityList() got %v, want %v", got, tt.want)
+			}
+
+			if tt.wantErr && (err == nil) {
+				t.Errorf("SelectBrokerFromPriorityList() wanted error but got 'nil'")
+				return
+			}
+			brokers.ResetBrokerMemory()
 		})
 	}
 }

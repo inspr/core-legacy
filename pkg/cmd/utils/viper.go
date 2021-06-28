@@ -64,7 +64,7 @@ func createInsprConfigFolder(path string) error {
 // ConfigFile is the currently loaded config file
 var ConfigFile string
 
-// ReadDefaultConfig reads the default inspr configuration
+// ReadDefaultConfig reads the default insprctl configuration
 func ReadDefaultConfig() error {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -111,7 +111,7 @@ func ChangeViperValues(key string, value interface{}) error {
 }
 
 // ExistsKey - informs to the user if the key passed exists in the
-// default keys that are saved in the inspr config file
+// default keys that are saved in the insprctl config file
 func ExistsKey(key string) bool {
 	return viper.IsSet(key)
 }

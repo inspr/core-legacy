@@ -3,9 +3,10 @@ package utils
 import (
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/disiqueira/gotree"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // PrintAppTree prints the app tree
@@ -36,14 +37,21 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 	}
 	if len(app.Spec.Aliases) > 0 {
 		aliases := spec.Add("Aliases")
-		for aliasKey := range app.Spec.Aliases {
-			aliases.Add(aliasKey)
+		for aliasKey, alias := range app.Spec.Aliases {
+			aliasTree := aliases.Add(aliasKey)
+			aliasTree.Add("Target: " + alias.Target)
 		}
 	}
 	if app.Spec.Node.Spec.Image != "" {
 		node := spec.Add("Node")
+
+		nodeMeta := node.Add("Meta")
+		populateMeta(nodeMeta, &app.Spec.Node.Meta)
+
 		nodeSpec := node.Add("Spec")
+
 		nodeSpec.Add("Image: " + app.Spec.Node.Spec.Image)
+
 		if len(app.Spec.Node.Spec.Environment) > 0 {
 			env := spec.Add("Environment")
 			for name, value := range app.Spec.Types {
@@ -51,6 +59,19 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 			}
 		}
 		nodeSpec.Add(fmt.Sprintf("Replicas: %d", app.Spec.Node.Spec.Replicas))
+
+		sidecarPort := nodeSpec.Add("SidecarPort")
+		sidecarPort.Add(fmt.Sprintf("LBRead: %d", app.Spec.Node.Spec.SidecarPort.LBRead))
+		sidecarPort.Add(fmt.Sprintf("LBWrite: %d", app.Spec.Node.Spec.SidecarPort.LBWrite))
+
+		if len(app.Spec.Node.Spec.Ports) > 0 {
+			ports := spec.Add("Ports")
+			for index, nodePort := range app.Spec.Node.Spec.Ports {
+				npIndex := ports.Add(strconv.Itoa(index))
+				npIndex.Add(fmt.Sprintf("Port: %d", nodePort.Port))
+				npIndex.Add(fmt.Sprintf("TargetPort: %d", nodePort.TargetPort))
+			}
+		}
 
 	}
 	if len(app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)) > 0 {
@@ -69,6 +90,16 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 		}
 	}
 
+	auth := spec.Add("Auth")
+	auth.Add("Scope: " + app.Spec.Auth.Scope)
+
+	if len(app.Spec.Auth.Permissions) > 0 {
+		permissions := auth.Add("Permissions")
+		for _, permission := range app.Spec.Auth.Permissions {
+			permissions.Add(permission)
+		}
+	}
+
 	fmt.Fprintln(out, tree.Print())
 
 }
@@ -83,10 +114,26 @@ func PrintChannelTree(ch *meta.Channel, out io.Writer) {
 	spec := channel.Add("Spec")
 	spec.Add("Type: " + ch.Spec.Type)
 
+	if len(ch.Spec.BrokerPriorityList) > 0 {
+		brokerList := spec.Add("BrokerPriorityList")
+		for _, broker := range ch.Spec.BrokerPriorityList {
+			brokerList.Add(broker)
+		}
+	}
+
+	spec.Add("SelectedBroker: " + ch.Spec.SelectedBroker)
+
 	if len(ch.ConnectedApps) > 0 {
 		conApps := channel.Add("ConnectedApps")
 		for _, appName := range ch.ConnectedApps {
 			conApps.Add(appName)
+		}
+	}
+
+	if len(ch.ConnectedAliases) > 0 {
+		conAliases := channel.Add("ConnectedAliases")
+		for _, alias := range ch.ConnectedAliases {
+			conAliases.Add(alias)
 		}
 	}
 

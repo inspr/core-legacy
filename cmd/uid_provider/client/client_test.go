@@ -13,10 +13,10 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 var redisServer *miniredis.Miniredis
@@ -102,8 +102,9 @@ func TestClient_CreateUser(t *testing.T) {
 				uid: auxUser2.UID,
 				pwd: auxUser2.Password,
 				newUser: User{
-					UID:      "user3",
-					Password: "u3pwd",
+					UID:         "user3",
+					Password:    "u3pwd",
+					Permissions: map[string][]string{"ascope.bscope": {auth.UpdateAlias, auth.CreateAlias}},
 				},
 			},
 			wantErr: true,
@@ -600,7 +601,7 @@ func Test_hasPermission(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "User has admin permisson",
+			name: "User has admin permission",
 			args: args{
 				uid: "user1",
 				pwd: "none",
@@ -635,7 +636,7 @@ func Test_hasPermission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := hasPermission(auxCtx, redisClient.rdb, tt.args.uid, tt.args.pwd)
+			err := hasPermission(auxCtx, redisClient.rdb, tt.args.uid, tt.args.pwd, auxUser, true)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -812,7 +813,7 @@ func mockRedis() *miniredis.Miniredis {
 }
 
 func insprServerHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		rest.ERROR(w, fmt.Errorf("method should be POST"))
 	}
 	data := auth.Payload{}
@@ -831,4 +832,56 @@ func insprServerHandler(w http.ResponseWriter, r *http.Request) {
 		Token: []byte(token),
 	}
 	rest.JSON(w, 200, val)
+}
+
+func Test_isPermissionAllowed(t *testing.T) {
+	type args struct {
+		newUserPermissionScope   string
+		newUserPermissions       []string
+		requestorPermissionScope string
+		requestorPermissions     []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "requestor permissions are enough to create new user",
+			args: args{
+				newUserPermissionScope:   "a.b.c",
+				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
+				requestorPermissionScope: "a.b",
+				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel, auth.CreateToken},
+			},
+			want: true,
+		},
+		{
+			name: "requestor permissions (scope) are not enough to create new user",
+			args: args{
+				newUserPermissionScope:   "a.b.c",
+				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
+				requestorPermissionScope: "a.b.c.d",
+				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel},
+			},
+			want: false,
+		},
+		{
+			name: "requestor permissions (permissions) are not enough to create new user",
+			args: args{
+				newUserPermissionScope:   "a.b.c",
+				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
+				requestorPermissionScope: "a.b",
+				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isPermissionAllowed(tt.args.newUserPermissionScope, tt.args.requestorPermissionScope, tt.args.newUserPermissions, tt.args.requestorPermissions, true); got != tt.want {
+				t.Errorf("isPermissionAllowed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // AliasHandler - contains handlers that uses the AliasMemory interface methods
@@ -47,7 +47,7 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 			logger.Error("unable to create Alias",
 				zap.Any("alias", data.Alias),
 				zap.String("targed", data.Target),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -106,11 +106,11 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Alias get transaction")
 		ah.Memory.InitTransaction()
 
-		app, err := ah.Memory.Root().Alias().Get(scope, data.Key)
+		app, err := ah.Memory.Tree().Alias().Get(scope, data.Key)
 		if err != nil {
 			logger.Error("unable to get Alias",
 				zap.String("alias key", data.Key),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -148,7 +148,7 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 			logger.Error("unable to update Alias",
 				zap.Any("alias", data.Alias),
 				zap.String("targed", data.Target),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()
@@ -210,7 +210,7 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 		if err != nil {
 			logger.Error("unable to delete Alias",
 				zap.String("alias key", data.Key),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ah.Memory.Cancel()

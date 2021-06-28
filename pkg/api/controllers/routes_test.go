@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/fake"
-	authmock "github.com/inspr/inspr/pkg/auth/mocks"
+	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	authmock "inspr.dev/inspr/pkg/auth/mocks"
 )
 
 // TestServer_initRoutes - this test is a bit different than the one automatically
@@ -21,6 +21,7 @@ func TestServer_initRoutes(t *testing.T) {
 		Mux:           http.NewServeMux(),
 		MemoryManager: fake.MockMemoryManager(nil),
 		auth:          authmock.NewMockAuth(errors.New("unauthorized")),
+		BrokerManager: fake.MockBrokerManager(nil),
 	}
 	testServer.initRoutes()
 	defaultMethods := [...]string{
@@ -71,6 +72,26 @@ func TestServer_initRoutes(t *testing.T) {
 				http.StatusInternalServerError,
 				http.StatusInternalServerError,
 				http.StatusInternalServerError,
+				http.StatusMethodNotAllowed,
+			},
+		},
+		{
+			name: "brokers",
+			want: [...]int{
+				http.StatusOK,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+			},
+		},
+		{
+			name: "brokers/kafka",
+			want: [...]int{
+				http.StatusMethodNotAllowed,
+				http.StatusInternalServerError,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
 				http.StatusMethodNotAllowed,
 			},
 		},

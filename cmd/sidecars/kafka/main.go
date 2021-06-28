@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	kafkasc "github.com/inspr/inspr/cmd/sidecars/kafka/client"
-	"github.com/inspr/inspr/pkg/environment"
-	"github.com/inspr/inspr/pkg/sidecar/models"
-	sidecarserv "github.com/inspr/inspr/pkg/sidecar/server"
+	kafkasc "inspr.dev/inspr/cmd/sidecars/kafka/client"
+	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/meta/brokers"
+
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/sidecars/models"
+	sidecarserv "inspr.dev/inspr/pkg/sidecars/server"
 )
 
 var logger *zap.Logger
@@ -17,7 +19,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "kafka-sidecar-server")))
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "kafka-sidecar-server")))
 }
 
 func main() {
@@ -27,7 +29,7 @@ func main() {
 	var err error
 
 	logger.Info("instantiating Kafka Sidecar reader")
-	if len(environment.GetInputChannels()) != 0 {
+	if len(environment.GetInputChannelsData()) != 0 {
 		reader, err = kafkasc.NewReader()
 		if err != nil {
 			logger.Error("unable to instantiate Kafka Sidecar reader")
@@ -38,8 +40,8 @@ func main() {
 	}
 
 	logger.Info("instantiating Kafka Sidecar writer")
-	if len(environment.GetOutputChannels()) != 0 {
-		writer, err = kafkasc.NewWriter(false)
+	if len(environment.GetOutputChannelsData()) != 0 {
+		writer, err = kafkasc.NewWriter()
 		if err != nil {
 			logger.Error("unable to instantiate Kafka Sidecar writer")
 
@@ -47,11 +49,13 @@ func main() {
 			return
 		}
 	}
-	s := sidecarserv.NewServer()
 
 	logger.Info("initializing Kafka Sidecar server")
-	s.Init(reader, writer)
+	s := sidecarserv.Init(reader, writer, brokers.Kafka)
 
 	logger.Info("running Kafka Sidecar server")
-	s.Run(ctx)
+	err = s.Run(ctx)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
 }

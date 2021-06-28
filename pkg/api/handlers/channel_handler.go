@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // ChannelHandler - contains handlers that uses the ChannelMemory interface methods
@@ -45,7 +45,7 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("channel", data.Channel.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -103,11 +103,11 @@ func (ch *ChannelHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Channel get transaction")
 		ch.Memory.InitTransaction()
 
-		channel, err := ch.Memory.Root().Channels().Get(scope, data.ChName)
+		channel, err := ch.Memory.Tree().Channels().Get(scope, data.ChName)
 		if err != nil {
 			logger.Error("unable to get Channel",
 				zap.String("channel", data.ChName),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -144,7 +144,7 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 		if err != nil {
 			logger.Error("unable to update Channel",
 				zap.String("channel", data.Channel.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
@@ -206,14 +206,14 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 		if err != nil {
 			logger.Error("unable to delete Channel",
 				zap.String("channel", data.ChName),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			ch.Memory.Cancel()
 			return
 		}
 
-		changes, err := ch.Memory.Channels().GetTransactionChanges()
+		changes, err := ch.Memory.GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Channel delete request changes",
 				zap.Any("error", err))
@@ -233,10 +233,10 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 				return
 			}
 
-			logger.Info("committing Channel create changes")
+			logger.Info("committing Channel delete changes")
 			defer ch.Memory.Commit()
 		} else {
-			logger.Info("cancelling Channel create changes")
+			logger.Info("cancelling Channel delete changes")
 			defer ch.Memory.Cancel()
 		}
 

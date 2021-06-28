@@ -8,12 +8,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 func TestChannelClient_Delete(t *testing.T) {
@@ -59,7 +59,7 @@ func TestChannelClient_Delete(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "DELETE" {
+				if r.Method != http.MethodDelete {
 					t.Errorf("method is not DELETE")
 				}
 
@@ -150,7 +150,7 @@ func TestChannelClient_Get(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "GET" {
+				if r.Method != http.MethodGet {
 					t.Errorf("method is not GET")
 				}
 
@@ -249,7 +249,7 @@ func TestChannelClient_Create(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 
@@ -339,7 +339,7 @@ func TestChannelClient_Update(t *testing.T) {
 					t.Errorf("path is not channels")
 				}
 
-				if r.Method != "PUT" {
+				if r.Method != http.MethodPut {
 					t.Errorf("method is not PUT")
 				}
 

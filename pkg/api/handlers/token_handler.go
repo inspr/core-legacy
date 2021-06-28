@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // ControllerRefreshHandler handles requests for token refresing on inspr controllers on Insprd
@@ -27,7 +27,7 @@ func (h *Handler) ControllerRefreshHandler() rest.Handler {
 		// this is the path to the app
 		appQuery := string(received.RefreshToken)
 
-		app, err := h.Memory.Root().Apps().Get(appQuery)
+		app, err := h.Memory.Tree().Apps().Get(appQuery)
 		if err != nil {
 			log.Printf("err = %+v\n", err)
 			rest.ERROR(w, err)

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // AppMemoryManager implements the App interface
@@ -60,15 +60,15 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 	return nil, err
 }
 
-// Create instantiates a new dApp in the given context.
-// If the dApp's information is invalid, returns an error. The same goes for an invalid context.
-// In case of context being an empty string, the dApp is created inside the root dApp.
-func (amm *AppMemoryManager) Create(context string, app *meta.App) error {
+// Create instantiates a new dApp in the given scope.
+// If the dApp's information is invalid, returns an error. The same goes for an invalid scope.
+// In case of scope being an empty string, the dApp is created inside the root dApp.
+func (amm *AppMemoryManager) Create(scope string, app *meta.App) error {
 	logger.Info("trying to create a dApp",
 		zap.String("dApp", app.Meta.Name),
-		zap.String("context", context))
+		zap.String("scope", scope))
 
-	parentApp, err := amm.Get(context)
+	parentApp, err := amm.Get(scope)
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (amm *AppMemoryManager) Delete(query string) error {
 func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
 	logger.Info("trying to update a dApp",
 		zap.String("dApp", app.Meta.Name),
-		zap.String("in context", query))
+		zap.String("in scope", query))
 
 	logger.Debug("getting dApp to be updated")
 	currentApp, err := amm.Get(query)
@@ -183,9 +183,9 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
 	return nil
 }
 
-// AppRootGetter returns a getter that gets apps from the root structure of the app, without the current changes.
+// AppPermTreeGetter returns a getter that gets apps from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
-type AppRootGetter struct {
+type AppPermTreeGetter struct {
 	tree *meta.App
 }
 
@@ -194,7 +194,7 @@ type AppRootGetter struct {
 // The tree root dApp is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
+func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
 	logger.Info("trying to get a dApp (Root Getter)", zap.String("dApp", query))
 
 	if query == "" {
@@ -202,7 +202,7 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query: " + query).Build()
+	err := ierrors.NewError().NotFound().Message("dApp not found for given query '%v'", query).Build()
 
 	nextApp := amm.tree
 	if nextApp != nil {
@@ -221,7 +221,8 @@ func (amm *AppRootGetter) Get(query string) (*meta.App, error) {
 	return nil, err
 }
 
-//ResolveBoundary is the recursive method that resolves connections for dApp boundaries
+// ResolveBoundary is the recursive method that resolves connections for dApp boundaries
+// returns a map of boundary to  their respective resolved channel query
 func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
 	logger.Debug("resolving dApp boundary",
 		zap.String("dApp", app.Meta.Name))

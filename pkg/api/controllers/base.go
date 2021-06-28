@@ -5,10 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	"github.com/inspr/inspr/pkg/auth"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/pkg/auth"
 )
 
 var logger *zap.Logger
@@ -17,7 +18,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "insprd-api-controllers")))
+	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "insprd-api-controllers")))
 }
 
 // Server is a struct that contains the variables necessary
@@ -25,16 +26,18 @@ func init() {
 type Server struct {
 	Mux           *http.ServeMux
 	MemoryManager memory.Manager
+	BrokerManager brokers.Manager
 	op            operators.OperatorInterface
 	auth          auth.Auth
 }
 
 // Init - configures the server
-func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface, auth auth.Auth) {
+func (s *Server) Init(mm memory.Manager, op operators.OperatorInterface, auth auth.Auth, bm brokers.Manager) {
 	logger.Info("initializing Insprd server")
 
 	s.Mux = http.NewServeMux()
 	s.MemoryManager = mm
+	s.BrokerManager = bm
 	s.op = op
 	s.auth = auth
 	s.initRoutes()

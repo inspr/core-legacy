@@ -11,10 +11,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/rest"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 var server Server
@@ -88,7 +88,7 @@ func TestServer_Refresh(t *testing.T) {
 	// Private key in PEM format
 	privPEM := pem.EncodeToMemory(&privBlock)
 
-	// Configuring enviroment for tests
+	// Configuring environment for tests
 	os.Setenv("JWT_PRIVATE_KEY", string(privPEM))
 
 	server.Init()

@@ -6,10 +6,10 @@ import (
 	"errors"
 	"os"
 
-	"github.com/inspr/inspr/cmd/uid_provider/client"
-	"github.com/inspr/inspr/pkg/cmd"
-	build "github.com/inspr/inspr/pkg/cmd"
 	"gopkg.in/yaml.v2"
+	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/cmd"
+	build "inspr.dev/inspr/pkg/cmd"
 )
 
 type createUserOptionsDT struct {

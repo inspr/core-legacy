@@ -1,10 +1,10 @@
 package fake
 
 import (
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // MemManager is the api struct with the necessary implementations
@@ -61,8 +61,8 @@ func MockMemoryManager(failErr error) memory.Manager {
 	}
 }
 
-// Root mocks a root getter interface
-func (mm *MemManager) Root() memory.GetInterface {
+// Tree mocks a root getter interface
+func (mm *MemManager) Tree() memory.GetInterface {
 	return (*LookupMemManager)(mm)
 }
 

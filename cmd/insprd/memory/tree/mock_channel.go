@@ -1,7 +1,7 @@
 package tree
 
 import (
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // ChannelMockManager mocks a channel interface for testing
@@ -10,17 +10,17 @@ type ChannelMockManager struct {
 }
 
 // Get mocks a channel method for testing
-func (cmm *ChannelMockManager) Get(context string, chName string) (*meta.Channel, error) {
+func (cmm *ChannelMockManager) Get(scope, name string) (*meta.Channel, error) {
 	return nil, nil
 }
 
 // Create mocks a channel method for testing
-func (cmm *ChannelMockManager) Create(context string, ch *meta.Channel) error {
+func (cmm *ChannelMockManager) Create(scope string, ch *meta.Channel) error {
 	return nil
 }
 
 // Delete mocks a channel method for testing
-func (cmm *ChannelMockManager) Delete(context string, chName string) error {
+func (cmm *ChannelMockManager) Delete(scope, name string) error {
 	return nil
 }
 

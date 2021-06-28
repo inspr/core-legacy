@@ -8,10 +8,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 func TestAuthClient_GenerateToken(t *testing.T) {
@@ -62,7 +62,7 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 					t.Errorf("path is not auth")
 				}
 
-				if r.Method != "POST" {
+				if r.Method != http.MethodPost {
 					t.Errorf("method is not POST")
 				}
 

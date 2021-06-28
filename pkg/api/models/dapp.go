@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/inspr/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta"
 )
 
 // AppDI - Data Input(DI) format for requests that pass the app data
