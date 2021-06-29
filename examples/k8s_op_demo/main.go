@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/insprd/operators/nodes"
 	"inspr.dev/inspr/pkg/meta"
@@ -12,6 +13,7 @@ import (
 
 func main() {
 	mem := tree.GetTreeMemory()
+	bmm := brokers.GetBrokerMemory()
 	mem.InitTransaction()
 	err := mem.Types().Create("", &meta.Type{
 		Meta: meta.Metadata{
@@ -22,7 +24,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
+	brokers, err := bmm.Get()
+	if err != nil {
+		panic(err)
+	}
 	err = mem.Channels().Create("", &meta.Channel{
 		Meta: meta.Metadata{
 			Name: "ch1",
@@ -30,7 +35,7 @@ func main() {
 		Spec: meta.ChannelSpec{
 			Type: "type1",
 		},
-	})
+	}, brokers)
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +67,7 @@ func main() {
 				},
 			},
 		},
-	})
+	}, brokers)
 	if err != nil {
 		panic(err)
 	}
