@@ -8,7 +8,6 @@ import (
 
 	"inspr.dev/inspr/cmd/uid_provider/client"
 	"inspr.dev/inspr/pkg/cmd"
-	build "inspr.dev/inspr/pkg/cmd"
 )
 
 var cl client.UIDClient
@@ -20,7 +19,7 @@ type loginOptionsDT struct {
 
 var loginOptions = loginOptionsDT{}
 
-var loginCmd = build.NewCmd("login").WithDescription(
+var loginCmd = cmd.NewCmd("login").WithDescription(
 	"Log in to the Inspr UID provider and get a token.",
 ).WithExample(
 	"log in with your user and password",

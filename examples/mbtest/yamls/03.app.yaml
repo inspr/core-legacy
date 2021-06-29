@@ -8,7 +8,7 @@ spec:
     meta:
       name: multibrokerexample
     spec:
-      image: gcr.io/red-inspr/examples/mbtest:latest
+      image: gcr.io/insprlabs/examples/mbtest:latest
       replicas: 1
 
   boundary:

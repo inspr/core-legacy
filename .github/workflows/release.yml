@@ -33,7 +33,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@master
         with:
-          project_id: red-inspr
+          project_id: insprlabs
           export_default_credentials: true
 
       - name: Create file with GCR stuff

@@ -10,6 +10,10 @@
 	- added a readme describing the process of installation
 ---
   
+### #80 Story CORE-497 | Migrate cluster from "red-inspr" to "insprlabs"
+- misc:
+  - changed the tags of the dockers image, from red-inspr to insprlabs. Meaning that i changed the place in which the docker images are stored.
+
 ### #79 Story CORE-481 | Adding fields descriptions to the documentations in docs/yamls 
 - misc:
     - created the alias doc

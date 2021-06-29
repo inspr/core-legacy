@@ -37,11 +37,11 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
-secretRepository: gcr.io/red-inspr/uidp/redis/secret
+secretRepository: gcr.io/insprlabs/uidp/redis/secret
 secret:
   privateKeyName: redisprivatekey
   adminPassword: "123456"
-  adminToken: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjQ1NTAxMDEsInBheWxvYWQiOnsidWlkIjoiIiwicGVybWlzc2lvbnMiOnsiIjpbImNyZWF0ZTp0b2tlbiJdfSwicmVmcmVzaCI6bnVsbCwicmVmcmVzaHVybCI6IiJ9fQ.GIzCL96stqT6gj_S32R6-GXFn9uUdHJC9XN3LSI6O9ZDbaeK9_WHgNhX_Vh9mFsvr8K5GkwTS9Qs9ekSgRe4Tw
+  adminToken: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjQ4OTY1MDMsInBheWxvYWQiOnsidWlkIjoiIiwicGVybWlzc2lvbnMiOnsiIjpbImNyZWF0ZTp0b2tlbiJdfSwicmVmcmVzaCI6bnVsbCwicmVmcmVzaHVybCI6IiJ9fQ.TyGdgrPtTCc-m_1L0tGnPeJxmvhT498H0ei6IlfQeefWIgRAAmRxQVlVKf2zQT3KB3gh9FEe6HBhkBNXBgBlag
   # set this admin token from a token that contains full power over the cluster
 
 statefulset:
@@ -56,7 +56,7 @@ service:
   port: 80
   targetPort: 9001
 
-uidpRepository: gcr.io/red-inspr/uidp/redis/api
+uidpRepository: gcr.io/insprlabs/uidp/redis/api
 deployment:
   insprdAddr: "http://insprd-svc.default.svc"
   replicas: 1

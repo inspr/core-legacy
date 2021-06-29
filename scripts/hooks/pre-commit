@@ -2,7 +2,7 @@ all=0
 files=()
 for file in $(git diff --cached --name-only --diff-filter=ATMR --line-prefix=./ | grep "\.go\$")
 do
-	staticcheck -set_exit_status $file 2> /dev/null
+	staticcheck --no-stash -set_exit_status $file 2> /dev/null
 	if [[ $? -ne 0 ]]
 	then
 		all=1

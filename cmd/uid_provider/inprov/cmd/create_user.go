@@ -9,7 +9,6 @@ import (
 	"gopkg.in/yaml.v2"
 	"inspr.dev/inspr/cmd/uid_provider/client"
 	"inspr.dev/inspr/pkg/cmd"
-	build "inspr.dev/inspr/pkg/cmd"
 )
 
 type createUserOptionsDT struct {
@@ -22,7 +21,7 @@ type createUserOptionsDT struct {
 
 var createUsrOptions = createUserOptionsDT{}
 
-var createUserCmd = build.NewCmd(
+var createUserCmd = cmd.NewCmd(
 	"create { -yaml || -json || -u USR | -p PWD | -s SCOPES } <username> <password>",
 ).WithDescription(
 	"Creates a new user on the Insprd UID provider.",

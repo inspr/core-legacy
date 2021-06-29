@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: sidecar-kafka
-      image: "gcr.io/red-inspr/operator:latest"
+      image: "gcr.io/insprlabs/operator:latest"
       imagePullPolicy: Always
       env:
         - name: INSPR_APP_SCOPE
@@ -17,7 +17,7 @@ spec:
         - name: KAFKA_AUTO_OFFSET_RESET
           value: "earliest"
         - name: INSPR_SIDECAR_IMAGE
-          value: "gcr.io/red-inspr/inspr/sidecar/kafka:3610a43-dirty"
+          value: "gcr.io/insprlabs/inspr/sidecar/kafka:3610a43-dirty"
         - name: INSPR_APP_ID
           value: "abcdef"
         - name: "NODES_APPS_NAMESPACE"

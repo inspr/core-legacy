@@ -36,9 +36,9 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 | deployment.insprdName | Name of Insprd deployment  | insprd-deployment |
 | deployment.authName | Name of Auth Service deployment  | auth-deployment |
 | deployment.initKey | Key used to initialize the Auth Service  | "1234567890" |
-| insprdRepository | Insprd image  | gcr.io/red-inspr/insprd |
-| authRepository | Auth Service image | gcr.io/red-inspr/authsvc |
-| secretRepository | Secret Job Generator image  | gcr.io/red-inspr/secretgen |
+| insprdRepository | Insprd image  | gcr.io/insprlabs/insprd |
+| authRepository | Auth Service image | gcr.io/insprlabs/authsvc |
+| secretRepository | Secret Job Generator image  | gcr.io/insprlabs/secretgen |
 | service.type | Kubernetes Service type | ClusterIP |
 | service.authName | Auth Service Kubernetes Service name | insprd-svc |
 | service.insprdName | Insprd Kubernetes Service name | insprd-svc |
@@ -51,7 +51,7 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 | sidecarClient.writePort | Port which the Load Balancer Sidecar will receive write requests from the Sidecar Client | 3048 |
 | lbSidecar.port | Port which the Load Balancer Sidecar will receive read requests and redirect to the Sidecar Client | 3051 |
 | lbSidecar.readPort | Port which the Load Balancer Sidecar is running | 3047 |
-| lbsidecarImage | Load Balancer sidecar image | gcr.io/red-inspr/inspr/sidecar/lbsidecar |
+| lbsidecarImage | Load Balancer sidecar image | gcr.io/insprlabs/inspr/sidecar/lbsidecar |
 | insprAppsNamespace | Kubernetes namespace on which Inspr apps will be instantiated | default |
 
 ## Exposing Inspr via NGINX
