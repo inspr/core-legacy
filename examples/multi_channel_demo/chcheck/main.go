@@ -6,7 +6,7 @@ import (
 	"io"
 	"log"
 
-	"golang.org/x/net/context"
+	"context"
 	dappclient "inspr.dev/inspr/pkg/client"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
