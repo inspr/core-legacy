@@ -1,3 +1,3 @@
 build:
-	docker build -f Dockerfile -t gcr.io/red-inspr/examples/mbtest ../..
-	docker push gcr.io/red-inspr/examples/mbtest:latest
+	docker build -f Dockerfile -t gcr.io/insprlabs/examples/mbtest ../..
+	docker push gcr.io/insprlabs/examples/mbtest:latest

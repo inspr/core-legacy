@@ -9,7 +9,7 @@ spec:
         medium: Memory
   containers:
     - name: sidecar-kafka
-      image: gcr.io/red-inspr/inspr/sidecar/kafka:0b6a876-dirty
+      image: gcr.io/insprlabs/inspr/sidecar/kafka:0b6a876-dirty
       imagePullPolicy: Always
       volumeMounts:
         - name: inspr-volume
@@ -38,7 +38,7 @@ spec:
         - name: INSPR_APP_ID
           value: "abcdef"
     - name: app
-      image: gcr.io/red-inspr/inspr/sidecar/test:latest
+      image: gcr.io/insprlabs/inspr/sidecar/test:latest
       imagePullPolicy: Always
       volumeMounts:
         - name: inspr-volume
