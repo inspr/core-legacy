@@ -803,7 +803,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
@@ -812,8 +812,8 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Apps()
+			}
+			amm := mem.Apps()
 			got, err := amm.Get(tt.args.query)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
@@ -850,7 +850,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		args          args
 		wantErr       bool
 		want          *meta.App
-		checkFunction func(t *testing.T)
+		checkFunction func(t *testing.T, tmm *treeMemoryManager)
 	}{
 		{
 			name: "Creating app inside of root",
@@ -1439,8 +1439,8 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				},
 			},
 			wantErr: false,
-			checkFunction: func(t *testing.T) {
-				am := GetTreeMemory().Channels()
+			checkFunction: func(t *testing.T, tmm *treeMemoryManager) {
+				am := tmm.Channels()
 				ch, err := am.Get("app2.app7", "channel1")
 				if err != nil {
 					t.Errorf("cant get channel channel1")
@@ -1558,8 +1558,8 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				},
 			},
 			wantErr: false,
-			checkFunction: func(t *testing.T) {
-				am := GetTreeMemory().Types()
+			checkFunction: func(t *testing.T, tmm *treeMemoryManager) {
+				am := tmm.Types()
 				ct, err := am.Get("app2.app2", "ct1")
 				if err != nil {
 					t.Errorf("cant get Type ct1")
@@ -1829,7 +1829,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
@@ -1838,9 +1838,8 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			am := GetTreeMemory().Apps()
-			am.InitTransaction()
+			}
+			am := mem.Apps()
 			err := am.Create(tt.args.context, tt.args.app, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -1859,9 +1858,8 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			}
 
 			if tt.checkFunction != nil {
-				tt.checkFunction(t)
+				tt.checkFunction(t, mem.treeMemoryManager)
 			}
-			am.Cancel()
 		})
 	}
 }
@@ -1883,7 +1881,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 		args          args
 		wantErr       bool
 		want          *meta.App
-		checkFunction func(t *testing.T)
+		checkFunction func(t *testing.T, tmm *treeMemoryManager)
 	}{
 		{
 			name: "Deleting leaf app from root",
@@ -1974,8 +1972,8 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 				query: "app1.thenewapp",
 			},
 			wantErr: false,
-			checkFunction: func(t *testing.T) {
-				am := GetTreeMemory().Channels()
+			checkFunction: func(t *testing.T, tmm *treeMemoryManager) {
+				am := tmm.Channels()
 				ch, err := am.Get("app1", "ch1app1")
 				if err != nil {
 					t.Errorf("cant get channel ch1app1")
@@ -1988,7 +1986,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
@@ -1997,8 +1995,8 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			am := GetTreeMemory().Apps()
+			}
+			am := mem.Apps()
 			err := am.Delete(tt.args.query)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -2011,7 +2009,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 				}
 			}
 			if tt.checkFunction != nil {
-				tt.checkFunction(t)
+				tt.checkFunction(t, mem.treeMemoryManager)
 			}
 		})
 	}
@@ -2041,7 +2039,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 		args          args
 		wantErr       bool
 		want          *meta.App
-		checkFunction func(t *testing.T)
+		checkFunction func(t *testing.T, tmm *treeMemoryManager)
 	}{
 		{
 			name: "invalid- update changing apps' name",
@@ -2475,8 +2473,8 @@ func TestAppMemoryManager_Update(t *testing.T) {
 			},
 			wantErr: false,
 			want:    nil,
-			checkFunction: func(t *testing.T) {
-				am := GetTreeMemory().Channels()
+			checkFunction: func(t *testing.T, tmm *treeMemoryManager) {
+				am := tmm.Channels()
 
 				ch, err := am.Get("app1", "ch1app1")
 				if err != nil {
@@ -2491,7 +2489,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
@@ -2500,8 +2498,8 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			am := GetTreeMemory().Apps()
+			}
+			am := mem.Apps()
 			err := am.Update(tt.args.query, tt.args.app, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
@@ -2520,7 +2518,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				}
 			}
 			if tt.checkFunction != nil {
-				tt.checkFunction(t)
+				tt.checkFunction(t, mem.treeMemoryManager)
 			}
 		})
 	}
@@ -2662,7 +2660,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
@@ -2671,8 +2669,8 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Apps()
+			}
+			amm := mem.Apps()
 			got, err := amm.ResolveBoundary(tt.args.app)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.ResolveBoundary() error = %v, wantErr %v", err, tt.wantErr)
@@ -2742,13 +2740,13 @@ func TestAppMemoryManager_removeFromParentBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: getMockApp(),
 					tree: getMockApp(),
 				},
-			})
-			amm := GetTreeMemory().Apps().(*AppMemoryManager)
+			}
+			amm := mem.Apps().(*AppMemoryManager)
 			amm.removeFromParentBoundary(tt.args.app, tt.args.parent)
 			if !metautils.CompareWithoutUUID(tt.args.parent.Spec.Channels, tt.want) {
 				t.Errorf("removeFromParentBoundary() result =\n%#v, want\n%#v", tt.args.parent.Spec.Channels, tt.want)

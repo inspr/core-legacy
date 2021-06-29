@@ -232,6 +232,7 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 // ChannelPermTreeGetter returns a getter that gets channels from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
 type ChannelPermTreeGetter struct {
+	*PermTreeGetter
 }
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
@@ -243,7 +244,7 @@ func (cmm *ChannelPermTreeGetter) Get(scope, name string) (*meta.Channel, error)
 		zap.String("channel", name),
 		zap.String("scope", scope))
 
-	parentApp, err := GetTreeMemory().Tree().Apps().Get(scope)
+	parentApp, err := cmm.Apps().Get(scope)
 	if err != nil {
 		newError := ierrors.
 			NewError().

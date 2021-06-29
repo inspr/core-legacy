@@ -259,13 +259,13 @@ func nodeIsEmpty(node meta.Node) bool {
 	return noAnnotations && noName && noParent && noImage
 }
 
-func getParentApp(childQuery string) (*meta.App, error) {
+func getParentApp(childQuery string, tmm *treeMemoryManager) (*meta.App, error) {
 	parentQuery, childName, err := metautils.RemoveLastPartInScope(childQuery)
 	if err != nil {
 		return nil, err
 	}
 
-	parentApp, err := GetTreeMemory().Apps().Get(parentQuery)
+	parentApp, err := tmm.Apps().Get(parentQuery)
 	if err != nil {
 		return nil, err
 	}

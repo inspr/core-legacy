@@ -48,7 +48,7 @@ func (tmm *TypeMemoryManager) Create(scope string, insprType *meta.Type) error {
 	}
 
 	logger.Debug("getting Type parent dApp")
-	parentApp, err := GetTreeMemory().Apps().Get(scope)
+	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).InvalidType().
 			Message("couldn't create Type %v : %v", insprType.Meta.Name, err.Error()).
@@ -75,7 +75,7 @@ func (tmm *TypeMemoryManager) Get(scope, name string) (*meta.Type, error) {
 		zap.String("type", name),
 		zap.String("scope", scope))
 
-	parentApp, err := GetTreeMemory().Apps().Get(scope)
+	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
 		return nil, ierrors.NewError().BadRequest().InnerError(err).
 			Message("target dApp doesn't exist").Build()
@@ -121,7 +121,7 @@ func (tmm *TypeMemoryManager) Delete(scope, name string) error {
 			Build()
 	}
 
-	parentApp, err := GetTreeMemory().Apps().Get(scope)
+	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
 		return ierrors.NewError().InternalServer().InnerError(err).
 			Message("target app doesn't exist").Build()
@@ -153,7 +153,7 @@ func (tmm *TypeMemoryManager) Update(scope string, insprType *meta.Type) error {
 	insprType.ConnectedChannels = oldChType.ConnectedChannels
 	insprType.Meta.UUID = oldChType.Meta.UUID
 
-	parentApp, err := GetTreeMemory().Apps().Get(scope)
+	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
 		return ierrors.NewError().InternalServer().InnerError(err).
 			Message("target app doesn't exist").Build()
@@ -169,7 +169,9 @@ func (tmm *TypeMemoryManager) Update(scope string, insprType *meta.Type) error {
 
 // TypePermTreeGetter returns a getter that gets Types from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
-type TypePermTreeGetter struct{}
+type TypePermTreeGetter struct {
+	*PermTreeGetter
+}
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
 // memory tree until it finds the Type which name is equal to the last query element.
@@ -180,7 +182,7 @@ func (trg *TypePermTreeGetter) Get(scope, name string) (*meta.Type, error) {
 		zap.String("type", name),
 		zap.String("scope", scope))
 
-	parentApp, err := GetTreeMemory().Tree().Apps().Get(scope)
+	parentApp, err := trg.Apps().Get(scope)
 	if err != nil {
 		return nil, ierrors.
 			NewError().

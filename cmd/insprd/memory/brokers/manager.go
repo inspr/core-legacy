@@ -24,7 +24,7 @@ type brokerMemoryManager struct {
 	broker  *brokers.Brokers
 }
 
-var brokerMemory Manager
+var brokerMemory *brokerMemoryManager
 
 // GetBrokerMemory allows for connection with BrokersManager sigleton
 func GetBrokerMemory() Manager {
@@ -37,10 +37,4 @@ func GetBrokerMemory() Manager {
 		}
 	}
 	return brokerMemory
-}
-
-// ResetBrokerMemory makes the BrokersManagers singleton points to nil,
-// used only in tests
-func ResetBrokerMemory() {
-	brokerMemory = nil
 }

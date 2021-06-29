@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/sidecars"
 	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/meta"
@@ -250,11 +249,7 @@ func Test_nodeIsEmpty(t *testing.T) {
 
 func Test_getParentApp(t *testing.T) {
 	type fields struct {
-		root   *meta.App
-		appErr error
-		mockC  bool
-		mockCT bool
-		mockA  bool
+		root *meta.App
 	}
 	type args struct {
 		sonQuery string
@@ -269,11 +264,7 @@ func Test_getParentApp(t *testing.T) {
 		{
 			name: "Parent is the root",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				sonQuery: "app1",
@@ -284,11 +275,7 @@ func Test_getParentApp(t *testing.T) {
 		{
 			name: "Parent is another app",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				sonQuery: "app2.app3",
@@ -299,11 +286,7 @@ func Test_getParentApp(t *testing.T) {
 		{
 			name: "invalidquery",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				sonQuery: "invalid.query",
@@ -314,17 +297,11 @@ func Test_getParentApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
-			})
-			got, err := getParentApp(tt.args.sonQuery)
+			tmm := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
+			}
+			got, err := getParentApp(tt.args.sonQuery, tmm)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getParentApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -769,7 +746,7 @@ func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
@@ -778,8 +755,8 @@ func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Apps().(*AppMemoryManager)
+			}
+			amm := mem.Apps().(*AppMemoryManager)
 			err := amm.connectAppBoundary(tt.args.app)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.connectAppsThroughAliases() error = %v, wantErr %v", err, tt.wantErr)
@@ -849,7 +826,7 @@ func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
@@ -858,8 +835,8 @@ func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Apps().(*AppMemoryManager)
+			}
+			amm := mem.Apps().(*AppMemoryManager)
 			if err := amm.connectAppsBoundaries(tt.args.app); (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.connectAppsBoundaries() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -1046,7 +1023,7 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
@@ -1055,8 +1032,8 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Apps().(*AppMemoryManager)
+			}
+			amm := mem.Apps().(*AppMemoryManager)
 			parentApp, _ := amm.Get(tt.args.parentApp)
 			amm.addAppInTree(tt.args.app, parentApp)
 		})
@@ -1344,7 +1321,6 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 				t.Errorf("SelectBrokerFromPriorityList() wanted error but got 'nil'")
 				return
 			}
-			brokers.ResetBrokerMemory()
 		})
 	}
 }

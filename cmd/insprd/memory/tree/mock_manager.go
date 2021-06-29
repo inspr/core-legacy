@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
@@ -72,17 +71,17 @@ func (tmm *MockManager) Tree() GetInterface {
 	}
 }
 
-// SetMockedTree receives a mock manager that has the configs of the
-// tree structure to be mocked and used in tests where tree access is needed
-func SetMockedTree(root *meta.App, appErr error, mockC, mockA, mockT bool) {
-	setTree(&MockManager{
-		treeMemoryManager: &treeMemoryManager{
-			root: root,
-			tree: root,
-		},
-		appErr: appErr,
-		mockC:  mockC,
-		mockA:  mockA,
-		mockCT: mockT,
-	})
-}
+// // SetMockedTree receives a mock manager that has the configs of the
+// // tree structure to be mocked and used in tests where tree access is needed
+// func SetMockedTree(root *meta.App, appErr error, mockC, mockA, mockT bool) {
+// 	setTree(&MockManager{
+// 		treeMemoryManager: &treeMemoryManager{
+// 			root: root,
+// 			tree: root,
+// 		},
+// 		appErr: appErr,
+// 		mockC:  mockC,
+// 		mockA:  mockA,
+// 		mockCT: mockT,
+// 	})
+// }

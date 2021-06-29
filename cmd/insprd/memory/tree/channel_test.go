@@ -123,7 +123,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
@@ -131,8 +131,8 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			chh := GetTreeMemory().Channels()
+			}
+			chh := mem.Channels()
 			got, err := chh.Get(tt.args.context, tt.args.chName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
@@ -164,7 +164,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 		args          args
 		wantErr       bool
 		want          *meta.Channel
-		checkFunction func() (bool, string)
+		checkFunction func(*treeMemoryManager) (bool, string)
 	}{
 		{
 			name: "It should create a new Channel on a valid App",
@@ -310,8 +310,8 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 			},
 			wantErr: false,
 			want:    nil,
-			checkFunction: func() (bool, string) {
-				am := GetTreeMemory().Types()
+			checkFunction: func(tmm *treeMemoryManager) (bool, string) {
+				am := tmm.Types()
 				ct, err := am.Get("", "type1")
 				if err != nil {
 					return false, "cant get type 'type1'"
@@ -354,7 +354,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
@@ -362,8 +362,8 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			chh := GetTreeMemory().Channels()
+			}
+			chh := mem.Channels()
 			err := chh.Create(tt.args.context, tt.args.ch, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -382,7 +382,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 				}
 			}
 			if tt.checkFunction != nil {
-				if passed, msg := tt.checkFunction(); !passed {
+				if passed, msg := tt.checkFunction(mem.treeMemoryManager); !passed {
 					t.Errorf("check function not passed: " + msg)
 				}
 			}
@@ -485,7 +485,7 @@ func TestChannelMemoryManager_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
@@ -493,8 +493,8 @@ func TestChannelMemoryManager_Delete(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			chh := GetTreeMemory().Channels()
+			}
+			chh := mem.Channels()
 			if err := chh.Delete(tt.args.context, tt.args.chName); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -619,7 +619,7 @@ func TestChannelMemoryManager_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
@@ -627,8 +627,8 @@ func TestChannelMemoryManager_Update(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			chh := GetTreeMemory().Channels()
+			}
+			chh := mem.Channels()
 			if err := chh.Update(tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return

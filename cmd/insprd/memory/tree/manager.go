@@ -15,8 +15,8 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "memory-tree")))
-	// logger = zap.NewNop()
+	// logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "memory-tree")))
+	logger = zap.NewNop()
 }
 
 // treeMemoryManager defines a memory manager interface
@@ -26,7 +26,7 @@ type treeMemoryManager struct {
 	sync.Mutex
 }
 
-var dapptree Manager
+var dapptree *treeMemoryManager
 
 // GetTreeMemory returns a memory manager interface
 func GetTreeMemory() Manager {
@@ -56,7 +56,7 @@ func newTreeMemory() *treeMemoryManager {
 	}
 }
 
-func setTree(tmm Manager) {
+func setTree(tmm *treeMemoryManager) {
 	dapptree = tmm
 }
 
@@ -99,17 +99,23 @@ func (t *PermTreeGetter) Apps() AppGetInterface {
 
 // Channels returns a getter for channels on the root.
 func (t *PermTreeGetter) Channels() ChannelGetInterface {
-	return &ChannelPermTreeGetter{}
+	return &ChannelPermTreeGetter{
+		PermTreeGetter: t,
+	}
 }
 
 // Types returns a getter for Types on the root
 func (t *PermTreeGetter) Types() TypeGetInterface {
-	return &TypePermTreeGetter{}
+	return &TypePermTreeGetter{
+		PermTreeGetter: t,
+	}
 }
 
 // Alias returns a getter for alias on the root
 func (t *PermTreeGetter) Alias() AliasGetInterface {
-	return &AliasPermTreeGetter{}
+	return &AliasPermTreeGetter{
+		PermTreeGetter: t,
+	}
 }
 
 // Tree returns a getter for objects on the tree without the current changes.

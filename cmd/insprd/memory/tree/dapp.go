@@ -119,7 +119,7 @@ func (amm *AppMemoryManager) Delete(query string) error {
 	if err != nil {
 		return err
 	}
-	parent, errParent := getParentApp(query)
+	parent, errParent := getParentApp(query, amm.treeMemoryManager)
 	if errParent != nil {
 		return errParent
 	}
@@ -161,7 +161,7 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App, brokers *apimod
 		return ierrors.NewError().InvalidApp().Message("dApp mustn't have a Node and other dApps at the same time").Build()
 	}
 
-	parent, errParent := getParentApp(query)
+	parent, errParent := getParentApp(query, amm.treeMemoryManager)
 	if errParent != nil {
 		return errParent
 	}

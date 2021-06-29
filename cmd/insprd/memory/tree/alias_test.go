@@ -34,6 +34,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 			tmm := &treeMemoryManager{
 				root: tt.fields.root,
 			}
+
 			if got := tmm.Alias(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MemoryManager.Alias() = %v, want %v", got, tt.want)
 			}
@@ -43,11 +44,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 
 func TestAliasMemoryManager_Create(t *testing.T) {
 	type fields struct {
-		root   *meta.App
-		appErr error
-		mockA  bool
-		mockC  bool
-		mockCT bool
+		root *meta.App
 	}
 	type args struct {
 		query          string
@@ -129,17 +126,11 @@ func TestAliasMemoryManager_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Alias()
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
+			}
+			amm := mem.Alias()
 			if err := amm.Create(tt.args.query, tt.args.targetBoundary, tt.args.alias); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -205,17 +196,12 @@ func TestAliasMemoryManager_Get(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Alias()
+
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
+			}
+			amm := mem.Alias()
 
 			got, err := amm.Get(tt.args.context, tt.args.aliasKey)
 			if (err != nil) != tt.wantErr {
@@ -303,17 +289,11 @@ func TestAliasMemoryManager_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Alias()
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
+			}
+			amm := mem.Alias()
 
 			if err := amm.Update(tt.args.context, tt.args.aliasKey, tt.args.alias); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
@@ -387,18 +367,13 @@ func TestAliasMemoryManager_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
-			})
 
-			amm := GetTreeMemory().Alias()
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
+			}
+
+			amm := mem.Alias()
 			if err := amm.Delete(tt.args.context, tt.args.aliasKey); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}

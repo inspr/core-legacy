@@ -121,7 +121,7 @@ func TestTypeMemoryManager_GetType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
@@ -129,8 +129,8 @@ func TestTypeMemoryManager_GetType(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			ctm := GetTreeMemory().Types()
+			}
+			ctm := mem.Types()
 			got, err := ctm.Get(tt.args.context, tt.args.ctName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TypeMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
@@ -284,7 +284,7 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
@@ -292,8 +292,8 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			ctm := GetTreeMemory().Types()
+			}
+			ctm := mem.Types()
 			err := ctm.Create(tt.args.context, tt.args.ct)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TypeMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -410,7 +410,7 @@ func TestTypeMemoryManager_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
@@ -418,8 +418,8 @@ func TestTypeMemoryManager_Delete(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			ctm := GetTreeMemory().Types()
+			}
+			ctm := mem.Types()
 			if err := ctm.Delete(tt.args.context, tt.args.ctName); (err != nil) != tt.wantErr {
 				t.Errorf("TypeMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -538,7 +538,7 @@ func TestTypeMemoryManager_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
+			mem := &MockManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
@@ -546,8 +546,8 @@ func TestTypeMemoryManager_Update(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			ctm := GetTreeMemory().Types()
+			}
+			ctm := mem.Types()
 			if err := ctm.Update(tt.args.context, tt.args.ct); (err != nil) != tt.wantErr {
 				t.Errorf("TypeMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
