@@ -14,6 +14,7 @@
 - fixes:
     - fixed all tests
     - fixed k8s operator example to comply with new data injected methods
+---
 
 ### #80 Story CORE-497 | Migrate cluster from "red-inspr" to "insprlabs"
 - misc:
