@@ -14,6 +14,8 @@
 - fixes:
     - fixed all tests
     - fixed k8s operator example to comply with new data injected methods
+- misc:
+    - added multiplexers to protect broker data structure
 ---
 
 ### #80 Story CORE-497 | Migrate cluster from "red-inspr" to "insprlabs"
