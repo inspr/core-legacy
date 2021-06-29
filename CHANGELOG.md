@@ -6,9 +6,9 @@
     - design new general memory manager to provide a single access point to all memory for Insprd
     - implemented new general MemoryManager by injecting both tree and brokers managers into it.
     - removed all broker dependency from tree managing structure
-    - injected nescessary broker information into tree managing metheds
-    - refactored singletons to allocate managin structs instead of interfaces to better fit the pattern
-    - removed all access points to tree memory manager through the singleton from the tree managing methods, replaced it's uses to the access point that already existed iside each structure specific manager
+    - injected necessary broker information into tree managing metheds that require it
+    - refactored singletons to allocate managing structs instead of interfaces to better fit the pattern
+    - removed all access points to tree memory manager through the singleton from the tree managing methods, replaced it's uses to the access point that already existed inside each structure specific manager
     - improved structure specific permanent tree getters to be capable of connecting back to the general permanent tree getter
     - removed all access points to tree memory manager through the singleton from the structure specific permanent tree getters
 - fixes:
