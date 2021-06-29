@@ -6,8 +6,8 @@ import (
 
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/sidecars"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/meta"
-	metabrokers "inspr.dev/inspr/pkg/meta/brokers"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
 	"inspr.dev/inspr/pkg/utils"
 )
@@ -16,6 +16,7 @@ func Test_validAppStructure(t *testing.T) {
 	type args struct {
 		app       meta.App
 		parentApp meta.App
+		brokers   *apimodels.BrokersDI
 	}
 	tests := []struct {
 		name    string
@@ -25,6 +26,10 @@ func Test_validAppStructure(t *testing.T) {
 		{
 			name: "All valid structures",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: meta.App{
 					Meta: meta.Metadata{
 						Name:        "app5",
@@ -61,6 +66,10 @@ func Test_validAppStructure(t *testing.T) {
 		{
 			name: "invalidapp name - empty",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: meta.App{
 					Meta: meta.Metadata{
 						Name:        "",
@@ -98,6 +107,10 @@ func Test_validAppStructure(t *testing.T) {
 		{
 			name: "invalidapp substructure",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: meta.App{
 					Meta: meta.Metadata{
 						Name:        "app5",
@@ -137,6 +150,10 @@ func Test_validAppStructure(t *testing.T) {
 		{
 			name: "invalidapp - parent has Node structure",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: meta.App{
 					Meta: meta.Metadata{
 						Name:        "app4",
@@ -174,7 +191,7 @@ func Test_validAppStructure(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validAppStructure(&tt.args.app, &tt.args.parentApp)
+			err := validAppStructure(&tt.args.app, &tt.args.parentApp, tt.args.brokers)
 			if tt.wantErr && (err == nil) {
 				t.Errorf("validAppStructure(): wanted error but received 'nil'")
 				return
@@ -321,7 +338,8 @@ func Test_getParentApp(t *testing.T) {
 
 func Test_checkAndUpdates(t *testing.T) {
 	type args struct {
-		app *meta.App
+		app     *meta.App
+		brokers *apimodels.BrokersDI
 	}
 	tests := []struct {
 		name    string
@@ -331,6 +349,10 @@ func Test_checkAndUpdates(t *testing.T) {
 		{
 			name: "valid channel structure - it shouldn't return a error",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
@@ -402,6 +424,10 @@ func Test_checkAndUpdates(t *testing.T) {
 		{
 			name: "invalid channel: using non-existent type",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
@@ -474,6 +500,10 @@ func Test_checkAndUpdates(t *testing.T) {
 		{
 			name: "invalid channel structure - it should return a name channel error",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
@@ -546,6 +576,10 @@ func Test_checkAndUpdates(t *testing.T) {
 		{
 			name: "valid channel structure - it shouldn't return a error",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
@@ -618,7 +652,7 @@ func Test_checkAndUpdates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := checkAndUpdates(tt.args.app)
+			err := checkAndUpdates(tt.args.app, tt.args.brokers)
 			if tt.wantErr && (err == nil) {
 				t.Errorf("checkAndUpdates(): wanted error but received 'nil'")
 				return
@@ -1250,69 +1284,52 @@ var kafkaStructMock = sidecars.KafkaConfig{
 func TestSelectBrokerFromPriorityList(t *testing.T) {
 	type args struct {
 		brokerList []string
+		brokers    *apimodels.BrokersDI
 	}
 	tests := []struct {
 		name    string
 		args    args
 		want    string
 		wantErr bool
-		before  func()
 	}{
 		{
 			name: "Should return the first available broker",
 			args: args{
-				brokerList: []string{metabrokers.Kafka},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
+				brokerList: []string{"some_broker"},
 			},
-			want: metabrokers.Kafka,
-			before: func() {
-				bmm := brokers.GetBrokerMemory()
-				bmm.Create(&kafkaStructMock)
-				bmm.SetDefault(metabrokers.Kafka)
-			},
+			want: "some_broker",
 		},
 		{
-			name: "Invalid - Brokers in broker list are no supported",
+			name: "Should return the default broker",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				brokerList: []string{"fakeBroker"},
 			},
-			want:    metabrokers.Kafka,
-			wantErr: true,
-			before: func() {
-				bmm := brokers.GetBrokerMemory()
-				bmm.Create(&kafkaStructMock)
-			},
+			want:    "some_broker",
+			wantErr: false,
 		},
-		// {
-		// 	name: "Should return the default broker",
-		// 	args: args{
-		// 		brokerList: []string{"A", "Broker_B"},
-		// 	},
-		// 	want: "Broker_A",
-		// 	before: func() {
-		// 		bmm := brokers.GetBrokerMemory()
-		// 		bmm.Create("Broker_A", nil)
-		// 		bmm.SetDefault("Broker_A")
-		// 	},
-		// },
-		// {
-		// 	name: "Should return the default broker when priority list is empty",
-		// 	args: args{
-		// 		brokerList: []string{},
-		// 	},
-		// 	want: "Broker_A",
-		// 	before: func() {
-		// 		bmm := brokers.GetBrokerMemory()
-		// 		bmm.Create("Broker_A", nil)
-		// 		bmm.SetDefault("Broker_A")
-		// 	},
-		// },
+		{
+			name: "Should return the default broker when priority list is empty",
+			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
+				brokerList: []string{},
+			},
+			want: "some_broker",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.before != nil {
-				tt.before()
-			}
-			got, err := SelectBrokerFromPriorityList(tt.args.brokerList)
+			got, err := SelectBrokerFromPriorityList(tt.args.brokerList, tt.args.brokers)
 
 			if !tt.wantErr && (err != nil) {
 				t.Errorf("SelectBrokerFromPriorityList() error %v", err)

@@ -6,6 +6,7 @@ import (
 
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/sidecars"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
@@ -826,9 +827,9 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 }
 
 func TestAppMemoryManager_Create(t *testing.T) {
-	kafkaConfig := sidecars.KafkaConfig{}
-	bmm := brokers.GetBrokerMemory()
-	bmm.Create(&kafkaConfig)
+	// kafkaConfig := sidecars.KafkaConfig{}
+	// bmm := brokers.GetBrokerMemory()
+	// bmm.Create(&kafkaConfig)
 
 	type fields struct {
 		root   *meta.App
@@ -841,6 +842,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		app         *meta.App
 		context     string
 		searchQuery string
+		brokers     *apimodels.BrokersDI
 	}
 	tests := []struct {
 		name          string
@@ -860,6 +862,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "",
 				searchQuery: "appCr1",
 				app: &meta.App{
@@ -913,6 +919,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "app2",
 				searchQuery: "app2.appCr2-1",
 				app: &meta.App{
@@ -966,6 +976,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "invalidCtx",
 				searchQuery: "invalidCtx.invalidApp",
 				app: &meta.App{
@@ -1001,6 +1015,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "appNode",
 				searchQuery: "appNode.appInvalidWithNode",
 				app: &meta.App{
@@ -1036,6 +1054,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "",
 				searchQuery: "app2",
 				app: &meta.App{
@@ -1071,6 +1093,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "app2",
 				searchQuery: "app2.app2",
 				app: &meta.App{
@@ -1124,6 +1150,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "app2",
 				searchQuery: "app2.app2",
 				app: &meta.App{
@@ -1177,6 +1207,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "app2",
 				searchQuery: "app2.app2",
 				app: &meta.App{
@@ -1212,6 +1246,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "app2",
 				searchQuery: "app2.app2",
 				app: &meta.App{
@@ -1260,6 +1298,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "app2",
 				searchQuery: "app2.app2",
 				app: &meta.App{
@@ -1335,6 +1377,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context: "app2",
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -1415,6 +1461,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context: "app2",
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -1465,6 +1515,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context: "app2",
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -1525,6 +1579,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "",
 				searchQuery: "appCr1",
 				app: &meta.App{
@@ -1560,6 +1618,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "app2",
 				searchQuery: "app2.app2",
 				app: &meta.App{
@@ -1635,6 +1697,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "app2",
 				searchQuery: "app2.app2",
 				app: &meta.App{
@@ -1690,6 +1756,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				context:     "app2",
 				searchQuery: "app2.app2",
 				app: &meta.App{
@@ -1771,7 +1841,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			})
 			am := GetTreeMemory().Apps()
 			am.InitTransaction()
-			err := am.Create(tt.args.context, tt.args.app)
+			err := am.Create(tt.args.context, tt.args.app, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -1825,6 +1895,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+
 				query: "app1.thenewapp",
 			},
 			wantErr: false,
@@ -1960,8 +2031,9 @@ func TestAppMemoryManager_Update(t *testing.T) {
 		updated bool
 	}
 	type args struct {
-		app   *meta.App
-		query string
+		app     *meta.App
+		query   string
+		brokers *apimodels.BrokersDI
 	}
 	tests := []struct {
 		name          string
@@ -1981,6 +2053,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				query: "app1",
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -2030,6 +2106,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				query: "app1",
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -2092,6 +2172,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				query: "app1",
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -2143,6 +2227,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				query: "app1",
 				app:   getMockApp().Spec.Apps["app1"],
 			},
@@ -2160,6 +2248,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				updated: true,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				query: "app1",
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -2309,6 +2401,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				mockA:  false,
 			},
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 				query: "app1",
 				app: &meta.App{
 					Meta: meta.Metadata{
@@ -2406,7 +2502,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				mockCT: tt.fields.mockCT,
 			})
 			am := GetTreeMemory().Apps()
-			err := am.Update(tt.args.query, tt.args.app)
+			err := am.Update(tt.args.query, tt.args.app, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -23,8 +23,10 @@ func TestBrokersMemoryManager_Get(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "getall from empty brokerMM",
-			want:    nil,
+			name: "getall from empty brokerMM",
+			want: &apimodels.BrokersDI{
+				Available: []string{},
+			},
 			wantErr: false,
 		},
 	}

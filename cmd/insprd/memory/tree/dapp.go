@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"go.uber.org/zap"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
@@ -62,7 +63,7 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 // Create instantiates a new dApp in the given scope.
 // If the dApp's information is invalid, returns an error. The same goes for an invalid scope.
 // In case of scope being an empty string, the dApp is created inside the root dApp.
-func (amm *AppMemoryManager) Create(scope string, app *meta.App) error {
+func (amm *AppMemoryManager) Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	logger.Info("trying to create a dApp",
 		zap.String("dApp", app.Meta.Name),
 		zap.String("scope", scope))
@@ -78,7 +79,7 @@ func (amm *AppMemoryManager) Create(scope string, app *meta.App) error {
 	}
 
 	logger.Debug("checking dApp structure")
-	appErr := amm.checkApp(app, parentApp)
+	appErr := amm.checkApp(app, parentApp, brokers)
 	if appErr != nil {
 		logger.Error("unable to create dApp - invalid structure")
 		return appErr
@@ -139,7 +140,7 @@ func (amm *AppMemoryManager) Delete(query string) error {
 // Update receives a pointer to a dApp and the path to where this dApp is inside the memory tree.
 // If the current dApp is found and the new structure is valid, it's updated.
 // Otherwise, returns an error.
-func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
+func (amm *AppMemoryManager) Update(query string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	logger.Info("trying to update a dApp",
 		zap.String("dApp", app.Meta.Name),
 		zap.String("in scope", query))
@@ -165,7 +166,7 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
 		return errParent
 	}
 
-	appErr := amm.checkApp(app, parent)
+	appErr := amm.checkApp(app, parent, brokers)
 	if appErr != nil {
 		logger.Error("unable to update dApp - invalid structure")
 		return appErr

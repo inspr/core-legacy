@@ -47,7 +47,16 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 		logger.Debug("initiating dApp create transaction")
 		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Tree().Apps().Create(scope, &data.App)
+		brokers, err := ah.Memory.Brokers().Get()
+		if err != nil {
+			logger.Error("unable to get broker data",
+				zap.Any("error", err))
+			rest.ERROR(w, err)
+			ah.Memory.Tree().Cancel()
+			return
+		}
+
+		err = ah.Memory.Tree().Apps().Create(scope, &data.App, brokers)
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("dApp", data.App.Meta.Name),
@@ -146,7 +155,16 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 		logger.Debug("initiating dApp update transaction")
 		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Tree().Apps().Update(scope, &data.App)
+		brokers, err := ah.Memory.Brokers().Get()
+		if err != nil {
+			logger.Error("unable to get broker data",
+				zap.Any("error", err))
+			rest.ERROR(w, err)
+			ah.Memory.Tree().Cancel()
+			return
+		}
+
+		err = ah.Memory.Tree().Apps().Update(scope, &data.App, brokers)
 		if err != nil {
 			logger.Error("unable to update dApp",
 				zap.String("dApp", data.App.Meta.Name),

@@ -258,7 +258,7 @@ func TestAppHandler_HandleGet(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Tree().Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
+			tt.ah.Memory.Tree().Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}}, &models.BrokersDI{})
 
 			client := ts.Client()
 			req, _ := http.NewRequest(
@@ -291,7 +291,7 @@ func TestAppHandler_HandleUpdate(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Tree().Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
+			tt.ah.Memory.Tree().Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}}, &models.BrokersDI{})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -316,7 +316,7 @@ func TestAppHandler_HandleDelete(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Tree().Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}})
+			tt.ah.Memory.Tree().Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}}, &models.BrokersDI{})
 
 			client := ts.Client()
 			req, _ := http.NewRequest(

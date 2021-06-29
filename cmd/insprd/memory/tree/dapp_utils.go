@@ -39,15 +39,15 @@ func SelectBrokerFromPriorityList(brokerList []string, brokers *apimodels.Broker
 
 // checkApp is used when creating or updating dApps. It verifies if the dApp structure
 // is valid, not consideing boundary resolution.
-func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
-	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp)
+func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
+	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp, brokers)
 	if structureErrors != nil {
 		return structureErrors
 	}
 	return nil
 }
 
-func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App) error {
+func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
@@ -58,9 +58,9 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App
 		app.Spec.Node.Meta.Parent = parentScope
 	}
 
-	merr.Add(validAppStructure(app, parentApp))
+	merr.Add(validAppStructure(app, parentApp, brokers))
 	for _, childApp := range app.Spec.Apps {
-		merr.Add(amm.recursiveCheckAndRefineApp(childApp, app))
+		merr.Add(amm.recursiveCheckAndRefineApp(childApp, app, brokers))
 	}
 
 	if !merr.Empty() {
@@ -70,7 +70,7 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App
 	return nil
 }
 
-func validAppStructure(app, parentApp *meta.App) error {
+func validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
@@ -89,7 +89,7 @@ func validAppStructure(app, parentApp *meta.App) error {
 			Build())
 	}
 
-	merr.Add(checkAndUpdates(app))
+	merr.Add(checkAndUpdates(app, brokers))
 	merr.Add(validAliases(app))
 
 	if !merr.Empty() {
@@ -280,7 +280,7 @@ func getParentApp(childQuery string) (*meta.App, error) {
 	return parentApp, err
 }
 
-func checkAndUpdates(app *meta.App) error {
+func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 	boundaries := app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)
 	channels := app.Spec.Channels
 	types := app.Spec.Types
@@ -324,7 +324,7 @@ func checkAndUpdates(app *meta.App) error {
 				types[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
 			}
 
-			broker, err := SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList)
+			broker, err := SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList, brokers)
 			if err != nil {
 				return err
 			}

@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"inspr.dev/inspr/cmd/insprd/memory/fake"
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/auth"
 	authmock "inspr.dev/inspr/pkg/auth/mocks"
 	"inspr.dev/inspr/pkg/meta"
@@ -269,7 +270,10 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mem.Apps().Create("", tt.args.app)
+			mem.Apps().Create("", tt.args.app, &apimodels.BrokersDI{
+				Available: []string{"some_broker"},
+				Default:   "some_broker",
+			})
 			no := &NodeOperator{
 				clientSet: tt.fields.clientSet,
 				memory:    tt.fields.memory,

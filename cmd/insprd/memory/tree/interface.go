@@ -30,9 +30,9 @@ type ChannelGetInterface interface {
 type AppMemory interface {
 	TransactionInterface
 	AppGetInterface
-	Create(scope string, app *meta.App) error
+	Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error
 	Delete(query string) error
-	Update(query string, app *meta.App) error
+	Update(query string, app *meta.App, brokers *apimodels.BrokersDI) error
 	ResolveBoundary(app *meta.App) (map[string]string, error)
 }
 
