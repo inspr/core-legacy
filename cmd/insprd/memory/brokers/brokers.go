@@ -11,6 +11,8 @@ import (
 
 // Get returns the brokers configured data
 func (bmm *brokerMemoryManager) Get() (*apimodels.BrokersDI, error) {
+	bmm.availible.Lock()
+	defer bmm.availible.Unlock()
 	mem, err := bmm.get()
 	if err != nil {
 		return nil, err
@@ -30,6 +32,8 @@ func (bmm *brokerMemoryManager) get() (*brokers.Brokers, error) {
 
 // Create configures a new broker on insprd
 func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error {
+	bmm.availible.Lock()
+	defer bmm.availible.Unlock()
 	logger.Info("creating new broker")
 	mem, err := bmm.get()
 	if err != nil {
@@ -70,6 +74,8 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 
 // SetDefault sets a previously configured broker as insprd's default broker
 func (bmm *brokerMemoryManager) SetDefault(broker string) error {
+	bmm.def.Lock()
+	defer bmm.def.Unlock()
 	logger.Debug("setting new default broker",
 		zap.String("broker", broker))
 	mem, err := bmm.get()
