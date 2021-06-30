@@ -24,7 +24,7 @@ func init() {
 type brokerMemoryManager struct {
 	factory   SidecarManager
 	broker    *brokers.Brokers
-	availible sync.Mutex
+	available sync.Mutex
 	def       sync.Mutex
 }
 

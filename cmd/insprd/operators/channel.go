@@ -42,7 +42,7 @@ func (g GenOp) getOperator(scope, name string, deleteCmd bool) (ChannelOperatorI
 	// delete should get it's channel information from the unaltered tree,
 	// otherwise the channel wouldnt be found
 	if deleteCmd {
-		channel, err = g.memory.Tree().Channels().Get(scope, name)
+		channel, err = g.memory.Perm().Channels().Get(scope, name)
 		if err != nil {
 			return nil, err
 		}

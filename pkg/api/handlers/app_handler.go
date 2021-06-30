@@ -119,7 +119,7 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating dApp get transaction")
 		ah.Memory.Tree().InitTransaction()
 
-		app, err := ah.Memory.Tree().Tree().Apps().Get(scope)
+		app, err := ah.Memory.Tree().Perm().Apps().Get(scope)
 		if err != nil {
 			logger.Error("unable to get dApp",
 				zap.String("dApp query", scope),

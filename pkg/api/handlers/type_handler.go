@@ -94,7 +94,7 @@ func (th *TypeHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Type get transaction")
 		th.Memory.Tree().InitTransaction()
 
-		insprType, err := th.Memory.Tree().Tree().Types().Get(scope, data.TypeName)
+		insprType, err := th.Memory.Tree().Perm().Types().Get(scope, data.TypeName)
 		if err != nil {
 			logger.Error("unable to get Type",
 				zap.String("type-name", data.TypeName),

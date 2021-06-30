@@ -724,11 +724,7 @@ func TestMemoryManager_Apps(t *testing.T) {
 
 func TestAppMemoryManager_GetApp(t *testing.T) {
 	type fields struct {
-		root   *meta.App
-		appErr error
-		mockC  bool
-		mockCT bool
-		mockA  bool
+		root *meta.App
 	}
 	type args struct {
 		query string
@@ -743,11 +739,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 		{
 			name: "Getting root app",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				query: "",
@@ -758,11 +750,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 		{
 			name: "Getting a root's child app",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				query: "app1",
@@ -773,11 +761,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 		{
 			name: "Getting app inside non-root app",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				query: "app2.app3",
@@ -788,11 +772,7 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 		{
 			name: "Using invalid query",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				query: "app2.app9",
@@ -803,15 +783,9 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mem := &MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
 			}
 			amm := mem.Apps()
 			got, err := amm.Get(tt.args.query)
@@ -827,16 +801,8 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 }
 
 func TestAppMemoryManager_Create(t *testing.T) {
-	// kafkaConfig := sidecars.KafkaConfig{}
-	// bmm := brokers.GetBrokerMemory()
-	// bmm.Create(&kafkaConfig)
-
 	type fields struct {
-		root   *meta.App
-		appErr error
-		mockA  bool
-		mockC  bool
-		mockCT bool
+		root *meta.App
 	}
 	type args struct {
 		app         *meta.App
@@ -855,11 +821,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app inside of root",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -912,11 +874,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app inside of non-root app",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -969,11 +927,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app with invalid context",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1008,11 +962,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Invalid - Creating app inside of app with Node",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1047,11 +997,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app with conflicting name",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1086,11 +1032,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app with existing name but not in the same context",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1143,11 +1085,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app with valid boundary",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1200,11 +1138,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app with invalid boundary",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1239,11 +1173,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app with node and other apps in it",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1291,11 +1221,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app with Node",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1370,11 +1296,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "It should update the channel's connectedApps list",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1454,11 +1376,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Create App with a channel that has a invalid Type",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1508,11 +1426,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "It should update the Type's connectedChannels list",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1572,11 +1486,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Invalid name - doesn't create app",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1611,11 +1521,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Creating app with Node without name",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1690,11 +1596,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Invalid - App with boundary and channel with same name",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1749,11 +1651,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 		{
 			name: "Invalid alias",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -1829,15 +1727,9 @@ func TestAppMemoryManager_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mem := &MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
 			}
 			am := mem.Apps()
 			err := am.Create(tt.args.context, tt.args.app, tt.args.brokers)
@@ -1858,7 +1750,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			}
 
 			if tt.checkFunction != nil {
-				tt.checkFunction(t, mem.treeMemoryManager)
+				tt.checkFunction(t, mem)
 			}
 		})
 	}
@@ -1866,11 +1758,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 
 func TestAppMemoryManager_Delete(t *testing.T) {
 	type fields struct {
-		root   *meta.App
-		appErr error
-		mockA  bool
-		mockC  bool
-		mockCT bool
+		root *meta.App
 	}
 	type args struct {
 		query string
@@ -1886,11 +1774,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 		{
 			name: "Deleting leaf app from root",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  true,
-				mockCT: true,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 
@@ -1902,11 +1786,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 		{
 			name: "Deleting leaf app from another app",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  true,
-				mockCT: true,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				query: "app2.app3",
@@ -1917,11 +1797,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 		{
 			name: "Deleting app with child apps and channels",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  true,
-				mockCT: true,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				query: "app2",
@@ -1932,11 +1808,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 		{
 			name: "Deleting root - invalid deletion",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  true,
-				mockCT: true,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				query: "",
@@ -1947,11 +1819,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 		{
 			name: "Deleting with invalid query - invalid deletion",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  true,
-				mockCT: true,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				query: "invalid.query.to.app",
@@ -1962,11 +1830,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 		{
 			name: "It should update the channel's connectedApps",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				query: "app1.thenewapp",
@@ -1986,15 +1850,9 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mem := &MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
 			}
 			am := mem.Apps()
 			err := am.Delete(tt.args.query)
@@ -2009,7 +1867,7 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 				}
 			}
 			if tt.checkFunction != nil {
-				tt.checkFunction(t, mem.treeMemoryManager)
+				tt.checkFunction(t, mem)
 			}
 		})
 	}
@@ -2022,10 +1880,6 @@ func TestAppMemoryManager_Update(t *testing.T) {
 
 	type fields struct {
 		root    *meta.App
-		appErr  error
-		mockA   bool
-		mockC   bool
-		mockCT  bool
 		updated bool
 	}
 	type args struct {
@@ -2044,11 +1898,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 		{
 			name: "invalid- update changing apps' name",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -2097,11 +1947,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 		{
 			name: "invalid- updated app has node and child apps",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -2163,11 +2009,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 		{
 			name: "invalid- has structural errors",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -2218,11 +2060,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 		{
 			name: "Valid - updated app doesn't have changes",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  true,
-				mockCT: true,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -2238,11 +2076,8 @@ func TestAppMemoryManager_Update(t *testing.T) {
 		{
 			name: "Valid - updated app has changes",
 			fields: fields{
-				root:    getMockApp(),
-				appErr:  nil,
-				mockC:   true,
-				mockCT:  true,
-				mockA:   false,
+				root: getMockApp(),
+
 				updated: true,
 			},
 			args: args{
@@ -2392,11 +2227,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 		{
 			name: "Valid -  check if connectedApps is updated due to invalid changes in channel structure",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
@@ -2489,15 +2320,9 @@ func TestAppMemoryManager_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mem := &MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
 			}
 			am := mem.Apps()
 			err := am.Update(tt.args.query, tt.args.app, tt.args.brokers)
@@ -2518,7 +2343,7 @@ func TestAppMemoryManager_Update(t *testing.T) {
 				}
 			}
 			if tt.checkFunction != nil {
-				tt.checkFunction(t, mem.treeMemoryManager)
+				tt.checkFunction(t, mem)
 			}
 		})
 	}
@@ -2528,10 +2353,6 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 	type fields struct {
 		MemoryManager *treeMemoryManager
 		root          *meta.App
-		appErr        error
-		mockA         bool
-		mockC         bool
-		mockCT        bool
 	}
 	type args struct {
 		app *meta.App
@@ -2546,11 +2367,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 		{
 			name: "Valid - resolve direct boundary",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				app: getMockApp().Spec.Apps["bound"],
@@ -2564,11 +2381,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 		{
 			name: "Valid - resolve boundary through alias",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"],
@@ -2582,11 +2395,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 		{
 			name: "Valid - resolve boundary through recursive alias",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"].Spec.Apps["bound3"],
@@ -2600,11 +2409,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 		{
 			name: "Valid - resolve boundary through mixed references",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound4"],
@@ -2618,11 +2423,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 		{
 			name: "Invalid - app with bad parent",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				app: getMockApp().Spec.Apps["bound"].Spec.Apps["boundNP"],
@@ -2632,11 +2433,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 		{
 			name: "Invalid - app with bad grandpa",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				app: getMockApp().Spec.Apps["bound"].Spec.Apps["boundNP"].Spec.Apps["boundNP2"],
@@ -2646,11 +2443,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 		{
 			name: "Invalid - bad reference",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound5"],
@@ -2660,15 +2453,9 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mem := &MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
 			}
 			amm := mem.Apps()
 			got, err := amm.ResolveBoundary(tt.args.app)
@@ -2740,11 +2527,9 @@ func TestAppMemoryManager_removeFromParentBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mem := &MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: getMockApp(),
-					tree: getMockApp(),
-				},
+			mem := &treeMemoryManager{
+				root: getMockApp(),
+				tree: getMockApp(),
 			}
 			amm := mem.Apps().(*AppMemoryManager)
 			amm.removeFromParentBoundary(tt.args.app, tt.args.parent)

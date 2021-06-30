@@ -119,7 +119,7 @@ func (t *PermTreeGetter) Alias() AliasGetInterface {
 }
 
 // Tree returns a getter for objects on the tree without the current changes.
-func (tmm *treeMemoryManager) Tree() GetInterface {
+func (tmm *treeMemoryManager) Perm() GetInterface {
 	return &PermTreeGetter{
 		tree: tmm.tree,
 	}
