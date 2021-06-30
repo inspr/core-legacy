@@ -7,7 +7,7 @@ import (
 	"inspr.dev/inspr/pkg/meta/brokers"
 )
 
-// GetAll returns an array containing all currently mocked brokers
+// Get returns an array containing all currently mocked brokers
 func (bks *BrokersMock) Get() (*apimodels.BrokersDI, error) {
 	if bks.fail != nil {
 		return nil, bks.fail

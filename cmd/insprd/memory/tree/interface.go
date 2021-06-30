@@ -1,5 +1,3 @@
-// Package memory provides simple interfaces for the
-// in memory management of the cluster.
 package tree
 
 import (

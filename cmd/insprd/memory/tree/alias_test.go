@@ -140,11 +140,7 @@ func TestAliasMemoryManager_Create(t *testing.T) {
 
 func TestAliasMemoryManager_Get(t *testing.T) {
 	type fields struct {
-		root   *meta.App
-		appErr error
-		mockA  bool
-		mockC  bool
-		mockCT bool
+		root *meta.App
 	}
 	type args struct {
 		context  string
@@ -217,11 +213,7 @@ func TestAliasMemoryManager_Get(t *testing.T) {
 
 func TestAliasMemoryManager_Update(t *testing.T) {
 	type fields struct {
-		root   *meta.App
-		appErr error
-		mockA  bool
-		mockC  bool
-		mockCT bool
+		root *meta.App
 	}
 	type args struct {
 		context  string
@@ -304,11 +296,7 @@ func TestAliasMemoryManager_Update(t *testing.T) {
 
 func TestAliasMemoryManager_Delete(t *testing.T) {
 	type fields struct {
-		root   *meta.App
-		appErr error
-		mockA  bool
-		mockC  bool
-		mockCT bool
+		root *meta.App
 	}
 	type args struct {
 		context  string

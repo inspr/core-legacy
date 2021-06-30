@@ -28,7 +28,7 @@ type treeMemoryManager struct {
 
 var dapptree *treeMemoryManager
 
-// GetTreeMemory returns a memory manager interface
+// GetTreeMemory returns a tree memory manager interface
 func GetTreeMemory() Manager {
 	if dapptree == nil {
 		setTree(newTreeMemory())
@@ -61,27 +61,27 @@ func setTree(tmm *treeMemoryManager) {
 }
 
 //InitTransaction copies and reserves the current tree structure so that changes can be reversed
-func (mm *treeMemoryManager) InitTransaction() {
-	mm.Lock()
-	utils.DeepCopy(mm.tree, &mm.root)
+func (tmm *treeMemoryManager) InitTransaction() {
+	tmm.Lock()
+	utils.DeepCopy(tmm.tree, &tmm.root)
 }
 
 //Commit applies changes from a transaction in to the tree structure
-func (mm *treeMemoryManager) Commit() {
-	defer mm.Unlock()
-	mm.tree = mm.root
-	mm.root = nil
+func (tmm *treeMemoryManager) Commit() {
+	defer tmm.Unlock()
+	tmm.tree = tmm.root
+	tmm.root = nil
 }
 
 //Cancel discarts changes made in the last transaction
-func (mm *treeMemoryManager) Cancel() {
-	defer mm.Unlock()
-	mm.root = nil
+func (tmm *treeMemoryManager) Cancel() {
+	defer tmm.Unlock()
+	tmm.root = nil
 }
 
 //GetTransactionChanges returns the changelog resulting from the current transaction.
-func (mm *treeMemoryManager) GetTransactionChanges() (diff.Changelog, error) {
-	cl, err := diff.Diff(mm.tree, mm.root)
+func (tmm *treeMemoryManager) GetTransactionChanges() (diff.Changelog, error) {
+	cl, err := diff.Diff(tmm.tree, tmm.root)
 	return cl, err
 }
 

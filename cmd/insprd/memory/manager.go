@@ -12,6 +12,7 @@ type memoryManager struct {
 
 var memManager *memoryManager
 
+// GetMemoryManager returns a general memory manager interface
 func GetMemoryManager() Manager {
 	if memManager != nil {
 		return memManager
@@ -22,10 +23,12 @@ func GetMemoryManager() Manager {
 	}
 }
 
+// Tree  retrunrs the tree specific memory managing interface
 func (mem *memoryManager) Tree() tree.Manager {
 	return mem.tree
 }
 
+// Brokers retrunrs the broker specific memory managing interface
 func (mem *memoryManager) Brokers() brokers.Manager {
 	return mem.brokers
 }
