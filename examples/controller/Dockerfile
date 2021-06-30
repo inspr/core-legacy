@@ -1,13 +1,10 @@
 FROM golang:alpine as build
 WORKDIR /app
-COPY go.mod go.mod
-RUN go mod download
 COPY . .
-WORKDIR /app/examples/controller
-RUN go build
+RUN go build -o main examples/controller/main.go
 
 FROM alpine
 WORKDIR /app
-COPY --from=build /app/examples/controller/controller controller
-CMD ./controller
+COPY --from=build /app/main .
+CMD ./main
 

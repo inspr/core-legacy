@@ -1,9 +1,0 @@
-
-
-//sender 
-ctrlClient.HEader(INSPR_TARGET, "channel")
-ctrlClient.HEader(INSPR_OPERATION, "get")
-
-
-// receiver
-r.Header.Get(INSPR_TARGET)

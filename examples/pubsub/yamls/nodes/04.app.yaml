@@ -1,0 +1,17 @@
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: pubsubapi
+  parent: pubsub
+spec:
+  node:
+    spec:
+      replicas: 1
+      image: gcr.io/insprlabs/inspr/examples/pubsubapi:latest
+      ports:
+        - port: 80
+          targetPort: 8080
+  boundary:
+    output:
+      - pubsubch

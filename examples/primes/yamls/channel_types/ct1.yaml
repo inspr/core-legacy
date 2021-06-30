@@ -1,7 +1,0 @@
-apiVersion: "v1"
-kind: "type"
-meta:
-  name: "primes_ct1"
-  reference: ""
-  parent: ""  
-schema: '{"type":"int"}'

@@ -10,15 +10,11 @@ import (
 	"net/http"
 
 	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 type slackMessage struct {
 	Text string `json:"text"`
-}
-
-type expectedDataType struct {
-	Message string `json:"message"`
-	Channel string `json:"channel"`
 }
 
 var webhook = "https://hooks.slack.com/services/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"
@@ -30,14 +26,14 @@ func main() {
 	client.HandleChannel(channel, func(ctx context.Context, body io.Reader) error {
 		decoder := json.NewDecoder(body)
 
-		subMsg := expectedDataType{}
+		subMsg := models.BrokerMessage{}
 		err := decoder.Decode(&subMsg)
 		if err != nil {
 			return err
 		}
 
 		msg := slackMessage{
-			Text: fmt.Sprintf("%v", subMsg.Message),
+			Text: fmt.Sprintf("%v", subMsg.Data),
 		}
 
 		msgBuff, _ := json.Marshal(msg)
