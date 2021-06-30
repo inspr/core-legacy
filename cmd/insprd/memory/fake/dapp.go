@@ -1,6 +1,7 @@
 package fake
 
 import (
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils"
@@ -8,7 +9,7 @@ import (
 
 // Apps - mocks the implementation of the AppMemory interface methods
 type Apps struct {
-	*MemManager
+	*TreeMemoryMock
 	fail error
 	apps map[string]*meta.App
 }
@@ -30,7 +31,7 @@ func (a *Apps) Get(query string) (*meta.App, error) {
 }
 
 // Create - simple mock
-func (a *Apps) Create(scope string, app *meta.App) error {
+func (a *Apps) Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	if a.fail != nil {
 		return a.fail
 	}
@@ -67,7 +68,7 @@ func (a *Apps) Delete(query string) error {
 }
 
 // Update - simple mock
-func (a *Apps) Update(scope string, app *meta.App) error {
+func (a *Apps) Update(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	if a.fail != nil {
 		return a.fail
 	}

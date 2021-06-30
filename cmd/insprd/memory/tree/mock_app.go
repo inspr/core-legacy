@@ -1,6 +1,9 @@
 package tree
 
-import "inspr.dev/inspr/pkg/meta"
+import (
+	apimodels "inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/meta"
+)
 
 // MockAppManager to Mock App Manager
 type MockAppManager struct {
@@ -17,7 +20,7 @@ func (mock *MockAppManager) Get(scope string) (*meta.App, error) {
 }
 
 // Create Mock
-func (mock *MockAppManager) Create(scope string, app *meta.App) error {
+func (mock *MockAppManager) Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	return nil
 }
 
@@ -27,7 +30,7 @@ func (mock *MockAppManager) Delete(scope string) error {
 }
 
 // Update Mock
-func (mock *MockAppManager) Update(scope string, app *meta.App) error {
+func (mock *MockAppManager) Update(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	return nil
 }
 

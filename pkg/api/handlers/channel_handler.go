@@ -39,25 +39,31 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 		}
 
 		logger.Debug("initiating Channel create transaction")
-		ch.Memory.InitTransaction()
-
-		err = ch.Memory.Channels().Create(scope, &data.Channel)
+		ch.Memory.Tree().InitTransaction()
+		brokers, err := ch.Memory.Brokers().Get()
+		if err != nil {
+			logger.Error("unable to attain inprd's Broker information",
+				zap.Any("error", err))
+			rest.ERROR(w, err)
+			return
+		}
+		err = ch.Memory.Tree().Channels().Create(scope, &data.Channel, brokers)
 		if err != nil {
 			logger.Error("unable to create Channel",
 				zap.String("channel", data.Channel.Meta.Name),
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ch.Memory.Cancel()
+			ch.Memory.Tree().Cancel()
 			return
 		}
 
-		changes, err := ch.Memory.GetTransactionChanges()
+		changes, err := ch.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Channel create request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ch.Memory.Cancel()
+			ch.Memory.Tree().Cancel()
 			return
 		}
 
@@ -68,15 +74,15 @@ func (ch *ChannelHandler) HandleCreate() rest.Handler {
 				logger.Error("unable to apply Channel create changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				ch.Memory.Cancel()
+				ch.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing Channel create changes")
-			defer ch.Memory.Commit()
+			defer ch.Memory.Tree().Commit()
 		} else {
 			logger.Info("cancelling Channel create changes")
-			defer ch.Memory.Cancel()
+			defer ch.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
@@ -101,20 +107,20 @@ func (ch *ChannelHandler) HandleGet() rest.Handler {
 		}
 
 		logger.Debug("initiating Channel get transaction")
-		ch.Memory.InitTransaction()
+		ch.Memory.Tree().InitTransaction()
 
-		channel, err := ch.Memory.Tree().Channels().Get(scope, data.ChName)
+		channel, err := ch.Memory.Tree().Perm().Channels().Get(scope, data.ChName)
 		if err != nil {
 			logger.Error("unable to get Channel",
 				zap.String("channel", data.ChName),
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ch.Memory.Cancel()
+			ch.Memory.Tree().Cancel()
 			return
 		}
 
-		defer ch.Memory.Cancel()
+		defer ch.Memory.Tree().Cancel()
 
 		rest.JSON(w, http.StatusOK, channel)
 	}
@@ -138,25 +144,25 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 		}
 
 		logger.Debug("initiating Channel update transaction")
-		ch.Memory.InitTransaction()
+		ch.Memory.Tree().InitTransaction()
 
-		err = ch.Memory.Channels().Update(scope, &data.Channel)
+		err = ch.Memory.Tree().Channels().Update(scope, &data.Channel)
 		if err != nil {
 			logger.Error("unable to update Channel",
 				zap.String("channel", data.Channel.Meta.Name),
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ch.Memory.Cancel()
+			ch.Memory.Tree().Cancel()
 			return
 		}
 
-		changes, err := ch.Memory.GetTransactionChanges()
+		changes, err := ch.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Channel update request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ch.Memory.Cancel()
+			ch.Memory.Tree().Cancel()
 			return
 		}
 
@@ -167,15 +173,15 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 				logger.Error("unable to apply Channel update changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				ch.Memory.Cancel()
+				ch.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing Channel update changes")
-			defer ch.Memory.Commit()
+			defer ch.Memory.Tree().Commit()
 		} else {
 			logger.Info("cancelling Channel update changes")
-			defer ch.Memory.Cancel()
+			defer ch.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)
@@ -200,25 +206,25 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 		}
 
 		logger.Debug("initiating Channel delete transaction")
-		ch.Memory.InitTransaction()
+		ch.Memory.Tree().InitTransaction()
 
-		err = ch.Memory.Channels().Delete(scope, data.ChName)
+		err = ch.Memory.Tree().Channels().Delete(scope, data.ChName)
 		if err != nil {
 			logger.Error("unable to delete Channel",
 				zap.String("channel", data.ChName),
 				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ch.Memory.Cancel()
+			ch.Memory.Tree().Cancel()
 			return
 		}
 
-		changes, err := ch.Memory.GetTransactionChanges()
+		changes, err := ch.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Channel delete request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			ch.Memory.Cancel()
+			ch.Memory.Tree().Cancel()
 			return
 		}
 
@@ -229,15 +235,15 @@ func (ch *ChannelHandler) HandleDelete() rest.Handler {
 				logger.Error("unable to apply Channel delete changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				ch.Memory.Cancel()
+				ch.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing Channel delete changes")
-			defer ch.Memory.Commit()
+			defer ch.Memory.Tree().Commit()
 		} else {
 			logger.Info("cancelling Channel delete changes")
-			defer ch.Memory.Cancel()
+			defer ch.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, changes)

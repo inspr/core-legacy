@@ -9,7 +9,7 @@ import (
 
 // Types - mocks the implementation of the TypeMemory interface methods
 type Types struct {
-	*MemManager
+	*TreeMemoryMock
 	fail       error
 	insprTypes map[string]*meta.Type
 }

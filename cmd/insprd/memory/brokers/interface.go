@@ -1,9 +1,9 @@
 package brokers
 
 import (
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/meta/brokers"
 	"inspr.dev/inspr/pkg/sidecars/models"
-	"inspr.dev/inspr/pkg/utils"
 )
 
 // Manager is the interface that allows the management
@@ -12,8 +12,7 @@ import (
 // Manager is the interface that allows for interaction
 // with the systems multiple brokers and its configurations.
 type Manager interface {
-	GetAll() (utils.StringArray, error)
-	GetDefault() (string, error)
+	Get() (*apimodels.BrokersDI, error)
 	Create(config brokers.BrokerConfiguration) error
 	SetDefault(broker string) error
 	Factory() SidecarManager

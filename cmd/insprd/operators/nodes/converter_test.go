@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/auth"
 	authmock "inspr.dev/inspr/pkg/auth/mocks"
 	"inspr.dev/inspr/pkg/meta"
@@ -96,7 +97,7 @@ func Test_intToint32(t *testing.T) {
 }
 
 func TestNodeOperator_withBoundary(t *testing.T) {
-	mem := fake.MockMemoryManager(nil)
+	mem := fake.MockTreeMemory(nil)
 	mem.InitTransaction()
 	mem.Channels().Create("", &meta.Channel{
 		Meta: meta.Metadata{
@@ -107,7 +108,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 			Type:           "channel1type",
 			SelectedBroker: "someBroker",
 		},
-	})
+	}, nil)
 	mem.Channels().Create("", &meta.Channel{
 		Meta: meta.Metadata{
 			Name: "channel2",
@@ -117,7 +118,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 			Type:           "channel2type",
 			SelectedBroker: "someBroker",
 		},
-	})
+	}, nil)
 
 	mem.Types().Create("", &meta.Type{
 		Meta: meta.Metadata{
@@ -134,7 +135,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 
 	type fields struct {
 		clientSet kubernetes.Interface
-		memory    memory.Manager
+		memory    tree.Manager
 		auth      auth.Auth
 	}
 	type args struct {
@@ -269,7 +270,10 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mem.Apps().Create("", tt.args.app)
+			mem.Apps().Create("", tt.args.app, &apimodels.BrokersDI{
+				Available: []string{"some_broker"},
+				Default:   "some_broker",
+			})
 			no := &NodeOperator{
 				clientSet: tt.fields.clientSet,
 				memory:    tt.fields.memory,
@@ -518,7 +522,7 @@ func TestNodeOperator_toSecret(t *testing.T) {
 
 	type fields struct {
 		clientSet kubernetes.Interface
-		memory    memory.Manager
+		memory    tree.Manager
 		auth      auth.Auth
 	}
 	type args struct {

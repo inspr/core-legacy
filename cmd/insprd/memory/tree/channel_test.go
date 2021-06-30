@@ -5,9 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
-	"inspr.dev/inspr/cmd/insprd/memory/brokers"
-	"inspr.dev/inspr/cmd/sidecars"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metabrokers "inspr.dev/inspr/pkg/meta/brokers"
@@ -22,7 +20,7 @@ func TestMemoryManager_Channels(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   memory.ChannelMemory
+		want   ChannelMemory
 	}{
 		{
 			name: "It should return a pointer to ChannelMemoryManager.",
@@ -30,7 +28,7 @@ func TestMemoryManager_Channels(t *testing.T) {
 				root: getMockChannels(),
 			},
 			want: &ChannelMemoryManager{
-				&MemoryManager{
+				&treeMemoryManager{
 					root: getMockChannels(),
 				},
 			},
@@ -38,7 +36,7 @@ func TestMemoryManager_Channels(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmm := &MemoryManager{
+			tmm := &treeMemoryManager{
 				root: tt.fields.root,
 			}
 			if got := tmm.Channels(); !reflect.DeepEqual(got, tt.want) {
@@ -125,16 +123,16 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+			mem := &MockManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			chh := GetTreeMemory().Channels()
+			}
+			chh := mem.Channels()
 			got, err := chh.Get(tt.args.context, tt.args.chName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
@@ -148,10 +146,6 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 }
 
 func TestChannelMemoryManager_Create(t *testing.T) {
-	kafkaConfig := sidecars.KafkaConfig{}
-	bmm := brokers.GetBrokerMemory()
-	bmm.Create(&kafkaConfig)
-
 	type fields struct {
 		root   *meta.App
 		appErr error
@@ -162,6 +156,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 	type args struct {
 		context string
 		ch      *meta.Channel
+		brokers *apimodels.BrokersDI
 	}
 	tests := []struct {
 		name          string
@@ -169,7 +164,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 		args          args
 		wantErr       bool
 		want          *meta.Channel
-		checkFunction func() (bool, string)
+		checkFunction func(*treeMemoryManager) (bool, string)
 	}{
 		{
 			name: "It should create a new Channel on a valid App",
@@ -190,6 +185,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 					Spec: meta.ChannelSpec{
 						Type: "type1",
 					},
+				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
 				},
 			},
 			wantErr: false,
@@ -222,6 +221,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 					},
 					Spec: meta.ChannelSpec{},
 				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 			},
 			wantErr: true,
 			want:    nil,
@@ -243,6 +246,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Parent: "",
 					},
 					Spec: meta.ChannelSpec{},
+				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
 				},
 			},
 			wantErr: true,
@@ -268,6 +275,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Type: "ct1",
 					},
 				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 			},
 			wantErr: true,
 			want:    nil,
@@ -292,11 +303,15 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Type: "type1",
 					},
 				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 			},
 			wantErr: false,
 			want:    nil,
-			checkFunction: func() (bool, string) {
-				am := GetTreeMemory().Types()
+			checkFunction: func(tmm *treeMemoryManager) (bool, string) {
+				am := tmm.Types()
 				ct, err := am.Get("", "type1")
 				if err != nil {
 					return false, "cant get type 'type1'"
@@ -328,6 +343,10 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 						Type: "type1",
 					},
 				},
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"kafka"},
+					Default:   "kafka",
+				},
 			},
 			wantErr: true,
 			want:    nil,
@@ -335,17 +354,17 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+			mem := &MockManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			chh := GetTreeMemory().Channels()
-			err := chh.Create(tt.args.context, tt.args.ch)
+			}
+			chh := mem.Channels()
+			err := chh.Create(tt.args.context, tt.args.ch, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -363,7 +382,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 				}
 			}
 			if tt.checkFunction != nil {
-				if passed, msg := tt.checkFunction(); !passed {
+				if passed, msg := tt.checkFunction(mem.treeMemoryManager); !passed {
 					t.Errorf("check function not passed: " + msg)
 				}
 			}
@@ -466,16 +485,16 @@ func TestChannelMemoryManager_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+			mem := &MockManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			chh := GetTreeMemory().Channels()
+			}
+			chh := mem.Channels()
 			if err := chh.Delete(tt.args.context, tt.args.chName); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -600,16 +619,16 @@ func TestChannelMemoryManager_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+			mem := &MockManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 				},
 				appErr: tt.fields.appErr,
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			chh := GetTreeMemory().Channels()
+			}
+			chh := mem.Channels()
 			if err := chh.Update(tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return

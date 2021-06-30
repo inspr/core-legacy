@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
@@ -15,13 +15,13 @@ import (
 // AppMemoryManager implements the App interface
 // and provides methos for operating on dApps
 type AppMemoryManager struct {
-	*MemoryManager
+	*treeMemoryManager
 }
 
 // Apps is a MemoryManager method that provides an access point for Apps
-func (tmm *MemoryManager) Apps() memory.AppMemory {
+func (tmm *treeMemoryManager) Apps() AppMemory {
 	return &AppMemoryManager{
-		MemoryManager: tmm,
+		treeMemoryManager: tmm,
 	}
 }
 
@@ -63,7 +63,7 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 // Create instantiates a new dApp in the given scope.
 // If the dApp's information is invalid, returns an error. The same goes for an invalid scope.
 // In case of scope being an empty string, the dApp is created inside the root dApp.
-func (amm *AppMemoryManager) Create(scope string, app *meta.App) error {
+func (amm *AppMemoryManager) Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	logger.Info("trying to create a dApp",
 		zap.String("dApp", app.Meta.Name),
 		zap.String("scope", scope))
@@ -79,7 +79,7 @@ func (amm *AppMemoryManager) Create(scope string, app *meta.App) error {
 	}
 
 	logger.Debug("checking dApp structure")
-	appErr := amm.checkApp(app, parentApp)
+	appErr := amm.checkApp(app, parentApp, brokers)
 	if appErr != nil {
 		logger.Error("unable to create dApp - invalid structure")
 		return appErr
@@ -119,7 +119,7 @@ func (amm *AppMemoryManager) Delete(query string) error {
 	if err != nil {
 		return err
 	}
-	parent, errParent := getParentApp(query)
+	parent, errParent := getParentApp(query, amm.treeMemoryManager)
 	if errParent != nil {
 		return errParent
 	}
@@ -140,7 +140,7 @@ func (amm *AppMemoryManager) Delete(query string) error {
 // Update receives a pointer to a dApp and the path to where this dApp is inside the memory tree.
 // If the current dApp is found and the new structure is valid, it's updated.
 // Otherwise, returns an error.
-func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
+func (amm *AppMemoryManager) Update(query string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	logger.Info("trying to update a dApp",
 		zap.String("dApp", app.Meta.Name),
 		zap.String("in scope", query))
@@ -161,12 +161,12 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App) error {
 		return ierrors.NewError().InvalidApp().Message("dApp mustn't have a Node and other dApps at the same time").Build()
 	}
 
-	parent, errParent := getParentApp(query)
+	parent, errParent := getParentApp(query, amm.treeMemoryManager)
 	if errParent != nil {
 		return errParent
 	}
 
-	appErr := amm.checkApp(app, parent)
+	appErr := amm.checkApp(app, parent, brokers)
 	if appErr != nil {
 		logger.Error("unable to update dApp - invalid structure")
 		return appErr
@@ -233,7 +233,7 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, 
 		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
 		unresolved[bound] = true
 	}
-	parentApp, err := amm.MemoryManager.Apps().Get(app.Meta.Parent)
+	parentApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +288,7 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 		}
 		return &merr
 	}
-	parentApp, err := amm.MemoryManager.Apps().Get(app.Meta.Parent)
+	parentApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
 	if err != nil {
 		return err
 	}

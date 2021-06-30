@@ -1,15 +1,15 @@
 package fake
 
 import (
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/meta"
 )
 
-// MemManager is the api struct with the necessary implementations
+// TreeMemoryMock is the api struct with the necessary implementations
 // to satisfy the interface used in the routes established
-type MemManager struct {
+type TreeMemoryMock struct {
 	insprType Types // inspr type
 	channel   Channels
 	app       Apps
@@ -17,31 +17,31 @@ type MemManager struct {
 }
 
 // LookupMemManager mocks getter for roots
-type LookupMemManager MemManager
+type LookupMemManager TreeMemoryMock
 
 // Apps mocks an app getter
-func (l LookupMemManager) Apps() memory.AppGetInterface {
+func (l LookupMemManager) Apps() tree.AppGetInterface {
 	return &l.app
 }
 
 // Channels mocks a channel getter
-func (l LookupMemManager) Channels() memory.ChannelGetInterface {
+func (l LookupMemManager) Channels() tree.ChannelGetInterface {
 	return &l.channel
 }
 
 // Types mocks a Type getter
-func (l LookupMemManager) Types() memory.TypeGetInterface {
+func (l LookupMemManager) Types() tree.TypeGetInterface {
 	return &l.insprType
 }
 
 // Alias mocks a alias getter
-func (l LookupMemManager) Alias() memory.AliasGetInterface {
+func (l LookupMemManager) Alias() tree.AliasGetInterface {
 	return &l.alias
 }
 
-// MockMemoryManager mock exported with propagated error through the functions
-func MockMemoryManager(failErr error) memory.Manager {
-	return &MemManager{
+// MockTreeMemory mock exported with propagated error through the functions
+func MockTreeMemory(failErr error) tree.Manager {
+	return &TreeMemoryMock{
 		insprType: Types{
 			fail:       failErr,
 			insprTypes: make(map[string]*meta.Type),
@@ -61,41 +61,41 @@ func MockMemoryManager(failErr error) memory.Manager {
 	}
 }
 
-// Tree mocks a root getter interface
-func (mm *MemManager) Tree() memory.GetInterface {
+// Perm mocks a root getter interface
+func (mm *TreeMemoryMock) Perm() tree.GetInterface {
 	return (*LookupMemManager)(mm)
 }
 
 // Apps returns manager of DApps
-func (mm *MemManager) Apps() memory.AppMemory {
+func (mm *TreeMemoryMock) Apps() tree.AppMemory {
 	return &mm.app
 }
 
 // Channels returns manager's DApp
-func (mm *MemManager) Channels() memory.ChannelMemory {
+func (mm *TreeMemoryMock) Channels() tree.ChannelMemory {
 	return &mm.channel
 }
 
 // Types returns manager's DApp
-func (mm *MemManager) Types() memory.TypeMemory {
+func (mm *TreeMemoryMock) Types() tree.TypeMemory {
 	return &mm.insprType
 }
 
 // Alias returns manager's Alias
-func (mm *MemManager) Alias() memory.AliasMemory {
+func (mm *TreeMemoryMock) Alias() tree.AliasMemory {
 	return &mm.alias
 }
 
 //InitTransaction mock interface structure
-func (mm *MemManager) InitTransaction() {}
+func (mm *TreeMemoryMock) InitTransaction() {}
 
 //Commit mock interface structure
-func (mm *MemManager) Commit() {}
+func (mm *TreeMemoryMock) Commit() {}
 
 //Cancel mock interface structure
-func (mm *MemManager) Cancel() {}
+func (mm *TreeMemoryMock) Cancel() {}
 
 //GetTransactionChanges mock interface structure
-func (mm *MemManager) GetTransactionChanges() (diff.Changelog, error) {
+func (mm *TreeMemoryMock) GetTransactionChanges() (diff.Changelog, error) {
 	return diff.Changelog{}, nil
 }

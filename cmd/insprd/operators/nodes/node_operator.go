@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/pkg/auth"
 	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils"
@@ -21,7 +21,7 @@ import (
 //NodeOperator defines a node operations interface.
 type NodeOperator struct {
 	clientSet kubernetes.Interface
-	memory    memory.Manager
+	memory    tree.Manager
 	brokers   brokers.Manager
 	auth      auth.Auth
 }
@@ -87,7 +87,7 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 
 	logger.Debug("getting name of the k8s deployment to be deleted")
 	scope, _ := utils.JoinScopes(nodeContext, nodeName)
-	app, _ := no.memory.Tree().Apps().Get(scope)
+	app, _ := no.memory.Perm().Apps().Get(scope)
 
 	logger.Info("deploying a Node structure in k8s",
 		zap.Any("node", app))
@@ -102,7 +102,7 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 }
 
 // NewNodeOperator initializes a k8s based node operator with in cluster configuration
-func NewNodeOperator(memory memory.Manager, authenticator auth.Auth, broker brokers.Manager) (nop *NodeOperator, err error) {
+func NewNodeOperator(memory tree.Manager, authenticator auth.Auth, broker brokers.Manager) (nop *NodeOperator, err error) {
 	nop = &NodeOperator{
 		memory:  memory,
 		auth:    authenticator,

@@ -58,7 +58,7 @@ func Test_getBrokers(t *testing.T) {
 			flagsAndArgs: []string{"b"},
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.JSON(w, 200, &models.BrokersDI{
-					Installed: []string{"mock_broker"},
+					Available: []string{"mock_broker"},
 					Default:   "mock_broker",
 				})
 			},
