@@ -91,30 +91,30 @@ type PermTreeGetter struct {
 }
 
 // Apps returns a getter for apps on the root.
-func (t *PermTreeGetter) Apps() AppGetInterface {
+func (ptg *PermTreeGetter) Apps() AppGetInterface {
 	return &AppPermTreeGetter{
-		tree: t.tree,
+		tree: ptg.tree,
 	}
 }
 
 // Channels returns a getter for channels on the root.
-func (t *PermTreeGetter) Channels() ChannelGetInterface {
+func (ptg *PermTreeGetter) Channels() ChannelGetInterface {
 	return &ChannelPermTreeGetter{
-		PermTreeGetter: t,
+		PermTreeGetter: ptg,
 	}
 }
 
 // Types returns a getter for Types on the root
-func (t *PermTreeGetter) Types() TypeGetInterface {
+func (ptg *PermTreeGetter) Types() TypeGetInterface {
 	return &TypePermTreeGetter{
-		PermTreeGetter: t,
+		PermTreeGetter: ptg,
 	}
 }
 
 // Alias returns a getter for alias on the root
-func (t *PermTreeGetter) Alias() AliasGetInterface {
+func (ptg *PermTreeGetter) Alias() AliasGetInterface {
 	return &AliasPermTreeGetter{
-		PermTreeGetter: t,
+		PermTreeGetter: ptg,
 	}
 }
 
