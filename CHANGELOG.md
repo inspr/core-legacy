@@ -18,12 +18,19 @@
     - added multiplexers to protect broker data structure
 ---
 
+### #83 Story CORE-477 | troubleshooting.md
+- features:
+    - Updated `troubleshooting.md` with some new "troubles" that users may encounter
+    - Updated PingPong demo readme file
+---
+
 ### #82 Story CORE-482 | fix examples
 - features:
     - Documented all examples/demos in `/examples`
     - Updated all structures YAML definitions for the examples/demos
     - Updated all Dockerfiles and `.go` files for examples/demos
     - Updated PubSub doc
+---
 
 ### #80 Story CORE-497 | Migrate cluster from "red-inspr" to "insprlabs"
 - misc:
