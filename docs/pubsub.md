@@ -105,7 +105,7 @@ spec:
       - pubsubch #Channel created above
 ```
 
-Now all there is left to is creating the subscribers' dApps. Since we could build any number of subscribers, depending on what clients we would like interact with, consider the following example a template for their files.
+Now all there is left to is creating the subscribers' dApps. Since we could build any number of subscribers, depending on what clients we would like to interact with, consider the following example a template for their files.
 
 Subscribers (04-06.app.yaml) :
 ```yaml
@@ -191,7 +191,7 @@ func (s *Server) Init() {
 
 ## Subscribers
 
-As most applications that run on Inspr the subscribers only execute their tasks when they receive a message through it's dApp client. Once the message has been sent to the clients the message is committed, acknowledging to the message broker that that application is done with that message and can go on to the next one.
+As most applications that run on Inspr the subscribers only execute their tasks when they receive a message through it's dApp client. Once the message has been sent to the clients the message is committed, acknowledging to the message broker that the application is done with that message and can go on to the next one.
 
 These examples were implemented using webhooks that receive JSON objects with specific fields.
 
@@ -308,7 +308,7 @@ pubsub
         └── 06.app.yaml
 ```
 
-Keep in mind Slack an Discord are only examples.
+Keep in mind Slack and Discord are only examples.
 
 Deployment:
 You have to apply every YAML we created for dApps, Channels, Type and Kafka by running the following commands (be sure to have the latest version of [Inspr CLI](cli_install.md) installed):

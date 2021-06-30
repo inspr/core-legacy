@@ -6,7 +6,7 @@ The test consists in initializing a dApp client that will write and read message
 **To check if the test worked properly, the demo should print a number that represents a counter for the messages sent (each message adds +1 to the counter).**
 
 ## How to run it:  
-To run this demo, it must be assured that Kafka is installed in the cluester. Then, Kafka must be installed in Insprd so Channels can use the Kafka Broker:  
+To run this demo, it must be assured that Kafka is installed in the cluster. Then, Kafka must be installed in Insprd so Channels can use the Kafka Broker:  
 ```
 insprctl cluster config kafka yamls/kafka.yaml
 ```  
