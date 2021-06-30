@@ -81,7 +81,7 @@ func (c *Client) Run(ctx context.Context) error {
 		}
 	}()
 
-	log.Printf("sideCar listener is up...")
+	log.Printf("dApp client listener is up...")
 
 	<-ctx.Done()
 

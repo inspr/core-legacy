@@ -1,5 +1,6 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
+
 metadata:
   name: pubsub-ingress
   namespace: inspr-apps
@@ -9,13 +10,12 @@ metadata:
 spec:
   rules:
     - host: inspr.com
-
       http:
         paths:
           - path: /publish
             pathType: Prefix
             backend:
               service:
-                name: pubsub-publish-front
+                name: node-9f926641-474e-43a1-8a7d-31084eab06ce
                 port:
                   number: 80

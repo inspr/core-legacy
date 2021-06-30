@@ -1,11 +1,11 @@
-apiVersion: "v1"
-kind: "channel"
+apiVersion: v1
+kind: channel
+
 meta:
-  name: "primes_ch1"
+  name: primesch1
   reference: ""
-  Annotations: 
-    kafka.partition.number: "1"
-    kafka.replication.factor: "1"
-  parent: ""  
+  parent: ""
 spec:
-  type: "primes_ct1"
+  type: primes_ct1
+  brokerlist:
+    - kafka

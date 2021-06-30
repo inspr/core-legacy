@@ -29,6 +29,8 @@ func main() {
 				return err
 			}
 
+			fmt.Println(testMsg)
+
 			checkMessage := fmt.Sprintf("%s Check!", testChannel)
 			if err := client.WriteMessage(ctx, checkChannel, checkMessage); err != nil {
 				return err

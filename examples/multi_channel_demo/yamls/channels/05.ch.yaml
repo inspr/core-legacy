@@ -2,10 +2,8 @@ apiVersion: v1
 kind: channel
 
 meta:
-  name: primesch2
-  reference: ""
-  parent: ""
+  name: checkch
 spec:
-  type: primes_ct2
+  type: channelTestType
   brokerlist:
     - kafka

@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: controller-ingress
@@ -10,14 +10,23 @@ spec:
       http:
         paths:
           - path: /update
+            pathType: Prefix
             backend:
-              serviceName: node-2cb79eff-d313-473f-8dd9-25defb1aed31
-              servicePort: 8080
+              service:
+                name: node-de64309b-0b62-43db-98b3-0f519c6a2711
+                port:
+                  number: 8080
           - path: /delete
+            pathType: Prefix
             backend:
-              serviceName: node-2cb79eff-d313-473f-8dd9-25defb1aed31
-              servicePort: 8080
+              service:
+                name: node-de64309b-0b62-43db-98b3-0f519c6a2711
+                port:
+                  number: 8080
           - path: /create
+            pathType: Prefix
             backend:
-              serviceName: node-2cb79eff-d313-473f-8dd9-25defb1aed31
-              servicePort: 8080
+              service:
+                name: node-de64309b-0b62-43db-98b3-0f519c6a2711
+                port:
+                  number: 8080

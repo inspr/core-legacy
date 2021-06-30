@@ -1,10 +1,10 @@
 kind: channel
 apiVersion: v1
+
 meta:
   name: pubsubch
   parent: pubsub
-  annotations:
-    kafka.replication.factor: 1
-    kafka.partition.number: 1
 spec:
   type: pubsubct
+  brokerlist:
+    - kafka

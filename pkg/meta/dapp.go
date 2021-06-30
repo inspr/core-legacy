@@ -26,7 +26,7 @@ type NodeSpec struct {
 	Image       string               `yaml:"image,omitempty"  json:"image"`
 	Replicas    int                  `yaml:"replicas,omitempty" json:"replicas"`
 	Environment utils.EnvironmentMap `yaml:"environment,omitempty" json:"environment"`
-	SidecarPort SidecarPort          `yaml:"sidecar_port,omitempty" json:"sidecar_port"`
+	SidecarPort SidecarPort          `yaml:"sidecarPort,omitempty" json:"sidecarPort"`
 }
 
 // App is an inspr component that represents an dApp. An App can contain other apps, channels and other components.

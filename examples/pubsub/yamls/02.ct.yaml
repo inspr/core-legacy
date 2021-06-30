@@ -1,7 +1,7 @@
 kind: type
 apiVersion: v1
+
 meta:
   name: pubsubct
   parent: pubsub
-
-schema: inspr/schema.avsc
+schema: '{"type":"string"}'
