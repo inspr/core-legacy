@@ -1,6 +1,13 @@
 
 # Changelog
 
+### #84 Story CORE-480 | difference.md
+- features:
+    - Updated `difference.md`
+- refactores:
+    - Changed parameter from `ctx` to `scope` in `pkg/meta/utils/diff/diff.go`
+---
+
 ### #83 Story CORE-477 | troubleshooting.md
 - features:
     - Updated `troubleshooting.md` with some new "troubles" that users may encounter
