@@ -91,10 +91,10 @@ func (cl Changelog) Print(out io.Writer) {
 	}
 }
 
-func (cl *Changelog) diff(from, to *meta.App, ctx string) (Changelog, error) {
+func (cl *Changelog) diff(from, to *meta.App, scope string) (Changelog, error) {
 
 	change := Change{
-		Scope:     ctx,
+		Scope:     scope,
 		changelog: cl,
 	}
 
