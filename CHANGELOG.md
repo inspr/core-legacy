@@ -1,7 +1,14 @@
 
 # Changelog
 
-### #81 Story CORE-476 | Memory dependency refactor [Singletons]
+### #84 Story CORE-480 | difference.md
+- features:
+    - Updated `difference.md`
+- refactores:
+    - Changed parameter from `ctx` to `scope` in `pkg/meta/utils/diff/diff.go`
+---
+
+### #81 Story CORE-476 | Memory dependency refactor \[Singletons\]
 - features:
     - design new general memory manager to provide a single access point to all memory for Insprd
     - implemented new general MemoryManager by injecting both tree and brokers managers into it.
