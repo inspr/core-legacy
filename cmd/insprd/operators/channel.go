@@ -4,8 +4,8 @@ import (
 	"context"
 	"reflect"
 
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	kafkaop "inspr.dev/inspr/cmd/insprd/operators/kafka"
 	"inspr.dev/inspr/cmd/sidecars"
 	"inspr.dev/inspr/pkg/ierrors"
@@ -16,7 +16,7 @@ import (
 //GenOp is a general channel operator for dinamically selecting required operator
 type GenOp struct {
 	brokers brokers.Manager
-	memory  memory.Manager
+	memory  tree.Manager
 	configs map[string]struct {
 		config metabrokers.BrokerConfiguration
 		op     ChannelOperatorInterface
@@ -24,7 +24,7 @@ type GenOp struct {
 }
 
 //NewGeneralOperator creates an instance of GenOp for a given broker and memory manager
-func NewGeneralOperator(brokers brokers.Manager, memory memory.Manager) *GenOp {
+func NewGeneralOperator(brokers brokers.Manager, memory tree.Manager) *GenOp {
 	return &GenOp{
 		brokers: brokers,
 		memory:  memory,
@@ -42,7 +42,7 @@ func (g GenOp) getOperator(scope, name string, deleteCmd bool) (ChannelOperatorI
 	// delete should get it's channel information from the unaltered tree,
 	// otherwise the channel wouldnt be found
 	if deleteCmd {
-		channel, err = g.memory.Tree().Channels().Get(scope, name)
+		channel, err = g.memory.Perm().Channels().Get(scope, name)
 		if err != nil {
 			return nil, err
 		}

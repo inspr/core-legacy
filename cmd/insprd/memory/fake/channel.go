@@ -3,13 +3,14 @@ package fake
 import (
 	"fmt"
 
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 )
 
 // Channels - mocks the implementation of the ChannelMemory interface methods
 type Channels struct {
-	*MemManager
+	*TreeMemoryMock
 	fail     error
 	channels map[string]*meta.Channel
 }
@@ -32,7 +33,7 @@ func (ch *Channels) Get(scope, name string) (*meta.Channel, error) {
 }
 
 // Create - simple mock
-func (ch *Channels) Create(scope string, channel *meta.Channel) error {
+func (ch *Channels) Create(scope string, channel *meta.Channel, brokers *apimodels.BrokersDI) error {
 	if ch.fail != nil {
 		return ch.fail
 	}

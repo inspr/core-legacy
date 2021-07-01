@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
@@ -13,50 +13,41 @@ import (
 
 // SelectBrokerFromPriorityList takes a broker priority list and returns the first
 // broker that is available
-func SelectBrokerFromPriorityList(brokerList []string) (string, error) {
+func SelectBrokerFromPriorityList(brokerList []string, brokers *apimodels.BrokersDI) (string, error) {
 	logger.Info("selecting broker from priority list")
-	bmm := brokers.GetBrokerMemory()
-	availableBrokers, err := bmm.GetAll()
-	if err != nil {
-		return "", err
-	}
 
-	logger.Debug("available brokers", zap.Any("brokers", availableBrokers))
-	if len(availableBrokers) == 0 {
+	logger.Debug("available brokers", zap.Any("brokers", brokers.Available))
+	if len(brokers.Available) == 0 {
 		return "", ierrors.NewError().
 			Message("there are no brokers installed in insprd").
 			Build()
 	}
 
 	for _, broker := range brokerList {
-		if utils.Includes(availableBrokers, broker) {
+		if utils.Includes(brokers.Available, broker) {
 			logger.Debug("selected broker: ", zap.String("broker", broker))
 			return broker, nil
 		}
 	}
 
-	def, err := bmm.GetDefault()
-	if err != nil {
-		return "", err
-	}
-	logger.Debug("selected the default broker: ", zap.String("broker", def))
+	logger.Debug("selected the default broker: ", zap.String("broker", brokers.Default))
 
-	return def, nil
+	return brokers.Default, nil
 }
 
 // Auxiliar dApp  functions
 
 // checkApp is used when creating or updating dApps. It verifies if the dApp structure
 // is valid, not consideing boundary resolution.
-func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App) error {
-	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp)
+func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
+	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp, brokers)
 	if structureErrors != nil {
 		return structureErrors
 	}
 	return nil
 }
 
-func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App) error {
+func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
@@ -67,9 +58,9 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App
 		app.Spec.Node.Meta.Parent = parentScope
 	}
 
-	merr.Add(validAppStructure(app, parentApp))
+	merr.Add(validAppStructure(app, parentApp, brokers))
 	for _, childApp := range app.Spec.Apps {
-		merr.Add(amm.recursiveCheckAndRefineApp(childApp, app))
+		merr.Add(amm.recursiveCheckAndRefineApp(childApp, app, brokers))
 	}
 
 	if !merr.Empty() {
@@ -79,7 +70,7 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App
 	return nil
 }
 
-func validAppStructure(app, parentApp *meta.App) error {
+func validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
@@ -98,7 +89,7 @@ func validAppStructure(app, parentApp *meta.App) error {
 			Build())
 	}
 
-	merr.Add(checkAndUpdates(app))
+	merr.Add(checkAndUpdates(app, brokers))
 	merr.Add(validAliases(app))
 
 	if !merr.Empty() {
@@ -215,7 +206,7 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 func (amm *AppMemoryManager) updateUUID(app *meta.App, parentStr string) {
 	app.Meta.Parent = parentStr
 	query, _ := metautils.JoinScopes(parentStr, app.Meta.Name)
-	oldApp, err := amm.Tree().Apps().Get(query)
+	oldApp, err := amm.Perm().Apps().Get(query)
 	if err == nil {
 		app.Meta.UUID = oldApp.Meta.UUID
 		for chName, ch := range app.Spec.Channels {
@@ -268,13 +259,13 @@ func nodeIsEmpty(node meta.Node) bool {
 	return noAnnotations && noName && noParent && noImage
 }
 
-func getParentApp(childQuery string) (*meta.App, error) {
+func getParentApp(childQuery string, tmm *treeMemoryManager) (*meta.App, error) {
 	parentQuery, childName, err := metautils.RemoveLastPartInScope(childQuery)
 	if err != nil {
 		return nil, err
 	}
 
-	parentApp, err := GetTreeMemory().Apps().Get(parentQuery)
+	parentApp, err := tmm.Apps().Get(parentQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -289,7 +280,7 @@ func getParentApp(childQuery string) (*meta.App, error) {
 	return parentApp, err
 }
 
-func checkAndUpdates(app *meta.App) error {
+func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 	boundaries := app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)
 	channels := app.Spec.Channels
 	types := app.Spec.Types
@@ -333,7 +324,7 @@ func checkAndUpdates(app *meta.App) error {
 				types[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
 			}
 
-			broker, err := SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList)
+			broker, err := SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList, brokers)
 			if err != nil {
 				return err
 			}

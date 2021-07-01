@@ -1,18 +1,22 @@
 package fake
 
 import (
+	apimodels "inspr.dev/inspr/pkg/api/models"
+
 	memory "inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/pkg/meta/brokers"
-	"inspr.dev/inspr/pkg/utils"
 )
 
-// GetAll returns an array containing all currently mocked brokers
-func (bks *BrokersMock) GetAll() (utils.StringArray, error) {
+// Get returns an array containing all currently mocked brokers
+func (bks *BrokersMock) Get() (*apimodels.BrokersDI, error) {
 	if bks.fail != nil {
 		return nil, bks.fail
 	}
 
-	return bks.broker.Available.Brokers(), nil
+	return &apimodels.BrokersDI{
+		Available: bks.broker.Available.Brokers(),
+		Default:   bks.broker.Default,
+	}, nil
 }
 
 // GetDefault returns the broker mocked as default

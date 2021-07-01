@@ -6,7 +6,7 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/sidecars"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
@@ -25,11 +25,11 @@ func init() {
 type ChannelOperator struct {
 	k      kafkaAdminClient
 	logger *zap.Logger
-	mem    memory.Manager
+	mem    tree.Manager
 }
 
 // NewOperator returns an initialized operator from the environment variables
-func NewOperator(mem memory.Manager, config sidecars.KafkaConfig) (*ChannelOperator, error) {
+func NewOperator(mem tree.Manager, config sidecars.KafkaConfig) (*ChannelOperator, error) {
 	var kafkaConfig *kafka.ConfigMap
 	var err error
 	var adminClient kafkaAdminClient
@@ -60,7 +60,7 @@ func NewOperator(mem memory.Manager, config sidecars.KafkaConfig) (*ChannelOpera
 
 // Get gets a channel from kafka
 func (c *ChannelOperator) Get(ctx context.Context, context string, name string) (*meta.Channel, error) {
-	channel, _ := c.mem.Tree().Channels().Get(context, name)
+	channel, _ := c.mem.Perm().Channels().Get(context, name)
 	logger.Info("trying to get Channel from Kafka Topic",
 		zap.String("channel", name),
 		zap.String("context", context))
@@ -132,7 +132,7 @@ func (c *ChannelOperator) Update(ctx context.Context, context string, channel *m
 
 // Delete deletes a channel from kafka
 func (c *ChannelOperator) Delete(ctx context.Context, context string, name string) error {
-	channel, _ := c.mem.Tree().Channels().Get(context, name)
+	channel, _ := c.mem.Perm().Channels().Get(context, name)
 	topics := []string{toTopic(channel)}
 	logger.Info("trying to delete a Channel from Kafka Topics",
 		zap.String("channel", name),

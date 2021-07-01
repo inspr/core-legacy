@@ -3,31 +3,27 @@ package brokers
 import (
 	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/sidecars"
+	apimodels "inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta/brokers"
 	"inspr.dev/inspr/pkg/sidecars/models"
-	"inspr.dev/inspr/pkg/utils"
 )
 
-// GetAll returns an array containing all currently configured brokers
-func (bmm *BrokerMemoryManager) GetAll() (utils.StringArray, error) {
+// Get returns the brokers configured data
+func (bmm *brokerMemoryManager) Get() (*apimodels.BrokersDI, error) {
+	bmm.available.Lock()
+	defer bmm.available.Unlock()
 	mem, err := bmm.get()
 	if err != nil {
 		return nil, err
 	}
-	return mem.Available.Brokers(), nil
+	return &apimodels.BrokersDI{
+		Available: mem.Available.Brokers(),
+		Default:   mem.Default,
+	}, nil
 }
 
-// GetDefault returns the broker configured as default
-func (bmm *BrokerMemoryManager) GetDefault() (string, error) {
-	mem, err := bmm.get()
-	if err != nil {
-		return "", err
-	}
-	return mem.Default, nil
-}
-
-func (bmm *BrokerMemoryManager) get() (*brokers.Brokers, error) {
+func (bmm *brokerMemoryManager) get() (*brokers.Brokers, error) {
 	if bmm.broker == nil {
 		return nil, ierrors.NewError().Message("broker status memory is empty").Build()
 	}
@@ -35,7 +31,9 @@ func (bmm *BrokerMemoryManager) get() (*brokers.Brokers, error) {
 }
 
 // Create configures a new broker on insprd
-func (bmm *BrokerMemoryManager) Create(config brokers.BrokerConfiguration) error {
+func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error {
+	bmm.available.Lock()
+	defer bmm.available.Unlock()
 	logger.Info("creating new broker")
 	mem, err := bmm.get()
 	if err != nil {
@@ -75,7 +73,9 @@ func (bmm *BrokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 }
 
 // SetDefault sets a previously configured broker as insprd's default broker
-func (bmm *BrokerMemoryManager) SetDefault(broker string) error {
+func (bmm *brokerMemoryManager) SetDefault(broker string) error {
+	bmm.def.Lock()
+	defer bmm.def.Unlock()
 	logger.Debug("setting new default broker",
 		zap.String("broker", broker))
 	mem, err := bmm.get()
@@ -92,12 +92,12 @@ func (bmm *BrokerMemoryManager) SetDefault(broker string) error {
 }
 
 // Factory provides the struct implementation for Sidecarfactory
-func (bmm *BrokerMemoryManager) Factory() SidecarManager {
+func (bmm *brokerMemoryManager) Factory() SidecarManager {
 	return bmm.factory
 }
 
 //Configs returns the configurations for a given broker
-func (bmm *BrokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
+func (bmm *brokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
 	logger.Info("getting config for broker sidecar",
 		zap.String("broker", broker))
 

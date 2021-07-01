@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils"
@@ -13,13 +12,13 @@ import (
 // AliasMemoryManager implements the Alias interface
 // and provides methos for operating on Aliass
 type AliasMemoryManager struct {
-	*MemoryManager
+	*treeMemoryManager
 }
 
 // Alias is a MemoryManager method that provides an access point for Alias
-func (tmm *MemoryManager) Alias() memory.AliasMemory {
+func (tmm *treeMemoryManager) Alias() AliasMemory {
 	return &AliasMemoryManager{
-		MemoryManager: tmm,
+		treeMemoryManager: tmm,
 	}
 }
 
@@ -31,7 +30,7 @@ func (amm *AliasMemoryManager) Get(scope, aliasKey string) (*meta.Alias, error) 
 		zap.String("alias", aliasKey),
 		zap.String("scope", scope))
 
-	app, err := GetTreeMemory().Apps().Get(scope)
+	app, err := amm.treeMemoryManager.Apps().Get(scope)
 	if err != nil {
 		logger.Error("unable to get Alias")
 		return nil, err
@@ -57,7 +56,7 @@ func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.
 		zap.Any("alias", alias),
 		zap.String("scope", scope))
 	// get app from scope
-	app, err := GetTreeMemory().Apps().Get(scope)
+	app, err := amm.Apps().Get(scope)
 	if err != nil {
 		return err
 	}
@@ -73,7 +72,7 @@ func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.
 	}
 
 	// get parentApp of app
-	parentApp, _ := getParentApp(scope)
+	parentApp, _ := getParentApp(scope, amm.treeMemoryManager)
 
 	targetChannel := alias.Target
 
@@ -129,7 +128,7 @@ func (amm *AliasMemoryManager) Update(scope, aliasKey string, alias *meta.Alias)
 			Build()
 		return newError
 	}
-	parentApp, _ := GetTreeMemory().Apps().Get(scope)
+	parentApp, _ := amm.treeMemoryManager.Apps().Get(scope)
 
 	logger.Debug("validating Alias")
 	// valid target channel
@@ -161,7 +160,7 @@ func (amm *AliasMemoryManager) Delete(scope, aliasKey string) error {
 		zap.Any("alias", aliasKey),
 		zap.String("scope", scope))
 	// get app from scope
-	app, err := GetTreeMemory().Apps().Get(scope)
+	app, err := amm.treeMemoryManager.Apps().Get(scope)
 	if err != nil {
 		return err
 	}
@@ -202,6 +201,7 @@ func (amm *AliasMemoryManager) Delete(scope, aliasKey string) error {
 // AliasPermTreeGetter returns a getter that gets alias from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
 type AliasPermTreeGetter struct {
+	*PermTreeGetter
 }
 
 // Get receives a scope and a alias key. The scope defines
@@ -213,7 +213,7 @@ func (amm *AliasPermTreeGetter) Get(scope, aliasKey string) (*meta.Alias, error)
 		zap.String("alias", aliasKey),
 		zap.String("scope", scope))
 	// get app from scope
-	app, err := GetTreeMemory().Apps().Get(scope)
+	app, err := amm.Apps().Get(scope)
 	if err != nil {
 		logger.Error("unable to get Alias (Root Getter)")
 		return nil, err

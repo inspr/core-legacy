@@ -7,7 +7,7 @@ import (
 
 // Alias - mocks the implementation of the AppMemory interface methods
 type Alias struct {
-	*MemManager
+	*TreeMemoryMock
 	fail  error
 	alias map[string]*meta.Alias
 }

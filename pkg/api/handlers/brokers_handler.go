@@ -27,25 +27,15 @@ func (handler *Handler) NewBrokerHandler() *BrokerHandler {
 func (bh *BrokerHandler) HandleGet() rest.Handler {
 	logger.Info("handling Brokers get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		available, err := bh.Brokers.GetAll()
+		brokers, err := bh.Memory.Brokers().Get()
 		if err != nil {
 			logger.Error("unable to obtain currently available brokers on cluster",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
 			return
 		}
-		def, err := bh.Brokers.GetDefault()
-		if err != nil {
-			logger.Error("unable to obtain currently default brokers on cluster",
-				zap.Any("error", err))
-			rest.ERROR(w, err)
-			return
-		}
-		brokers := &models.BrokersDI{
-			Installed: available,
-			Default:   def,
-		}
-		logger.Debug("current brokers:", zap.Any("brokers", brokers.Installed))
+
+		logger.Debug("current brokers:", zap.Any("brokers", brokers.Available))
 
 		rest.JSON(w, http.StatusOK, brokers)
 	}
@@ -72,7 +62,7 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 			return
 		}
 
-		if err = bh.Brokers.Create(
+		if err = bh.Memory.Brokers().Create(
 			&kafkaConfig,
 		); err != nil {
 			rest.ERROR(w, err)

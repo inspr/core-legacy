@@ -1,14 +1,12 @@
 package tree
 
 import (
-	"inspr.dev/inspr/cmd/insprd/memory"
-	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 // MockManager mocks a tree structure for testing
 type MockManager struct {
-	*MemoryManager
+	*treeMemoryManager
 	appErr error
 	mockC  bool
 	mockCT bool
@@ -16,31 +14,31 @@ type MockManager struct {
 }
 
 // Channels mocks a channel interface for testing
-func (tmm *MockManager) Channels() memory.ChannelMemory {
+func (tmm *MockManager) Channels() ChannelMemory {
 	if tmm.mockC {
 		return &ChannelMockManager{
 			MockManager: tmm,
 		}
 	}
 	return &ChannelMemoryManager{
-		MemoryManager: tmm.MemoryManager,
+		treeMemoryManager: tmm.treeMemoryManager,
 	}
 }
 
 // Types mocks a Type interface for testing
-func (tmm *MockManager) Types() memory.TypeMemory {
+func (tmm *MockManager) Types() TypeMemory {
 	if tmm.mockCT {
 		return &TypeMockManager{
 			MockManager: tmm,
 		}
 	}
 	return &TypeMemoryManager{
-		MemoryManager: tmm.MemoryManager,
+		treeMemoryManager: tmm.treeMemoryManager,
 	}
 }
 
 // Apps mocks an app interface for testing
-func (tmm *MockManager) Apps() memory.AppMemory {
+func (tmm *MockManager) Apps() AppMemory {
 	if tmm.mockA {
 		return &MockAppManager{
 			MockManager: tmm,
@@ -48,7 +46,7 @@ func (tmm *MockManager) Apps() memory.AppMemory {
 		}
 	}
 	return &AppMemoryManager{
-		MemoryManager: tmm.MemoryManager,
+		treeMemoryManager: tmm.treeMemoryManager,
 	}
 }
 
@@ -67,23 +65,8 @@ func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
 }
 
 // Tree mock interface structure
-func (tmm *MockManager) Tree() memory.GetInterface {
+func (tmm *MockManager) Tree() GetInterface {
 	return &PermTreeGetter{
 		tmm.root,
 	}
-}
-
-// SetMockedTree receives a mock manager that has the configs of the
-// tree structure to be mocked and used in tests where tree access is needed
-func SetMockedTree(root *meta.App, appErr error, mockC, mockA, mockT bool) {
-	setTree(&MockManager{
-		MemoryManager: &MemoryManager{
-			root: root,
-			tree: root,
-		},
-		appErr: appErr,
-		mockC:  mockC,
-		mockA:  mockA,
-		mockCT: mockT,
-	})
 }

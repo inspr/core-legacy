@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"go.uber.org/zap"
-	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
@@ -20,25 +19,25 @@ func init() {
 	// logger = zap.NewNop()
 }
 
-// MemoryManager defines a memory manager interface
-type MemoryManager struct {
+// treeMemoryManager defines a memory manager interface
+type treeMemoryManager struct {
 	root *meta.App
 	tree *meta.App
 	sync.Mutex
 }
 
-var dapptree memory.Manager
+var dapptree *treeMemoryManager
 
-// GetTreeMemory returns a memory manager interface
-func GetTreeMemory() memory.Manager {
+// GetTreeMemory returns a tree memory manager interface
+func GetTreeMemory() Manager {
 	if dapptree == nil {
 		setTree(newTreeMemory())
 	}
 	return dapptree
 }
 
-func newTreeMemory() *MemoryManager {
-	return &MemoryManager{
+func newTreeMemory() *treeMemoryManager {
+	return &treeMemoryManager{
 		tree: &meta.App{
 			Meta: meta.Metadata{
 				Annotations: map[string]string{},
@@ -57,32 +56,32 @@ func newTreeMemory() *MemoryManager {
 	}
 }
 
-func setTree(tmm memory.Manager) {
+func setTree(tmm *treeMemoryManager) {
 	dapptree = tmm
 }
 
 //InitTransaction copies and reserves the current tree structure so that changes can be reversed
-func (mm *MemoryManager) InitTransaction() {
-	mm.Lock()
-	utils.DeepCopy(mm.tree, &mm.root)
+func (tmm *treeMemoryManager) InitTransaction() {
+	tmm.Lock()
+	utils.DeepCopy(tmm.tree, &tmm.root)
 }
 
 //Commit applies changes from a transaction in to the tree structure
-func (mm *MemoryManager) Commit() {
-	defer mm.Unlock()
-	mm.tree = mm.root
-	mm.root = nil
+func (tmm *treeMemoryManager) Commit() {
+	defer tmm.Unlock()
+	tmm.tree = tmm.root
+	tmm.root = nil
 }
 
 //Cancel discarts changes made in the last transaction
-func (mm *MemoryManager) Cancel() {
-	defer mm.Unlock()
-	mm.root = nil
+func (tmm *treeMemoryManager) Cancel() {
+	defer tmm.Unlock()
+	tmm.root = nil
 }
 
 //GetTransactionChanges returns the changelog resulting from the current transaction.
-func (mm *MemoryManager) GetTransactionChanges() (diff.Changelog, error) {
-	cl, err := diff.Diff(mm.tree, mm.root)
+func (tmm *treeMemoryManager) GetTransactionChanges() (diff.Changelog, error) {
+	cl, err := diff.Diff(tmm.tree, tmm.root)
 	return cl, err
 }
 
@@ -92,30 +91,36 @@ type PermTreeGetter struct {
 }
 
 // Apps returns a getter for apps on the root.
-func (t *PermTreeGetter) Apps() memory.AppGetInterface {
+func (ptg *PermTreeGetter) Apps() AppGetInterface {
 	return &AppPermTreeGetter{
-		tree: t.tree,
+		tree: ptg.tree,
 	}
 }
 
 // Channels returns a getter for channels on the root.
-func (t *PermTreeGetter) Channels() memory.ChannelGetInterface {
-	return &ChannelPermTreeGetter{}
+func (ptg *PermTreeGetter) Channels() ChannelGetInterface {
+	return &ChannelPermTreeGetter{
+		PermTreeGetter: ptg,
+	}
 }
 
 // Types returns a getter for Types on the root
-func (t *PermTreeGetter) Types() memory.TypeGetInterface {
-	return &TypePermTreeGetter{}
+func (ptg *PermTreeGetter) Types() TypeGetInterface {
+	return &TypePermTreeGetter{
+		PermTreeGetter: ptg,
+	}
 }
 
 // Alias returns a getter for alias on the root
-func (t *PermTreeGetter) Alias() memory.AliasGetInterface {
-	return &AliasPermTreeGetter{}
+func (ptg *PermTreeGetter) Alias() AliasGetInterface {
+	return &AliasPermTreeGetter{
+		PermTreeGetter: ptg,
+	}
 }
 
-// Tree returns a getter for objects on the tree without the current changes.
-func (mm *MemoryManager) Tree() memory.GetInterface {
+// Perm returns a getter for objects on the tree without the current changes.
+func (tmm *treeMemoryManager) Perm() GetInterface {
 	return &PermTreeGetter{
-		tree: mm.tree,
+		tree: tmm.tree,
 	}
 }
