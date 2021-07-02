@@ -102,8 +102,7 @@ To install redis in the cluster we need the yaml files that we can use to create
 
 In you terminal create the two necessary files by using the commands below.
 ```bash
-# creates the configMap yaml file named uidp-configMap.yaml
-$ echo "
+# content of configMap yaml file named uidp-configMap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -172,13 +171,10 @@ spec:
       resources:
         requests:
           storage: 50Mi
-" > uidp-configMap.yaml
 ```
 
 ```bash
-# creates the service yaml file named uidp-svc.yaml
-$ echo "
----
+# content of the service yaml file named uidp-svc.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -226,7 +222,7 @@ With everything ready for the creation of dApps in the minikube cluster we only 
 
 > firstly create a `create_user.yaml` by using the command below
 ```bash
-echo "
+# content of the create_user.yaml
 uid: minikube
 password: "123"
 permissions:
@@ -252,14 +248,13 @@ permissions:
     - "delete:channel"
     - "delete:type"
     - "delete:alias"
-" > user_example.yaml
 ```
 
 
 Run the following inprov command
 
 ```bash
-inprov create --yaml user_example.yaml admin 123456
+inprov create --yaml create_user.yaml admin 123456
 ```
 
 > This will create a user that has permissions to do any CRUD operation with dApps in the cluster. Futhermore it is a permanent account, unlike the admin initial user.
@@ -308,16 +303,16 @@ In the pingpong folder there are golang files that can be built into docker imag
 Clone the inspr repository, and open the terminal in the `pingpong_demo` directory.
 
 Run the following commands
-> `dockerhub_url/<image_name>:tag` is related to the repository that you are using, for example when using dockerhub it would be something like `TODO`. A recommendation is to use the tag `latest` when building this example, since it facilitates the process.
+> `dockerhub_url/<image_name>:tag` is related to the repository that you are using, for example when using dockerhub it would be something like `nicholasinspr/minikube-test`. A recommendation is to use the tag `latest` when building this example, since it facilitates the process.
 
 ```bash
 ### builds the ping docker image and send it to the docker hub
-$ docker build -t <public_repo_url>/ping:latest -f ping/ping.Dockerfile ../..
-$ docker push <public_repo_url>/ping:latest
+$ docker build -t <public_repo_url>-ping:latest -f ping/ping.Dockerfile ../..
+$ docker push <public_repo_url>-ping:latest
 
 ### builds the pong docker image and send it to the docker hub
-$ docker build -t <public_repo_url>/pong:latest -f pong/pong.Dockerfile ../..
-$ docker push <public_repo_url>/pong:latest
+$ docker build -t <public_repo_url>-pong:latest -f pong/pong.Dockerfile ../..
+$ docker push <public_repo_url>-pong:latest
 ```
 
 After doing the previous steps, it is now necessary to change the `image` field in `ping` and `pong` yaml files in the `pingpong_example/yamls/nodes` folder. 
@@ -330,12 +325,12 @@ After doing the previous steps, it is now necessary to change the `image` field 
 Run the following commands to deploy dapps into your minikube cluster.
 
 ```bash
-$ echo "
+$ echo '
 bootstrapServers: kafka.default.svc:9092
 autoOffsetReset: earliest
 sidecarImage: gcr.io/insprlabs/inspr/sidecar/kafka:latest
 sidecarAddr: "http://localhost"
-" > kafkaConfig.yaml
+' > kafkaConfig.yaml
 
 ### installs message broker into the cluster
 $ insprctl cluster config kafka kafkaConfig.yaml
