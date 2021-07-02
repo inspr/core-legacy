@@ -1,11 +1,14 @@
 
 # Changelog
 
+### #86 Story CORE-485 | minikube.md
+- features:
+  - created the documentation on how to run insprd/uidp on minikube
+---
 ### #85 Story CORE-464 | Multibroker documentation
 - features:
     - documentation for multibroker feature
 ---
-
 ### #84 Story CORE-480 | difference.md
 - features:
     - Updated `difference.md`
