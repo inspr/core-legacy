@@ -78,6 +78,14 @@ With the ip in hand add the entry to your local `/etc/hosts` in the following fo
 $MINIKUBE_IP    inspr.com
 ```
 
+
+### **Setting up env variables**
+
+Set the env variable on your local machine to fit the url set in the `/etc/hosts`
+```bash
+export INPROV_PROVIDER_URL="http://inspr.com"
+```
+
 ### Obtaining the auth-svc token
 After setting up the ip of minikube, use the `insprctl` to obtain the adminToken generated in its service creation.
 ```
@@ -207,6 +215,7 @@ kubectl exec -it redis-cluster-0 -- redis-cli --cluster create --cluster-replica
 Now that the admin token is set enter the upper directory of the cloned repository and run the command `skaffold run --profile uidp`.
 
 >This will install the uidp into the minikube cluster.
+
 
 ## **Deploying dApps**
 
