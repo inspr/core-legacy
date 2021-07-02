@@ -1,6 +1,6 @@
 # Multibroker
 
-Message brokers are communication services designed to connect  multiple clients on a centralized message channel, allowing each client to send and receive messages through this central service. This  form of communication is imperative on Inspr because it allows multiple applications to connect amongst them selfs, effectively forming a group in which every message send, by one party,  is guaranteed to reach every other registered party.
+Message brokers are communication services designed to connect  multiple clients on a centralized message channel, allowing each client to send and receive messages through this central service. This  form of communication is imperative on Inspr because it allows multiple applications to connect amongst them selfs, effectively forming a group in which every message send by one party is guaranteed to reach every other registered party.
 
 Knowing what are message brokers and the central role they play on Inspr, we developed a easy way to configure new brokers on Insprd, giving the user the flexibility to choose the one that best fits their requirements.  
 
