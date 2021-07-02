@@ -40,11 +40,6 @@ $ helm repo update
 $ helm install ingress-nginx ingress-nginx/ingress-nginx
 ```
 
-Alternatively on **minikube** you could use the command
-```
-$ minikube addons enable ingress
-```
-
 For confirmation that the service is up and running run the command below, it should be a service with the name `ingress-nginx-controller`.
 ```
 $ kubectl get service -A
@@ -213,7 +208,6 @@ Now that the admin token is set enter the upper directory of the cloned reposito
 
 >This will install the uidp into the minikube cluster.
 
-
 ## **Deploying dApps**
 
 ### **Setting up permissions' account**
@@ -265,6 +259,16 @@ To login use the following command
 inprov login minikube 123 
 ```
 
+### **Installing a Message Broker**
+
+With everything in place we now need a way in which messages between dApps can work be send through, for this example we will use `kafka`.
+
+To install kafka use the following commands:
+```bash
+$ helm repo add bitnami https://charts.bitnami.com/bitnami
+
+$ helm install my-release bitnami/kafka
+```
 
 ### **Docker Images**
 
@@ -344,3 +348,4 @@ $ insprctl apply -f yamls/table.yaml
 ### deploys the nodes
 $ insprctl apply -k yamls/nodes
 ```
+
