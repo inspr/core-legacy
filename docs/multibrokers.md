@@ -128,7 +128,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			zap.String("broker", channelBroker),
 			zap.String("channel", channel))
 
-        // Forwars the message to the broker specific sidecar
+        // Forwards the message to the broker specific sidecar
             resp, err := sendRequest(reqAddress, encodedMsg)
             if err != nil {
                 logger.Error("unable to send request to "+channelBroker+" sidecar",
@@ -156,7 +156,7 @@ func (s *Server) readMessageHandler() rest.Handler {
         // From the request's URL the LB obtains the targeted channel.
 			channel := strings.TrimPrefix(r.URL.Path, "/")
         
-		// Verification step to make sure the Node shoul receive input from the targeted channel
+		// Verification step to make sure the Node should receive input from the targeted channel
             if !environment.InputChannelList().Contains(channel) {
                 logger.Error("channel " + channel + " not found in input channel list")
                 insprError := ierrors.NewError().
@@ -167,7 +167,7 @@ func (s *Server) readMessageHandler() rest.Handler {
                 return
             }
         
-		// With the channel's parsed and verified, LB fetches the information 
+		// With the channel parsed and verified, LB fetches the information 
         //required to forward the message to the Node
             clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
             if clientReadPort == "" {
@@ -181,7 +181,7 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		logger.Debug("decoding message from Avro schema")
         
-        //Decode mesage from Avro to JSON
+        //Decode message from Avro to JSON
             decodedMsg, err := decodeFromAvro(channel, r.Body)
             if err != nil {
                 logger.Error("unable to decode message from Avro schema",
