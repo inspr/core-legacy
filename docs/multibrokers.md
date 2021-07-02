@@ -19,7 +19,7 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
       - Address of Kafka's bootstrap servers
       - The auto offset reset configuration
 
-   2. With these informations you can proceed by creating the configuration file to send Insprd. This file will require two more pieces of information, the image for that broker's sidecar[], which Inspr provides to you and the address you want that sidecar to be deployed at. The address by default should be "http://localhost" which just indicates that that deploy should happen on the same container as the other pieces of your dApp.
+   2. With these informations you can proceed by creating the configuration file to send Insprd. This file will require two more pieces of information, the image for that broker's sidecar, which Inspr provides to you and the address you want that sidecar to be deployed at. The address by default should be "http://localhost" which just indicates that that deploy should happen on the same container as the other pieces of your dApp.
       If you followed the Helm installation for Kafka suggested above, the file you need should be exactly like this:
 
       *kafkaConfig.yaml*:
@@ -33,7 +33,7 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
 
       If you choose to install the broker some other way, the information may change but the **format should remain like the example above**.
 
-      Finally if you are installing any broker other than Kafka you should consult the correct format for that broker [here].
+      Finally if you are installing any broker other than Kafka you should consult the correct format for that broker. 
 
    3. Once you have you configuration file all you need to do is run:
 
@@ -63,9 +63,7 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
 By configuring your broker what you are doing is subscribing the corresponding sidecar for that broker into a *Factory*, allowing Insprd to deploy sidecars of this type whenever a *dApp* you create uses a *Channel* configured to work with this broker. The architecture to support the dynamic choice of sidecars is based on a **Load-balancer** that is responsible for connecting to all of the broker specific sidecars your *dApp* demands.
 
 
-
-ADD IMAGE HERE ONCE MIRO IS BACK
-
+![Multibroker](./img/brokers.png)
 
 
 ### Load Balancer
@@ -80,60 +78,68 @@ As discussed previously, when deploying a *Node* Insprd also deploys other artif
 func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger.Info("handling message write")
+			
+        // From the request's URL the LB obtains the targeted channel.
+			channel := strings.TrimPrefix(r.URL.Path, "/")
+        
+		// Verification step to make sure the node can output on the targeted channel
+            if !environment.OutputChannelList().Contains(channel) {
+                logger.Error(fmt.Sprintf("channel %s not found in output channel list", channel))
+                insprError := ierrors.NewError().
+                    BadRequest().
+                    Message("channel '%s' not found", channel)
 
-		channel := strings.TrimPrefix(r.URL.Path, "/")
+                rest.ERROR(w, insprError.Build())
+                return
+            }
+		
+        // Once the channel is verified the broker searches for it's respective broker
+            channelBroker, err := environment.GetChannelBroker(channel)
+            if err != nil {
+                logger.Error("unable to get channel broker",
+                    zap.String("channel", channel),
+                    zap.Any("error", err))
 
-		if !environment.OutputChannelList().Contains(channel) {
-			logger.Error(fmt.Sprintf("channel %s not found in output channel list", channel))
-			insprError := ierrors.NewError().
-				BadRequest().
-				Message("channel '%s' not found", channel)
+                rest.ERROR(w, err)
+                return
+            }
 
-			rest.ERROR(w, insprError.Build())
-			return
-		}
+        // With all the channel's information parsed and verified, LB fetches the information 
+        //required to reach the correct broker specific sidecar
+            sidecarAddress := environment.GetBrokerSpecificSidecarAddr(channelBroker)
+            sidecarWritePort := environment.GetBrokerWritePort(channelBroker)
 
-		channelBroker, err := environment.GetChannelBroker(channel)
-		if err != nil {
-			logger.Error("unable to get channel broker",
-				zap.String("channel", channel),
-				zap.Any("error", err))
-
-			rest.ERROR(w, err)
-			return
-		}
-
-		sidecarAddress := environment.GetBrokerSpecificSidecarAddr(channelBroker)
-		sidecarWritePort := environment.GetBrokerWritePort(channelBroker)
-
-		reqAddress := fmt.Sprintf("%s:%s/%s", sidecarAddress, sidecarWritePort, channel)
+			reqAddress := fmt.Sprintf("%s:%s/%s", sidecarAddress, sidecarWritePort, channel)
 
 		logger.Debug("encoding message to Avro schema")
+        
+		// Message is encoded to avro
+            encodedMsg, err := encodeToAvro(channel, r.Body)
+            if err != nil {
+                logger.Error("unable to encode message to Avro schema",
+                    zap.String("channel", channel),
+                    zap.Any("error", err))
 
-		encodedMsg, err := encodeToAvro(channel, r.Body)
-		if err != nil {
-			logger.Error("unable to encode message to Avro schema",
-				zap.String("channel", channel),
-				zap.Any("error", err))
-
-			rest.ERROR(w, err)
-			return
-		}
+                rest.ERROR(w, err)
+                return
+            }
 
 		logger.Info("sending message to broker",
 			zap.String("broker", channelBroker),
 			zap.String("channel", channel))
 
-		resp, err := sendRequest(reqAddress, encodedMsg)
-		if err != nil {
-			logger.Error("unable to send request to "+channelBroker+" sidecar",
-				zap.Any("error", err))
+        // Forwars the message to the broker specific sidecar
+            resp, err := sendRequest(reqAddress, encodedMsg)
+            if err != nil {
+                logger.Error("unable to send request to "+channelBroker+" sidecar",
+                    zap.Any("error", err))
 
-			rest.ERROR(w, err)
-			return
-		}
-
-		rest.JSON(w, resp.StatusCode, resp.Body)
+                rest.ERROR(w, err)
+                return
+            }
+		
+        // Responds the Node
+			rest.JSON(w, resp.StatusCode, resp.Body)
 	}
 }
 ```
@@ -147,54 +153,60 @@ func (s *Server) readMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger.Info("handling message read")
 
-		channel := strings.TrimPrefix(r.URL.Path, "/")
+        // From the request's URL the LB obtains the targeted channel.
+			channel := strings.TrimPrefix(r.URL.Path, "/")
+        
+		// Verification step to make sure the Node shoul receive input from the targeted channel
+            if !environment.InputChannelList().Contains(channel) {
+                logger.Error("channel " + channel + " not found in input channel list")
+                insprError := ierrors.NewError().
+                    BadRequest().
+                    Message("channel '%s' not found", channel)
 
-		if !environment.InputChannelList().Contains(channel) {
-			logger.Error("channel " + channel + " not found in input channel list")
-			insprError := ierrors.NewError().
-				BadRequest().
-				Message("channel '%s' not found", channel)
+                rest.ERROR(w, insprError.Build())
+                return
+            }
+        
+		// With the channel's parsed and verified, LB fetches the information 
+        //required to forward the message to the Node
+            clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
+            if clientReadPort == "" {
+                insprError := ierrors.NewError().
+                    NotFound().
+                    Message("[ENV VAR] INSPR_SCCLIENT_READ_PORT not found")
 
-			rest.ERROR(w, insprError.Build())
-			return
-		}
-
-		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
-		if clientReadPort == "" {
-			insprError := ierrors.NewError().
-				NotFound().
-				Message("[ENV VAR] INSPR_SCCLIENT_READ_PORT not found")
-
-			rest.ERROR(w, insprError.Build())
-			return
-		}
+                rest.ERROR(w, insprError.Build())
+                return
+            }
 
 		logger.Debug("decoding message from Avro schema")
+        
+        //Decode mesage from Avro to JSON
+            decodedMsg, err := decodeFromAvro(channel, r.Body)
+            if err != nil {
+                logger.Error("unable to decode message from Avro schema",
+                    zap.String("channel", channel),
+                    zap.Any("error", err))
 
-		decodedMsg, err := decodeFromAvro(channel, r.Body)
-		if err != nil {
-			logger.Error("unable to decode message from Avro schema",
-				zap.String("channel", channel),
-				zap.Any("error", err))
-
-			rest.ERROR(w, err)
-			return
-		}
+                rest.ERROR(w, err)
+                return
+            }
 
 		logger.Info("sending message to node through: ",
 			zap.String("channel", channel))
 
-		reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
-
-		resp, err := sendRequest(reqAddress, decodedMsg)
-		if err != nil {
-			logger.Error("unable to send request from lbsidecar to node",
-				zap.Any("error", err))
-			rest.ERROR(w, err)
-			return
-		}
-
-		rest.JSON(w, resp.StatusCode, resp.Body)
+        // Forwards the message to the Node
+            reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
+            resp, err := sendRequest(reqAddress, decodedMsg)
+            if err != nil {
+                logger.Error("unable to send request from lbsidecar to node",
+                    zap.Any("error", err))
+                rest.ERROR(w, err)
+                return
+            }
+		
+        //Responds to the broker specific sidecar
+			rest.JSON(w, resp.StatusCode, resp.Body)
 	}
 }
 ```
