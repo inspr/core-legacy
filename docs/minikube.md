@@ -349,3 +349,29 @@ $ insprctl apply -f yamls/table.yaml
 $ insprctl apply -k yamls/nodes
 ```
 
+Important to make it clear that in the yaml files that are in the nodes, the ping.app.yaml and pong.app.yaml, their field `image` has to be change to contain your repository where you stored the docker image.
+
+For illustration the ping.app.yaml would be like
+
+```yaml
+apiVersion: v1
+kind: dapp
+
+meta:
+  name: ping
+  parent: pptable
+spec:
+  node:
+    spec:
+      replicas: 1
+      # here is a example of the change that has to happen
+      image: nicholasinspr/minikube-test-ping:latest
+      environment:
+        SUPER_SECRET_0001: "false"
+  boundary:
+    input:
+      - pinginput
+    output:
+      - pingoutput
+
+```
