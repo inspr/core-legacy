@@ -1,19 +1,33 @@
-all=0
+
+PASS=true
 files=()
+
 for file in $(git diff --cached --name-only --diff-filter=ATMR --line-prefix=./ | grep "\.go\$")
 do
+    # formats the file
+    go fmt $file
+
+    # runs linter
 	staticcheck -set_exit_status $file 2> /dev/null
-	if [[ $? -ne 0 ]]
-	then
-		all=1
+	if [[ $? -ne 0 ]]; then
+		PASS=false
 	fi
+    
+    # go vet reports suspicious constructs
+    go vet $file
+    if [[ $? != 0 ]]; then
+        PASS=false
+    fi
 done
 
-if [[ $all -ne 0 ]]
-then
-	echo "Lint for cached files failed, fix it before commiting"
-fi
 
-exit $all
+if ! $PASS; then
+    printf "COMMIT FAILED\n"
+    exit 1
+else
+    printf "COMMIT SUCCEEDED\n"
+fi
+exit 0
+
 
 
