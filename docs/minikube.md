@@ -103,7 +103,7 @@ Clone the github repository containing the UIDP information and alter the file `
 ### **Installing Redis**
 To install redis in the cluster we need the yaml files that we can use to create the service and configMap. 
 
-In you terminal create the two necessary files by using the commands below.
+Create two files with the content described below.
 ```bash
 # content of configMap yaml file named uidp-configMap.yaml
 apiVersion: v1
@@ -193,7 +193,6 @@ spec:
     name: gossip
   selector:
     app: redis-cluster
-" > uidp-svc.yaml
 ```
 
 
@@ -223,7 +222,7 @@ Now that the admin token is set enter the upper directory of the cloned reposito
 
 With everything ready for the creation of dApps in the minikube cluster we only need to create a user in our system, that can be done by using the `inprov` cli.
 
-> firstly create a `create_user.yaml` by using the command below
+> firstly create a `create_user.yaml` with the following content
 ```bash
 # content of the create_user.yaml
 uid: minikube
