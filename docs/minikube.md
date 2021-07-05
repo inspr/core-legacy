@@ -6,12 +6,12 @@ For the purporse of testing Insprd locally we recommmend using [minikube](https:
 Following this tutorial you will see the necessary steps to have one of the Inspr's examples running locally, more specifically the `ping pong` demonstration, but it will work for any other.
 
 The requirements for this turorial are:
-- Docker Hub account
-- Docker installed
-- kubectl installed
-- Helm installed
-- insprctl installed
-- Skaffold installed
+- [Docker Hub account](https://hub.docker.com/)
+- [Docker installed](https://www.docker.com/get-started)
+- [kubectl installed](https://kubernetes.io/docs/tasks/tools/)
+- [Helm installed](https://helm.sh/docs/intro/install/)
+- [insprctl installed](https://github.com/inspr/inspr/releases)
+- [Skaffold installed](https://skaffold.dev/docs/install/)
 
 
 # Step by Step
@@ -28,7 +28,7 @@ $ kubectl create clusterrolebinding --clusterrole admin --serviceaccount default
 $ kubectl create namespace inspr-apps
 ```
 
-## Installation of the insprd and uidp
+## Installation of the Insprd and UID Provider
 
 The process of installation involves adding a few Helm repositories and running `helm install`, the detailed process can be found [here](helm_installation.md).
 
@@ -57,9 +57,9 @@ $ helm install insprd inspr/insprd \
     --set lbsidecarImage=gcr.io/red-inspr/inspr/sidecar/lbsidecar:v0.1.0
 ```
 
-## **Installing UIDP Provider**
+## **Installing UID Provider**
 
-With the `insprd` and its `auth-svc` installed we can now install the inspr's UIDP Provider. This can be done by running `skaffold` in the [github repository](https://github.com/inspr/inspr) that contains the necessary information (you should clone the repository to your local machine).
+With the `insprd` and its `auth-svc` installed we can now install the Inspr's UID Provider. This can be done by running `skaffold` in the [github repository](https://github.com/inspr/inspr) that contains the necessary information (you should clone the repository to your local machine).
 
 
 First we need to open an IP so we can make requests to our minikube services, this can be done by the commands below.
@@ -330,7 +330,7 @@ After doing the previous steps, it is now necessary to change the `image` field 
 The new value should be the `dockerhub_url/<image_name>:tag`, just like it was typed in the docker push the steps above.
 ### Deploying dApps
 
-Run the following commands to deploy dapps into your minikube cluster.
+Run the following commands to deploy dApps into your minikube cluster.
 
 ```bash
 $ echo '
