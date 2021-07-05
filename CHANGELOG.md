@@ -8,6 +8,9 @@
 	- creates a pre-commit script for linting files that are staged for committing
 	- creates an installation script that creates symlinks for the hooks
 	- added a readme describing the process of installation
+    - added a comment that signals that the staticcheck should ignore the file in:
+        - `node_operator.go`
+        - `node_operator_test.go`
 ---
   
 ### #80 Story CORE-497 | Migrate cluster from "red-inspr" to "insprlabs"
