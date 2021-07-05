@@ -1,6 +1,6 @@
 # Multibroker
 
-Message brokers are communication services designed to connect  multiple clients on a centralized message channel, allowing each client to send and receive messages through this central service. This  form of communication is imperative on Inspr because it allows multiple applications to connect amongst them selfs, effectively forming a group in which every message send by one party is guaranteed to reach every other registered party.
+Message brokers are communication services designed to connect  multiple clients on a centralized message channel, allowing each client to send and receive messages through this central service. This  form of communication is imperative on Inspr because it allows multiple applications to connect among themselfs, effectively forming a group in which every message send by one party is guaranteed to reach every other registered party.
 
 Knowing what are message brokers and the central role they play on Inspr, we developed a easy way to configure new brokers on Insprd, giving the user the flexibility to choose the one that best fits their requirements.  
 
@@ -43,7 +43,7 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
    3. Once you have you configuration file all you need to do is run:
 
       ```shell
-      insprctl cluster config kafka relative_path_to/your_file.yaml
+      insprctl cluster config kafka <relative_path_to>/your_file.yaml
       ```
 
       To which the expected response is: `successfully installed broker on insprd`. 
@@ -73,7 +73,7 @@ By configuring your broker what you are doing is subscribing the corresponding s
 
 ### Load Balancer
 
-The load balancer is technically itself a sidecar, since it is deployed alongside every *Node* and is used by it as an intermediate to all communication, but it serves different purposes. The load balancer is of central importance to the Multibroker architecture because of two of its functionalities: dynamic broker-specific sidecar balancing and serialization.
+The load balancer is technically itself a sidecar, since it is deployed alongside every *Node* and is used by it as an intermediate to all communication, but it serves a different purposes. The load balancer is of central importance to the Multibroker architecture because of two of its functionalities: dynamic broker-specific sidecar balancing and serialization.
 
 As discussed previously, when deploying a *Node* Insprd also deploys other artifacts, of these artifacts the Load Balancer is the only one that is attached to **all** deployed nodes. This is the case because it is **necessary** to allow the *Node* to communicate. During the deploy the *Node* is configured to communicate with the Load Balancer through requests to a `writeMessageHandler`, so every time it needs to send a message using a *Channel* it sends a request to the Load Balancer by providing it with the message and the targeted channel. Once the Load Balancer, which is configured with most of that *Node's Channels* informations,  receives a message request it verifies if that channel is valid, then sends a request to the sidecar that corresponds to the specified channel's broker.  This allows the *Node*'s client to send multiple messages without having to deal with the overhead related to broker verification, sidecar selection or message serialization, since each of these requests is handled by a separate thread, via the traditional *HTTP* server architecture.  
 
@@ -144,12 +144,12 @@ func (s *Server) writeMessageHandler() rest.Handler {
             }
 		
         // Responds the Node
-			rest.JSON(w, resp.StatusCode, resp.Body)
+	    rest.JSON(w, resp.StatusCode, resp.Body)
 	}
 }
 ```
 
-To receive information from these brokers the Load Balancer  serves a `readMessageHandler`, which is posted to by the broker specific sidecars when these receive a message from the broker itself. The read handler then parses from the request the *Channel* targeted by that operation, verifying if this *Channel* is in fact part of the *Node*'s *Boundaries*, if it is it then **deserializes** the message received, from *Avro* to *JSON*, and sends it to the *Node*'s client.
+To receive information from these brokers the Load Balancer  serves a `readMessageHandler`, which is posted to by the broker specific sidecars when these receive a message from the broker itself. The read handler then parses from the request the *Channel* targeted by that operation, verifying if this *Channel* is in fact part of the *Node*'s *Boundaries*, if so, it then **deserializes** the message received, from *Avro* to *JSON*, and sends it to the *Node*'s client.
 
 `readMessageHandler`:
 
@@ -211,7 +211,7 @@ func (s *Server) readMessageHandler() rest.Handler {
             }
 		
         //Responds to the broker specific sidecar
-			rest.JSON(w, resp.StatusCode, resp.Body)
+	    rest.JSON(w, resp.StatusCode, resp.Body)
 	}
 }
 ```
