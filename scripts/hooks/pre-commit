@@ -1,33 +1,34 @@
 
-PASS=true
-files=()
+PASS=""
 
 for file in $(git diff --cached --name-only --diff-filter=ATMR --line-prefix=./ | grep "\.go\$")
 do
     # formats the file
     go fmt $file
+    if [[ $? -ne 0 ]]; then
+		PASS="go fmt error"
+	fi
 
     # runs linter
-	staticcheck -set_exit_status $file 2> /dev/null
+	staticcheck $file 
 	if [[ $? -ne 0 ]]; then
-		PASS=false
+		PASS="staticcheck error"
 	fi
     
     # go vet reports suspicious constructs
     go vet $file
     if [[ $? != 0 ]]; then
-        PASS=false
+        PASS="go vet error"
     fi
 done
 
-
-if ! $PASS; then
-    printf "COMMIT FAILED\n"
-    exit 1
+if [ -z "$PASS" ]; then
+    echo "COMMIT SUCCEEDED"
 else
-    printf "COMMIT SUCCEEDED\n"
+    echo "COMMIT FAILED - $PASS"
+    exit 1
 fi
-exit 0
+
 
 
 
