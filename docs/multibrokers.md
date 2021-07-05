@@ -12,17 +12,22 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
 
 1. First thing you have to do is install the broker on you cluster. For Kafka this can be done simply by following this tutorial: https://bitnami.com/stack/kafka/helm.
 
-2. Next you need to configure your Insprd Instance, this is done through a command that receives the specific broker you want to install and the required configuration of your broker's instance, which may differ from broker to broker.
+2. Next you need to configure your Insprd Instance. This is done through a command that receives the specific broker you want to install and the required configuration of your broker's instance, which may differ from broker to broker.
 
-   1. For Kafka the configurations you'll need to attain from your deployment are: 
+   1. For Kafka the configurations you'll need to attain from your Kafka deployment are: 
 
       - Address of Kafka's bootstrap servers
       - The auto offset reset configuration
 
-   2. With these informations you can proceed by creating the configuration file to send Insprd. This file will require two more pieces of information, the image for that broker's sidecar, which Inspr provides to you and the address you want that sidecar to be deployed at. The address by default should be "http://localhost" which just indicates that that deploy should happen on the same container as the other pieces of your dApp.
+   2. With these informations you can proceed by creating the configuration file to send Insprd. This file will require two more pieces of information:
+
+      - the image for that broker's sidecar, which Inspr provides to you 
+      - the address you want that sidecar to be deployed at.
+
+   The address by default should be `http://localhost` which just indicates that that deploy should happen on the same container as the other pieces of your dApp.
       If you followed the Helm installation for Kafka suggested above, the file you need should be exactly like this:
 
-      *kafkaConfig.yaml*:
+      `kafkaConfig.yaml`:
 
       ```yaml
       bootstrapServers: kafka.default.svc:9092
@@ -33,7 +38,7 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
 
       If you choose to install the broker some other way, the information may change but the **format should remain like the example above**.
 
-      Finally if you are installing any broker other than Kafka you should consult the correct format for that broker. 
+      Finally if you are installing any broker other than Kafka you should consult the correct file format for that broker. 
 
    3. Once you have you configuration file all you need to do is run:
 
@@ -49,7 +54,7 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
       insprctl cluster config <broker-name> <relative_file_path>
       ```
 
-      You should keep in mind:
+      Keep in mind:
 
       - `<broker-name>` must be one of the supported broker options for Inspr. This is actually not an argument, it is a sub-command.
       - `<relative_file_path>` must refer to a YAML file with the correct fields for the chosen broker.
@@ -58,7 +63,7 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
 
 
 
-## How dos it work
+## How does it work
 
 By configuring your broker what you are doing is subscribing the corresponding sidecar for that broker into a *Factory*, allowing Insprd to deploy sidecars of this type whenever a *dApp* you create uses a *Channel* configured to work with this broker. The architecture to support the dynamic choice of sidecars is based on a **Load-balancer** that is responsible for connecting to all of the broker specific sidecars your *dApp* demands.
 
@@ -68,11 +73,11 @@ By configuring your broker what you are doing is subscribing the corresponding s
 
 ### Load Balancer
 
-The load balancer is technically itself a sidecar, since it is deployed alongside every *Node* and is used by it as an intermediate to all communication, but it serves different purposes. The load balancer is of central importance to the Multi-Broker architecture because of two of its functionalities: dynamic broker-specific sidecar balancing and serialization.
+The load balancer is technically itself a sidecar, since it is deployed alongside every *Node* and is used by it as an intermediate to all communication, but it serves different purposes. The load balancer is of central importance to the Multibroker architecture because of two of its functionalities: dynamic broker-specific sidecar balancing and serialization.
 
-As discussed previously, when deploying a *Node* Insprd also deploys other artifacts, of these artifacts the Load Balancer is the only one that is attached to **all** deployed nodes. This is the case because it is **necessary** to allow the *Node* to communicate. During the deploy the *Node* is configured to communicate with the Load Balancer through requests to a `writeMessageHandler`, so every time it needs to send a message using a *Channel* it request the Load Balancer by providing it with the message and the targeted channel. Once the Load Balancer, which is configured with most of that *Node's Channels* informations,  receives a message request it verifies if that channel is valid, than sends a request to the sidecar that corresponds to the specified channel's broker.  This allows the *Node*'s client to send multiple messages without having to deal with the overhead related to broker verification, sidecar selection or message serialization, since each of these requests is handled by a separate thread, via the traditional *Http* server architecture.  
+As discussed previously, when deploying a *Node* Insprd also deploys other artifacts, of these artifacts the Load Balancer is the only one that is attached to **all** deployed nodes. This is the case because it is **necessary** to allow the *Node* to communicate. During the deploy the *Node* is configured to communicate with the Load Balancer through requests to a `writeMessageHandler`, so every time it needs to send a message using a *Channel* it sends a request to the Load Balancer by providing it with the message and the targeted channel. Once the Load Balancer, which is configured with most of that *Node's Channels* informations,  receives a message request it verifies if that channel is valid, then sends a request to the sidecar that corresponds to the specified channel's broker.  This allows the *Node*'s client to send multiple messages without having to deal with the overhead related to broker verification, sidecar selection or message serialization, since each of these requests is handled by a separate thread, via the traditional *HTTP* server architecture.  
 
-`*writeMessageHandler`:
+`writeMessageHandler`:
 
 ```go
 func (s *Server) writeMessageHandler() rest.Handler {
@@ -144,7 +149,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 }
 ```
 
-To receive information from these brokers the Load Balancer  serves a `readMessageHandler` which is posted to by the broker specific sidecars, when these receive a message from the broker itself. The read handler then parses from the request the *Channel* targeted by that operation, verifying if this *Channel* is in fact part of the *Node*'s *Boundaries*, if it is it then **deserializes** the message received, from *Avro* to *Json* and sends it to the *Node*'s client.
+To receive information from these brokers the Load Balancer  serves a `readMessageHandler`, which is posted to by the broker specific sidecars when these receive a message from the broker itself. The read handler then parses from the request the *Channel* targeted by that operation, verifying if this *Channel* is in fact part of the *Node*'s *Boundaries*, if it is it then **deserializes** the message received, from *Avro* to *JSON*, and sends it to the *Node*'s client.
 
 `readMessageHandler`:
 
