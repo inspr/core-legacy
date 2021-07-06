@@ -21,6 +21,9 @@ import (
 	k8stesting "k8s.io/client-go/testing"
 )
 
+// ignores unused code for this file in the staticcheck
+//lint:file-ignore U1000 Ignore all unused code
+
 type k8sKind string
 
 const (

@@ -18,6 +18,9 @@ import (
 	cv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
+// ignores unused code for this file in the staticcheck
+//lint:file-ignore U1000 Ignore all unused code
+
 //NodeOperator defines a node operations interface.
 type NodeOperator struct {
 	clientSet kubernetes.Interface
