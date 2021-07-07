@@ -1,6 +1,8 @@
 
 # Changelog
 
+## Release v0.1.1
+
 ###  #87 Story CORE-478 | readme.md
 - features:
     - updated readme.md doc
