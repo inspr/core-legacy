@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	kafkaop "inspr.dev/inspr/cmd/insprd/operators/kafka"
@@ -92,6 +93,9 @@ func (g GenOp) setOperator(config metabrokers.BrokerConfiguration) error {
 
 //Get executes Get method of correct operator given the desired channel's broker
 func (g GenOp) Get(ctx context.Context, scope, name string) (*meta.Channel, error) {
+	logger.Info("operator trying to get channel",
+		zap.Any("channel", name),
+		zap.Any("scope", scope))
 	op, err := g.getOperator(scope, name, false)
 	if err != nil {
 		return nil, err
@@ -101,6 +105,9 @@ func (g GenOp) Get(ctx context.Context, scope, name string) (*meta.Channel, erro
 
 //Create executes Create method of correct operator given the desired channel's broker
 func (g GenOp) Create(ctx context.Context, scope string, channel *meta.Channel) error {
+	logger.Info("operator trying to create channel",
+		zap.Any("channel", channel.Meta.Name),
+		zap.Any("scope", scope))
 	op, err := g.getOperator(scope, channel.Meta.Name, false)
 	if err != nil {
 		return err
@@ -110,6 +117,10 @@ func (g GenOp) Create(ctx context.Context, scope string, channel *meta.Channel) 
 
 //Update executes Update method of correct operator given the desired channel's broker
 func (g GenOp) Update(ctx context.Context, scope string, channel *meta.Channel) error {
+	logger.Info("operator trying to update channel",
+		zap.Any("channel", channel.Meta.Name),
+		zap.Any("scope", scope),
+	)
 	op, err := g.getOperator(scope, channel.Meta.Name, false)
 	if err != nil {
 		return err
@@ -119,6 +130,9 @@ func (g GenOp) Update(ctx context.Context, scope string, channel *meta.Channel) 
 
 //Delete executes Delete method of correct operator given the desired channel's broker
 func (g GenOp) Delete(ctx context.Context, scope, name string) error {
+	logger.Info("operator trying to delete channel",
+		zap.Any("channel", name),
+		zap.Any("scope", scope))
 	op, err := g.getOperator(scope, name, true)
 	if err != nil {
 		return err

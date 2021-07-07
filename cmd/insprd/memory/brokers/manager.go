@@ -1,8 +1,6 @@
 package brokers
 
 import (
-	"sync"
-
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/meta/brokers"
 )
@@ -22,10 +20,10 @@ func init() {
 
 // brokerMemoryManager implements the methods described by the BrokersInterface
 type brokerMemoryManager struct {
-	factory   SidecarManager
-	broker    *brokers.Brokers
-	available sync.Mutex
-	def       sync.Mutex
+	factory SidecarManager
+	broker  *brokers.Brokers
+	// available sync.Mutex
+	// def       sync.Mutex
 }
 
 var brokerMemory *brokerMemoryManager

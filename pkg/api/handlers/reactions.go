@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 
+	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta/utils"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
@@ -116,6 +117,7 @@ var updatedChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 			errs := ierrors.MultiError{
 				Errors: []error{},
 			}
+			logger.Debug("channel for diff reaction", zap.Any("channel", d.Name))
 			channel, _ := handler.Memory.Tree().Channels().Get(scope, d.Name)
 			err := handler.Operator.Channels().Update(context.Background(), scope, channel)
 			if err != nil {

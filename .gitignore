@@ -1,6 +1,6 @@
 .vscode
 **/*.cov
-
+overwrite-*.yaml
 # Ignore .idea configs from JetBrains
 .idea
 

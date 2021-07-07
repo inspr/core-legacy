@@ -15,7 +15,8 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "insprd-api-handlers")))
+	logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "insprd-api-handlers")))
+	// logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "insprd-api-handlers")))
 }
 
 // Handler is a general handler for inspr routes. It contains the necessary components
@@ -58,6 +59,8 @@ func (handler *Handler) addChangeReactor(op ...diff.ChangeReaction) {
 }
 
 func (handler *Handler) applyChangesInDiff(changes diff.Changelog) error {
+	logger.Debug("trying to aplly changes in diff",
+		zap.Any("changes", changes))
 	errs := ierrors.MultiError{
 		Errors: []error{},
 	}
