@@ -1,6 +1,11 @@
 
 # Changelog
 
+###  #87 Story CORE-478 | readme.md
+- features:
+    - updated readme.md doc
+---
+
 ### #86 Story CORE-485 | minikube.md
 - features:
   - created the documentation on how to run insprd/uidp on minikube
