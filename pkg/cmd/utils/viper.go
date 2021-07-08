@@ -14,7 +14,7 @@ const (
 
 var defaultValues map[string]string = map[string]string{
 	configScope:    "",
-	configServerIP: "http://127.0.0.1:8080",
+	configServerIP: "http://<cluster_ip>",
 }
 
 //GetConfiguredServerIP is responsible for returning config value for serverIp.

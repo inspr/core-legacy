@@ -77,7 +77,18 @@ func Test_changeViperValues(t *testing.T) {
 
 	// read mock config values
 	folder := setupViperTest(t)
-	os.Setenv("HOME", folder)
+	viper.SetConfigType("yaml")
+
+	// resets the old value of the HOME env var after the tests
+	oldHomeValue := os.Getenv("HOME")
+	defer func() { os.Setenv("HOME", oldHomeValue) }()
+
+	if err := os.Setenv("HOME", folder); err != nil {
+		t.Errorf(
+			"failed to set the HOME env var, %v",
+			err,
+		)
+	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -86,7 +97,12 @@ func Test_changeViperValues(t *testing.T) {
 			}
 
 			// reads the current values of the viper config
-			ReadDefaultConfig()
+			if err := ReadDefaultConfig(); err != nil {
+				t.Errorf(
+					"failed reading the DefaultConfig, %v",
+					err,
+				)
+			}
 
 			err := ChangeViperValues(tt.args.key, tt.args.value)
 			if (err != nil) != tt.wantErr {

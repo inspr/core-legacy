@@ -27,7 +27,14 @@ func NewClient() *Client {
 func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 
 	var resp string
-	err := c.rc.Send(ctx, "/login", http.MethodPost, models.ReceivedDataLogin{UID: uid, Password: pwd}, &resp)
+	err := c.rc.Send(
+		ctx,
+		"/login",
+		http.MethodPost,
+		request.DefaultHost,
+		models.ReceivedDataLogin{UID: uid, Password: pwd},
+		&resp)
+
 	if err != nil {
 		return "", err
 	}
@@ -38,7 +45,14 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser client.User) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/newuser", http.MethodPost, models.ReceivedDataCreate{UID: uid, Password: pwd, User: newUser}, resp)
+	err := c.rc.Send(
+		ctx,
+		"/newuser",
+		http.MethodPost,
+		request.DefaultHost,
+		models.ReceivedDataCreate{UID: uid, Password: pwd, User: newUser},
+		resp)
+
 	return err
 }
 
@@ -46,7 +60,13 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser client
 func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/deleteuser", http.MethodDelete, models.ReceivedDataDelete{UID: uid, Password: pwd, UserToBeDeleted: usrToBeDeleted}, resp)
+	err := c.rc.Send(ctx,
+		"/deleteuser",
+		http.MethodDelete,
+		request.DefaultHost,
+		models.ReceivedDataDelete{UID: uid, Password: pwd, UserToBeDeleted: usrToBeDeleted},
+		resp)
+
 	return err
 }
 
@@ -54,6 +74,12 @@ func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string
 func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, newPwd string) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/updatepwd", http.MethodPut, models.ReceivedDataUpdate{UID: uid, Password: pwd, UserToBeUpdated: usrToBeUpdated, NewPassword: newPwd}, resp)
+	err := c.rc.Send(ctx,
+		"/updatepwd",
+		http.MethodPut,
+		request.DefaultHost,
+		models.ReceivedDataUpdate{UID: uid, Password: pwd, UserToBeUpdated: usrToBeUpdated, NewPassword: newPwd},
+		resp)
+
 	return err
 }
