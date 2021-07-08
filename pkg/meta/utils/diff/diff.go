@@ -552,7 +552,7 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 
 	// set := metautils.DisjunctSet(fromSet, toSet)
 
-	parentAnnUpdate := false
+	// parentAnnUpdate := false
 	annFrom := ""
 	annTo := ""
 	annDiff := []Difference{}
@@ -563,7 +563,7 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 		toVal, toOk := to.Annotations[k]
 
 		if fromOk != toOk {
-			parentAnnUpdate = true
+			// parentAnnUpdate = true
 			annotationChange = true
 			if fromVal == "" {
 				fromVal = "<nil>"
@@ -575,7 +575,7 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 			annFrom += fmt.Sprintf("%s:%s;", k, fromVal)
 			annTo += fmt.Sprintf("%s:%s;", k, toVal)
 		} else if fromVal != toVal {
-			parentAnnUpdate = true
+			// parentAnnUpdate = true
 			annotationChange = true
 			op = Update
 			annFrom += fmt.Sprintf("%s:%s;", k, fromVal)
@@ -593,19 +593,22 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 			})
 		}
 	}
-	if parentAnnUpdate {
-		change.Diff = append(change.Diff, Difference{
-			Field:     fmt.Sprintf("%sMeta.Annotations", ctx),
-			From:      annFrom,
-			To:        annTo,
-			Kind:      MetaKind | parentKind,
-			Name:      parentElement,
-			Operation: Update,
-		})
-		change.Diff = append(change.Diff, annDiff...)
-		change.Kind |= MetaKind | parentKind | AnnotationKind
-		change.Operation |= Update
-	}
+	change.Diff = append(change.Diff, annDiff...)
+	change.Kind |= MetaKind | AnnotationKind
+	change.Operation |= Update
+	// if parentAnnUpdate {
+	// 	change.Diff = append(change.Diff, Difference{
+	// 		Field:     fmt.Sprintf("%sMeta.Annotations", ctx),
+	// 		From:      annFrom,
+	// 		To:        annTo,
+	// 		Kind:      MetaKind | parentKind,
+	// 		Name:      parentElement,
+	// 		Operation: Update,
+	// 	})
+	// 	change.Diff = append(change.Diff, annDiff...)
+	// 	change.Kind |= MetaKind | parentKind | AnnotationKind
+	// 	change.Operation |= Update
+	// }
 
 	return nil
 }
