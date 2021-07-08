@@ -8,6 +8,11 @@ do
     if [[ $? -ne 0 ]]; then
 		PASS="go fmt error"
 	fi
+
+    golint $file
+    if [[ $? -ne 0 ]]; then
+		PASS="golint error"
+	fi
 done
 
 # runs linter in the entire repo
