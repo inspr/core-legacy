@@ -546,34 +546,65 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 
 	fromSet, _ := metautils.MakeStrSet(from.Annotations)
 	toSet, _ := metautils.MakeStrSet(to.Annotations)
+	set := fromSet
 
-	set := metautils.DisjunctSet(fromSet, toSet)
+	set.AppendSet(toSet)
 
+	// set := metautils.DisjunctSet(fromSet, toSet)
+
+	parentAnnUpdate := false
+	annFrom := ""
+	annTo := ""
+	annDiff := []Difference{}
 	for k := range set {
 		var op Operation
-		origVal := from.Annotations[k]
-		currVal := to.Annotations[k]
+		annotationChange := false
+		fromVal, fromOk := from.Annotations[k]
+		toVal, toOk := to.Annotations[k]
 
-		if origVal == "" {
-			origVal = "<nil>"
-			op = Create
+		if fromOk != toOk {
+			parentAnnUpdate = true
+			annotationChange = true
+			if fromVal == "" {
+				fromVal = "<nil>"
+				op = Create
+			} else {
+				toVal = "<nil>"
+				op = Delete
+			}
+			annFrom += fmt.Sprintf("%s:%s;", k, fromVal)
+			annTo += fmt.Sprintf("%s:%s;", k, toVal)
+		} else if fromVal != toVal {
+			parentAnnUpdate = true
+			annotationChange = true
+			op = Update
+			annFrom += fmt.Sprintf("%s:%s;", k, fromVal)
+			annTo += fmt.Sprintf("%s:%s;", k, toVal)
 		}
 
-		if currVal == "" {
-			currVal = "<nil>"
-			op = Delete
+		if annotationChange {
+			annDiff = append(annDiff, Difference{
+				Field:     fmt.Sprintf("%sMeta.Annotations[%s]", ctx, k),
+				From:      fromVal,
+				To:        toVal,
+				Kind:      MetaKind | AnnotationKind,
+				Name:      k,
+				Operation: op,
+			})
 		}
-
+	}
+	if parentAnnUpdate {
 		change.Diff = append(change.Diff, Difference{
-			Field:     fmt.Sprintf("Meta.Annotations[%s]", k),
-			From:      origVal,
-			To:        currVal,
-			Kind:      MetaKind | parentKind | AnnotationKind,
-			Name:      k,
-			Operation: op,
+			Field:     fmt.Sprintf("%sMeta.Annotations", ctx),
+			From:      annFrom,
+			To:        annTo,
+			Kind:      MetaKind | parentKind,
+			Name:      parentElement,
+			Operation: Update,
 		})
+		change.Diff = append(change.Diff, annDiff...)
 		change.Kind |= MetaKind | parentKind | AnnotationKind
-		change.Operation |= op
+		change.Operation |= Update
 	}
 
 	return nil

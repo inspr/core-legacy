@@ -3,8 +3,6 @@ kind: channel
 
 meta:
   name: ppchannel2
-  annotations:
-    TEST: bla
 spec:
   type: pptype1
   brokerlist:

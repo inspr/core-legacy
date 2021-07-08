@@ -47,10 +47,18 @@ func TestDiff(t *testing.T) {
 					Operation: Create | Update | Delete,
 					Diff: []Difference{
 						{
+							Field:     "Meta.Annotations",
+							From:      "an1:<nil>;an2:<nil>;",
+							To:        "an1:a;an2:b;",
+							Kind:      AppKind | MetaKind,
+							Name:      "",
+							Operation: Update,
+						},
+						{
 							Field:     "Meta.Annotations[an1]",
 							From:      "<nil>",
 							To:        "a",
-							Kind:      AnnotationKind | AppKind | MetaKind,
+							Kind:      AnnotationKind | MetaKind,
 							Name:      "an1",
 							Operation: Create,
 						},
@@ -58,7 +66,7 @@ func TestDiff(t *testing.T) {
 							Field:     "Meta.Annotations[an2]",
 							From:      "<nil>",
 							To:        "b",
-							Kind:      MetaKind | AppKind | AnnotationKind,
+							Kind:      MetaKind | AnnotationKind,
 							Operation: Create,
 							Name:      "an2",
 						},
@@ -103,6 +111,69 @@ func TestDiff(t *testing.T) {
 							Name:      "ct1",
 						},
 					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Channel annotations test",
+			args: args{
+				appOrig: &meta.App{
+					Meta: meta.Metadata{
+						Name: "app1",
+					},
+					Spec: meta.AppSpec{
+						Channels: map[string]*meta.Channel{
+							"chan1": {
+								Meta: meta.Metadata{
+									Name: "chan1",
+									Annotations: map[string]string{
+										"TEST": "bla",
+									},
+								},
+							},
+						},
+					},
+				},
+				appCurr: &meta.App{
+					Meta: meta.Metadata{
+						Name: "app1",
+					},
+					Spec: meta.AppSpec{
+						Channels: map[string]*meta.Channel{
+							"chan1": {
+								Meta: meta.Metadata{
+									Name:        "chan1",
+									Annotations: map[string]string{},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: Changelog{
+				Change{
+					Scope: "",
+					Diff: []Difference{
+						{
+							Field:     "Spec.Channels[chan1].Meta.Annotations",
+							From:      "TEST:bla;",
+							To:        "TEST:<nil>;",
+							Kind:      MetaKind | ChannelKind,
+							Name:      "chan1",
+							Operation: Update,
+						},
+						{
+							Field:     "Spec.Channels[chan1].Meta.Annotations[TEST]",
+							From:      "bla",
+							To:        "<nil>",
+							Kind:      MetaKind | AnnotationKind,
+							Name:      "TEST",
+							Operation: Delete,
+						},
+					},
+					Kind:      ChannelKind,
+					Operation: Update,
 				},
 			},
 			wantErr: false,
