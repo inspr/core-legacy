@@ -92,17 +92,16 @@ func Test_changeViperValues(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
 			if tt.wantErr {
+				// points to a non existant file
+				// main way that viper is going to break, other than that
+				// viper will just create an unused key
 				os.Setenv("HOME", "/etc/")
 			}
 
 			// reads the current values of the viper config
-			if err := ReadDefaultConfig(); err != nil {
-				t.Errorf(
-					"failed reading the DefaultConfig, %v",
-					err,
-				)
-			}
+			ReadDefaultConfig()
 
 			err := ChangeViperValues(tt.args.key, tt.args.value)
 			if (err != nil) != tt.wantErr {
@@ -157,7 +156,6 @@ func Test_existingKeys(t *testing.T) {
 }
 
 /// test utils functions
-
 func setupViperTest(t *testing.T) string {
 	folder := t.TempDir()
 	config := struct {
