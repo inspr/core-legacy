@@ -47,14 +47,6 @@ func TestDiff(t *testing.T) {
 					Operation: Create | Update | Delete,
 					Diff: []Difference{
 						{
-							Field:     "Meta.Annotations",
-							From:      "an1:<nil>;an2:<nil>;",
-							To:        "an1:a;an2:b;",
-							Kind:      AppKind | MetaKind,
-							Name:      "",
-							Operation: Update,
-						},
-						{
 							Field:     "Meta.Annotations[an1]",
 							From:      "<nil>",
 							To:        "a",
@@ -155,14 +147,6 @@ func TestDiff(t *testing.T) {
 				Change{
 					Scope: "",
 					Diff: []Difference{
-						{
-							Field:     "Spec.Channels[chan1].Meta.Annotations",
-							From:      "TEST:bla;",
-							To:        "TEST:<nil>;",
-							Kind:      MetaKind | ChannelKind,
-							Name:      "chan1",
-							Operation: Update,
-						},
 						{
 							Field:     "Spec.Channels[chan1].Meta.Annotations[TEST]",
 							From:      "bla",
@@ -989,7 +973,7 @@ func TestChange_diffMetadata(t *testing.T) {
 			wantErr: false,
 			want: Change{
 				Kind:      MetaKind | NodeKind | AnnotationKind,
-				Operation: Create | Update,
+				Operation: Update,
 				Diff: []Difference{
 					{
 						Field:     "Meta.Reference",
@@ -1002,7 +986,7 @@ func TestChange_diffMetadata(t *testing.T) {
 						Field:     "Meta.Annotations[1]",
 						From:      "<nil>",
 						To:        "1",
-						Kind:      MetaKind | NodeKind | AnnotationKind,
+						Kind:      MetaKind | AnnotationKind,
 						Operation: Create,
 						Name:      "1",
 					},
@@ -1111,14 +1095,14 @@ func TestChange_diffMetadata(t *testing.T) {
 			},
 			wantErr: false,
 			want: Change{
-				Operation: Delete,
-				Kind:      MetaKind | NodeKind | AnnotationKind,
+				Operation: Update,
+				Kind:      MetaKind | AnnotationKind,
 				Diff: []Difference{
 					{
 						Field:     "Meta.Annotations[2]",
 						From:      "1",
 						To:        "<nil>",
-						Kind:      MetaKind | NodeKind | AnnotationKind,
+						Kind:      MetaKind | AnnotationKind,
 						Operation: Delete,
 						Name:      "2",
 					},
