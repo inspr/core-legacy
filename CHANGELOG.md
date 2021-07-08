@@ -1,14 +1,36 @@
 
 # Changelog
 
+### #90 Bug CORE-499 | Unable to delete multi-layered dApps
+- refactors:
+    - Added the usePermTree (bool) parameter in the ResolveBoundary function. If true, then use the unmodified app tree.
+    - Updated all uses of the ResolveBoundary function. In particular, in the convert file of package node the parameter usePermTree is set to true
+---
+
+### #89 Story CORE-500 | removing inspr.com from local `/etc/hosts` 
+- fixes:
+    - added hostname variable to the Send func in the request pkg
+    - changed the git hook since `staticcheck` and `go vet` fails when looking only at a specific file, now looks at the entire repository folder
+    - changing minikube.md to replace `/etc/hosts` with a explanation on how to setup the serverip via the insprctl cli.
+---
+
+## Release v0.1.1
+
+###  #87 Story CORE-478 | readme.md
+- features:
+    - updated readme.md doc
+---
+
 ### #86 Story CORE-485 | minikube.md
 - features:
   - created the documentation on how to run insprd/uidp on minikube
 ---
+
 ### #85 Story CORE-464 | Multibroker documentation
 - features:
     - documentation for multibroker feature
 ---
+
 ### #84 Story CORE-480 | difference.md
 - features:
     - Updated `difference.md`

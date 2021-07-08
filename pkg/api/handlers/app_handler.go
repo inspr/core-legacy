@@ -223,7 +223,7 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 			return
 		}
 
-		logger.Debug("initiating dApp delete transaction")
+		logger.Info("initiating dApp delete transaction")
 		ah.Memory.Tree().InitTransaction()
 
 		err = ah.Memory.Tree().Apps().Delete(scope)
@@ -256,10 +256,10 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 				return
 			}
 
-			logger.Info("committing Channel delete changes")
+			logger.Debug("committing dApp delete changes")
 			defer ah.Memory.Tree().Commit()
 		} else {
-			logger.Info("cancelling Channel delete changes")
+			logger.Debug("cancelling dApp delete changes")
 			defer ah.Memory.Tree().Cancel()
 		}
 
