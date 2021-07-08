@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #92 Tech CORE-456 | Review auto labeler 
+- features:
+    - updated autolabeler workflow so it labels properly
+    - updated codecov action to use codecov's github action
+---
+
 ### #90 Bug CORE-499 | Unable to delete multi-layered dApps
 - refactors:
     - Added the usePermTree (bool) parameter in the ResolveBoundary function. If true, then use the unmodified app tree.
@@ -34,7 +40,7 @@
 ### #84 Story CORE-480 | difference.md
 - features:
     - Updated `difference.md`
-- refactores:
+- refactors:
     - Changed parameter from `ctx` to `scope` in `pkg/meta/utils/diff/diff.go`
 ---
 
