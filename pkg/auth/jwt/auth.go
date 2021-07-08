@@ -91,7 +91,14 @@ func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
 	client := request.NewJSONClient(JA.authURL)
 
 	data := auth.JwtDO{}
-	err := client.Send(context.Background(), "/init", http.MethodPost, initDO, &data)
+	err := client.Send(
+		context.Background(),
+		"/init",
+		http.MethodPost,
+		request.DefaultHost,
+		initDO,
+		&data)
+
 	if err != nil {
 		log.Printf("err = %+v\n", err)
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
@@ -107,7 +114,14 @@ func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
 	client := request.NewJSONClient(JA.authURL)
 
 	data := auth.JwtDO{}
-	err := client.Send(context.Background(), "/token", http.MethodPost, load, &data)
+	err := client.Send(
+		context.Background(),
+		"/token",
+		http.MethodPost,
+		request.DefaultHost,
+		load,
+		&data)
+
 	if err != nil {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
@@ -126,7 +140,14 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 
 	data := auth.JwtDO{}
 
-	err := client.Send(context.Background(), "/refresh", http.MethodGet, nil, &data)
+	err := client.Send(
+		context.Background(),
+		"/refresh",
+		http.MethodGet,
+		request.DefaultHost,
+		nil,
+		&data)
+
 	if err != nil {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err

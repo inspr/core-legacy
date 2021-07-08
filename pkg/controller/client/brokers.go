@@ -17,7 +17,14 @@ type BrokersClient struct {
 func (bc *BrokersClient) Get(ctx context.Context) (*models.BrokersDI, error) {
 	resp := &models.BrokersDI{}
 
-	err := bc.reqClient.Send(ctx, "/brokers", http.MethodGet, nil, resp)
+	err := bc.reqClient.Send(
+		ctx,
+		"/brokers",
+		http.MethodGet,
+		request.DefaultHost,
+		nil,
+		resp)
+
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +42,9 @@ func (bc *BrokersClient) Create(ctx context.Context, brokerName string, config [
 		ctx,
 		"/brokers/"+brokerName,
 		http.MethodPost,
+		request.DefaultHost,
 		dataBody,
 		nil)
+
 	return err
 }

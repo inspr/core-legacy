@@ -17,7 +17,7 @@ const (
 
 var defaultValues map[string]string = map[string]string{
 	configScope:    "",
-	configServerIP: "http://127.0.0.1:8080",
+	configServerIP: "http://<cluster_ip>",
 }
 
 //GetConfiguredServerIP is responsible for returning config value for serverIp.
@@ -38,30 +38,6 @@ func InitViperConfig() {
 	for k, v := range defaultValues {
 		viper.SetDefault(k, v)
 	}
-}
-
-// createViperConfig - creates the folder and or file of the inspr's viper config
-//
-// if they already a file the createConfig will truncate it before writing
-func createViperConfig(path string) error {
-	// creates config file
-	err := viper.WriteConfigAs(path)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// createInsprConfigFolder - creates the folder of the inspr's config, it only
-// creates the folder if already doesn't exists
-func createInsprConfigFolder(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		if err := os.Mkdir(path, 0777); err != nil { // perm 0666
-			return err
-		}
-	}
-
-	return nil
 }
 
 // ConfigFile is the currently loaded config file

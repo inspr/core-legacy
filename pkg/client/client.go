@@ -48,7 +48,14 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface
 	var resp interface{}
 	log.Println("sending message to sidecar")
 	// sends a message to the corresponding channel route on the sidecar
-	err := c.client.Send(ctx, "/"+channel, http.MethodPost, data, &resp)
+	err := c.client.Send(
+		ctx,
+		"/"+channel,
+		http.MethodPost,
+		request.DefaultHost,
+		data,
+		&resp)
+
 	log.Println("message sent")
 	return err
 }
