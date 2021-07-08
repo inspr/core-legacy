@@ -13,4 +13,4 @@ ignore:
   - "**/mock/*"
   - "**/fake/*"
   - "**/main.go"
-  - "**/interface.go"
+  - "**/*interface*"
