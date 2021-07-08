@@ -71,21 +71,14 @@ $ minikube tunnel
 $ minikube ip
 ```
 
-With the IP in hand add the entry to your local `/etc/hosts` in the following format:
-
-```bash
-127.0.0.1       localhost
-::1             localhost
-$MINIKUBE_IP    inspr.com
-```
-
+With the IP in hand set its value as the ServerIP in the `insprctl` cli. This can be done by running `insprctl init` when running for the first time, if you already used the command you can simply use `insprctl config serverip https://<server-IP>`.
 
 ### **Setting up environment variables**
 
-Set the environment variable on your local machine to fit the URL set in the `/etc/hosts`
+Set the environment variable on your local machine to fit the URL set in the `serverip` in the cli.
 
 ```bash
-export INPROV_PROVIDER_URL="http://inspr.com"
+export INPROV_PROVIDER_URL="http://<server-IP>"
 ```
 
 ### Obtaining the auth-svc token

@@ -27,7 +27,7 @@ func (cc *ChannelClient) Get(ctx context.Context, scope, name string) (*meta.Cha
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", http.MethodGet, cdi, &resp)
+		Send(ctx, "/channels", http.MethodGet, request.DefaultHost, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (cc *ChannelClient) Create(ctx context.Context, scope string, ch *meta.Chan
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", http.MethodPost, cdi, &resp)
+		Send(ctx, "/channels", http.MethodPost, request.DefaultHost, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (cc *ChannelClient) Delete(ctx context.Context, scope, name string, dryRun 
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", http.MethodDelete, cdi, &resp)
+		Send(ctx, "/channels", http.MethodDelete, request.DefaultHost, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (cc *ChannelClient) Update(ctx context.Context, scope string, ch *meta.Chan
 
 	err := cc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/channels", http.MethodPut, cdi, &resp)
+		Send(ctx, "/channels", http.MethodPut, request.DefaultHost, cdi, &resp)
 	if err != nil {
 		return nil, err
 	}
