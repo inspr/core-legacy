@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -12,6 +11,8 @@ import (
 )
 
 const (
+	// DefaultHost is the the standard hostname, it is used in requests made by
+	// the cli to the insprd/uidp services in the cluster
 	DefaultHost = "inspr.com"
 )
 
@@ -138,7 +139,6 @@ func (c Client) handleResponseErr(resp *http.Response) error {
 		return ierrors.NewError().Message("Route not found").Build()
 
 	default:
-		fmt.Println(err)
 		decoder.Decode(&err)
 		if err == nil {
 			return defaultErr
