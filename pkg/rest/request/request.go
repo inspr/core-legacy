@@ -136,7 +136,7 @@ func (c Client) handleResponseErr(resp *http.Response) error {
 		}
 		return defaultErr
 	case http.StatusNotFound:
-		return ierrors.NewError().Message("Route not found").Build()
+		return ierrors.NewError().Message("route not found").Build()
 
 	default:
 		decoder.Decode(&err)
