@@ -209,12 +209,6 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	ch.ConnectedAliases = oldCh.ConnectedAliases
 	ch.Meta.UUID = oldCh.Meta.UUID
 
-	// broker, err := SelectBrokerFromPriorityList(ch.Spec.BrokerPriorityList, brokers)
-	// if err != nil {
-	// 	return err
-	// }
-	// logger.Debug("channel updated selected broker", zap.Any("broker", broker))
-
 	broker := oldCh.Spec.SelectedBroker
 	ch.Spec.SelectedBroker = broker
 
