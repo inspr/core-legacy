@@ -2353,9 +2353,11 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 	type fields struct {
 		MemoryManager *treeMemoryManager
 		root          *meta.App
+		tree          *meta.App
 	}
 	type args struct {
-		app *meta.App
+		app         *meta.App
+		usePermTree bool
 	}
 	tests := []struct {
 		name    string
@@ -2370,7 +2372,8 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				root: getMockApp(),
 			},
 			args: args{
-				app: getMockApp().Spec.Apps["bound"],
+				app:         getMockApp().Spec.Apps["bound"],
+				usePermTree: false,
 			},
 			want: map[string]string{
 				"ch1": "ch1",
@@ -2384,7 +2387,8 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				root: getMockApp(),
 			},
 			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"],
+				app:         getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"],
+				usePermTree: false,
 			},
 			want: map[string]string{
 				"alias1": "bound.bdch1",
@@ -2398,7 +2402,8 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				root: getMockApp(),
 			},
 			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"].Spec.Apps["bound3"],
+				app:         getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"].Spec.Apps["bound3"],
+				usePermTree: false,
 			},
 			want: map[string]string{
 				"alias1": "bound.bdch1",
@@ -2412,7 +2417,8 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				root: getMockApp(),
 			},
 			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound4"],
+				app:         getMockApp().Spec.Apps["bound"].Spec.Apps["bound4"],
+				usePermTree: false,
 			},
 			want: map[string]string{
 				"ch1":    "ch1",
@@ -2426,7 +2432,8 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				root: getMockApp(),
 			},
 			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["boundNP"],
+				app:         getMockApp().Spec.Apps["bound"].Spec.Apps["boundNP"],
+				usePermTree: false,
 			},
 			wantErr: true,
 		},
@@ -2436,17 +2443,35 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				root: getMockApp(),
 			},
 			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["boundNP"].Spec.Apps["boundNP2"],
+				app:         getMockApp().Spec.Apps["bound"].Spec.Apps["boundNP"].Spec.Apps["boundNP2"],
+				usePermTree: false,
 			},
 			wantErr: true,
 		},
 		{
-			name: "Invalid - bad reference",
+			name: "Use perm tree",
+			fields: fields{
+				root: getMockApp(),
+				tree: getMockApp(),
+			},
+			args: args{
+				app:         getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"],
+				usePermTree: true,
+			},
+			want: map[string]string{
+				"alias1": "bound.bdch1",
+				"alias2": "bound.bdch2",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Use perm tree - want error (tree not set)",
 			fields: fields{
 				root: getMockApp(),
 			},
 			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound5"],
+				app:         getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"],
+				usePermTree: true,
 			},
 			wantErr: true,
 		},
@@ -2455,10 +2480,10 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mem := &treeMemoryManager{
 				root: tt.fields.root,
-				tree: tt.fields.root,
+				tree: tt.fields.tree,
 			}
 			amm := mem.Apps()
-			got, err := amm.ResolveBoundary(tt.args.app, false)
+			got, err := amm.ResolveBoundary(tt.args.app, tt.args.usePermTree)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.ResolveBoundary() error = %v, wantErr %v", err, tt.wantErr)
 				return
