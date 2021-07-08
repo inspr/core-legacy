@@ -8,9 +8,9 @@ coverage:
         threshold: 10%
 
 ignore:
-  - "examples" # ignore folders and all its contents
+  - "examples/**/*" # ignore folders and all its contents
   - "**/*mock*" # wildcards accepted
-  - "**/mock/*"
+  - "**/mock*/*"
   - "**/fake/*"
   - "**/main.go"
-  - "**/*interface*"
+  - "**/interface*"
