@@ -1,15 +1,15 @@
 
 # Changelog
 
-## Release v0.1.1
 
 ### #89 Story CORE-500 | removing inspr.com from local `/etc/hosts` 
 - fixes:
     - added hostname variable to the Send func in the request pkg
     - changed the git hook since `staticcheck` and `go vet` fails when looking only at a specific file, now looks at the entire repository folder
     - changing minikube.md to replace `/etc/hosts` with a explanation on how to setup the serverip via the insprctl cli.
-
 ---
+
+## Release v0.1.1
 
 ###  #87 Story CORE-478 | readme.md
 - features:
