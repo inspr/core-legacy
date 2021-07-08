@@ -8,19 +8,20 @@ do
     if [[ $? -ne 0 ]]; then
 		PASS="go fmt error"
 	fi
-
-    # runs linter
-	staticcheck $file 
-	if [[ $? -ne 0 ]]; then
-		PASS="staticcheck error"
-	fi
-    
-    # go vet reports suspicious constructs
-    go vet $file
-    if [[ $? != 0 ]]; then
-        PASS="go vet error"
-    fi
 done
+
+# runs linter in the entire repo
+staticcheck ./...
+if [[ $? -ne 0 ]]; then
+    PASS="staticcheck error"
+fi
+
+# go vet reports suspicious constructs
+go vet ./...
+if [[ $? != 0 ]]; then
+    PASS="go vet error"
+fi
+
 
 if [ -z "$PASS" ]; then
     echo "COMMIT SUCCEEDED"
