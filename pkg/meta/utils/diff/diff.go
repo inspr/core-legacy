@@ -546,24 +546,21 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 
 	fromSet, _ := metautils.MakeStrSet(from.Annotations)
 	toSet, _ := metautils.MakeStrSet(to.Annotations)
-	set := fromSet
 
-	set.AppendSet(toSet)
+	fromSet.AppendSet(toSet)
 
-	// set := metautils.DisjunctSet(fromSet, toSet)
-
-	// parentAnnUpdate := false
+	parentAnnUpdate := false
 	annFrom := ""
 	annTo := ""
 	annDiff := []Difference{}
-	for k := range set {
+	for k := range fromSet {
 		var op Operation
 		annotationChange := false
 		fromVal, fromOk := from.Annotations[k]
 		toVal, toOk := to.Annotations[k]
 
 		if fromOk != toOk {
-			// parentAnnUpdate = true
+			parentAnnUpdate = true
 			annotationChange = true
 			if fromVal == "" {
 				fromVal = "<nil>"
@@ -575,7 +572,7 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 			annFrom += fmt.Sprintf("%s:%s;", k, fromVal)
 			annTo += fmt.Sprintf("%s:%s;", k, toVal)
 		} else if fromVal != toVal {
-			// parentAnnUpdate = true
+			parentAnnUpdate = true
 			annotationChange = true
 			op = Update
 			annFrom += fmt.Sprintf("%s:%s;", k, fromVal)
@@ -593,22 +590,11 @@ func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, 
 			})
 		}
 	}
-	change.Diff = append(change.Diff, annDiff...)
-	change.Kind |= MetaKind | AnnotationKind
-	change.Operation |= Update
-	// if parentAnnUpdate {
-	// 	change.Diff = append(change.Diff, Difference{
-	// 		Field:     fmt.Sprintf("%sMeta.Annotations", ctx),
-	// 		From:      annFrom,
-	// 		To:        annTo,
-	// 		Kind:      MetaKind | parentKind,
-	// 		Name:      parentElement,
-	// 		Operation: Update,
-	// 	})
-	// 	change.Diff = append(change.Diff, annDiff...)
-	// 	change.Kind |= MetaKind | parentKind | AnnotationKind
-	// 	change.Operation |= Update
-	// }
+	if parentAnnUpdate {
+		change.Diff = append(change.Diff, annDiff...)
+		change.Kind |= MetaKind | AnnotationKind
+		change.Operation |= Update
+	}
 
 	return nil
 }
