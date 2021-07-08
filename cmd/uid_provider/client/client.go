@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/go-redis/redis/v8"
+	"golang.org/x/crypto/bcrypt"
 	"inspr.dev/inspr/pkg/auth"
 	"inspr.dev/inspr/pkg/controller/client"
 	"inspr.dev/inspr/pkg/ierrors"
@@ -72,6 +73,13 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
 	}
 
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	if err != nil {
+		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+	}
+
+	newUser.Password = string(hashedPwd)
+
 	if err := set(ctx, c.rdb, newUser); err != nil {
 		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
@@ -111,7 +119,12 @@ func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, n
 		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
 	}
 
-	user.Password = newPwd
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(newPwd), bcrypt.DefaultCost)
+	if err != nil {
+		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+	}
+
+	user.Password = string(hashedPwd)
 
 	if err := set(ctx, c.rdb, *user); err != nil {
 		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
@@ -127,7 +140,8 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	if err != nil {
 		return "", ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
-	if pwd != user.Password {
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pwd)); err != nil {
 		return "", ierrors.NewError().Unauthorized().
 			Message("user and password don't match").Build()
 	}
@@ -323,7 +337,8 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	if err != nil {
 		return err
 	}
-	if requestor.Password != pwd {
+
+	if err := bcrypt.CompareHashAndPassword([]byte(requestor.Password), []byte(pwd)); err != nil {
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
 
