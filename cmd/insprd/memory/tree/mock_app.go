@@ -35,6 +35,6 @@ func (mock *MockAppManager) Update(scope string, app *meta.App, brokers *apimode
 }
 
 // ResolveBoundary Mock
-func (mock *MockAppManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
+func (mock *MockAppManager) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
 	return nil, nil
 }

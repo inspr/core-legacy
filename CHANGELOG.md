@@ -1,6 +1,11 @@
 
 # Changelog
 
+### #90 Bug CORE-499 | Unable to delete multi-layered dApps
+- refactors:
+    - Added the usePermTree (bool) parameter in the ResolveBoundary function. If true, then use the unmodified app tree.
+    - Updated all uses of the ResolveBoundary function. In particular, in the convert file of package node the parameter usePermTree is set to true
+---
 
 ### #89 Story CORE-500 | removing inspr.com from local `/etc/hosts` 
 - fixes:
@@ -20,10 +25,12 @@
 - features:
   - created the documentation on how to run insprd/uidp on minikube
 ---
+
 ### #85 Story CORE-464 | Multibroker documentation
 - features:
     - documentation for multibroker feature
 ---
+
 ### #84 Story CORE-480 | difference.md
 - features:
     - Updated `difference.md`
