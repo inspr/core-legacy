@@ -2,7 +2,7 @@
 # Changelog
 
 ### #90 Bug CORE-499 | Unable to delete multi-layered dApps
-- refactories:
+- refactors:
     - Added the usePermTree (bool) parameter in the ResolveBoundary function. If true, then use the unmodified app tree.
     - Updated all uses of the ResolveBoundary function. In particular, in the convert file of package node the parameter usePermTree is set to true
 ---
