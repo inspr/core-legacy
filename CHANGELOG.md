@@ -1,11 +1,21 @@
 
 # Changelog
 
+## Release v0.1.1
+
+###  #87 Story CORE-478 | readme.md
+- features:
+    - updated readme.md doc
+---
+
+### #86 Story CORE-485 | minikube.md
+- features:
+  - created the documentation on how to run insprd/uidp on minikube
+---
 ### #85 Story CORE-464 | Multibroker documentation
 - features:
     - documentation for multibroker feature
 ---
-
 ### #84 Story CORE-480 | difference.md
 - features:
     - Updated `difference.md`
@@ -44,6 +54,17 @@
     - Updated PubSub doc
 ---
 
+### #50 - Feature: creates git hooks scripts and pre-commit
+- feature:
+	- creates a wrapper script for git hooks
+	- creates a pre-commit script for linting files that are staged for committing
+	- creates an installation script that creates symlinks for the hooks
+	- added a readme describing the process of installation
+    - added a comment that signals that the staticcheck should ignore the file in:
+        - `node_operator.go`
+        - `node_operator_test.go`
+---
+  
 ### #80 Story CORE-497 | Migrate cluster from "red-inspr" to "insprlabs"
 - misc:
   - changed the tags of the dockers image, from red-inspr to insprlabs. Meaning that i changed the place in which the docker images are stored.
@@ -81,6 +102,7 @@
 ---
 
 ### #77 Story CORE-463 | Create documentation for Auth
+
 - features:
     - authentication doc
 ---

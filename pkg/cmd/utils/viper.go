@@ -7,6 +7,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+// ignores unused code for this file in the staticcheck
+//lint:file-ignore U1000 Ignore all unused code
+
 const (
 	configScope    = "scope"
 	configServerIP = "serverIP"
