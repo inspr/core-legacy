@@ -2458,7 +2458,7 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 				tree: tt.fields.root,
 			}
 			amm := mem.Apps()
-			got, err := amm.ResolveBoundary(tt.args.app)
+			got, err := amm.ResolveBoundary(tt.args.app, false)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.ResolveBoundary() error = %v, wantErr %v", err, tt.wantErr)
 				return

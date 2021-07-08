@@ -223,7 +223,7 @@ func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
 
 // ResolveBoundary is the recursive method that resolves connections for dApp boundaries
 // returns a map of boundary to  their respective resolved channel query
-func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, error) {
+func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
 	logger.Debug("resolving dApp boundary",
 		zap.String("dApp", app.Meta.Name))
 
@@ -233,16 +233,29 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, 
 		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
 		unresolved[bound] = true
 	}
-	parentApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
-	if err != nil {
-		return nil, err
+
+	var parentApp *meta.App
+
+	if usePermTree {
+		parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
+		if err != nil {
+			return nil, err
+		}
+		parentApp = parApp
+
+	} else {
+		parApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
+		if err != nil {
+			return nil, err
+		}
+		parentApp = parApp
 	}
 
 	logger.Debug("recursively resolving dApp boundaries",
 		zap.String("dApp", app.Meta.Name),
 		zap.Any("boundaries", boundaries))
 
-	err = amm.recursivelyResolve(parentApp, boundaries, unresolved)
+	err := amm.recursivelyResolve(parentApp, boundaries, unresolved, usePermTree)
 	if err != nil {
 		logger.Error("couldn't resolve boundaries for given dApp",
 			zap.String("dApp", app.Meta.Name),
@@ -253,7 +266,7 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App) (map[string]string, 
 	return boundaries, nil
 }
 
-func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[string]string, unresolved metautils.StrSet) error {
+func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[string]string, unresolved metautils.StrSet, usePermTree bool) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
@@ -288,20 +301,35 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 		}
 		return &merr
 	}
-	parentApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
-	if err != nil {
-		return err
+	logger.Info("Getting parent app inside recursively resolve")
+
+	var parentApp *meta.App
+
+	if usePermTree {
+		parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
+		if err != nil {
+			return err
+		}
+		parentApp = parApp
+
+	} else {
+		parApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
+		if err != nil {
+			return err
+		}
+		parentApp = parApp
 	}
-	return amm.recursivelyResolve(parentApp, boundaries, unresolved)
+
+	return amm.recursivelyResolve(parentApp, boundaries, unresolved, usePermTree)
 }
 
 func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
-	logger.Debug("removing dApp from parent's Channels connected apps list",
+	logger.Info("removing dApp from parent's Channels connected apps list",
 		zap.String("dApp", app.Meta.Name),
 		zap.String("parent", parent.Meta.Name))
 
 	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
-	resolution, _ := amm.ResolveBoundary(app)
+	resolution, _ := amm.ResolveBoundary(app, false)
 	for _, chName := range appBoundary {
 		resolved := resolution[chName]
 		_, chName, _ := metautils.RemoveLastPartInScope(resolved)

@@ -23,6 +23,8 @@ import (
 var lbsidecarPort int32
 
 func (no *NodeOperator) dappToService(app *meta.App) *kubeService {
+	logger.Info("constructing kube service")
+
 	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_PORT"))
 	lbsidecarPort = int32(temp)
 	appID := toAppID(app)
@@ -119,7 +121,7 @@ func (no *NodeOperator) getAllSidecarBrokers(app *meta.App) utils.StringArray {
 	output := app.Spec.Boundary.Output
 	channels := input.Union(output)
 
-	resolves, err := no.memory.Apps().ResolveBoundary(app)
+	resolves, err := no.memory.Apps().ResolveBoundary(app, true)
 	if err != nil {
 		logger.Error("unable to resolve Node boundaries",
 			zap.Any("boundaries", app.Spec.Boundary))
@@ -149,7 +151,7 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 		output := app.Spec.Boundary.Output
 		channels := input.Union(output)
 
-		resolves, err := no.memory.Apps().ResolveBoundary(app)
+		resolves, err := no.memory.Apps().ResolveBoundary(app, true)
 		if err != nil {
 			logger.Error("unable to resolve Node boundaries",
 				zap.Any("boundaries", app.Spec.Boundary))

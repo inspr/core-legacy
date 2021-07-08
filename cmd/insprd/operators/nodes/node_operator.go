@@ -90,9 +90,14 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 
 	logger.Debug("getting name of the k8s deployment to be deleted")
 	scope, _ := utils.JoinScopes(nodeContext, nodeName)
-	app, _ := no.memory.Perm().Apps().Get(scope)
+	app, err := no.memory.Perm().Apps().Get(scope)
+	if err != nil {
+		logger.Info("Error while getting app inside DeleteNode",
+			zap.String("scope", scope),
+		)
+	}
 
-	logger.Info("deploying a Node structure in k8s",
+	logger.Debug("deleting a Node structure in k8s",
 		zap.Any("node", app))
 
 	for _, applicable := range no.dappApplications(app) {

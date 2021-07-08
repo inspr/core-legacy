@@ -129,7 +129,7 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
-	_, err := amm.ResolveBoundary(app)
+	_, err := amm.ResolveBoundary(app, false)
 	if err != nil {
 		merr.Add(ierrors.NewError().Message(err.Error()).Build())
 		return &merr
