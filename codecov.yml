@@ -10,7 +10,7 @@ coverage:
 ignore:
   - "examples/**/*" # ignore folders and all its contents
   - "**/*mock*" # wildcards accepted
-  - "**/mock*/*"
+  - "*mock*"
   - "**/fake/*"
   - "**/main.go"
   - "**/interface*"
