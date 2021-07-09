@@ -2,6 +2,9 @@
 **/*.cov
 overwrite-*.yaml
 my-notes.md
+bin/
+tags.out
+
 # Ignore .idea configs from JetBrains
 .idea
 

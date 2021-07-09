@@ -15,9 +15,7 @@ jobs:
       - name: Download golint
         run: go get -u golang.org/x/lint/golint
       - name: Lint packages
-        run: golint -set_exit_status ./... 
-      
-
+        run: golint -set_exit_status ./...
 
   coverage:
     runs-on: ubuntu-latest
@@ -29,10 +27,15 @@ jobs:
         with:
           go-version: "^1.16.0"
       - name: Run coverage
-        run: go test -coverprofile=profile.cov.tmp -coverpkg=./... ./... || exit 1 
+        run: go test -coverprofile=profile.cov.tmp -coverpkg=./... ./... || exit 1
       - name: Filter files
-        run: cat profile.cov.tmp | grep -v 'fake\|mock\|doc\|examples\|main.go' > coverage.out
+        run: cat profile.cov.tmp | grep -v 'fake\|mock\|doc\|examples\|main\|interface' > coverage.out
+      # - name: Upload coverage to Codecov
+      #   run: bash <(curl -s https://codecov.io/bash) -f
       - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -f 
-  
-  
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./profile.cov.tmp
+          flags: unittests
+          name: codecov-umbrella
