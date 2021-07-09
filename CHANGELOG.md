@@ -1,6 +1,15 @@
 
 # Changelog
 
+### #91 Bug CORE-498 | Unable to update channels
+## Changelog
+- fixes:
+    - Changed the Annotations metadata diff to work according to new brokers configuration process.
+    - Copied `SelectedBroker` from old channel to new on Update operation
+- misc:
+    - changed Skaffod deployment to get secret values from a file other than the default Values.
+---
+
 ### #92 Tech CORE-456 | Review auto labeler 
 - features:
     - updated autolabeler workflow so it labels properly

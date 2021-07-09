@@ -146,6 +146,10 @@ func (ch *ChannelHandler) HandleUpdate() rest.Handler {
 		logger.Debug("initiating Channel update transaction")
 		ch.Memory.Tree().InitTransaction()
 
+		logger.Debug("Channel update operation",
+			zap.Any("scope", scope),
+			zap.Any("Channel", &data.Channel),
+		)
 		err = ch.Memory.Tree().Channels().Update(scope, &data.Channel)
 		if err != nil {
 			logger.Error("unable to update Channel",

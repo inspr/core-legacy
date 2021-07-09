@@ -2,6 +2,7 @@ package brokers
 
 import (
 	"reflect"
+	"sync"
 	"testing"
 
 	"inspr.dev/inspr/cmd/sidecars"
@@ -173,4 +174,74 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 
 func resetBrokers() {
 	brokerMemory = nil
+}
+
+func Test_brokerMemoryManager_Configs(t *testing.T) {
+	type fields struct {
+		factory SidecarManager
+		broker  *brokers.Brokers
+	}
+	type args struct {
+		broker string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    brokers.BrokerConfiguration
+		wantErr bool
+	}{
+		{
+			name: "valid config get",
+			fields: fields{
+				factory: nil,
+				broker: &brokers.Brokers{
+					Default: "brk1",
+					Available: brokers.BrokerStatusArray{
+						"brk1": nil,
+					},
+				},
+			},
+			args: args{
+				broker: "brk1",
+			},
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name: "invalid config get",
+			fields: fields{
+				factory: nil,
+				broker: &brokers.Brokers{
+					Default: "brk1",
+					Available: brokers.BrokerStatusArray{
+						"brk1": nil,
+					},
+				},
+			},
+			args: args{
+				broker: "brk2",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bmm := &brokerMemoryManager{
+				factory:   tt.fields.factory,
+				broker:    tt.fields.broker,
+				available: sync.Mutex{},
+				def:       sync.Mutex{},
+			}
+			got, err := bmm.Configs(tt.args.broker)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("brokerMemoryManager.Configs() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("brokerMemoryManager.Configs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

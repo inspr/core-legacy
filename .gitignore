@@ -1,8 +1,9 @@
 .vscode
 **/*.cov
+overwrite-*.yaml
+my-notes.md
 bin/
 tags.out
-overwrite-*.yaml
 
 # Ignore .idea configs from JetBrains
 .idea
