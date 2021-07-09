@@ -14,7 +14,14 @@ var deleteUsrOptions = deleteUsrOptionsDT{}
 
 var deleteUserCmd = build.NewCmd("delete").WithDescription(
 	"Delete a user from the Inspr UID provider",
-).WithExample(
+).WithLongDescription(`
+Delete command is responsible for executing the operation of deleting
+an user in the InsprRedis instance in the cluster.
+
+To execute this command one must specify the username of the account that
+is going to be deleted and provide his credentials as well, the operation
+will only be successful if the user provider has the permission to do so.
+`).WithExample(
 	"delete a user given credentials",
 	"inprov delete --username userToBeDeleted username password",
 ).WithFlags(

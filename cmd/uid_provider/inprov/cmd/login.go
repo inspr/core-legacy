@@ -21,7 +21,10 @@ var loginOptions = loginOptionsDT{}
 
 var loginCmd = cmd.NewCmd("login").WithDescription(
 	"Log in to the Inspr UID provider and get a token.",
-).WithExample(
+).WithLongDescription(`
+login is the command responsible for associating the insprctl operations
+with an account on the UID Provider on the cluster.
+`).WithExample(
 	"log in with your user and password",
 	"inprov login usr pwd",
 ).WithFlags(
