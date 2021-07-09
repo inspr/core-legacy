@@ -31,10 +31,16 @@ type Client struct {
 }
 
 func (c *Client) initAdminUser() error {
+
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(os.Getenv("ADMIN_PASSWORD")), bcrypt.DefaultCost)
+	if err != nil {
+		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+	}
+
 	adminUser := User{
 		UID:         "admin",
 		Permissions: auth.AdminPermissions,
-		Password:    os.Getenv("ADMIN_PASSWORD"),
+		Password:    string(hashedPwd),
 	}
 	payload, _ := c.encrypt(adminUser)
 	token, err := c.requestNewToken(context.Background(), *payload)
