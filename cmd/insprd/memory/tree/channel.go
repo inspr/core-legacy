@@ -209,8 +209,7 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	ch.ConnectedAliases = oldCh.ConnectedAliases
 	ch.Meta.UUID = oldCh.Meta.UUID
 
-	broker := oldCh.Spec.SelectedBroker
-	ch.Spec.SelectedBroker = broker
+	ch.Spec.SelectedBroker = oldCh.Spec.SelectedBroker
 
 	parentApp, _ := chh.Apps().Get(scope)
 

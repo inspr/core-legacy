@@ -59,7 +59,7 @@ func (handler *Handler) addChangeReactor(op ...diff.ChangeReaction) {
 }
 
 func (handler *Handler) applyChangesInDiff(changes diff.Changelog) error {
-	logger.Debug("trying to aplly changes in diff",
+	logger.Debug("trying to apply changes in diff",
 		zap.Any("changes", changes))
 	errs := ierrors.MultiError{
 		Errors: []error{},
