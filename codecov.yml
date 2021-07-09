@@ -11,7 +11,6 @@ ignore:
   - "examples/**/*" # ignore folders and all its contents
   - "**/*mock*" # wildcards accepted
   - "**/mock*/*"
-  - "mock*.go"
   - "**/fake/*"
   - "**/main.go"
   - "**/interface*"
