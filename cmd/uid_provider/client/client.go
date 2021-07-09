@@ -73,7 +73,7 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
 	}
 
-	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
 	}
