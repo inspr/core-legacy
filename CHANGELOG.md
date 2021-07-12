@@ -6,7 +6,7 @@
   - added a logger to the requests that the uidp handles.
   - added description for the cli commands in the `inprov`.
 - fixes:
-  - removed the `COMMIT SUCESSED` message when the git hook didn't encounter any errors.
+  - removed the `COMMIT SUCCEEDED` message when the git hook didn't encounter any errors.
 
 ### #93 Tech CORE-366 | Encrypt the user password into the database
 - features:

@@ -4,7 +4,7 @@ import handler "inspr.dev/inspr/cmd/uid_provider/api/handlers"
 
 // initRoutes defines which routes the UID Provider API will have
 func (s *Server) initRoutes() {
-	logger.Debug("initializing Insprd server routes")
+	logger.Debug("initializing UIDP server routes")
 
 	h := handler.NewHandler(s.ctx, s.rdb)
 

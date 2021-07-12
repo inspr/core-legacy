@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -64,7 +65,14 @@ func loginAction(c context.Context, s []string) error {
 			return err
 		}
 	}
-	return login(c, s[0], s[1], output)
+
+	err = login(c, s[0], s[1], output)
+
+	// no errors
+	if err == nil {
+		fmt.Fprintln(output, "logged in succesfully")
+	}
+	return err
 }
 
 func login(ctx context.Context, login, password string, output io.Writer) error {
