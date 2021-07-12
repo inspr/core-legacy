@@ -2,7 +2,7 @@
 Expand the name of the chart.
 */}}
 {{- define "uidp.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- .Values.name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
@@ -14,7 +14,7 @@ If release name contains chart name it will be used as a full name.
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- $name := .Values.name }}
 {{- if contains $name .Release.Name }}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -40,6 +40,7 @@ helm.sh/chart: {{ include "uidp.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+app: {{ include "uidp.fullname" . }}
 {{- end }}
 
 {{/*
@@ -48,6 +49,7 @@ Selector labels
 {{- define "uidp.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "uidp.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ include "uidp.fullname" . }}
 {{- end }}
 {{/*
 Return the proper Docker Image Registry Secret Names

@@ -2,7 +2,7 @@
 Expand the name of the chart.
 */}}
 {{- define "insprd.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- default .Chart.Name .Values.name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
@@ -21,4 +21,14 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+{{- define "insprd.labels" }}
+{{- include "common.labels" $ }}
+app: {{ include "insprd.fullname" $ }}
+{{- end }}
+
+{{- define "insprd.selectorLabels" }}
+{{- include "common.labels" $ }}
+app: {{ include "insprd.fullname" $ }}
 {{- end }}

@@ -4,8 +4,7 @@ kind: Service
 metadata:
   name: {{ include "auth.fullname" $ }}
   labels:
-    {{- include "common.labels" $ | nindent 4 }}
-    app: {{ include "auth.fullname" $ }}
+    {{- include "auth.labels" $ | nindent 4 }}
 spec:
   type: {{ .service.type }}
   ports:

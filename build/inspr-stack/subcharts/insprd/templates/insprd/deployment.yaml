@@ -4,19 +4,16 @@ kind: Deployment
 metadata:
   name: {{ include "insprd.fullname" $ }}
   labels:
-    {{- include "common.labels" $ | nindent 4 }}
-    app: {{ include "insprd.fullname" $ }}
+    {{- include "insprd.labels" $ | nindent 4 }}
 spec:
   replicas: {{ .replicaCount }}
   selector:
     matchLabels:
-      {{- include "common.selectorLabels" $ | nindent 6 }}
-      app: {{ include "insprd.fullname" $ }}
+      {{- include "insprd.selectorLabels" $ | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "common.selectorLabels" $ | nindent 8 }}
-        app: {{ include "insprd.fullname" $ }}
+        {{- include "insprd.selectorLabels" $ | nindent 8 }}
     spec:
       serviceAccountName: {{ include "insprd.fullname" $ }}
       {{- include "common.images.pullSecrets" (dict "images" (list .image) "global" $) | nindent 6 }}

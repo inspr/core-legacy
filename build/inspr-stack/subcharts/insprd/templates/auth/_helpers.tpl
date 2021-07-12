@@ -10,3 +10,8 @@ If release name contains chart name it will be used as a full name.
 {{ printf "%s-%s" .Release.Name .Values.auth.name }}
 {{- end }}
 {{- end }}
+
+{{- define "auth.labels"}}
+{{- include "common.labels" $ }}
+app: {{ include "auth.fullname" $ }}
+{{- end -}}

@@ -4,8 +4,7 @@ kind: Service
 metadata:
   name: {{ include "insprd.fullname" $ }}
   labels:
-    {{- include "common.labels" $ | nindent 4 }}
-    app: {{ include "insprd.fullname" $ }}
+    {{- include "insprd.labels" $ | nindent 4 }}
 spec:
   type: {{ .service.type }}
   ports:
@@ -14,6 +13,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: {{ include "insprd.fullname" $ }}
-    {{- include "common.selectorLabels" $ | nindent 4 }}
+    {{- include "insprd.selectorLabels" $ | nindent 4 }}
 {{- end -}}
