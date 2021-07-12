@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	corev1 "k8s.io/api/core/v1"
+	"inspr.dev/inspr/pkg/controller/client"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -15,9 +15,17 @@ import (
 
 var clientSet kubernetes.Interface
 
+func initInsprd() ( string, error ){
+
+	cont :=  client.NewControllerClient(client.ControllerConfig{
+		URL: os.Getenv("INSPRD_URL"),
+	})
+
+	token, err := cont.Authorization().Init(context.Background(), os.Getenv("INSPRD_INIT_KEY"))
+	return token, err
+}
 // initKube initializes a k8s operator with in cluster configuration
 func initKube() error {
-
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return err
@@ -34,19 +42,16 @@ func initKube() error {
 func main() {
 	ctx := context.Background()
 	namespace := os.Getenv("K8S_NAMESPACE")
-	pvtKeyName := os.Getenv("PVT_KEY_NAME")
+	secretName := os.Getenv("SECRET_NAME")
 
-	token := os.Getenv("ADMIN_TOKEN")
-	password := os.Getenv("ADMIN_PASSWORD")
-	defer os.Unsetenv("ADMIN_PASSWORD")
-	if pvtKeyName == "" {
-		panic("[ENV VAR] PVT_KEY_NAME not found")
-	}
 
 	initKube()
-	_, err := clientSet.CoreV1().Secrets(namespace).Get(ctx, "redisprivatekey", v1.GetOptions{})
-
+	secret, err := clientSet.CoreV1().Secrets(namespace).Get(ctx,secretName, v1.GetOptions{})
 	if err != nil {
+		panic(err)
+	}
+
+	if _, exists := secret.Data["REFRESH_KEY"]; !exists {
 		bytes := make([]byte, 32) //generate a random 32 byte key for AES-256
 		if _, err := rand.Read(bytes); err != nil {
 			panic(err.Error())
@@ -54,23 +59,18 @@ func main() {
 
 		key := hex.EncodeToString(bytes)
 		privateKeyBytes := []byte(key)
-
-		privSec := corev1.Secret{
-			Type: corev1.SecretTypeOpaque,
-			ObjectMeta: v1.ObjectMeta{
-				Name: pvtKeyName,
-			},
-			Data: map[string][]byte{
-				"key":      privateKeyBytes,
-				"password": []byte(password),
-				"token":    []byte(token),
-			},
+		secret.Data["REFRESH_KEY"] = privateKeyBytes
+		if os.Getenv("INIT_INSPRD") == "true" {
+			token, err := initInsprd()
+			if err != nil {
+				panic(err)
+			}
+			secret.Data["ADMIN_TOKEN"] = []byte(token)
 		}
 
-		_, err = clientSet.CoreV1().Secrets(namespace).Create(ctx, &privSec, v1.CreateOptions{})
+		_, err = clientSet.CoreV1().Secrets(namespace).Update(ctx, secret, v1.UpdateOptions{})
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-
 	}
 }
