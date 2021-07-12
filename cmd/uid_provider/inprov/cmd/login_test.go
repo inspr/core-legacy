@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"io/ioutil"
@@ -61,13 +60,9 @@ func Test_login(t *testing.T) {
 					return "this is a token", nil
 				},
 			}
-			output := &bytes.Buffer{}
-			if err := login(tt.args.ctx, tt.args.login, tt.args.password, output); (err != nil) != tt.wantErr {
+			if err := login(tt.args.ctx, tt.args.login, tt.args.password); (err != nil) != tt.wantErr {
 				t.Errorf("login() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if gotOutput := output.String(); gotOutput != tt.wantOutput {
-				t.Errorf("login() = %v, want %v", gotOutput, tt.wantOutput)
 			}
 		})
 	}
@@ -82,7 +77,6 @@ func Test_loginAction(t *testing.T) {
 	}()
 	type args struct {
 		c context.Context
-		s []string
 	}
 	tests := []struct {
 		name      string
@@ -97,7 +91,6 @@ func Test_loginAction(t *testing.T) {
 			name: "stdout output",
 			args: args{
 				c: context.Background(),
-				s: []string{"username", "password"},
 			},
 			before: func() {
 				var err error
@@ -108,7 +101,9 @@ func Test_loginAction(t *testing.T) {
 				os.Stdout = writer
 			},
 			options: loginOptionsDT{
-				stdout: true,
+				stdout:   true,
+				user:     "username",
+				password: "password",
 			},
 			after: func() {
 				os.Stdout = recoverStdout
@@ -119,10 +114,11 @@ func Test_loginAction(t *testing.T) {
 			name: "file output",
 			args: args{
 				c: context.Background(),
-				s: []string{"username2", "password2"},
 			},
 			options: loginOptionsDT{
-				output: "afile",
+				output:   "afile",
+				user:     "username2",
+				password: "password2",
 			},
 			getReader: func() {
 				reader, _ = os.Open("afile")
@@ -136,10 +132,11 @@ func Test_loginAction(t *testing.T) {
 			name: "invalid file",
 			args: args{
 				c: context.Background(),
-				s: []string{"username3", "password3"},
 			},
 			options: loginOptionsDT{
-				output: "/usr/bin/afile",
+				output:   "/usr/bin/afile",
+				user:     "username3",
+				password: "password3",
 			},
 			wantErr: true,
 		},
@@ -157,17 +154,17 @@ func Test_loginAction(t *testing.T) {
 
 			cl = mockCl{
 				login: func(c context.Context, s1, s2 string) (string, error) {
-					if s1 != tt.args.s[0] {
-						t.Errorf("username is not set correctly\n%v\n!=\n%v", s1, tt.args.s[0])
+					if s1 != tt.options.user {
+						t.Errorf("username is not set correctly\n%v\n!=\n%v", s1, tt.options.user)
 					}
-					if s2 != tt.args.s[1] {
-						t.Errorf("password is not set correctly\n%v\n!=\n%v", s2, tt.args.s[1])
+					if s2 != tt.options.password {
+						t.Errorf("password is not set correctly\n%v\n!=\n%v", s2, tt.options.password)
 					}
 					return "this is a test", nil
 				},
 			}
 
-			if err := loginAction(tt.args.c, tt.args.s); (err != nil) != tt.wantErr {
+			if err := loginAction(tt.args.c); (err != nil) != tt.wantErr {
 				t.Errorf("loginAction() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			writer.Close()
@@ -176,11 +173,20 @@ func Test_loginAction(t *testing.T) {
 				tt.getReader()
 			}
 			bytes, err := ioutil.ReadAll(reader)
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("loginAction() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if (string(bytes) != "this is a test") != tt.wantErr {
-				t.Errorf("loginAction() = %v, want %v", string(bytes), "this is a test")
+
+			if tt.options.stdout {
+				if (string(bytes) != "Successfully logged in!\nthis is a test") != tt.wantErr {
+					t.Errorf("loginAction() = %v, want %v", string(bytes), "Successfully logged in!\nthis is a test")
+				}
+
+			} else {
+				if (string(bytes) != "this is a test") != tt.wantErr {
+					t.Errorf("loginAction() = %v, want %v", string(bytes), "this is a test")
+				}
 			}
 		})
 	}
