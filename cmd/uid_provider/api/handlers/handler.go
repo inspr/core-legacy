@@ -60,7 +60,7 @@ func (h *Handler) CreateUserHandler() rest.Handler {
 // DeleteUserHandler handles user deletion requests
 func (h *Handler) DeleteUserHandler() rest.Handler {
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("deleting a user")
+		logger.Info("deleting an user")
 
 		data := models.ReceivedDataDelete{}
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
@@ -80,7 +80,7 @@ func (h *Handler) DeleteUserHandler() rest.Handler {
 // UpdatePasswordHandler handles requests to update an user password
 func (h *Handler) UpdatePasswordHandler() rest.Handler {
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("updating a user")
+		logger.Info("updating an user")
 
 		data := models.ReceivedDataUpdate{}
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {

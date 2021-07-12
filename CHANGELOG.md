@@ -7,6 +7,14 @@
   - added description for the cli commands in the `inprov`.
 - fixes:
   - removed the `COMMIT SUCCEEDED` message when the git hook didn't encounter any errors.
+---
+
+### #96 Tech CORE-372 | Protect user password on inprov login #96
+- features:
+    - developed new execution standard for login command
+- tests: 
+    - adapted tests
+---
 
 ### #93 Tech CORE-366 | Encrypt the user password into the database
 - features:
