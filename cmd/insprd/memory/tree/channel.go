@@ -209,6 +209,8 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	ch.ConnectedAliases = oldCh.ConnectedAliases
 	ch.Meta.UUID = oldCh.Meta.UUID
 
+	ch.Spec.SelectedBroker = oldCh.Spec.SelectedBroker
+
 	parentApp, _ := chh.Apps().Get(scope)
 
 	logger.Debug("validating new Channel structure")

@@ -24,6 +24,8 @@ deploy:
   helm:
     releases:
       - name: insprd
+        valuesFiles: 
+          - overwrite-insprd.yaml
         artifactOverrides:
           insprdRepository: gcr.io/insprlabs/insprd
           lbsidecarImage: gcr.io/insprlabs/inspr/sidecar/lbsidecar
@@ -48,6 +50,8 @@ profiles:
       helm:
         releases:
           - name: uidp
+            valuesFiles: 
+              - overwrite-uidp.yaml
             artifactOverrides:
               uidpRepository: gcr.io/insprlabs/uidp/redis/api
               secretRepository: gcr.io/insprlabs/uidp/redis/secret

@@ -98,6 +98,8 @@ func (bmm *brokerMemoryManager) Factory() SidecarManager {
 
 //Configs returns the configurations for a given broker
 func (bmm *brokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
+	bmm.available.Lock()
+	defer bmm.available.Unlock()
 	logger.Info("getting config for broker sidecar",
 		zap.String("broker", broker))
 

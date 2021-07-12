@@ -1,4 +1,3 @@
-
 PASS=""
 
 for file in $(git diff --cached --name-only --diff-filter=ATMR --line-prefix=./ | grep "\.go\$")

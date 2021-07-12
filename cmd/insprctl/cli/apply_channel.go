@@ -26,6 +26,7 @@ func NewApplyChannel() RunMethod {
 		if err := yaml.Unmarshal(data, &channel); err != nil {
 			return err
 		}
+
 		if channel.Meta.Name == "" {
 			return ierrors.NewError().Message("channel without name").Build()
 		}
