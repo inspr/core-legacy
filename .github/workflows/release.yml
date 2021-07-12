@@ -46,24 +46,17 @@ jobs:
         run: |
           gcloud auth activate-service-account ${{ secrets.GCR_ACCOUNT }} --key-file=$GCR_FILENAME.json
 
+      - name: Run skaffold build
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $GCR_FILENAME.json
+        run: |
+          skaffold build --filename=/home/runner/work/inspr/inspr/skaffold.yaml
+
       - name: Build CLI
         run: bash .github/scripts/buildcli.sh
 
       - name: Push CLI
         run: bash .github/scripts/pushcli.sh
-
-      - name: Create temp file to store skaffold build return
-        run: |
-          touch tags.out
-
-      - name: Run skaffold build
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $GCR_FILENAME.json
-        run: |
-          skaffold build --file-output=tags.out --filename=/home/runner/work/inspr/inspr/skaffold.yaml
-
-      - name: Helm Chart update
-        run: bash .github/scripts/update_tags.sh https://inspr-charts.storage.googleapis.com/ gs://inspr-charts
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
