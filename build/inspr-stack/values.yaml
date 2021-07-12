@@ -61,6 +61,7 @@ insprd:
       tag: 
 
 uidp:
+  name: uidp
   enabled: true
   image:
     registry: gcr.io/insprlabs
@@ -84,6 +85,7 @@ uidp:
   admin:
     password:
     token:
+    generatePassword: true
 
   redis:
     password:

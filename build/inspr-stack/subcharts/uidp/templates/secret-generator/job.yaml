@@ -32,3 +32,7 @@ spec:
                   name: {{ tpl .Values.insprd.init.secret.name . }}
                   key: {{ .Values.insprd.init.secret.key }}
             {{- end }}
+            {{- if .Values.admin.generatePassword }}
+            - name: ADMIN_PASSWORD_GENERATE
+              value: "true"
+            {{- end }}

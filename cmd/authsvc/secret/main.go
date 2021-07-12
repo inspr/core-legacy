@@ -14,12 +14,30 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"time"
+	rands "math/rand"
+	"strings"
 )
 
 var clientSet kubernetes.Interface
 var logger *zap.Logger
 
 const bitSize = 512 // min size for encoding your payload
+
+
+func generatePassword() string {
+	rands.Seed(time.Now().UnixNano())
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ" +
+		"abcdefghijklmnopqrstuvwxyzåäö" +
+		"0123456789")
+	length := 20
+	var b strings.Builder
+	for i := 0; i < length; i++ {
+		b.WriteRune(chars[rands.Intn(len(chars))])
+	}
+	str := b.String()
+	return str
+}
 
 // initKube initializes a k8s operator with in cluster configuration
 func initKube() error {
@@ -151,5 +169,20 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 		logger.Info("New secrets generated.")
+	}
+
+	if secretName := os.Getenv("INSPRD_INIT_KEY_SECRET_NAME"); secretName != "" {
+		secret, err := clientSet.CoreV1().Secrets(namespace).Get(context.Background(), secretName, v1.GetOptions{})
+		if err != nil {
+ 			panic(err)
+		}
+		if secret.Data == nil {
+			secret.Data = map[string][]byte{}
+		}
+		secret.Data["key"] = []byte(generatePassword())
+		_, err = clientSet.CoreV1().Secrets(namespace).Update(context.Background(), secret, v1.UpdateOptions{})
+		if err != nil {
+			panic(err)
+		}
 	}
 }

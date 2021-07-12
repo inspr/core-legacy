@@ -11,8 +11,24 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	rands "math/rand"
+	"strings"
+	"time"
 )
 
+func generatePassword() string {
+	rands.Seed(time.Now().UnixNano())
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ" +
+		"abcdefghijklmnopqrstuvwxyzåäö" +
+		"0123456789")
+	length := 20
+	var b strings.Builder
+	for i := 0; i < length; i++ {
+		b.WriteRune(chars[rands.Intn(len(chars))])
+	}
+	str := b.String()
+	return str
+}
 var clientSet kubernetes.Interface
 
 func initInsprd() ( string, error ){
@@ -66,6 +82,9 @@ func main() {
 				panic(err)
 			}
 			secret.Data["ADMIN_TOKEN"] = []byte(token)
+		}
+		if os.Getenv("ADMIN_PASSWORD_GENERATE") == "true" {
+			secret.Data["ADMIN_PASSWORD"] = []byte(generatePassword())	
 		}
 
 		_, err = clientSet.CoreV1().Secrets(namespace).Update(ctx, secret, v1.UpdateOptions{})

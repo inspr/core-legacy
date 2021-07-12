@@ -1,6 +1,7 @@
 # Default values for UIDProvider.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+name: uidp
 
 image:
   registry: gcr.io/insprlabs
@@ -22,8 +23,8 @@ secret:
     tag:
 
 admin:
+  generatePassword: true
   password:
-  token:
 
 redis:
   password: 
@@ -34,6 +35,7 @@ ingress:
   enabled: true
   class: "nginx"
   host:
+  token:
 
 insprd:
   name: "insprd"

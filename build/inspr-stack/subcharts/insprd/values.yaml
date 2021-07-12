@@ -25,7 +25,9 @@ ingress:
   host:
   class:
 
-initKey: ""
+init:
+  generateKey: true
+  key: ""
 
 service:
   type: ClusterIP

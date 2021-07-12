@@ -16,3 +16,4 @@ rules:
       - "get"
       - "delete"
       - "create"
+      - "update"
