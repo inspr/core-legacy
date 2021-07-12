@@ -13,6 +13,7 @@ func Test_login(t *testing.T) {
 		ctx      context.Context
 		login    string
 		password string
+		file     string
 	}
 	tests := []struct {
 		name       string
@@ -25,8 +26,8 @@ func Test_login(t *testing.T) {
 			name: "correct functionality",
 			args: args{
 				ctx:      context.Background(),
-				login:    "login",
 				password: "password",
+				file:     "file",
 			},
 			wantOutput: "this is a token",
 			wantErr:    false,
@@ -60,6 +61,10 @@ func Test_login(t *testing.T) {
 					return "this is a token", nil
 				},
 			}
+			loginOptions = loginOptionsDT{
+				output: tt.args.file,
+			}
+			defer os.Remove(tt.args.file)
 			if err := login(tt.args.ctx, tt.args.login, tt.args.password); (err != nil) != tt.wantErr {
 				t.Errorf("login() error = %v, wantErr %v", err, tt.wantErr)
 				return
