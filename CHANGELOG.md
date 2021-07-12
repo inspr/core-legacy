@@ -1,8 +1,15 @@
 
 # Changelog
 
+### #95 Tech CORE-491 | Improve UIDP
+- features:
+  - added a logger to the requests that the uidp handles.
+  - added description for the cli commands in the `inprov`.
+- fixes:
+  - removed the `COMMIT SUCESSED` message when the git hook didn't encounter any errors.
+
+
 ### #91 Bug CORE-498 | Unable to update channels
-## Changelog
 - fixes:
     - Changed the Annotations metadata diff to work according to new brokers configuration process.
     - Copied `SelectedBroker` from old channel to new on Update operation
