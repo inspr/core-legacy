@@ -1,0 +1,52 @@
+# 1. Get the uidp URL by running these commands:
+{{- if .Values.uidp.ingress.enabled }}
+{{- range $host := .Values.uidp.ingress.hosts }}
+  {{- range .paths }}
+  http{{ if $.Values.uidp.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- else if contains "NodePort" .Values.uidp.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "uidp.fullname" (dict "Values" .Values.uidp "Chart" .Chart "Release" .Release) }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.uidp.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "uidp.fullname" (dict "Values" .Values.uidp "Chart" .Chart "Release" .Release) }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "uidp.fullname" (dict "Values" .Values.uidp "Chart" .Chart "Release" .Release) }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.uidp.service.port }}
+{{- else if contains "ClusterIP" .Values.uidp.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "uidp.name" (dict "Values" .Values.uidp ) }},app.kubernetes.io/instance={{ .Release.Name }},app={{ include "uidp.fullname" (dict "Values" .Values.uidp "Release" .Release "Chart" .Chart )}}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 9001:$CONTAINER_PORT &
+  echo "Run 'fg' to return to the port foward and disable it if needed"
+{{- end }}
+
+# 2. Get the insprd URL by running these commands:
+{{- if .Values.insprd.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- else if contains "NodePort" .Values.insprd.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "insprd.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.insprd.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "insprd.fullname" . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "insprd.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.insprd.service.port }}
+{{- else if contains "ClusterIP" .Values.insprd.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "insprd.name" (dict "Values" .Values.insprd "Chart" .Chart "Release" .Release ) }},app.kubernetes.io/instance={{ .Release.Name }},app={{ include "insprd.fullname" . }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT &
+  echo "Run 'fg' to return to the port foward and disable it if needed"
+{{- end }}
+
+# 3. Login to the admin account by running these commands:
+  UIDP_ADMIN_PASSWORD=$(kubectl get secrets -n {{ .Release.Namespace }} {{ tpl .Values.uidp.secret.name . }} -o jsonpath="{.data.ADMIN_PASSWORD}" | base64 --decode)
+  INPROV_PROVIDER_URL=http://localhost:9001 inprov login admin ${UIDP_ADMIN_PASSWORD}
+
+# 4. Set the insprd url to the fowarded port
+  insprctl config serverip http://localhost:8080
