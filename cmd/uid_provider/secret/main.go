@@ -11,20 +11,19 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	rands "math/rand"
 	"strings"
-	"time"
+	"math/big"
 )
 
 func generatePassword() string {
-	rands.Seed(time.Now().UnixNano())
-	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ" +
-		"abcdefghijklmnopqrstuvwxyzåäö" +
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+		"abcdefghijklmnopqrstuvwxyz" +
 		"0123456789")
 	length := 20
 	var b strings.Builder
 	for i := 0; i < length; i++ {
-		b.WriteRune(chars[rands.Intn(len(chars))])
+		index, _ := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
+		b.WriteRune(chars[index.Int64()])
 	}
 	str := b.String()
 	return str
