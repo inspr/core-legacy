@@ -95,6 +95,7 @@ profiles:
       helm:
         releases:
           - name: inspr-stack
+            createNamespace: true
             valuesFiles: 
               - overwrite-stack.yaml
             artifactOverrides:
