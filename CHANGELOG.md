@@ -8,6 +8,16 @@
     - adapted tests
 ---
 
+### #93 Tech CORE-366 | Encrypt the user password into the database
+- features:
+    - Password encryption when creating user
+    - Password encryption when initializing admin user
+    - Passord verifycation when trying to delete/update/create a new user now uses the hashed password and bcrypt function
+    - Redis install/uninstall documentation
+- refactors:
+    - Updated all the tests for create/delete/update a user
+---
+
 ### #91 Bug CORE-498 | Unable to update channels
 - fixes:
     - Changed the Annotations metadata diff to work according to new brokers configuration process.
