@@ -13,6 +13,7 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
+	"golang.org/x/crypto/bcrypt"
 	"inspr.dev/inspr/pkg/api/models"
 	"inspr.dev/inspr/pkg/auth"
 	"inspr.dev/inspr/pkg/meta/utils"
@@ -54,16 +55,19 @@ func TestClient_CreateUser(t *testing.T) {
 	setup()
 	defer teardown()
 
+	auxPass := "none"
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte("none"), bcrypt.DefaultCost)
+
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
 		Permissions: map[string][]string{"": {auth.CreateToken}},
-		Password:    "none",
+		Password:    string(hashedAuxPass),
 	}
 	auxUser2 := User{
 		UID:         "user2",
 		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
-		Password:    "none",
+		Password:    string(hashedAuxPass),
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -87,7 +91,7 @@ func TestClient_CreateUser(t *testing.T) {
 			c:    &redisClient,
 			args: args{
 				uid: auxUser.UID,
-				pwd: auxUser.Password,
+				pwd: auxPass,
 				newUser: User{
 					UID:      "user3",
 					Password: "u3pwd",
@@ -100,7 +104,7 @@ func TestClient_CreateUser(t *testing.T) {
 			c:    &redisClient,
 			args: args{
 				uid: auxUser2.UID,
-				pwd: auxUser2.Password,
+				pwd: auxPass,
 				newUser: User{
 					UID:         "user3",
 					Password:    "u3pwd",
@@ -130,21 +134,24 @@ func TestClient_DeleteUser(t *testing.T) {
 	setup()
 	defer teardown()
 
+	auxPass := "none"
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte("none"), bcrypt.DefaultCost)
+
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
 		Permissions: map[string][]string{"": {auth.CreateToken}},
-		Password:    "none",
+		Password:    string(hashedAuxPass),
 	}
 	auxUser2 := User{
 		UID:         "user2",
 		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
-		Password:    "none",
+		Password:    string(hashedAuxPass),
 	}
 	auxUser3 := User{
 		UID:         "user3",
 		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
-		Password:    "1234",
+		Password:    string(hashedAuxPass),
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -170,7 +177,7 @@ func TestClient_DeleteUser(t *testing.T) {
 			c:    &redisClient,
 			args: args{
 				uid:            auxUser.UID,
-				pwd:            auxUser.Password,
+				pwd:            auxPass,
 				usrToBeDeleted: "user3",
 			},
 			wantErr: false,
@@ -180,7 +187,7 @@ func TestClient_DeleteUser(t *testing.T) {
 			c:    &redisClient,
 			args: args{
 				uid:            auxUser2.UID,
-				pwd:            auxUser2.Password,
+				pwd:            auxPass,
 				usrToBeDeleted: "user3",
 			},
 			wantErr: true,
@@ -206,16 +213,21 @@ func TestClient_UpdatePassword(t *testing.T) {
 	setup()
 	defer teardown()
 
+	auxPass := "none"
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte(auxPass), bcrypt.DefaultCost)
+
+	auxPass2 := "banana"
+
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
 		Permissions: map[string][]string{"": {auth.CreateToken}},
-		Password:    "none",
+		Password:    string(hashedAuxPass),
 	}
 	auxUser2 := User{
 		UID:         "user2",
 		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
-		Password:    "none",
+		Password:    string(hashedAuxPass),
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -240,9 +252,9 @@ func TestClient_UpdatePassword(t *testing.T) {
 			c:    &redisClient,
 			args: args{
 				uid:            auxUser.UID,
-				pwd:            auxUser.Password,
+				pwd:            auxPass,
 				usrToBeUpdated: auxUser2.UID,
-				newPwd:         "banana",
+				newPwd:         auxPass2,
 			},
 			wantErr: false,
 		},
@@ -251,9 +263,9 @@ func TestClient_UpdatePassword(t *testing.T) {
 			c:    &redisClient,
 			args: args{
 				uid:            auxUser2.UID,
-				pwd:            auxUser2.Password,
+				pwd:            auxPass,
 				usrToBeUpdated: auxUser2.UID,
-				newPwd:         "banana",
+				newPwd:         auxPass2,
 			},
 			wantErr: true,
 		},
@@ -267,7 +279,10 @@ func TestClient_UpdatePassword(t *testing.T) {
 			}
 
 			updatedUser, err := get(auxCtx, redisClient.rdb, tt.args.usrToBeUpdated)
-			if !tt.wantErr && (err != nil || updatedUser.Password != tt.args.newPwd) {
+
+			passErr := bcrypt.CompareHashAndPassword([]byte(updatedUser.Password), []byte(tt.args.newPwd))
+
+			if !tt.wantErr && (err != nil || passErr != nil) {
 				t.Errorf("Client.UpdatePassword() error = %v", err)
 			}
 		})
@@ -278,11 +293,14 @@ func TestClient_Login(t *testing.T) {
 	setup()
 	defer teardown()
 
+	auxPass := "none"
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte(auxPass), bcrypt.DefaultCost)
+
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
 		Permissions: map[string][]string{"ascope": {auth.CreateToken}},
-		Password:    "none",
+		Password:    string(hashedAuxPass),
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -304,7 +322,7 @@ func TestClient_Login(t *testing.T) {
 			c:    &redisClient,
 			args: args{
 				uid: auxUser.UID,
-				pwd: auxUser.Password,
+				pwd: auxPass,
 			},
 			want:    "user1-ascope",
 			wantErr: false,
@@ -573,16 +591,19 @@ func Test_hasPermission(t *testing.T) {
 	setup()
 	defer teardown()
 
+	auxPass := "none"
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte(auxPass), bcrypt.DefaultCost)
+
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
 		Permissions: map[string][]string{"": {auth.CreateToken}},
-		Password:    "none",
+		Password:    string(hashedAuxPass),
 	}
 	auxUser2 := User{
 		UID:         "user2",
 		Permissions: nil,
-		Password:    "none",
+		Password:    string(hashedAuxPass),
 	}
 
 	strData, _ := json.Marshal(auxUser)
@@ -604,7 +625,7 @@ func Test_hasPermission(t *testing.T) {
 			name: "User has admin permission",
 			args: args{
 				uid: "user1",
-				pwd: "none",
+				pwd: auxPass,
 			},
 			wantErr: false,
 			want:    true,
@@ -629,7 +650,7 @@ func Test_hasPermission(t *testing.T) {
 			name: "User is not admin",
 			args: args{
 				uid: "user2",
-				pwd: "none",
+				pwd: auxPass,
 			},
 			wantErr: true,
 		},
