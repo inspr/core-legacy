@@ -6,7 +6,7 @@
     - Password encryption when creating user
     - Password encryption when initializing admin user
     - Passord verifycation when trying to delete/update/create a new user now uses the hashed password and bcrypt function
-    - Redis install/unninstall documentation
+    - Redis install/uninstall documentation
 - refactors:
     - Updated all the tests for create/delete/update a user
 ---
