@@ -39,7 +39,7 @@ spec:
             - name: "INSPR_LBSIDECAR_IMAGE"
               value: {{ include "common.images.image" ( dict "image" .sidecar.image "global" $.Values.global )}}
             - name: "NODES_APPS_NAMESPACE"
-              value: {{ .apps.namespace }}
+              value: {{ tpl .apps.namespace $ }}
             - name: "INSPR_ENV"
               value: {{ $.Values.environment }}
             - name: JWT_PUBLIC_KEY
@@ -47,5 +47,7 @@ spec:
                 secretKeyRef:
                   name: jwtpublickey
                   key: key
+            - name: LOG_LEVEL
+              value: {{ .logLevel }}
 
     {{- end -}}

@@ -4,7 +4,7 @@ metadata:
   name: {{ include "insprd.fullname" $ }}
   labels:
     {{- include "common.labels" $ | nindent 4 }}
-  namespace: {{ .Values.apps.namespace }}
+  namespace: {{ tpl .Values.apps.namespace $ }}
 rules:
   - apiGroups:
       - "apps"

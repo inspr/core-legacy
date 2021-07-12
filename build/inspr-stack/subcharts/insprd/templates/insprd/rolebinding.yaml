@@ -12,4 +12,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ include "insprd.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ tpl .Release.Namespace $ }}
