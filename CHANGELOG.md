@@ -1,6 +1,13 @@
 
 # Changelog
 
+### #96 Tech CORE-372 | Protect user password on inprov login #96
+- features:
+    - developed new execution standard for login command
+- tests: 
+    - adapted tests
+---
+
 ### #93 Tech CORE-366 | Encrypt the user password into the database
 - features:
     - Password encryption when creating user
