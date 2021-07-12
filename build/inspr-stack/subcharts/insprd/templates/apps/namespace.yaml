@@ -1,0 +1,8 @@
+{{- if .Values.apps.createNamespace -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.apps.namespace }}
+  labels:
+    {{- include "common.labels" $ | nindent 4 }}
+{{- end -}}

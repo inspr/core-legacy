@@ -1,0 +1,19 @@
+{{- with .Values.auth }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "auth.fullname" $ }}
+  labels:
+    {{- include "common.labels" $ | nindent 4 }}
+    app: {{ include "auth.fullname" $ }}
+spec:
+  type: {{ .service.type }}
+  ports:
+    - port: {{ .service.port }}
+      targetPort: {{ .service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "auth.fullname" $ }}
+    {{- include "common.selectorLabels" $ | nindent 4 }}
+{{- end -}}

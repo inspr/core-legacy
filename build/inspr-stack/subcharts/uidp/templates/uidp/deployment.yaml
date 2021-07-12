@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "uidp.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "uidp.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "uidp.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      initContainers:
+      {{- include "insprd.init-check" . | nindent 8 }}
+      containers:
+        - name: {{ include "uidp.fullname" . }}
+          image: {{ include "common.images.image" (dict "image" .Values.image "global" $) }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: {{ tpl .Values.secret.name . }}
+          env:
+            - name: INSPR_CLUSTER_ADDR
+              value: {{ include "insprd.address" . }}
+            - name: REDIS_HOST
+              value: {{ .Values.redis.host }}
+            - name: REDIS_PORT
+              value: {{ .Values.redis.port | quote }}
+            - name: REFRESH_URL
+              value: {{ if .Values.refreshURL }}{{ .Values.refreshURL }}{{ else }}http://{{ include "uidp.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}{{ end }}
+

@@ -1,0 +1,41 @@
+{{- with .Values.auth }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "auth.fullname" $ }}
+  labels:
+    {{- include "common.labels" $ | nindent 4 }}
+    app: {{ include "auth.fullname" $ }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.selectorLabels"  $ | nindent 6 }}
+      app: {{ include "auth.fullname" $ }}
+  template:
+    metadata:
+      labels:
+        {{- include "common.selectorLabels"  $ | nindent 8 }}
+        app: {{ include "auth.fullname" $ }}
+    spec:
+      {{- include "common.images.pullSecrets" (dict (list .image) "global" $.Values.global ) | nindent 6 }}
+      containers:
+        - name: {{ include "auth.fullname" $ }}
+          image: {{ include "common.images.image" (dict "image" .image "global" $.Values.global) }}
+          imagePullPolicy: {{ .imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .service.targetPort }}
+              protocol: TCP
+          env:
+            - name: INSPR_INIT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "insprd.fullname" $ }}-init-key
+                  key: key
+            - name: JWT_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwtprivatekey
+                  key: key
+  {{- end -}}
