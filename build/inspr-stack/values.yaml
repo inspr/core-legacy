@@ -22,12 +22,12 @@ insprd:
   replicaCount: 1
 
   apps:
-    namespace: "inspr-apps"
+    namespace:
 
   ingress:
-    enabled: true
-    host: "inspr.com"
-    class: "nginx"
+    enabled: false
+    host:
+    class:
 
   initKey: ""
 
@@ -86,13 +86,13 @@ uidp:
     token:
 
   redis:
-    password: 
+    password:
     host:
     port:
 
   ingress:
-    enabled: true
-    class: "nginx"
+    enabled: false
+    class:
     host:
 
   insprd:

@@ -14,15 +14,16 @@ image:
 imagePullPolicy: IfNotPresent
 
 replicaCount: 1
+logLevel: info
 
 apps:
-  namespace: "inspr-apps"
+  namespace: "{{ .Release.Name }}-inspr-apps"
   createNamespace: false
 
 ingress:
   enabled: true
-  host: "inspr.com"
-  class: "nginx"
+  host:
+  class:
 
 initKey: ""
 
