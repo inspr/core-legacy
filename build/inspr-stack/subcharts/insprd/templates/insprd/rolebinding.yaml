@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: {{ include "insprd.fullname" . }}
-  namespace: {{ .Values.apps.namespace }}
+  namespace: {{ tpl .Values.apps.namespace . }}
   labels:
     {{- include "common.labels" $ | nindent 4 }}
 roleRef:
@@ -12,4 +12,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ include "insprd.fullname" . }}
-  namespace: {{ tpl .Release.Namespace $ }}
+  namespace: {{ .Release.Namespace }}
