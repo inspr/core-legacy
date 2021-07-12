@@ -1,6 +1,16 @@
 
 # Changelog
 
+### #93 Tech CORE-366 | Encrypt the user password into the database
+- features:
+    - Password encryption when creating user
+    - Password encryption when initializing admin user
+    - Passord verifycation when trying to delete/update/create a new user now uses the hashed password and bcrypt function
+    - Redis install/unninstall documentation
+- refactors:
+    - Updated all the tests for create/delete/update a user
+---
+
 ### #90 Bug CORE-499 | Unable to delete multi-layered dApps
 - refactors:
     - Added the usePermTree (bool) parameter in the ResolveBoundary function. If true, then use the unmodified app tree.
