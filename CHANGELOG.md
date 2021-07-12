@@ -1,8 +1,14 @@
 
 # Changelog
 
+### #96 Tech CORE-372 | Protect user password on inprov login #96
+- features:
+    - developed new execution standard for login command
+- tests: 
+    - adapted tests
+---
+
 ### #91 Bug CORE-498 | Unable to update channels
-## Changelog
 - fixes:
     - Changed the Annotations metadata diff to work according to new brokers configuration process.
     - Copied `SelectedBroker` from old channel to new on Update operation
