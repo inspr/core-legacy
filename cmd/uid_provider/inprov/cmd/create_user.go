@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -24,8 +25,20 @@ var createUsrOptions = createUserOptionsDT{}
 var createUserCmd = cmd.NewCmd(
 	"create { -yaml || -json || -u USR | -p PWD | -s SCOPES } <username> <password>",
 ).WithDescription(
-	"Creates a new user on the Insprd UID provider.",
-).WithExample(
+	"Create a user in the Inspr UID Provider",
+).WithLongDescription(`
+Creates a new user on the Insprd UID provider.
+
+For the operation to be successful one must specify the new username and
+its password, followed by the user and password of the user trying to 
+execute the operation. The operation will only work if the user has the 
+permission to create other users.
+
+By default a user created will have its permissions from the root scope 
+and as consequence it can execute the operations in all dApps, the way 
+in which this can be changed is by using flag '-s', in the examples 
+section there is a usage of the flag.
+`).WithExample(
 	"create a new user directly from the cli",
 	"inprov create --username newUsername --password newPwd -s \"\" -s app1.app2 username password",
 ).WithExample(
@@ -102,5 +115,8 @@ func createUser(ctx context.Context, inputArgs []string) error {
 	}
 
 	err = cl.CreateUser(ctx, inputArgs[0], inputArgs[1], usr)
+	if err == nil {
+		fmt.Println("Successfully created the user: ", usr.UID)
+	}
 	return err
 }
