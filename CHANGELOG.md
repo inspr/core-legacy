@@ -1,6 +1,14 @@
 
 # Changelog
 
+
+### #97 Tech CORE-490 | Channels envvars with broker
+- features:
+   - change the separator for the channel brokers. 
+- test
+   - fixed the tests that use channel's env variables   
+---
+
 ### #95 Tech CORE-491 | Improve UIDP
 - features:
   - added a logger to the requests that the uidp handles.
