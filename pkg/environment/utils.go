@@ -83,7 +83,7 @@ func getChannelData(channelList string) []brokers.ChannelBroker {
 	channelBrokers := utils.StringArray(strings.Split(channelList, ";"))
 	channels := []brokers.ChannelBroker{}
 	channelBrokers.Map(func(channel string) string {
-		data := strings.Split(channel, "_")
+		data := strings.Split(channel, "@")
 		channelData := brokers.ChannelBroker{
 			ChName: data[0],
 			Broker: data[1],

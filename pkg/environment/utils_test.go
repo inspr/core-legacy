@@ -84,7 +84,7 @@ func TestGetChannelBoundaryList(t *testing.T) {
 		{
 			name: "It should get all the channels in the InputChannels env",
 			fields: fields{
-				InputChannels:    "ch1_b;ch2_b;ch3_b;ch4_b",
+				InputChannels:    "ch1@b;ch2@b;ch3@b;ch4@b",
 				OutputChannels:   "",
 				UnixSocketAddr:   "",
 				InsprAppContext:  "",
@@ -187,7 +187,7 @@ func TestGetResolvedBoundaryChannelList(t *testing.T) {
 		{
 			name: "Returns resolved boundary",
 			args: args{
-				boundary: "ch1_b;ch2_b",
+				boundary: "ch1@b;ch2@b",
 			},
 			want: utils.StringArray{"channel1_resolved", "channel2_resolved"},
 		},
@@ -219,7 +219,7 @@ func TestGetResolvedChannel(t *testing.T) {
 			name: "Returns resolved channel",
 			args: args{
 				channel:   "ch1",
-				inputChan: "ch1_b;ch2_b",
+				inputChan: "ch1@b;ch2@b",
 			},
 			wantErr: false,
 			want:    "channel1_resolved",
@@ -228,7 +228,7 @@ func TestGetResolvedChannel(t *testing.T) {
 			name: "Invalid channel",
 			args: args{
 				channel:   "ch3",
-				inputChan: "ch1_b;ch2_b",
+				inputChan: "ch1@b;ch2@b",
 			},
 			wantErr: true,
 			want:    "",

@@ -244,7 +244,7 @@ func TestServer_readMessageHandler(t *testing.T) {
 type randomStruct struct{}
 
 func createMockEnvVars() {
-	customEnvValues := "chan1_randBroker3;chan3_randBroker4;chan4_randBroker2;chan5_randBroker1;chan6_randBroker5"
+	customEnvValues := "chan1@randBroker3;chan3@randBroker4;chan4@randBroker2;chan5@randBroker1;chan6@randBroker5"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
 
