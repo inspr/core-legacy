@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -114,5 +115,8 @@ func createUser(ctx context.Context, inputArgs []string) error {
 	}
 
 	err = cl.CreateUser(ctx, inputArgs[0], inputArgs[1], usr)
+	if err == nil {
+		fmt.Println("Successfully created the user: ", usr.UID)
+	}
 	return err
 }

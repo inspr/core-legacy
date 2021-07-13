@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 
 	build "inspr.dev/inspr/pkg/cmd"
 )
@@ -34,6 +35,9 @@ will only be successful if the user provider has the permission to do so.
 ).ExactArgs(2, deleteAction)
 
 func deleteAction(ctx context.Context, inputArgs []string) error {
-
-	return cl.DeleteUser(ctx, inputArgs[0], inputArgs[1], deleteUsrOptions.username)
+	err := cl.DeleteUser(ctx, inputArgs[0], inputArgs[1], deleteUsrOptions.username)
+	if err == nil {
+		fmt.Println("Successfully deleted the user")
+	}
+	return err
 }
