@@ -8,8 +8,8 @@ import (
 
 func mockInsprEnvironment() *InsprEnvVars {
 	return &InsprEnvVars{
-		InputChannels:    "chan_someBroker;chan1_someBroker;chan2_someBroker;chan3_someBroker",
-		OutputChannels:   "chan_someBroker;chan1_someBroker;chan2_someBroker;chan3_someBroker",
+		InputChannels:    "chan@someBroker;chan1@someBroker;chan2@someBroker;chan3@someBroker",
+		OutputChannels:   "chan@someBroker;chan1@someBroker;chan2@someBroker;chan3@someBroker",
 		SidecarImage:     "mock_sidecar_image",
 		InsprAppContext:  "mock.dapp.context",
 		InsprEnvironment: "mock_env",
@@ -55,14 +55,14 @@ func Test_getEnv(t *testing.T) {
 			args: args{
 				name: "INSPR_INPUT_CHANNELS",
 			},
-			want: "chan_someBroker;chan1_someBroker;chan2_someBroker;chan3_someBroker",
+			want: "chan@someBroker;chan1@someBroker;chan2@someBroker;chan3@someBroker",
 		},
 		{
 			name: "Get output channel environment variable",
 			args: args{
 				name: "INSPR_OUTPUT_CHANNELS",
 			},
-			want: "chan_someBroker;chan1_someBroker;chan2_someBroker;chan3_someBroker",
+			want: "chan@someBroker;chan1@someBroker;chan2@someBroker;chan3@someBroker",
 		},
 		{
 			name: "Get unix socket environment variable",

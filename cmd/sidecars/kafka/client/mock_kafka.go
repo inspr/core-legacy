@@ -76,8 +76,8 @@ func (mc *MockConsumer) Close() (err error) {
 // createMockEnvVars - sets up the env values to be used in the tests functions
 // createMockEnvVars - sets up the env values to be used in the tests functions
 func createMockEnv() {
-	os.Setenv("INSPR_INPUT_CHANNELS", "ch1_someBroker;ch2_someBroker")
-	os.Setenv("INSPR_OUTPUT_CHANNELS", "ch1_someBroker;ch2_someBroker")
+	os.Setenv("INSPR_INPUT_CHANNELS", "ch1@someBroker;ch2@someBroker")
+	os.Setenv("INSPR_OUTPUT_CHANNELS", "ch1@someBroker;ch2@someBroker")
 	os.Setenv("INSPR_UNIX_SOCKET", "/addr/to/socket")
 	os.Setenv("INSPR_APP_SCOPE", "")
 	os.Setenv("INSPR_ENV", "random")
