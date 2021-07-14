@@ -7,11 +7,11 @@ import (
 	"os"
 	"strings"
 
-	cliutils "github.dev/inspr/pkg/cmd/utils"
-	"github.dev/inspr/pkg/meta"
-	metautils "github.dev/inspr/pkg/meta/utils"
-	"github.dev/inspr/pkg/utils"
-	"github.dev/spf13/cobra"
+	"github.com/spf13/cobra"
+	cliutils "inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/meta"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 var completionCmd = &cobra.Command{
@@ -21,13 +21,13 @@ var completionCmd = &cobra.Command{
 
 Bash:
 
-  $ source <(inspr completion bash)
+  $ source <(insprctl completion bash)
 
   # To load completions for each session, execute once:
   # Linux:
-  $ inspr completion bash > /etc/bash_completion.d/inspr
+  $ insprctl completion bash > /etc/bash_completion.d/insprctl
   # macOS:
-  $ inspr completion bash > /usr/local/etc/bash_completion.d/inspr
+  $ insprctl completion bash > /usr/local/etc/bash_completion.d/insprctl
 
 Zsh:
 
@@ -37,23 +37,23 @@ Zsh:
   $ echo "autoload -U compinit; compinit" >> ~/.zshrc
 
   # To load completions for each session, execute once:
-  $ inspr completion zsh > "${fpath[1]}/_inspr"
+  $ insprctl completion zsh > "${fpath[1]}/_insprctl"
 
   # You will need to start a new shell for this setup to take effect.
 
 fish:
 
-  $ inspr completion fish | source
+  $ insprctl completion fish | source
 
   # To load completions for each session, execute once:
-  $ inspr completion fish > ~/.config/fish/completions/inspr.fish
+  $ insprctl completion fish > ~/.config/fish/completions/insprctl.fish
 
 PowerShell:
 
-  PS> inspr completion powershell | Out-String | Invoke-Expression
+  PS> insprctl completion powershell | Out-String | Invoke-Expression
 
   # To load completions for every new session, run:
-  PS> inspr completion powershell > inspr.ps1
+  PS> insprctl completion powershell > insprctl.ps1
   # and source this file from your PowerShell profile.
 `,
 	DisableFlagsInUseLine: true,
@@ -65,7 +65,7 @@ PowerShell:
 			cmd.Root().GenBashCompletion(os.Stdout)
 		case "zsh":
 			cmd.Root().GenZshCompletion(os.Stdout)
-			fmt.Print("compdef _inspr inspr")
+			fmt.Print("compdef _insprctl insprctl")
 		case "fish":
 			cmd.Root().GenFishCompletion(os.Stdout, true)
 		case "powershell":
@@ -162,6 +162,9 @@ func getCurrentValidApp(toComplete string) (string, *meta.App, error) {
 	}
 
 	newScope, err := metautils.JoinScopes(scope, toComplete)
+	if err != nil {
+		return "", nil, errors.New("")
+	}
 	if _, err := client.Apps().Get(context.Background(), newScope); err != nil {
 		newScope, _, _ = metautils.RemoveLastPartInScope(newScope)
 	}

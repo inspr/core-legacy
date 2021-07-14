@@ -81,11 +81,10 @@ func (c StringArray) Less(i, j int) bool {
 	return c[i] < c[j]
 }
 
+//Sorted is a helper method that sorts an String Array
 func (c StringArray) Sorted() StringArray {
 	n := StringArray{}
-	for _, s := range c {
-		n = append(n, s)
-	}
+	n = append(n, c...)
 	sort.Sort(n)
 	return n
 }

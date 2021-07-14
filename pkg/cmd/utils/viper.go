@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/inspr/inspr/pkg/cmd"
-	"github.com/inspr/inspr/pkg/meta/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/meta/utils"
 )
 
 // ignores unused code for this file in the staticcheck
@@ -36,6 +36,9 @@ var flagCompletionRegistry = map[string]func(cmd *cobra.Command, args []string, 
 		}
 
 		newScope, err := utils.JoinScopes(scope, toComplete)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
 		if _, err := client.Apps().Get(context.Background(), newScope); err != nil {
 			newScope, _, _ = utils.RemoveLastPartInScope(newScope)
 		}
