@@ -1,6 +1,13 @@
 
 # Changelog
 
+### #98 Story CORE-493 | Restart Policy for Nodes
+- refactors:
+    - Deleted option/function of configuring restartPolicy of a deployment
+    - Deleted the tests of the function that changed the restart policy
+    - Added support for creating nodes with replicas
+---
+
 ### #96 Tech CORE-372 | Protect user password on inprov login #96
 - features:
     - developed new execution standard for login command
