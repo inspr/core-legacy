@@ -7,7 +7,7 @@ meta:
 spec:
   node:
     spec:
-      replicas: 1
+      replicas: 3
       image: gcr.io/insprlabs/inspr/example/ping:latest
       environment:
         SUPER_SECRET_0001: "false"
