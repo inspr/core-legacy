@@ -182,7 +182,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 				Env: []kubeCore.EnvVar{
 					{
 						Name:  "INSPR_INPUT_CHANNELS",
-						Value: "channel1_someBroker;channel2_someBroker",
+						Value: "channel1@someBroker;channel2@someBroker",
 					},
 					{
 						Name:  "INSPR_OUTPUT_CHANNELS",
@@ -242,7 +242,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 				Env: []kubeCore.EnvVar{
 					{
 						Name:  "INSPR_OUTPUT_CHANNELS",
-						Value: "channel1_someBroker;channel2_someBroker",
+						Value: "channel1@someBroker;channel2@someBroker",
 					},
 					{
 						Name:  "INSPR_INPUT_CHANNELS",

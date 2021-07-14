@@ -8,6 +8,21 @@
     - Added support for creating nodes with replicas
 ---
 
+### #97 Tech CORE-490 | Channels envvars with broker
+- features:
+   - change the separator for the channel brokers. 
+- test
+   - fixed the tests that use channel's env variables   
+---
+
+### #95 Tech CORE-491 | Improve UIDP
+- features:
+  - added a logger to the requests that the uidp handles.
+  - added description for the cli commands in the `inprov`.
+- fixes:
+  - removed the `COMMIT SUCCEEDED` message when the git hook didn't encounter any errors.
+---
+
 ### #96 Tech CORE-372 | Protect user password on inprov login #96
 - features:
     - developed new execution standard for login command

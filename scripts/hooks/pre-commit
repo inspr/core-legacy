@@ -27,9 +27,7 @@ if [[ $? != 0 ]]; then
 fi
 
 
-if [ -z "$PASS" ]; then
-    echo "COMMIT SUCCEEDED"
-else
+if [ ! -z "$PASS" ]; then
     echo "COMMIT FAILED - $PASS"
     exit 1
 fi

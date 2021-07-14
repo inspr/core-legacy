@@ -203,7 +203,7 @@ func (no *NodeOperator) returnChannelBroker(channel, pathToResolvedChannel strin
 	if err != nil {
 		return ""
 	}
-	return fmt.Sprintf("%s_%s", channel, resolvedCh.Spec.SelectedBroker)
+	return fmt.Sprintf("%s@%s", channel, resolvedCh.Spec.SelectedBroker)
 }
 
 func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
