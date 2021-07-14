@@ -76,6 +76,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 			k8s.WithContainer(
 				append(scContainers, nodeContainer)...,
 			),
+			k8s.WithReplicas(app.Spec.Node.Spec.Replicas),
 		))
 }
 
@@ -146,7 +147,6 @@ func (no *NodeOperator) withBoundary(app *meta.App) k8s.ContainerOption {
 		return nil
 	}
 	return func(c *corev1.Container) {
-
 		input := app.Spec.Boundary.Input
 		output := app.Spec.Boundary.Output
 		channels := input.Union(output)

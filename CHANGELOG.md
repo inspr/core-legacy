@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #98 Story CORE-493 | Restart Policy for Nodes
+- refactors:
+    - Deleted option/function of configuring restartPolicy of a deployment
+    - Deleted the tests of the function that changed the restart policy
+    - Added support for creating nodes with replicas
+---
 
 ### #97 Tech CORE-490 | Channels envvars with broker
 - features:
