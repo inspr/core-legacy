@@ -46,7 +46,7 @@
 
 # 3. Login to the admin account by running these commands:
   UIDP_ADMIN_PASSWORD=$(kubectl get secrets -n {{ .Release.Namespace }} {{ tpl .Values.uidp.secret.name . }} -o jsonpath="{.data.ADMIN_PASSWORD}" | base64 --decode)
-  INPROV_PROVIDER_URL=http://localhost:9001 inprov login admin ${UIDP_ADMIN_PASSWORD}
+  INPROV_PROVIDER_URL=http://localhost:9001 inprov login -u admin -p ${UIDP_ADMIN_PASSWORD}
 
 # 4. Set the insprd url to the fowarded port
   insprctl config serverip http://localhost:8080
