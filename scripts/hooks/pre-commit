@@ -1,0 +1,37 @@
+PASS=""
+
+for file in $(git diff --cached --name-only --diff-filter=ATMR --line-prefix=./ | grep "\.go\$")
+do
+    # formats the file
+    go fmt $file
+    if [[ $? -ne 0 ]]; then
+		PASS="go fmt error"
+	fi
+
+    golint $file
+    if [[ $? -ne 0 ]]; then
+		PASS="golint error"
+	fi
+done
+
+# runs linter in the entire repo
+staticcheck ./...
+if [[ $? -ne 0 ]]; then
+    PASS="staticcheck error"
+fi
+
+# go vet reports suspicious constructs
+go vet ./...
+if [[ $? != 0 ]]; then
+    PASS="go vet error"
+fi
+
+
+if [ ! -z "$PASS" ]; then
+    echo "COMMIT FAILED - $PASS"
+    exit 1
+fi
+
+
+
+

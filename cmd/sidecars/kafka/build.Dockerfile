@@ -1,6 +1,6 @@
 # Install librdkafka base image, which is necessary for kafka to run
 # Tag used to build this image:
-# gcr.io/red-inspr/inspr/sidecar/kafka:build
+# gcr.io/insprlabs/inspr/sidecar/kafka:build
 FROM golang:alpine AS kafka-build 
 
 RUN apk update && \

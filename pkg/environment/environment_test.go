@@ -8,8 +8,8 @@ import (
 
 func mockInsprEnvironment() *InsprEnvVars {
 	return &InsprEnvVars{
-		InputChannels:    "chan;chan1;chan2;chan3",
-		OutputChannels:   "chan;chan1;chan2;chan3",
+		InputChannels:    "chan@someBroker;chan1@someBroker;chan2@someBroker;chan3@someBroker",
+		OutputChannels:   "chan@someBroker;chan1@someBroker;chan2@someBroker;chan3@someBroker",
 		SidecarImage:     "mock_sidecar_image",
 		InsprAppContext:  "mock.dapp.context",
 		InsprEnvironment: "mock_env",
@@ -55,14 +55,14 @@ func Test_getEnv(t *testing.T) {
 			args: args{
 				name: "INSPR_INPUT_CHANNELS",
 			},
-			want: "chan;chan1;chan2;chan3",
+			want: "chan@someBroker;chan1@someBroker;chan2@someBroker;chan3@someBroker",
 		},
 		{
 			name: "Get output channel environment variable",
 			args: args{
 				name: "INSPR_OUTPUT_CHANNELS",
 			},
-			want: "chan;chan1;chan2;chan3",
+			want: "chan@someBroker;chan1@someBroker;chan2@someBroker;chan3@someBroker",
 		},
 		{
 			name: "Get unix socket environment variable",
@@ -99,10 +99,10 @@ func TestRefreshEnviromentVariables(t *testing.T) {
 	os.Setenv("INSPR_INPUT_CHANNELS", "one")
 	os.Setenv("INSPR_OUTPUT_CHANNELS", "two")
 	os.Setenv("INSPR_UNIX_SOCKET", "three")
-	os.Setenv("INSPR_APP_CTX", "four")
+	os.Setenv("INSPR_APP_SCOPE", "four")
 	os.Setenv("INSPR_ENV", "five")
 	os.Setenv("INSPR_APP_ID", "six")
-	os.Setenv("INSPR_SIDECAR_IMAGE", "seven")
+	os.Setenv("INSPR_LBSIDECAR_IMAGE", "seven")
 	tests := []struct {
 		name    string
 		refresh bool
@@ -173,4 +173,20 @@ func TestRecoverEnvironmentErrors(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSidecarEnvVarsMethods(t *testing.T) {
+	SetMockEnv()
+	defer UnsetMockEnv()
+
+	t.Run("Get Broker-specific sidecars env vars", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("Recovered in 'TestSidecarEnvVarsMethods': %v", r)
+			}
+		}()
+		GetBrokerReadPort("TEST")
+		GetBrokerWritePort("TEST")
+		GetBrokerSpecificSidecarAddr("TEST")
+	})
 }

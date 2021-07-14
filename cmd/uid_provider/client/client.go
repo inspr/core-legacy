@@ -14,10 +14,12 @@ import (
 	"strings"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/controller/client"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/utils"
+	"golang.org/x/crypto/bcrypt"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/controller/client"
+	"inspr.dev/inspr/pkg/ierrors"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // Client defines a Redis client, which has the interface methods
@@ -29,10 +31,16 @@ type Client struct {
 }
 
 func (c *Client) initAdminUser() error {
+
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(os.Getenv("ADMIN_PASSWORD")), bcrypt.DefaultCost)
+	if err != nil {
+		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+	}
+
 	adminUser := User{
 		UID:         "admin",
-		Permissions: map[string][]string{"": {auth.CreateToken}},
-		Password:    os.Getenv("ADMIN_PASSWORD"),
+		Permissions: auth.AdminPermissions,
+		Password:    string(hashedPwd),
 	}
 	payload, _ := c.encrypt(adminUser)
 	token, err := c.requestNewToken(context.Background(), *payload)
@@ -54,9 +62,9 @@ func NewRedisClient() *Client {
 		refreshKey:    getEnv("REFRESH_KEY"),
 		insprdAddress: getEnv("INSPR_CLUSTER_ADDR"),
 	}
+
 	err := c.initAdminUser()
 	if err != nil {
-		fmt.Println("ERROR CREATING REDIS-CLIENT", err.Error())
 		log.Println("ERROR CREATING REDIS-CLIENT", err.Error())
 		panic(err)
 	}
@@ -65,11 +73,19 @@ func NewRedisClient() *Client {
 
 // CreateUser inserts a new user into Redis
 func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) error {
-	err := hasPermission(ctx, c.rdb, uid, pwd)
+	err := hasPermission(ctx, c.rdb, uid, pwd, newUser, true)
 
 	if err != nil {
 		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
 	}
+
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+	}
+
+	newUser.Password = string(hashedPwd)
+
 	if err := set(ctx, c.rdb, newUser); err != nil {
 		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
@@ -78,7 +94,15 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 
 // DeleteUser deletes an user from Redis, if it exists
 func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error {
-	err := hasPermission(ctx, c.rdb, uid, pwd)
+	user, err := get(ctx, c.rdb, usrToBeDeleted)
+	if err != nil {
+		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
+	}
+
+	err = hasPermission(ctx, c.rdb, uid, pwd, *user, false)
+	if err != nil {
+		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
+	}
 
 	if err != nil {
 		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
@@ -91,17 +115,22 @@ func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string
 
 // UpdatePassword changes an users password, if that user exists
 func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, newPwd string) error {
-	err := hasPermission(ctx, c.rdb, uid, pwd)
-
-	if err != nil {
-		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
-	}
 	user, err := get(ctx, c.rdb, usrToBeUpdated)
 	if err != nil {
 		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
 
-	user.Password = newPwd
+	err = hasPermission(ctx, c.rdb, uid, pwd, *user, false)
+	if err != nil {
+		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
+	}
+
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(newPwd), bcrypt.DefaultCost)
+	if err != nil {
+		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+	}
+
+	user.Password = string(hashedPwd)
 
 	if err := set(ctx, c.rdb, *user); err != nil {
 		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
@@ -117,7 +146,8 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	if err != nil {
 		return "", ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
-	if pwd != user.Password {
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pwd)); err != nil {
 		return "", ierrors.NewError().Unauthorized().
 			Message("user and password don't match").Build()
 	}
@@ -308,21 +338,46 @@ func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
 	return nil
 }
 
-func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string) error {
+func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string, newUser User, isCreation bool) error {
 	requestor, err := get(ctx, rdb, uid)
 	if err != nil {
 		return err
 	}
-	if requestor.Password != pwd {
+
+	if err := bcrypt.CompareHashAndPassword([]byte(requestor.Password), []byte(pwd)); err != nil {
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
 
-	if rootPerm, ok := requestor.Permissions[""]; ok {
-		if utils.Includes(rootPerm, string(auth.CreateToken)) {
-			return nil
+	for newUserPermissionScope, newUserPermissions := range newUser.Permissions {
+		isAllowed := false
+		for requestorPermissionScope, requestorPermissions := range requestor.Permissions {
+			if isPermissionAllowed(newUserPermissionScope, requestorPermissionScope, newUserPermissions, requestorPermissions, isCreation) {
+				isAllowed = true
+				break
+			}
+		}
+
+		if !isAllowed {
+			return ierrors.NewError().Forbidden().Message("not allowed to create/delete/update a user with current permissions").Build()
+		}
+
+	}
+
+	return nil
+}
+
+func isPermissionAllowed(newUserPermissionScope, requestorPermissionScope string, newUserPermissions, requestorPermissions []string, isCreation bool) bool {
+	if !metautils.IsInnerScope(requestorPermissionScope, newUserPermissionScope) {
+		return false
+	}
+
+	for _, permission := range newUserPermissions {
+		if (isCreation && !utils.Includes(requestorPermissions, permission)) || !utils.Includes(requestorPermissions, auth.CreateToken) {
+			return false
 		}
 	}
-	return fmt.Errorf("user %v doesn't have admin permission", uid)
+
+	return true
 }
 
 func getEnv(name string) string {

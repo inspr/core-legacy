@@ -39,6 +39,10 @@ func WithVolumes(vol ...corev1.Volume) DeploymentOption {
 
 // WithReplicas changes the number of replicas of a deployment
 func WithReplicas(n int) DeploymentOption {
+	if n == 0 {
+		n = 1
+	}
+
 	converted := int32(n)
 	return func(d *appsv1.Deployment) {
 		d.Spec.Replicas = &converted
@@ -77,13 +81,6 @@ func WithAnnotations(labels map[string]string) DeploymentOption {
 			d.Annotations[key] = value
 			d.Spec.Template.Annotations[key] = value
 		}
-	}
-}
-
-// WithRestartPolicy changes the restart policy of the deployment's template
-func WithRestartPolicy(policy corev1.RestartPolicy) DeploymentOption {
-	return func(d *appsv1.Deployment) {
-		d.Spec.Template.Spec.RestartPolicy = policy
 	}
 }
 

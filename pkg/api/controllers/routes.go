@@ -1,30 +1,39 @@
 package controller
 
 import (
-	"github.com/inspr/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest"
 
-	handler "github.com/inspr/inspr/pkg/api/handlers"
+	handler "inspr.dev/inspr/pkg/api/handlers"
+	metabrokers "inspr.dev/inspr/pkg/meta/brokers"
 )
 
 func (s *Server) initRoutes() {
+
 	logger.Debug("initializing Insprd server routes")
 	h := handler.NewHandler(
-		s.MemoryManager, s.op, s.auth,
+		s.memory, s.op, s.auth,
 	)
 
 	ahandler := h.NewAppHandler()
-	s.Mux.Handle("/apps", rest.HandleCRUD(ahandler))
+	s.mux.Handle("/apps", rest.HandleCRUD(ahandler))
 
 	chandler := h.NewChannelHandler()
-	s.Mux.Handle("/channels", rest.HandleCRUD(chandler))
+	s.mux.Handle("/channels", rest.HandleCRUD(chandler))
 
-	cthandler := h.NewTypeHandler()
-	s.Mux.Handle("/types", rest.HandleCRUD(cthandler))
+	thandler := h.NewTypeHandler()
+	s.mux.Handle("/types", rest.HandleCRUD(thandler))
 
 	aliasHandler := h.NewAliasHandler()
-	s.Mux.Handle("/alias", rest.HandleCRUD(aliasHandler))
+	s.mux.Handle("/alias", rest.HandleCRUD(aliasHandler))
 
-	s.Mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
-	s.Mux.Handle("/refreshController", h.ControllerRefreshHandler())
-	s.Mux.Handle("/init", h.InitHandler())
+	brokersHandler := h.NewBrokerHandler()
+	s.mux.Handle("/brokers", brokersHandler.HandleGet().Get().JSON())
+	s.mux.Handle(
+		"/brokers/"+metabrokers.Kafka,
+		brokersHandler.KafkaCreateHandler().Post().JSON(),
+	)
+
+	s.mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
+	s.mux.Handle("/refreshController", h.ControllerRefreshHandler())
+	s.mux.Handle("/init", h.InitHandler())
 }

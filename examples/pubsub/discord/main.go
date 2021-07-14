@@ -9,7 +9,8 @@ import (
 	"log"
 	"net/http"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 type discordMessage struct {
@@ -24,25 +25,20 @@ type discordMessage struct {
 var webhook = "https://discord.com/api/webhooks/823903452475162666/o9aKLMVOb9-ZhfDD7RJ84OCW6WgU2PQnsEj0CzPgFzKC1icqgqWqF8LZxHSFXEzH1NED"
 var channel = "pubsubch"
 
-type expectedDataType struct {
-	Message string `json:"message"`
-	Channel string `json:"channel"`
-}
-
 func main() {
 	c := &http.Client{}
 	client := dappclient.NewAppClient()
 	client.HandleChannel(channel, func(ctx context.Context, body io.Reader) error {
 		decoder := json.NewDecoder(body)
 
-		subMsg := expectedDataType{}
+		subMsg := models.BrokerMessage{}
 		err := decoder.Decode(&subMsg)
 		if err != nil {
 			return err
 		}
 
 		msg := discordMessage{
-			Content:   fmt.Sprintf("%v", subMsg.Message),
+			Content:   fmt.Sprintf("%v", subMsg.Data),
 			Username:  "Notifications",
 			AvatarURL: "",
 			TTS:       true,
@@ -58,6 +54,7 @@ func main() {
 		if err != nil {
 			return err
 		}
+
 		return nil
 
 	})

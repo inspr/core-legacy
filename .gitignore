@@ -1,5 +1,9 @@
 .vscode
 **/*.cov
+overwrite-*.yaml
+my-notes.md
+bin/
+tags.out
 
 # Ignore .idea configs from JetBrains
 .idea
@@ -171,6 +175,7 @@ celerybeat.pid
 
 # Environments
 # .env
+*.secrets
 .env/
 .venv/
 env/

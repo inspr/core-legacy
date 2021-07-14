@@ -2,10 +2,14 @@ package client
 
 import (
 	"context"
+	"io/ioutil"
+	"net/http"
+	"os"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // AuthClient is a client for getting auth information from Insprd
@@ -24,7 +28,7 @@ func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (
 		*reqClient = reqClient.Header(rest.HeaderScopeKey, k)
 	}
 
-	err := reqClient.Send(ctx, "/auth", "POST", payload, &authDI)
+	err := reqClient.Send(ctx, "/auth", http.MethodPost, request.DefaultHost, payload, &authDI)
 	if err != nil {
 		return "", err
 	}
@@ -38,7 +42,13 @@ func (ac *AuthClient) Init(ctx context.Context, key string) (string, error) {
 	authDO := struct{ Key string }{key}
 	authDI := auth.JwtDO{}
 
-	err := ac.reqClient.Send(ctx, "/init", "POST", authDO, &authDI)
+	tokenPath := cmd.InsprOptions.Token
+	err := ioutil.WriteFile(tokenPath, []byte(""), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	err = ac.reqClient.Send(ctx, "/init", http.MethodPost, request.DefaultHost, authDO, &authDI)
 	if err != nil {
 		return "", err
 	}

@@ -23,12 +23,11 @@ insprEnvironment: test
 deployment:
   insprdName: insprd-deployment
   authName: auth-deployment
-  initKey: "1234567890"
+  initKey: ""
 
-insprdRepository: gcr.io/red-inspr/insprd
-authRepository: gcr.io/red-inspr/authsvc
-secretRepository: gcr.io/red-inspr/secretgen
-
+insprdRepository: gcr.io/insprlabs/insprd
+authRepository: gcr.io/insprlabs/authsvc
+secretRepository: gcr.io/insprlabs/secretgen
 
 service:
   type: ClusterIP
@@ -57,15 +56,14 @@ tolerations: []
 
 affinity: {}
 
-sidecar:
-    port: 3051
-    readPort: 3047
-    writePort: 3048
+sidecarClient:
+  readPort: 3046
+  writePort: 3048
 
-sidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
+lbSidecar:
+  port: 3051
+  readPort: 3047
 
-kafka:
-    bootstrap: kafka.default.svc:9092
-    offsetReset: earliest
+lbsidecarImage: gcr.io/insprlabs/inspr/sidecar/lbsidecar
 
 insprAppsNamespace: inspr-apps

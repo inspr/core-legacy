@@ -1,6 +1,6 @@
 package meta
 
-import "github.com/inspr/inspr/pkg/utils"
+import "inspr.dev/inspr/pkg/utils"
 
 // Node represents an inspr component that is a node.
 type Node struct {
@@ -14,22 +14,23 @@ type NodePort struct {
 	TargetPort int `yaml:"targetPort" json:"targetPort"`
 }
 
-// SidecarPort represents the port for communication between node and sidecar
+// SidecarPort represents the port for communication between node and load balancer sidecar
 type SidecarPort struct {
-	Read  int `json:"read"`
-	Write int `json:"write"`
+	LBRead  int `json:"lbRead"`
+	LBWrite int `json:"lbWrite"`
 }
 
 // NodeSpec represents a configuration for a node. The image represents the Docker image for the main container of the Node.
 type NodeSpec struct {
-	Ports       []NodePort           `yaml:"ports,omitempty" json:"ports,omitempty"`
-	Image       string               `yaml:"image,omitempty"  json:"image"`
-	Replicas    int                  `yaml:"replicas,omitempty" json:"replicas"`
-	Environment utils.EnvironmentMap `yaml:"environment,omitempty" json:"environment"`
-	SidecarPort SidecarPort          `yaml:"sidecar_port,omitempty" json:"sidecar_port"`
+	Ports         []NodePort           `yaml:"ports,omitempty" json:"ports,omitempty"`
+	Image         string               `yaml:"image,omitempty"  json:"image"`
+	Replicas      int                  `yaml:"replicas,omitempty" json:"replicas"`
+	RestartPolicy string               `yaml:"restartPolicy,omitempty" json:"restartPolicy"`
+	Environment   utils.EnvironmentMap `yaml:"environment,omitempty" json:"environment"`
+	SidecarPort   SidecarPort          `yaml:"sidecarPort,omitempty" json:"sidecarPort"`
 }
 
-// App is an inspr component that represents an App. An App can contain other apps, channels and other components.
+// App is an inspr component that represents an dApp. An App can contain other apps, channels and other components.
 type App struct {
 	Meta Metadata `yaml:"meta,omitempty" json:"meta"`
 	Spec AppSpec  `yaml:"spec,omitempty" json:"spec"`
@@ -44,9 +45,6 @@ type AppBoundary struct {
 
 // AppSpec represents the configuration of an App.
 //
-// The app contains a list of apps and a list of nodes. The apps and nodes can be dereferenced by it's metadata
-// reference, at CLI time.
-//
 // The boundary represent the possible connections to other apps, and the fields that can be overriten when instantiating the app.
 type AppSpec struct {
 	Node     Node                `yaml:"node,omitempty"   json:"node"`
@@ -58,7 +56,7 @@ type AppSpec struct {
 	Auth     AppAuth             `yaml:"auth"  json:"auth"`
 }
 
-// AppAuth represents the permissions that a dApp (and its sons) contains
+// AppAuth represents the permissions that a dApp (and its children) contains
 type AppAuth struct {
 	Scope       string            `yaml:"scope"  json:"scope"`
 	Permissions utils.StringArray `yaml:"permissions"  json:"permissions"`

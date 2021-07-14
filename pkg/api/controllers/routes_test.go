@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/inspr/inspr/cmd/insprd/memory/fake"
-	authmock "github.com/inspr/inspr/pkg/auth/mocks"
+	"inspr.dev/inspr/cmd/insprd/memory/fake"
+	authmock "inspr.dev/inspr/pkg/auth/mocks"
 )
 
 // TestServer_initRoutes - this test is a bit different than the one automatically
@@ -18,9 +18,9 @@ import (
 // the requests
 func TestServer_initRoutes(t *testing.T) {
 	testServer := &Server{
-		Mux:           http.NewServeMux(),
-		MemoryManager: fake.MockMemoryManager(nil),
-		auth:          authmock.NewMockAuth(errors.New("unauthorized")),
+		auth:   authmock.NewMockAuth(errors.New("unauthorized")),
+		memory: fake.GetMockMemoryManager(nil, nil),
+		mux:    http.NewServeMux(),
 	}
 	testServer.initRoutes()
 	defaultMethods := [...]string{
@@ -75,6 +75,26 @@ func TestServer_initRoutes(t *testing.T) {
 			},
 		},
 		{
+			name: "brokers",
+			want: [...]int{
+				http.StatusOK,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+			},
+		},
+		{
+			name: "brokers/kafka",
+			want: [...]int{
+				http.StatusMethodNotAllowed,
+				http.StatusInternalServerError,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+				http.StatusMethodNotAllowed,
+			},
+		},
+		{
 			name: "wrong_route",
 			want: [...]int{
 				http.StatusNotFound,
@@ -87,7 +107,7 @@ func TestServer_initRoutes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ts := httptest.NewServer(testServer.Mux)
+			ts := httptest.NewServer(testServer.mux)
 			defer ts.Close()
 			client := ts.Client()
 			for i, statusCodeResult := range tt.want {

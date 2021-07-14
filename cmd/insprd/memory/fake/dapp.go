@@ -1,14 +1,15 @@
 package fake
 
 import (
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
+	apimodels "inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils"
 )
 
 // Apps - mocks the implementation of the AppMemory interface methods
 type Apps struct {
-	*MemManager
+	*TreeMemoryMock
 	fail error
 	apps map[string]*meta.App
 }
@@ -30,11 +31,11 @@ func (a *Apps) Get(query string) (*meta.App, error) {
 }
 
 // Create - simple mock
-func (a *Apps) Create(context string, ct *meta.App) error {
+func (a *Apps) Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	if a.fail != nil {
 		return a.fail
 	}
-	query, _ := utils.JoinScopes(context, ct.Meta.Name)
+	query, _ := utils.JoinScopes(scope, app.Meta.Name)
 
 	_, ok := a.apps[query]
 	if ok {
@@ -44,7 +45,7 @@ func (a *Apps) Create(context string, ct *meta.App) error {
 			Message("dapp %s already exists", query).
 			Build()
 	}
-	a.apps[query] = ct
+	a.apps[query] = app
 	return nil
 }
 
@@ -67,11 +68,11 @@ func (a *Apps) Delete(query string) error {
 }
 
 // Update - simple mock
-func (a *Apps) Update(context string, ct *meta.App) error {
+func (a *Apps) Update(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
 	if a.fail != nil {
 		return a.fail
 	}
-	query, _ := utils.JoinScopes(context, ct.Meta.Name)
+	query, _ := utils.JoinScopes(scope, app.Meta.Name)
 	_, ok := a.apps[query]
 	if !ok {
 		return ierrors.
@@ -80,15 +81,15 @@ func (a *Apps) Update(context string, ct *meta.App) error {
 			Message("dapp %s not found", query).
 			Build()
 	}
-	a.apps[query] = ct
+	a.apps[query] = app
 	return nil
 }
 
 // ResolveBoundary mock
-func (*Apps) ResolveBoundary(app *meta.App) (map[string]string, error) {
+func (*Apps) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
 	ret := map[string]string{}
 	for _, ch := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
-		ret[ch] = ch + "_resolved"
+		ret[ch] = ch
 	}
 	return ret, nil
 }

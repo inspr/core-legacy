@@ -1,7 +1,8 @@
 apiVersion: v1
 kind: dapp
+
 meta:
-  name: "basicexample"
+  name: primesexample
 spec:
   types:
     primes_ct1:
@@ -14,78 +15,77 @@ spec:
       schema: '{"type":"int"}'
 
   channels:
-    primes_ch1:
+    primesch1:
       meta:
-        name: "primes_ch1"
+        name: "primesch1"
         reference: ""
-        annotations:
-          kafka.partition.number: "10"
-          kafka.replication.factor: "3"
         parent: ""
       spec:
         type: "primes_ct1"
-    primes_ch2:
+        brokerlist:
+          - kafka
+    primesch2:
       meta:
-        name: "primes_ch2"
+        name: "primesch2"
         reference: ""
-        annotations:
-          kafka.partition.number: "3"
-          kafka.replication.factor: "3"
         parent: ""
       spec:
         type: "primes_ct2"
+        brokerlist:
+          - kafka
 
   aliases:
-    primes.input:
-      target: primes_ch1
-    primes.output:
-      target: primes_ch2
+    primes.filterinput:
+      target: primesch1
+    primes.filteroutput:
+      target: primesch2
+    primes.printerinput:
+      target: primesch2
 
   apps:
     # number generators
     generator:
       meta:
-          name: generator
+        name: generator
       spec:
         node:
           spec:
-            image: gcr.io/red-inspr/inspr/examples/primes/generator:latest
+            image: gcr.io/insprlabs/inspr/examples/primes/generator:latest
             replicas: 1
             environment:
               MODULE: 300
         boundary:
           output:
-            - primes_ch1
+            - primesch1
 
     primes:
       meta:
-          name: primes
+        name: primes
       spec:
         boundary:
           input:
-            - input
+            - filterinput
+            - printerinput
           output:
-            - output
-        aliases:
-          printer.input:
-            target: output
+            - filteroutput
+
         apps:
           # filters primes
           filter:
             meta:
-              name: "filter"
+              name: filter
               reference: ""
               parent: ""
             spec:
               node:
                 spec:
-                  image: gcr.io/red-inspr/inspr/examples/primes/filter:latest
+                  image: gcr.io/insprlabs/inspr/examples/primes/filter:latest
                   replicas: 2
               boundary:
                 input:
-                  - input
+                  - filterinput
                 output:
-                  - output
+                  - filteroutput
 
           # prints the filtered
           printer:
@@ -98,8 +98,8 @@ spec:
                 meta:
                   name: "printer"
                 spec:
-                  image: gcr.io/red-inspr/inspr/examples/primes/printer:latest
+                  image: gcr.io/insprlabs/inspr/examples/primes/printer:latest
                   replicas: 1
               boundary:
                 input:
-                  - input
+                  - printerinput

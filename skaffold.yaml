@@ -4,43 +4,45 @@ metadata:
   name: core
 build:
   artifacts:
-  - image: gcr.io/red-inspr/insprd
-    context: .
-    docker:
-      dockerfile: cmd/insprd/Dockerfile
-  - image: gcr.io/red-inspr/inspr/sidecar/kafka
-    context: .
-    docker:
-      dockerfile: cmd/sidecars/kafka/Dockerfile
-  - image: gcr.io/red-inspr/authsvc
-    context: .
-    docker:
-      dockerfile: cmd/authsvc/Dockerfile
-  - image: gcr.io/red-inspr/secretgen
-    context: .
-    docker:
-      dockerfile: cmd/authsvc/secret/Dockerfile
+    - image: gcr.io/insprlabs/insprd
+      context: .
+      docker:
+        dockerfile: cmd/insprd/Dockerfile
+    - image: gcr.io/insprlabs/inspr/sidecar/lbsidecar
+      context: .
+      docker:
+        dockerfile: cmd/sidecars/lbsidecar/Dockerfile
+    - image: gcr.io/insprlabs/authsvc
+      context: .
+      docker:
+        dockerfile: cmd/authsvc/Dockerfile
+    - image: gcr.io/insprlabs/secretgen
+      context: .
+      docker:
+        dockerfile: cmd/authsvc/secret/Dockerfile
 deploy:
   helm:
     releases:
-    - name: insprd
-      artifactOverrides:
-        insprdRepository: gcr.io/red-inspr/insprd
-        sidecarImage: gcr.io/red-inspr/inspr/sidecar/kafka
-        authRepository: gcr.io/red-inspr/authsvc
-        secretRepository: gcr.io/red-inspr/secretgen
-      chartPath: build/helm
+      - name: insprd
+        valuesFiles: 
+          - overwrite-insprd.yaml
+        artifactOverrides:
+          insprdRepository: gcr.io/insprlabs/insprd
+          lbsidecarImage: gcr.io/insprlabs/inspr/sidecar/lbsidecar
+          authRepository: gcr.io/insprlabs/authsvc
+          secretRepository: gcr.io/insprlabs/secretgen
+        chartPath: build/helm
 profiles:
   - name: uidp
     build:
       tagPolicy:
         sha256: {}
       artifacts:
-        - image: gcr.io/red-inspr/uidp/redis/secret
+        - image: gcr.io/insprlabs/uidp/redis/secret
           context: .
           docker:
             dockerfile: cmd/uid_provider/secret/Dockerfile
-        - image: gcr.io/red-inspr/uidp/redis/api
+        - image: gcr.io/insprlabs/uidp/redis/api
           context: .
           docker:
             dockerfile: cmd/uid_provider/Dockerfile
@@ -48,7 +50,9 @@ profiles:
       helm:
         releases:
           - name: uidp
+            valuesFiles: 
+              - overwrite-uidp.yaml
             artifactOverrides:
-              uidpRepository: gcr.io/red-inspr/uidp/redis/api
-              secretRepository: gcr.io/red-inspr/uidp/redis/secret
+              uidpRepository: gcr.io/insprlabs/uidp/redis/api
+              secretRepository: gcr.io/insprlabs/uidp/redis/secret
             chartPath: build/uidp_helm

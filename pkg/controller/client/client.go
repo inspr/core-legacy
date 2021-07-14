@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/inspr/inspr/pkg/controller"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/controller"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 const inClusterEnviromentError = "authentication as controller failed. controllers requires following " +
@@ -95,6 +95,13 @@ func (c *Client) Authorization() controller.AuthorizationInterface {
 // Alias interacts with alias on the Insprd
 func (c *Client) Alias() controller.AliasInterface {
 	return &AliasClient{
+		reqClient: c.HTTPClient,
+	}
+}
+
+// Brokers interacts with brokers from the Insprd
+func (c *Client) Brokers() controller.BrokersInterface {
+	return &BrokersClient{
 		reqClient: c.HTTPClient,
 	}
 }

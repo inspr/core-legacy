@@ -3,14 +3,12 @@ package main
 import (
 	"os"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/memory/tree"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	kafka "github.com/inspr/inspr/cmd/insprd/operators/kafka"
-	"github.com/inspr/inspr/pkg/api"
-	"github.com/inspr/inspr/pkg/auth"
-	jwtauth "github.com/inspr/inspr/pkg/auth/jwt"
-	authmock "github.com/inspr/inspr/pkg/auth/mocks"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	"inspr.dev/inspr/pkg/api"
+	"inspr.dev/inspr/pkg/auth"
+	jwtauth "inspr.dev/inspr/pkg/auth/jwt"
+	authmock "inspr.dev/inspr/pkg/auth/mocks"
 )
 
 func main() {
@@ -21,8 +19,8 @@ func main() {
 
 	if _, ok := os.LookupEnv("DEBUG"); ok {
 		authenticator = authmock.NewMockAuth(nil)
-		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator(memoryManager, authenticator)
+		memoryManager = memory.GetMemoryManager()
+		operator, err = operators.NewOperator(memoryManager, authenticator)
 		if err != nil {
 			panic(err)
 		}
@@ -32,8 +30,8 @@ func main() {
 			panic(err)
 		}
 		authenticator = jwtauth.NewJWTauth(pubKey)
-		memoryManager = tree.GetTreeMemory()
-		operator, err = kafka.NewKafkaOperator(memoryManager, authenticator)
+		memoryManager = memory.GetMemoryManager()
+		operator, err = operators.NewOperator(memoryManager, authenticator)
 		if err != nil {
 			panic(err)
 		}

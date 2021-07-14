@@ -13,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 func TestClient_Send(t *testing.T) {
@@ -49,7 +49,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "POST",
+				method: http.MethodPost,
 				body:   "hello",
 			},
 			wantErr: false,
@@ -66,7 +66,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "GET",
+				method: http.MethodGet,
 				body:   "hello",
 			},
 			wantErr: false,
@@ -83,7 +83,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "GET",
+				method: http.MethodGet,
 				body:   "hello",
 			},
 			wantErr:    true,
@@ -103,7 +103,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "GET",
+				method: http.MethodGet,
 				body:   "hello",
 			},
 			wantErr: true,
@@ -120,7 +120,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "POST",
+				method: http.MethodPost,
 				body:   "hello",
 			},
 			wantErr: true,
@@ -138,7 +138,7 @@ func TestClient_Send(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				route:  "/test",
-				method: "POST",
+				method: http.MethodPost,
 				body:   "hello",
 			},
 			wantErr: true,
@@ -197,6 +197,7 @@ func TestClient_Send(t *testing.T) {
 				tt.args.ctx,
 				tt.args.route,
 				tt.args.method,
+				DefaultHost,
 				tt.args.body,
 				&tt.response,
 			)

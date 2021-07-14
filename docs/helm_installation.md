@@ -4,7 +4,7 @@ This document will walk you through the installation of Inspr using Helm, as wel
 
 ## Adding the Inspr Helm Repository
 
-If you’re installing the Inspr chart via helm, first you need to add the Inspr repository with the command:
+If you’re installing the Inspr chart via Helm, first you need to add the Inspr repository with the command:
 
 ```
 $ helm repo add inspr https://inspr-charts.storage.googleapis.com/
@@ -23,26 +23,40 @@ $ helm upgrade --install insprd inspr/insprd
 
 ## Configuration
 
-The following table lists the configurable parameters of the Inspr Ingress controller chart and their default values.
+The following table lists the configurable parameters of Inspr Helm Chart and their default values.
 
 | Parameter | Description | Default
 |--|--|--|
-| replicaCount | Number of replicas of the Inspr Ingress controller deployment. | 1 |
+| replicas.insprdCount | Number of replicas of Insprd (Inspr daemon) deployment | 1 |
+| replicas.authCount | Number of replicas of Authentication Service deployment | 1 |
 | insprIngress.host | Main route for the Inspr Ingress Controller | inspr.com |
-| deployment.insprdName | Name of the Ingress Inspr deployment  | insprd-deployment|
+| image.insprdPullPolicy | Insprd's image pull policy | IfNotPresent |
+| image.authPullPolicy | Auth Service image pull policy | IfNotPresent |
 | insprEnvironment | Inspr Service Environment.  | test |
-| service.type | Insprd Kubernetes Service type | ClusterIP |
+| deployment.insprdName | Name of Insprd deployment  | insprd-deployment |
+| deployment.authName | Name of Auth Service deployment  | auth-deployment |
+| deployment.initKey | Key used to initialize the Auth Service  | "1234567890" |
+| insprdRepository | Insprd image  | gcr.io/insprlabs/insprd |
+| authRepository | Auth Service image | gcr.io/insprlabs/authsvc |
+| secretRepository | Secret Job Generator image  | gcr.io/insprlabs/secretgen |
+| service.type | Kubernetes Service type | ClusterIP |
+| service.authName | Auth Service Kubernetes Service name | insprd-svc |
 | service.insprdName | Insprd Kubernetes Service name | insprd-svc |
-| service.insprdPort | HTTP port of the Inspr controller service.  | 80 |
-| service.insprdTargetPort | Target port of the insprdPort. | 8080 |
-| kafkaSidecarImage | Kafka operator sidecar image | gcr.io/red-inspr/inspr/sidecar/kafka |
-| kafkaBootstrap | Kafka operator bootstrap configuration | kafka.default.svc:9092 |
-| kafkaAutoOffsetReset | Kafka operator offset reset  | earliest |
+| service.secretgenName | Secret Job Generator Kubernetes Service name | secretgen-svc |
+| service.insprdPort | HTTP port of Insprd k8s service  | 80 |
+| service.insprdTargetPort | Targeted port of insprdPort | 8080 |
+| service.authPort | HTTP port of Auth Service k8s service  | 80 |
+| service.authTargetPort | Targeted port of the authPort | 8080 |
+| sidecarClient.readPort | Port which the Sidecar Client will receive requests | 3046 |
+| sidecarClient.writePort | Port which the Load Balancer Sidecar will receive write requests from the Sidecar Client | 3048 |
+| lbSidecar.port | Port which the Load Balancer Sidecar will receive read requests and redirect to the Sidecar Client | 3051 |
+| lbSidecar.readPort | Port which the Load Balancer Sidecar is running | 3047 |
+| lbsidecarImage | Load Balancer sidecar image | gcr.io/insprlabs/inspr/sidecar/lbsidecar |
 | insprAppsNamespace | Kubernetes namespace on which Inspr apps will be instantiated | default |
 
 ## Exposing Inspr via NGINX
 
-Inspr Controller will be exposed via NGINX by default, so you just need to have NGINX installed. Follow the instructions in the [official NGINX documentation](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/) to install it.
+Insprd will be exposed via NGINX by default, so you just need to have NGINX installed. Follow the instructions in the [official NGINX documentation](https://kubernetes.github.io/ingress-nginx/deploy/) to install it.
 
 
 ### Hostname

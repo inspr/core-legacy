@@ -77,11 +77,26 @@ func Test_changeViperValues(t *testing.T) {
 
 	// read mock config values
 	folder := setupViperTest(t)
-	os.Setenv("HOME", folder)
+	viper.SetConfigType("yaml")
+
+	// resets the old value of the HOME env var after the tests
+	oldHomeValue := os.Getenv("HOME")
+	defer func() { os.Setenv("HOME", oldHomeValue) }()
+
+	if err := os.Setenv("HOME", folder); err != nil {
+		t.Errorf(
+			"failed to set the HOME env var, %v",
+			err,
+		)
+	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
 			if tt.wantErr {
+				// points to a non existant file
+				// main way that viper is going to break, other than that
+				// viper will just create an unused key
 				os.Setenv("HOME", "/etc/")
 			}
 
@@ -141,7 +156,6 @@ func Test_existingKeys(t *testing.T) {
 }
 
 /// test utils functions
-
 func setupViperTest(t *testing.T) string {
 	folder := t.TempDir()
 	config := struct {

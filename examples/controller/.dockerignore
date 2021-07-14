@@ -1,0 +1,5 @@
+*/**
+!pkg
+!go.mod
+!go.sum
+!examples/primes

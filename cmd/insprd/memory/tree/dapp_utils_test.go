@@ -4,24 +4,31 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/inspr/inspr/pkg/meta"
-	metautils "github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/cmd/sidecars"
+	apimodels "inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/meta"
+	metautils "inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func Test_validAppStructure(t *testing.T) {
 	type args struct {
 		app       meta.App
 		parentApp meta.App
+		brokers   *apimodels.BrokersDI
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "All valid structures",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: meta.App{
 					Meta: meta.Metadata{
 						Name:        "app5",
@@ -54,11 +61,14 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "",
 		},
 		{
 			name: "invalidapp name - empty",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: meta.App{
 					Meta: meta.Metadata{
 						Name:        "",
@@ -91,11 +101,15 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "invalid dApp name;",
+			wantErr: true,
 		},
 		{
 			name: "invalidapp substructure",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: meta.App{
 					Meta: meta.Metadata{
 						Name:        "app5",
@@ -130,11 +144,15 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["app2"],
 			},
-			want: "invalid substructure;",
+			wantErr: true,
 		},
 		{
 			name: "invalidapp - parent has Node structure",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: meta.App{
 					Meta: meta.Metadata{
 						Name:        "app4",
@@ -167,13 +185,19 @@ func Test_validAppStructure(t *testing.T) {
 				},
 				parentApp: *getMockApp().Spec.Apps["appNode"],
 			},
-			want: "parent has Node;",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := validAppStructure(&tt.args.app, &tt.args.parentApp); got != tt.want {
-				t.Errorf("validAppStructure() = %v, want %v", got, tt.want)
+			err := validAppStructure(&tt.args.app, &tt.args.parentApp, tt.args.brokers)
+			if tt.wantErr && (err == nil) {
+				t.Errorf("validAppStructure(): wanted error but received 'nil'")
+				return
+			}
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("validAppStructure() error: %v", reflect.TypeOf(err))
 			}
 		})
 	}
@@ -225,11 +249,7 @@ func Test_nodeIsEmpty(t *testing.T) {
 
 func Test_getParentApp(t *testing.T) {
 	type fields struct {
-		root   *meta.App
-		appErr error
-		mockC  bool
-		mockCT bool
-		mockA  bool
+		root *meta.App
 	}
 	type args struct {
 		sonQuery string
@@ -244,11 +264,7 @@ func Test_getParentApp(t *testing.T) {
 		{
 			name: "Parent is the root",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				sonQuery: "app1",
@@ -259,11 +275,7 @@ func Test_getParentApp(t *testing.T) {
 		{
 			name: "Parent is another app",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				sonQuery: "app2.app3",
@@ -274,11 +286,7 @@ func Test_getParentApp(t *testing.T) {
 		{
 			name: "invalidquery",
 			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
+				root: getMockApp(),
 			},
 			args: args{
 				sonQuery: "invalid.query",
@@ -289,17 +297,11 @@ func Test_getParentApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
-			})
-			got, err := getParentApp(tt.args.sonQuery)
+			tmm := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
+			}
+			got, err := getParentApp(tt.args.sonQuery, tmm)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getParentApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -313,17 +315,21 @@ func Test_getParentApp(t *testing.T) {
 
 func Test_checkAndUpdates(t *testing.T) {
 	type args struct {
-		app *meta.App
+		app     *meta.App
+		brokers *apimodels.BrokersDI
 	}
 	tests := []struct {
-		name  string
-		args  args
-		want  bool
-		want1 string
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "valid channel structure - it shouldn't return a error",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
@@ -391,12 +397,14 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  true,
-			want1: "",
 		},
 		{
 			name: "invalid channel: using non-existent type",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
@@ -464,12 +472,15 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  false,
-			want1: "invalid channel: using non-existent type;",
+			wantErr: true,
 		},
 		{
 			name: "invalid channel structure - it should return a name channel error",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
@@ -537,12 +548,15 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  false,
-			want1: "invalid channel name: invalid.channel.name",
+			wantErr: true,
 		},
 		{
 			name: "valid channel structure - it shouldn't return a error",
 			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
 				app: &meta.App{
 					Meta: meta.Metadata{
 						Name:        "app1",
@@ -610,18 +624,19 @@ func Test_checkAndUpdates(t *testing.T) {
 					},
 				},
 			},
-			want:  false,
-			want1: "invalid type name: invalid.type",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := checkAndUpdates(tt.args.app)
-			if got != tt.want {
-				t.Errorf("checkChannels() got = %v, want %v", got, tt.want)
+			err := checkAndUpdates(tt.args.app, tt.args.brokers)
+			if tt.wantErr && (err == nil) {
+				t.Errorf("checkAndUpdates(): wanted error but received 'nil'")
+				return
 			}
-			if got1 != tt.want1 {
-				t.Errorf("checkChannels() got1 = %v, want %v", got1, tt.want1)
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("checkAndUpdates() error: %v", err)
 			}
 		})
 	}
@@ -629,7 +644,7 @@ func Test_checkAndUpdates(t *testing.T) {
 
 func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 	type fields struct {
-		MemoryManager *MemoryManager
+		MemoryManager *treeMemoryManager
 		root          *meta.App
 		appErr        error
 		mockA         bool
@@ -731,8 +746,8 @@ func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+			mem := &MockManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -740,8 +755,8 @@ func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Apps().(*AppMemoryManager)
+			}
+			amm := mem.Apps().(*AppMemoryManager)
 			err := amm.connectAppBoundary(tt.args.app)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.connectAppsThroughAliases() error = %v, wantErr %v", err, tt.wantErr)
@@ -778,7 +793,7 @@ func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 
 func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 	type fields struct {
-		MemoryManager *MemoryManager
+		MemoryManager *treeMemoryManager
 		root          *meta.App
 		appErr        error
 		mockA         bool
@@ -811,8 +826,8 @@ func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+			mem := &MockManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -820,8 +835,8 @@ func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Apps().(*AppMemoryManager)
+			}
+			amm := mem.Apps().(*AppMemoryManager)
 			if err := amm.connectAppsBoundaries(tt.args.app); (err != nil) != tt.wantErr {
 				t.Errorf("AppMemoryManager.connectAppsBoundaries() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -831,7 +846,7 @@ func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 
 func TestAppMemoryManager_addAppInTree(t *testing.T) {
 	type fields struct {
-		MemoryManager *MemoryManager
+		MemoryManager *treeMemoryManager
 		root          *meta.App
 		appErr        error
 		mockA         bool
@@ -1008,8 +1023,8 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTree(&MockManager{
-				MemoryManager: &MemoryManager{
+			mem := &MockManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.fields.root,
 					tree: tt.fields.root,
 				},
@@ -1017,8 +1032,8 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 				mockC:  tt.fields.mockC,
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
-			})
-			amm := GetTreeMemory().Apps().(*AppMemoryManager)
+			}
+			amm := mem.Apps().(*AppMemoryManager)
 			parentApp, _ := amm.Get(tt.args.parentApp)
 			amm.addAppInTree(tt.args.app, parentApp)
 		})
@@ -1157,7 +1172,7 @@ func TestAppMemoryManager_updateUUID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			amm := &AppMemoryManager{
-				MemoryManager: &MemoryManager{
+				treeMemoryManager: &treeMemoryManager{
 					root: tt.args.tree,
 					tree: tt.args.tree,
 				},
@@ -1209,35 +1224,102 @@ func Test_validAliases(t *testing.T) {
 		app *meta.App
 	}
 	tests := []struct {
-		name  string
-		args  args
-		valid bool
-		msg1  string
-		msg2  string
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "test alias validation",
 			args: args{
 				app: &appTest,
 			},
-			valid: false,
-			msg1:  "alias: invalid.alias2 points to an non-existent channel 'ch4'; alias: invalid.alias1 points to an non-existent channel 'ch3'",
-			msg2:  "alias: invalid.alias1 points to an non-existent channel 'ch3'; alias: invalid.alias2 points to an non-existent channel 'ch4'",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := validAliases(tt.args.app)
-			if got != tt.valid {
-				t.Errorf("validAliases() got = %v, want %v", got, tt.valid)
+			err := validAliases(tt.args.app)
+			if tt.wantErr && (err == nil) {
+				t.Errorf("validAliases(): wanted error but received 'nil'")
+				return
 			}
-			if got1 != tt.msg1 && got1 != tt.msg2 {
-				if got1 != tt.msg1 {
-					t.Errorf("validAliases() got1 = %v, want %v", got1, tt.msg1)
-				}
-				if got1 != tt.msg2 {
-					t.Errorf("validAliases() got1 = %v, want %v", got1, tt.msg2)
-				}
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("validAliases() error: %v", err)
+			}
+		})
+	}
+}
+
+var kafkaStructMock = sidecars.KafkaConfig{
+	BootstrapServers: "",
+	AutoOffsetReset:  "",
+	KafkaInsprAddr:   "",
+	SidecarImage:     "",
+}
+
+func TestSelectBrokerFromPriorityList(t *testing.T) {
+	type args struct {
+		brokerList []string
+		brokers    *apimodels.BrokersDI
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "Should return the first available broker",
+			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
+				brokerList: []string{"some_broker"},
+			},
+			want: "some_broker",
+		},
+		{
+			name: "Should return the default broker",
+			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
+				brokerList: []string{"fakeBroker"},
+			},
+			want:    "some_broker",
+			wantErr: false,
+		},
+		{
+			name: "Should return the default broker when priority list is empty",
+			args: args{
+				brokers: &apimodels.BrokersDI{
+					Available: []string{"some_broker"},
+					Default:   "some_broker",
+				},
+				brokerList: []string{},
+			},
+			want: "some_broker",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := SelectBrokerFromPriorityList(tt.args.brokerList, tt.args.brokers)
+
+			if !tt.wantErr && (err != nil) {
+				t.Errorf("SelectBrokerFromPriorityList() error %v", err)
+				return
+			}
+
+			if !tt.wantErr && (got != tt.want) {
+				t.Errorf("SelectBrokerFromPriorityList() got %v, want %v", got, tt.want)
+			}
+
+			if tt.wantErr && (err == nil) {
+				t.Errorf("SelectBrokerFromPriorityList() wanted error but got 'nil'")
+				return
 			}
 		})
 	}

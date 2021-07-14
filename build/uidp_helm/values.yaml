@@ -37,12 +37,12 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
-secretRepository: gcr.io/red-inspr/uidp/redis/secret
+secretRepository: gcr.io/insprlabs/uidp/redis/secret
 secret:
   privateKeyName: redisprivatekey
-  adminPassword: "123456"
-  adminToken: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA5MTI0MTEsInBheWxvYWQiOnsidWlkIjoiIiwicGVybWlzc2lvbnMiOnsiIjpbImNyZWF0ZTp0b2tlbiJdfSwicmVmcmVzaCI6bnVsbCwicmVmcmVzaHVybCI6IiJ9fQ.fL1dAAQuINnskvXr_TR2MSAeNeJtMZAokhLTglWoHoTQiltD99cNtANiKRVQhQdiHSWcGZqINcO54fPPRNa6tQ
- # set this admin token from a token that contains full power over the cluster
+  adminPassword: ""
+  adminToken: ""
+    # set this admin token from a token that contains full power over the cluster
 
 statefulset:
   uidpName: uidp-stset
@@ -56,7 +56,7 @@ service:
   port: 80
   targetPort: 9001
 
-uidpRepository: gcr.io/red-inspr/uidp/redis/api
+uidpRepository: gcr.io/insprlabs/uidp/redis/api
 deployment:
   insprdAddr: "http://insprd-svc.default.svc"
   replicas: 1
@@ -65,7 +65,7 @@ deployment:
 
 ingress:
   name: uidp-ingress
-  host: "inspr.com"
+  host: inspr.com
 
 redis:
   password: ""

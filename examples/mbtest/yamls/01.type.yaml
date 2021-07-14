@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: type
+
+meta:
+  name: "mbct1"
+  parent: ""
+schema: '{"type":"int"}'

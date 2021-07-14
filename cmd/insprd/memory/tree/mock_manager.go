@@ -1,13 +1,12 @@
 package tree
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 // MockManager mocks a tree structure for testing
 type MockManager struct {
-	*MemoryManager
+	*treeMemoryManager
 	appErr error
 	mockC  bool
 	mockCT bool
@@ -15,31 +14,31 @@ type MockManager struct {
 }
 
 // Channels mocks a channel interface for testing
-func (tmm *MockManager) Channels() memory.ChannelMemory {
+func (tmm *MockManager) Channels() ChannelMemory {
 	if tmm.mockC {
 		return &ChannelMockManager{
 			MockManager: tmm,
 		}
 	}
 	return &ChannelMemoryManager{
-		MemoryManager: tmm.MemoryManager,
+		treeMemoryManager: tmm.treeMemoryManager,
 	}
 }
 
 // Types mocks a Type interface for testing
-func (tmm *MockManager) Types() memory.TypeMemory {
+func (tmm *MockManager) Types() TypeMemory {
 	if tmm.mockCT {
 		return &TypeMockManager{
 			MockManager: tmm,
 		}
 	}
 	return &TypeMemoryManager{
-		MemoryManager: tmm.MemoryManager,
+		treeMemoryManager: tmm.treeMemoryManager,
 	}
 }
 
 // Apps mocks an app interface for testing
-func (tmm *MockManager) Apps() memory.AppMemory {
+func (tmm *MockManager) Apps() AppMemory {
 	if tmm.mockA {
 		return &MockAppManager{
 			MockManager: tmm,
@@ -47,7 +46,7 @@ func (tmm *MockManager) Apps() memory.AppMemory {
 		}
 	}
 	return &AppMemoryManager{
-		MemoryManager: tmm.MemoryManager,
+		treeMemoryManager: tmm.treeMemoryManager,
 	}
 }
 
@@ -65,9 +64,9 @@ func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
 	return diff.Changelog{}, nil
 }
 
-// Root mock interface structure
-func (tmm *MockManager) Root() memory.GetInterface {
-	return &RootGetter{
+// Tree mock interface structure
+func (tmm *MockManager) Tree() GetInterface {
+	return &PermTreeGetter{
 		tmm.root,
 	}
 }

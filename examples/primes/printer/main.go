@@ -7,7 +7,8 @@ import (
 	"io"
 	"log"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 func main() {
@@ -15,17 +16,16 @@ func main() {
 	c := dappclient.NewAppClient()
 
 	// sets up ticker
-	chName := "input"
+	chName := "printerinput"
 	fmt.Println("starting...")
 	c.HandleChannel(chName, func(_ context.Context, r io.Reader) error {
 
-		var message struct {
-			Message int `json:"message"`
-		}
+		var message models.BrokerMessage
+
 		fmt.Println("reading message")
 		decoder := json.NewDecoder(r)
 		decoder.Decode(&message)
-		fmt.Println("the number ", message.Message, " is a prime")
+		fmt.Println("the number ", message.Data, " is a prime")
 		return nil
 
 	})

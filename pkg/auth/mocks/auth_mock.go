@@ -1,7 +1,7 @@
 package authmock
 
 import (
-	"github.com/inspr/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/auth"
 )
 
 // MockAuth is the structure to mock the auth interface

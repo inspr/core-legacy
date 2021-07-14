@@ -1,0 +1,14 @@
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: slackpub
+  parent: pubsub
+spec:
+  node:
+    spec:
+      replicas: 1
+      image: gcr.io/insprlabs/inspr/examples/slackpub:latest
+  boundary:
+    input:
+      - pubsubch

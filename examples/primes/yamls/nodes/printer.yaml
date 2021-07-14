@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: dapp
+
+meta:
+  name: printer
+  reference: ""
+  parent: primesexample
+spec:
+  node:
+    meta:
+      name: node-printer
+      parent: printer
+    spec:
+      image: gcr.io/insprlabs/inspr/examples/primes/printer:latest
+      replicas: 3
+      environment:
+        teste_env: test
+  boundary:
+    input:
+      - printerinput

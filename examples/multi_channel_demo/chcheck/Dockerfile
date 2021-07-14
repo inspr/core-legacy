@@ -1,12 +1,9 @@
-FROM golang:alpine AS build-env
+FROM golang:alpine AS build
 WORKDIR /app
-COPY go.mod .
-RUN go mod download
 COPY . .
-WORKDIR /app/examples/multi_channel_demo/chcheck
-RUN go build
+RUN go build -o main examples/multi_channel_demo/chcheck/main.go
 
 FROM alpine
 WORKDIR /app
-COPY --from=build-env /app/examples/multi_channel_demo/chcheck/chcheck .
-CMD ./chcheck
+COPY --from=build /app/main .
+CMD ./main

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // CRUDHandler handles crud requests to a given resource
@@ -84,14 +84,13 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		token := strings.TrimPrefix(headerContent[0], "Bearer ")
 		payload, newToken, err := auth.Validate([]byte(token))
 		log.Printf("payload = %+v\n", payload)
-		log.Printf("string(newToken) = %+v\n", string(newToken))
 
 		// returns the same token or a refreshed one in the header of the response
 		w.Header().Add("Authorization", "Bearer "+string(newToken))
 
 		// error management
 		if err != nil {
-			// check for invalid error or non Existant
+			// check for invalid error or non existent
 			if ierrors.HasCode(err, ierrors.InvalidToken) {
 
 				ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token").Build())
@@ -122,6 +121,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 
 				if strings.HasPrefix(rs, scope) &&
 					utils.Includes(payload.Permissions[scope], perm) {
+					log.Printf("permission granted")
 					// token and context are valid
 					h(w, r)
 					return
@@ -153,7 +153,8 @@ func getOperation(r *http.Request) string {
 }
 
 // getTarget isolates the area that is being requested, for example the request
-// URL is https://example.org:8000/channels, the getTarget removes the base of the url and some unecessary '/' and returns only 'channels'
+// URL is https://example.org:8000/channels, the getTarget removes the base of the url
+// and some unnecessary '/' and returns only 'channels'
 func getTarget(r *http.Request) string {
 	route := strings.TrimSuffix(r.URL.Path, "/")
 	route = strings.TrimPrefix(route, r.URL.Host)

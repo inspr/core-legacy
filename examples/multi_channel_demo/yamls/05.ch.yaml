@@ -1,9 +1,0 @@
-kind: channel
-apiVersion: v1
-meta:
-  name: checkch
-  annotations:
-    kafka.replication.factor: 1
-    kafka.partition.number: 2
-spec:
-  type: channelTestType

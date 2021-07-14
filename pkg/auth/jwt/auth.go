@@ -12,11 +12,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/pkg/auth"
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest/request"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
+	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // JWTauth implements the Auth interface for jwt authetication provider
@@ -49,7 +49,7 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 	)
 	if err != nil {
 		if err.Error() == errors.New(`exp not satisfied`).Error() {
-
+			// token expired
 			newToken, err := JA.Refresh(token)
 			if err != nil {
 				return nil,
@@ -57,8 +57,7 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 					ierrors.
 						NewError().
 						InternalServer().
-						InnerError(err).
-						Message("error refreshing token").
+						Message("error refreshing token: %v", err).
 						Build()
 			}
 			token = newToken
@@ -66,8 +65,6 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 			return nil, token, err
 		}
 	}
-
-	// expired
 
 	// gets payload from token
 	payload, err := auth.Desserialize(token)
@@ -84,15 +81,9 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 	return payload, token, nil
 }
 
-// InitDO  structure for initialization requests
-type InitDO struct {
-	auth.Payload
-	Key string
-}
-
 // Init receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
-	initDO := InitDO{
+	initDO := auth.InitDO{
 		Key:     key,
 		Payload: load,
 	}
@@ -100,7 +91,14 @@ func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
 	client := request.NewJSONClient(JA.authURL)
 
 	data := auth.JwtDO{}
-	err := client.Send(context.Background(), "/init", http.MethodPost, initDO, &data)
+	err := client.Send(
+		context.Background(),
+		"/init",
+		http.MethodPost,
+		request.DefaultHost,
+		initDO,
+		&data)
+
 	if err != nil {
 		log.Printf("err = %+v\n", err)
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
@@ -116,7 +114,14 @@ func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
 	client := request.NewJSONClient(JA.authURL)
 
 	data := auth.JwtDO{}
-	err := client.Send(context.Background(), "/token", http.MethodPost, load, &data)
+	err := client.Send(
+		context.Background(),
+		"/token",
+		http.MethodPost,
+		request.DefaultHost,
+		load,
+		&data)
+
 	if err != nil {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
@@ -135,7 +140,14 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 
 	data := auth.JwtDO{}
 
-	err := client.Send(context.Background(), "/refresh", http.MethodGet, nil, &data)
+	err := client.Send(
+		context.Background(),
+		"/refresh",
+		http.MethodGet,
+		request.DefaultHost,
+		nil,
+		&data)
+
 	if err != nil {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err

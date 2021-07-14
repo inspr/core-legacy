@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/rest"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // TypeHandler - contains handlers that uses the
@@ -40,34 +40,34 @@ func (th *TypeHandler) HandleCreate() rest.Handler {
 		}
 
 		logger.Debug("initiating Type create transaction")
-		th.Memory.InitTransaction()
+		th.Memory.Tree().InitTransaction()
 
-		err = th.Memory.Types().Create(scope, &data.Type)
+		err = th.Memory.Tree().Types().Create(scope, &data.Type)
 		if err != nil {
 			logger.Error("unable to create Type",
 				zap.String("type", data.Type.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			th.Memory.Cancel()
+			th.Memory.Tree().Cancel()
 			return
 		}
 
-		diff, err := th.Memory.GetTransactionChanges()
+		diff, err := th.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Type create request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			th.Memory.Cancel()
+			th.Memory.Tree().Cancel()
 			return
 		}
 
 		if !data.DryRun {
 			logger.Info("committing Type create changes")
-			defer th.Memory.Commit()
+			defer th.Memory.Tree().Commit()
 		} else {
 			logger.Info("canceling Type create changes")
-			defer th.Memory.Cancel()
+			defer th.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, diff)
@@ -92,20 +92,20 @@ func (th *TypeHandler) HandleGet() rest.Handler {
 		}
 
 		logger.Debug("initiating Type get transaction")
-		th.Memory.InitTransaction()
+		th.Memory.Tree().InitTransaction()
 
-		insprType, err := th.Memory.Root().Types().Get(scope, data.TypeName)
+		insprType, err := th.Memory.Tree().Perm().Types().Get(scope, data.TypeName)
 		if err != nil {
 			logger.Error("unable to get Type",
 				zap.String("type-name", data.TypeName),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			th.Memory.Cancel()
+			th.Memory.Tree().Cancel()
 			return
 		}
 
-		defer th.Memory.Cancel()
+		defer th.Memory.Tree().Cancel()
 
 		rest.JSON(w, http.StatusOK, insprType)
 	}
@@ -129,25 +129,25 @@ func (th *TypeHandler) HandleUpdate() rest.Handler {
 		}
 
 		logger.Debug("initiating Type update transaction")
-		th.Memory.InitTransaction()
+		th.Memory.Tree().InitTransaction()
 
-		err = th.Memory.Types().Update(scope, &data.Type)
+		err = th.Memory.Tree().Types().Update(scope, &data.Type)
 		if err != nil {
 			logger.Error("unable to update Type",
 				zap.String("type", data.Type.Meta.Name),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			th.Memory.Cancel()
+			th.Memory.Tree().Cancel()
 			return
 		}
 
-		diff, err := th.Memory.GetTransactionChanges()
+		diff, err := th.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Type update request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			th.Memory.Cancel()
+			th.Memory.Tree().Cancel()
 			return
 		}
 
@@ -158,15 +158,15 @@ func (th *TypeHandler) HandleUpdate() rest.Handler {
 				logger.Error("unable to apply Type update changes in diff",
 					zap.Any("error", err))
 				rest.ERROR(w, err)
-				th.Memory.Cancel()
+				th.Memory.Tree().Cancel()
 				return
 			}
 
 			logger.Info("committing Type update changes")
-			defer th.Memory.Commit()
+			defer th.Memory.Tree().Commit()
 		} else {
 			logger.Info("canceling Type update changes")
-			defer th.Memory.Cancel()
+			defer th.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, diff)
@@ -191,34 +191,34 @@ func (th *TypeHandler) HandleDelete() rest.Handler {
 		}
 
 		logger.Debug("initiating Type delete transaction")
-		th.Memory.InitTransaction()
+		th.Memory.Tree().InitTransaction()
 
-		err = th.Memory.Types().Delete(scope, data.TypeName)
+		err = th.Memory.Tree().Types().Delete(scope, data.TypeName)
 		if err != nil {
 			logger.Error("unable to delete Type",
 				zap.String("type", data.TypeName),
-				zap.String("context", scope),
+				zap.String("scope", scope),
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			th.Memory.Cancel()
+			th.Memory.Tree().Cancel()
 			return
 		}
 
-		diff, err := th.Memory.GetTransactionChanges()
+		diff, err := th.Memory.Tree().GetTransactionChanges()
 		if err != nil {
 			logger.Error("unable to get Type delete request changes",
 				zap.Any("error", err))
 			rest.ERROR(w, err)
-			th.Memory.Cancel()
+			th.Memory.Tree().Cancel()
 			return
 		}
 
 		if !data.DryRun {
 			logger.Info("committing Type delete changes")
-			defer th.Memory.Commit()
+			defer th.Memory.Tree().Commit()
 		} else {
 			logger.Info("canceling Type delete changes")
-			defer th.Memory.Cancel()
+			defer th.Memory.Tree().Cancel()
 		}
 
 		rest.JSON(w, http.StatusOK, diff)

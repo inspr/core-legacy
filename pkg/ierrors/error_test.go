@@ -483,3 +483,45 @@ func TestInsprError_StackToError(t *testing.T) {
 		})
 	}
 }
+
+func TestUnwrap(t *testing.T) {
+	mutipleErrors := NewError().InnerError(errors.New("mock")).Build()
+	mutipleErrors.Wrap("new_error_message")
+
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "unwrap_empty_err_stack",
+			args:    args{err: nil},
+			wantErr: false,
+		},
+		{
+			name:    "unwrap_simple_err_stack",
+			args:    args{err: errors.New("mock")},
+			wantErr: false,
+		},
+		{
+			name:    "unwrap_simple_inspr_err_stack",
+			args:    args{err: NewError().InnerError(errors.New("mock")).Build()},
+			wantErr: false,
+		},
+		{
+			name:    "unwrap_complex_inspr_err_stack",
+			args:    args{err: mutipleErrors},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := Unwrap(tt.args.err); (err != nil) != tt.wantErr {
+				t.Errorf("Unwrap() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

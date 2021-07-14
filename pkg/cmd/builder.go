@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // Option is an option to be applied on the construction of a command
@@ -15,7 +15,7 @@ type Option func(*cobra.Command)
 // Builder is used to build cobra commands.
 // it contains all the methods to manipulate a command
 type Builder interface {
-	WithAliases([]string) Builder
+	WithAliases(...string) Builder
 	WithDescription(description string) Builder
 	WithLongDescription(long string) Builder
 	WithExample(comment, command string) Builder
@@ -91,12 +91,12 @@ func (b *builder) WithLongDescription(long string) Builder {
 
 // WithExample - adds and example of how to use the command
 //
-// it will show ' #comment_given inspr  #subcommand_example '
+// it will show ' #comment_given insprctl  #subcommand_example '
 func (b *builder) WithExample(comment, command string) Builder {
 	if b.cmd.Example != "" {
 		b.cmd.Example += "\n"
 	}
-	b.cmd.Example += fmt.Sprintf("  # %s\n inspr %s\n", comment, command)
+	b.cmd.Example += fmt.Sprintf("  # %s\n insprctl %s\n", comment, command)
 	return b
 }
 
@@ -209,7 +209,7 @@ func handleWellKnownErrors(err error) error {
 }
 
 // WithAliases adds command aliases
-func (b *builder) WithAliases(alias []string) Builder {
+func (b *builder) WithAliases(alias ...string) Builder {
 	b.cmd.Aliases = alias
 	return b
 }

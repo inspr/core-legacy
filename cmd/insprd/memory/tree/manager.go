@@ -3,11 +3,10 @@ package tree
 import (
 	"sync"
 
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
 var logger *zap.Logger
@@ -17,27 +16,29 @@ var logger *zap.Logger
 // have been initialized
 func init() {
 	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "memory-tree")))
+	// logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "memory-tree")))
+	// logger = zap.NewNop()
 }
 
-// MemoryManager defines a memory manager interface
-type MemoryManager struct {
+// treeMemoryManager defines a memory manager interface
+type treeMemoryManager struct {
 	root *meta.App
 	tree *meta.App
 	sync.Mutex
 }
 
-var dapptree memory.Manager
+var dapptree *treeMemoryManager
 
-// GetTreeMemory returns a memory manager interface
-func GetTreeMemory() memory.Manager {
+// GetTreeMemory returns a tree memory manager interface
+func GetTreeMemory() Manager {
 	if dapptree == nil {
 		setTree(newTreeMemory())
 	}
 	return dapptree
 }
 
-func newTreeMemory() *MemoryManager {
-	return &MemoryManager{
+func newTreeMemory() *treeMemoryManager {
+	return &treeMemoryManager{
 		tree: &meta.App{
 			Meta: meta.Metadata{
 				Annotations: map[string]string{},
@@ -56,65 +57,71 @@ func newTreeMemory() *MemoryManager {
 	}
 }
 
-func setTree(tmm memory.Manager) {
+func setTree(tmm *treeMemoryManager) {
 	dapptree = tmm
 }
 
 //InitTransaction copies and reserves the current tree structure so that changes can be reversed
-func (mm *MemoryManager) InitTransaction() {
-	mm.Lock()
-	utils.DeepCopy(mm.tree, &mm.root)
+func (tmm *treeMemoryManager) InitTransaction() {
+	tmm.Lock()
+	utils.DeepCopy(tmm.tree, &tmm.root)
 }
 
 //Commit applies changes from a transaction in to the tree structure
-func (mm *MemoryManager) Commit() {
-	defer mm.Unlock()
-	mm.tree = mm.root
-	mm.root = nil
+func (tmm *treeMemoryManager) Commit() {
+	defer tmm.Unlock()
+	tmm.tree = tmm.root
+	tmm.root = nil
 }
 
 //Cancel discarts changes made in the last transaction
-func (mm *MemoryManager) Cancel() {
-	defer mm.Unlock()
-	mm.root = nil
+func (tmm *treeMemoryManager) Cancel() {
+	defer tmm.Unlock()
+	tmm.root = nil
 }
 
 //GetTransactionChanges returns the changelog resulting from the current transaction.
-func (mm *MemoryManager) GetTransactionChanges() (diff.Changelog, error) {
-	cl, err := diff.Diff(mm.tree, mm.root)
+func (tmm *treeMemoryManager) GetTransactionChanges() (diff.Changelog, error) {
+	cl, err := diff.Diff(tmm.tree, tmm.root)
 	return cl, err
 }
 
-// RootGetter is a structure that gets components from the root, without the current changes.
-type RootGetter struct {
+// PermTreeGetter is a structure that gets components from the root, without the current changes.
+type PermTreeGetter struct {
 	tree *meta.App
 }
 
 // Apps returns a getter for apps on the root.
-func (t *RootGetter) Apps() memory.AppGetInterface {
-	return &AppRootGetter{
-		tree: t.tree,
+func (ptg *PermTreeGetter) Apps() AppGetInterface {
+	return &AppPermTreeGetter{
+		tree: ptg.tree,
 	}
 }
 
 // Channels returns a getter for channels on the root.
-func (t *RootGetter) Channels() memory.ChannelGetInterface {
-	return &ChannelRootGetter{}
+func (ptg *PermTreeGetter) Channels() ChannelGetInterface {
+	return &ChannelPermTreeGetter{
+		PermTreeGetter: ptg,
+	}
 }
 
 // Types returns a getter for Types on the root
-func (t *RootGetter) Types() memory.TypeGetInterface {
-	return &TypeRootGetter{}
+func (ptg *PermTreeGetter) Types() TypeGetInterface {
+	return &TypePermTreeGetter{
+		PermTreeGetter: ptg,
+	}
 }
 
 // Alias returns a getter for alias on the root
-func (t *RootGetter) Alias() memory.AliasGetInterface {
-	return &AliasRootGetter{}
+func (ptg *PermTreeGetter) Alias() AliasGetInterface {
+	return &AliasPermTreeGetter{
+		PermTreeGetter: ptg,
+	}
 }
 
-// Root returns a getter for objects on the root of the tree, without the current changes.
-func (mm *MemoryManager) Root() memory.GetInterface {
-	return &RootGetter{
-		tree: mm.tree,
+// Perm returns a getter for objects on the tree without the current changes.
+func (tmm *treeMemoryManager) Perm() GetInterface {
+	return &PermTreeGetter{
+		tree: tmm.tree,
 	}
 }

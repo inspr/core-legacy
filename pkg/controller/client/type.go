@@ -2,27 +2,24 @@ package client
 
 import (
 	"context"
+	"net/http"
 
-	"github.com/inspr/inspr/pkg/api/models"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/meta/utils/diff"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/meta/utils/diff"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
-// TypeClient interacts with types on the Insprd
+// TypeClient is a client for manipulating Type structures in Insprd
 type TypeClient struct {
 	reqClient *request.Client
 }
 
-// Get gets a Type from the Insprd
-//
-// The scope refers to the parent app of the given channel type, represented with a dot separated query
+// Get gets a Type from Insprd, if it exists.
+// The scope refers to the dApp in which the Type is in, represented with a dot separated query
 // such as app1.app2
-//
-// The name is the name of the channel type. So to search for a channel type inside app1 with the name type1 you
-// would call tc.Get(context.Background(), "app1", "type1")
-func (tc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta.Type, error) {
+func (tc *TypeClient) Get(ctx context.Context, scope, name string) (*meta.Type, error) {
 	tdi := models.TypeQueryDI{
 		TypeName: name,
 	}
@@ -30,7 +27,7 @@ func (tc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "GET", tdi, &resp)
+		Send(ctx, "/types", http.MethodGet, request.DefaultHost, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -38,25 +35,19 @@ func (tc *TypeClient) Get(ctx context.Context, scope string, name string) (*meta
 	return &resp, nil
 }
 
-// Create creates a Type inside the Insprd
-//
-// The scope refers to the parent app of the given channel type, represented with a dot separated query
-// such as **app1.app2**
-//
-// The Type information such as name and etc will be inferred from the given Type's metadata.
-//
-// So to create a channel type inside app1 with the name type1 you
-// would call tc.Create(context.Background(), "app1", &meta.Type{...})
-func (tc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
+// Create creates given Type inside of Insprd
+// The scope refers to the dApp in which the Type will be in, represented with a dot separated query
+// such as app1.app2
+func (tc *TypeClient) Create(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error) {
 	tdi := models.TypeDI{
-		Type:   *ch,
+		Type:   *t,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "POST", tdi, &resp)
+		Send(ctx, "/types", http.MethodPost, request.DefaultHost, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -64,16 +55,10 @@ func (tc *TypeClient) Create(ctx context.Context, scope string, ch *meta.Type, d
 	return resp, nil
 }
 
-// Delete deletes a Type inside the Insprd
-//
-// The scope refers to the parent app of the given channel type, represented with a dot separated query
-// such as **app1.app2**
-//
-// The name is the name of the Type to be deleted.
-//
-// So to delete a channel type inside app1 with the name type1 you
-// would call tc.Delete(context.Background(), "app1", "type1")
-func (tc *TypeClient) Delete(ctx context.Context, scope string, name string, dryRun bool) (diff.Changelog, error) {
+// Delete deletes a Type from Insprd, if exists.
+// The scope refers  to the dApp in which the Type is in, represented with a dot separated query
+// such as app1.app2. The name is the name of the Type to be deleted
+func (tc *TypeClient) Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error) {
 	tdi := models.TypeQueryDI{
 		TypeName: name,
 		DryRun:   dryRun,
@@ -82,7 +67,7 @@ func (tc *TypeClient) Delete(ctx context.Context, scope string, name string, dry
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "DELETE", tdi, &resp)
+		Send(ctx, "/types", http.MethodDelete, request.DefaultHost, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -90,25 +75,19 @@ func (tc *TypeClient) Delete(ctx context.Context, scope string, name string, dry
 	return resp, nil
 }
 
-// Update updates a Type inside the Insprd
-//
-// The scope refers to the parent app of the given channel type, represented with a dot separated query
-// such as **app1.app2**
-//
-// The Type information such as name and etc will be inferred from the given Type's metadata.
-//
-// So to update a channel type inside app1 with the name type1 you
-// would call tc.Create(context.Background(), "app1", &meta.Type{...})
-func (tc *TypeClient) Update(ctx context.Context, scope string, ch *meta.Type, dryRun bool) (diff.Changelog, error) {
+// Update updates given Type in Insprd, if it exists.
+// The scope refers to the dApp in which the Type is in, represented with a dot separated query
+// such asapp1.app2
+func (tc *TypeClient) Update(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error) {
 	tdi := models.TypeDI{
-		Type:   *ch,
+		Type:   *t,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", "PUT", tdi, &resp)
+		Send(ctx, "/types", http.MethodPut, request.DefaultHost, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}

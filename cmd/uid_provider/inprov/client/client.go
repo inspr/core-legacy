@@ -2,11 +2,12 @@ package client
 
 import (
 	"context"
+	"net/http"
 	"os"
 
-	"github.com/inspr/inspr/cmd/uid_provider/api/models"
-	"github.com/inspr/inspr/cmd/uid_provider/client"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/cmd/uid_provider/api/models"
+	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 // Client is the client for communicating with the in-cluster uidp
@@ -26,7 +27,14 @@ func NewClient() *Client {
 func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 
 	var resp string
-	err := c.rc.Send(ctx, "/login", "POST", models.ReceivedDataLogin{UID: uid, Password: pwd}, &resp)
+	err := c.rc.Send(
+		ctx,
+		"/login",
+		http.MethodPost,
+		request.DefaultHost,
+		models.ReceivedDataLogin{UID: uid, Password: pwd},
+		&resp)
+
 	if err != nil {
 		return "", err
 	}
@@ -37,7 +45,14 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser client.User) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/newuser", "POST", models.ReceivedDataCreate{UID: uid, Password: pwd, User: newUser}, resp)
+	err := c.rc.Send(
+		ctx,
+		"/newuser",
+		http.MethodPost,
+		request.DefaultHost,
+		models.ReceivedDataCreate{UID: uid, Password: pwd, User: newUser},
+		resp)
+
 	return err
 }
 
@@ -45,7 +60,13 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser client
 func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/deleteuser", "DELETE", models.ReceivedDataDelete{UID: uid, Password: pwd, UserToBeDeleted: usrToBeDeleted}, resp)
+	err := c.rc.Send(ctx,
+		"/deleteuser",
+		http.MethodDelete,
+		request.DefaultHost,
+		models.ReceivedDataDelete{UID: uid, Password: pwd, UserToBeDeleted: usrToBeDeleted},
+		resp)
+
 	return err
 }
 
@@ -53,6 +74,12 @@ func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string
 func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, newPwd string) error {
 
 	var resp interface{}
-	err := c.rc.Send(ctx, "/updatepwd", "PUT", models.ReceivedDataUpdate{UID: uid, Password: pwd, UserToBeUpdated: usrToBeUpdated, NewPassword: newPwd}, resp)
+	err := c.rc.Send(ctx,
+		"/updatepwd",
+		http.MethodPut,
+		request.DefaultHost,
+		models.ReceivedDataUpdate{UID: uid, Password: pwd, UserToBeUpdated: usrToBeUpdated, NewPassword: newPwd},
+		resp)
+
 	return err
 }

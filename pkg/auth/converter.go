@@ -3,11 +3,11 @@ package auth
 import (
 	"encoding/json"
 
-	"github.com/inspr/inspr/pkg/ierrors"
 	"github.com/lestrrat-go/jwx/jwt"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
-// Desserialize converts a interface to a Payload model
+// Desserialize converts a token to a Payload model
 func Desserialize(tokenBytes []byte) (*Payload, error) {
 
 	token, err := jwt.Parse(tokenBytes)

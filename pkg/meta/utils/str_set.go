@@ -3,9 +3,9 @@ package utils
 import (
 	"reflect"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/meta"
-	"github.com/inspr/inspr/pkg/utils"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 const exists = true
@@ -100,6 +100,15 @@ func (set *StrSet) AppendSet(target StrSet) {
 	for k := range target {
 		(*set)[k] = exists
 	}
+}
+
+//ToArray returns an array of all items in the set.
+func (set *StrSet) ToArray() utils.StringArray {
+	arr := utils.StringArray{}
+	for k := range *set {
+		arr = append(arr, k)
+	}
+	return arr
 }
 
 //DisjunctSet returns the disjunction set between two StrSet.

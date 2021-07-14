@@ -1,0 +1,14 @@
+kind: dapp
+apiVersion: v1
+
+meta:
+  name: discordpub
+  parent: pubsub
+spec:
+  node:
+    spec:
+      replicas: 1
+      image: gcr.io/insprlabs/inspr/examples/discordpub:latest
+  boundary:
+    input:
+      - pubsubch

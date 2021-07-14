@@ -1,0 +1,4 @@
+**/*
+!cmd
+!pkg
+!go.mod

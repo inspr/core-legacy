@@ -10,9 +10,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/inspr/inspr/pkg/ierrors"
-	"github.com/inspr/inspr/pkg/rest"
-	"github.com/inspr/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 // Client is the struct which implements the methods of AppClient interface
@@ -22,16 +23,11 @@ type Client struct {
 	readAddr string
 }
 
-// clientMessage is the struct that represents the client's request format
-type clientMessage struct {
-	Message interface{} `json:"message"`
-}
-
 // NewAppClient returns a new instance of the client of the AppClient package
 func NewAppClient() *Client {
 
-	writeAddr := fmt.Sprintf("http://localhost:%s", os.Getenv("INSPR_SIDECAR_WRITE_PORT"))
-	readAddr := fmt.Sprintf(":%s", os.Getenv("INSPR_SIDECAR_READ_PORT"))
+	writeAddr := fmt.Sprintf("http://localhost:%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"))
+	readAddr := fmt.Sprintf(":%s", os.Getenv("INSPR_SCCLIENT_READ_PORT"))
 	return &Client{
 		readAddr: readAddr,
 		client: request.NewClient().
@@ -45,14 +41,21 @@ func NewAppClient() *Client {
 
 // WriteMessage receives a channel and a message and sends it in a request to the sidecar server
 func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface{}) error {
-	data := clientMessage{
-		Message: msg,
+	data := models.BrokerMessage{
+		Data: msg,
 	}
 
 	var resp interface{}
 	log.Println("sending message to sidecar")
 	// sends a message to the corresponding channel route on the sidecar
-	err := c.client.Send(ctx, "/"+channel, http.MethodPost, data, &resp)
+	err := c.client.Send(
+		ctx,
+		"/"+channel,
+		http.MethodPost,
+		request.DefaultHost,
+		data,
+		&resp)
+
 	log.Println("message sent")
 	return err
 }
@@ -66,8 +69,7 @@ func (c *Client) HandleChannel(channel string, handler func(ctx context.Context,
 			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Build())
 			return
 		}
-		rest.JSON(w, 200, struct{ Status string }{"OK"})
-
+		rest.JSON(w, 200, nil)
 	})
 }
 
@@ -86,7 +88,7 @@ func (c *Client) Run(ctx context.Context) error {
 		}
 	}()
 
-	log.Printf("sideCar listener is up...")
+	log.Printf("dApp client listener is up...")
 
 	<-ctx.Done()
 

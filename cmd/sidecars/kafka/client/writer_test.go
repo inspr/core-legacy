@@ -5,50 +5,40 @@ import (
 	"testing"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/inspr/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/environment"
 )
 
 func TestNewWriter(t *testing.T) {
 	createMockEnv()
 	defer deleteMockEnv()
-	type args struct {
-		mock bool
-	}
 	tests := []struct {
 		name    string
-		args    args
 		want    *Writer
 		wantErr bool
 	}{
 		{
-			name: "Valid writer creation",
-			args: args{
-				mock: true,
-			},
+			name:    "Valid writer creation",
 			wantErr: false,
 			want:    &Writer{},
 		},
 		{
-			name: "Invalid writer creation - not mocked (without kafka server up)",
-			args: args{
-				mock: false,
-			},
+			name:    "Invalid writer creation - not mocked (without kafka server up)",
 			wantErr: true,
 			want:    &Writer{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewWriter(tt.args.mock)
+			got, err := NewWriter()
 			if err != nil {
 				t.Error(err)
 			}
 			defer got.Close()
-			if tt.wantErr && (got.producer.GetFatalError() != nil) {
+			if tt.wantErr && (got.Producer().GetFatalError() != nil) {
 				t.Errorf("NewWriter() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got.producer == nil {
+			if got.Producer() == nil {
 				t.Errorf("NewWriter() = %v, want %v", got, tt.want)
 			}
 		})
@@ -56,10 +46,10 @@ func TestNewWriter(t *testing.T) {
 }
 
 func TestWriter_WriteMessage(t *testing.T) {
-	mProd, _ := NewWriter(true)
+	mProd, _ := newMockWriter()
 	defer mProd.Close()
 	createMockEnv()
-	os.Setenv("INSPR_APP_CTX", "")
+	os.Setenv("INSPR_APP_SCOPE", "")
 	environment.RefreshEnviromentVariables()
 	defer deleteMockEnv()
 	type fields struct {
@@ -67,7 +57,7 @@ func TestWriter_WriteMessage(t *testing.T) {
 	}
 	type args struct {
 		channel string
-		message interface{}
+		message []byte
 	}
 	tests := []struct {
 		name    string
@@ -78,22 +68,22 @@ func TestWriter_WriteMessage(t *testing.T) {
 		{
 			name: "Invalid channel",
 			fields: fields{
-				producer: mProd.producer,
+				producer: mProd.Producer(),
 			},
 			args: args{
 				channel: "invalid",
-				message: "testMessageWriterTest",
+				message: []byte("testMessageWriterTest"),
 			},
 			wantErr: true,
 		},
 		{
 			name: "Valid message writing",
 			fields: fields{
-				producer: mProd.producer,
+				producer: mProd.Producer(),
 			},
 			args: args{
 				channel: "ch1",
-				message: "testMessageWriterTest",
+				message: []byte("testMessageWriterTest"),
 			},
 			wantErr: false,
 		},
@@ -111,18 +101,18 @@ func TestWriter_WriteMessage(t *testing.T) {
 }
 
 func TestWriter_produceMessage(t *testing.T) {
-	mProd, _ := NewWriter(true)
+	mProd, _ := newMockWriter()
 	defer mProd.Close()
 	createMockEnv()
-	os.Setenv("INSPR_APP_CTX", "")
+	os.Setenv("INSPR_APP_SCOPE", "")
 	environment.RefreshEnviromentVariables()
 	defer deleteMockEnv()
 	type fields struct {
 		producer *kafka.Producer
 	}
 	type args struct {
-		message interface{}
-		channel kafkaTopic
+		message []byte
+		channel string
 	}
 	tests := []struct {
 		name    string
@@ -133,24 +123,13 @@ func TestWriter_produceMessage(t *testing.T) {
 		{
 			name: "Valid production of given message",
 			fields: fields{
-				producer: mProd.producer,
+				producer: mProd.Producer(),
 			},
 			args: args{
-				message: "testProducingMessage",
+				message: []byte("testProducingMessage"),
 				channel: "ch1_resolved",
 			},
 			wantErr: false,
-		},
-		{
-			name: "Invalid production - encode error",
-			fields: fields{
-				producer: mProd.producer,
-			},
-			args: args{
-				message: "testProducingMessage",
-				channel: "invalid",
-			},
-			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

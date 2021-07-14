@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: inspr-ingress
@@ -10,26 +10,51 @@ spec:
       http:
         paths:
           - path: /channels
+            pathType: Prefix
             backend:
-              serviceName: {{ .Values.service.insprdName }}
-              servicePort: {{ .Values.service.insprdPort }}
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
           - path: /apps
+            pathType: Prefix
             backend:
-              serviceName: {{ .Values.service.insprdName }}
-              servicePort: {{ .Values.service.insprdPort }}
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
           - path: /types
+            pathType: Prefix
             backend:
-              serviceName: {{ .Values.service.insprdName }}
-              servicePort: {{ .Values.service.insprdPort }}
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
           - path: /alias
+            pathType: Prefix
             backend:
-              serviceName: {{ .Values.service.insprdName }}
-              servicePort: {{ .Values.service.insprdPort }}
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
           - path: /auth
+            pathType: Prefix
             backend:
-              serviceName: {{ .Values.service.insprdName }}
-              servicePort: {{ .Values.service.insprdPort }}
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
           - path: /init
+            pathType: Prefix
             backend:
-              serviceName: {{ .Values.service.insprdName }}
-              servicePort: {{ .Values.service.insprdPort }}
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}
+          - path: /brokers
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.insprdName }}
+                port: 
+                  number: {{ .Values.service.insprdPort }}

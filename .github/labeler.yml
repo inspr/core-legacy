@@ -1,25 +1,23 @@
 documentation:
   - doc/*
-  - "*.md"
+  - examples/**/*.md
 
-cmd@insprd:
+insprd:
   - ./cmd/insprd/**/*
 
-cmd@sidecar:
+sidecar:
   - ./cmd/sidecar/**/*
-
-cmd@uidp:
-  - ./cmd/uid_provider/**/*
-
-pkg@sidecar:
   - ./pkg/sidecar/**/*
+
+uidp:
+  - ./cmd/uid_provider/**/*
 
 build:
   - skaffold.yaml
   - build/*
   - "**/Dockerfile"
 
-devOps:
+devops:
   - .github/*
 
 controller:

@@ -1,17 +1,17 @@
 package api
 
 import (
-	"github.com/inspr/inspr/cmd/insprd/memory"
-	"github.com/inspr/inspr/cmd/insprd/operators"
-	ctrl "github.com/inspr/inspr/pkg/api/controllers"
-	"github.com/inspr/inspr/pkg/auth"
+	"inspr.dev/inspr/cmd/insprd/memory"
+	"inspr.dev/inspr/cmd/insprd/operators"
+	ctrl "inspr.dev/inspr/pkg/api/controllers"
+	"inspr.dev/inspr/pkg/auth"
 )
 
 var server ctrl.Server
 
 // Run is the server start up function
-func Run(mm memory.Manager, op operators.OperatorInterface, auth auth.Auth) {
+func Run(mem memory.Manager, op operators.OperatorInterface, auth auth.Auth) {
 	// server.Init(mocks.MockMemoryManager(nil))
-	server.Init(mm, op, auth)
+	server.Init(mem, op, auth)
 	server.Run(":8080")
 }

@@ -430,57 +430,6 @@ func TestWithAnnotations(t *testing.T) {
 	}
 }
 
-func TestWithRestartPolicy(t *testing.T) {
-	type args struct {
-		policy corev1.RestartPolicy
-	}
-	tests := []struct {
-		name string
-		args args
-		want *appsv1.Deployment
-	}{
-		{
-			name: "correct injection",
-			args: args{
-				policy: corev1.RestartPolicyNever,
-			},
-			want: &appsv1.Deployment{
-				Spec: appsv1.DeploymentSpec{
-					Template: corev1.PodTemplateSpec{
-						Spec: corev1.PodSpec{
-							RestartPolicy: corev1.RestartPolicyNever,
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "correct injection",
-			args: args{
-				policy: corev1.RestartPolicyAlways,
-			},
-			want: &appsv1.Deployment{
-				Spec: appsv1.DeploymentSpec{
-					Template: corev1.PodTemplateSpec{
-						Spec: corev1.PodSpec{
-							RestartPolicy: corev1.RestartPolicyAlways,
-						},
-					},
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			dep := &appsv1.Deployment{}
-			option := WithRestartPolicy(tt.args.policy)
-			option(dep)
-			if !reflect.DeepEqual(dep, tt.want) {
-				t.Errorf("WithVolume() = %v, want %v", dep, tt.want)
-			}
-		})
-	}
-}
 func assertEQ(t *testing.T, f string, got, want interface{}) {
 	t.Helper()
 	if !reflect.DeepEqual(got, want) {

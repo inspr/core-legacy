@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
+	dappclient "inspr.dev/inspr/pkg/client"
 )
 
 const defaultMOD = 100
@@ -31,7 +31,7 @@ func main() {
 	// sets up client for sidecar
 	c := dappclient.NewAppClient()
 	// channel name
-	chName := "primes_ch1"
+	chName := "primesch1"
 	ctx := context.Background()
 	fmt.Println("starting...")
 
@@ -39,7 +39,7 @@ func main() {
 		randNumber := rand.Int() % mod
 		fmt.Println("random number -> ", randNumber)
 		err := c.WriteMessage(ctx, chName, randNumber)
-		fmt.Println("wrote message to insprd")
+		fmt.Printf("wrote message to %s\n", chName)
 		if err != nil {
 			fmt.Println(err.Error())
 		}

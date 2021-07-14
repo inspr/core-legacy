@@ -12,6 +12,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+// ignores unused code for this file in the staticcheck
+//lint:file-ignore U1000 Ignore all unused code
+
 const (
 	configScope    = "scope"
 	configServerIP = "serverIP"
@@ -19,7 +22,7 @@ const (
 
 var defaultValues map[string]string = map[string]string{
 	configScope:    "",
-	configServerIP: "http://127.0.0.1:8080",
+	configServerIP: "http://<cluster_ip>",
 }
 
 var flagCompletionRegistry = map[string]func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective){
@@ -86,34 +89,10 @@ func InitViperConfig() {
 	}
 }
 
-// createViperConfig - creates the folder and or file of the inspr's viper config
-//
-// if they already a file the createConfig will truncate it before writing
-func createViperConfig(path string) error {
-	// creates config file
-	err := viper.WriteConfigAs(path)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// createInsprConfigFolder - creates the folder of the inspr's config, it only
-// creates the folder if already doesn't exists
-func createInsprConfigFolder(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		if err := os.Mkdir(path, 0777); err != nil { // perm 0666
-			return err
-		}
-	}
-
-	return nil
-}
-
 // ConfigFile is the currently loaded config file
 var ConfigFile string
 
-// ReadDefaultConfig reads the default inspr configuration
+// ReadDefaultConfig reads the default insprctl configuration
 func ReadDefaultConfig() error {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -160,7 +139,7 @@ func ChangeViperValues(key string, value interface{}) error {
 }
 
 // ExistsKey - informs to the user if the key passed exists in the
-// default keys that are saved in the inspr config file
+// default keys that are saved in the insprctl config file
 func ExistsKey(key string) bool {
 	return viper.IsSet(key)
 }

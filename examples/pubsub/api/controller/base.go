@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	dappclient "github.com/inspr/inspr/pkg/client"
-	"github.com/inspr/inspr/pkg/rest"
+	dappclient "inspr.dev/inspr/pkg/client"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // Server is a struct that contains the variables necessary
@@ -17,7 +17,7 @@ type Server struct {
 	Mux *http.ServeMux
 }
 
-var discordCH = "pubsubch"
+var pubsubChannel = "pubsubch"
 
 type message struct {
 	Message string `json:"message"`
@@ -42,13 +42,13 @@ func (s *Server) Init() {
 			return
 		}
 
-		discordMsg := data.Message
-		if err := client.WriteMessage(ctx, discordCH, discordMsg); err != nil {
+		pubMsg := data.Message
+		if err := client.WriteMessage(ctx, pubsubChannel, pubMsg); err != nil {
 			fmt.Println(err)
 			rest.ERROR(w, err)
 		}
 
-		rest.JSON(w, http.StatusOK, nil)
+		rest.JSON(w, http.StatusOK, "Message sent!")
 	})
 }
 

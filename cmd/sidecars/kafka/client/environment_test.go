@@ -14,8 +14,8 @@ func mockKafkaEnvironment() *Environment {
 }
 
 func TestGetEnvironment(t *testing.T) {
-	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "localhost")
-	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "101019")
+	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", "localhost")
+	os.Setenv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET", "101019")
 	defer deleteMockEnv()
 	tests := []struct {
 		name string
@@ -28,7 +28,7 @@ func TestGetEnvironment(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetEnvironment(); !reflect.DeepEqual(got, tt.want) {
+			if got := GetKafkaEnvironment(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetEnvironment() = %v, want %v", got, tt.want)
 			}
 		})
@@ -47,14 +47,14 @@ func Test_getEnv(t *testing.T) {
 		{
 			name: "Get bootstrap servers environment variable",
 			args: args{
-				name: "KAFKA_BOOTSTRAP_SERVERS",
+				name: "INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS",
 			},
 			want: "localhost",
 		},
 		{
 			name: "Get auto offset reset environment variable",
 			args: args{
-				name: "KAFKA_AUTO_OFFSET_RESET",
+				name: "INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET",
 			},
 			want: "101019",
 		},
@@ -82,8 +82,8 @@ func Test_getEnv(t *testing.T) {
 
 func TestRefreshEnviromentVariables(t *testing.T) {
 	createMockEnv()
-	os.Setenv("KAFKA_BOOTSTRAP_SERVERS", "one")
-	os.Setenv("KAFKA_AUTO_OFFSET_RESET", "two")
+	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", "one")
+	os.Setenv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET", "two")
 	defer deleteMockEnv()
 	tests := []struct {
 		name    string
