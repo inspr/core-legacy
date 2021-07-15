@@ -39,8 +39,11 @@ func Init() *Server {
 func (s *Server) Run(ctx context.Context) error {
 	errCh := make(chan error)
 
+	mux := http.NewServeMux()
+	mux.Handle("/log/level", alevel)
+	mux.Handle("/", s.writeMessageHandler().Post().JSON())
 	writeServer := &http.Server{
-		Handler: s.writeMessageHandler().Post().JSON(),
+		Handler: mux,
 		Addr:    s.writeAddr,
 	}
 	go func() {

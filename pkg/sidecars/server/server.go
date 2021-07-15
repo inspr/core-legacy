@@ -66,8 +66,11 @@ func Init(r models.Reader, w models.Writer, broker string) *Server {
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(ctx context.Context) error {
+	mux := http.NewServeMux()
+	mux.Handle("/log/level", alevel)
+	mux.Handle("/", s.writeMessageHandler().Post().JSON())
 	server := &http.Server{
-		Handler: s.writeMessageHandler().Post().JSON(),
+		Handler: mux,
 		Addr:    s.inAddr,
 	}
 	errCh := make(chan error)
