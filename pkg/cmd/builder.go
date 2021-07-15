@@ -156,6 +156,13 @@ func (b *builder) AddSubCommand(cmds ...*cobra.Command) Builder {
 // if the exact amount of arguments are given, if didn't received the proper args
 // it will show the cmd.help() content
 func (b *builder) ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command {
+	f := b.cmd.ValidArgsFunction
+	b.cmd.ValidArgsFunction = func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) >= argCount {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return f(cmd, args, toComplete)
+	}
 	b.cmd.Args = cobra.ExactArgs(argCount)
 	b.cmd.RunE = func(_ *cobra.Command, args []string) error {
 		err := handleWellKnownErrors(action(b.cmd.Context(), args))

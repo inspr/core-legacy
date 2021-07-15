@@ -145,7 +145,9 @@ func generateCompletion(tg func(*meta.App) utils.StringArray) func(*cobra.Comman
 		}).Filter(
 			func(s string) bool {
 				return strings.HasPrefix(s, toComplete)
-			})
+			}).Filter(func(s string) bool {
+			return !utils.Includes(args, s)
+		})
 
 		return newOnes, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 	}
