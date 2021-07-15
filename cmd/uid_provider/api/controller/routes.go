@@ -1,6 +1,9 @@
 package controller
 
-import handler "inspr.dev/inspr/cmd/uid_provider/api/handlers"
+import (
+	handler "inspr.dev/inspr/cmd/uid_provider/api/handlers"
+	"inspr.dev/inspr/pkg/rest"
+)
 
 // initRoutes defines which routes the UID Provider API will have
 func (s *Server) initRoutes() {
@@ -17,4 +20,6 @@ func (s *Server) initRoutes() {
 	s.mux.HandleFunc("/login", h.LoginHandler())
 
 	s.mux.HandleFunc("/refreshtoken", h.RefreshTokenHandler())
+
+	s.mux.Handle("/healthz", rest.Healthz())
 }

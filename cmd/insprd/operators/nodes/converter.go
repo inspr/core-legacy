@@ -283,7 +283,7 @@ func withLBSidecarConfiguration() k8s.ContainerOption {
 		corev1.EnvFromSource{
 			ConfigMapRef: &corev1.ConfigMapEnvSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "inspr-lbsidecar-configuration",
+					Name: os.Getenv("INSPR_LBSIDECAR_CONFIGMAP"),
 				},
 			},
 		},

@@ -1,0 +1,66 @@
+# Default values for insprd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  imagePullSecrets: []
+  imageRegistry:
+
+name: "insprd"
+image:
+  registry: gcr.io/insprlabs
+  repository: insprd
+  tag:
+imagePullPolicy: IfNotPresent
+
+replicaCount: 1
+logLevel: info
+
+apps:
+  namespace: "{{ .Release.Name }}-inspr-apps"
+  createNamespace: false
+
+ingress:
+  enabled: true
+  host:
+  class:
+
+init:
+  generateKey: true
+  key: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+sidecar:
+  image: 
+    registry: gcr.io/insprlabs
+    repository: inspr/sidecar/lbsidecar
+    tag:
+  ports:
+    client:
+      read: 3046
+      write: 3048
+    server:
+      read: 3047
+      write: 3051
+
+
+auth:
+  name: "auth"
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8081
+  image:
+    registry: gcr.io/insprlabs
+    repository: authsvc
+    tag: 
+
+secretGenerator:
+  image:
+    registry: gcr.io/insprlabs
+    repository: secretgen
+    tag:

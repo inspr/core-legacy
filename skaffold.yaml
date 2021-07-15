@@ -27,11 +27,14 @@ deploy:
         valuesFiles: 
           - overwrite-insprd.yaml
         artifactOverrides:
-          insprdRepository: gcr.io/insprlabs/insprd
-          lbsidecarImage: gcr.io/insprlabs/inspr/sidecar/lbsidecar
-          authRepository: gcr.io/insprlabs/authsvc
-          secretRepository: gcr.io/insprlabs/secretgen
-        chartPath: build/helm
+          image: gcr.io/insprlabs/insprd
+          sidecar.image: gcr.io/insprlabs/inspr/sidecar/lbsidecar
+          auth.image: gcr.io/insprlabs/authsvc
+          secretGenerator.image: gcr.io/insprlabs/secretgen
+        chartPath: build/inspr-stack/charts/insprd
+        imageStrategy:
+          helm:
+            explicitRegistry: true
 profiles:
   - name: uidp
     build:
@@ -53,6 +56,57 @@ profiles:
             valuesFiles: 
               - overwrite-uidp.yaml
             artifactOverrides:
-              uidpRepository: gcr.io/insprlabs/uidp/redis/api
-              secretRepository: gcr.io/insprlabs/uidp/redis/secret
-            chartPath: build/uidp_helm
+              image: gcr.io/insprlabs/uidp/redis/api
+              secret.image: gcr.io/insprlabs/uidp/redis/secret
+            chartPath: build/inspr-stack/charts/uidp
+            imageStrategy:
+              helm:
+                explicitRegistry: true
+  - name: inspr-stack
+    build:
+      tagPolicy:
+        sha256: {}
+      artifacts:
+        - image: gcr.io/insprlabs/insprd
+          context: .
+          docker:
+            dockerfile: cmd/insprd/Dockerfile
+        - image: gcr.io/insprlabs/inspr/sidecar/lbsidecar
+          context: .
+          docker:
+            dockerfile: cmd/sidecars/lbsidecar/Dockerfile
+        - image: gcr.io/insprlabs/authsvc
+          context: .
+          docker:
+            dockerfile: cmd/authsvc/Dockerfile
+        - image: gcr.io/insprlabs/secretgen
+          context: .
+          docker:
+            dockerfile: cmd/authsvc/secret/Dockerfile
+        - image: gcr.io/insprlabs/uidp/redis/secret
+          context: .
+          docker:
+            dockerfile: cmd/uid_provider/secret/Dockerfile
+        - image: gcr.io/insprlabs/uidp/redis/api
+          context: .
+          docker:
+            dockerfile: cmd/uid_provider/Dockerfile
+    deploy:
+      helm:
+        releases:
+          - name: inspr-stack
+            createNamespace: true
+            valuesFiles: 
+              - overwrite-stack.yaml
+            artifactOverrides:
+              uidp.image: gcr.io/insprlabs/uidp/redis/api
+              uidp.secret.image: gcr.io/insprlabs/uidp/redis/secret
+              insprd.image: gcr.io/insprlabs/insprd
+              insprd.sidecar.image: gcr.io/insprlabs/inspr/sidecar/lbsidecar
+              insprd.auth.image: gcr.io/insprlabs/authsvc
+              insprd.secretGenerator.image: gcr.io/insprlabs/secretgen
+            chartPath: build/inspr-stack
+            imageStrategy:
+              helm:
+                explicitRegistry: true
+

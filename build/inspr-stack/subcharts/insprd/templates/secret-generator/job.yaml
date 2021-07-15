@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: '{{ include "insprd.fullname" $ }}-secret-generator'
+  labels:
+    {{- include "common.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: '{{ include "insprd.fullname" $ }}-secret-generator'
+      {{- include "common.images.pullSecrets" (dict "images" (list .Values.secretGenerator.image) "global" $) | nindent 6 }}
+      containers:
+      - name: secret-generator
+        image: {{ include "common.images.image" (dict "image" .Values.secretGenerator.image "global" .Values.global) }}
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: K8S_NAMESPACE
+            value: '{{ .Release.Namespace }}'
+          {{- if .Values.init.generateKey }}
+          - name: INSPRD_INIT_KEY_SECRET_NAME
+            value: '{{- include "insprd.fullname" $ }}-init-key'
+          {{- end }}

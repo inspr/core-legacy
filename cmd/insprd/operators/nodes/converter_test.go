@@ -489,8 +489,13 @@ func Test_withLBSidecarConfiguration(t *testing.T) {
 	tests := []struct {
 		name string
 		want *kubeCore.Container
+		before func()
+		after func()
 	}{
 		{
+			before: func() {
+				os.Setenv("INSPR_LBSIDECAR_CONFIGMAP", "inspr-lbsidecar-configuration")
+			},
 			name: "correct configmap configuration",
 			want: &kubeCore.Container{
 				EnvFrom: []kubeCore.EnvFromSource{
@@ -503,10 +508,15 @@ func Test_withLBSidecarConfiguration(t *testing.T) {
 					},
 				},
 			},
+			after: func() {
+				os.Unsetenv("INSPR_LBSIDECAR_CONFIGMAP_NAME")
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.before()
+			defer tt.after()
 			option := withLBSidecarConfiguration()
 			got := &kubeCore.Container{}
 			option(got)

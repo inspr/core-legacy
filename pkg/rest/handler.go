@@ -11,6 +11,13 @@ import (
 	"inspr.dev/inspr/pkg/meta/utils"
 )
 
+// Healthz handles health check requests
+func Healthz() Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("OK"))
+	}
+}
+
 // Handler is an alias of the api router function.
 // It acts as the function that handles the routes but at
 // the same time it contains certain methods attached to it

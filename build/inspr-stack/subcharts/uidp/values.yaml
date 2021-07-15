@@ -1,0 +1,47 @@
+# Default values for UIDProvider.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+name: uidp
+
+image:
+  registry: gcr.io/insprlabs
+  repository: uidp/redis/api
+  tag:
+
+imagePullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+secret:
+  name: '{{ .Release.Name }}-init-secret'
+  image:
+    registry: gcr.io/insprlabs
+    repository: uidp/redis/secret
+    tag:
+
+admin:
+  generatePassword: true
+  password:
+
+redis:
+  password: 
+  host:
+  port:
+
+ingress:
+  enabled: true
+  class: "nginx"
+  host:
+  token:
+
+insprd:
+  name: "insprd"
+  init:
+    enabled: false
+    secret:
+      key:
+      name:
+  address: 'insprd'

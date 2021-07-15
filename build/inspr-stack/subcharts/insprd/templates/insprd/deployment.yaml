@@ -1,0 +1,51 @@
+{{- with .Values }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "insprd.fullname" $ }}
+  labels:
+    {{- include "insprd.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "insprd.selectorLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "insprd.selectorLabels" $ | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "insprd.fullname" $ }}
+      {{- include "common.images.pullSecrets" (dict "images" (list .image) "global" $) | nindent 6 }}
+      containers:
+        - name: {{ include "insprd.fullname" $ }}
+          image: {{ include "common.images.image" (dict "image" .image "global" $) }}
+          imagePullPolicy: {{ .imagePullPolicy }}
+          {{- include "insprd.healthcheck" $ | nindent 10 }}
+          ports:
+            - name: http
+              containerPort: {{ .service.targetPort }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "lbsidecar.fullname" $ }}
+          env:
+            - name: AUTH_PATH
+              value: http://{{ include "auth.fullname" $ }}
+            - name: INSPR_LBSIDECAR_CONFIGMAP
+              value: "{{include "lbsidecar.fullname" $}}"
+            - name: "INSPR_LBSIDECAR_IMAGE"
+              value: {{ include "common.images.image" ( dict "image" .sidecar.image "global" $.Values.global )}}
+            - name: "NODES_APPS_NAMESPACE"
+              value: {{ tpl .apps.namespace $ }}
+            - name: "INSPR_ENV"
+              value: {{ $.Values.environment }}
+            - name: JWT_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwtpublickey
+                  key: key
+            - name: LOG_LEVEL
+              value: {{ .logLevel }}
+
+    {{- end -}}

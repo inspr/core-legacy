@@ -1,0 +1,17 @@
+{{- with .Values -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "insprd.fullname" $ }}
+  labels:
+    {{- include "insprd.labels" $ | nindent 4 }}
+spec:
+  type: {{ .service.type }}
+  ports:
+    - port: {{ .service.port }}
+      targetPort: {{ .service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "insprd.selectorLabels" $ | nindent 4 }}
+{{- end -}}

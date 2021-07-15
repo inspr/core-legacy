@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: '{{ include "uidp.fullname" . }}-secret-generator'
+  labels: {{- include "uidp.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: '{{ include "uidp.fullname" $ }}-secret-generator'
+      {{- if .Values.insprd.init.enabled }}
+      initContainers:
+      {{- include "insprd.init-check" $ | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: secret-generator
+          image: {{ include "common.images.image" (dict "image" .Values.secret.image "global" .) }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          env:
+            - name: K8S_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: SECRET_NAME
+              value: {{ tpl .Values.secret.name . }}
+            {{- if .Values.insprd.init.enabled }}
+            - name: INIT_INSPRD
+              value: "true"
+            - name: INSPRD_URL
+              value: {{ include "insprd.address" . }}
+            - name: INSPRD_INIT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ tpl .Values.insprd.init.secret.name . }}
+                  key: {{ .Values.insprd.init.secret.key }}
+            {{- end }}
+            {{- if .Values.admin.generatePassword }}
+            - name: ADMIN_PASSWORD_GENERATE
+              value: "true"
+            {{- end }}

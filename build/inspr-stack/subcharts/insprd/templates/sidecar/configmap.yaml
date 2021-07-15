@@ -1,0 +1,27 @@
+{{- with .Values -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{include "lbsidecar.fullname" $}}
+data:
+    INSPR_LBSIDECAR_READ_PORT:  {{ .sidecar.ports.server.read | quote }}
+    INSPR_LBSIDECAR_WRITE_PORT:  {{ .sidecar.ports.client.write | quote }}
+    INSPR_LBSIDECAR_PORT:  {{ .sidecar.ports.server.write | quote }}
+    INSPR_SCCLIENT_READ_PORT:  {{ .sidecar.ports.client.read | quote }}
+    INSPR_INSPRD_ADDRESS: "{{ include "insprd.fullname" $ }}:{{.service.port}}"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{include "lbsidecar.fullname" $}}
+  namespace: {{ tpl .apps.namespace $ }}
+data:
+    INSPR_LBSIDECAR_READ_PORT:  {{ .sidecar.ports.server.read | quote }}
+    INSPR_LBSIDECAR_WRITE_PORT:  {{ .sidecar.ports.client.write | quote }}
+    INSPR_LBSIDECAR_PORT:  {{ .sidecar.ports.server.write | quote }}
+    INSPR_SCCLIENT_READ_PORT:  {{ .sidecar.ports.client.read | quote }}
+    INSPR_INSPRD_ADDRESS:  "http://{{ include "insprd.fullname" $ }}.{{ $.Release.Namespace }}:{{.service.port}}"
+
+{{- end -}}
