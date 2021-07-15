@@ -41,15 +41,18 @@ func NewHandler(ctx context.Context, rdb client.RedisManager) *Handler {
 // CreateUserHandler handles user creation requests
 func (h *Handler) CreateUserHandler() rest.Handler {
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("creating a new user")
+		logger.Info("received create user request", zap.String("host", r.Host))
 
 		data := models.ReceivedDataCreate{}
+		logger.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			logger.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
-
+		logger.Debug("creating user in redis", zap.Any("created-user", data.User), zap.String("auth-user-uid", data.UID))
 		if err := h.rdb.CreateUser(h.ctx, data.UID, data.Password, data.User); err != nil {
+			logger.Error("error creating user in redis", zap.Any("created-user", data.User), zap.String("auth-user", data.UID), zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
@@ -61,15 +64,19 @@ func (h *Handler) CreateUserHandler() rest.Handler {
 // DeleteUserHandler handles user deletion requests
 func (h *Handler) DeleteUserHandler() rest.Handler {
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("deleting an user")
+		logger.Info("received delete user request", zap.String("host", r.Host))
 
 		data := models.ReceivedDataDelete{}
+		logger.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			logger.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
+		logger.Debug("deleting user in redis", zap.Any("deleted-user", data.UserToBeDeleted), zap.String("auth-user-uid", data.UID))
 		if err := h.rdb.DeleteUser(h.ctx, data.UID, data.Password, data.UserToBeDeleted); err != nil {
+			logger.Error("error deleting user in redis", zap.Any("created-user", data.UserToBeDeleted), zap.String("auth-user", data.UID), zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
@@ -81,17 +88,20 @@ func (h *Handler) DeleteUserHandler() rest.Handler {
 // UpdatePasswordHandler handles requests to update an user password
 func (h *Handler) UpdatePasswordHandler() rest.Handler {
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("updating an user")
+		logger.Info("received update request", zap.String("host", r.Host))
 
 		data := models.ReceivedDataUpdate{}
+		logger.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			logger.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
+		logger.Debug("updating user in redis", zap.Any("updated-user", data.UserToBeUpdated), zap.String("auth-user-uid", data.UID))
 		if err := h.rdb.UpdatePassword(h.ctx, data.UID, data.Password,
 			data.UserToBeUpdated, data.NewPassword); err != nil {
-
+			logger.Error("error updating user in redis", zap.Any("created-user", data.UserToBeUpdated), zap.String("auth-user", data.UID), zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
@@ -103,18 +113,20 @@ func (h *Handler) UpdatePasswordHandler() rest.Handler {
 // LoginHandler handles login requests
 func (h *Handler) LoginHandler() rest.Handler {
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("login of an user")
+		logger.Info("received login request", zap.String("host", r.Host))
 
 		data := models.ReceivedDataLogin{}
+		logger.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			logger.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
-		logger.Info("username provided", zap.String("UID", data.UID))
-
+		logger.Debug("logging in user username provided", zap.String("UID", data.UID))
 		token, err := h.rdb.Login(h.ctx, data.UID, data.Password)
 		if err != nil {
+			logger.Debug("error logging in", zap.String("UID", data.UID))
 			rest.ERROR(w, err)
 			return
 		}
@@ -126,16 +138,20 @@ func (h *Handler) LoginHandler() rest.Handler {
 // RefreshTokenHandler handles token refresh requests
 func (h *Handler) RefreshTokenHandler() rest.Handler {
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("refreshing the token")
+		logger.Info("received refresh token request", zap.String("host", r.Host))
 
 		data := models.ReceivedDataRefresh{}
+		logger.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			logger.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
+		logger.Debug("refreshing token")
 		payload, err := h.rdb.RefreshToken(h.ctx, data.RefreshToken)
 		if err != nil {
+			logger.Error("error refreshing token", zap.Binary("token", data.RefreshToken), zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}

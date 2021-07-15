@@ -24,9 +24,11 @@ import (
 )
 
 var logger *zap.Logger
+
 func init() {
 	logger, _ = logs.Logger(zap.Fields(zap.String("section", "redis-client")))
 }
+
 // Client defines a Redis client, which has the interface methods
 type Client struct {
 	rdb           *redis.ClusterClient
@@ -37,7 +39,13 @@ type Client struct {
 
 func (c *Client) initAdminUser() error {
 
-	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(os.Getenv("ADMIN_PASSWORD")), bcrypt.DefaultCost)
+	password := os.Getenv("")
+	if password == "" {
+		logger.Error("password is empty")
+		return ierrors.NewError().InvalidArgs().Message("invalid password").Build()
+	}
+	logger.Debug("received password, generating encryption")
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
 	}
@@ -47,9 +55,17 @@ func (c *Client) initAdminUser() error {
 		Permissions: auth.AdminPermissions,
 		Password:    string(hashedPwd),
 	}
-	payload, _ := c.encrypt(adminUser)
+
+	logger.Debug("encrypting admin user")
+	payload, err := c.encrypt(adminUser)
+	if err != nil {
+		logger.Error("error encrypting admin user", zap.Error(err))
+		return err
+	}
+	logger.Info("requesting new token from insprd")
 	token, err := c.requestNewToken(context.Background(), *payload)
 	if err != nil {
+		logger.Error("error requesting new token", zap.Error(err), zap.String("insprd-address", c.insprdAddress))
 		return err
 	}
 	os.Setenv("ADMIN_TOKEN", token)
@@ -58,40 +74,52 @@ func (c *Client) initAdminUser() error {
 
 // NewRedisClient creates and returns a new Redis client
 func NewRedisClient() *Client {
+	password := getEnv("REDIS_PASSWORD")
+	refreshURL := getEnv("REFRESH_URL")
+	refreshKey := getEnv("REFRESH_KEY")
+	insprdAddress := getEnv("INSPR_CLUSTER_ADDRESS")
+	redisHost := getEnv("REDIS_HOST")
+	redisPort := getEnv("REDIS_PORT")
+	redisAddress := fmt.Sprintf("%s:%s", redisHost, redisPort)
+	refreshPath := fmt.Sprintf("%s/refreshtoken", refreshURL)
+	logger.Info("initializing redis client", zap.String("redis-address", redisAddress), zap.String("refresh-path", refreshPath), zap.String("insprd-address", insprdAddress))
 	c := &Client{
 		rdb: redis.NewClusterClient(&redis.ClusterOptions{
-			Addrs:    []string{fmt.Sprintf("%s:%s", getEnv("REDIS_HOST"), getEnv("REDIS_PORT"))},
-			Password: getEnv("REDIS_PASSWORD"),
+			Addrs:    []string{redisAddress},
+			Password: password,
 		}),
-		refreshURL:    fmt.Sprintf("%s/refreshtoken", getEnv("REFRESH_URL")),
-		refreshKey:    getEnv("REFRESH_KEY"),
-		insprdAddress: getEnv("INSPR_CLUSTER_ADDR"),
+		refreshURL:    refreshPath,
+		refreshKey:    refreshKey,
+		insprdAddress: insprdAddress,
 	}
 
 	err := c.initAdminUser()
 	if err != nil {
-		log.Println("ERROR CREATING REDIS-CLIENT", err.Error())
-		panic(err)
+		logger.Panic("error initializing admin user", zap.Error(err))
 	}
 	return c
 }
 
 // CreateUser inserts a new user into Redis
 func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) error {
+	logger.Debug("checking user permissions", zap.String("user", uid))
 	err := hasPermission(ctx, c.rdb, uid, pwd, newUser, true)
 
 	if err != nil {
+		logger.Info("unable to aquire permissions", zap.String("user", uid))
 		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
 	}
 
 	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 	if err != nil {
+		logger.Error("unable to hash password", zap.Error(err))
 		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
 	}
 
 	newUser.Password = string(hashedPwd)
 
 	if err := set(ctx, c.rdb, newUser); err != nil {
+		logger.Error("unable to set key on redis", zap.Error(err))
 		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
 	return nil
@@ -147,23 +175,31 @@ func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, n
 // If so, it sends a request to Insprd so it can generate a new token for the
 // given user, and returns the toker if it's creation was successful
 func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
+	logger.Debug("getting user key from redis", zap.String("user", uid))
 	user, err := get(ctx, c.rdb, uid)
 	if err != nil {
+		logger.Error("unable to get key from redis", zap.String("user", uid), zap.Error(err))
 		return "", ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
 
+	logger.Debug("comparing password")
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pwd)); err != nil {
+		logger.Debug("passwords don't match", zap.Error(err))
 		return "", ierrors.NewError().Unauthorized().
 			Message("user and password don't match").Build()
 	}
 
+	logger.Debug("encrypting user")
 	payload, err := c.encrypt(*user)
 	if err != nil {
+		logger.Error("unable to encrypt user", zap.Any("user", user), zap.Error(err))
 		return "", ierrors.NewError().InternalServer().Message(err.Error()).Build()
 	}
 
+	logger.Debug("requesting user token")
 	token, err := c.requestNewToken(ctx, *payload)
 	if err != nil {
+		logger.Error("unable to request token from insprd", zap.String("insprd-address", c.insprdAddress), zap.Error(err))
 		return "", ierrors.NewError().InternalServer().Message(err.Error()).Build()
 	}
 
@@ -174,18 +210,24 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 // If so, it returns a payload containing the updated user info
 // (user which is associated with the given refreshToken)
 func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.Payload, error) {
+	logger.Debug("decripting refresh token")
 	oldUser, err := c.decrypt(refreshToken)
 	if err != nil {
+		logger.Error("unable do decript token", zap.Error(err))
 		return nil, ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
 
+	logger.Debug("retrieving user from redis")
 	newUser, err := get(ctx, c.rdb, oldUser.UID)
 	if err != nil {
+		logger.Error("unable to get key from redis", zap.Any("user", oldUser), zap.Error(err))
 		return nil, ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
 
+	logger.Debug("encripting new user")
 	updatedPayload, err := c.encrypt(*newUser)
 	if err != nil {
+		logger.Error("unable to encrypt new user", zap.Any("user", newUser), zap.Error(err))
 		return nil, ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
 
@@ -198,6 +240,7 @@ func (c *Client) encrypt(user User) (*auth.Payload, error) {
 	//Since the key is in string, we need to convert decode it to bytes
 	key, err := hex.DecodeString(c.refreshKey)
 	if err != nil {
+		logger.Error("unable to decode refresh key", zap.Error(err))
 		return nil, err
 	}
 	plaintext := []byte(stringToEncrypt)
@@ -205,6 +248,7 @@ func (c *Client) encrypt(user User) (*auth.Payload, error) {
 	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(key)
 	if err != nil {
+		logger.Error("unable to initiate cypher from key", zap.Error(err))
 		return nil, err
 	}
 
@@ -238,24 +282,28 @@ func (c *Client) encrypt(user User) (*auth.Payload, error) {
 func (c *Client) decrypt(encryptedString []byte) (*User, error) {
 	key, err := hex.DecodeString(c.refreshKey)
 	if err != nil {
+		logger.Error("error decoding hex stream", zap.Error(err))
 		return nil, err
 	}
 
 	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(key)
 	if err != nil {
+		logger.Error("unable to create aes cipher from key", zap.Binary("key", key), zap.Error(err))
 		return nil, err
 	}
 
 	//Create a new GCM
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
+		logger.Error("invalid GCM block", zap.Error(err))
 		return nil, err
 	}
 
 	//Get the nonce size
 	nonceSize := aesGCM.NonceSize()
 	if len(encryptedString) < nonceSize {
+		logger.Error("invalid refresh token", zap.String("error", "invalid nonce"))
 		return nil, fmt.Errorf("invalid refresh token")
 	}
 
@@ -271,6 +319,7 @@ func (c *Client) decrypt(encryptedString []byte) (*User, error) {
 	plaintext := string(bytetext)
 	usrData := strings.Split(plaintext, ":")
 	if len(usrData) != 2 {
+		logger.Error("invalid refresh token", zap.String("error", "not enough fields on refresh token"))
 		return nil, fmt.Errorf("invalid refresh token")
 	}
 
@@ -297,6 +346,7 @@ func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (str
 
 	token, err := ncc.Authorization().GenerateToken(ctx, payload)
 	if err != nil {
+		logger.Error("error generating new token", zap.String("insprd-address", c.insprdAddress), zap.Error(err))
 		return "", err
 	}
 
@@ -308,11 +358,14 @@ func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (str
 func set(ctx context.Context, rdb *redis.ClusterClient, data User) error {
 	strData, err := json.Marshal(data)
 	if err != nil {
+		logger.Error("error marshalling data", zap.Any("data", data), zap.Error(err))
 		return err
 	}
 
+	logger.Debug("setting key on redis")
 	err = rdb.Set(ctx, data.UID, strData, 0).Err()
 	if err != nil {
+		logger.Error("error setting key on redis", zap.String("key", data.UID), zap.Error(err))
 		return err
 	}
 	return nil
@@ -320,15 +373,21 @@ func set(ctx context.Context, rdb *redis.ClusterClient, data User) error {
 
 func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, error) {
 	var parsedValue User
+	logger.Debug("retrieving key from redis")
 	value, err := rdb.Get(ctx, key).Result()
 
 	if err == redis.Nil {
 		return nil, fmt.Errorf("key '%v' does not exist", key)
 	} else if err != nil {
+		logger.Error("error retrieving key from redis", zap.String("key", key), zap.Error(err))
 		return nil, err
 	}
 
-	json.Unmarshal([]byte(value), &parsedValue)
+	err = json.Unmarshal([]byte(value), &parsedValue)
+	if err != nil {
+		logger.Error("error unmarshalling value from redis", zap.String("value", value), zap.Error(err))
+		return nil, err
+	}
 
 	return &parsedValue, nil
 }
@@ -336,8 +395,10 @@ func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, erro
 func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
 	numDeleted, err := rdb.Del(ctx, key).Result()
 	if err != nil {
+		logger.Error("error deleting redis key", zap.Error(err))
 		return err
 	} else if numDeleted == 0 {
+		logger.Error("key not found")
 		return fmt.Errorf("no items were deleted for key %v", key)
 	}
 	return nil
@@ -346,10 +407,12 @@ func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
 func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string, newUser User, isCreation bool) error {
 	requestor, err := get(ctx, rdb, uid)
 	if err != nil {
+		logger.Error("error getting user", zap.String("user", uid), zap.Error(err))
 		return err
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(requestor.Password), []byte(pwd)); err != nil {
+		logger.Info("invalid password", zap.String("user", uid))
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
 
@@ -363,6 +426,7 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 		}
 
 		if !isAllowed {
+			logger.Info("user unauthorized", zap.String("user", uid))
 			return ierrors.NewError().Forbidden().Message("not allowed to create/delete/update a user with current permissions").Build()
 		}
 
