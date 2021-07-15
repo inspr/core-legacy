@@ -97,10 +97,24 @@ Renders the image value while overriding the image registry
   command:
     - "sh"
     - "-c"
-    - "until curl -s {{ include "insprd.address" $ }}; do echo waiting for insprd; sleep 2; done"
+    - "until curl -s {{ include "insprd.address" $ }}/heathz; do echo waiting for insprd; sleep 2; done"
 {{- end -}}
 
 
 {{- define "insprd.address" -}}
 {{ tpl .Values.insprd.address . }}
+{{- end -}}
+{{- define "uidp.healthcheck" -}}
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: {{ .service.port }}
+    initialDelaySeconds: 3
+    periodSeconds: 3
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: {{ .service.port }}
+    initialDelaySeconds: 5
+    periodSeconds: 3
 {{- end -}}

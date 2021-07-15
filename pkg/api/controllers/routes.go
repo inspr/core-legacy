@@ -36,4 +36,5 @@ func (s *Server) initRoutes() {
 	s.mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
 	s.mux.Handle("/refreshController", h.ControllerRefreshHandler())
 	s.mux.Handle("/init", h.InitHandler())
+	s.mux.Handle("/healthz", rest.Healthz())
 }

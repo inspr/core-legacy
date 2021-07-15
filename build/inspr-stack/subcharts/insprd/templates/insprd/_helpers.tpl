@@ -32,3 +32,7 @@ app: {{ include "insprd.fullname" $ }}
 {{- include "common.labels" $ }}
 app: {{ include "insprd.fullname" $ }}
 {{- end }}
+
+{{- define "insprd.healthcheck" -}}
+{{ include "common.healthcheck" .Values.service }}
+{{- end -}}

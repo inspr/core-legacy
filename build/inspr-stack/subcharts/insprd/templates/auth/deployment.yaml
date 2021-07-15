@@ -38,4 +38,5 @@ spec:
                 secretKeyRef:
                   name: jwtprivatekey
                   key: key
+          {{- include "auth.healthcheck" $ | nindent 10 }}
   {{- end -}}

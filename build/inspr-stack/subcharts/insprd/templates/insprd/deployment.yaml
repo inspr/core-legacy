@@ -21,6 +21,7 @@ spec:
         - name: {{ include "insprd.fullname" $ }}
           image: {{ include "common.images.image" (dict "image" .image "global" $) }}
           imagePullPolicy: {{ .imagePullPolicy }}
+          {{- include "insprd.healthcheck" $ | nindent 10 }}
           ports:
             - name: http
               containerPort: {{ .service.targetPort }}

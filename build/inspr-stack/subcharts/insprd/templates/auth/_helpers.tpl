@@ -15,3 +15,6 @@ If release name contains chart name it will be used as a full name.
 {{- include "common.labels" $ }}
 app: {{ include "auth.fullname" $ }}
 {{- end -}}
+{{- define "auth.healthcheck" -}}
+{{ include "common.healthcheck" .Values.auth.service }}
+{{- end -}}

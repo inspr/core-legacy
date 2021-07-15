@@ -38,4 +38,5 @@ spec:
               value: {{ .Values.redis.port | quote }}
             - name: REFRESH_URL
               value: {{ if .Values.refreshURL }}{{ .Values.refreshURL }}{{ else }}http://{{ include "uidp.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}{{ end }}
+          {{- include "uidp.healthcheck" | nindent 10 }}
 
