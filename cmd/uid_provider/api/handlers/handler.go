@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/uid_provider/api/models"
 	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/rest"
 )
 
@@ -17,7 +18,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "uidp-api-handlers")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "uidp-api-handlers")))
 }
 
 // Handler is a structure which cointains methods to handle

@@ -9,6 +9,7 @@ import (
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/sidecars"
 	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/meta"
 )
 
@@ -18,7 +19,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "kafka-channel-operator")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "kafka-channel-operator")))
 }
 
 // ChannelOperator is a client for channel operations on kafka

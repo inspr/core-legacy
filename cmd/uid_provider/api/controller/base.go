@@ -8,6 +8,7 @@ import (
 
 	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/logs"
 )
 
 var logger *zap.Logger
@@ -16,7 +17,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "uidp-api-controllers")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "uidp-api-controllers")))
 }
 
 // Server is a struct that contains the variables necessary

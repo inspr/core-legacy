@@ -9,10 +9,11 @@ import (
 
 	"go.uber.org/zap"
 	"golang.org/x/crypto/ssh"
+	"inspr.dev/inspr/pkg/logs"
 )
 
 func Test_KeyGen(t *testing.T) {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "Auth-provider")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "Auth-provider")))
 
 	privateKey, err := generatePrivateKey()
 	if err != nil {

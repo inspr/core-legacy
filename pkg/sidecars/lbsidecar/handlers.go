@@ -14,13 +14,15 @@ import (
 	"inspr.dev/inspr/pkg/environment"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 var logger *zap.Logger
+var alevel *zap.AtomicLevel
 
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalancer-sidecar")))
+	logger, alevel = logs.Logger(zap.Fields(zap.String("section", "load-balancer-sidecar")))
 }
 
 // writeMessageHandler handles requests sent to the write message server

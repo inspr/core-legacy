@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/utils"
 	"inspr.dev/inspr/pkg/meta/utils/diff"
@@ -15,7 +16,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "memory-tree")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "memory-tree")))
 	// logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "memory-tree")))
 	// logger = zap.NewNop()
 }

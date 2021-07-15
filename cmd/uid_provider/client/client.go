@@ -9,19 +9,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"inspr.dev/inspr/pkg/auth"
 	"inspr.dev/inspr/pkg/controller/client"
 	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/logs"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
 	"inspr.dev/inspr/pkg/utils"
 )
 
+var logger *zap.Logger
+func init() {
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "redis-client")))
+}
 // Client defines a Redis client, which has the interface methods
 type Client struct {
 	rdb           *redis.ClusterClient

@@ -13,6 +13,7 @@ import (
 
 	"go.uber.org/zap"
 	"golang.org/x/crypto/ssh"
+	"inspr.dev/inspr/pkg/logs"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -114,7 +115,7 @@ func generatePublicKey(publicKey *rsa.PublicKey) ([]byte, error) {
 }
 
 func main() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "Auth-provider")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "auth-provider")))
 
 	namespace := os.Getenv("K8S_NAMESPACE")
 

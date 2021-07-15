@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/logs"
 )
 
 type k8sVariables struct {
@@ -33,5 +34,5 @@ func getFromEnv(name string) string {
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "sidecar-channel-operator")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "sidecar-channel-operator")))
 }
