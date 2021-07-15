@@ -20,7 +20,6 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 			NewApplyCmd(),
 			NewDescribeCmd(),
 			NewConfigChangeCmd(),
-			// authCommand,
 			completionCmd,
 			NewClusterCommand(),
 			initCommand,
