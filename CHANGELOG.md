@@ -449,6 +449,20 @@
 	- unit tests for GetInClusterConfigs
 ---
 
+### #40 Issue CORE-332 | adds a permissions field to the dApp definition
+
+- features:
+	- adds a permission field to dapp meta
+	- changes new dapp on tree to handle the injection
+---
+
+### #50 - Feature: creates the completion command on the CLI
+
+- feature:
+	- creates the completion command
+- fix:
+	- adds descriptions to the cluster init command
+
 ### #41 - Feature: Handling invalid requests in the middleware authorization
 - features:
     - rest/middleware.go -> using the `permissions` field in the payload, created in the issue CORE-336, for the scope and permissions check.

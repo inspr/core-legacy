@@ -1,10 +1,15 @@
 package utils
 
 import (
+	"context"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"inspr.dev/inspr/pkg/cmd"
+	"inspr.dev/inspr/pkg/meta/utils"
 )
 
 // ignores unused code for this file in the staticcheck
@@ -18,6 +23,53 @@ const (
 var defaultValues map[string]string = map[string]string{
 	configScope:    "",
 	configServerIP: "http://<cluster_ip>",
+}
+
+var flagCompletionRegistry = map[string]func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective){
+	"scope": func(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		toComplete = strings.TrimSuffix(toComplete, ".")
+		client := GetCliClient()
+		scope, err := GetScope()
+
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+
+		newScope, err := utils.JoinScopes(scope, toComplete)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+		if _, err := client.Apps().Get(context.Background(), newScope); err != nil {
+			newScope, _, _ = utils.RemoveLastPartInScope(newScope)
+		}
+
+		app, err := client.Apps().Get(context.Background(), newScope)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+
+		scopes := []string{}
+		for name := range app.Spec.Apps {
+			newScope, _ := utils.JoinScopes(newScope, name)
+			if strings.HasPrefix(newScope, toComplete) {
+				scopes = append(scopes, newScope+".")
+			}
+		}
+		return scopes, cobra.ShellCompDirectiveNoSpace
+	},
+}
+
+// AddDefaultFlagCompletion adds the default completion for most used flags
+func AddDefaultFlagCompletion() cmd.Option {
+	return func(c *cobra.Command) {
+		for name, f := range flagCompletionRegistry {
+			c.RegisterFlagCompletionFunc(name, f)
+		}
+		c.MarkFlagFilename("token")
+		c.MarkFlagFilename("config")
+		c.MarkFlagFilename("file")
+		c.MarkFlagDirname("folder")
+	}
 }
 
 //GetConfiguredServerIP is responsible for returning config value for serverIp.

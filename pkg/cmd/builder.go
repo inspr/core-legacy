@@ -9,6 +9,9 @@ import (
 	"inspr.dev/inspr/pkg/ierrors"
 )
 
+// Option is an option to be applied on the construction of a command
+type Option func(*cobra.Command)
+
 // Builder is used to build cobra commands.
 // it contains all the methods to manipulate a command
 type Builder interface {
@@ -25,6 +28,9 @@ type Builder interface {
 	NoArgs(action func(context.Context) error) *cobra.Command
 	AddSubCommand(cmds ...*cobra.Command) Builder
 	Version(version string) Builder
+	WithOptions(...Option) Builder
+	ValidArgsFunc(validation func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective)) Builder
+	WithRequiredFlag(string) Builder
 	Super() *cobra.Command
 }
 
@@ -42,6 +48,30 @@ func NewCmd(use string) Builder {
 	}
 }
 
+// WithRequiredFlag sets a flag as required when creating the command
+func (b *builder) WithRequiredFlag(flag string) Builder {
+	b.cmd.MarkFlagRequired(flag)
+	return b
+}
+
+// ValidArgsFunc adds a validation function to the arguments of a command. This is useful for completion
+func (b *builder) ValidArgsFunc(validation func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective)) Builder {
+	b.cmd.ValidArgsFunction = validation
+	return b
+}
+
+// WithOptions adds custom options to the command. These options are functions that
+// cause some change in the command
+func (b *builder) WithOptions(options ...Option) Builder {
+	for _, opt := range options {
+		if opt != nil {
+			opt(&b.cmd)
+		}
+	}
+	return b
+}
+
+// Version adds the version to the cli
 func (b *builder) Version(v string) Builder {
 	b.cmd.Version = v
 	return b
@@ -114,6 +144,7 @@ func (b *builder) Hidden() Builder {
 	return b
 }
 
+// AddSubCommand adds subcommands to the command
 func (b *builder) AddSubCommand(cmds ...*cobra.Command) Builder {
 	for _, cmd := range cmds {
 		b.cmd.AddCommand(cmd)
@@ -125,6 +156,13 @@ func (b *builder) AddSubCommand(cmds ...*cobra.Command) Builder {
 // if the exact amount of arguments are given, if didn't received the proper args
 // it will show the cmd.help() content
 func (b *builder) ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command {
+	f := b.cmd.ValidArgsFunction
+	b.cmd.ValidArgsFunction = func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) >= argCount {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return f(cmd, args, toComplete)
+	}
 	b.cmd.Args = cobra.ExactArgs(argCount)
 	b.cmd.RunE = func(_ *cobra.Command, args []string) error {
 		err := handleWellKnownErrors(action(b.cmd.Context(), args))

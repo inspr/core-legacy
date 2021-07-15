@@ -20,6 +20,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 			NewApplyCmd(),
 			NewDescribeCmd(),
 			NewConfigChangeCmd(),
+			completionCmd,
 			NewClusterCommand(),
 			initCommand,
 		).
@@ -34,6 +35,9 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 }
 
 func mainCmdPreRun(cm *cobra.Command, args []string) error {
+	if cm.Name() == "completion" {
+		return nil
+	}
 	if cm.Name() == "init" && cm.Parent().Name() == "insprctl" {
 		return nil
 	}

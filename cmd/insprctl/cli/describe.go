@@ -21,6 +21,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given app by the path", "describe apps app1.app2.hello_world").
 		WithAliases("a").
 		WithCommonFlags().
+		ValidArgsFunc(completeDapps).
 		ExactArgs(1, displayAppState)
 
 	describeChannel := cmd.NewCmd("channels <channel_name | channel_path>").
@@ -30,6 +31,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given channel by the path", "describe channels app1.app2.hello_world").
 		WithAliases("ch").
 		WithCommonFlags().
+		ValidArgsFunc(completeChannels).
 		ExactArgs(1, displayChannelState)
 
 	describeType := cmd.NewCmd("types <type_name | type_path>").
@@ -39,6 +41,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given type by the path", "describe types app1.app2.hello_world").
 		WithAliases("t").
 		WithCommonFlags().
+		ValidArgsFunc(completeTypes).
 		ExactArgs(1, displayTypeState)
 
 	describeAlias := cmd.NewCmd("alias <alias_key | alais_path>").
@@ -48,6 +51,7 @@ func NewDescribeCmd() *cobra.Command {
 		WithExample("Display the state of the given alias by the path", "describe alias app1.app2.myalias").
 		WithAliases("al").
 		WithCommonFlags().
+		ValidArgsFunc(completeAliases).
 		ExactArgs(1, displayAlias)
 
 	describeCmd := cmd.NewCmd("describe").

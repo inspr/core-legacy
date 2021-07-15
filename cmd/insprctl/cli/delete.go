@@ -21,6 +21,8 @@ func NewDeleteCmd() *cobra.Command {
 		WithExample("Delete app from a custom scope", "delete apps <appname> --scope app1.app2").
 		WithAliases("a").
 		WithCommonFlags().
+		WithOptions(cliutils.AddDefaultFlagCompletion()).
+		ValidArgsFunc(completeDapps).
 		MinimumArgs(1, deleteApps)
 	deleteChannels := cmd.NewCmd("channels").
 		WithDescription("Delete channels from scope").
@@ -28,6 +30,8 @@ func NewDeleteCmd() *cobra.Command {
 		WithExample("Delete channels from a custom scope", "delete channels <channelname> --scope app1.app2").
 		WithAliases("ch").
 		WithCommonFlags().
+		WithOptions(cliutils.AddDefaultFlagCompletion()).
+		ValidArgsFunc(completeChannels).
 		MinimumArgs(1, deleteChannels)
 	deleteTypes := cmd.NewCmd("types").
 		WithDescription("Delete types from scope").
@@ -35,6 +39,8 @@ func NewDeleteCmd() *cobra.Command {
 		WithExample("Delete type from a custom scope", "delete types <typename> --scope app1.app2").
 		WithAliases("t").
 		WithCommonFlags().
+		WithOptions(cliutils.AddDefaultFlagCompletion()).
+		ValidArgsFunc(completeTypes).
 		MinimumArgs(1, deleteTypes)
 	deleteAlias := cmd.NewCmd("alias").
 		WithDescription("Delete alias from scope").
@@ -42,6 +48,8 @@ func NewDeleteCmd() *cobra.Command {
 		WithExample("Delete alias from a custom scope", "delete alias <aliaskey> --scope app1.app2").
 		WithAliases("al").
 		WithCommonFlags().
+		WithOptions(cliutils.AddDefaultFlagCompletion()).
+		ValidArgsFunc(completeAliases).
 		MinimumArgs(1, deleteAlias)
 
 	return cmd.NewCmd("delete").

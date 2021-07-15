@@ -7,6 +7,7 @@
 package utils
 
 import (
+	"sort"
 	"strings"
 
 	kubeCore "k8s.io/api/core/v1"
@@ -70,9 +71,38 @@ func Map(vs []string, f func(string) string) []string {
 // StringArray is an array of strings with functional and set-like helper methods
 type StringArray []string
 
+func (c StringArray) Swap(i, j int) {
+	c[i], c[j] = c[j], c[i]
+}
+func (c StringArray) Len() int {
+	return len(c)
+}
+func (c StringArray) Less(i, j int) bool {
+	return c[i] < c[j]
+}
+
+//Sorted is a helper method that sorts an String Array
+func (c StringArray) Sorted() StringArray {
+	n := StringArray{}
+	n = append(n, c...)
+	sort.Sort(n)
+	return n
+}
+
 // Map maps a given function into another string array
 func (c StringArray) Map(f func(string) string) StringArray {
 	return Map(c, f)
+}
+
+// Filter creates a new string array without the filtered items
+func (c StringArray) Filter(f func(string) bool) StringArray {
+	var ret StringArray
+	for _, s := range c {
+		if f(s) {
+			ret = append(ret, s)
+		}
+	}
+	return ret
 }
 
 // Union returns the union of a string array with another
