@@ -12,7 +12,7 @@ var alevel zap.AtomicLevel
 
 // Logger returns the singleton logger and it's atomic level
 func Logger(options ...zap.Option) (*zap.Logger, *zap.AtomicLevel) {
-	if alevel == zap.NewAtomicLevel() {
+	if logger == nil {
 		var level zapcore.Level
 		switch os.Getenv("LOG_LEVEL") {
 		case "warn", "warning":
