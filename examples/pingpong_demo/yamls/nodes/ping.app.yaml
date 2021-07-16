@@ -5,6 +5,7 @@ meta:
   name: ping
   parent: pptable
 spec:
+  logLevel: debug
   node:
     spec:
       replicas: 3

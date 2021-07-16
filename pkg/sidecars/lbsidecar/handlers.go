@@ -13,14 +13,16 @@ import (
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/environment"
 	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 var logger *zap.Logger
+var alevel *zap.AtomicLevel
 
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "loadbalancer-sidecar")))
+	logger, alevel = logs.Logger(zap.Fields(zap.String("section", "load-balancer-sidecar")))
 }
 
 // writeMessageHandler handles requests sent to the write message server
@@ -141,7 +143,7 @@ func (s *Server) readMessageHandler() rest.Handler {
 }
 
 func sendRequest(addr string, body []byte) (*http.Response, error) {
-	client := http.Client{}
+	client := http.DefaultClient
 	req, err := http.NewRequest(http.MethodPost, addr, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err

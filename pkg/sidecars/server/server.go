@@ -9,6 +9,7 @@ import (
 
 	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
@@ -26,9 +27,10 @@ type Server struct {
 }
 
 var logger *zap.Logger
+var alevel *zap.AtomicLevel
 
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "sidecar")))
+	logger, alevel = logs.Logger(zap.Fields(zap.String("section", "sidecar")))
 }
 
 // Init - configures the server
@@ -64,8 +66,11 @@ func Init(r models.Reader, w models.Writer, broker string) *Server {
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(ctx context.Context) error {
+	mux := http.NewServeMux()
+	mux.Handle("/log/level", alevel)
+	mux.Handle("/", s.writeMessageHandler().Post().JSON())
 	server := &http.Server{
-		Handler: s.writeMessageHandler().Post().JSON(),
+		Handler: mux,
 		Addr:    s.inAddr,
 	}
 	errCh := make(chan error)

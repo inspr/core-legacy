@@ -32,6 +32,7 @@ func Init() *Server {
 
 	s.writeAddr = fmt.Sprintf(":%s", wAddr)
 	s.readAddr = fmt.Sprintf(":%s", rAddr)
+	logger = logger.With(zap.String("read-address", rAddr), zap.String("write-address", wAddr))
 	return &s
 }
 
@@ -39,8 +40,11 @@ func Init() *Server {
 func (s *Server) Run(ctx context.Context) error {
 	errCh := make(chan error)
 
+	mux := http.NewServeMux()
+	mux.Handle("/log/level", alevel)
+	mux.Handle("/", s.writeMessageHandler().Post().JSON())
 	writeServer := &http.Server{
-		Handler: s.writeMessageHandler().Post().JSON(),
+		Handler: mux,
 		Addr:    s.writeAddr,
 	}
 	go func() {

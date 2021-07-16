@@ -6,6 +6,7 @@ import (
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/insprd/operators/nodes"
 	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/logs"
 )
 
 var logger *zap.Logger
@@ -14,9 +15,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "memory-tree")))
-	// logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "operators")))
-	// logger = zap.NewNop()
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "memory-tree")))
 }
 
 // Operator is an operator for creating channels and nodes inside kubernetes
@@ -29,13 +28,13 @@ type Operator struct {
 
 // Nodes returns the nodes that communicate via sidecars inside kubernetes
 func (op *Operator) Nodes() NodeOperatorInterface {
-	logger.Info("summoning Nodes Operator")
+	logger.Debug("instantiating node operator")
 	return op.nodes
 }
 
 // Channels returns the Channels Operator Interface for a given node
 func (op *Operator) Channels() ChannelOperatorInterface {
-	logger.Info("summoning Channels Operator")
+	logger.Debug("instantiating channel operator")
 	return op.channels
 }
 

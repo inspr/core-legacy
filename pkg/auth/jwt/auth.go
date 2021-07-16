@@ -8,14 +8,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
+	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/auth"
 	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/rest/request"
 )
 
@@ -25,12 +26,18 @@ type JWTauth struct {
 	authURL   string
 }
 
+var logger *zap.Logger
+
+func init() {
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "authentication")))
+}
+
 // NewJWTauth takes an *rsa.PublicKey and returns an
 // structure that implements the auth interface
 func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
 	url, ok := os.LookupEnv("AUTH_PATH")
 	if !ok {
-		panic("[ENV VAR] AUTH_PATH not found")
+		logger.Panic("missing AUTH_PATH environment variable")
 	}
 	return &JWTauth{
 		publicKey: rsaPublicKey,
@@ -42,16 +49,20 @@ func NewJWTauth(rsaPublicKey *rsa.PublicKey) *JWTauth {
 // valid, proceeds to execute the request and if it isn't valid returns an error
 func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 
+	logger.Debug("parsing jwt token")
 	_, err := jwt.Parse(
 		token,
 		jwt.WithValidate(true),
 		jwt.WithVerify(jwa.RS256, JA.publicKey),
 	)
 	if err != nil {
+		logger.Debug("error in parsing jwt token")
 		if err.Error() == errors.New(`exp not satisfied`).Error() {
 			// token expired
+			logger.Info("refreshing jwt token")
 			newToken, err := JA.Refresh(token)
 			if err != nil {
+				logger.Error("error refreshing jwt token", zap.Error(err))
 				return nil,
 					token,
 					ierrors.
@@ -66,9 +77,11 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 		}
 	}
 
+	logger.Debug("desserializing token and acquiring credentials")
 	// gets payload from token
 	payload, err := auth.Desserialize(token)
 	if err != nil {
+		logger.Error("error desserializing token", zap.Error(err))
 		return nil,
 			token,
 			ierrors.
@@ -83,6 +96,7 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 
 // Init receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
+	logger.Debug("received initialization request")
 	initDO := auth.InitDO{
 		Key:     key,
 		Payload: load,
@@ -91,6 +105,7 @@ func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
 	client := request.NewJSONClient(JA.authURL)
 
 	data := auth.JwtDO{}
+	logger.Debug("sending initialization request to auth service", zap.String("auth-service", JA.authURL))
 	err := client.Send(
 		context.Background(),
 		"/init",
@@ -100,8 +115,8 @@ func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
 		&data)
 
 	if err != nil {
-		log.Printf("err = %+v\n", err)
-		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		logger.Error("error initializing cluster", zap.Error(err))
+		err = ierrors.NewError().InternalServer().Message("error initializing cluster").InnerError(err).Build()
 		return nil, err
 	}
 
@@ -110,10 +125,11 @@ func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
 
 // Tokenize receives a payload and returns it in signed jwt format. Uses JWT authentication provider
 func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
-
+	logger.Debug("received tokenization request")
 	client := request.NewJSONClient(JA.authURL)
 
 	data := auth.JwtDO{}
+	logger.Debug("sending request to authorization server", zap.String("auth-service", JA.authURL))
 	err := client.Send(
 		context.Background(),
 		"/token",
@@ -123,6 +139,7 @@ func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
 		&data)
 
 	if err != nil {
+		logger.Error("unable to tokenize data", zap.Any("data", load), zap.String("auth-service", JA.authURL), zap.Error(err))
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
 	}
@@ -132,6 +149,7 @@ func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
 
 // Refresh refreshes a jwt token. Uses JWT authentication provider
 func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
+	logger.Debug("received refresh request")
 	client := request.NewClient().
 		BaseURL(JA.authURL).
 		Encoder(json.Marshal).
@@ -140,6 +158,7 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 
 	data := auth.JwtDO{}
 
+	logger.Debug("sending request to authorization server", zap.String("auth-service", JA.authURL))
 	err := client.Send(
 		context.Background(),
 		"/refresh",
@@ -149,10 +168,10 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 		&data)
 
 	if err != nil {
+		logger.Error("unable to refresh token", zap.String("auth-service", JA.authURL), zap.Error(err))
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err
 	}
-	log.Printf("string(data.Token) = %+v\n", string(data.Token))
 
 	return data.Token, nil
 }

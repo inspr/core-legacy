@@ -30,6 +30,8 @@ spec:
             - secretRef:
                 name: {{ tpl .Values.secret.name . }}
           env:
+            - name: LOG_LEVEL
+              value: {{ .Values.global.logLevel | default .Values.logLevel }}
             - name: INSPR_CLUSTER_ADDR
               value: {{ include "insprd.address" . }}
             - name: REDIS_HOST
@@ -38,5 +40,5 @@ spec:
               value: {{ .Values.redis.port | quote }}
             - name: REFRESH_URL
               value: {{ if .Values.refreshURL }}{{ .Values.refreshURL }}{{ else }}http://{{ include "uidp.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}{{ end }}
-          {{- include "uidp.healthcheck" | nindent 10 }}
+          {{- include "uidp.healthcheck" .Values | nindent 10 }}
 

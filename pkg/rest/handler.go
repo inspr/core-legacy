@@ -8,12 +8,16 @@ package rest
 import (
 	"net/http"
 
+	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/meta/utils"
 )
 
 // Healthz handles health check requests
 func Healthz() Handler {
+	l, _ := logs.Logger(zap.Fields(zap.String("section", "healthcheck")))
 	return func(w http.ResponseWriter, r *http.Request) {
+		l.Info("received heathcheck - responding with 200 OK")
 		w.Write([]byte("OK"))
 	}
 }

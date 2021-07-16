@@ -37,4 +37,6 @@ func (s *Server) initRoutes() {
 	s.mux.Handle("/refreshController", h.ControllerRefreshHandler())
 	s.mux.Handle("/init", h.InitHandler())
 	s.mux.Handle("/healthz", rest.Healthz())
+
+	s.mux.Handle("/log/level", alevel)
 }

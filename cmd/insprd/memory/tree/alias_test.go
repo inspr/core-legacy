@@ -26,6 +26,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 				&treeMemoryManager{
 					root: getMockAlias(),
 				},
+				logger,
 			},
 		},
 	}
@@ -35,7 +36,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 				root: tt.fields.root,
 			}
 
-			if got := tmm.Alias(); !reflect.DeepEqual(got, tt.want) {
+			if got := tmm.Alias(); !reflect.DeepEqual(got.(*AliasMemoryManager).root, tt.want.(*AliasMemoryManager).root) {
 				t.Errorf("MemoryManager.Alias() = %v, want %v", got, tt.want)
 			}
 		})

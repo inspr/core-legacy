@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -9,15 +8,17 @@ import (
 	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/operators"
 	"inspr.dev/inspr/pkg/auth"
+	"inspr.dev/inspr/pkg/logs"
 )
 
 var logger *zap.Logger
+var alevel *zap.AtomicLevel
 
 // init is called after all the variable declarations in the package have evaluated
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "insprd-api-controllers")))
+	logger, alevel = logs.Logger(zap.Fields(zap.String("section", "insprd-api-controllers")))
 }
 
 // Server is a struct that contains the variables necessary
@@ -42,9 +43,8 @@ func (s *Server) Init(mem memory.Manager, op operators.OperatorInterface, auth a
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
-	logger.Info("running Insprd server",
-		zap.String("on address", addr))
+	logger = logger.With(zap.String("port", addr))
+	logger.Info("running Insprd server")
 
-	fmt.Printf("insprd rest api is up! Listening on port: %s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, s.mux))
 }

@@ -59,7 +59,7 @@ func (no *NodeOperator) dappToService(app *meta.App) *kubeService {
 }
 
 // dAppToDeployment translates the DApp to a k8s deployment
-func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
+func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeployment {
 	appDeployName := toDeploymentName(app)
 	appLabels := map[string]string{
 		"inspr-app": toAppID(app),
@@ -69,7 +69,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 	nodeContainer := createNodeContainer(app, appDeployName)
 	scContainers := no.withAllSidecarsContainers(app, appDeployName)
 
-	return (*kubeDeploy)(
+	return (*kubeDeployment)(
 		k8s.NewDeployment(
 			appDeployName,
 			k8s.WithLabels(appLabels),
@@ -94,6 +94,10 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 		container, addrEnvVar := factory(app,
 			getAvailiblePorts(),
 			no.withBoundary(app),
+			k8s.ContainerWithEnv(corev1.EnvVar{
+				Name:  "LOG_LEVEL",
+				Value: app.Spec.LogLevel,
+			}),
 			withLBSidecarConfiguration())
 
 		containers = append(containers, container)
@@ -109,6 +113,10 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 		withLBSidecarConfiguration(),
 		k8s.ContainerWithEnv(sidecarAddrs...),
 		withNodeID(app),
+		k8s.ContainerWithEnv(corev1.EnvVar{
+			Name:  "LOG_LEVEL",
+			Value: app.Spec.LogLevel,
+		}),
 		k8s.ContainerWithPullPolicy(corev1.PullAlways),
 	)
 
@@ -259,6 +267,10 @@ func createNodeContainer(app *meta.App, appDeployName string) corev1.Container {
 		app.Spec.Node.Spec.Image,
 		withLBSidecarPorts(app),
 		withSecretDefinition(app),
+		k8s.ContainerWithEnv(corev1.EnvVar{
+			Name:  "LOG_LEVEL",
+			Value: app.Spec.LogLevel,
+		}),
 		withLBSidecarConfiguration(),
 	)
 }

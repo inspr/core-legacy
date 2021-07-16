@@ -22,6 +22,7 @@ func (tmm *MockManager) Channels() ChannelMemory {
 	}
 	return &ChannelMemoryManager{
 		treeMemoryManager: tmm.treeMemoryManager,
+		logger:            logger,
 	}
 }
 
@@ -34,6 +35,7 @@ func (tmm *MockManager) Types() TypeMemory {
 	}
 	return &TypeMemoryManager{
 		treeMemoryManager: tmm.treeMemoryManager,
+		logger:            logger,
 	}
 }
 
@@ -47,6 +49,7 @@ func (tmm *MockManager) Apps() AppMemory {
 	}
 	return &AppMemoryManager{
 		treeMemoryManager: tmm.treeMemoryManager,
+		logger:            logger,
 	}
 }
 
@@ -68,5 +71,6 @@ func (tmm *MockManager) GetTransactionChanges() (diff.Changelog, error) {
 func (tmm *MockManager) Tree() GetInterface {
 	return &PermTreeGetter{
 		tmm.root,
+		logger,
 	}
 }

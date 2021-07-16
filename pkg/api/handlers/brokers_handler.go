@@ -14,28 +14,30 @@ import (
 // BrokerHandler - contains handlers that uses the BrokerManager interface methods
 type BrokerHandler struct {
 	*Handler
+	logger *zap.Logger
 }
 
 // NewBrokerHandler - returns the handle functions that regard brokers
 func (handler *Handler) NewBrokerHandler() *BrokerHandler {
 	return &BrokerHandler{
-		handler,
+		Handler: handler,
+		logger:  logger.With(zap.String("subSection", "brokers")),
 	}
 }
 
 // HandleGet returns the get handler for brokers
 func (bh *BrokerHandler) HandleGet() rest.Handler {
-	logger.Info("handling Brokers get request")
+	l := bh.logger.With(zap.String("operation", "get"))
+	l.Info("received brokers get request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		brokers, err := bh.Memory.Brokers().Get()
 		if err != nil {
-			logger.Error("unable to obtain currently available brokers on cluster",
-				zap.Any("error", err))
+			l.Error("unable to obtain currently available brokers on cluster", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
-		logger.Debug("current brokers:", zap.Any("brokers", brokers.Available))
+		l.Debug("current brokers:", zap.Strings("brokers", brokers.Available))
 
 		rest.JSON(w, http.StatusOK, brokers)
 	}
@@ -44,7 +46,8 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 
 // KafkaCreateHandler is the function that processes requests at the /brokers/kafka endpoint
 func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
-	logger.Info("handling the brokers' kafka route request")
+	l := bh.logger.With(zap.String("operation", "create"), zap.String("broker", "kafka"))
+	l.Info("received kafka broker create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		// decode into the bytes of yaml file
 		var content models.BrokerConfigDI
@@ -58,6 +61,7 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 		// parsing the bytes into a Kafka config structure
 		err = yaml.Unmarshal(content.FileContents, &kafkaConfig)
 		if err != nil {
+			l.Error("unable to unmarshall config", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
@@ -65,6 +69,7 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 		if err = bh.Memory.Brokers().Create(
 			&kafkaConfig,
 		); err != nil {
+			l.Error("error creating kafka broker on memory", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}

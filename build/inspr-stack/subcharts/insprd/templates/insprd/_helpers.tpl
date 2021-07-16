@@ -34,5 +34,5 @@ app: {{ include "insprd.fullname" $ }}
 {{- end }}
 
 {{- define "insprd.healthcheck" -}}
-{{ include "common.healthcheck" .Values.service }}
+{{ include "common.healthcheck" .Values }}
 {{- end -}}

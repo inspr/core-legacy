@@ -6,6 +6,7 @@ import (
 
 	kafkasc "inspr.dev/inspr/cmd/sidecars/kafka/client"
 	"inspr.dev/inspr/pkg/environment"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/meta/brokers"
 
 	"go.uber.org/zap"
@@ -19,7 +20,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "kafka-sidecar-server")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "kafka-sidecar-server")))
 }
 
 func main() {

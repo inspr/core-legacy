@@ -13,6 +13,7 @@ import (
 
 	"go.uber.org/zap"
 	"golang.org/x/crypto/ssh"
+	"inspr.dev/inspr/pkg/logs"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -23,7 +24,6 @@ var clientSet kubernetes.Interface
 var logger *zap.Logger
 
 const bitSize = 512 // min size for encoding your payload
-
 
 func generatePassword() string {
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -114,7 +114,7 @@ func generatePublicKey(publicKey *rsa.PublicKey) ([]byte, error) {
 }
 
 func main() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "Auth-provider")))
+	logger, _ = logs.Logger()
 
 	namespace := os.Getenv("K8S_NAMESPACE")
 
@@ -172,9 +172,10 @@ func main() {
 	}
 
 	if secretName := os.Getenv("INSPRD_INIT_KEY_SECRET_NAME"); secretName != "" {
+		logger.Info("generating init key")
 		secret, err := clientSet.CoreV1().Secrets(namespace).Get(context.Background(), secretName, v1.GetOptions{})
 		if err != nil {
- 			panic(err)
+			panic(err)
 		}
 		if secret.Data == nil {
 			secret.Data = map[string][]byte{}

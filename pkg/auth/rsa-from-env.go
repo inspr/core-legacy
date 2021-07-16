@@ -3,7 +3,6 @@ package auth
 import (
 	"crypto/rsa"
 	"encoding/pem"
-	"fmt"
 	"os"
 
 	"golang.org/x/crypto/ssh"
@@ -17,7 +16,6 @@ func GetPublicKey() (*rsa.PublicKey, error) {
 		err := ierrors.NewError().Message("JWT_PUBLIC_KEY unavailable").Build()
 		return nil, err
 	}
-	fmt.Printf("%s\n", pubBytes)
 
 	pubBlock, _ := pem.Decode([]byte(pubBytes))
 	if pubBlock.Type != "RSA PUBLIC KEY" {

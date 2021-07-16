@@ -211,12 +211,13 @@ func TestNewTypeHandler(t *testing.T) {
 			},
 			want: &TypeHandler{
 				h,
+				logger.With(zap.String("subSection", "type")),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := h.NewTypeHandler(); !reflect.DeepEqual(got, tt.want) {
+			if got := h.NewTypeHandler(); !reflect.DeepEqual(got.Handler, tt.want.Handler) {
 				t.Errorf("NewTypeHandler() = %v, want %v", got, tt.want)
 			}
 		})

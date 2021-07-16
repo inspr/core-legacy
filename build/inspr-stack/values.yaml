@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 global:
   imagePullSecrets: []
+  logLevel: info
   imageRegistry:
   insprd:
     name: insprd
@@ -18,6 +19,8 @@ insprd:
     repository: insprd
     tag:
   imagePullPolicy: IfNotPresent
+
+  logLevel: info
 
   replicaCount: 1
 
@@ -51,6 +54,7 @@ insprd:
 
   auth:
     name: "auth"
+    logLevel: info
     service:
       type: ClusterIP
       port: 80
@@ -63,6 +67,7 @@ insprd:
 uidp:
   name: uidp
   enabled: true
+  logLevel: info
   image:
     registry: gcr.io/insprlabs
     repository: uidp/redis/api
@@ -88,7 +93,7 @@ uidp:
     generatePassword: true
 
   redis:
-    password:
+    password: ""
     host:
     port:
 

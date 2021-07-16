@@ -1,12 +1,13 @@
 package rest
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
+	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/auth"
 	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/utils"
 )
 
@@ -69,21 +70,21 @@ func (h Handler) JSON() Handler {
 
 // Validate handles the token validation of the http requests made, it receives an implementation of the auth interface as a parameter.
 func (h Handler) Validate(auth auth.Auth) Handler {
+	logger, _ := logs.Logger(zap.Fields(zap.String("section", "api"), zap.String("subSection", "authorization-middleware")))
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]
-		log.Println("validating")
-		log.Printf("headerContent = %+v\n", headerContent)
+		logger.Info("validating request")
 		if (len(headerContent) == 0) ||
 			(!strings.HasPrefix(headerContent[0], "Bearer ")) {
-
+			logger.Info("invalid token received")
 			ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token format").Build())
 			return
 		}
 
 		token := strings.TrimPrefix(headerContent[0], "Bearer ")
 		payload, newToken, err := auth.Validate([]byte(token))
-		log.Printf("payload = %+v\n", payload)
+		logger.Debug("payload after validation")
 
 		// returns the same token or a refreshed one in the header of the response
 		w.Header().Add("Authorization", "Bearer "+string(newToken))
@@ -92,7 +93,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		if err != nil {
 			// check for invalid error or non existent
 			if ierrors.HasCode(err, ierrors.InvalidToken) {
-
+				logger.Info("invalid token received, refusing request")
 				ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token").Build())
 				return
 			}
@@ -104,25 +105,24 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 
 		// used for checking scope authorization
 		reqScopes := r.Header[HeaderScopeKey]
-		log.Printf("payload.Permissions = %+v\n", payload.Permissions)
+		logger.Debug("payload permissions", zap.Any("permissions", payload.Permissions))
 
 		// used for checking permissions
 		operation := getOperation(r)
 		target := getTarget(r)
 		perm := operation + ":" + target
-		log.Printf("reqOperation = %v\n", perm)
+		logger.Info("validating permissions for request", zap.String("operation", operation), zap.String("target", target))
 
 		for scope := range payload.Permissions {
-			log.Printf("permission-scope = %+v\n", scope)
+			logger.Debug("checking permissions for scope", zap.String("token-scope", scope))
 
 			// usually the request will one have one scope
 			for _, rs := range reqScopes {
-				log.Printf("request-scope = %+v\n", rs)
+				logger.Debug("comparing scope with token scope", zap.String("request-scope", rs))
 
 				if strings.HasPrefix(rs, scope) &&
 					utils.Includes(payload.Permissions[scope], perm) {
-					log.Printf("permission granted")
-					// token and context are valid
+					logger.Info("permission granted for request", zap.String("request-scope", rs), zap.String("token-scope", scope), zap.String("request", perm))
 					h(w, r)
 					return
 				}
@@ -130,6 +130,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		}
 
 		// there were no valid operations
+		logger.Info("insufficient credentials, refusing request", zap.String("requested-permission", perm), zap.Strings("requested-scopes", reqScopes))
 		ERROR(
 			w,
 			ierrors.

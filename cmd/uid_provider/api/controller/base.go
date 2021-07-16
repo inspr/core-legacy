@@ -2,12 +2,12 @@ package controller
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 
 	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/pkg/logs"
 )
 
 var logger *zap.Logger
@@ -16,7 +16,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = zap.NewProduction(zap.Fields(zap.String("section", "uidp-api-controllers")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "uidp-api-controllers")))
 }
 
 // Server is a struct that contains the variables necessary
@@ -39,9 +39,8 @@ func (s *Server) Init(ctx context.Context, rdb client.RedisManager) {
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
-	logger.Info("running UIDP server",
-		zap.String("on address", addr))
+	logger = logger.With(zap.String("port", addr))
+	logger.Info("listening")
 
-	fmt.Printf("uidp rest api is up! listening on port: %s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, s.mux))
 }

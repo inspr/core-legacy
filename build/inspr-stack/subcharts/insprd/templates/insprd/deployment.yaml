@@ -30,6 +30,8 @@ spec:
             - configMapRef:
                 name: {{ include "lbsidecar.fullname" $ }}
           env:
+            - name: LOG_LEVEL
+              value: {{ $.Values.global.logLevel | default .logLevel }}
             - name: AUTH_PATH
               value: http://{{ include "auth.fullname" $ }}
             - name: INSPR_LBSIDECAR_CONFIGMAP
@@ -45,7 +47,5 @@ spec:
                 secretKeyRef:
                   name: jwtpublickey
                   key: key
-            - name: LOG_LEVEL
-              value: {{ .logLevel }}
 
     {{- end -}}
