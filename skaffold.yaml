@@ -39,7 +39,6 @@ profiles:
   - name: uidp
     build:
       tagPolicy:
-        sha256: {}
       artifacts:
         - image: gcr.io/insprlabs/uidp/redis/secret
           context: .
@@ -64,8 +63,6 @@ profiles:
                 explicitRegistry: true
   - name: inspr-stack
     build:
-      tagPolicy:
-        sha256: {}
       artifacts:
         - image: gcr.io/insprlabs/insprd
           context: .
