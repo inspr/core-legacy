@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"net/http/pprof"
+
 	"inspr.dev/inspr/pkg/rest"
 
 	handler "inspr.dev/inspr/pkg/api/handlers"
@@ -39,4 +41,14 @@ func (s *Server) initRoutes() {
 	s.mux.Handle("/healthz", rest.Healthz())
 
 	s.mux.Handle("/log/level", alevel)
+
+	s.mux.HandleFunc("/debug/pprof/", pprof.Index)
+	s.mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	s.mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	s.mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+
+	s.mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
+	s.mux.Handle("/debug/pprof/heap", pprof.Handler("heap"))
+	s.mux.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
+	s.mux.Handle("/debug/pprof/block", pprof.Handler("block"))
 }
