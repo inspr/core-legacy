@@ -108,13 +108,13 @@ Renders the image value while overriding the image registry
 livenessProbe:
   httpGet:
     path: /healthz
-    port: {{ .service.port }}
-    initialDelaySeconds: 3
-    periodSeconds: 3
+    port: {{ .service.targetPort }}
+  initialDelaySeconds: 3
+  periodSeconds: 3
 readinessProbe:
   httpGet:
     path: /healthz
-    port: {{ .service.port }}
-    initialDelaySeconds: 5
-    periodSeconds: 3
+    port: {{ .service.targetPort }}
+  initialDelaySeconds: 5
+  periodSeconds: 3
 {{- end -}}

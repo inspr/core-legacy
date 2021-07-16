@@ -88,7 +88,7 @@ uidp:
     generatePassword: true
 
   redis:
-    password:
+    password: ""
     host:
     port:
 
