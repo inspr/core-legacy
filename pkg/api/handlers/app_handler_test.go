@@ -215,12 +215,12 @@ func TestNewAppHandler(t *testing.T) {
 			args: args{
 				memManager: fake.GetMockMemoryManager(nil, nil),
 			},
-			want: &AppHandler{h},
+			want: &AppHandler{h, logger},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := h.NewAppHandler(); !reflect.DeepEqual(got, tt.want) {
+			if got := h.NewAppHandler(); !reflect.DeepEqual(got.Handler, tt.want.Handler) {
 				t.Errorf("NewAppHandler() = %v, want %v", got, tt.want)
 			}
 		})

@@ -707,6 +707,7 @@ func TestMemoryManager_Apps(t *testing.T) {
 				&treeMemoryManager{
 					root: getMockApp(),
 				},
+				logger,
 			},
 		},
 	}

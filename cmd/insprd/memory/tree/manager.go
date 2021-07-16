@@ -17,8 +17,6 @@ var logger *zap.Logger
 // have been initialized
 func init() {
 	logger, _ = logs.Logger(zap.Fields(zap.String("section", "memory-tree")))
-	// logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "memory-tree")))
-	// logger = zap.NewNop()
 }
 
 // treeMemoryManager defines a memory manager interface
@@ -35,10 +33,12 @@ func GetTreeMemory() Manager {
 	if dapptree == nil {
 		setTree(newTreeMemory())
 	}
+	logger.Debug("getting singleton tree memory manager")
 	return dapptree
 }
 
 func newTreeMemory() *treeMemoryManager {
+	logger.Info("initializing memory tree")
 	return &treeMemoryManager{
 		tree: &meta.App{
 			Meta: meta.Metadata{
@@ -89,13 +89,15 @@ func (tmm *treeMemoryManager) GetTransactionChanges() (diff.Changelog, error) {
 
 // PermTreeGetter is a structure that gets components from the root, without the current changes.
 type PermTreeGetter struct {
-	tree *meta.App
+	tree   *meta.App
+	logger *zap.Logger
 }
 
 // Apps returns a getter for apps on the root.
 func (ptg *PermTreeGetter) Apps() AppGetInterface {
 	return &AppPermTreeGetter{
 		tree: ptg.tree,
+		logs: logger,
 	}
 }
 
@@ -103,6 +105,7 @@ func (ptg *PermTreeGetter) Apps() AppGetInterface {
 func (ptg *PermTreeGetter) Channels() ChannelGetInterface {
 	return &ChannelPermTreeGetter{
 		PermTreeGetter: ptg,
+		logs:           logger,
 	}
 }
 
@@ -110,6 +113,7 @@ func (ptg *PermTreeGetter) Channels() ChannelGetInterface {
 func (ptg *PermTreeGetter) Types() TypeGetInterface {
 	return &TypePermTreeGetter{
 		PermTreeGetter: ptg,
+		logs:           logger,
 	}
 }
 
@@ -117,12 +121,14 @@ func (ptg *PermTreeGetter) Types() TypeGetInterface {
 func (ptg *PermTreeGetter) Alias() AliasGetInterface {
 	return &AliasPermTreeGetter{
 		PermTreeGetter: ptg,
+		logs:           logger,
 	}
 }
 
 // Perm returns a getter for objects on the tree without the current changes.
 func (tmm *treeMemoryManager) Perm() GetInterface {
 	return &PermTreeGetter{
-		tree: tmm.tree,
+		tree:   tmm.tree,
+		logger: logger,
 	}
 }

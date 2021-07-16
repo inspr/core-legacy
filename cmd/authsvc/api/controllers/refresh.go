@@ -95,8 +95,7 @@ func refreshPayload(refreshToken []byte, refreshURL string) (*auth.Payload, erro
 		return nil, err
 	}
 
-	c := &http.Client{}
-	resp, err := c.Post(refreshURL, "application/json", bytes.NewBuffer(reqBytes))
+	resp, err := http.Post(refreshURL, "application/json", bytes.NewBuffer(reqBytes))
 	if err != nil || resp.StatusCode != http.StatusOK {
 		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
 		return nil, err

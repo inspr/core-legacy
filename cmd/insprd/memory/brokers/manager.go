@@ -15,7 +15,6 @@ var logger *zap.Logger
 // have been initialized
 func init() {
 	logger, _ = logs.Logger(zap.Fields(zap.String("section", "broker-memory")))
-	// logger = zap.NewNop()
 }
 
 // BrokerManager implements broker's Manager interface,
@@ -34,6 +33,7 @@ var brokerMemory *brokerMemoryManager
 // GetBrokerMemory allows for connection with BrokersManager sigleton
 func GetBrokerMemory() Manager {
 	if brokerMemory == nil {
+		logger.Debug("creating new broker memory")
 		brokerMemory = &brokerMemoryManager{
 			broker: &brokers.Brokers{
 				Available: make(brokers.BrokerStatusArray),

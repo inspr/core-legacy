@@ -13,8 +13,8 @@ import (
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/environment"
 	"inspr.dev/inspr/pkg/ierrors"
-	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/logs"
+	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
@@ -143,7 +143,7 @@ func (s *Server) readMessageHandler() rest.Handler {
 }
 
 func sendRequest(addr string, body []byte) (*http.Response, error) {
-	client := http.Client{}
+	client := http.DefaultClient
 	req, err := http.NewRequest(http.MethodPost, addr, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err

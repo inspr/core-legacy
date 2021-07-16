@@ -13,12 +13,14 @@ import (
 // provides methods for operating on Channels
 type ChannelMemoryManager struct {
 	*treeMemoryManager
+	logger *zap.Logger
 }
 
 // Channels return a pointer to ChannelMemoryManager
 func (tmm *treeMemoryManager) Channels() ChannelMemory {
 	return &ChannelMemoryManager{
 		treeMemoryManager: tmm,
+		logger:            logger.With(zap.String("sub-section", "channels")),
 	}
 }
 
@@ -26,12 +28,16 @@ func (tmm *treeMemoryManager) Channels() ChannelMemory {
 // the path to an App. If this App has a pointer to a channel that has the
 // same name as the name passed as an argument, the pointer to that channel is returned
 func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) {
-	logger.Info("trying to get a Channel",
+	l := chh.logger.With(
+		zap.String("operation", "get"),
 		zap.String("channel", name),
-		zap.String("scope", scope))
+		zap.String("scope", scope),
+	)
+	l.Debug("recevide channel retrieval request")
 
 	parentApp, err := chh.Apps().Get(scope)
 	if err != nil {
+		logger.Debug("unable to find channel")
 		newError := ierrors.
 			NewError().
 			InnerError(err).
@@ -43,13 +49,12 @@ func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) 
 
 	if parentApp.Spec.Channels != nil {
 		if ch, ok := parentApp.Spec.Channels[name]; ok {
+			l.Debug("channel found")
 			return ch, nil
 		}
 	}
 
-	logger.Debug("unable to get Channel in given scope",
-		zap.String("channel", name),
-		zap.String("scope", scope))
+	l.Debug("unable to get Channel in given scope")
 
 	newError := ierrors.
 		NewError().
@@ -62,30 +67,31 @@ func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) 
 // Create receives a scope that defines a path to the App
 // in which to add a pointer to the channel passed as an argument
 func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers *apimodels.BrokersDI) error {
-	logger.Info("trying to create a Channel",
+	l := chh.logger.With(
+		zap.String("operation", "create"),
 		zap.String("channel", ch.Meta.Name),
-		zap.String("scope", scope))
+		zap.String("scope", scope),
+	)
+	l.Debug("trying to create a Channel")
 
 	nameErr := metautils.StructureNameIsValid(ch.Meta.Name)
 	if nameErr != nil {
-		logger.Error("invalid Channel name",
+		l.Debug("invalid Channel name",
 			zap.String("channel", ch.Meta.Name))
 		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
 	}
 
-	logger.Debug("checking if Channel already exists",
-		zap.String("channel", ch.Meta.Name),
-		zap.String("scope", scope))
+	l.Debug("checking if Channel already exists")
 
 	chAlreadyExist, _ := chh.Get(scope, ch.Meta.Name)
 	if chAlreadyExist != nil {
-		logger.Error("channel already exists")
+		l.Debug("channel already exists")
 		return ierrors.NewError().AlreadyExists().
 			Message("channel with name %v already exists in the scope %v", ch.Meta.Name, scope).
 			Build()
 	}
 
-	logger.Debug("getting Channel parent dApp")
+	l.Debug("getting Channel parent dApp")
 	parentApp, err := chh.Apps().Get(scope)
 	if err != nil {
 		newError := ierrors.NewError().InnerError(err).InvalidChannel().
@@ -94,9 +100,9 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers 
 		return newError
 	}
 
-	logger.Debug("checking if Channel's type is valid")
+	l.Debug("checking if Channel's type is valid")
 	if _, ok := parentApp.Spec.Types[ch.Spec.Type]; !ok {
-		logger.Error("channel's type is invalid")
+		l.Debug("channel's type is invalid")
 		return ierrors.NewError().InvalidChannel().Message("references a Type that doesn't exist").Build()
 	}
 
@@ -106,19 +112,17 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers 
 		parentApp.Spec.Types[ch.Spec.Type].ConnectedChannels = connectedChannels
 	}
 
-	logger.Debug("channel broker priority list", zap.Any("list", ch.Spec.BrokerPriorityList))
+	l.Debug("channel broker priority list", zap.Any("list", ch.Spec.BrokerPriorityList))
 
 	broker, err := SelectBrokerFromPriorityList(ch.Spec.BrokerPriorityList, brokers)
 	if err != nil {
 		return err
 	}
 
-	logger.Debug("channel selected broker", zap.Any("broker", broker))
+	l.Debug("channel selected broker", zap.Any("broker", broker))
 	ch.Spec.SelectedBroker = broker
 
-	logger.Debug("adding Channel to dApp",
-		zap.String("channel", ch.Meta.Name),
-		zap.String("dApp", parentApp.Meta.Name))
+	l.Debug("adding Channel to dApp")
 	if parentApp.Spec.Channels == nil {
 		parentApp.Spec.Channels = map[string]*meta.Channel{}
 	}
@@ -135,9 +139,12 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers 
 // has a pointer to a channel that has the same name as the name passed
 // as an argument, that pointer is removed from the list of App channels
 func (chh *ChannelMemoryManager) Delete(scope, name string) error {
-	logger.Info("trying to delete a Channel",
+	l := chh.logger.With(
+		zap.String("operation", "delete"),
 		zap.String("channel", name),
-		zap.String("scope", scope))
+		zap.String("scope", scope),
+	)
+	l.Debug("trying to delete a Channel")
 
 	channel, err := chh.Get(scope, name)
 
@@ -151,11 +158,11 @@ func (chh *ChannelMemoryManager) Delete(scope, name string) error {
 		return newError
 	}
 
-	logger.Debug("checking if Channel can be deleted")
+	l.Debug("checking if Channel can be deleted")
 	if len(channel.ConnectedApps) > 0 || len(channel.ConnectedAliases) > 0 {
-		logger.Error("unable to delete Channel for it's being used",
-			zap.Any("connected dApps", channel.ConnectedApps),
-			zap.Any("connected Aliases", channel.ConnectedAliases))
+		l.Debug("unable to delete Channel for it's being used",
+			zap.Any("connected-dapps", channel.ConnectedApps),
+			zap.Any("connected-aliases", channel.ConnectedAliases))
 
 		return ierrors.NewError().
 			BadRequest().
@@ -167,8 +174,7 @@ func (chh *ChannelMemoryManager) Delete(scope, name string) error {
 
 	insprType := parentApp.Spec.Types[channel.Spec.Type]
 
-	logger.Debug("removing Channel from Type connected channels list",
-		zap.String("channel", name),
+	l.Debug("removing Channel from Type connected channels list",
 		zap.String("type", insprType.Meta.Name))
 
 	insprType.ConnectedChannels = utils.Remove(
@@ -176,9 +182,7 @@ func (chh *ChannelMemoryManager) Delete(scope, name string) error {
 		channel.Meta.Name,
 	)
 
-	logger.Debug("removing Channel from its parents 'Channels' structure",
-		zap.String("channel", name),
-		zap.String("dApp", parentApp.Meta.Name))
+	l.Debug("removing Channel from its parents 'Channels' structure")
 
 	delete(parentApp.Spec.Channels, name)
 
@@ -190,9 +194,12 @@ func (chh *ChannelMemoryManager) Delete(scope, name string) error {
 // a channel pointer that has the same name as that passed as an argument,
 // this pointer will be replaced by the new one
 func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
-	logger.Info("trying to update a Channel",
+	l := logger.With(
+		zap.String("operation", "update"),
 		zap.String("channel", ch.Meta.Name),
-		zap.String("scope", scope))
+		zap.String("scope", scope),
+	)
+	l.Debug("trying to update a Channel")
 
 	oldCh, err := chh.Get(scope, ch.Meta.Name)
 	if err != nil {
@@ -213,18 +220,16 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 
 	parentApp, _ := chh.Apps().Get(scope)
 
-	logger.Debug("validating new Channel structure")
+	l.Debug("validating new Channel structure")
 
 	if _, ok := parentApp.Spec.Types[ch.Spec.Type]; !ok {
-		logger.Error("unable to create Channel for it references an invalid Type",
-			zap.String("invalid Type", ch.Spec.Type))
+		l.Debug("unable to create Channel for it references an invalid Type",
+			zap.String("type", ch.Spec.Type))
 
 		return ierrors.NewError().InvalidChannel().Message("references a Type that doesn't exist").Build()
 	}
 
-	logger.Debug("replacing old Channel with the new one in dApps 'Channels'",
-		zap.String("channel", ch.Meta.Name),
-		zap.String("dApp", parentApp.Meta.Name))
+	l.Debug("replacing old Channel with the new one in dApps 'Channels'")
 
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
@@ -235,6 +240,7 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 // The getter does not allow changes in the structure, just visualization.
 type ChannelPermTreeGetter struct {
 	*PermTreeGetter
+	logs *zap.Logger
 }
 
 // Get receives a query string (format = 'x.y.z') and iterates through the
@@ -242,9 +248,12 @@ type ChannelPermTreeGetter struct {
 // If the specified Channel is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
 func (cmm *ChannelPermTreeGetter) Get(scope, name string) (*meta.Channel, error) {
-	logger.Info("trying to get a Channel (Root Getter)",
+	l := cmm.logs.With(
+		zap.String("operation", "get-root"),
 		zap.String("channel", name),
-		zap.String("scope", scope))
+		zap.String("scope", scope),
+	)
+	l.Debug("trying to get a Channel ")
 
 	parentApp, err := cmm.Apps().Get(scope)
 	if err != nil {
@@ -262,14 +271,12 @@ func (cmm *ChannelPermTreeGetter) Get(scope, name string) (*meta.Channel, error)
 		}
 	}
 
-	logger.Error("unable to get Channel in given scope (Root Getter)",
-		zap.String("type", name),
-		zap.String("scope", scope))
+	l.Debug("unable to get Channel in given scope ")
 
 	newError := ierrors.
 		NewError().
 		NotFound().
-		Message("channel not found (Root Getter)").
+		Message("channel not found ").
 		Build()
 	return nil, newError
 }

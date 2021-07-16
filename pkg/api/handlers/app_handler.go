@@ -25,7 +25,7 @@ type AppHandler struct {
 func (handler *Handler) NewAppHandler() *AppHandler {
 	return &AppHandler{
 		Handler: handler,
-		logger: logger.With(zap.String("section", "api"), zap.String("subsection", "dapps")),
+		logger:  logger.With(zap.String("section", "api"), zap.String("subsection", "dapps")),
 	}
 }
 

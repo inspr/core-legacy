@@ -16,8 +16,6 @@ var logger *zap.Logger
 // have been initialized
 func init() {
 	logger, _ = logs.Logger(zap.Fields(zap.String("section", "memory-tree")))
-	// logger, _ = zap.NewDevelopment(zap.Fields(zap.String("section", "operators")))
-	// logger = zap.NewNop()
 }
 
 // Operator is an operator for creating channels and nodes inside kubernetes
@@ -30,13 +28,13 @@ type Operator struct {
 
 // Nodes returns the nodes that communicate via sidecars inside kubernetes
 func (op *Operator) Nodes() NodeOperatorInterface {
-	logger.Info("summoning Nodes Operator")
+	logger.Debug("instantiating node operator")
 	return op.nodes
 }
 
 // Channels returns the Channels Operator Interface for a given node
 func (op *Operator) Channels() ChannelOperatorInterface {
-	logger.Info("summoning Channels Operator")
+	logger.Debug("instantiating channel operator")
 	return op.channels
 }
 

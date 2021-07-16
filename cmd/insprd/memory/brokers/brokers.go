@@ -11,12 +11,16 @@ import (
 
 // Get returns the brokers configured data
 func (bmm *brokerMemoryManager) Get() (*apimodels.BrokersDI, error) {
+	l := logger.With(zap.String("operation", "get"))
+	l.Debug("received broker get request")
 	bmm.available.Lock()
 	defer bmm.available.Unlock()
 	mem, err := bmm.get()
 	if err != nil {
+		l.Debug("unable to get memory manager")
 		return nil, err
 	}
+	l.Debug("retrieved brokers, returning")
 	return &apimodels.BrokersDI{
 		Available: mem.Available.Brokers(),
 		Default:   mem.Default,
@@ -32,18 +36,19 @@ func (bmm *brokerMemoryManager) get() (*brokers.Brokers, error) {
 
 // Create configures a new broker on insprd
 func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error {
+	l := logger.With(
+		zap.String("operation", "create"),
+		zap.Any("configs", config),
+	)
 	bmm.available.Lock()
 	defer bmm.available.Unlock()
-	logger.Info("creating new broker")
+	l.Info("creating new broker")
 	mem, err := bmm.get()
 	if err != nil {
 		return err
 	}
 
 	broker := config.Broker()
-	logger.Debug("broker to be created",
-		zap.String("broker", broker),
-		zap.Any("configs", config))
 
 	if _, ok := mem.Available[broker]; ok {
 		return ierrors.NewError().Message("broker %s is already configured on memory", broker).Build()
@@ -52,21 +57,24 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 	var factory models.SidecarFactory
 	switch broker {
 	case brokers.Kafka:
+		l.Debug("configuring broker as kafka brojer")
 		obj, _ := config.(*sidecars.KafkaConfig)
 		factory = sidecars.KafkaToDeployment(*obj)
 	default:
+		l.Debug("found unsupported broker config, rejecting request")
 		return ierrors.NewError().Message("broker %s is not supported", broker).Build()
 	}
 
-	logger.Debug("subscribing broker to sidecar factory")
+	l.Debug("subscribing broker to sidecar factory")
 	err = bmm.Factory().Subscribe(broker, factory)
 	if err != nil {
-		logger.Error("unable to subscribe broker")
+		l.Error("unable to subscribe broker")
 		return err
 	}
 
 	mem.Available[broker] = config
 	if mem.Default == "" {
+		l.Debug("no default broker found - setting broker as default")
 		bmm.SetDefault(broker)
 	}
 	return nil
@@ -74,20 +82,23 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 
 // SetDefault sets a previously configured broker as insprd's default broker
 func (bmm *brokerMemoryManager) SetDefault(broker string) error {
+	l := logger.With(zap.String("operation", "set-default"), zap.String("broker", broker))
 	bmm.def.Lock()
 	defer bmm.def.Unlock()
-	logger.Debug("setting new default broker",
-		zap.String("broker", broker))
+	l.Debug("received default broker change request")
 	mem, err := bmm.get()
 	if err != nil {
+		l.Debug("unable to get broker memory")
 		return err
 	}
 
 	if _, ok := mem.Available[broker]; !ok {
+		l.Debug("broker not configured")
 		return ierrors.NewError().Message("broker %s is not configured on memory", broker).Build()
 	}
 
 	mem.Default = broker
+	l.Debug("default broker set")
 	return nil
 }
 
@@ -98,10 +109,10 @@ func (bmm *brokerMemoryManager) Factory() SidecarManager {
 
 //Configs returns the configurations for a given broker
 func (bmm *brokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
+	l := logger.With(zap.String("operation", "get-configs"), zap.String("broker", broker))
 	bmm.available.Lock()
 	defer bmm.available.Unlock()
-	logger.Info("getting config for broker sidecar",
-		zap.String("broker", broker))
+	l.Info("getting config for broker sidecar")
 
 	mem, err := bmm.get()
 	if err != nil {

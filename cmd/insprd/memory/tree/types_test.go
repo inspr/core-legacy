@@ -19,11 +19,12 @@ func TestMemoryManager_Types(t *testing.T) {
 		want   TypeMemory
 	}{
 		{
-			name: "creating a TypeMemortMannager",
+			name: "creating a TypeMemoryManager",
 			fields: fields{
 				root: getMockTypes(),
 			},
 			want: &TypeMemoryManager{
+				logger,
 				&treeMemoryManager{
 					root: getMockTypes(),
 				},
@@ -35,7 +36,7 @@ func TestMemoryManager_Types(t *testing.T) {
 			tmm := &treeMemoryManager{
 				root: tt.fields.root,
 			}
-			if got := tmm.Types(); !reflect.DeepEqual(got, tt.want) {
+			if got := tmm.Types(); !reflect.DeepEqual(got.(*TypeMemoryManager).root, tt.want.(*TypeMemoryManager).root) {
 				t.Errorf("MemoryManager.Types() = %v, want %v", got, tt.want)
 			}
 		})

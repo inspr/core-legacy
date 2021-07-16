@@ -25,7 +25,6 @@ var logger *zap.Logger
 
 const bitSize = 512 // min size for encoding your payload
 
-
 func generatePassword() string {
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
 		"abcdefghijklmnopqrstuvwxyz" +
@@ -115,7 +114,7 @@ func generatePublicKey(publicKey *rsa.PublicKey) ([]byte, error) {
 }
 
 func main() {
-	logger, _ = logs.Logger(zap.Fields(zap.String("section", "auth-provider")))
+	logger, _ = logs.Logger()
 
 	namespace := os.Getenv("K8S_NAMESPACE")
 
@@ -173,9 +172,10 @@ func main() {
 	}
 
 	if secretName := os.Getenv("INSPRD_INIT_KEY_SECRET_NAME"); secretName != "" {
+		logger.Info("generating init key")
 		secret, err := clientSet.CoreV1().Secrets(namespace).Get(context.Background(), secretName, v1.GetOptions{})
 		if err != nil {
- 			panic(err)
+			panic(err)
 		}
 		if secret.Data == nil {
 			secret.Data = map[string][]byte{}

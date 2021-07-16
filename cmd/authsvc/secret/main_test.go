@@ -13,7 +13,7 @@ import (
 )
 
 func Test_KeyGen(t *testing.T) {
-	logger, _ = logs.Logger(zap.Fields(zap.String("section", "Auth-provider")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "auth-provider")))
 
 	privateKey, err := generatePrivateKey()
 	if err != nil {

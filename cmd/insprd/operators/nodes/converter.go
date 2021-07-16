@@ -59,7 +59,7 @@ func (no *NodeOperator) dappToService(app *meta.App) *kubeService {
 }
 
 // dAppToDeployment translates the DApp to a k8s deployment
-func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
+func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeployment {
 	appDeployName := toDeploymentName(app)
 	appLabels := map[string]string{
 		"inspr-app": toAppID(app),
@@ -69,7 +69,7 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeploy {
 	nodeContainer := createNodeContainer(app, appDeployName)
 	scContainers := no.withAllSidecarsContainers(app, appDeployName)
 
-	return (*kubeDeploy)(
+	return (*kubeDeployment)(
 		k8s.NewDeployment(
 			appDeployName,
 			k8s.WithLabels(appLabels),

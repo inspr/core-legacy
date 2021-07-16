@@ -21,7 +21,7 @@ type BrokerHandler struct {
 func (handler *Handler) NewBrokerHandler() *BrokerHandler {
 	return &BrokerHandler{
 		Handler: handler,
-		logger: logger.With(zap.String("sub-section", "brokers")),
+		logger:  logger.With(zap.String("sub-section", "brokers")),
 	}
 }
 
@@ -46,7 +46,8 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 
 // KafkaCreateHandler is the function that processes requests at the /brokers/kafka endpoint
 func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
-	logger.Info("handling the brokers' kafka route request")
+	l := bh.logger.With(zap.String("operation", "create"), zap.String("broker", "kafka"))
+	l.Info("received kafka broker create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		// decode into the bytes of yaml file
 		var content models.BrokerConfigDI
@@ -60,6 +61,7 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 		// parsing the bytes into a Kafka config structure
 		err = yaml.Unmarshal(content.FileContents, &kafkaConfig)
 		if err != nil {
+			l.Error("unable to unmarshall config", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
@@ -67,6 +69,7 @@ func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
 		if err = bh.Memory.Brokers().Create(
 			&kafkaConfig,
 		); err != nil {
+			l.Error("error creating kafka broker on memory", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}

@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"testing"
 
+	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/insprd/memory"
 	"inspr.dev/inspr/cmd/insprd/memory/fake"
 	"inspr.dev/inspr/cmd/insprd/operators"
@@ -46,6 +47,7 @@ func TestHandler_NewBrokerHandler(t *testing.T) {
 					Operator: ofake.NewFakeOperator(),
 					Auth:     authmock.NewMockAuth(nil),
 				},
+				logger: logger.With(zap.String("sub-section", "brokers")),
 			},
 		},
 	}
@@ -58,7 +60,7 @@ func TestHandler_NewBrokerHandler(t *testing.T) {
 				diffReactions:   tt.fields.diffReactions,
 				changeReactions: tt.fields.changeReactions,
 			}
-			if got := handler.NewBrokerHandler(); !reflect.DeepEqual(got, tt.want) {
+			if got := handler.NewBrokerHandler(); !reflect.DeepEqual(got.Handler, tt.want.Handler) {
 				t.Errorf("Handler.NewBrokerHandler() = %v, want %v", got, tt.want)
 			}
 		})
@@ -93,6 +95,7 @@ func TestBrokerHandler_HandleGet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			bh := &BrokerHandler{
 				Handler: tt.fields.Handler,
+				logger:  logger,
 			}
 			handlerFunc := bh.HandleGet().HTTPHandlerFunc()
 			ts := httptest.NewServer(handlerFunc)
@@ -170,6 +173,7 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			bh := &BrokerHandler{
 				Handler: tt.fields.Handler,
+				logger:  logger,
 			}
 
 			// creating the test server

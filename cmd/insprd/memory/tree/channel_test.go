@@ -31,6 +31,7 @@ func TestMemoryManager_Channels(t *testing.T) {
 				&treeMemoryManager{
 					root: getMockChannels(),
 				},
+				logger,
 			},
 		},
 	}
@@ -39,7 +40,7 @@ func TestMemoryManager_Channels(t *testing.T) {
 			tmm := &treeMemoryManager{
 				root: tt.fields.root,
 			}
-			if got := tmm.Channels(); !reflect.DeepEqual(got, tt.want) {
+			if got := tmm.Channels(); !reflect.DeepEqual(got.(*ChannelMemoryManager).root, tt.want.(*ChannelMemoryManager).root) {
 				t.Errorf("MemoryManager.Channels() = %v, want %v", got, tt.want)
 			}
 		})
@@ -494,6 +495,8 @@ func TestChannelMemoryManager_Delete(t *testing.T) {
 				mockA:  tt.fields.mockA,
 				mockCT: tt.fields.mockCT,
 			}
+			mem.InitTransaction()
+			defer mem.Cancel()
 			chh := mem.Channels()
 			if err := chh.Delete(tt.args.context, tt.args.chName); (err != nil) != tt.wantErr {
 				t.Errorf("ChannelMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
