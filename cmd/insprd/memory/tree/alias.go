@@ -20,7 +20,7 @@ type AliasMemoryManager struct {
 func (tmm *treeMemoryManager) Alias() AliasMemory {
 	return &AliasMemoryManager{
 		treeMemoryManager: tmm,
-		logger:            logger.With(zap.String("sub-section", "alias")),
+		logger:            logger.With(zap.String("subSection", "alias")),
 	}
 }
 

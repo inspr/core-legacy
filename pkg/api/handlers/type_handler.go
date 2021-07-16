@@ -21,7 +21,7 @@ type TypeHandler struct {
 func (handler *Handler) NewTypeHandler() *TypeHandler {
 	return &TypeHandler{
 		Handler: handler,
-		logger:  logger.With(zap.String("sub-section", "type")),
+		logger:  logger.With(zap.String("subSection", "type")),
 	}
 }
 

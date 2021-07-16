@@ -20,7 +20,7 @@ type AliasHandler struct {
 func (handler *Handler) NewAliasHandler() *AliasHandler {
 	return &AliasHandler{
 		Handler: handler,
-		logger:  logger.With(zap.String("section", "api"), zap.String("sub-section", "aliases")),
+		logger:  logger.With(zap.String("section", "api"), zap.String("subSection", "aliases")),
 	}
 }
 

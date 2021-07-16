@@ -79,7 +79,7 @@ func NewRedisClient() *Client {
 	redisAddress := fmt.Sprintf("%s:%s", redisHost, redisPort)
 	refreshPath := fmt.Sprintf("%s/refreshtoken", refreshURL)
 	logger = logger.With(zap.String("redis-address", redisAddress), zap.String("refresh-path", refreshPath), zap.String("insprd-address", insprdAddress))
-	userLogger = logger.With(zap.String("sub-section", "user"))
+	userLogger = logger.With(zap.String("subSection", "user"))
 	c := &Client{
 		rdb: redis.NewClusterClient(&redis.ClusterOptions{
 			Addrs:    []string{redisAddress},
@@ -225,7 +225,7 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 // If so, it returns a payload containing the updated user info
 // (user which is associated with the given refreshToken)
 func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.Payload, error) {
-	l := logger.With(zap.String("sub-section", "token"), zap.String("operation", "refresh"))
+	l := logger.With(zap.String("subSection", "token"), zap.String("operation", "refresh"))
 	l.Debug("decripting refresh token")
 	oldUser, err := c.decrypt(refreshToken)
 	if err != nil {
@@ -253,7 +253,7 @@ func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.P
 }
 
 func (c *Client) encrypt(user User) (*auth.Payload, error) {
-	l := logger.With(zap.String("sub-section", "token"), zap.String("operation", "encript"))
+	l := logger.With(zap.String("subSection", "token"), zap.String("operation", "encript"))
 	stringToEncrypt := fmt.Sprintf("%s:%s", user.UID, user.Password)
 
 	//Since the key is in string, we need to convert decode it to bytes
@@ -300,7 +300,7 @@ func (c *Client) encrypt(user User) (*auth.Payload, error) {
 }
 
 func (c *Client) decrypt(encryptedString []byte) (*User, error) {
-	l := logger.With(zap.String("sub-section", "token"), zap.String("operation", "encript"))
+	l := logger.With(zap.String("subSection", "token"), zap.String("operation", "encript"))
 	l.Debug("decoding refresh key")
 	key, err := hex.DecodeString(c.refreshKey)
 	if err != nil {
@@ -381,7 +381,7 @@ func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (str
 // Auxiliar methods
 
 func set(ctx context.Context, rdb *redis.ClusterClient, data User) error {
-	l := logger.With(zap.String("sub-section", "redis"), zap.String("operation", "set"))
+	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "set"))
 	strData, err := json.Marshal(data)
 	if err != nil {
 		l.Error("error marshalling data", zap.Any("data", data), zap.Error(err))
@@ -398,7 +398,7 @@ func set(ctx context.Context, rdb *redis.ClusterClient, data User) error {
 }
 
 func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, error) {
-	l := logger.With(zap.String("sub-section", "redis"), zap.String("operation", "get"))
+	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "get"))
 	var parsedValue User
 	l.Debug("retrieving key from redis")
 	value, err := rdb.Get(ctx, key).Result()
@@ -420,7 +420,7 @@ func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, erro
 }
 
 func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
-	l := logger.With(zap.String("sub-section", "redis"), zap.String("operation", "delete"))
+	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "delete"))
 	numDeleted, err := rdb.Del(ctx, key).Result()
 	if err != nil {
 		l.Error("error deleting redis key", zap.Error(err))
@@ -433,7 +433,7 @@ func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
 }
 
 func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string, newUser User, isCreation bool) error {
-	l := logger.With(zap.String("sub-section", "permission"), zap.String("operation", "check"))
+	l := logger.With(zap.String("subSection", "permission"), zap.String("operation", "check"))
 	requestor, err := get(ctx, rdb, uid)
 	if err != nil {
 		l.Error("error getting user", zap.String("user", uid), zap.Error(err))

@@ -24,7 +24,7 @@ func (tmm *treeMemoryManager) Apps() AppMemory {
 	logger.Debug("recovering dapp memory manager")
 	return &AppMemoryManager{
 		treeMemoryManager: tmm,
-		logger:            logger.With(zap.String("sub-section", "dapp")),
+		logger:            logger.With(zap.String("subSection", "dapp")),
 	}
 }
 

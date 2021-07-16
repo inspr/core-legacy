@@ -40,93 +40,108 @@ func NewHandler(ctx context.Context, rdb client.RedisManager) *Handler {
 
 // CreateUserHandler handles user creation requests
 func (h *Handler) CreateUserHandler() rest.Handler {
+	l := logger.With(zap.String("subSection", "users"), zap.String("operation", "create"))
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("received create user request", zap.String("host", r.Host))
+		l = l.With(zap.String("host", r.Host))
+		l.Info("received create user request")
 
 		data := models.ReceivedDataCreate{}
-		logger.Debug("reading request body")
+		l.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-			logger.Error("error reading body", zap.Error(err))
+			l.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
-		logger.Debug("creating user in redis", zap.Any("created-user", data.User), zap.String("auth-user-uid", data.UID))
+		l.With(zap.String("user-creator", data.UID), zap.String("user-created", data.User.UID))
+		l.Debug("creating user in redis")
 		if err := h.rdb.CreateUser(h.ctx, data.UID, data.Password, data.User); err != nil {
-			logger.Error("error creating user in redis", zap.Any("created-user", data.User), zap.String("auth-user", data.UID), zap.Error(err))
+			l.Error("error creating user in redis", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
-		logger.Info("user created", zap.String("username", data.UID))
+		l.Info("user created")
 	}).Post().JSON().Recover()
 }
 
 // DeleteUserHandler handles user deletion requests
 func (h *Handler) DeleteUserHandler() rest.Handler {
+	l := logger.With(zap.String("subSection", "users"), zap.String("operation", "delete"))
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("received delete user request", zap.String("host", r.Host))
+		l = l.With(zap.String("host", r.Host))
+		l.Info("received delete user request")
 
 		data := models.ReceivedDataDelete{}
-		logger.Debug("reading request body")
+		l.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-			logger.Error("error reading body", zap.Error(err))
+			l.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
-		logger.Debug("deleting user in redis", zap.Any("deleted-user", data.UserToBeDeleted), zap.String("auth-user-uid", data.UID))
+		l = l.With(zap.String("user-deleter", data.UID), zap.String("user-deleted", data.UserToBeDeleted))
+
+		l.Debug("deleting user in redis")
 		if err := h.rdb.DeleteUser(h.ctx, data.UID, data.Password, data.UserToBeDeleted); err != nil {
-			logger.Error("error deleting user in redis", zap.Any("created-user", data.UserToBeDeleted), zap.String("auth-user", data.UID), zap.Error(err))
+			l.Error("error deleting user in redis", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
-		logger.Info("user deleted", zap.String("username", data.UID))
+		l.Info("user deleted")
 	}).Delete().JSON().Recover()
 }
 
 // UpdatePasswordHandler handles requests to update an user password
 func (h *Handler) UpdatePasswordHandler() rest.Handler {
+	l := logger.With(zap.String("subSection", "users"), zap.String("operation", "update"))
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("received update request", zap.String("host", r.Host))
+		l = l.With(zap.String("host", r.Host))
+		l.Info("received update request")
 
 		data := models.ReceivedDataUpdate{}
-		logger.Debug("reading request body")
+		l.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-			logger.Error("error reading body", zap.Error(err))
+			l.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
-		logger.Debug("updating user in redis", zap.Any("updated-user", data.UserToBeUpdated), zap.String("auth-user-uid", data.UID))
+		l = l.With(zap.String("user-updater", data.UID), zap.String("user-updated", data.UID))
+
+		l.Debug("updating user in redis")
 		if err := h.rdb.UpdatePassword(h.ctx, data.UID, data.Password,
 			data.UserToBeUpdated, data.NewPassword); err != nil {
-			logger.Error("error updating user in redis", zap.Any("created-user", data.UserToBeUpdated), zap.String("auth-user", data.UID), zap.Error(err))
+			l.Error("error updating user in redis", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
-		logger.Info("user updated", zap.String("username", data.UID))
+		l.Info("user updated")
 	}).Put().JSON().Recover()
 }
 
 // LoginHandler handles login requests
 func (h *Handler) LoginHandler() rest.Handler {
+	l := logger.With(zap.String("subSection", "users"), zap.String("operation", "login"))
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("received login request", zap.String("host", r.Host))
+		l = l.With(zap.String("host", r.Host))
+		l.Info("received login request")
 
 		data := models.ReceivedDataLogin{}
-		logger.Debug("reading request body")
+		l.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-			logger.Error("error reading body", zap.Error(err))
+			l.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 
-		logger.Debug("logging in user username provided", zap.String("UID", data.UID))
+		l = l.With(zap.String("user", data.UID))
+
+		l.Debug("logging in user username provided")
 		token, err := h.rdb.Login(h.ctx, data.UID, data.Password)
 		if err != nil {
-			logger.Debug("error logging in", zap.String("UID", data.UID))
+			l.Debug("error logging in")
 			rest.ERROR(w, err)
 			return
 		}
@@ -137,21 +152,24 @@ func (h *Handler) LoginHandler() rest.Handler {
 
 // RefreshTokenHandler handles token refresh requests
 func (h *Handler) RefreshTokenHandler() rest.Handler {
+	l := logger.With(zap.String("subSection", "token"), zap.String("operation", "refresh"))
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("received refresh token request", zap.String("host", r.Host))
+		l = l.With(zap.String("host", r.Host))
+		l.Info("received refresh token request")
 
 		data := models.ReceivedDataRefresh{}
-		logger.Debug("reading request body")
+		l.Debug("reading request body")
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-			logger.Error("error reading body", zap.Error(err))
+			l.Error("error reading body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
+		l = l.With(zap.Binary("token", data.RefreshToken))
 
-		logger.Debug("refreshing token")
+		l.Debug("refreshing token")
 		payload, err := h.rdb.RefreshToken(h.ctx, data.RefreshToken)
 		if err != nil {
-			logger.Error("error refreshing token", zap.Binary("token", data.RefreshToken), zap.Error(err))
+			l.Error("error refreshing token", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}

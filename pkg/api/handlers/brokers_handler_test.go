@@ -47,7 +47,7 @@ func TestHandler_NewBrokerHandler(t *testing.T) {
 					Operator: ofake.NewFakeOperator(),
 					Auth:     authmock.NewMockAuth(nil),
 				},
-				logger: logger.With(zap.String("sub-section", "brokers")),
+				logger: logger.With(zap.String("subSection", "brokers")),
 			},
 		},
 	}

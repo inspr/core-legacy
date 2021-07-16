@@ -12,7 +12,7 @@ import (
 var reactionLogger *zap.Logger
 
 func init() {
-	reactionLogger = logger.With(zap.String("section", "api"), zap.String("sub-section", "reactions"))
+	reactionLogger = logger.With(zap.String("section", "api"), zap.String("subSection", "reactions"))
 }
 
 var createdNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {

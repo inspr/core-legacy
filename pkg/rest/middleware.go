@@ -70,7 +70,7 @@ func (h Handler) JSON() Handler {
 
 // Validate handles the token validation of the http requests made, it receives an implementation of the auth interface as a parameter.
 func (h Handler) Validate(auth auth.Auth) Handler {
-	logger, _ := logs.Logger(zap.Fields(zap.String("section", "api"), zap.String("sub-section", "authorization-middleware")))
+	logger, _ := logs.Logger(zap.Fields(zap.String("section", "api"), zap.String("subSection", "authorization-middleware")))
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]

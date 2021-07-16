@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	tokenLogger = logger.With(zap.String("sub-section", "token"))
+	tokenLogger = logger.With(zap.String("subSection", "token"))
 }
 
 var tokenLogger *zap.Logger

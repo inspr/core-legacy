@@ -19,7 +19,7 @@ func (mm *treeMemoryManager) Types() TypeMemory {
 	logger.Debug("recovering type manager on the memory tree")
 	return &TypeMemoryManager{
 		treeMemoryManager: mm,
-		logger:            logger.With(zap.String("sub-section", "tree-memory")),
+		logger:            logger.With(zap.String("subSection", "types")),
 	}
 }
 

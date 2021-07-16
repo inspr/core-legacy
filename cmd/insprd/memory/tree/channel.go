@@ -20,7 +20,7 @@ type ChannelMemoryManager struct {
 func (tmm *treeMemoryManager) Channels() ChannelMemory {
 	return &ChannelMemoryManager{
 		treeMemoryManager: tmm,
-		logger:            logger.With(zap.String("sub-section", "channels")),
+		logger:            logger.With(zap.String("subSection", "channels")),
 	}
 }
 

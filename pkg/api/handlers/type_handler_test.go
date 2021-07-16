@@ -211,7 +211,7 @@ func TestNewTypeHandler(t *testing.T) {
 			},
 			want: &TypeHandler{
 				h,
-				logger.With(zap.String("sub-section", "type")),
+				logger.With(zap.String("subSection", "type")),
 			},
 		},
 	}

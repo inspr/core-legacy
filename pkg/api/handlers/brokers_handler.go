@@ -21,7 +21,7 @@ type BrokerHandler struct {
 func (handler *Handler) NewBrokerHandler() *BrokerHandler {
 	return &BrokerHandler{
 		Handler: handler,
-		logger:  logger.With(zap.String("sub-section", "brokers")),
+		logger:  logger.With(zap.String("subSection", "brokers")),
 	}
 }
 

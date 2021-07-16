@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -44,9 +43,8 @@ func (s *Server) Init(mem memory.Manager, op operators.OperatorInterface, auth a
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
-	logger.Info("running Insprd server",
-		zap.String("on address", addr))
+	logger = logger.With(zap.String("port", addr))
+	logger.Info("running Insprd server")
 
-	fmt.Printf("insprd rest api is up! Listening on port: %s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, s.mux))
 }
