@@ -74,17 +74,17 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]
-		logger.Info("validating request", zap.Strings("header-content", headerContent))
+		logger.Info("validating request")
 		if (len(headerContent) == 0) ||
 			(!strings.HasPrefix(headerContent[0], "Bearer ")) {
-			logger.Info("invalid token received", zap.Strings("header-content", headerContent))
+			logger.Info("invalid token received")
 			ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token format").Build())
 			return
 		}
 
 		token := strings.TrimPrefix(headerContent[0], "Bearer ")
 		payload, newToken, err := auth.Validate([]byte(token))
-		logger.Debug("payload after validation", zap.Any("payload", payload))
+		logger.Debug("payload after validation")
 
 		// returns the same token or a refreshed one in the header of the response
 		w.Header().Add("Authorization", "Bearer "+string(newToken))

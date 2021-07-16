@@ -381,24 +381,24 @@ func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (str
 // Auxiliar methods
 
 func set(ctx context.Context, rdb *redis.ClusterClient, data User) error {
-	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "set"))
+	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "set"), zap.String("key", data.UID))
 	strData, err := json.Marshal(data)
 	if err != nil {
-		l.Error("error marshalling data", zap.Any("data", data), zap.Error(err))
+		l.Error("error marshalling data", zap.Error(err))
 		return err
 	}
 
 	l.Debug("setting key on redis")
 	err = rdb.Set(ctx, data.UID, strData, 0).Err()
 	if err != nil {
-		l.Error("error setting key on redis", zap.String("key", data.UID), zap.Error(err))
+		l.Error("error setting key on redis", zap.Error(err))
 		return err
 	}
 	return nil
 }
 
 func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, error) {
-	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "get"))
+	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "get"), zap.String("key", key))
 	var parsedValue User
 	l.Debug("retrieving key from redis")
 	value, err := rdb.Get(ctx, key).Result()
@@ -406,13 +406,13 @@ func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, erro
 	if err == redis.Nil {
 		return nil, fmt.Errorf("key '%v' does not exist", key)
 	} else if err != nil {
-		l.Error("error retrieving key from redis", zap.String("key", key), zap.Error(err))
+		l.Error("error retrieving key from redis", zap.Error(err))
 		return nil, err
 	}
 
 	err = json.Unmarshal([]byte(value), &parsedValue)
 	if err != nil {
-		l.Error("error unmarshalling value from redis", zap.String("value", value), zap.Error(err))
+		l.Error("error unmarshalling value from redis", zap.Error(err))
 		return nil, err
 	}
 
@@ -420,7 +420,7 @@ func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, erro
 }
 
 func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
-	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "delete"))
+	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "delete"), zap.String("key", key))
 	numDeleted, err := rdb.Del(ctx, key).Result()
 	if err != nil {
 		l.Error("error deleting redis key", zap.Error(err))
@@ -433,15 +433,15 @@ func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
 }
 
 func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string, newUser User, isCreation bool) error {
-	l := logger.With(zap.String("subSection", "permission"), zap.String("operation", "check"))
+	l := logger.With(zap.String("subSection", "permission"), zap.String("operation", "check"), zap.String("user", uid))
 	requestor, err := get(ctx, rdb, uid)
 	if err != nil {
-		l.Error("error getting user", zap.String("user", uid), zap.Error(err))
+		l.Error("error getting user", zap.Error(err))
 		return err
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(requestor.Password), []byte(pwd)); err != nil {
-		l.Debug("invalid password", zap.String("user", uid))
+		l.Debug("invalid password")
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
 
@@ -455,7 +455,7 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 		}
 
 		if !isAllowed {
-			l.Debug("user unauthorized", zap.String("user", uid))
+			l.Debug("user unauthorized")
 			return ierrors.NewError().Forbidden().Message("not allowed to create/delete/update a user with current permissions").Build()
 		}
 
