@@ -32,6 +32,7 @@ func Init() *Server {
 
 	s.writeAddr = fmt.Sprintf(":%s", wAddr)
 	s.readAddr = fmt.Sprintf(":%s", rAddr)
+	logger = logger.With(zap.String("read-address", rAddr), zap.String("write-address", wAddr))
 	return &s
 }
 

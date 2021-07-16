@@ -16,7 +16,7 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = logs.Logger(zap.Fields(zap.String("section", "insprd-api-controllers")))
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "api")))
 }
 
 // Handler is a general handler for inspr routes. It contains the necessary components

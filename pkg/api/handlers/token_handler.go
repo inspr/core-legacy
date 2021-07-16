@@ -3,23 +3,29 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
+	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/auth"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/rest"
 )
 
+func init() {
+	tokenLogger = logger.With(zap.String("sub-section", "token"))
+}
+var tokenLogger *zap.Logger
 // ControllerRefreshHandler handles requests for token refresing on inspr controllers on Insprd
 func (h *Handler) ControllerRefreshHandler() rest.Handler {
-
+	l := tokenLogger.With(zap.String("operation", "refresh"))
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
+		l.Info("received refresh token request")
 		received := auth.ResfreshDO{}
+		l.Debug("decoding refresh body")
 		err := json.NewDecoder(r.Body).Decode(&received)
 		if err != nil {
-			log.Printf("err = %+v\n", err)
+			l.Error("unable to decode body", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}

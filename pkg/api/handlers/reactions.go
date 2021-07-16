@@ -9,7 +9,12 @@ import (
 	"inspr.dev/inspr/pkg/meta/utils/diff"
 )
 
+var reactionLogger *zap.Logger 
+func init() {
+	reactionLogger = logger.With(zap.String("section", "api"), zap.String("sub-section", "reactions"))
+}
 var createdNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {
+	l := reactionLogger.With(zap.String("subsection", "nodes"), zap.String("operation", "create"))
 	return diff.NewChangeReaction(
 		func(c diff.Change) bool {
 			_, errFrom := handler.Memory.Tree().Perm().Apps().Get(c.Scope)
