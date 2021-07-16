@@ -25,7 +25,7 @@ func Logger(options ...zap.Option) (*zap.Logger, *zap.AtomicLevel) {
 		}
 		config := zap.NewProductionEncoderConfig()
 		config.EncodeTime = zapcore.RFC3339TimeEncoder
-		config.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		config.EncodeLevel = zapcore.CapitalLevelEncoder
 		core := zapcore.NewCore(zapcore.NewConsoleEncoder(config), os.Stdout, zap.LevelEnablerFunc(enablerFunc))
 		logger = zap.New(core)
 	}

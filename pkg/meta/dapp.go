@@ -54,6 +54,7 @@ type AppSpec struct {
 	Aliases  map[string]*Alias   `yaml:"aliases"   json:"aliases"`
 	Boundary AppBoundary         `yaml:"boundary,omitempty"   json:"boundary"`
 	Auth     AppAuth             `yaml:"auth"  json:"auth"`
+	LogLevel string              `yaml:"logLevel" json:"logLevel"`
 }
 
 // AppAuth represents the permissions that a dApp (and its children) contains
