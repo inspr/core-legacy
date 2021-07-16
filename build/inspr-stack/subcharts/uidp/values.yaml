@@ -10,6 +10,8 @@ image:
 
 imagePullPolicy: IfNotPresent
 
+logLevel: info
+
 service:
   type: ClusterIP
   port: 80

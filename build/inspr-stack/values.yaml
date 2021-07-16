@@ -19,6 +19,8 @@ insprd:
     tag:
   imagePullPolicy: IfNotPresent
 
+  logLevel: info
+
   replicaCount: 1
 
   apps:
@@ -51,6 +53,7 @@ insprd:
 
   auth:
     name: "auth"
+    logLevel: info
     service:
       type: ClusterIP
       port: 80
@@ -63,6 +66,7 @@ insprd:
 uidp:
   name: uidp
   enabled: true
+  logLevel: info
   image:
     registry: gcr.io/insprlabs
     repository: uidp/redis/api

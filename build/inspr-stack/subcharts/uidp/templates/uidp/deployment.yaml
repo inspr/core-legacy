@@ -30,6 +30,8 @@ spec:
             - secretRef:
                 name: {{ tpl .Values.secret.name . }}
           env:
+            - name: LOG_LEVEL
+              value: {{ .Values.global.logLevel | default .Values.logLevel }}
             - name: INSPR_CLUSTER_ADDR
               value: {{ include "insprd.address" . }}
             - name: REDIS_HOST
