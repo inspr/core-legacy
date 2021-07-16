@@ -237,7 +237,7 @@ func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.P
 	l.Debug("retrieving user from redis")
 	newUser, err := get(ctx, c.rdb, oldUser.UID)
 	if err != nil {
-		l.Error("unable to get key from redis", zap.Any("user", oldUser), zap.Error(err))
+		l.Error("unable to get key from redis", zap.Error(err))
 		return nil, ierrors.NewError().BadRequest().Message(err.Error()).Build()
 	}
 	l = l.With(zap.String("new-user", newUser.UID))
