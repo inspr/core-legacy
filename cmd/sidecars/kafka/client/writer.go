@@ -24,6 +24,18 @@ func NewWriter() (*Writer, error) {
 		"bootstrap.servers": bootstrapServers,
 	})
 
+	go func(events <-chan kafka.Event) {
+		for {
+			switch ev := (<-events).(type) {
+			case *kafka.Error:
+				logger.Warn("kafka has created an error event", zap.Error(ev))
+			case *kafka.LogEvent:
+				logger.Debug(ev.Message, zap.String("sub-section", ev.Tag))
+			default:
+			}
+		}
+	}(kProd.Events())
+
 	if err != nil {
 		return nil, ierrors.NewError().Message(err.Error()).Build()
 	}
