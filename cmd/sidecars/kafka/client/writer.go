@@ -31,8 +31,7 @@ func NewWriter() (*Writer, error) {
 	return &Writer{kProd}, nil
 }
 
-// Producer returns a Writer's producer
-func (writer *Writer) Producer() *kafka.Producer {
+func (writer *Writer) getProducer() *kafka.Producer {
 	return writer.producer
 }
 
