@@ -10,8 +10,11 @@ import (
 	"inspr.dev/inspr/pkg/ierrors"
 )
 
+<<<<<<< HEAD
 // AttachProfiler is responsible for adding the pprof routes to the server mux
 // passed as a parameter
+=======
+>>>>>>> 0a33d610 (dev(servers): added the route for pprof in all inspr services, still missing for pods/dapps created)
 func AttachProfiler(m *http.ServeMux) {
 	m.HandleFunc("/debug/pprof/", pprof.Index)
 	m.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
