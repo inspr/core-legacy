@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"go.uber.org/zap"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 )
