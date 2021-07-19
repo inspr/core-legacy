@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	kafkasc "inspr.dev/inspr/cmd/sidecars/kafka/client"
 	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/sidecars/models"
