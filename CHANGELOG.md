@@ -1,6 +1,11 @@
 
 # Changelog
 
+### #101 Fix | adds routine for collecting kafka events
+- fix:
+    - update kafka go version to 1.7.0
+    - adds go routine for collecting kafka writer events
+
 ### #98 Story CORE-493 | Restart Policy for Nodes
 - refactors:
     - Deleted option/function of configuring restartPolicy of a deployment
