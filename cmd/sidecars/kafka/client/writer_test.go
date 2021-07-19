@@ -34,11 +34,11 @@ func TestNewWriter(t *testing.T) {
 				t.Error(err)
 			}
 			defer got.Close()
-			if tt.wantErr && (got.Producer().GetFatalError() != nil) {
+			if tt.wantErr && (got.getProducer().GetFatalError() != nil) {
 				t.Errorf("NewWriter() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got.Producer() == nil {
+			if got.getProducer() == nil {
 				t.Errorf("NewWriter() = %v, want %v", got, tt.want)
 			}
 		})
@@ -68,7 +68,7 @@ func TestWriter_WriteMessage(t *testing.T) {
 		{
 			name: "Invalid channel",
 			fields: fields{
-				producer: mProd.Producer(),
+				producer: mProd.getProducer(),
 			},
 			args: args{
 				channel: "invalid",
@@ -79,7 +79,7 @@ func TestWriter_WriteMessage(t *testing.T) {
 		{
 			name: "Valid message writing",
 			fields: fields{
-				producer: mProd.Producer(),
+				producer: mProd.getProducer(),
 			},
 			args: args{
 				channel: "ch1",
@@ -123,7 +123,7 @@ func TestWriter_produceMessage(t *testing.T) {
 		{
 			name: "Valid production of given message",
 			fields: fields{
-				producer: mProd.Producer(),
+				producer: mProd.getProducer(),
 			},
 			args: args{
 				message: []byte("testProducingMessage"),
