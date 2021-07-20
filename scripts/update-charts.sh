@@ -8,8 +8,13 @@ echo
 
 "
 
+CHARTS=(/inspr-stack /inspr-stack/subcharts/insprd /inspr-stack/subcharts/uidp)
+
 echo "Creating new .tgz file..."
-helm package ../build/helm -d ../build/charts
+for chart in ${CHARTS[@]}; do
+    helm dependency update ../build$chart
+    helm package ../build$chart -d ../build/charts
+done
 
 echo "Creating updated index.yaml file..."
 helm repo index ../build/charts --url https://inspr-charts.storage.googleapis.com
