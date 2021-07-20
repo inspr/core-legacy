@@ -10,7 +10,7 @@ name: "insprd"
 image:
   registry: gcr.io/insprlabs
   repository: insprd
-  tag:
+  tag: v0.1.2
 imagePullPolicy: IfNotPresent
 
 replicaCount: 1
@@ -38,7 +38,7 @@ sidecar:
   image: 
     registry: gcr.io/insprlabs
     repository: inspr/sidecar/lbsidecar
-    tag:
+    tag: v0.1.2
   ports:
     client:
       read: 3046
@@ -57,10 +57,10 @@ auth:
   image:
     registry: gcr.io/insprlabs
     repository: authsvc
-    tag: 
+    tag: v0.1.2 
 
 secretGenerator:
   image:
     registry: gcr.io/insprlabs
     repository: secretgen
-    tag:
+    tag: v0.1.2
