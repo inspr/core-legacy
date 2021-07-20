@@ -1,6 +1,10 @@
 
 # Changelog
 
+### #102 Devops | Updated script for chart releassing
+- features:
+    - updated github integration scripts for helm chart release updating
+
 ### #98 Story CORE-493 | Restart Policy for Nodes
 - refactors:
     - Deleted option/function of configuring restartPolicy of a deployment
