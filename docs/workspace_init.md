@@ -605,7 +605,7 @@ inprov login admin <password>
 
 First let's install Kafka in Insprd using the configs written in `kafka.yaml`, so our Channels will be able to communicate through the Kafka Broker. To do so, run the following command from within the "/pingpong_demo" folder:
 ```
-insprctl cluster config kafka yamls/kafka.yaml
+insprctl brokers kafka yamls/kafka.yaml
 ```
 The expected response is: `successfully installed broker on insprd`.  
 Now we apply the YAML files by using Inspr CLIs commands. The structures should be applied in the following order:
