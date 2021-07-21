@@ -11,6 +11,7 @@ import (
 	"inspr.dev/inspr/pkg/ierrors"
 )
 
+// NewBrokerCmd creates broker command for Inspr CLI
 func NewBrokerCmd() *cobra.Command {
 
 	kafkaCmd := cmd.NewCmd("kafka").
