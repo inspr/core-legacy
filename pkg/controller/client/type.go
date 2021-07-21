@@ -27,7 +27,7 @@ func (tc *TypeClient) Get(ctx context.Context, scope, name string) (*meta.Type, 
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", http.MethodGet, request.DefaultHost, tdi, &resp)
+		Send(ctx, "/types", http.MethodGet, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (tc *TypeClient) Create(ctx context.Context, scope string, t *meta.Type, dr
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", http.MethodPost, request.DefaultHost, tdi, &resp)
+		Send(ctx, "/types", http.MethodPost, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (tc *TypeClient) Delete(ctx context.Context, scope, name string, dryRun boo
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", http.MethodDelete, request.DefaultHost, tdi, &resp)
+		Send(ctx, "/types", http.MethodDelete, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (tc *TypeClient) Update(ctx context.Context, scope string, t *meta.Type, dr
 
 	err := tc.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/types", http.MethodPut, request.DefaultHost, tdi, &resp)
+		Send(ctx, "/types", http.MethodPut, tdi, &resp)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,98 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: external-dns-example
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: nick.inspr.dev
+      http:
+        paths:
+          #### INSPRD SECTION
+          - path: /channels
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-insprd 
+                port: 
+                  number: 80
+          - path: /apps
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-insprd
+                port: 
+                  number: 80
+          - path: /types
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-insprd
+                port: 
+                  number: 80
+          - path: /alias
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-insprd
+                port: 
+                  number: 80
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-insprd
+                port: 
+                  number: 80
+          - path: /init
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-insprd
+                port: 
+                  number: 80
+          - path: /brokers
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-insprd
+                port: 
+                  number: 80
+
+          ##### UIDP SECTION
+          - path: /newuser
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-uidp
+                port:
+                  number: 80
+          - path: /deleteuser
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-uidp
+                port:
+                  number: 80
+          - path: /updatepwd
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-uidp
+                port:
+                  number: 80
+          - path: /login
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-uidp
+                port:
+                  number: 80
+          - path: /refreshtoken
+            pathType: Prefix
+            backend:
+              service:
+                name: inspr-stack-uidp
+                port:
+                  number: 80

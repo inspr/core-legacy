@@ -21,7 +21,6 @@ func (bc *BrokersClient) Get(ctx context.Context) (*models.BrokersDI, error) {
 		ctx,
 		"/brokers",
 		http.MethodGet,
-		request.DefaultHost,
 		nil,
 		resp)
 
@@ -42,7 +41,6 @@ func (bc *BrokersClient) Create(ctx context.Context, brokerName string, config [
 		ctx,
 		"/brokers/"+brokerName,
 		http.MethodPost,
-		request.DefaultHost,
 		dataBody,
 		nil)
 
