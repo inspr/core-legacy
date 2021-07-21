@@ -1,5 +1,5 @@
-uid: bugtest
-password: "123"
+uid: salles
+password: "122333221"
 permissions:
   "":
     - "create:token"
