@@ -73,8 +73,8 @@ the url or a ingress with a host ending with the value of `clusterDomain`
 
 #### kubectl
 
-In case you don't like using helm and want to use the option of installing it using just
-kubectl, the steps can be found
+If you prefer to use kubectl, all the necessary instructions and steps can be
+found
 [here](https://github.com/kubernetes-sigs/external-dns/tree/master/docs/tutorials).
 
 ## Usage Examples
