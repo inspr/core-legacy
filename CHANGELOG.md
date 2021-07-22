@@ -1,9 +1,18 @@
 
 # Changelog
 
+### #104 Tech CORE-545 | external-dns and removal of hostname in cli
+- fix:
+    - removed the hostname in the insprctl requests
+    - added small documentation about external-dns
+- misc:
+    - added `external-dns-*.yaml` to gitignore
+---
+
 ### #102 Devops | Updated script for chart releassing
 - features:
     - updated github integration scripts for helm chart release updating
+---
 
 ### #98 Story CORE-493 | Restart Policy for Nodes
 - refactors:
