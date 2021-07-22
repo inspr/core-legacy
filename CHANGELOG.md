@@ -3,11 +3,24 @@
 
 ### #103 Tech CORE-542 | Change broker commands and sub-commands
 - features:
-	- change clusters cli sub-commands.
-	- create brokers cli command and sub-commands. 
-	- update workspace_init doc to the new broker command.
+    - change clusters cli sub-commands.
+    - create brokers cli command and sub-commands. 
+    - update workspace_init doc to the new broker command.
 - tests:
-	- fixed the tests that are related to brokers and clusters.
+    - fixed the tests that are related to brokers and clusters.
+---
+
+### #104 Tech CORE-545 | external-dns and removal of hostname in cli
+- fix:
+    - removed the hostname in the insprctl requests
+    - added small documentation about external-dns
+- misc:
+    - added `external-dns-*.yaml` to gitignore
+---
+
+### #102 Devops | Updated script for chart releassing
+- features:
+    - updated github integration scripts for helm chart release updating
 ---
 
 ### #98 Story CORE-493 | Restart Policy for Nodes

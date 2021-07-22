@@ -20,7 +20,7 @@ const (
 // route and method, using
 // the encoder to encode the body and the decoder to decode the response into
 // the responsePtr
-func (c Client) Send(ctx context.Context, route, method, hostname string, body, responsePtr interface{}) (err error) {
+func (c Client) Send(ctx context.Context, route, method string, body, responsePtr interface{}) (err error) {
 	buf, err := c.encoder(body)
 	if err != nil {
 		return ierrors.
@@ -37,10 +37,6 @@ func (c Client) Send(ctx context.Context, route, method, hostname string, body, 
 		c.routeToURL(route),
 		bytes.NewBuffer(buf),
 	)
-
-	// Specifies the hostname of the request, default is inspr.com
-	// it is useful for cluster ingresses reverse DNS
-	req.Host = hostname
 
 	if err != nil {
 		return ierrors.

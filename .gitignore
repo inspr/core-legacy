@@ -2,6 +2,7 @@
 .vscode
 **/*.cov
 overwrite-*.yaml
+external-dns-*.yaml
 my-notes.md
 bin/
 tags.out

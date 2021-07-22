@@ -28,7 +28,7 @@ func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias,
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", http.MethodGet, request.DefaultHost, aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodGet, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (ac *AliasClient) Create(ctx context.Context, scope, target string, alias *
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", http.MethodPost, request.DefaultHost, aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodPost, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (ac *AliasClient) Delete(ctx context.Context, scope, key string, dryRun boo
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", http.MethodDelete, request.DefaultHost, aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodDelete, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (ac *AliasClient) Update(ctx context.Context, scope, target string, alias *
 
 	err := ac.reqClient.
 		Header(rest.HeaderScopeKey, scope).
-		Send(ctx, "/alias", http.MethodPut, request.DefaultHost, aliasQuery, &resp)
+		Send(ctx, "/alias", http.MethodPut, aliasQuery, &resp)
 	if err != nil {
 		return nil, err
 	}
