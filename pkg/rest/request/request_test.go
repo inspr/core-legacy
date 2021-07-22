@@ -197,7 +197,6 @@ func TestClient_Send(t *testing.T) {
 				tt.args.ctx,
 				tt.args.route,
 				tt.args.method,
-				DefaultHost,
 				tt.args.body,
 				&tt.response,
 			)

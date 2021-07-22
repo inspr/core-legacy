@@ -110,7 +110,6 @@ func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
 		context.Background(),
 		"/init",
 		http.MethodPost,
-		request.DefaultHost,
 		initDO,
 		&data)
 
@@ -134,7 +133,6 @@ func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
 		context.Background(),
 		"/token",
 		http.MethodPost,
-		request.DefaultHost,
 		load,
 		&data)
 
@@ -163,7 +161,6 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 		context.Background(),
 		"/refresh",
 		http.MethodGet,
-		request.DefaultHost,
 		nil,
 		&data)
 
