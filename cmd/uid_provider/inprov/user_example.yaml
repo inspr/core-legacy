@@ -1,5 +1,5 @@
-uid: salles
-password: "122333221"
+uid: name
+password: password
 permissions:
   "":
     - "create:token"
