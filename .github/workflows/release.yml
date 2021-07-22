@@ -50,7 +50,7 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: $GCR_FILENAME.json
         run: |
-          skaffold build --filename=/home/runner/work/inspr/inspr/skaffold.yaml
+          skaffold build --profile=inspr-stack --filename=/home/runner/work/inspr/inspr/skaffold.yaml
 
       - name: Build CLI
         run: bash .github/scripts/buildcli.sh
