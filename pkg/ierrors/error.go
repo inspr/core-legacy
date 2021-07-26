@@ -21,6 +21,14 @@ type (
 	}
 )
 
+// New is the function to create a New Error
+func New(msg string) *ierror {
+	return &ierror{
+		Err:  errors.New(msg),
+		Code: Unknown,
+	}
+}
+
 // Error returns the ierror Message
 func (err *ierror) Error() string {
 	return err.fullMessage()
@@ -46,21 +54,22 @@ func Wrap(err error, msg string) error {
 	// if not an ierror type, makes the conversion
 	ierr, ok := err.(*ierror)
 	if !ok {
-		ierr = NewError().
-			InnerError(err).
-			Code(ExtenalPkgError).
-			Build()
+		ierr = New(err.Error())
 	}
 
 	// checks if there is a '%w' wrapper in the msg, if not it will add it to
 	// the end of the error message.
 	// like ('my message: %w', err)
 	if strings.Contains(msg, "%w") {
-		return fmt.Errorf(msg, ierr)
-	} else {
+		// if there is %w just return err with wrapper
+		ierr.Err = fmt.Errorf(msg, ierr)
+	} else if msg != "" {
+		// if there isn't %w but there is a message, add %w at the end
 		msg += ": %w"
-		return fmt.Errorf(msg, ierr)
 	}
+
+	// if msg is empty return normal error without extra context
+	return ierr
 }
 
 // Unwrap is a err function that is capable of handling both the standard golang

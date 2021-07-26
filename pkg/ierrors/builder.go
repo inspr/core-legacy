@@ -1,126 +1,88 @@
 package ierrors
 
-// ErrBuilder is an Inspr Error Creator
-type ErrBuilder struct {
-	err ierror
-}
-
-// NewError is the start function to create a New Error
-func NewError() ErrBuilder {
-	return ErrBuilder{
-		err: ierror{},
-	}
-}
-
-// InnerError adds a inner error to the error
-func (b ErrBuilder) InnerError(err error) ErrBuilder {
-	b.err.Err = err
-	return b
-}
-
-func (b ErrBuilder) Code(code ErrCode) ErrBuilder {
-	b.err.Code = code
-	return b
-}
-
-// Build returns the created Inspr Error
-func (b ErrBuilder) Build() *ierror {
-	return &b.err
-}
-
-// From this point forward are the functions that uses the constants ierror
-// values, these are merely functions that simplyfy the process of specifying
-// the current type of error
-
-// Instead of using builder.SetErrorCode(ierrors.NotFound), one could simply use
-// the following builder.NotFound() which already does the process above.
+// The functions bellow are designed so the.CodeCode of a ierror can only be
+// modified in a way after being instantiated, that meaning that one should use
+// the following:
+//
+// ierrors.New("my message").NotFound()
+//
+// This allows us to create functions to change the.CodeCode state but it doesn't
+// add exported functions to the pkg.
 
 // NotFound adds Not Found code to Inspr Error
-func (b ErrBuilder) NotFound() ErrBuilder {
-	b.err.Code = NotFound
-	return b
+func (e *ierror) NotFound() *ierror {
+	e.Code = NotFound
+	return e
 }
 
 // AlreadyExists adds Already Exists code to Inspr Error
-func (b ErrBuilder) AlreadyExists() ErrBuilder {
-	b.err.Code = AlreadyExists
-	return b
+func (e *ierror) AlreadyExists() *ierror {
+	e.Code = AlreadyExists
+	return e
 }
 
 // BadRequest adds Bad Request code to Inspr Error
-func (b ErrBuilder) BadRequest() ErrBuilder {
-	b.err.Code = BadRequest
-	return b
+func (e *ierror) BadRequest() *ierror {
+	e.Code = BadRequest
+	return e
 }
 
 // InternalServer adds Internal Server code to Inspr Error
-func (b ErrBuilder) InternalServer() ErrBuilder {
-	b.err.Code = InternalServer
-	return b
+func (e *ierror) InternalServer() *ierror {
+	e.Code = InternalServer
+	return e
 }
 
 // InvalidName adds Invalid Name code to Inspr Error
-func (b ErrBuilder) InvalidName() ErrBuilder {
-	b.err.Code = InvalidName
-	return b
+func (e *ierror) InvalidName() *ierror {
+	e.Code = InvalidName
+	return e
 }
 
 // InvalidApp adds Invalid App code to Inspr Error
-func (b ErrBuilder) InvalidApp() ErrBuilder {
-	b.err.Code = InvalidApp
-	return b
+func (e *ierror) InvalidApp() *ierror {
+	e.Code = InvalidApp
+	return e
 }
 
 // InvalidChannel adds Invalid Channel code to Inspr Error
-func (b ErrBuilder) InvalidChannel() ErrBuilder {
-	b.err.Code = InvalidChannel
-	return b
+func (e *ierror) InvalidChannel() *ierror {
+	e.Code = InvalidChannel
+	return e
 }
 
 // InvalidType adds Invalid Type code to Inspr Error
-func (b ErrBuilder) InvalidType() ErrBuilder {
-	b.err.Code = InvalidType
-	return b
+func (e *ierror) InvalidType() *ierror {
+	e.Code = InvalidType
+	return e
 }
 
 // InvalidFile adds Invalid Args code to Inspr Error
-func (b ErrBuilder) InvalidFile() ErrBuilder {
-	b.err.Code = InvalidFile
-	return b
+func (e *ierror) InvalidFile() *ierror {
+	e.Code = InvalidFile
+	return e
 }
 
 // InvalidArgs adds Invalid Args code to Inspr Error
-func (b ErrBuilder) InvalidArgs() ErrBuilder {
-	b.err.Code = InvalidArgs
-	return b
+func (e *ierror) InvalidArgs() *ierror {
+	e.Code = InvalidArgs
+	return e
 }
 
 // Forbidden adds Forbidden code to Inspr Error
-func (b ErrBuilder) Forbidden() ErrBuilder {
-	b.err.Code = Forbidden
-	return b
+func (e *ierror) Forbidden() *ierror {
+	e.Code = Forbidden
+	return e
 }
 
 // Unauthorized adds Unauthorized code to Inspr Error
-func (b ErrBuilder) Unauthorized() ErrBuilder {
-	b.err.Code = Unauthorized
-	return b
+func (e *ierror) Unauthorized() *ierror {
+	e.Code = Unauthorized
+	return e
 }
 
 // ExternalErr adds ExternalPkgError code to Inspr Error
-func (b ErrBuilder) ExternalErr() ErrBuilder {
-	b.err.Code = ExtenalPkgError
-	return b
+func (e *ierror) ExternalErr() *ierror {
+	e.Code = ExtenalPkg
+	return e
 }
-
-/* TODO remove
-// Message adds a message to the error
-func (b ErrBuilder) Message(format string, values ...interface{}) ErrBuilder {
-	b.err.Message = fmt.Sprintf(format, values...)
-	b.err.Stack = b.err.Message
-	return b
-}
-
-
-
-*/
