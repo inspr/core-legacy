@@ -1,3 +1,4 @@
+// package ierrors
 package ierrors
 
 import (
@@ -10,8 +11,8 @@ import (
 type (
 	// ierror is an error that happened inside inspr
 	ierror struct {
-		Err  error   `yaml:"_" json:"_"`
-		Code ErrCode `yaml:"code"  json:"code"`
+		err  error
+		code ErrCode
 	}
 
 	// parseStruct is used in the unmarshal and marshal of ierror struct
@@ -21,19 +22,21 @@ type (
 	}
 )
 
-// New is the function to create a New Error
+// New is the function to create a New.error
 func New(msg string) *ierror {
 	return &ierror{
-		Err:  errors.New(msg),
-		Code: Unknown,
+		err:  errors.New(msg),
+		code: Unknown,
 	}
 }
 
-// Error returns the ierror Message
+//.error returns the ierror Message
 func (err *ierror) Error() string {
-	return err.fullMessage()
+	return fmt.Sprintf("Code %d : %v", err.code, err.err.Error())
 }
 
+// TODO do a pkg function? or just an extension of ierror
+// probably best to do a pkg func
 func (err *ierror) fullMessage() string {
 	// TODO fmtState?
 
@@ -62,18 +65,20 @@ func Wrap(err error, msg string) error {
 	// like ('my message: %w', err)
 	if strings.Contains(msg, "%w") {
 		// if there is %w just return err with wrapper
-		ierr.Err = fmt.Errorf(msg, ierr)
+		ierr.err = fmt.Errorf(msg, ierr.err)
 	} else if msg != "" {
 		// if there isn't %w but there is a message, add %w at the end
-		msg += ": %w"
+		ierr.err = fmt.Errorf("%v : %w", msg, ierr.err)
 	}
 
 	// if msg is empty return normal error without extra context
 	return ierr
 }
 
+// TODO REVIEW unwrap descrition
+
 // Unwrap is a err function that is capable of handling both the standard golang
-// error as well as the insprError structure, it removes the last wrap done to
+// error as well as the insp.error structure, it removes the last wrap done to
 // the err stack and if that was the last error in the stack it will return nil.
 func Unwrap(err error) error {
 	ierr, ok := err.(*ierror)
@@ -81,46 +86,30 @@ func Unwrap(err error) error {
 		return errors.Unwrap(err)
 	}
 
-	// unwraps the insprError
-	ierr.Err = errors.Unwrap(ierr.Err)
+	// unwraps the insp.error
+	ierr.err = errors.Unwrap(ierr.err)
 
 	// if there is no other error inside the inspr stack, returns nil
-	if ierr.Err == nil {
+	if ierr.err == nil {
 		return nil
 	}
 
 	return ierr
 }
 
-// Is Compares errors
-func (err *ierror) Is(target error) bool {
-
-	// check if is another type of error inside the error stack
-	if errors.Is(err.Err, target) {
-		return true
-	}
-
-	// is it is an ierror it checks the code
-	t, ok := target.(*ierror)
-	if !ok {
-		return false
-	}
-
-	return t.Code&err.Code > 0
-}
-
-// HasCode Compares error with error code
-func (err *ierror) HasCode(code ErrCode) bool {
-	return (code & err.Code) > 0
-}
-
 // MarshalJSON a struct function that allows for operations to be done
 // before or after the json.Marshal procedure
 func (err *ierror) MarshalJSON() ([]byte, error) {
+
+	// there is no way of setting the inner error as nil using the exported funcs,
+	// one would have to set it inside the ierrors pkg.
+	if err.err == nil {
+		return []byte{}, New("unexpected err, ierror inner error field got set to nil").ExternalErr()
+	}
+
 	t := parseStruct{
-		// TODO func to create the stack
-		Stack: "unwrapped error",
-		Code:  err.Code,
+		Stack: err.err.Error(),
+		Code:  err.code,
 	}
 	return json.Marshal(t)
 }
@@ -134,14 +123,14 @@ func (err *ierror) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	err.Code = t.Code
-	err.Err = stackToError(t.Stack)
+	err.code = t.Code
+	err.err = stackError(t.Stack)
 	return err
 }
 
-// stackToError converts the following structure of a error stack message
-// into an actual stack of errors using the fmt.Errorf
-func stackToError(stack string) error {
+// stackT.error converts the following structure of a error stack message
+// into an actual stack of errors using the fmt.errorf
+func stackError(stack string) error {
 	var err error
 
 	// reverses the stack to so they are inserted in the proper order

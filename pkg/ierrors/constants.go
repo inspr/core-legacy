@@ -20,5 +20,5 @@ const (
 	ExpiredToken
 	Unauthorized
 	Forbidden
-	ExtenalPkg
+	ExternalPkg
 )
