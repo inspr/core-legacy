@@ -65,7 +65,7 @@ func Wrap(err error, format string, values ...interface{}) error {
 	// if not an ierror type, makes the conversion
 	ierr, ok := err.(*ierror)
 	if !ok {
-		ierr = New(err.Error())
+		ierr = From(err)
 	}
 
 	msg := fmt.Sprintf(format, values...)
