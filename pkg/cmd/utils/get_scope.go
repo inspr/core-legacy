@@ -20,10 +20,8 @@ func GetScope() (string, error) {
 			scope = cmd.InsprOptions.Scope
 		} else {
 			return "", ierrors.
-				NewError().
-				BadRequest().
-				Message("'%v' is an invalid scope", cmd.InsprOptions.Scope).
-				Build()
+				New("'%v' is an invalid scope", cmd.InsprOptions.Scope).
+				BadRequest()
 		}
 	}
 

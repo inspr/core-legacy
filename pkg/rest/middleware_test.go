@@ -91,7 +91,9 @@ func TestHandler_Validate(t *testing.T) {
 			name: "invalid_token",
 			args: args{
 				auth: authMock.NewMockAuth(
-					&ierrors.InsprError{Code: ierrors.InvalidToken},
+					// TODO REVIEW
+					// &ierrors.InsprError{Code: ierrors.InvalidToken},
+					ierrors.New("").InvalidToken(),
 				),
 				Authorization: "Bearer mock_token",
 				httpMethod:    http.MethodPost,

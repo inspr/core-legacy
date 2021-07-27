@@ -81,7 +81,7 @@ func displayAppState(_ context.Context, args []string) error {
 
 	if !utils.IsValidScope(args[0]) {
 		fmt.Fprint(out, "invalid args\n")
-		return ierrors.NewError().Message("Invalid args").BadRequest().Build()
+		return ierrors.New("Invalid args").BadRequest()
 	}
 
 	path, _ := utils.JoinScopes(scope, args[0])

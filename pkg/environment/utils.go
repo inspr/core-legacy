@@ -40,7 +40,9 @@ func GetResolvedBoundaryChannelList(channels []brokers.ChannelBroker) utils.Stri
 func GetSchema(channel string) (string, error) {
 	schema, ok := os.LookupEnv(channel + "_SCHEMA")
 	if !ok {
-		return "", ierrors.NewError().NotFound().Message("schema for channel %s not found", channel).Build()
+		return "", ierrors.New(
+			"schema for channel %s not found", channel,
+		).NotFound()
 	}
 	return schema, nil
 }
@@ -70,10 +72,9 @@ func GetResolvedChannel(channel string, inputChan, outputChan []brokers.ChannelB
 	if IsInChannelBoundary(channel, inputChan) || IsInChannelBoundary(channel, outputChan) {
 		return os.Getenv(channel + "_RESOLVED"), nil
 	}
-	return "", ierrors.NewError().
-		InvalidChannel().
-		Message("channel " + channel + " not listed as an input or output").
-		Build()
+	return "", ierrors.New(
+		"channel " + channel + " not listed as an input or output",
+	).InvalidChannel()
 }
 
 func getChannelData(channelList string) []brokers.ChannelBroker {

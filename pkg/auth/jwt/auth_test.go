@@ -266,7 +266,7 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			},
 			want: nil,
 			handle: func(w http.ResponseWriter, r *http.Request) {
-				err := ierrors.NewError().InternalServer().Message("error").Build()
+				err := ierrors.New("error").InternalServer()
 				rest.ERROR(w, err)
 			},
 			wantErr: true,
@@ -367,7 +367,7 @@ func TestJWTauth_Refresh(t *testing.T) {
 			},
 			want: nil,
 			handle: func(w http.ResponseWriter, r *http.Request) {
-				err := ierrors.NewError().InternalServer().Message("error").Build()
+				err := ierrors.New("error").InternalServer()
 				rest.ERROR(w, err)
 			},
 			wantErr: true,

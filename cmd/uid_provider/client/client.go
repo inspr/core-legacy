@@ -43,7 +43,7 @@ func (c *Client) initAdminUser() error {
 	logger.Debug("received password, generating encryption")
 	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return ierrors.From(err).InternalServer()
 	}
 
 	adminUser := User{
@@ -107,20 +107,20 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 
 	if err != nil {
 		l.Debug("not enough permissions - refusing request")
-		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
+		return ierrors.From(err).Forbidden()
 	}
 
 	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		l.Error("unable to hash password", zap.Error(err))
-		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return ierrors.From(err).InternalServer()
 	}
 
 	newUser.Password = string(hashedPwd)
 
 	if err := set(ctx, c.rdb, newUser); err != nil {
 		l.Error("unable to set key on redis", zap.Error(err))
-		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
+		return ierrors.From(err).BadRequest()
 	}
 	return nil
 }
@@ -132,20 +132,20 @@ func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string
 	user, err := get(ctx, c.rdb, usrToBeDeleted)
 	if err != nil {
 		l.Debug("user not found")
-		return ierrors.NewError().NotFound().Message(err.Error()).Build()
+		return ierrors.From(err).NotFound()
 	}
 
 	l.Debug("checking user permissions")
 	err = hasPermission(ctx, c.rdb, uid, pwd, *user, false)
 	if err != nil {
 		l.Debug("not enough permissions - refusing request")
-		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
+		return ierrors.From(err).Forbidden()
 	}
 
 	l.Debug("deleting user from redis")
 	if err = delete(ctx, c.rdb, usrToBeDeleted); err != nil {
 		l.Error("unable to delete user from redis")
-		return ierrors.NewError().BadRequest().Message(err.Error()).Build()
+		return ierrors.From(err).BadRequest()
 	}
 	return nil
 }
@@ -158,21 +158,21 @@ func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, n
 	user, err := get(ctx, c.rdb, usrToBeUpdated)
 	if err != nil {
 		l.Debug("user not found")
-		return ierrors.NewError().NotFound().Message(err.Error()).Build()
+		return ierrors.From(err).NotFound()
 	}
 
 	l.Debug("checking user permissions")
 	err = hasPermission(ctx, c.rdb, uid, pwd, *user, false)
 	if err != nil {
 		l.Debug("not enough permissions - refusing request")
-		return ierrors.NewError().Forbidden().Message(err.Error()).Build()
+		return ierrors.From(err).Forbidden()
 	}
 
 	l.Debug("updating password")
 	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(newPwd), bcrypt.DefaultCost)
 	if err != nil {
 		l.Error("unable to encript password")
-		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return ierrors.From(err).InternalServer()
 	}
 
 	user.Password = string(hashedPwd)
@@ -180,7 +180,7 @@ func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, n
 	l.Debug("updating user on redis")
 	if err := set(ctx, c.rdb, *user); err != nil {
 		l.Error("unable to set user on redis")
-		return ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return ierrors.From(err).InternalServer()
 	}
 	return nil
 }
@@ -194,28 +194,27 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 	user, err := get(ctx, c.rdb, uid)
 	if err != nil {
 		l.Error("unable to get key from redis", zap.Error(err))
-		return "", ierrors.NewError().BadRequest().Message(err.Error()).Build()
+		return "", ierrors.From(err).BadRequest()
 	}
 
 	l.Debug("comparing password")
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pwd)); err != nil {
 		l.Debug("passwords don't match", zap.Error(err))
-		return "", ierrors.NewError().Unauthorized().
-			Message("user and password don't match").Build()
+		return "", ierrors.From(err).Unauthorized()
 	}
 
 	l.Debug("encrypting user")
 	payload, err := c.encrypt(*user)
 	if err != nil {
 		l.Error("unable to encrypt user", zap.Error(err))
-		return "", ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return "", ierrors.From(err).InternalServer()
 	}
 
 	l.Debug("requesting user token")
 	token, err := c.requestNewToken(ctx, *payload)
 	if err != nil {
 		l.Error("unable to request token from insprd", zap.Error(err))
-		return "", ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return "", ierrors.From(err).InternalServer()
 	}
 
 	return token, nil
@@ -230,7 +229,7 @@ func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.P
 	oldUser, err := c.decrypt(refreshToken)
 	if err != nil {
 		l.Error("unable do decript token", zap.Error(err))
-		return nil, ierrors.NewError().BadRequest().Message(err.Error()).Build()
+		return nil, ierrors.From(err).BadRequest()
 	}
 	l = l.With(zap.String("current-user", oldUser.UID))
 
@@ -238,7 +237,7 @@ func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.P
 	newUser, err := get(ctx, c.rdb, oldUser.UID)
 	if err != nil {
 		l.Error("unable to get key from redis", zap.Error(err))
-		return nil, ierrors.NewError().BadRequest().Message(err.Error()).Build()
+		return nil, ierrors.From(err).BadRequest()
 	}
 	l = l.With(zap.String("new-user", newUser.UID))
 
@@ -246,7 +245,7 @@ func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.P
 	updatedPayload, err := c.encrypt(*newUser)
 	if err != nil {
 		l.Error("unable to encrypt new user", zap.Error(err))
-		return nil, ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		return nil, ierrors.From(err).InternalServer()
 	}
 
 	return updatedPayload, nil
@@ -456,7 +455,9 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 
 		if !isAllowed {
 			l.Debug("user unauthorized")
-			return ierrors.NewError().Forbidden().Message("not allowed to create/delete/update a user with current permissions").Build()
+			return ierrors.New(
+				"not allowed to create/delete/update a user with current permissions",
+			).Forbidden()
 		}
 
 	}

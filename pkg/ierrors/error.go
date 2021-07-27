@@ -23,9 +23,17 @@ type (
 )
 
 // New is the function to create a New.error
-func New(msg string) *ierror {
+func New(format string, values ...interface{}) *ierror {
 	return &ierror{
-		err:  errors.New(msg),
+		err:  fmt.Errorf(format, values...),
+		code: Unknown,
+	}
+}
+
+// From is the function to create a ierror using as a base the an error interface
+func From(err error) *ierror {
+	return &ierror{
+		err:  err,
 		code: Unknown,
 	}
 }
@@ -35,12 +43,12 @@ func (err *ierror) Error() string {
 	return fmt.Sprintf("Code %d : %v", err.code, err.err.Error())
 }
 
-// TODO do a pkg function? or just an extension of ierror
-// probably best to do a pkg func
-func (err *ierror) fullMessage() string {
-	// TODO fmtState?
-
-	return ""
+func Code(err error) ErrCode {
+	ierr, ok := err.(*ierror)
+	if !ok {
+		ierr = New(err.Error())
+	}
+	return ierr.code
 }
 
 // TODO REVIEW wrap descrition
@@ -48,7 +56,7 @@ func (err *ierror) fullMessage() string {
 // Wrap is responsible for adding extra context to an error, this is done by
 // stacking error messages that give the receiver of the error the path of the
 // error occurrence
-func Wrap(err error, msg string) error {
+func Wrap(err error, format string, values ...interface{}) error {
 	// returns nil if error doesn't exist
 	if err == nil {
 		return nil
@@ -60,18 +68,13 @@ func Wrap(err error, msg string) error {
 		ierr = New(err.Error())
 	}
 
-	// checks if there is a '%w' wrapper in the msg, if not it will add it to
-	// the end of the error message.
-	// like ('my message: %w', err)
-	if strings.Contains(msg, "%w") {
-		// if there is %w just return err with wrapper
-		ierr.err = fmt.Errorf(msg, ierr.err)
-	} else if msg != "" {
-		// if there isn't %w but there is a message, add %w at the end
+	msg := fmt.Sprintf(format, values...)
+
+	// if not empty
+	if msg != "" {
 		ierr.err = fmt.Errorf("%v : %w", msg, ierr.err)
 	}
 
-	// if msg is empty return normal error without extra context
 	return ierr
 }
 
@@ -118,6 +121,10 @@ func (err *ierror) MarshalJSON() ([]byte, error) {
 // before or after the json.Unmarshal procedure
 func (err *ierror) UnmarshalJSON(data []byte) error {
 	t := &parseStruct{}
+
+	if len(data) == 0 {
+		return New("no data to unmarshal, empty slice of bytes")
+	}
 
 	if err := json.Unmarshal(data, &t); err != nil {
 		return err

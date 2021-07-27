@@ -30,19 +30,20 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		}
 
 		if !environment.OutputBrokerChannnels(s.broker).Contains(channel) {
-			insprError := ierrors.
-				NewError().
-				BadRequest().
-				Message("channel '%s' not found", channel)
-
-			rest.ERROR(w, insprError.Build())
+			rest.ERROR(
+				w,
+				ierrors.New("channel '%s' not found", channel).BadRequest(),
+			)
 			return
 		}
 
 		logger.Info("writing message to broker",
 			zap.String("channel", channel))
 		if err := s.Writer.WriteMessage(channel, body); err != nil {
-			rest.ERROR(w, ierrors.NewError().Message("broker's WriteMessage failed, %s", err.Error()).Build())
+			rest.ERROR(
+				w,
+				ierrors.New("broker's WriteMessage failed, %s", err.Error()),
+			)
 			return
 		}
 		rest.JSON(w, 200, nil)

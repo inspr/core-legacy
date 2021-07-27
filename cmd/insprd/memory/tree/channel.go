@@ -38,12 +38,10 @@ func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) 
 	parentApp, err := chh.Apps().Get(scope)
 	if err != nil {
 		logger.Debug("unable to find channel")
-		newError := ierrors.
-			NewError().
-			InnerError(err).
-			NotFound().
-			Message("channel not found, the scope '%v' is invalid", scope).
-			Build()
+		newError := ierrors.Wrap(
+			ierrors.From(err).NotFound(),
+			"channel not found, the scope '%v' is invalid", scope,
+		)
 		return nil, newError
 	}
 
@@ -56,11 +54,7 @@ func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) 
 
 	l.Debug("unable to get Channel in given scope")
 
-	newError := ierrors.
-		NewError().
-		NotFound().
-		Message("channel not found").
-		Build()
+	newError := ierrors.New("channel not found").NotFound()
 	return nil, newError
 }
 
@@ -78,7 +72,7 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers 
 	if nameErr != nil {
 		l.Debug("invalid Channel name",
 			zap.String("channel", ch.Meta.Name))
-		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
+		return ierrors.From(nameErr)
 	}
 
 	l.Debug("checking if Channel already exists")
@@ -86,24 +80,28 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers 
 	chAlreadyExist, _ := chh.Get(scope, ch.Meta.Name)
 	if chAlreadyExist != nil {
 		l.Debug("channel already exists")
-		return ierrors.NewError().AlreadyExists().
-			Message("channel with name %v already exists in the scope %v", ch.Meta.Name, scope).
-			Build()
+		return ierrors.New(
+			"channel with name %v already exists in the scope %v",
+			ch.Meta.Name, scope,
+		).AlreadyExists()
 	}
 
 	l.Debug("getting Channel parent dApp")
 	parentApp, err := chh.Apps().Get(scope)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).InvalidChannel().
-			Message("couldn't create channel %v : %v", ch.Meta.Name, err.Error()).
-			Build()
+		newError := ierrors.Wrap(
+			ierrors.From(err).InvalidChannel(),
+			"couldn't create channel %v", ch.Meta.Name,
+		)
 		return newError
 	}
 
 	l.Debug("checking if Channel's type is valid")
 	if _, ok := parentApp.Spec.Types[ch.Spec.Type]; !ok {
 		l.Debug("channel's type is invalid")
-		return ierrors.NewError().InvalidChannel().Message("references a Type that doesn't exist").Build()
+		return ierrors.New(
+			"references a Type that doesn't exist",
+		).InvalidChannel()
 	}
 
 	connectedChannels := parentApp.Spec.Types[ch.Spec.Type].ConnectedChannels
@@ -149,12 +147,10 @@ func (chh *ChannelMemoryManager) Delete(scope, name string) error {
 	channel, err := chh.Get(scope, name)
 
 	if err != nil {
-		newError := ierrors.
-			NewError().
-			InnerError(err).
-			NotFound().
-			Message("channel %s not found", name).
-			Build()
+		newError := ierrors.Wrap(
+			ierrors.From(err).NotFound(),
+			"channel %s not found", name,
+		)
 		return newError
 	}
 
@@ -164,10 +160,9 @@ func (chh *ChannelMemoryManager) Delete(scope, name string) error {
 			zap.Any("connected-dapps", channel.ConnectedApps),
 			zap.Any("connected-aliases", channel.ConnectedAliases))
 
-		return ierrors.NewError().
-			BadRequest().
-			Message("channel cannot be deleted as it is being used by other apps").
-			Build()
+		return ierrors.New(
+			"channel cannot be deleted as it is being used by other apps",
+		).BadRequest()
 	}
 
 	parentApp, _ := chh.Apps().Get(scope)
@@ -203,12 +198,10 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 
 	oldCh, err := chh.Get(scope, ch.Meta.Name)
 	if err != nil {
-		newError := ierrors.
-			NewError().
-			InnerError(err).
-			NotFound().
-			Message("channel %s not found", ch.Meta.Name).
-			Build()
+		newError := ierrors.Wrap(
+			ierrors.From(err).NotFound(),
+			"channel %s not found", ch.Meta.Name,
+		)
 		return newError
 	}
 
@@ -226,7 +219,9 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 		l.Debug("unable to create Channel for it references an invalid Type",
 			zap.String("type", ch.Spec.Type))
 
-		return ierrors.NewError().InvalidChannel().Message("references a Type that doesn't exist").Build()
+		return ierrors.New(
+			"references a Type that doesn't exist",
+		).InvalidChannel()
 	}
 
 	l.Debug("replacing old Channel with the new one in dApps 'Channels'")
@@ -257,11 +252,10 @@ func (cmm *ChannelPermTreeGetter) Get(scope, name string) (*meta.Channel, error)
 
 	parentApp, err := cmm.Apps().Get(scope)
 	if err != nil {
-		newError := ierrors.
-			NewError().
-			InnerError(err).
-			NotFound().
-			Message("the '%v' scope is invalid", scope).Build()
+		newError := ierrors.Wrap(
+			ierrors.From(err).NotFound(),
+			"the '%v' scope is invalid", scope,
+		)
 		return nil, newError
 	}
 
@@ -273,10 +267,6 @@ func (cmm *ChannelPermTreeGetter) Get(scope, name string) (*meta.Channel, error)
 
 	l.Debug("unable to get Channel in given scope ")
 
-	newError := ierrors.
-		NewError().
-		NotFound().
-		Message("channel not found ").
-		Build()
+	newError := ierrors.New("channel not found ").NotFound()
 	return nil, newError
 }

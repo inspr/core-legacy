@@ -25,7 +25,7 @@ func (server *Server) HandleInit() rest.Handler {
 		decoder := json.NewDecoder(r.Body)
 		decoder.Decode(&data)
 		if initialized {
-			rest.ERROR(w, ierrors.NewError().Message("already initialized").Build())
+			rest.ERROR(w, ierrors.New("already initialized").AlreadyExists())
 			return
 		}
 
@@ -33,12 +33,15 @@ func (server *Server) HandleInit() rest.Handler {
 			zap.Any("data: ", data))
 
 		if data.Key != os.Getenv("INSPR_INIT_KEY") {
-			rest.ERROR(w, ierrors.NewError().Message("invalid key").Forbidden().Build())
+			rest.ERROR(w, ierrors.New("invalid key").Forbidden())
 			return
 		}
 
 		initialized = true
-		token, err := server.tokenize(data.Payload, time.Now().Add(time.Minute*30))
+		token, err := server.tokenize(
+			data.Payload,
+			time.Now().Add(time.Minute*30),
+		)
 		if err != nil {
 			rest.ERROR(w, err)
 			return

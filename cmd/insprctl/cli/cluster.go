@@ -90,7 +90,7 @@ func clusterConfig(c context.Context, args []string) error {
 		}
 
 		fmt.Fprintf(output, "not a yaml file\n")
-		return ierrors.NewError().Message("not a yaml file").InvalidFile().Build()
+		return ierrors.New("not a yaml file").InvalidFile()
 	}
 
 	bytes, err := os.ReadFile(filePath)

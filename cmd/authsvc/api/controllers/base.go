@@ -35,7 +35,7 @@ func (s *Server) Init() {
 	var privPemBytes []byte
 	if privKey.Type != "RSA PRIVATE KEY" {
 		s.logger.Error("RSA private key is of the wrong type")
-		err = ierrors.NewError().InternalServer().Message("RSA private key is of the wrong type").Build()
+		err = ierrors.New("RSA private key is of the wrong type").InternalServer()
 		panic(err)
 	}
 
@@ -47,7 +47,10 @@ func (s *Server) Init() {
 			s.logger.Error("unable to parse RSA private key",
 				zap.Any("error", err))
 
-			err = ierrors.NewError().InternalServer().Message("error parsing RSA private key: %v", err).Build()
+			err = ierrors.Wrap(
+				ierrors.From(err).InternalServer(),
+				"error parsing RSA private key",
+			)
 			panic(err)
 		}
 	}
@@ -55,14 +58,14 @@ func (s *Server) Init() {
 	privateKey, ok := parsedKey.(*rsa.PrivateKey)
 	if !ok {
 		s.logger.Error("unable to parse RSA private key")
-		err = ierrors.NewError().InternalServer().Message("unable to parse RSA private key").Build()
+		err = ierrors.New("unable to parse RSA private key").InternalServer()
 		panic(err)
 	}
 
 	err = privateKey.Validate()
 	if err != nil {
 		s.logger.Error("unable to validate private key", zap.Any("error", err))
-		err = ierrors.NewError().InternalServer().Message("unable to validate private key").Build()
+		err = ierrors.New("unable to validate private key").InternalServer()
 		panic(err)
 	}
 

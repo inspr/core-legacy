@@ -199,14 +199,14 @@ func TestRequestErrorMessage(t *testing.T) {
 		{
 			name: "ierror-unauthorized",
 			args: args{
-				ierrors.NewError().Unauthorized().Build(),
+				ierrors.New("").Unauthorized(),
 			},
 			wantW: "failed to authenticate with the cluster. Is your token configured correctly?\n",
 		},
 		{
 			name: "ierror-forbidden",
 			args: args{
-				ierrors.NewError().Forbidden().Build(),
+				ierrors.New("").Forbidden(),
 			},
 			wantW: "forbidden operation, please check for the scope.\n",
 		},

@@ -63,6 +63,12 @@ func (e *ierror) InvalidFile() *ierror {
 	return e
 }
 
+// InvalidToken adds Invalid Token code to Inspr Error
+func (e *ierror) InvalidToken() *ierror {
+	e.code = InvalidToken
+	return e
+}
+
 // InvalidArgs adds Invalid Args code to Inspr Error
 func (e *ierror) InvalidArgs() *ierror {
 	e.code = InvalidArgs

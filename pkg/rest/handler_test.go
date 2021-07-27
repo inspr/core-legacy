@@ -235,12 +235,13 @@ func TestHandler_Recover(t *testing.T) {
 
 	body := rr.Result().Body
 
-	var got *ierrors.InsprError
+	// TODO review
+	got := ierrors.New("")
 	json.NewDecoder(body).Decode(&got)
 
-	want := ierrors.NewError().InternalServer().Message("Panic Test").Build()
+	want := ierrors.New("Panic Test").InternalServer()
 
-	if !reflect.DeepEqual(want.Message, got.Message) || !reflect.DeepEqual(want.Code, got.Code) {
+	if !reflect.DeepEqual(want.Error(), got.Error()) {
 		t.Errorf("RecoverFromPanic=%v, want %v", got, want)
 	}
 }

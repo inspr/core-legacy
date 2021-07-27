@@ -79,7 +79,7 @@ func deleteApps(_ context.Context, args []string) error {
 	for _, arg := range args {
 		if !utils.IsValidScope(arg) {
 			fmt.Fprint(out, "invalid args\n")
-			return ierrors.NewError().Message("invalid args").BadRequest().Build()
+			return ierrors.New("invalid args").BadRequest()
 		}
 		path, _ := utils.JoinScopes(scope, arg)
 

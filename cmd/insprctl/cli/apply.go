@@ -88,7 +88,7 @@ func doApply(_ context.Context) error {
 			out,
 			"Invalid command call\nFor help, type 'insprctl apply --help'",
 		)
-		return ierrors.NewError().Message("invalid flag arguments").Build()
+		return ierrors.New("invalid flag arguments")
 	}
 
 	if hasFileFlag {

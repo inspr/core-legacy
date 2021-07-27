@@ -53,7 +53,7 @@ var initCommand = cmd.NewCmd("init").
 				if os.IsNotExist(err) {
 					os.Mkdir(defaultFolder, os.ModePerm)
 				} else if err != nil {
-					return ierrors.NewError().Message(err.Error()).Build()
+					return ierrors.From(err)
 				} else {
 					return errors.New("default folder already defined as a file. did you name something .inspr in your home folder?")
 				}

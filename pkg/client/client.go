@@ -83,7 +83,7 @@ func (c *Client) HandleChannel(channel string, handler func(ctx context.Context,
 		err := handler(context.Background(), r.Body)
 		if err != nil {
 			l.Error("error handling message", zap.Error(err))
-			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Build())
+			rest.ERROR(w, ierrors.From(err).InternalServer())
 			return
 		}
 		rest.JSON(w, 200, nil)

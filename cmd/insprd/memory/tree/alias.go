@@ -45,10 +45,8 @@ func (amm *AliasMemoryManager) Get(scope, aliasKey string) (*meta.Alias, error) 
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
 		l.Debug("alias not found for the key")
 		return nil, ierrors.
-			NewError().
-			BadRequest().
-			Message("alias not found for the given key %v", aliasKey).
-			Build()
+			New("alias not found for the given key %v", aliasKey).
+			BadRequest()
 	}
 
 	//return alias
@@ -76,7 +74,10 @@ func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.
 	if !appBound.Input.Contains(targetBoundary) && !appBound.Output.Contains(targetBoundary) {
 		l.Debug("invalid dApp boundary for Alias",
 			zap.String("targeted boundary", targetBoundary))
-		return ierrors.NewError().BadRequest().Message("target boundary doesn't exist in %v", app.Meta.Name).Build()
+		return ierrors.New(
+			"target boundary doesn't exist in %v",
+			app.Meta.Name,
+		).BadRequest()
 	}
 
 	// get parentApp of app
@@ -100,7 +101,7 @@ func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.
 	// check if alias is already there
 	if _, ok := parentApp.Spec.Aliases[aliasKey]; ok {
 		l.Debug("alias already exists")
-		return ierrors.NewError().BadRequest().Message("alias already exists in parent dApp").Build()
+		return ierrors.New("alias already exists in parent dApp").BadRequest()
 	}
 
 	alias.Meta = utils.InjectUUID(alias.Meta)
@@ -130,11 +131,10 @@ func (amm *AliasMemoryManager) Update(scope, aliasKey string, alias *meta.Alias)
 	// check if alias key exist in scope
 	oldAlias, err := amm.Get(scope, aliasKey)
 	if err != nil {
-		newError := ierrors.NewError().
-			InnerError(err).
-			NotFound().
-			Message("alias '%s' not found on scope '%s'", aliasKey, scope).
-			Build()
+		newError := ierrors.Wrap(
+			ierrors.From(err).NotFound(),
+			"alias '%s' not found on scope '%s'", aliasKey, scope,
+		)
 		return newError
 	}
 	parentApp, _ := amm.treeMemoryManager.Apps().Get(scope)
@@ -179,10 +179,8 @@ func (amm *AliasMemoryManager) Delete(scope, aliasKey string) error {
 	// check if alias key exist in scope
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
 		return ierrors.
-			NewError().
-			BadRequest().
-			Message("alias not found for the given key %v", aliasKey).
-			Build()
+			New("alias not found for the given key %v", aliasKey).
+			BadRequest()
 	}
 
 	childName := strings.Split(aliasKey, ".")[0]
@@ -194,7 +192,9 @@ func (amm *AliasMemoryManager) Delete(scope, aliasKey string) error {
 		childBound := childApp.Spec.Boundary
 		if childBound.Input.Contains(target) || childBound.Output.Contains(target) {
 			l.Debug("unable to delete Alias that is being used by a dApp")
-			return ierrors.NewError().BadRequest().Message("can't delete the alias since it's being used by a child app").Build()
+			return ierrors.New(
+				"can't delete the alias since it's being used by a child app",
+			).BadRequest()
 		}
 	}
 
@@ -234,7 +234,9 @@ func (amm *AliasPermTreeGetter) Get(scope, aliasKey string) (*meta.Alias, error)
 	// check if alias key exist in scope
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
 		l.Debug("alias doesn't exist")
-		return nil, ierrors.NewError().BadRequest().Message("alias not found for the given key %v", aliasKey).Build()
+		return nil, ierrors.New(
+			"alias not found for the given key %v", aliasKey,
+		).BadRequest()
 	}
 
 	//return alias
@@ -246,7 +248,7 @@ func validTargetChannel(app *meta.App, targetChannel string) error {
 	parentBound := app.Spec.Boundary
 	if _, ok := app.Spec.Channels[targetChannel]; !ok && !parentBound.Input.Contains(targetChannel) && !parentBound.Output.Contains(targetChannel) {
 		logger.Debug("alias targets an invalid Channel")
-		return ierrors.NewError().BadRequest().Message("channel doesn't exist in app").Build()
+		return ierrors.New("channel doesn't exist in app").BadRequest()
 	}
 
 	return nil

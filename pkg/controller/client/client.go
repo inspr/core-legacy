@@ -35,9 +35,7 @@ func GetInClusterConfigs() (*ControllerConfig, error) {
 	scope, scopeok := os.LookupEnv("INSPR_CONTROLLER_SCOPE")
 	_, tknok := os.LookupEnv("INSPR_CONTROLLER_TOKEN")
 	if !urlok || !scopeok || !tknok {
-		return nil, ierrors.NewError().
-			Message(inClusterEnviromentError).
-			Build()
+		return nil, ierrors.New(inClusterEnviromentError)
 	}
 	return &ControllerConfig{
 		Auth:  authenticator{},

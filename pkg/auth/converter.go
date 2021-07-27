@@ -12,13 +12,18 @@ func Desserialize(tokenBytes []byte) (*Payload, error) {
 
 	token, err := jwt.Parse(tokenBytes)
 	if err != nil {
-		err = ierrors.NewError().InternalServer().Message("jwt parsing failed, error: %s", err.Error()).Build()
+		err = ierrors.Wrap(
+			ierrors.From(err).InternalServer(),
+			"jwt parsing failed",
+		)
 		return nil, err
 	}
 
 	load, ok := token.Get("payload")
 	if !ok {
-		err = ierrors.NewError().InternalServer().Message("jwt token didn't carry a payload").Build()
+		err = ierrors.New(
+			"jwt token didn't carry a payload",
+		).InternalServer()
 		return nil, err
 	}
 

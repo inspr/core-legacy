@@ -18,9 +18,7 @@ func SelectBrokerFromPriorityList(brokerList []string, brokers *apimodels.Broker
 
 	logger.Debug("available brokers", zap.Any("brokers", brokers.Available))
 	if len(brokers.Available) == 0 {
-		return "", ierrors.NewError().
-			Message("there are no brokers installed in insprd").
-			Build()
+		return "", ierrors.New("there are no brokers installed in insprd")
 	}
 
 	for _, broker := range brokerList {
@@ -78,15 +76,11 @@ func validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) e
 	merr.Add(metautils.StructureNameIsValid(app.Meta.Name))
 
 	if !nodeIsEmpty(app.Spec.Node) && !(len(app.Spec.Apps) == 0) {
-		merr.Add(ierrors.NewError().
-			Message("a node can't contain child dApps inside of it").
-			Build())
+		merr.Add(ierrors.New("a node can't contain child dApps inside of it"))
 	}
 
 	if !nodeIsEmpty(parentApp.Spec.Node) {
-		merr.Add(ierrors.NewError().
-			Message("unable to create dApp for its parent is a Node").
-			Build())
+		merr.Add(ierrors.New("unable to create dApp for its parent is a Node"))
 	}
 
 	merr.Add(checkAndUpdates(app, brokers))
@@ -131,13 +125,13 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 	}
 	_, err := amm.ResolveBoundary(app, false)
 	if err != nil {
-		merr.Add(ierrors.NewError().Message(err.Error()).Build())
+		merr.Add(ierrors.From(err))
 		return &merr
 	}
 	for _, childApp := range app.Spec.Apps {
 		err = amm.recursiveBoundaryValidation(childApp)
 		if err != nil {
-			merr.Add(ierrors.NewError().Message(err.Error()).Build())
+			merr.Add(ierrors.From(err))
 		}
 	}
 
@@ -174,7 +168,10 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(val.Target) {
 			continue
 		}
-		merr.Add(ierrors.NewError().Message("%s's alias %s points to an non-existent channel", parentApp.Meta.Name, key).Build())
+		merr.Add(ierrors.New(
+			"%s's alias %s points to an non-existent channel",
+			parentApp.Meta.Name, key,
+		))
 	}
 	if !merr.Empty() {
 		return &merr
@@ -193,7 +190,10 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(boundary) {
 			continue
 		}
-		merr.Add(ierrors.NewError().Message("%s boundary '%s' is invalid", parentApp.Meta.Name, boundary).Build())
+		merr.Add(ierrors.New(
+			"%s boundary '%s' is invalid",
+			parentApp.Meta.Name, boundary,
+		))
 	}
 	if !merr.Empty() {
 		return &merr
@@ -270,11 +270,10 @@ func getParentApp(childQuery string, tmm *treeMemoryManager) (*meta.App, error) 
 		return nil, err
 	}
 	if _, ok := parentApp.Spec.Apps[childName]; !ok {
-		return nil, ierrors.
-			NewError().
-			NotFound().
-			Message("dApp %s doesn't exist in dApp %v", childName, parentApp.Meta.Name).
-			Build()
+		return nil, ierrors.New(
+			"dApp %s doesn't exist in dApp %v",
+			childName, parentApp.Meta.Name,
+		).NotFound()
 	}
 
 	return parentApp, err
@@ -288,21 +287,22 @@ func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 	for typeName := range types {
 		nameErr := metautils.StructureNameIsValid(typeName)
 		if nameErr != nil {
-			return ierrors.NewError().Message("invalid type name '%v'", typeName).Build()
+			return ierrors.New("invalid type name '%v'", typeName)
 		}
 	}
 
 	for channelName, channel := range channels {
 		nameErr := metautils.StructureNameIsValid(channelName)
 		if nameErr != nil {
-			return ierrors.NewError().Message("invalid channel name '%v'", channelName).Build()
+			return ierrors.New("invalid channel name '%v'", channelName)
 		}
 
 		if channel.Spec.Type != "" {
 			if _, ok := types[channel.Spec.Type]; !ok {
-				return ierrors.NewError().
-					Message("channel '%v' using unexistent type '%v'", channelName, channel.Spec.Type).
-					Build()
+				return ierrors.New(
+					"channel '%v' using unexistent type '%v'",
+					channelName, channel.Spec.Type,
+				)
 			}
 
 			for _, appName := range channel.ConnectedApps {
@@ -333,9 +333,10 @@ func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 		}
 
 		if len(boundaries) > 0 && boundaries.Contains(channelName) {
-			return ierrors.NewError().
-				Message("channel and boundary with same name '%v'", channelName).
-				Build()
+			return ierrors.New(
+				"channel and boundary with same name '%v'",
+				channelName,
+			)
 		}
 	}
 	return nil
@@ -356,7 +357,7 @@ func validAliases(app *meta.App) error {
 	}
 
 	if len(msg) > 0 {
-		return ierrors.NewError().Message(msg.Join(";")).Build()
+		return ierrors.New(msg.Join(";"))
 	}
 
 	return nil

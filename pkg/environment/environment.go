@@ -66,7 +66,7 @@ func RefreshEnviromentVariables() *InsprEnvVars {
 func RecoverEnvironmentErrors(errch chan<- error) {
 	err := recover()
 	if err != nil {
-		errch <- ierrors.NewError().Message(err.(string)).Build()
+		errch <- ierrors.New(err.(string))
 	}
 	errch <- nil
 }
@@ -95,10 +95,7 @@ func GetChannelBroker(channel string) (string, error) {
 			return boundary.Broker, nil
 		}
 	}
-	return "", ierrors.NewError().
-		NotFound().
-		Message("[ENV VAR] %v_BROKER not found", channel).
-		Build()
+	return "", ierrors.New("[ENV VAR] %v_BROKER not found", channel).NotFound()
 }
 
 // GetOutputBrokerChannels returns environment variable which contains the output channels

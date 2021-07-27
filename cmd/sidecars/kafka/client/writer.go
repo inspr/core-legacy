@@ -25,7 +25,7 @@ func NewWriter() (*Writer, error) {
 	})
 
 	if err != nil {
-		return nil, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.From(err)
 	}
 
 	return &Writer{kProd}, nil

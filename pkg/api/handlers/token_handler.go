@@ -106,7 +106,13 @@ func (h *Handler) InitHandler() rest.Handler {
 		token, err := h.Auth.Init(res.Key, load)
 		if err != nil {
 			l.Error("error authenticating token", zap.Error(err))
-			rest.ERROR(w, ierrors.NewError().InternalServer().Message("unable to authenticate token").InnerError(err).Build())
+			rest.ERROR(
+				w,
+				ierrors.Wrap(
+					ierrors.From(err).InternalServer(),
+					"unable to authenticate token",
+				),
+			)
 			return
 		}
 		l.Debug("successfully initialized cluster")

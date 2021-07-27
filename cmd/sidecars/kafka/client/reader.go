@@ -35,7 +35,9 @@ func NewReader() (*Reader, error) {
 	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannelsData())
 	if len(resolvedChList) == 0 {
 		logger.Error("invalid resolved channel list")
-		return nil, ierrors.NewError().Message("INSPR_INPUT_CHANNELS not specified").InvalidChannel().Build()
+		return nil, ierrors.New(
+			"INSPR_INPUT_CHANNELS not specified",
+		).InvalidChannel()
 	}
 
 	reader.consumers = make(map[string]Consumer)
@@ -86,17 +88,13 @@ func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, 
 
 			case kafka.Error:
 				if ev.Code() == kafka.ErrAllBrokersDown {
-					return nil, ierrors.
-						NewError().
-						InnerError(ev).
-						Message("kafka error = all brokers are down\n%s", ev.Error()).
-						InternalServer().
-						Build()
+					return nil, ierrors.Wrap(
+						ierrors.From(ev).InternalServer(),
+						"kafka error = all brokers are down",
+					)
 				}
 				logger.Error("error while reading kafka message", zap.String("error", ev.Error()))
-				return nil, ierrors.NewError().
-					Message("%v", ev).
-					Build()
+				return nil, ierrors.New("%v", ev)
 
 			default:
 				continue
@@ -117,11 +115,9 @@ func (reader *Reader) Commit(ctx context.Context, channel string) error {
 		return ctx.Err()
 	case errCommit := <-doneChan:
 		if errCommit != nil {
-			return ierrors.
-				NewError().
-				Message("failed to commit last message: %s", errCommit.Error()).
-				InternalServer().
-				Build()
+			return ierrors.New(
+				"failed to commit last message: %s", errCommit.Error(),
+			).InternalServer()
 		}
 	}
 	return nil
@@ -153,7 +149,7 @@ func (reader *Reader) newSingleChannelConsumer(channel, resolved string) error {
 		"enable.auto.commit": false,
 	})
 	if errKafkaConsumer != nil {
-		return ierrors.NewError().Message(errKafkaConsumer.Error()).InnerError(errKafkaConsumer).InternalServer().Build()
+		return ierrors.From(errKafkaConsumer).InternalServer()
 	}
 
 	logger.Debug("subscribing new consumer",

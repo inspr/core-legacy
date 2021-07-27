@@ -34,11 +34,11 @@ func (s *Server) writeMessageHandler() rest.Handler {
 
 		if !environment.OutputChannelList().Contains(channel) {
 			logger.Error(fmt.Sprintf("channel %s not found in output channel list", channel))
-			insprError := ierrors.NewError().
-				BadRequest().
-				Message("channel '%s' not found", channel)
 
-			rest.ERROR(w, insprError.Build())
+			rest.ERROR(
+				w,
+				ierrors.New("channel '%s' not found", channel).BadRequest(),
+			)
 			return
 		}
 
@@ -95,21 +95,22 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		if !environment.InputChannelList().Contains(channel) {
 			logger.Error("channel " + channel + " not found in input channel list")
-			insprError := ierrors.NewError().
-				BadRequest().
-				Message("channel '%s' not found", channel)
-
-			rest.ERROR(w, insprError.Build())
+			rest.ERROR(
+				w,
+				ierrors.New("channel '%s' not found", channel).BadRequest(),
+			)
 			return
 		}
 
 		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
 		if clientReadPort == "" {
-			insprError := ierrors.NewError().
-				NotFound().
-				Message("[ENV VAR] INSPR_SCCLIENT_READ_PORT not found")
 
-			rest.ERROR(w, insprError.Build())
+			rest.ERROR(
+				w,
+				ierrors.New(
+					"[ENV VAR] INSPR_SCCLIENT_READ_PORT not found",
+				).NotFound(),
+			)
 			return
 		}
 
@@ -202,11 +203,10 @@ func getResolvedChannel(channel string) (string, error) {
 	resolvedCh, ok := os.LookupEnv(channel + "_RESOLVED")
 	if !ok {
 		logger.Error(fmt.Sprintf("couldn't find resolution for channel %s", channel))
-		insprError := ierrors.NewError().
-			BadRequest().
-			Message("resolution for channel '%s' not found", channel)
 
-		return "", insprError.Build()
+		return "", ierrors.New(
+			"resolution for channel '%s' not found", channel,
+		).BadRequest()
 	}
 	return resolvedCh, nil
 }

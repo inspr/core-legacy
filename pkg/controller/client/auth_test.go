@@ -54,7 +54,7 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest().Build())
+					encoder.Encode(ierrors.New("").BadRequest())
 					return
 				}
 

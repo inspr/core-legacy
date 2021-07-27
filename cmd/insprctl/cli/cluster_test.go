@@ -68,7 +68,7 @@ func Test_getBrokers(t *testing.T) {
 			name:         "Should return error",
 			flagsAndArgs: []string{"b"},
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 			expectedOutput: "unexpected inspr error: error\n",
 		},
@@ -121,7 +121,7 @@ func Test_authInit(t *testing.T) {
 			name:         "Should return error",
 			flagsAndArgs: []string{"init", "pwd"},
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 			expectedOutput: "unexpected inspr error: error\n",
 		},

@@ -66,47 +66,47 @@ func TestERROR(t *testing.T) {
 		},
 		{
 			name: "InsprErrors_NotFound",
-			err:  ierrors.NewError().NotFound().Build(),
+			err:  ierrors.New("").NotFound(),
 			want: http.StatusNotFound,
 		},
 		{
 			name: "InsprErrors_AlreadyExists",
-			err:  ierrors.NewError().AlreadyExists().Build(),
+			err:  ierrors.New("").AlreadyExists(),
 			want: http.StatusConflict,
 		},
 		{
 			name: "InsprErrors_InternalServer",
-			err:  ierrors.NewError().InternalServer().Build(),
+			err:  ierrors.New("").InternalServer(),
 			want: http.StatusInternalServerError,
 		},
 		{
 			name: "InsprErrors_InvalidName",
-			err:  ierrors.NewError().InvalidName().Build(),
+			err:  ierrors.New("").InvalidName(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_InvalidApp",
-			err:  ierrors.NewError().InvalidApp().Build(),
+			err:  ierrors.New("").InvalidApp(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_InvalidChannel",
-			err:  ierrors.NewError().InvalidChannel().Build(),
+			err:  ierrors.New("").InvalidChannel(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_InvalidType",
-			err:  ierrors.NewError().InvalidType().Build(),
+			err:  ierrors.New("").InvalidType(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_BadRequest",
-			err:  ierrors.NewError().BadRequest().Build(),
+			err:  ierrors.New("").BadRequest(),
 			want: http.StatusBadRequest,
 		},
 		{
 			name: "InsprErrors_Unknown_ErrCode",
-			err:  &ierrors.InsprError{Code: 9999},
+			err:  ierrors.New(""),
 			want: http.StatusInternalServerError,
 		},
 	}
@@ -117,11 +117,14 @@ func TestERROR(t *testing.T) {
 			if status := rr.Result().StatusCode; status != tt.want {
 				t.Errorf("JSON(w,code,data)=%v, want %v", status, tt.want)
 			}
-			var errorMessage ierrors.InsprError
+
+			// TODO REVIEW
+			errorMessage := errors.New("")
 			json.Unmarshal(rr.Body.Bytes(), &errorMessage)
 
-			if !reflect.DeepEqual(errorMessage.Message, tt.err.Error()) {
-				t.Errorf("JSON(w,code,data)=%v, want %v", errorMessage.Message, tt.err.Error())
+			if !reflect.DeepEqual(errorMessage.Error(), tt.err.Error()) {
+				t.Errorf("JSON(w,code,data)=%v, want %v",
+					errorMessage, tt.err.Error())
 			}
 		})
 	}
@@ -139,12 +142,12 @@ func TestRecoverFromPanic(t *testing.T) {
 		fmt.Println(err)
 	}
 
-	var got *ierrors.InsprError
+	got := ierrors.New("")
 	json.NewDecoder(resp.Body).Decode(&got)
 
-	want := ierrors.NewError().InternalServer().Message("This is a panic error").Build()
+	want := ierrors.New("This is a panic error").InternalServer()
 
-	if !reflect.DeepEqual(want.Message, got.Message) || !reflect.DeepEqual(want.Code, got.Code) {
+	if !reflect.DeepEqual(want.Error(), got.Error()) {
 		t.Errorf("RecoverFromPanic=%v, want %v", got, want)
 	}
 
@@ -154,11 +157,7 @@ func TestUnmarshalERROR(t *testing.T) {
 	type args struct {
 		r io.Reader
 	}
-	errBody := ierrors.
-		NewError().
-		InternalServer().
-		Message("cannot retrieve error from server").
-		Build()
+	errBody := ierrors.New("cannot retrieve error from server").InternalServer()
 	errBytes, _ := json.Marshal(errBody)
 
 	tests := []struct {

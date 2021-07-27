@@ -52,7 +52,7 @@ func TestBrokersClient_Get(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest().Build())
+					encoder.Encode(ierrors.New("").BadRequest())
 					return
 				}
 
@@ -123,10 +123,7 @@ func TestBrokersClient_Create(t *testing.T) {
 			handler := func(w http.ResponseWriter, r *http.Request) {
 				if tt.want != "" {
 					w.WriteHeader(http.StatusBadRequest)
-					rest.ERROR(w, ierrors.NewError().
-						Message(tt.want).
-						BadRequest().
-						Build())
+					rest.ERROR(w, ierrors.New(tt.want).BadRequest())
 					return
 				}
 

@@ -324,7 +324,7 @@ func Test_applyValidFiles(t *testing.T) {
 				files: tempFiles,
 			},
 			want:    nil,
-			funcErr: ierrors.NewError().Message("unauthorized").Unauthorized().Build(),
+			funcErr: ierrors.New("unauthorized").Unauthorized(),
 			errMsg:  "failed to authenticate with the cluster. Is your token configured correctly?\n",
 		},
 		{
@@ -334,7 +334,7 @@ func Test_applyValidFiles(t *testing.T) {
 				files: tempFiles,
 			},
 			want:    nil,
-			funcErr: ierrors.NewError().Message("forbidden").Forbidden().Build(),
+			funcErr: ierrors.New("forbidden").Forbidden(),
 			errMsg:  "forbidden operation, please check for the scope.\n",
 		},
 		{
@@ -344,7 +344,7 @@ func Test_applyValidFiles(t *testing.T) {
 				files: tempFiles,
 			},
 			want:    nil,
-			funcErr: ierrors.NewError().Message("default_error").BadRequest().Build(),
+			funcErr: ierrors.New("default_error").BadRequest(),
 			errMsg:  "unexpected inspr error: default_error\n",
 		},
 		{

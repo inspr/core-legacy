@@ -38,7 +38,7 @@ func (tmm *TypeMemoryManager) Create(scope string, insprType *meta.Type) error {
 	nameErr := utils.StructureNameIsValid(insprType.Meta.Name)
 	if nameErr != nil {
 		l.Error("invalid Type name")
-		return ierrors.NewError().InnerError(nameErr).Message(nameErr.Error()).Build()
+		return ierrors.From(nameErr)
 	}
 
 	l.Debug("checking if Type already exists")
@@ -46,16 +46,18 @@ func (tmm *TypeMemoryManager) Create(scope string, insprType *meta.Type) error {
 	_, err := tmm.Get(scope, insprType.Meta.Name)
 	if err == nil {
 		l.Info("type already exists")
-		return ierrors.NewError().AlreadyExists().
-			Message("target app already has a '%v' Type", insprType.Meta.Name).Build()
+		return ierrors.New(
+			"target app already has a '%v' Type", insprType.Meta.Name,
+		).AlreadyExists()
 	}
 
 	l.Debug("getting Type parent dApp")
 	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
-		newError := ierrors.NewError().InnerError(err).InvalidType().
-			Message("couldn't create Type %v : %v", insprType.Meta.Name, err.Error()).
-			Build()
+		newError := ierrors.Wrap(
+			ierrors.From(err).InvalidType(),
+			"couldn't create Type %v", insprType.Meta.Name,
+		)
 		return newError
 	}
 
@@ -83,8 +85,10 @@ func (tmm *TypeMemoryManager) Get(scope, name string) (*meta.Type, error) {
 	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
 		l.Debug("parent app does not exist, returning error")
-		return nil, ierrors.NewError().BadRequest().InnerError(err).
-			Message("target dApp doesn't exist").Build()
+		return nil, ierrors.Wrap(
+			ierrors.From(err).BadRequest(),
+			"target dApp doesn't exist",
+		)
 	}
 
 	if parentApp.Spec.Types != nil {
@@ -96,9 +100,7 @@ func (tmm *TypeMemoryManager) Get(scope, name string) (*meta.Type, error) {
 
 	l.Debug("unable to get Type in given scope")
 
-	return nil, ierrors.NewError().NotFound().
-		Message("Type not found for given query").
-		Build()
+	return nil, ierrors.New("Type not found for given query").NotFound()
 }
 
 // Delete deletes, if it exists, a Type from a given app.
@@ -114,8 +116,9 @@ func (tmm *TypeMemoryManager) Delete(scope, name string) error {
 	currType, err := tmm.Get(scope, name)
 	if currType == nil || err != nil {
 		l.Debug("unable to find type in tree")
-		return ierrors.NewError().BadRequest().
-			Message("target app doesn't contain a '%v' Type", name).Build()
+		return ierrors.New(
+			"target app doesn't contain a '%v' Type", name,
+		).BadRequest()
 	}
 
 	l.Debug("checking if Type can be deleted")
@@ -123,17 +126,18 @@ func (tmm *TypeMemoryManager) Delete(scope, name string) error {
 		l.Info("unable to delete Type for it's being used",
 			zap.Any("connected channels", currType.ConnectedChannels))
 
-		return ierrors.NewError().
-			BadRequest().
-			Message("Type cannot be deleted as it is being used by other structures").
-			Build()
+		return ierrors.New(
+			"Type cannot be deleted as it is being used by other structures",
+		).BadRequest()
 	}
 
 	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
 		l.Info("unable to get dApp from memory tree")
-		return ierrors.NewError().NotFound().InnerError(err).
-			Message("target app doesn't exist").Build()
+		return ierrors.Wrap(
+			ierrors.From(err).NotFound(),
+			"target app doesn't exist",
+		)
 	}
 
 	l.Info("removing Type from its parents 'Types' structure")
@@ -157,8 +161,9 @@ func (tmm *TypeMemoryManager) Update(scope string, insprType *meta.Type) error {
 	oldChType, err := tmm.Get(scope, insprType.Meta.Name)
 	if err != nil {
 		l.Debug("unable to find type in the tree")
-		return ierrors.NewError().BadRequest().
-			Message("target app doesn't contain a '%v' Type", insprType.Meta.Name).Build()
+		return ierrors.New(
+			"target app doesn't contain a '%v' Type", insprType.Meta.Name,
+		).BadRequest()
 	}
 
 	insprType.ConnectedChannels = oldChType.ConnectedChannels
@@ -166,8 +171,10 @@ func (tmm *TypeMemoryManager) Update(scope string, insprType *meta.Type) error {
 
 	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
-		return ierrors.NewError().InternalServer().InnerError(err).
-			Message("target app doesn't exist").Build()
+		return ierrors.Wrap(
+			ierrors.From(err).InternalServer(),
+			"target app doesn't exist",
+		)
 	}
 
 	l.Info("replacing old Type with the new one")
@@ -198,12 +205,10 @@ func (trg *TypePermTreeGetter) Get(scope, name string) (*meta.Type, error) {
 	parentApp, err := trg.Apps().Get(scope)
 	if err != nil {
 		l.Info("unable to find parent dapp")
-		return nil, ierrors.
-			NewError().
-			BadRequest().
-			InnerError(err).
-			Message("target dApp does not exist on root").
-			Build()
+		return nil, ierrors.Wrap(
+			ierrors.From(err).BadRequest(),
+			"target dApp does not exist on root",
+		)
 	}
 
 	if parentApp.Spec.Types != nil {
@@ -214,9 +219,7 @@ func (trg *TypePermTreeGetter) Get(scope, name string) (*meta.Type, error) {
 
 	l.Info("unable to get Type in given scope (root-tree)")
 
-	return nil, ierrors.
-		NewError().
-		NotFound().
-		Message("Type not found for given query on root").
-		Build()
+	return nil, ierrors.New(
+		"Type not found for given query on root",
+	).NotFound()
 }

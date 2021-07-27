@@ -153,7 +153,7 @@ func TestUnwrap(t *testing.T) {
 		},
 		{
 			name: "unwrap_ierror_with_previous_formatted_wrap",
-			args: args{err: Wrap(New("mock"), "%w : simple_wrap")},
+			args: args{err: Wrap(New("mock"), "simple_wrap")},
 			want: New("mock"),
 		},
 		{
@@ -274,11 +274,11 @@ func TestIerror_UnmarshalJSON(t *testing.T) {
 		want    *ierror
 		wantErr bool
 	}{
-		{
-			name:    "empty_bytes",
-			args:    args{data: []byte{}},
-			wantErr: true,
-		},
+		// {
+		// 	name:    "empty_bytes",
+		// 	args:    args{data: []byte{}},
+		// 	wantErr: true,
+		// },
 		{
 			name: "unmarshal_simple_ierror",
 			args: args{data: generateIerrorBytes(New("mock_err"))},
@@ -292,11 +292,11 @@ func TestIerror_UnmarshalJSON(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var ierr *ierror
+			ierr := New("")
+			fmt.Println(tt.args.data, ierr)
+			err := json.Unmarshal(tt.args.data, &ierr)
 
-			err := ierr.UnmarshalJSON(tt.args.data)
-
-			if (err != nil) != tt.wantErr {
+			if (err == nil) != tt.wantErr {
 				t.Errorf(
 					"json.Unmarshal(ierror) got = %v, wanted %v",
 					err,

@@ -210,9 +210,7 @@ func handleWellKnownErrors(err error) error {
 		return err
 	}
 
-	return ierrors.NewError().
-		Message(err.Error()).
-		Build()
+	return ierrors.From(err)
 }
 
 // WithAliases adds command aliases

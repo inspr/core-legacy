@@ -10,7 +10,9 @@ import (
 // StructureNameIsValid checks if the given name is valid for naming Channels, types and dApps
 func StructureNameIsValid(name string) error {
 	if len(name) == 0 || len(name) >= 64 {
-		return ierrors.NewError().BadRequest().Message("invalid name length, must be (0 < length < 64)").Build()
+		return ierrors.New(
+			"invalid name length, must be (0 < length < 64)",
+		).BadRequest()
 	}
 	qnameCharFmt := "[A-Za-z0-9]"
 	qnameExtCharFmt := "[-A-Za-z0-9_]"
@@ -20,14 +22,16 @@ func StructureNameIsValid(name string) error {
 	if r.MatchString(name) {
 		return nil
 	}
-	return ierrors.NewError().BadRequest().Message("invalid character in structure's name").Build()
+	return ierrors.New(
+		"invalid character in structure's name",
+	).BadRequest()
 }
 
 // AliasNameIsValid checks if the given name is valid for naming aliasses
 func AliasNameIsValid(name string) error {
 	names := strings.Split(name, ".")
 	if len(names) != 2 || names[len(names)-1] == "" {
-		return ierrors.NewError().BadRequest().Message("invalid alias name structure").Build()
+		return ierrors.New("invalid alias name structure").BadRequest()
 	}
 	err := StructureNameIsValid(names[0])
 	if err != nil {
