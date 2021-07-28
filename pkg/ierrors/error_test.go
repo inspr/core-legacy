@@ -38,7 +38,7 @@ func TestIerror_Error(t *testing.T) {
 		{
 			name:   "testing the error message of inspr error",
 			fields: fields{err: New("mock_message")},
-			want:   fmt.Sprintf("Code %d : mock_message", Unknown),
+			want:   New("mock_message").Error(),
 		},
 	}
 	for _, tt := range tests {

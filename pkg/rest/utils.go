@@ -50,8 +50,7 @@ func ERROR(w http.ResponseWriter, err error) {
 		JSON(w, http.StatusUnauthorized, err)
 	case ierrors.Forbidden:
 		JSON(w, http.StatusForbidden, err)
-	// default case
-	default:
+	default: // default case
 		JSON(w, http.StatusInternalServerError, err)
 	}
 }

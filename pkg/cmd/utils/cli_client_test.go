@@ -192,38 +192,41 @@ func TestRequestErrorMessage(t *testing.T) {
 		err error
 	}
 	tests := []struct {
-		name  string
-		args  args
-		wantW string
+		name string
+		args args
+		want string
 	}{
 		{
 			name: "ierror-unauthorized",
 			args: args{
 				ierrors.New("").Unauthorized(),
 			},
-			wantW: "failed to authenticate with the cluster. Is your token configured correctly?\n",
+			want: "failed to authenticate with the cluster. Is your token configured correctly?\n",
 		},
 		{
 			name: "ierror-forbidden",
 			args: args{
 				ierrors.New("").Forbidden(),
 			},
-			wantW: "forbidden operation, please check for the scope.\n",
+			want: "forbidden operation, please check for the scope.\n",
 		},
 		{
-			name: "ierror-unauthorized",
+			name: "ierror-unknown",
 			args: args{
 				err: errors.New("mock-error"),
 			},
-			wantW: "non inspr error: mock-error\n",
+			want: ierrors.Wrap(
+				ierrors.New("mock-error"),
+				"unknown inspr error",
+			).Error(),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := &bytes.Buffer{}
 			RequestErrorMessage(tt.args.err, w)
-			if gotW := w.String(); gotW != tt.wantW {
-				t.Errorf("RequestErrorMessage() = %v, want %v", gotW, tt.wantW)
+			if gotW := w.String(); gotW != tt.want {
+				t.Errorf("RequestErrorMessage() = %v, want %v", gotW, tt.want)
 			}
 		})
 	}

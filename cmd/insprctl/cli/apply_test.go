@@ -345,7 +345,10 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.New("default_error").BadRequest(),
-			errMsg:  "unexpected inspr error: default_error\n",
+			errMsg: ierrors.Wrap(
+				ierrors.New("default_error").BadRequest(),
+				"unknown inspr error",
+			).Error(),
 		},
 		{
 			name: "Unknown_error",
@@ -355,7 +358,10 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: errors.New("unknown_Error"),
-			errMsg:  "non inspr error: unknown_Error\n",
+			errMsg: ierrors.Wrap(
+				ierrors.New("unknown_Error"),
+				"unknown inspr error",
+			).Error(),
 		},
 	}
 	for _, tt := range tests {

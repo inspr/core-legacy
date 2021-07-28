@@ -97,12 +97,12 @@ func TestJWTauth_Validate(t *testing.T) {
 		token []byte
 	}
 	tests := []struct {
-		name    string
-		JA      *JWTauth
-		args    args
-		want    *auth.Payload
-		want1   []byte
-		wantErr bool
+		name        string
+		JA          *JWTauth
+		args        args
+		wantPayload *auth.Payload
+		wantByte    []byte
+		wantErr     bool
 	}{
 		{
 			name: "Invalid_token",
@@ -110,9 +110,9 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: invalidToken(),
 			},
-			want:    nil,
-			want1:   invalidToken(),
-			wantErr: true,
+			wantPayload: nil,
+			wantByte:    invalidToken(),
+			wantErr:     true,
 		},
 		{
 			name: "Expired_token",
@@ -120,9 +120,9 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: expiredToken(),
 			},
-			want:    nil,
-			want1:   expiredToken(),
-			wantErr: true,
+			wantPayload: nil,
+			wantByte:    expiredToken(),
+			wantErr:     true,
 		},
 		{
 			name: "nil_Expired_token",
@@ -130,9 +130,9 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: nilExpiredToken(),
 			},
-			want:    nil,
-			want1:   nilExpiredToken(),
-			wantErr: true,
+			wantPayload: nil,
+			wantByte:    nilExpiredToken(),
+			wantErr:     true,
 		},
 		{
 			name: "Payload_notFound",
@@ -140,9 +140,9 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: noPayloadToken(),
 			},
-			want:    nil,
-			want1:   noPayloadToken(),
-			wantErr: true,
+			wantPayload: nil,
+			wantByte:    noPayloadToken(),
+			wantErr:     true,
 		},
 		{
 			name: "Worked",
@@ -150,19 +150,19 @@ func TestJWTauth_Validate(t *testing.T) {
 			args: args{
 				token: fineToken(),
 			},
-			want: &auth.Payload{
+			wantPayload: &auth.Payload{
 				UID:         "mock_UID",
 				Permissions: map[string][]string{"": {"mock"}},
 				Refresh:     []byte("mock_refresh"),
 				RefreshURL:  "mock_refresh_url",
 			},
-			want1:   fineToken(),
-			wantErr: false,
+			wantByte: fineToken(),
+			wantErr:  false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, err := tt.JA.Validate(tt.args.token)
+			gotPayload, gotByte, err := tt.JA.Validate(tt.args.token)
 			if (err != nil) != tt.wantErr {
 				t.Errorf(
 					"JWTauth.Validade() error = %v, wantErr %v",
@@ -172,29 +172,29 @@ func TestJWTauth_Validate(t *testing.T) {
 				return
 			}
 
-			if got == nil {
-				if !reflect.DeepEqual(got, tt.want) {
+			if gotPayload == nil {
+				if !reflect.DeepEqual(gotPayload, tt.wantPayload) {
 					t.Errorf(
 						"JWTauth.Validade() got = %v, want %v",
-						got,
-						tt.want,
+						gotPayload,
+						tt.wantPayload,
 					)
 				}
 			} else {
-				if !reflect.DeepEqual(*got, *tt.want) {
+				if !reflect.DeepEqual(*gotPayload, *tt.wantPayload) {
 					t.Errorf(
 						"JWTauth.Validade() got = %v, want %v",
-						got,
-						tt.want,
+						gotPayload,
+						tt.wantPayload,
 					)
 				}
 			}
 
-			if !reflect.DeepEqual(got1, tt.want1) {
+			if !reflect.DeepEqual(gotByte, tt.wantByte) {
 				t.Errorf(
-					"JWTauth.Validade() got1 = %v, want %v",
-					got1,
-					tt.want1,
+					"JWTauth.Validade() gotByte = %v, want %v",
+					gotByte,
+					tt.wantByte,
 				)
 			}
 		})

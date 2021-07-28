@@ -70,7 +70,10 @@ func Test_getBrokers(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.New("error"))
 			},
-			expectedOutput: "unexpected inspr error: error\n",
+			expectedOutput: ierrors.Wrap(
+				ierrors.New("error"),
+				"unknown inspr error",
+			).Error(),
 		},
 	}
 	for _, tt := range tests {
@@ -123,7 +126,10 @@ func Test_authInit(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.New("error"))
 			},
-			expectedOutput: "unexpected inspr error: error\n",
+			expectedOutput: ierrors.Wrap(
+				ierrors.New("error"),
+				"unknown inspr error",
+			).Error(),
 		},
 	}
 	for _, tt := range tests {

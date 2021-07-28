@@ -32,21 +32,26 @@ func New(format string, values ...interface{}) *ierror {
 
 // From is the function to create a ierror using as a base the an error interface
 func From(err error) *ierror {
-	return &ierror{
-		err:  err,
-		code: Unknown,
+	ierr, ok := err.(*ierror)
+	if !ok {
+		ierr = &ierror{
+			err:  err,
+			code: Unknown,
+		}
 	}
+	return ierr
 }
 
 //.error returns the ierror Message
 func (err *ierror) Error() string {
-	return fmt.Sprintf("Code %d : %v", err.code, err.err.Error())
+	return fmt.Sprintf("%v", err.err.Error())
 }
 
 func Code(err error) ErrCode {
 	ierr, ok := err.(*ierror)
 	if !ok {
-		ierr = New(err.Error())
+		// attaches the code unknown to the new ierror
+		ierr = From(err)
 	}
 	return ierr.code
 }

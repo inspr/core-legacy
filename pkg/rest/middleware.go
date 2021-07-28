@@ -99,7 +99,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			}
 
 			// default error message
-			ERROR(w, ierrors.From(err).BadRequest())
+			ERROR(w, ierrors.From(err))
 			return
 		}
 
