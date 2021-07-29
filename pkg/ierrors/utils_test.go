@@ -1,10 +1,15 @@
 package ierrors
 
-/*
+import (
+	"errors"
+	"io/fs"
+	"testing"
+)
+
 func TestHasCode(t *testing.T) {
 	type args struct {
 		target error
-		code   InsprErrorCode
+		code   ErrCode
 	}
 	tests := []struct {
 		name string
@@ -22,62 +27,33 @@ func TestHasCode(t *testing.T) {
 		{
 			name: "ierror_test",
 			args: args{
-				target: NewError().AlreadyExists().Build(),
+				target: New("").AlreadyExists(),
 				code:   AlreadyExists,
 			},
 			want: true,
 		},
+		{
+			name: "ierror_test_with_different_code",
+			args: args{
+				target: New(""),
+				code:   AlreadyExists,
+			},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := HasCode(tt.args.target, tt.args.code); got != tt.want {
+			got := HasCode(tt.args.target, tt.args.code)
+			if got != tt.want {
 				t.Errorf("HasCode() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestIsIerror(t *testing.T) {
-	type args struct {
-		target error
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{
-			name: "non_ierror_test",
-			args: args{target: errors.New("mock")},
-			want: false,
-		},
-		{
-			name: "ierror_test",
-			args: args{target: NewError().AlreadyExists().Build()},
-			want: true,
-		},
-		{
-			name: "ierror_test_empty_errCode",
-			args: args{target: &InsprError{Code: 0}},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := IsIerror(tt.args.target); got != tt.want {
-				t.Errorf("IsIerror() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-/*
-
-func Testierror_Is(t *testing.T) {
+func TestIerror_Is(t *testing.T) {
 	type fields struct {
-		Message string
-		Err     error
-		Code    ErrCode
+		err error
 	}
 	type args struct {
 		target error
@@ -89,11 +65,9 @@ func Testierror_Is(t *testing.T) {
 		want   bool
 	}{
 		{
-			name: "It should return true since the two Errors Codes are equal",
+			name: "two_equal_errors_code",
 			fields: fields{
-				Code:    BadRequest,
-				Err:     nil,
-				Message: "A new message",
+				err: New("new message").BadRequest(),
 			},
 			args: args{
 				target: New("another message").BadRequest(),
@@ -101,42 +75,27 @@ func Testierror_Is(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "It should return false since the two Errors Codes are different",
+			name: "two_different_errors_code",
 			fields: fields{
-				Code:    BadRequest,
-				Err:     nil,
-				Message: "A new message",
+				err: New("new message").InternalServer(),
 			},
 			args: args{
-				target: New("Another").InternalServer(),
+				target: New("another message").BadRequest(),
 			},
 			want: false,
 		},
 		{
-			name: "The error given is in the error stack",
+			name: "error_not_in_stack",
 			fields: fields{
-				Err: fmt.Errorf(
-					"layer2: %w",
-					fmt.Errorf(
-						"layer1: %w",
-						fs.ErrClosed,
+				err: Wrap(
+					Wrap(
+						Wrap(
+							fs.ErrClosed,
+							"ctx_1",
+						),
+						"ctx_2",
 					),
-				),
-			},
-			args: args{
-				target: fs.ErrClosed,
-			},
-			want: true,
-		},
-		{
-			name: "The error given is NOT in the error stack",
-			fields: fields{
-				Err: fmt.Errorf(
-					"layer2: %w",
-					fmt.Errorf(
-						"layer1: %w",
-						fs.ErrClosed,
-					),
+					"ctx_3",
 				),
 			},
 			args: args{
@@ -144,72 +103,32 @@ func Testierror_Is(t *testing.T) {
 			},
 			want: false,
 		},
+		{
+			name: "error_in_stack",
+			fields: fields{
+				err: Wrap(
+					Wrap(
+						Wrap(
+							fs.ErrClosed,
+							"ctx_1",
+						),
+						"ctx_2",
+					),
+					"ctx_3",
+				),
+			},
+			args: args{
+				target: fs.ErrClosed,
+			},
+			want: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := &ierror{
-				err:  tt.fields.err,
-				code: tt.fields.code,
-			}
-			if got := err.Is(tt.args.target); got != tt.want {
+			got := Is(tt.fields.err, tt.args.target)
+			if got != tt.want {
 				t.Errorf("ierror.Is() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
-func Testierror_HasCode(t *testing.T) {
-	type fields struct {
-		Message string
-		Err     error
-		Code    ErrCode
-	}
-	type args struct {
-		code ErrCode
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		{
-			name: "It should return true since the Error code and the code are equal",
-			fields: fields{
-				Code:    BadRequest,
-				Err:     nil,
-				Message: "A new message",
-			},
-			args: args{
-				code: BadRequest,
-			},
-			want: true,
-		},
-		{
-			name: "It should return false since the Error code and the code are different",
-			fields: fields{
-				Code:    BadRequest,
-				Err:     nil,
-				Message: "A new message",
-			},
-			args: args{
-				code: AlreadyExists,
-			},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := &ierror{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Code:    tt.fields.Code,
-			}
-			if got := err.HasCode(tt.args.code); got != tt.want {
-				t.Errorf("ierror.HasCode() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-
-*/

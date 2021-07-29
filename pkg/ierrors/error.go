@@ -22,6 +22,21 @@ type (
 	}
 )
 
+func (ie *ierror) Is(err error) bool {
+	// check if is another type of error inside the error stack
+	if errors.Is(ie.err, err) {
+		return true
+	}
+
+	// converts target to ierror structure, if possible
+	t, ok := err.(*ierror)
+	if !ok {
+		return false
+	}
+
+	return ie.code&t.code > 0
+}
+
 // New is the function to create a New.error
 func New(format string, values ...interface{}) *ierror {
 	return &ierror{
@@ -42,7 +57,7 @@ func From(err error) *ierror {
 	return ierr
 }
 
-//.error returns the ierror Message
+// Error returns the ierror Message
 func (err *ierror) Error() string {
 	return fmt.Sprintf("%v", err.err.Error())
 }
@@ -56,7 +71,10 @@ func Code(err error) ErrCode {
 	return ierr.code
 }
 
-// TODO REVIEW wrap descrition
+// TODO REVIEW wrap -> descrition and maybe the possibility of using multiple
+// string values at once like:
+//
+// ierrors.Wrap(err, "msg1", "msg2", "msg3")
 
 // Wrap is responsible for adding extra context to an error, this is done by
 // stacking error messages that give the receiver of the error the path of the
@@ -127,13 +145,7 @@ func (err *ierror) MarshalJSON() ([]byte, error) {
 func (err *ierror) UnmarshalJSON(data []byte) error {
 	t := &parseStruct{}
 
-	if len(data) == 0 {
-		return New("no data to unmarshal, empty slice of bytes")
-	}
-
-	if err := json.Unmarshal(data, &t); err != nil {
-		return err
-	}
+	json.Unmarshal(data, &t)
 
 	err.code = t.Code
 	err.err = stackError(t.Stack)
@@ -157,9 +169,102 @@ func stackError(stack string) error {
 		if err == nil {
 			err = errors.New(m)
 		} else {
-			err = fmt.Errorf("%v: %w", m, err)
+			err = Wrap(err, m)
 		}
 	}
 
 	return err
+}
+
+// The functions bellow are designed so the.codeCode of a ierror can only be
+// modified in a way after being instantiated, that meaning that one should use
+// the following:
+//
+// ierrors.New("my message").NotFound()
+//
+// This allows us to create functions to change the.codeCode state but it doesn't
+// add exported functions to the pkg.
+
+// NotFound adds Not Found code to Inspr Error
+func (e *ierror) NotFound() *ierror {
+	e.code = NotFound
+	return e
+}
+
+// AlreadyExists adds Already Exists code to Inspr Error
+func (e *ierror) AlreadyExists() *ierror {
+	e.code = AlreadyExists
+	return e
+}
+
+// BadRequest adds Bad Request code to Inspr Error
+func (e *ierror) BadRequest() *ierror {
+	e.code = BadRequest
+	return e
+}
+
+// InternalServer adds Internal Server code to Inspr Error
+func (e *ierror) InternalServer() *ierror {
+	e.code = InternalServer
+	return e
+}
+
+// InvalidName adds Invalid Name code to Inspr Error
+func (e *ierror) InvalidName() *ierror {
+	e.code = InvalidName
+	return e
+}
+
+// InvalidApp adds Invalid App code to Inspr Error
+func (e *ierror) InvalidApp() *ierror {
+	e.code = InvalidApp
+	return e
+}
+
+// InvalidChannel adds Invalid Channel code to Inspr Error
+func (e *ierror) InvalidChannel() *ierror {
+	e.code = InvalidChannel
+	return e
+}
+
+// InvalidType adds Invalid Type code to Inspr Error
+func (e *ierror) InvalidType() *ierror {
+	e.code = InvalidType
+	return e
+}
+
+// InvalidFile adds Invalid Args code to Inspr Error
+func (e *ierror) InvalidFile() *ierror {
+	e.code = InvalidFile
+	return e
+}
+
+// InvalidToken adds Invalid Token code to Inspr Error
+func (e *ierror) InvalidToken() *ierror {
+	e.code = InvalidToken
+	return e
+}
+
+// InvalidArgs adds Invalid Args code to Inspr Error
+func (e *ierror) InvalidArgs() *ierror {
+	e.code = InvalidArgs
+	return e
+}
+
+// Forbidden adds Forbidden code to Inspr Error
+func (e *ierror) Forbidden() *ierror {
+	e.code = Forbidden
+	return e
+}
+
+// Unauthorized adds Unauthorized code to Inspr Error
+func (e *ierror) Unauthorized() *ierror {
+	e.code = Unauthorized
+	return e
+}
+
+// ExternalErr adds ExternalPkgError code to Inspr Error
+func (e *ierror) ExternalErr() *ierror {
+	e.code = ExternalPkg
+	return e
 }

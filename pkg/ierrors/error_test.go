@@ -25,7 +25,40 @@ func TestNew(t *testing.T) {
 	}
 }
 
-// TODO add Error case with different code
+func TestFrom(t *testing.T) {
+	type fields struct {
+		err error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   error
+	}{
+		{
+			name:   "test_from_errors",
+			fields: fields{err: errors.New("mock_err")},
+			want: &ierror{
+				err:  errors.New("mock_err"),
+				code: Unknown,
+			},
+		},
+		{
+			name:   "test_from_ierrors",
+			fields: fields{err: New("mock_err").InternalServer()},
+			want: &ierror{
+				err:  errors.New("mock_err"),
+				code: InternalServer,
+			},
+		},
+	}
+	for _, tt := range tests {
+		got := From(tt.fields.err)
+		if got.Error() != tt.want.Error() {
+			t.Errorf("Expected %v, got %v", got, tt.want)
+		}
+	}
+}
+
 func TestIerror_Error(t *testing.T) {
 	type fields struct {
 		err *ierror
@@ -48,6 +81,34 @@ func TestIerror_Error(t *testing.T) {
 				t.Errorf("ierror.Error() = '%v', want '%v'", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestCode(t *testing.T) {
+	type fields struct {
+		err error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   ErrCode
+	}{
+		{
+			name:   "test_from_errors",
+			fields: fields{err: errors.New("mock_err")},
+			want:   Unknown,
+		},
+		{
+			name:   "test_from_ierrors",
+			fields: fields{err: New("mock_err").InternalServer()},
+			want:   InternalServer,
+		},
+	}
+	for _, tt := range tests {
+		got := Code(tt.fields.err)
+		if got != tt.want {
+			t.Errorf("Expected %v, got %v", got, tt.want)
+		}
 	}
 }
 
@@ -90,20 +151,6 @@ func TestIerror_Wrap(t *testing.T) {
 			},
 			want: Wrap(New("mock_err"), "wrapper_context").Error(),
 		},
-
-		// TODO make an update on the wrap funcion to add the %w
-		// on the error message
-
-		// {
-		// 	name: "wrap_standard_error_with_formatted_message",
-		// 	fields: fields{
-		// 		err: errors.New("mock_err"),
-		// 	},
-		// 	args: args{
-		// 		msg: "%w wrapper_context",
-		// 	},
-		// 	want: Wrap(New("mock_err"), "%w wrapper_context").Error(),
-		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -272,83 +319,75 @@ func TestIerror_UnmarshalJSON(t *testing.T) {
 		data []byte
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    *ierror
-		wantErr bool
+		name string
+		args args
+		want error
 	}{
-		// {
-		// 	name:    "empty_bytes",
-		// 	args:    args{data: []byte{}},
-		// 	wantErr: true,
-		// },
 		{
 			name: "unmarshal_simple_ierror",
 			args: args{data: generateIerrorBytes(New("mock_err"))},
 			want: New("mock_err"),
 		},
-		// {
-		// 	name:    "unmarshal_wrapped_error",
-		// 	args:    args{data: []byte{0}},
-		// 	wantErr: true,
-		// },
+		{
+			name: "unmarshal_wrapped_error",
+			args: args{data: generateIerrorBytes(
+				From(
+					Wrap(
+						New("mock_err"),
+						"mock_context",
+					),
+				),
+			)},
+			want: Wrap(
+				New("mock_err"),
+				"mock_context",
+			),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ierr := New("")
-			fmt.Println(tt.args.data, ierr)
 			err := json.Unmarshal(tt.args.data, &ierr)
 
-			if (err == nil) != tt.wantErr {
+			if (err != nil) && !Is(ierr, tt.want) {
 				t.Errorf(
 					"json.Unmarshal(ierror) got = %v, wanted %v",
 					err,
-					tt.wantErr,
-				)
-			}
-
-			if ierr.Error() != tt.want.Error() {
-				t.Errorf(
-					"json.Unmarshal(ierror) got = %v, wanted %v",
-					err,
-					tt.wantErr,
+					tt.want,
 				)
 			}
 		})
 	}
 }
 
-/*
-
-func Testierror_StackToError(t *testing.T) {
+func TestIerror_stackError(t *testing.T) {
 	type fields struct {
-		Err   error
-		Stack string
+		stack string
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		wanted string // used for comparison with err.Error()
+		wanted error
 	}{
 		{
 			name: "basic_test",
 			fields: fields{
-				Err:   nil,
-				Stack: "hello: stack: test",
+				stack: Wrap(
+					New("mock_err"),
+					"wrap_1",
+				).Error(),
 			},
-			wanted: "hello: stack: test",
+			wanted: Wrap(
+				New("mock_err"),
+				"wrap_1",
+			),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ierror := &ierror{
-				Err:   tt.fields.Err,
-				Stack: tt.fields.Stack,
-			}
-			ierror.StackToError()
+			got := stackError(tt.fields.stack)
 
-			got := ierror.Err.Error()
-			if got != tt.wanted {
+			if got.Error() != tt.wanted.Error() {
 				t.Errorf(
 					"ierror.StackToError() error = %v, wanted = %v",
 					got,
@@ -358,4 +397,183 @@ func Testierror_StackToError(t *testing.T) {
 		})
 	}
 }
+
+func TestErrCode(t *testing.T) {
+	type fields struct {
+		err *ierror
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		exec   func(e *ierror) *ierror
+		want   ErrCode
+	}{
+		{
+			name: "It should receive the error Unknown",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e
+			},
+			want: Unknown,
+		},
+		{
+			name: "It should add the code NotFound to the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.NotFound()
+			},
+			want: NotFound,
+		},
+		{
+			name: "It should add the code AlreadyExists the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.AlreadyExists()
+			},
+			want: AlreadyExists,
+		},
+		{
+			name: "It should add the code BadRequest the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.BadRequest()
+			},
+			want: BadRequest,
+		},
+		{
+			name: "It should add the code InternalServer the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InternalServer()
+			},
+			want: InternalServer,
+		},
+		{
+			name: "It should add the code InvalidName the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidName()
+			},
+			want: InvalidName,
+		},
+		{
+			name: "It should add the code InvalidApp the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidApp()
+			},
+			want: InvalidApp,
+		},
+		{
+			name: "It should add the code InvalidChannel the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidChannel()
+			},
+			want: InvalidChannel,
+		},
+		{
+			name: "It should add the code InvalidType the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidType()
+			},
+			want: InvalidType,
+		},
+		{
+			name: "It should add the code InvalidFile the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidFile()
+			},
+			want: InvalidFile,
+		},
+		{
+			name: "It should add the code InvalidArgs the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidArgs()
+			},
+			want: InvalidArgs,
+		},
+		{
+			name: "It should add the code Forbidden the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.Forbidden()
+			},
+			want: Forbidden,
+		},
+		{
+			name: "It should add the code Unauthorized the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.Unauthorized()
+			},
+			want: Unauthorized,
+		},
+		{
+			name: "It should add the code ExternalErr the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.ExternalErr()
+			},
+			want: ExternalPkg,
+		},
+		{
+			name: "It should add the code InvalidToken the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidToken()
+			},
+			want: InvalidToken,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.exec(tt.fields.err)
+
+			if !reflect.DeepEqual(got.code, tt.want) {
+				t.Errorf("ErrCode = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+/*
+ierrors.Wrap(
+	err,
+	"handling dapp creation",
+	"oanfoanf"
+)
 */
