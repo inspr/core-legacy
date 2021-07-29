@@ -246,7 +246,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 					}(),
 				},
 			},
-			wantMessage: "cannot retrieve error from server",
+			wantMessage: defaultErr.Error(),
 		},
 		{
 			name: "default_error_message_unauthorized_code",
@@ -262,7 +262,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 					}(),
 				},
 			},
-			wantMessage: "cannot retrieve error from server",
+			wantMessage: defaultErr.Error(),
 		},
 		{
 			name: "default_error_message_forbidden_code",
@@ -278,7 +278,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 					}(),
 				},
 			},
-			wantMessage: "cannot retrieve error from server",
+			wantMessage: defaultErr.Error(),
 		},
 		{
 			name: "response with custom error",
@@ -295,7 +295,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 					}(),
 				},
 			},
-			wantMessage: "this is an error",
+			wantMessage: ierrors.New("this is an error").Error(),
 		},
 		{
 			name: "response with unauthorized error",
@@ -313,7 +313,10 @@ func TestClient_handleResponseErr(t *testing.T) {
 					}(),
 				},
 			},
-			wantMessage: "status unauthorized",
+			wantMessage: ierrors.Wrap(
+				ierrors.New("mock_error").Unauthorized(),
+				"status unauthorized",
+			).Error(),
 		},
 		{
 			name: "response with forbidden error",
@@ -331,7 +334,10 @@ func TestClient_handleResponseErr(t *testing.T) {
 					}(),
 				},
 			},
-			wantMessage: "status forbidden",
+			wantMessage: ierrors.Wrap(
+				ierrors.New("mock_error").Unauthorized(),
+				"status forbidden",
+			).Error(),
 		},
 	}
 	for _, tt := range tests {

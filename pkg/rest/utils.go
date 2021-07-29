@@ -25,8 +25,6 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 	}
 }
 
-// TODO REVIEW
-
 // ERROR reports the error back to the user within a JSON format
 func ERROR(w http.ResponseWriter, err error) {
 	switch ierrors.Code(err) {
@@ -55,18 +53,16 @@ func ERROR(w http.ResponseWriter, err error) {
 	}
 }
 
-// UnmarshalERROR generates a golang error with the
-// response body created by the ERROR function
+// UnmarshalERROR generates an ierror error with the response body created by
+// the ERROR function.
+//
+// Note that this function will always return an error no
+// matter if it found the error on the body or not, that means that if the
+// error details cannot be found on the body of the response body it will
+// generate a unkown error
 func UnmarshalERROR(body io.Reader) error {
-	defaultErr := ierrors.New("cannot retrieve error from server").
-		InternalServer()
-
-	err := ierrors.New("")
+	err := defaultErr
 	decoder := json.NewDecoder(body)
 	decoder.Decode(&err)
-
-	if err != nil {
-		return err
-	}
-	return defaultErr
+	return err
 }

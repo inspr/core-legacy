@@ -16,6 +16,12 @@ const (
 	DefaultHost = "inspr.com"
 )
 
+var (
+	defaultErr = ierrors.
+		New("cannot retrieve error from server").
+		InternalServer()
+)
+
 // Send sends a request to the url specified in instantiation, with the given
 // route and method, using
 // the encoder to encode the body and the decoder to decode the response into
@@ -97,9 +103,6 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 func (c Client) handleResponseErr(resp *http.Response) error {
 	decoder := c.decoderGenerator(resp.Body)
 	err := ierrors.New("")
-	defaultErr := ierrors.
-		New("cannot retrieve error from server").
-		InternalServer()
 
 	switch resp.StatusCode {
 	case http.StatusOK:

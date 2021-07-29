@@ -130,7 +130,8 @@ func (err *ierror) MarshalJSON() ([]byte, error) {
 	// there is no way of setting the inner error as nil using the exported funcs,
 	// one would have to set it inside the ierrors pkg.
 	if err.err == nil {
-		return []byte{}, New("unexpected err, ierror inner error field got set to nil").ExternalErr()
+		return []byte{},
+			New("unexpected err, ierror inner error field got set to nil").ExternalErr()
 	}
 
 	t := parseStruct{

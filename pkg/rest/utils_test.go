@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strings"
 	"testing"
 
 	"inspr.dev/inspr/pkg/ierrors"
@@ -61,7 +60,7 @@ func TestERROR(t *testing.T) {
 	}{
 		{
 			name: "non_InsprErrors",
-			err:  errors.New("server crashed"),
+			err:  errors.New(""),
 			want: http.StatusInternalServerError,
 		},
 		{
@@ -157,32 +156,45 @@ func TestUnmarshalERROR(t *testing.T) {
 	type args struct {
 		r io.Reader
 	}
-	errBody := ierrors.New("cannot retrieve error from server").InternalServer()
-	errBytes, _ := json.Marshal(errBody)
+
+	generateBody := func(body string) io.Reader {
+		bodyBytes, _ := json.Marshal(body)
+		return bytes.NewBuffer(bodyBytes)
+	}
+	generateErrBody := func(err error) io.Reader {
+		errBytes, _ := json.Marshal(err)
+		return bytes.NewBuffer(errBytes)
+	}
 
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name     string
+		args     args
+		want     error
+		wantCode ierrors.ErrCode
 	}{
 		{
-			name:    "basic_unmarshal_error",
-			args:    args{r: bytes.NewBuffer(errBytes)},
-			wantErr: true,
+			name: "basic_unmarshal_error",
+			args: args{r: generateErrBody(
+				ierrors.New("no permission to create dapp").Forbidden(),
+			)},
+			want:     ierrors.New("no permission to create dapp").Forbidden(),
+			wantCode: ierrors.Forbidden,
 		},
 		{
-			name:    "basic_unmarshal_empty_error",
-			args:    args{r: strings.NewReader("nothing")},
-			wantErr: true,
+			name:     "basic_unmarshal_empty_error",
+			args:     args{r: generateBody("nothing")},
+			want:     defaultErr,
+			wantCode: ierrors.Unknown,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.r)
 			err := UnmarshalERROR(tt.args.r)
-			if (err.Error() != "") != tt.wantErr {
+			if err.Error() != tt.want.Error() {
 				t.Errorf("UnmarshalERROR() error = %v, wantErr %v",
-					err.Error(),
-					tt.wantErr,
+					err,
+					tt.want,
 				)
 			}
 		})
