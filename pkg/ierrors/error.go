@@ -1,4 +1,4 @@
-// package ierrors
+// Package ierrors TODO ADD PKG description
 package ierrors
 
 import (
@@ -22,8 +22,42 @@ type (
 	}
 )
 
+// New is the func similar to the standard library `errors.New` but it
+// returns the inspr error structure, containing an error code and the
+// capability of wrapping the message with extra context messages
+func New(format string, values ...interface{}) *ierror { // MATCH /New.*unexported/
+	return &ierror{
+		err:  fmt.Errorf(format, values...),
+		code: Unknown,
+	}
+}
+
+// From is the func to create a ierror using as a base the an error interface
+func From(err error) *ierror {
+	ierr, ok := err.(*ierror)
+	if !ok {
+		ierr = &ierror{
+			err:  err,
+			code: Unknown,
+		}
+	}
+	return ierr
+}
+
+// Error returns the ierror Message
+func (ie *ierror) Error() string {
+	return fmt.Sprintf("%v", ie.err.Error())
+}
+
+// Is has the purpose of establishing a way to utilize the standard library func
+// known as "errors.Is(source,target)", by doing the overloading of the "Is"
+// func it allows the comparison of an ierror with any other type of error.
+//
+// When using errors.Is(source Ierror, target error) it will return true if the
+// `source` fully unwrapped is the same as `target` or if both of them have the
+// same ErrCode.
 func (ie *ierror) Is(err error) bool {
-	// check if is another type of error inside the error stack
+	// checks if is another type of error inside the error stack
 	if errors.Is(ie.err, err) {
 		return true
 	}
@@ -37,36 +71,14 @@ func (ie *ierror) Is(err error) bool {
 	return ie.code&t.code > 0
 }
 
-// New is the function to create a New.error
-func New(format string, values ...interface{}) *ierror {
-	return &ierror{
-		err:  fmt.Errorf(format, values...),
-		code: Unknown,
-	}
-}
-
-// From is the function to create a ierror using as a base the an error interface
-func From(err error) *ierror {
-	ierr, ok := err.(*ierror)
-	if !ok {
-		ierr = &ierror{
-			err:  err,
-			code: Unknown,
-		}
-	}
-	return ierr
-}
-
-// Error returns the ierror Message
-func (err *ierror) Error() string {
-	return fmt.Sprintf("%v", err.err.Error())
-}
-
+// Code is a function that tries to convert the error interface to an ierror
+// structure and returns its code value
 func Code(err error) ErrCode {
 	ierr, ok := err.(*ierror)
 	if !ok {
 		// attaches the code unknown to the new ierror
 		ierr = From(err)
+
 	}
 	return ierr.code
 }
@@ -125,32 +137,34 @@ func Unwrap(err error) error {
 
 // MarshalJSON a struct function that allows for operations to be done
 // before or after the json.Marshal procedure
-func (err *ierror) MarshalJSON() ([]byte, error) {
+func (ie *ierror) MarshalJSON() ([]byte, error) {
 
 	// there is no way of setting the inner error as nil using the exported funcs,
 	// one would have to set it inside the ierrors pkg.
-	if err.err == nil {
+	if ie.err == nil {
 		return []byte{},
 			New("unexpected err, ierror inner error field got set to nil").ExternalErr()
 	}
 
 	t := parseStruct{
-		Stack: err.err.Error(),
-		Code:  err.code,
+		Stack: ie.err.Error(),
+		Code:  ie.code,
 	}
 	return json.Marshal(t)
 }
 
 // UnmarshalJSON a struct function that allows for operations to be done
 // before or after the json.Unmarshal procedure
-func (err *ierror) UnmarshalJSON(data []byte) error {
+func (ie *ierror) UnmarshalJSON(data []byte) error {
 	t := &parseStruct{}
 
-	json.Unmarshal(data, &t)
+	if err := json.Unmarshal(data, &t); err != nil {
+		return err
+	}
 
-	err.code = t.Code
-	err.err = stackError(t.Stack)
-	return err
+	ie.code = t.Code
+	ie.err = stackError(t.Stack)
+	return ie
 }
 
 // stackT.error converts the following structure of a error stack message
@@ -187,85 +201,85 @@ func stackError(stack string) error {
 // add exported functions to the pkg.
 
 // NotFound adds Not Found code to Inspr Error
-func (e *ierror) NotFound() *ierror {
-	e.code = NotFound
-	return e
+func (ie *ierror) NotFound() *ierror {
+	ie.code = NotFound
+	return ie
 }
 
 // AlreadyExists adds Already Exists code to Inspr Error
-func (e *ierror) AlreadyExists() *ierror {
-	e.code = AlreadyExists
-	return e
+func (ie *ierror) AlreadyExists() *ierror {
+	ie.code = AlreadyExists
+	return ie
 }
 
 // BadRequest adds Bad Request code to Inspr Error
-func (e *ierror) BadRequest() *ierror {
-	e.code = BadRequest
-	return e
+func (ie *ierror) BadRequest() *ierror {
+	ie.code = BadRequest
+	return ie
 }
 
 // InternalServer adds Internal Server code to Inspr Error
-func (e *ierror) InternalServer() *ierror {
-	e.code = InternalServer
-	return e
+func (ie *ierror) InternalServer() *ierror {
+	ie.code = InternalServer
+	return ie
 }
 
 // InvalidName adds Invalid Name code to Inspr Error
-func (e *ierror) InvalidName() *ierror {
-	e.code = InvalidName
-	return e
+func (ie *ierror) InvalidName() *ierror {
+	ie.code = InvalidName
+	return ie
 }
 
 // InvalidApp adds Invalid App code to Inspr Error
-func (e *ierror) InvalidApp() *ierror {
-	e.code = InvalidApp
-	return e
+func (ie *ierror) InvalidApp() *ierror {
+	ie.code = InvalidApp
+	return ie
 }
 
 // InvalidChannel adds Invalid Channel code to Inspr Error
-func (e *ierror) InvalidChannel() *ierror {
-	e.code = InvalidChannel
-	return e
+func (ie *ierror) InvalidChannel() *ierror {
+	ie.code = InvalidChannel
+	return ie
 }
 
 // InvalidType adds Invalid Type code to Inspr Error
-func (e *ierror) InvalidType() *ierror {
-	e.code = InvalidType
-	return e
+func (ie *ierror) InvalidType() *ierror {
+	ie.code = InvalidType
+	return ie
 }
 
 // InvalidFile adds Invalid Args code to Inspr Error
-func (e *ierror) InvalidFile() *ierror {
-	e.code = InvalidFile
-	return e
+func (ie *ierror) InvalidFile() *ierror {
+	ie.code = InvalidFile
+	return ie
 }
 
 // InvalidToken adds Invalid Token code to Inspr Error
-func (e *ierror) InvalidToken() *ierror {
-	e.code = InvalidToken
-	return e
+func (ie *ierror) InvalidToken() *ierror {
+	ie.code = InvalidToken
+	return ie
 }
 
 // InvalidArgs adds Invalid Args code to Inspr Error
-func (e *ierror) InvalidArgs() *ierror {
-	e.code = InvalidArgs
-	return e
+func (ie *ierror) InvalidArgs() *ierror {
+	ie.code = InvalidArgs
+	return ie
 }
 
 // Forbidden adds Forbidden code to Inspr Error
-func (e *ierror) Forbidden() *ierror {
-	e.code = Forbidden
-	return e
+func (ie *ierror) Forbidden() *ierror {
+	ie.code = Forbidden
+	return ie
 }
 
 // Unauthorized adds Unauthorized code to Inspr Error
-func (e *ierror) Unauthorized() *ierror {
-	e.code = Unauthorized
-	return e
+func (ie *ierror) Unauthorized() *ierror {
+	ie.code = Unauthorized
+	return ie
 }
 
 // ExternalErr adds ExternalPkgError code to Inspr Error
-func (e *ierror) ExternalErr() *ierror {
-	e.code = ExternalPkg
-	return e
+func (ie *ierror) ExternalErr() *ierror {
+	ie.code = ExternalPkg
+	return ie
 }

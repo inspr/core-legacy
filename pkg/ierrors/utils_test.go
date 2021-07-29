@@ -125,7 +125,7 @@ func TestIerror_Is(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Is(tt.fields.err, tt.args.target)
+			got := errors.Is(tt.fields.err, tt.args.target)
 			if got != tt.want {
 				t.Errorf("ierror.Is() = %v, want %v", got, tt.want)
 			}

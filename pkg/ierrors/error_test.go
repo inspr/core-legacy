@@ -349,7 +349,7 @@ func TestIerror_UnmarshalJSON(t *testing.T) {
 			ierr := New("")
 			err := json.Unmarshal(tt.args.data, &ierr)
 
-			if (err != nil) && !Is(ierr, tt.want) {
+			if (err != nil) && !errors.Is(ierr, tt.want) {
 				t.Errorf(
 					"json.Unmarshal(ierror) got = %v, wanted %v",
 					err,
