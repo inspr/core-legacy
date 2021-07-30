@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"golang.org/x/term"
-	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uidp/client"
 	"inspr.dev/inspr/pkg/cmd"
 )
 

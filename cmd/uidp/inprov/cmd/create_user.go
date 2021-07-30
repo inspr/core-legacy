@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"gopkg.in/yaml.v2"
-	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uidp/client"
 	"inspr.dev/inspr/pkg/cmd"
 )
 
@@ -30,13 +30,13 @@ var createUserCmd = cmd.NewCmd(
 Creates a new user on the Insprd UID provider.
 
 For the operation to be successful one must specify the new username and
-its password, followed by the user and password of the user trying to 
-execute the operation. The operation will only work if the user has the 
+its password, followed by the user and password of the user trying to
+execute the operation. The operation will only work if the user has the
 permission to create other users.
 
-By default a user created will have its permissions from the root scope 
-and as consequence it can execute the operations in all dApps, the way 
-in which this can be changed is by using flag '-s', in the examples 
+By default a user created will have its permissions from the root scope
+and as consequence it can execute the operations in all dApps, the way
+in which this can be changed is by using flag '-s', in the examples
 section there is a usage of the flag.
 `).WithExample(
 	"create a new user directly from the cli",

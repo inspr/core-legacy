@@ -7,12 +7,13 @@ import (
 	"log"
 	"os"
 
+	"math/big"
+	"strings"
+
 	"inspr.dev/inspr/pkg/controller/client"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"strings"
-	"math/big"
 )
 
 func generatePassword() string {
@@ -28,17 +29,19 @@ func generatePassword() string {
 	str := b.String()
 	return str
 }
+
 var clientSet kubernetes.Interface
 
-func initInsprd() ( string, error ){
+func initInsprd() (string, error) {
 
-	cont :=  client.NewControllerClient(client.ControllerConfig{
+	cont := client.NewControllerClient(client.ControllerConfig{
 		URL: os.Getenv("INSPRD_URL"),
 	})
 
 	token, err := cont.Authorization().Init(context.Background(), os.Getenv("INSPRD_INIT_KEY"))
 	return token, err
 }
+
 // initKube initializes a k8s operator with in cluster configuration
 func initKube() error {
 	config, err := rest.InClusterConfig()
@@ -59,9 +62,8 @@ func main() {
 	namespace := os.Getenv("K8S_NAMESPACE")
 	secretName := os.Getenv("SECRET_NAME")
 
-
 	initKube()
-	secret, err := clientSet.CoreV1().Secrets(namespace).Get(ctx,secretName, v1.GetOptions{})
+	secret, err := clientSet.CoreV1().Secrets(namespace).Get(ctx, secretName, v1.GetOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -83,7 +85,7 @@ func main() {
 			secret.Data["ADMIN_TOKEN"] = []byte(token)
 		}
 		if os.Getenv("ADMIN_PASSWORD_GENERATE") == "true" {
-			secret.Data["ADMIN_PASSWORD"] = []byte(generatePassword())	
+			secret.Data["ADMIN_PASSWORD"] = []byte(generatePassword())
 		}
 
 		_, err = clientSet.CoreV1().Secrets(namespace).Update(ctx, secret, v1.UpdateOptions{})

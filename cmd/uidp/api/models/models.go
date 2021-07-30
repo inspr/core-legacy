@@ -1,6 +1,6 @@
 package models
 
-import "inspr.dev/inspr/cmd/uid_provider/client"
+import "inspr.dev/inspr/cmd/uidp/client"
 
 // ReceivedDataCreate defines the expected data structure to be
 // received as a response when calling the method Create(...)

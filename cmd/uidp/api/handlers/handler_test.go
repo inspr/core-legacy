@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
-	"inspr.dev/inspr/cmd/uid_provider/api/models"
-	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uidp/api/models"
+	"inspr.dev/inspr/cmd/uidp/client"
 )
 
 var redisServer *miniredis.Miniredis

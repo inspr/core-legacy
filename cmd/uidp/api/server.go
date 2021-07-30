@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 
-	"inspr.dev/inspr/cmd/uid_provider/api/controller"
-	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uidp/api/controller"
+	"inspr.dev/inspr/cmd/uidp/client"
 )
 
 var server controller.Server

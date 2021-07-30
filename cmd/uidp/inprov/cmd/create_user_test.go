@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"gopkg.in/yaml.v2"
-	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uidp/client"
 	"inspr.dev/inspr/pkg/auth"
 )
 

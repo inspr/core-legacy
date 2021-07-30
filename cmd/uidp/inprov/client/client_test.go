@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"inspr.dev/inspr/cmd/uid_provider/api/models"
-	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uidp/api/models"
+	"inspr.dev/inspr/cmd/uidp/client"
 	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/rest/request"
 )

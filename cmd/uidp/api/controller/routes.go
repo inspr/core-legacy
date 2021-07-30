@@ -2,7 +2,7 @@ package controller
 
 import (
 	"go.uber.org/zap"
-	handler "inspr.dev/inspr/cmd/uid_provider/api/handlers"
+	handler "inspr.dev/inspr/cmd/uidp/api/handlers"
 	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/rest"
 )

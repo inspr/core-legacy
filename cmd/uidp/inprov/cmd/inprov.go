@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"inspr.dev/inspr/cmd/uid_provider/inprov/client"
+	"inspr.dev/inspr/cmd/uidp/inprov/client"
 	build "inspr.dev/inspr/pkg/cmd"
 )
 

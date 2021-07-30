@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"inspr.dev/inspr/cmd/uid_provider/api"
-	"inspr.dev/inspr/cmd/uid_provider/client"
+	"inspr.dev/inspr/cmd/uidp/api"
+	"inspr.dev/inspr/cmd/uidp/client"
 )
 
 func main() {
