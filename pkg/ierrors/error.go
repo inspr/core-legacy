@@ -19,27 +19,30 @@ type (
 		Stack string  `yaml:"stack" json:"stack"`
 		Code  ErrCode `yaml:"code"  json:"code"`
 	}
+
+	// Msg is a type that defines func that handles the creation of the message
+	// to be wrapped in the error stack
+	Msg func(format string, values ...interface{}) string
 )
 
 const (
 	// prefixMessage is used by the stackToErr to remove the error message
 	// before processing the stack of errors
 	prefixMessage = "error :"
-
-	separator = ":"
+	separator     = ":"
 )
 
 // New is the func similar to the standard library `errors.New` but it
 // returns the inspr error structure, containing an error code and the
 // capability of wrapping the message with extra context messages
-func New(format string, values ...interface{}) *ierror { // MATCH /New.*unexported/
+func New(format string, values ...interface{}) *ierror {
 	return &ierror{
 		err:  fmt.Errorf(format, values...),
 		code: Unknown,
 	}
 }
 
-// From is the func to create a ierror using as a base the an error interface
+// From is the func to create an ierror structure using as a base the an error interface
 func From(err error) *ierror {
 	ierr, ok := err.(*ierror)
 	if !ok {
@@ -57,9 +60,20 @@ func (ie *ierror) Error() string {
 	// return FormatError(ie)
 }
 
+// FormatError is a simple function with the intention of handling the default
+// ierror Error() format into something more presentable.
+//
+// Meaning that the error
+//
+// "file X : func Y : <base_error> " will be converted into:
+//
+// file X
+//		func Y
+//		<base_error>
 func FormatError(err error) string {
 	ie := From(err)
 	stack := strings.TrimPrefix(ie.err.Error(), prefixMessage)
+
 	// reverses the stack to so they are inserted in the proper order
 	messages := strings.Split(stack, ":")
 
@@ -67,9 +81,9 @@ func FormatError(err error) string {
 	for i, msg := range messages {
 		m := strings.TrimSpace(msg)
 		if i == 0 {
-			message += prefixMessage + m + "\n"
+			message += fmt.Sprintf("%v %v\n", prefixMessage, m)
 		} else {
-			message += "\t" + m + "\n"
+			message += fmt.Sprintf("\t%v\n", m)
 		}
 	}
 	return message
@@ -106,23 +120,19 @@ func Code(err error) ErrCode {
 // Wrap is responsible for adding extra context to an error, this is done by
 // stacking error messages that give the receiver of the error the path of the
 // error occurrence
-func Wrap(err error, format string, values ...interface{}) error {
+func Wrap(err error, msgs ...string) error {
 	// returns nil if error doesn't exist
 	if err == nil {
 		return nil
 	}
 
 	// if not an ierror type, makes the conversion
-	ierr, ok := err.(*ierror)
-	if !ok {
-		ierr = From(err)
-	}
+	ierr := From(err)
 
-	msg := fmt.Sprintf(format, values...)
-
-	// if not empty
-	if msg != "" {
-		ierr.err = fmt.Errorf("%v %s %w", msg, separator, ierr.err)
+	for _, msg := range msgs {
+		if msg != "" {
+			ierr.err = fmt.Errorf("%s %s %w", msg, separator, ierr.err)
+		}
 	}
 
 	return ierr

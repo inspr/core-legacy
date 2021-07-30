@@ -1,94 +1,37 @@
-// Package zap provides fast, structured, leveled logging.
+// Package ierrors provides an easy way to wrap context to the error of the
+// standard library, as well as support for multiple errors.
 //
-// For applications that log in the hot path, reflection-based serialization
-// and string formatting are prohibitively expensive - they're CPU-intensive
-// and make many small allocations. Put differently, using json.Marshal and
-// fmt.Fprintf to log tons of interface{} makes your application slow.
+// Declaring an error
 //
-// Zap takes a different approach. It includes a reflection-free,
-// zero-allocation JSON encoder, and the base Logger strives to avoid
-// serialization overhead and allocations wherever possible. By building the
-// high-level SugaredLogger on that foundation, zap lets users choose when
-// they need to count every allocation and when they'd prefer a more familiar,
-// loosely typed API.
+// This is the most usual way of using the package, there are two options: the
+// first consists of using ierrors.New(""), specifying the message of the error,
+// and the ierrors.MultiError structure whichs supports multiple errors.
 //
-// Choosing a Logger
+// - ierror: is the structure created by the ierrors.New() and consists of a
+// message and an errorCode, the second parameter can be added when
+// instantiating an ierror after the New func call. An example of its usage would
+// be `ierrors.New("cli subcommand X error").InvalidArgs()`.
 //
-// In contexts where performance is nice, but not critical, use the
-// SugaredLogger. It's 4-10x faster than other structured logging packages and
-// supports both structured and printf-style logging. Like log15 and go-kit,
-// the SugaredLogger's structured logging APIs are loosely typed and accept a
-// variadic number of key-value pairs. (For more advanced use cases, they also
-// accept strongly typed fields - see the SugaredLogger.With documentation for
-// details.)
-//  sugar := zap.NewExample().Sugar()
-//  defer sugar.Sync()
-//  sugar.Infow("failed to fetch URL",
-//    "url", "http://example.com",
-//    "attempt", 3,
-//    "backoff", time.Second,
-//  )
-//  sugar.Infof("failed to fetch URL: %s", "http://example.com")
+// - MultiError: structure which is composed of an errorCode and a slice of
+// error interfaces, it contains the methods Add(error) and Empty(). Which can
+// be used to handle error requests that are comming from a set of goroutines.
 //
-// By default, loggers are unbuffered. However, since zap's low-level APIs
-// allow buffering, calling Sync before letting your process exit is a good
-// habit.
+// Some functionalities that are contained within this package are:
 //
-// In the rare contexts where every microsecond and every allocation matter,
-// use the Logger. It's even faster than the SugaredLogger and allocates far
-// less, but it only supports strongly-typed, structured logging.
-//  logger := zap.NewExample()
-//  defer logger.Sync()
-//  logger.Info("failed to fetch URL",
-//    zap.String("url", "http://example.com"),
-//    zap.Int("attempt", 3),
-//    zap.Duration("backoff", time.Second),
-//  )
+// - Wrap/Unwrap functions: handles the addition and removal of context to an
+// error, meaning that if desired the developer can provide extra information to
+// the error he can simply use `ierrors.Wrap(err, "on operation X")`.
 //
-// Choosing between the Logger and SugaredLogger doesn't need to be an
-// application-wide decision: converting between the two is simple and
-// inexpensive.
-//   logger := zap.NewExample()
-//   defer logger.Sync()
-//   sugar := logger.Sugar()
-//   plain := sugar.Desugar()
+// - Marshal/Unmarshal: the ierror structure declared by this package have
+// custom functions that are called when using json.Marshal or json.Unmarshal,
+// meaning that when creating a error it can be parsed into json and yaml
+// format, allowing the transfer of error information via http.
 //
-// Configuring Zap
-//
-// The simplest way to build a Logger is to use zap's opinionated presets:
-// NewExample, NewProduction, and NewDevelopment. These presets build a logger
-// with a single function call:
-//  logger, err := zap.NewProduction()
-//  if err != nil {
-//    log.Fatalf("can't initialize zap logger: %v", err)
-//  }
-//  defer logger.Sync()
-//
-// Presets are fine for small projects, but larger projects and organizations
-// naturally require a bit more customization. For most users, zap's Config
-// struct strikes the right balance between flexibility and convenience. See
-// the package-level BasicConfiguration example for sample code.
-//
-// More unusual configurations (splitting output between files, sending logs
-// to a message queue, etc.) are possible, but require direct use of
-// go.uber.org/zap/zapcore. See the package-level AdvancedConfiguration
-// example for sample code.
-//
-// Extending Zap
-//
-// The zap package itself is a relatively thin wrapper around the interfaces
-// in go.uber.org/zap/zapcore. Extending zap to support a new encoding (e.g.,
-// BSON), a new log sink (e.g., Kafka), or something more exotic (perhaps an
-// exception aggregation service, like Sentry or Rollbar) typically requires
-// implementing the zapcore.Encoder, zapcore.WriteSyncer, or zapcore.Core
-// interfaces. See the zapcore documentation for details.
-//
-// Similarly, package authors can use the high-performance Encoder and Core
-// implementations in the zapcore package to build their own loggers.
-//
-// Frequently Asked Questions
-//
-// An FAQ covering everything from installation errors to design decisions is
-// available at https://github.com/uber-go/zap/blob/master/FAQ.md.
-
+// - From: it receives an external error interace and converts it to an ierror
+// structure while mantaining the content. For example
+// ierrors.From(sql.ErrNoRows) creates an ierror with the base error of the sql
+// package, meaning that is possible to add futher context to the sql message.
+// By doing this it is still possible to use the errors.Is(err_1, err_2) from
+// the standard library to compare different types of errors even after adding
+// the contexts.
 package ierrors // import "inspr.dev/inspr/pkg/ierrors"

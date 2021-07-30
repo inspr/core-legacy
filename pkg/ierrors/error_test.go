@@ -84,6 +84,42 @@ func TestIerror_Error(t *testing.T) {
 	}
 }
 
+func TestFormatError(t *testing.T) {
+	type fields struct {
+		err error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "converting_nil",
+			fields: fields{
+				err: Wrap(
+					New("mock_err"),
+					"wrapper_1",
+					"wrapper_2",
+					"wrapper_3",
+				),
+			},
+			want: "error : wrapper_3\n\twrapper_2\n\twrapper_1\n\tmock_err\n",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := FormatError(tt.fields.err)
+			if got != tt.want {
+				t.Errorf(
+					"FormatError got '%v', want '%v'",
+					got, tt.want,
+				)
+			}
+		})
+	}
+}
+
 func TestCode(t *testing.T) {
 	type fields struct {
 		err error
@@ -139,7 +175,7 @@ func TestIerror_Wrap(t *testing.T) {
 			fields: fields{
 				err: errors.New("mock_err"),
 			},
-			want: Wrap(New("mock_err"), "").Error(),
+			want: New("mock_err").Error(),
 		},
 		{
 			name: "wrap_standard_error_with_message",
@@ -149,12 +185,32 @@ func TestIerror_Wrap(t *testing.T) {
 			args: args{
 				msg: "wrapper_context",
 			},
-			want: Wrap(New("mock_err"), "wrapper_context").Error(),
+			want: fmt.Errorf(
+				"error : %v : %w", "wrapper_context", errors.New("mock_err"),
+			).Error(),
+		},
+		{
+			name: "wrap_ierror_no_message",
+			fields: fields{
+				err: New("mock_err"),
+			},
+			want: New("mock_err").Error(),
+		},
+		{
+			name: "wrap_ierror_with_message",
+			fields: fields{
+				err: New("mock_err"),
+			},
+			args: args{
+				msg: "wrapper_context",
+			},
+			want: fmt.Errorf(
+				"error : %v : %w", "wrapper_context", errors.New("mock_err"),
+			).Error(),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			got := Wrap(tt.fields.err, tt.args.msg)
 
 			if (got == nil) != tt.wantNil {
@@ -210,21 +266,15 @@ func TestUnwrap(t *testing.T) {
 			name: "unwrap_ierror_with_multiple_previous_wraps",
 			args: args{
 				err: Wrap(
-					Wrap(
-						Wrap(
-							New("mock"),
-							"first_context",
-						),
-						"second_context",
-					),
+					New("mock"),
+					"first_context",
+					"second_context",
 					"third context",
 				),
 			},
 			want: Wrap(
-				Wrap(
-					New("mock"),
-					"first_context",
-				),
+				New("mock"),
+				"first_context",
 				"second_context",
 			),
 		},
