@@ -1,6 +1,18 @@
 
 # Changelog
 
+### #105 Tech CORE-442 | Refactor of the error structure in the project
+- features:
+    - refactor of the ierror pkg, removal of the builder concept, now has
+      similar behaviour to the standard library errors pkg but functions to add
+      more context to the error.
+    - The main focus was to develop a secluded pkg to be used for testing and
+      error context, should be used as a referenced in future features.
+- tests:
+    - changed 80+ files tests
+    - redid the tests of the ierror pkg
+
+
 ### #103 Tech CORE-542 | Change broker commands and sub-commands
 - features:
     - change clusters cli sub-commands.
