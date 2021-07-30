@@ -117,7 +117,6 @@ func TestERROR(t *testing.T) {
 				t.Errorf("JSON(w,code,data)=%v, want %v", status, tt.want)
 			}
 
-			// TODO REVIEW
 			errorMessage := ierrors.New("")
 			json.Unmarshal(rr.Body.Bytes(), &errorMessage)
 

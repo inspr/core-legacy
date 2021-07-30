@@ -235,7 +235,6 @@ func TestHandler_Recover(t *testing.T) {
 
 	body := rr.Result().Body
 
-	// TODO review
 	got := ierrors.New("")
 	json.NewDecoder(body).Decode(&got)
 

@@ -363,6 +363,7 @@ func TestIerror_UnmarshalJSON(t *testing.T) {
 func TestIerror_stackError(t *testing.T) {
 	type fields struct {
 		stack string
+		code  ErrCode
 	}
 	tests := []struct {
 		name   string
@@ -373,23 +374,25 @@ func TestIerror_stackError(t *testing.T) {
 			name: "basic_test",
 			fields: fields{
 				stack: Wrap(
-					New("mock_err"),
+					errors.New("mock_err"),
 					"wrap_1",
 				).Error(),
+				code: Unknown,
 			},
+
 			wanted: Wrap(
-				New("mock_err"),
+				errors.New("mock_err"),
 				"wrap_1",
 			),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := stackError(tt.fields.stack)
+			got := stackToError(tt.fields.stack, Unknown)
 
 			if got.Error() != tt.wanted.Error() {
 				t.Errorf(
-					"ierror.StackToError() error = %v, wanted = %v",
+					"ierror.StackToError() error = '%v', wanted = '%v'",
 					got,
 					tt.wanted,
 				)
@@ -569,11 +572,3 @@ func TestErrCode(t *testing.T) {
 		})
 	}
 }
-
-/*
-ierrors.Wrap(
-	err,
-	"handling dapp creation",
-	"oanfoanf"
-)
-*/

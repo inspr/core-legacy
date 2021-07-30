@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
@@ -17,7 +18,10 @@ const (
 )
 
 var (
-	defaultErr = ierrors.
+	// DefaultErr is the error returned by the request's response when an
+	// unexpected http.Status is provided and it doesn't have an error structure
+	// in its response body.
+	DefaultErr = ierrors.
 		New("cannot retrieve error from server").
 		InternalServer()
 )
@@ -41,7 +45,6 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 		c.routeToURL(route),
 		bytes.NewBuffer(buf),
 	)
-
 	if err != nil {
 		return ierrors.Wrap(
 			ierrors.From(err).BadRequest(),
@@ -89,7 +92,7 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 		decoder := json.NewDecoder(resp.Body)
 		err = decoder.Decode(responsePtr)
 
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			return nil
 		}
 
@@ -105,34 +108,27 @@ func (c Client) handleResponseErr(resp *http.Response) error {
 	switch resp.StatusCode {
 	case http.StatusOK:
 		return nil
+
 	case http.StatusUnauthorized:
 		decoder.Decode(&err)
-		if err != nil {
-			ierrors.Wrap(
-				err,
-				"status unauthorized",
-			)
-			return err
-		}
-		return defaultErr
+		return ierrors.Wrap(
+			err,
+			"status unauthorized",
+		)
 	case http.StatusForbidden:
 		decoder.Decode(&err)
-		if err != nil {
-			ierrors.Wrap(
-				err,
-				"status forbidden",
-			)
-			return err
-		}
-		return defaultErr
+		return ierrors.Wrap(
+			err,
+			"status forbidden",
+		)
 	case http.StatusNotFound:
 		return ierrors.New("route not found")
 
 	default:
 		decoder.Decode(&err)
 		if err == nil {
-			return defaultErr
+			err = DefaultErr
 		}
-		return err
+		return ierrors.Wrap(err, "")
 	}
 }

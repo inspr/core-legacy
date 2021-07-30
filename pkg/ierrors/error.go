@@ -1,4 +1,3 @@
-// Package ierrors TODO ADD PKG description
 package ierrors
 
 import (
@@ -23,9 +22,11 @@ type (
 )
 
 const (
-	// prefixErrorMessage is used by the stackToErr to remove the error message
+	// prefixMessage is used by the stackToErr to remove the error message
 	// before processing the stack of errors
-	prefixErrorMessage = "error: "
+	prefixMessage = "error :"
+
+	separator = ":"
 )
 
 // New is the func similar to the standard library `errors.New` but it
@@ -50,13 +51,28 @@ func From(err error) *ierror {
 	return ierr
 }
 
-func Empty() *ierror {
-	return nil
-}
-
 // Error returns the ierror Message
 func (ie *ierror) Error() string {
-	return fmt.Sprintf("%v%v", prefixErrorMessage, ie.err.Error())
+	return fmt.Sprintf("%v %v", prefixMessage, ie.err)
+	// return FormatError(ie)
+}
+
+func FormatError(err error) string {
+	ie := From(err)
+	stack := strings.TrimPrefix(ie.err.Error(), prefixMessage)
+	// reverses the stack to so they are inserted in the proper order
+	messages := strings.Split(stack, ":")
+
+	var message string
+	for i, msg := range messages {
+		m := strings.TrimSpace(msg)
+		if i == 0 {
+			message += prefixMessage + m + "\n"
+		} else {
+			message += "\t" + m + "\n"
+		}
+	}
+	return message
 }
 
 // Is has the purpose of establishing a way to utilize the standard library func
@@ -87,11 +103,6 @@ func Code(err error) ErrCode {
 	return From(err).code
 }
 
-// TODO REVIEW wrap -> descrition and maybe the possibility of using multiple
-// string values at once like:
-//
-// ierrors.Wrap(err, "msg1", "msg2", "msg3")
-
 // Wrap is responsible for adding extra context to an error, this is done by
 // stacking error messages that give the receiver of the error the path of the
 // error occurrence
@@ -111,17 +122,16 @@ func Wrap(err error, format string, values ...interface{}) error {
 
 	// if not empty
 	if msg != "" {
-		ierr.err = fmt.Errorf("%v : %w", msg, ierr.err)
+		ierr.err = fmt.Errorf("%v %s %w", msg, separator, ierr.err)
 	}
 
 	return ierr
 }
 
-// TODO REVIEW unwrap descrition
-
-// Unwrap is a err function that is capable of handling both the standard golang
-// error as well as the insp.error structure, it removes the last wrap done to
-// the err stack and if that was the last error in the stack it will return nil.
+// Unwrap is a err function that removes the last wrap done to the err stack
+// and if that was the last error in the stack it will return nil. It is
+// capable of handling both the standard golang error as well as the insprError
+// structure.
 func Unwrap(err error) error {
 	ierr, ok := err.(*ierror)
 	if !ok {
@@ -168,35 +178,37 @@ func (ie *ierror) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	ie.code = t.Code
-	ie.err = stackError(t.Stack)
-	return ie
+	parsedIerr := stackToError(t.Stack, t.Code)
+	ie.err = parsedIerr.err
+	ie.code = parsedIerr.code
+	return nil
 }
 
-// stackT.error converts the following structure of a error stack message
-// into an actual stack of errors using the fmt.errorf
-func stackError(stack string) error {
-	var err error
+// stackToError converts a stack message and a code into an ierror strucutre
+func stackToError(stack string, code ErrCode) *ierror {
+	var ie *ierror
 
-	stack = strings.TrimPrefix(stack, prefixErrorMessage)
+	stack = strings.TrimPrefix(stack, prefixMessage)
 
 	// reverses the stack to so they are inserted in the proper order
-	messages := strings.Split(stack, ":")
+	messages := strings.Split(stack, separator)
 
 	for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
 		messages[i], messages[j] = messages[j], messages[i]
 	}
 
 	for _, msg := range messages {
-		m := strings.TrimSpace(msg)
-		if err == nil {
-			err = errors.New(m)
+		msg = strings.TrimSpace(msg)
+
+		if ie == nil {
+			ie = New(msg)
+			ie.code = code
 		} else {
-			err = Wrap(err, m)
+			ie.err = fmt.Errorf("%v %s %w", msg, separator, ie.err)
 		}
 	}
 
-	return err
+	return ie
 }
 
 // The functions bellow are designed so the.codeCode of a ierror can only be
@@ -205,8 +217,8 @@ func stackError(stack string) error {
 //
 // ierrors.New("my message").NotFound()
 //
-// This allows us to create functions to change the.codeCode state but it doesn't
-// add exported functions to the pkg.
+// This allows us to create functions to change the ierr.Code state but it
+// doesn't add exported variables to the error structure.
 
 // NotFound adds Not Found code to Inspr Error
 func (ie *ierror) NotFound() *ierror {

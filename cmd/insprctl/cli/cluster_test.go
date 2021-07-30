@@ -13,6 +13,7 @@ import (
 	cliutils "inspr.dev/inspr/pkg/cmd/utils"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/rest/request"
 )
 
 func TestNewClusterCommand(t *testing.T) {
@@ -60,12 +61,20 @@ func Test_authInit(t *testing.T) {
 			expectedOutput: "This is a root token for authentication within your insprd. This will not be generated again. Save it wisely.\nmock_token\n",
 		},
 		{
-			name:         "Should return error",
+			name:         "Should_return_body_error",
 			flagsAndArgs: []string{"init", "pwd"},
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.New("error"))
 			},
-			expectedOutput: fmt.Sprintf("%v\n", ierrors.New("error").Error()),
+			expectedOutput: fmt.Sprintf("%v\n", ierrors.New("error")),
+		},
+		{
+			name:         "Should_return_default_request_error",
+			flagsAndArgs: []string{"init", "pwd"},
+			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				rest.ERROR(w, nil)
+			},
+			expectedOutput: fmt.Sprintf("%v\n", request.DefaultErr),
 		},
 	}
 	for _, tt := range tests {

@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strings"
 	"testing"
 
 	"inspr.dev/inspr/pkg/ierrors"
@@ -246,7 +245,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 					}(),
 				},
 			},
-			wantMessage: defaultErr.Error(),
+			wantMessage: DefaultErr.Error(),
 		},
 		{
 			name: "default_error_message_unauthorized_code",
@@ -257,12 +256,16 @@ func TestClient_handleResponseErr(t *testing.T) {
 				&http.Response{
 					StatusCode: http.StatusUnauthorized,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal(nil)
+						b, _ := json.Marshal(
+							ierrors.New("mock_error").Unauthorized())
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantMessage: defaultErr.Error(),
+			wantMessage: ierrors.Wrap(
+				ierrors.New("mock_error"),
+				"status unauthorized",
+			).Error(),
 		},
 		{
 			name: "default_error_message_forbidden_code",
@@ -273,12 +276,16 @@ func TestClient_handleResponseErr(t *testing.T) {
 				&http.Response{
 					StatusCode: http.StatusForbidden,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal(nil)
+						b, _ := json.Marshal(
+							ierrors.New("mock_error").Forbidden())
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantMessage: defaultErr.Error(),
+			wantMessage: ierrors.Wrap(
+				ierrors.New("mock_error"),
+				"status forbidden",
+			).Error(),
 		},
 		{
 			name: "response with custom error",
@@ -349,21 +356,10 @@ func TestClient_handleResponseErr(t *testing.T) {
 				decoderGenerator: tt.fields.decoderGenerator,
 			}
 			err := c.handleResponseErr(tt.args.resp)
-			var got string
-
-			// does it wrap?
-			wrapContent := errors.Unwrap(err)
-
-			if wrapContent == nil {
-				got = err.Error()
-			} else {
-				got = wrapContent.Error()
-			}
-
-			if strings.TrimSuffix(got, ": ") != tt.wantMessage {
+			if err.Error() != tt.wantMessage {
 				t.Errorf(
 					"Client.handleResponseErr() error = %v, wantErr %v",
-					got,
+					err.Error(),
 					tt.wantMessage,
 				)
 			}

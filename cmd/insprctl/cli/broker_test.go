@@ -65,9 +65,12 @@ func Test_getBrokers(t *testing.T) {
 		{
 			name: "Should return error",
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.New("error"))
+				rest.ERROR(w, ierrors.New("mock_error"))
 			},
-			expectedOutput: fmt.Sprintf("%v\n", ierrors.New("error").Error()),
+			expectedOutput: fmt.Sprintf(
+				"%v\n",
+				ierrors.New("mock_error").Error(),
+			),
 		},
 	}
 	for _, tt := range tests {

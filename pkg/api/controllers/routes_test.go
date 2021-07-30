@@ -10,9 +10,6 @@ import (
 	authmock "inspr.dev/inspr/pkg/auth/mocks"
 )
 
-// TODO REVIEW - add multiple auth mocks, checking the response for each method
-// when a different error occurs
-
 // TestServer_initRoutes - this test is a bit different than the one automatically
 // generated, the idea behind it is to specify in wanted the desired result for each
 // of the 4 default methods [GET,POST,PUT,DELETE] being a 405 a invalid request. It is
