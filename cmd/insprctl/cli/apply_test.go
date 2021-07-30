@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -347,7 +346,7 @@ func Test_applyValidFiles(t *testing.T) {
 			funcErr: ierrors.New("default_error").BadRequest(),
 			errMsg: ierrors.Wrap(
 				ierrors.New("default_error").BadRequest(),
-				"unknown inspr error",
+				filePath,
 			).Error(),
 		},
 		{
@@ -356,11 +355,11 @@ func Test_applyValidFiles(t *testing.T) {
 				path:  "",
 				files: tempFiles,
 			},
-			want:    nil,
-			funcErr: errors.New("unknown_Error"),
+			// TODO REVIEW
+			funcErr: ierrors.New("unknown_Error"),
 			errMsg: ierrors.Wrap(
 				ierrors.New("unknown_Error"),
-				"unknown inspr error",
+				filePath,
 			).Error(),
 		},
 	}

@@ -64,10 +64,7 @@ func Test_authInit(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.New("error"))
 			},
-			expectedOutput: ierrors.Wrap(
-				ierrors.New("error"),
-				"unknown inspr error",
-			).Error(),
+			expectedOutput: ierrors.New("error").Error(),
 		},
 	}
 	for _, tt := range tests {

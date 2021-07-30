@@ -97,7 +97,7 @@ func TestBrokersClient_Create(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want string
+		want error
 	}{
 		{
 			name: "send_request_to_route",
@@ -106,7 +106,7 @@ func TestBrokersClient_Create(t *testing.T) {
 				brokerName: "kafka",
 				config:     []byte{},
 			},
-			want: "",
+			want: nil,
 		},
 		{
 			name: "failed_to_send_request_to_route",
@@ -115,15 +115,15 @@ func TestBrokersClient_Create(t *testing.T) {
 				brokerName: "kafka",
 				config:     []byte{},
 			},
-			want: "error_on_request",
+			want: ierrors.New("error_on_request"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			handler := func(w http.ResponseWriter, r *http.Request) {
-				if tt.want != "" {
+				if tt.want != nil {
 					w.WriteHeader(http.StatusBadRequest)
-					rest.ERROR(w, ierrors.New(tt.want).BadRequest())
+					rest.ERROR(w, ierrors.From(tt.want).BadRequest())
 					return
 				}
 
@@ -153,7 +153,7 @@ func TestBrokersClient_Create(t *testing.T) {
 				got = err.Error()
 			}
 
-			if got != tt.want {
+			if (tt.want != nil) && got != tt.want.Error() {
 				t.Errorf("BrokersClient.Create() error = %v, want %v", err, tt.want)
 			}
 		})

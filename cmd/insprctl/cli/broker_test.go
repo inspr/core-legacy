@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -66,10 +67,7 @@ func Test_getBrokers(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.New("error"))
 			},
-			expectedOutput: ierrors.Wrap(
-				ierrors.New("error"),
-				"unknown inspr error",
-			).Error(),
+			expectedOutput: ierrors.New("error").Error(),
 		},
 	}
 	for _, tt := range tests {
@@ -135,9 +133,12 @@ func Test_brokerConfig(t *testing.T) {
 		wantMsg string
 	}{
 		{
-			name:    "filePath_empty",
-			args:    []string{"kafka", ""},
-			wantMsg: "invalid args: arg 'filePath' is empty\n",
+			name: "filePath_empty",
+			args: []string{"kafka", ""},
+			wantMsg: fmt.Sprintf(
+				"invalid args: %v\n",
+				ierrors.New("arg 'filePath' is empty").InvalidArgs().Error(),
+			),
 			wantErr: true,
 		},
 		{

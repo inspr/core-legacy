@@ -98,8 +98,6 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 	return err
 }
 
-// TODO REVIEW
-
 func (c Client) handleResponseErr(resp *http.Response) error {
 	decoder := c.decoderGenerator(resp.Body)
 	err := ierrors.New("")

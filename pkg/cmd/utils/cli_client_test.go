@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -213,12 +212,9 @@ func TestRequestErrorMessage(t *testing.T) {
 		{
 			name: "ierror-unknown",
 			args: args{
-				err: errors.New("mock-error"),
+				err: ierrors.New("mock-error"),
 			},
-			want: ierrors.Wrap(
-				ierrors.New("mock-error"),
-				"unknown inspr error",
-			).Error(),
+			want: ierrors.New("mock-error").Error(),
 		},
 	}
 	for _, tt := range tests {

@@ -118,12 +118,14 @@ func TestERROR(t *testing.T) {
 			}
 
 			// TODO REVIEW
-			errorMessage := errors.New("")
+			errorMessage := ierrors.New("")
 			json.Unmarshal(rr.Body.Bytes(), &errorMessage)
 
-			if !reflect.DeepEqual(errorMessage.Error(), tt.err.Error()) {
-				t.Errorf("JSON(w,code,data)=%v, want %v",
-					errorMessage, tt.err.Error())
+			gotCode := ierrors.Code(errorMessage)
+			wantCode := ierrors.Code(tt.err)
+
+			if !reflect.DeepEqual(gotCode, wantCode) {
+				t.Errorf("JSON(w,code,data)=%v, want %v", gotCode, wantCode)
 			}
 		})
 	}

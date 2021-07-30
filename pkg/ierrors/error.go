@@ -22,6 +22,12 @@ type (
 	}
 )
 
+const (
+	// prefixErrorMessage is used by the stackToErr to remove the error message
+	// before processing the stack of errors
+	prefixErrorMessage = "error: "
+)
+
 // New is the func similar to the standard library `errors.New` but it
 // returns the inspr error structure, containing an error code and the
 // capability of wrapping the message with extra context messages
@@ -44,9 +50,13 @@ func From(err error) *ierror {
 	return ierr
 }
 
+func Empty() *ierror {
+	return nil
+}
+
 // Error returns the ierror Message
 func (ie *ierror) Error() string {
-	return fmt.Sprintf("%v", ie.err.Error())
+	return fmt.Sprintf("%v%v", prefixErrorMessage, ie.err.Error())
 }
 
 // Is has the purpose of establishing a way to utilize the standard library func
@@ -74,13 +84,7 @@ func (ie *ierror) Is(err error) bool {
 // Code is a function that tries to convert the error interface to an ierror
 // structure and returns its code value
 func Code(err error) ErrCode {
-	ierr, ok := err.(*ierror)
-	if !ok {
-		// attaches the code unknown to the new ierror
-		ierr = From(err)
-
-	}
-	return ierr.code
+	return From(err).code
 }
 
 // TODO REVIEW wrap -> descrition and maybe the possibility of using multiple
@@ -156,7 +160,9 @@ func (ie *ierror) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON a struct function that allows for operations to be done
 // before or after the json.Unmarshal procedure
 func (ie *ierror) UnmarshalJSON(data []byte) error {
-	t := &parseStruct{}
+	t := &parseStruct{
+		Code: Unknown,
+	}
 
 	if err := json.Unmarshal(data, &t); err != nil {
 		return err
@@ -171,6 +177,8 @@ func (ie *ierror) UnmarshalJSON(data []byte) error {
 // into an actual stack of errors using the fmt.errorf
 func stackError(stack string) error {
 	var err error
+
+	stack = strings.TrimPrefix(stack, prefixErrorMessage)
 
 	// reverses the stack to so they are inserted in the proper order
 	messages := strings.Split(stack, ":")

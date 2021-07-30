@@ -1,6 +1,9 @@
 package ierrors
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestMultiError_Error(t *testing.T) {
 	type fields struct {
@@ -29,7 +32,11 @@ func TestMultiError_Error(t *testing.T) {
 				},
 				Code: 128,
 			},
-			wantRet: "err1\nerr2",
+			wantRet: fmt.Sprintf(
+				"%v\n%v",
+				New("err1"),
+				New("err2"),
+			),
 		},
 	}
 	for _, tt := range tests {
@@ -68,7 +75,11 @@ func TestMultiError_Add(t *testing.T) {
 			args: args{
 				New("err2"),
 			},
-			wantRet: "err1\nerr2",
+			wantRet: fmt.Sprintf(
+				"%v\n%v",
+				New("err1"),
+				New("err2"),
+			),
 		},
 	}
 	for _, tt := range tests {
