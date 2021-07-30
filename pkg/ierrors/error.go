@@ -19,10 +19,6 @@ type (
 		Stack string  `yaml:"stack" json:"stack"`
 		Code  ErrCode `yaml:"code"  json:"code"`
 	}
-
-	// Msg is a type that defines func that handles the creation of the message
-	// to be wrapped in the error stack
-	Msg func(format string, values ...interface{}) string
 )
 
 const (
