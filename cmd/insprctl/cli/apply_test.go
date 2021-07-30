@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -324,7 +325,13 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.New("unauthorized").Unauthorized(),
-			errMsg:  "failed to authenticate with the cluster. Is your token configured correctly?\n",
+			errMsg: fmt.Sprintf(
+				"%v\n",
+				ierrors.Wrap(
+					ierrors.New("unauthorized").Unauthorized(),
+					filePath,
+				),
+			),
 		},
 		{
 			name: "forbidden_error",
@@ -334,7 +341,13 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.New("forbidden").Forbidden(),
-			errMsg:  "forbidden operation, please check for the scope.\n",
+			errMsg: fmt.Sprintf(
+				"%v\n",
+				ierrors.Wrap(
+					ierrors.New("forbidden").Forbidden(),
+					filePath,
+				),
+			),
 		},
 		{
 			name: "default_ierror_message",
@@ -344,10 +357,10 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.New("default_error").BadRequest(),
-			errMsg: ierrors.Wrap(
+			errMsg: fmt.Sprintf("%v\n", ierrors.Wrap(
 				ierrors.New("default_error").BadRequest(),
 				filePath,
-			).Error(),
+			).Error()),
 		},
 		{
 			name: "Unknown_error",
@@ -355,12 +368,11 @@ func Test_applyValidFiles(t *testing.T) {
 				path:  "",
 				files: tempFiles,
 			},
-			// TODO REVIEW
 			funcErr: ierrors.New("unknown_Error"),
-			errMsg: ierrors.Wrap(
+			errMsg: fmt.Sprintf("%v\n", ierrors.Wrap(
 				ierrors.New("unknown_Error"),
 				filePath,
-			).Error(),
+			).Error()),
 		},
 	}
 	for _, tt := range tests {

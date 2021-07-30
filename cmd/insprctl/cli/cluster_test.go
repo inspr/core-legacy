@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -64,7 +65,7 @@ func Test_authInit(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.New("error"))
 			},
-			expectedOutput: ierrors.New("error").Error(),
+			expectedOutput: fmt.Sprintf("%v\n", ierrors.New("error").Error()),
 		},
 	}
 	for _, tt := range tests {

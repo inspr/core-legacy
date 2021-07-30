@@ -25,15 +25,15 @@ func NewClusterCommand() *cobra.Command {
 }
 
 func authInit(c context.Context, args []string) error {
-	output := utils.GetCliOutput()
+	out := utils.GetCliOutput()
 
 	token, err := utils.GetCliClient().Authorization().Init(c, args[0])
 	if err != nil {
-		utils.RequestErrorMessage(err, output)
+		fmt.Fprintf(out, "%v\n", err)
 		return err
 	}
 
-	fmt.Fprintln(output, "This is a root token for authentication within your insprd. This will not be generated again. Save it wisely.")
-	fmt.Fprintf(output, "%s\n", token)
+	fmt.Fprintln(out, "This is a root token for authentication within your insprd. This will not be generated again. Save it wisely.")
+	fmt.Fprintf(out, "%s\n", token)
 	return nil
 }

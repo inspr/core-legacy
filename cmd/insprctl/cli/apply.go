@@ -154,7 +154,7 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 		err = apply(file.content, out)
 		if err != nil {
 			ierrors.Wrap(err, file.fileName)
-			cliutils.RequestErrorMessage(err, out)
+			fmt.Fprintf(out, "%v\n", err)
 			continue
 		}
 

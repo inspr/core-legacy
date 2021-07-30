@@ -89,7 +89,7 @@ func deleteApps(_ context.Context, args []string) error {
 			cmd.InsprOptions.DryRun,
 		)
 		if err != nil {
-			cliutils.RequestErrorMessage(err, out)
+			fmt.Fprintf(out, "%v\n", err)
 			return err
 		}
 		cl.Print(out)
@@ -119,7 +119,7 @@ func deleteChannels(_ context.Context, args []string) error {
 			cmd.InsprOptions.DryRun,
 		)
 		if err != nil {
-			cliutils.RequestErrorMessage(err, out)
+			fmt.Fprintf(out, "%v\n", err)
 			return err
 		}
 		cl.Print(out)
@@ -150,7 +150,7 @@ func deleteTypes(_ context.Context, args []string) error {
 			cmd.InsprOptions.DryRun,
 		)
 		if err != nil {
-			cliutils.RequestErrorMessage(err, out)
+			fmt.Fprintf(out, "%v\n", err)
 			return err
 		}
 		cl.Print(out)
@@ -181,7 +181,7 @@ func deleteAlias(_ context.Context, args []string) error {
 			cmd.InsprOptions.DryRun,
 		)
 		if err != nil {
-			cliutils.RequestErrorMessage(err, out)
+			fmt.Fprintf(out, "%v\n", err)
 			return err
 		}
 		cl.Print(out)
