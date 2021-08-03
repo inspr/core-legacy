@@ -69,6 +69,9 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App) *kubeDeployment {
 	nodeContainer := createNodeContainer(app, appDeployName)
 	scContainers := no.withAllSidecarsContainers(app, appDeployName)
 
+	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_PORT"))
+	lbsidecarPort = int32(temp)
+
 	return (*kubeDeployment)(
 		k8s.NewDeployment(
 			appDeployName,

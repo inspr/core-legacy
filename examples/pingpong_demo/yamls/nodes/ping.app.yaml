@@ -8,7 +8,7 @@ spec:
   logLevel: debug
   node:
     spec:
-      replicas: 3
+      replicas: 1
       image: gcr.io/insprlabs/inspr/example/ping:latest
       environment:
         SUPER_SECRET_0001: "false"

@@ -124,6 +124,7 @@ func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte
 		if err == nil && status == http.StatusOK {
 			return
 		}
+		defer resp.Body.Close()
 		err = rest.UnmarshalERROR(resp.Body)
 	}
 

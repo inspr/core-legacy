@@ -81,6 +81,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
+		defer resp.Body.Close()
 
 		rest.JSON(w, resp.StatusCode, resp.Body)
 	}
@@ -137,6 +138,7 @@ func (s *Server) readMessageHandler() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
+		defer resp.Body.Close()
 
 		rest.JSON(w, resp.StatusCode, resp.Body)
 	}
@@ -148,6 +150,7 @@ func sendRequest(addr string, body []byte) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer req.Body.Close()
 
 	resp, err := client.Do(req)
 	if err != nil {
