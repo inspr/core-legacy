@@ -64,7 +64,6 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface
 		ctx,
 		"/"+channel,
 		http.MethodPost,
-		request.DefaultHost,
 		data,
 		&resp)
 	if err != nil {

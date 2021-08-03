@@ -22,6 +22,7 @@ func NewInsprCommand(out, err io.Writer, version string) *cobra.Command {
 			NewConfigChangeCmd(),
 			completionCmd,
 			NewClusterCommand(),
+			NewBrokerCmd(),
 			initCommand,
 		).
 		Version(version).

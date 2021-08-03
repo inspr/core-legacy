@@ -284,7 +284,6 @@ func TestClient_HandleChannel(t *testing.T) {
 				context.Background(),
 				tt.args.channel,
 				http.MethodPost,
-				request.DefaultHost,
 				struct{ Message interface{} }{tt.message},
 				&response)
 
@@ -363,7 +362,6 @@ func TestClient_Run(t *testing.T) {
 				ctx,
 				tt.channel,
 				http.MethodPost,
-				request.DefaultHost,
 				tt.message,
 				&response)
 

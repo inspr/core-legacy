@@ -1,6 +1,9 @@
 # Default values for UIDProvider.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+global: {}
+
 name: uidp
 
 image:
@@ -15,7 +18,7 @@ logLevel: info
 service:
   type: ClusterIP
   port: 80
-  targetPort: 8000
+  targetPort: 9001
 
 secret:
   name: '{{ .Release.Name }}-init-secret'
@@ -37,7 +40,6 @@ ingress:
   enabled: true
   class: "nginx"
   host:
-  token:
 
 insprd:
   name: "insprd"
@@ -47,3 +49,4 @@ insprd:
       key:
       name:
   address: 'insprd'
+  token:
