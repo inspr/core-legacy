@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"go.uber.org/zap"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	"inspr.dev/inspr/cmd/sidecars"
 	"inspr.dev/inspr/pkg/ierrors"
