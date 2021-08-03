@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #100 Feat/Fix Pprof/memLeak | adding pprof routes to servers and fixing memory leak
+- fix:
+    - closed the http.Requests and http.Response
+- features:
+    - added the pprof routes in the loadbalancer and services
+
 ### #101 Fix | adds routine for collecting kafka events
 - fix:
     - update kafka go version to 1.7.0
