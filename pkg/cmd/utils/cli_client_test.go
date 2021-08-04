@@ -137,7 +137,8 @@ func TestSetOutput(t *testing.T) {
 
 func TestSetClient(t *testing.T) {
 	type args struct {
-		url string
+		url  string
+		host string
 	}
 	tests := []struct {
 		name string
@@ -146,14 +147,15 @@ func TestSetClient(t *testing.T) {
 		{
 			name: "setClient-working",
 			args: args{
-				url: "mock_url",
+				url:  "mock_url",
+				host: "mock_host",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defaults.client = nil
-			SetClient(tt.args.url)
+			SetClient(tt.args.url, tt.args.host)
 			if defaults.client == nil {
 				t.Errorf("wanted non nil structure")
 			}
