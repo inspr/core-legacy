@@ -75,7 +75,7 @@ spec:
             meta:
               name: filter
               reference: ""
-              parent: ""
+              parent: "primes"
             spec:
               node:
                 spec:
@@ -92,7 +92,7 @@ spec:
             meta:
               name: "printer"
               reference: ""
-              parent: ""
+              parent: "primes"
             spec:
               node:
                 meta:

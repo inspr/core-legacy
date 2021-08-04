@@ -97,10 +97,10 @@ func (k *kubeDeployment) del(no *NodeOperator) error {
 	return err
 }
 
-func (no *NodeOperator) dappApplications(app *meta.App) []applyable {
+func (no *NodeOperator) dappApplications(app *meta.App, usePermTree bool) []applyable {
 	return []applyable{
 		no.toSecret(app),
-		no.dAppToDeployment(app),
+		no.dAppToDeployment(app, usePermTree),
 		no.dappToService(app),
 	}
 }

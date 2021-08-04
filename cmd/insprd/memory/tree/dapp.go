@@ -44,22 +44,22 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 		return amm.root, nil
 	}
 
-	reference := strings.Split(query, ".")
 	err := ierrors.
 		NewError().
 		NotFound().
 		Message("dApp not found for given query: %s", query).
 		Build()
 
+	reference := strings.Split(query, ".")
 	nextApp := amm.root
 	for _, element := range reference {
 		if nextApp.Spec.Apps == nil {
-			l.Debug("unable to find dApp for given query")
+			l.Debug("dApp for given query is null", zap.String("app", element))
 			return nil, err
 		}
 		nextApp = nextApp.Spec.Apps[element]
 		if nextApp == nil {
-			l.Debug("unable to find dApp for given query")
+			l.Debug("unable to find dApp for given query", zap.String("app", element))
 			return nil, err
 		}
 	}
@@ -211,7 +211,7 @@ type AppPermTreeGetter struct {
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
 func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
-	l := amm.logs.With(zap.String("operation", "root-get"), zap.String("query", query))
+	l := amm.logs.With(zap.String("operation", "perm-get"), zap.String("query", query))
 	l.Debug("received request for dapp retrieve")
 
 	if amm.tree == nil {
@@ -243,7 +243,7 @@ func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
 // returns a map of boundary to  their respective resolved channel query
 func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
 	l := amm.logger.With(zap.String("operation", "boundary-resolution"), zap.String("dapp", app.Meta.Name))
-	l.Debug("received boundary resolution request")
+	l.Debug("received boundary resolution request", zap.Bool("useperm", usePermTree))
 
 	boundaries := make(map[string]string)
 	unresolved := metautils.StrSet{}
@@ -256,6 +256,7 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (m
 
 	if usePermTree {
 		parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
+		// parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
 		if err != nil {
 			return nil, err
 		}
