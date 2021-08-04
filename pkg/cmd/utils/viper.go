@@ -17,12 +17,14 @@ import (
 
 const (
 	configScope    = "scope"
-	configServerIP = "serverIP"
+	configServerIP = "serverip"
+	configHost     = "host"
 )
 
 var defaultValues map[string]string = map[string]string{
 	configScope:    "",
 	configServerIP: "http://<cluster_ip>",
+	configHost:     "",
 }
 
 var flagCompletionRegistry = map[string]func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective){
@@ -72,6 +74,12 @@ func AddDefaultFlagCompletion() cmd.Option {
 	}
 }
 
+//ServetIpKey returns the key value of ConfigServerIP
+//Avoids having to constants public
+func ServerIpKey() string {
+	return configServerIP
+}
+
 //GetConfiguredServerIP is responsible for returning config value for serverIp.
 //Avoids having to constants public.
 func GetConfiguredServerIP() string {
@@ -82,6 +90,12 @@ func GetConfiguredServerIP() string {
 //Avoids having to constants public.
 func GetConfiguredScope() string {
 	return viper.GetString(configScope)
+}
+
+//GetConfiguredHost is responsible for returning config value for host.
+//Avoids having to constants public.
+func GetConfiguredHost() string {
+	return viper.GetString(configHost)
 }
 
 //InitViperConfig - sets defaults values and where is the file in which new values can be read
