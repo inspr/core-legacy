@@ -372,6 +372,7 @@ func Test_deleteApps(t *testing.T) {
 	tests := []struct {
 		name           string
 		flagsAndArgs   []string
+		host           string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput string
 	}{
@@ -409,7 +410,7 @@ func Test_deleteApps(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 
@@ -452,6 +453,7 @@ func Test_deleteChannels(t *testing.T) {
 	tests := []struct {
 		name           string
 		flagsAndArgs   []string
+		host           string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput string
 	}{
@@ -489,7 +491,7 @@ func Test_deleteChannels(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 
@@ -532,6 +534,7 @@ func Test_deletetypes(t *testing.T) {
 	tests := []struct {
 		name           string
 		flagsAndArgs   []string
+		host           string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput string
 	}{
@@ -569,7 +572,7 @@ func Test_deletetypes(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 
@@ -615,6 +618,7 @@ func Test_deleteAlias(t *testing.T) {
 	tests := []struct {
 		name           string
 		flagsAndArgs   []string
+		host           string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput string
 	}{
@@ -652,7 +656,7 @@ func Test_deleteAlias(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 

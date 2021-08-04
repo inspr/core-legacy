@@ -192,6 +192,7 @@ func Test_displayAppState(t *testing.T) {
 
 	tests := []struct {
 		name           string
+		host           string
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput string
@@ -230,7 +231,7 @@ func Test_displayAppState(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 
@@ -266,6 +267,7 @@ func Test_displayChannelState(t *testing.T) {
 
 	tests := []struct {
 		name           string
+		host           string
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput string
@@ -304,7 +306,7 @@ func Test_displayChannelState(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 
@@ -341,6 +343,7 @@ func Test_displayTypeState(t *testing.T) {
 
 	tests := []struct {
 		name           string
+		host           string
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput string
@@ -379,7 +382,7 @@ func Test_displayTypeState(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 
@@ -415,6 +418,7 @@ func Test_displayAlias(t *testing.T) {
 
 	tests := []struct {
 		name           string
+		host           string
 		flagsAndArgs   []string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 		expectedOutput string
@@ -453,7 +457,7 @@ func Test_displayAlias(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 

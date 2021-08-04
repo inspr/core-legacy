@@ -49,6 +49,7 @@ func Test_getBrokers(t *testing.T) {
 	tests := []struct {
 		name           string
 		expectedOutput string
+		host           string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
 	}{
 		{
@@ -77,7 +78,7 @@ func Test_getBrokers(t *testing.T) {
 			cliutils.SetOutput(buf)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 
