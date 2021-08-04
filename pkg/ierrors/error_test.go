@@ -9,19 +9,105 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	msg := "mockError"
-	want := ierror{
-		err:  errors.New(msg),
-		code: Unknown,
+
+	tests := []struct {
+		name string
+		arg  interface{}
+		want *ierror
+	}{
+		{
+			name: "ierror_from_string",
+			arg:  "mock",
+			want: &ierror{
+				err:  errors.New("mock"),
+				code: Unknown,
+			},
+		}, {
+			name: "ierror_from_standard_error",
+			arg:  errors.New("mock"),
+			want: &ierror{
+				err:  errors.New("mock"),
+				code: Unknown,
+			},
+		}, {
+			name: "ierror_from_ierror",
+			arg: &ierror{
+				err:  errors.New("mock"),
+				code: Unknown,
+			},
+			want: &ierror{
+				err:  errors.New("mock"),
+				code: Unknown,
+			},
+		}, {
+			name: "invalid_interface",
+			arg:  10,
+			want: nil,
+		},
 	}
 
-	got := New(msg)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := New(tt.arg)
 
-	if !reflect.DeepEqual(got.err.Error(), want.err.Error()) {
-		t.Errorf("Expected '%v', got '%v'", want.err, got.err)
+			if got == nil && got != tt.want {
+				t.Errorf(
+					"ierrors.New() got '%v', expected '%v'",
+					got, tt.want,
+				)
+			}
+
+			if got != nil && got.Error() != tt.want.Error() {
+				t.Errorf(
+					"ierrors.New() got '%v', expected '%v'",
+					got.Error(), tt.want.Error(),
+				)
+			}
+		})
 	}
-	if !reflect.DeepEqual(got.code, want.code) {
-		t.Errorf("Expected %v, got %v", want.code, got.code)
+}
+
+func TestNewIerror(t *testing.T) {
+	type fields struct {
+		format string
+		values string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   ierror
+	}{
+		{
+			name: "simple_creation",
+			fields: fields{
+				format: "something",
+			},
+			want: ierror{err: errors.New("something"), code: Unknown},
+		}, {
+			name: "creation_with_values",
+			fields: fields{
+				format: "%v---",
+				values: "value",
+			},
+			want: ierror{err: errors.New("value---"), code: Unknown},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got *ierror
+			if tt.fields.values == "" {
+				got = newIerror(tt.fields.format)
+			} else {
+				got = newIerror(tt.fields.format, tt.fields.values)
+			}
+
+			if !reflect.DeepEqual(got.err.Error(), tt.want.err.Error()) {
+				t.Errorf("Expected '%v', got '%v'", tt.want.err, got.err)
+			}
+			if !reflect.DeepEqual(got.code, tt.want.code) {
+				t.Errorf("Expected %v, got %v", tt.want.code, got.code)
+			}
+		})
 	}
 }
 
@@ -52,10 +138,12 @@ func TestFrom(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got := From(tt.fields.err)
-		if got.Error() != tt.want.Error() {
-			t.Errorf("Expected %v, got %v", got, tt.want)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			got := from(tt.fields.err)
+			if got.Error() != tt.want.Error() {
+				t.Errorf("Expected %v, got %v", got, tt.want)
+			}
+		})
 	}
 }
 
@@ -245,7 +333,7 @@ func TestUnwrap(t *testing.T) {
 		{
 			name: "unwrap_err_with_previous_wrap",
 			args: args{err: fmt.Errorf("wrap : %w", errors.New("mock"))},
-			want: errors.New("mock"),
+			want: newIerror("mock"),
 		},
 		{
 			name: "unwrap_ierror_without_previous_wrap",
@@ -255,7 +343,7 @@ func TestUnwrap(t *testing.T) {
 		{
 			name: "unwrap_ierror_with_previous_wrap",
 			args: args{err: Wrap(New("mock"), "simple_wrap")},
-			want: New("mock"),
+			want: newIerror("mock"),
 		},
 		{
 			name: "unwrap_ierror_with_previous_formatted_wrap",
@@ -381,7 +469,7 @@ func TestIerror_UnmarshalJSON(t *testing.T) {
 		{
 			name: "unmarshal_wrapped_error",
 			args: args{data: generateIerrorBytes(
-				From(
+				from(
 					Wrap(
 						New("mock_err"),
 						"mock_context",

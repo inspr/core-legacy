@@ -85,16 +85,12 @@ func TestIerror_Is(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "error_not_in_stack",
+			name: "external_error_not_in_stack",
 			fields: fields{
 				err: Wrap(
-					Wrap(
-						Wrap(
-							fs.ErrClosed,
-							"ctx_1",
-						),
-						"ctx_2",
-					),
+					New(fs.ErrClosed).ExternalErr(),
+					"ctx_1",
+					"ctx_2",
 					"ctx_3",
 				),
 			},
@@ -104,7 +100,7 @@ func TestIerror_Is(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "error_in_stack",
+			name: "external_error_in_stack",
 			fields: fields{
 				err: Wrap(
 					Wrap(

@@ -28,18 +28,45 @@ const (
 	separator     = ":"
 )
 
-// New is the func similar to the standard library `errors.New` but it
+// New is the function used to create an ierror, it accepts an interface since
+// an ierror can be created from one of the following:
+//
+// - A previous ierror
+// - An error interface
+// - Just a string value
+//
+// If none of the above are provided as a argument the function will return nil.
+//
+// One useful way of handling errors from an external pkg is to use this
+// function to translate it to an ierror, allowing the customization of the
+// ErrCode.
+func New(param interface{}) *ierror {
+	var ie *ierror
+
+	switch v := param.(type) {
+	case error:
+		ie = from(v)
+	case string:
+		ie = newIerror(v)
+	default:
+		ie = nil
+	}
+
+	return ie
+}
+
+// new is the func similar to the standard library `errors.New` but it
 // returns the inspr error structure, containing an error code and the
 // capability of wrapping the message with extra context messages
-func New(format string, values ...interface{}) *ierror {
+func newIerror(format string, values ...interface{}) *ierror {
 	return &ierror{
 		err:  fmt.Errorf(format, values...),
 		code: Unknown,
 	}
 }
 
-// From is the func to create an ierror structure using as a base the an error interface
-func From(err error) *ierror {
+// from is the func to create an ierror structure using as a base the an error interface
+func from(err error) *ierror {
 	ierr, ok := err.(*ierror)
 	if !ok {
 		ierr = &ierror{
@@ -67,7 +94,7 @@ func (ie *ierror) Error() string {
 //		func Y
 //		<base_error>
 func FormatError(err error) string {
-	ie := From(err)
+	ie := from(err)
 	stack := strings.TrimPrefix(ie.err.Error(), prefixMessage)
 
 	// reverses the stack to so they are inserted in the proper order
@@ -99,10 +126,7 @@ func (ie *ierror) Is(err error) bool {
 	}
 
 	// converts target to ierror structure, if possible
-	t, ok := err.(*ierror)
-	if !ok {
-		return false
-	}
+	t := from(err)
 
 	return ie.code&t.code > 0
 }
@@ -110,7 +134,7 @@ func (ie *ierror) Is(err error) bool {
 // Code is a function that tries to convert the error interface to an ierror
 // structure and returns its code value
 func Code(err error) ErrCode {
-	return From(err).code
+	return from(err).code
 }
 
 // Wrap is responsible for adding extra context to an error, this is done by
@@ -123,7 +147,7 @@ func Wrap(err error, msgs ...string) error {
 	}
 
 	// if not an ierror type, makes the conversion
-	ierr := From(err)
+	ierr := from(err)
 
 	for _, msg := range msgs {
 		if msg != "" {
@@ -139,10 +163,7 @@ func Wrap(err error, msgs ...string) error {
 // capable of handling both the standard golang error as well as the insprError
 // structure.
 func Unwrap(err error) error {
-	ierr, ok := err.(*ierror)
-	if !ok {
-		return errors.Unwrap(err)
-	}
+	ierr := from(err)
 
 	// unwraps the insp.error
 	ierr.err = errors.Unwrap(ierr.err)
