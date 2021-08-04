@@ -39,4 +39,7 @@ func (s *Server) initRoutes() {
 	s.mux.Handle("/healthz", rest.Healthz())
 
 	s.mux.Handle("/log/level", alevel)
+
+	// standard paths for /net/http/pprof
+	rest.AttachProfiler(s.mux)
 }

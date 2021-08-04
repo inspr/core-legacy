@@ -11,4 +11,7 @@ func (s *Server) initRoutes() {
 	s.Mux.HandleFunc("/refresh", s.Refresh().Methods(http.MethodGet))
 	s.Mux.HandleFunc("/init", s.HandleInit())
 	s.Mux.HandleFunc("/healthz", rest.Healthz())
+
+	// standard paths for /net/http/pprof
+	rest.AttachProfiler(s.Mux)
 }
