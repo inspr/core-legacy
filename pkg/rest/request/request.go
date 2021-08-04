@@ -37,7 +37,6 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 		c.routeToURL(route),
 		bytes.NewBuffer(buf),
 	)
-
 	if err != nil {
 		return ierrors.
 			NewError().
@@ -46,6 +45,7 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 			InnerError(err).
 			Build()
 	}
+	defer req.Body.Close()
 
 	for key, values := range c.headers {
 		req.Header[key] = values
@@ -73,6 +73,7 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 			Message(err.Error()).
 			Build()
 	}
+	defer resp.Body.Close()
 
 	err = c.handleResponseErr(resp)
 	if err != nil {
