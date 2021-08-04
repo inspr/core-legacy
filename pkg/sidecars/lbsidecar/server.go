@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"inspr.dev/inspr/pkg/rest"
 )
 
 // Server is a struct that contains the variables necessary
@@ -41,8 +42,11 @@ func (s *Server) Run(ctx context.Context) error {
 	errCh := make(chan error)
 
 	mux := http.NewServeMux()
+
+	rest.AttachProfiler(mux)
 	mux.Handle("/log/level", alevel)
 	mux.Handle("/", s.writeMessageHandler().Post().JSON())
+
 	writeServer := &http.Server{
 		Handler: mux,
 		Addr:    s.writeAddr,

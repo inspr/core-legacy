@@ -3,8 +3,8 @@ package kafkasc
 import (
 	"context"
 
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"go.uber.org/zap"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	globalEnv "inspr.dev/inspr/pkg/environment"
 	"inspr.dev/inspr/pkg/ierrors"
 )

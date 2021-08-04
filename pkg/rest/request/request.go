@@ -51,6 +51,7 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 			"error creating request",
 		)
 	}
+	defer req.Body.Close()
 
 	for key, values := range c.headers {
 		req.Header[key] = values
@@ -71,6 +72,7 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 	if err != nil {
 		return ierrors.From(err).BadRequest()
 	}
+	defer resp.Body.Close()
 
 	err = c.handleResponseErr(resp)
 	if err != nil {

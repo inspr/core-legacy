@@ -5,9 +5,25 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/pprof"
 
 	"inspr.dev/inspr/pkg/ierrors"
 )
+
+// AttachProfiler is responsible for adding the pprof routes to the server mux
+// passed as a parameter
+func AttachProfiler(m *http.ServeMux) {
+	m.HandleFunc("/debug/pprof/", pprof.Index)
+	m.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	m.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	m.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+
+	// Manually add support for paths linked to by index page at /debug/pprof/
+	m.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
+	m.Handle("/debug/pprof/heap", pprof.Handler("heap"))
+	m.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
+	m.Handle("/debug/pprof/block", pprof.Handler("block"))
+}
 
 // RecoverFromPanic will handle panic
 func RecoverFromPanic(w http.ResponseWriter) {
