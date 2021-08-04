@@ -29,6 +29,7 @@ type Client struct {
 	encoder          Encoder
 	decoderGenerator DecoderGenerator
 	headers          map[string]stringSlice
+	host             string
 	auth             Authenticator
 }
 
@@ -94,6 +95,11 @@ func (c Client) Token(token []byte) Client {
 // HTTPClient sets the http client for the client that is being built
 func (c Client) HTTPClient(client http.Client) Client {
 	c.c = client
+	return c
+}
+
+func (c Client) Host(value string) Client {
+	c.host = value
 	return c
 }
 

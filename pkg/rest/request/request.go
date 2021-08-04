@@ -51,6 +51,10 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 		req.Header[key] = values
 	}
 
+	if c.host != "" {
+		req.Host = c.host
+	}
+
 	if c.auth != nil {
 		token, err := c.auth.GetToken()
 		if err != nil {
