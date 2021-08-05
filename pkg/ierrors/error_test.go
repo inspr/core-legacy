@@ -10,30 +10,51 @@ import (
 
 func TestNew(t *testing.T) {
 
+	type fields struct {
+		arg    interface{}
+		values []interface{}
+	}
 	tests := []struct {
-		name string
-		arg  interface{}
-		want *ierror
+		name   string
+		fields fields
+		want   *ierror
 	}{
 		{
 			name: "ierror_from_string",
-			arg:  "mock",
+			fields: fields{
+				arg:    "mock",
+				values: []interface{}{},
+			},
 			want: &ierror{
 				err:  errors.New("mock"),
 				code: Unknown,
 			},
 		}, {
+			name: "ierror_from_composed_string",
+			fields: fields{
+				arg:    "mock-%v-%d",
+				values: []interface{}{"string_value", 20},
+			},
+			want: &ierror{
+				err:  errors.New("mock-string_value-20"),
+				code: Unknown,
+			},
+		}, {
 			name: "ierror_from_standard_error",
-			arg:  errors.New("mock"),
+			fields: fields{
+				arg: errors.New("mock"),
+			},
 			want: &ierror{
 				err:  errors.New("mock"),
 				code: Unknown,
 			},
 		}, {
 			name: "ierror_from_ierror",
-			arg: &ierror{
-				err:  errors.New("mock"),
-				code: Unknown,
+			fields: fields{
+				arg: &ierror{
+					err:  errors.New("mock"),
+					code: Unknown,
+				},
 			},
 			want: &ierror{
 				err:  errors.New("mock"),
@@ -41,14 +62,16 @@ func TestNew(t *testing.T) {
 			},
 		}, {
 			name: "invalid_interface",
-			arg:  10,
+			fields: fields{
+				arg: 10,
+			},
 			want: nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := New(tt.arg)
+			got := New(tt.fields.arg, tt.fields.values...)
 
 			if got == nil && got != tt.want {
 				t.Errorf(

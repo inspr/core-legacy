@@ -40,14 +40,14 @@ const (
 // One useful way of handling errors from an external pkg is to use this
 // function to translate it to an ierror, allowing the customization of the
 // ErrCode.
-func New(param interface{}) *ierror {
+func New(param interface{}, a ...interface{}) *ierror {
 	var ie *ierror
 
 	switch v := param.(type) {
 	case error:
 		ie = from(v)
 	case string:
-		ie = newIerror(v)
+		ie = newIerror(v, a...)
 	default:
 		ie = nil
 	}
@@ -59,8 +59,15 @@ func New(param interface{}) *ierror {
 // returns the inspr error structure, containing an error code and the
 // capability of wrapping the message with extra context messages
 func newIerror(format string, values ...interface{}) *ierror {
+	var msg string
+	if len(values) > 0 {
+		msg = fmt.Sprintf(format, values...)
+	} else {
+		msg = format
+	}
+
 	return &ierror{
-		err:  fmt.Errorf(format, values...),
+		err:  errors.New(msg),
 		code: Unknown,
 	}
 }
