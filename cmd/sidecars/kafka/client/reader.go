@@ -89,7 +89,7 @@ func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, 
 			case kafka.Error:
 				if ev.Code() == kafka.ErrAllBrokersDown {
 					return nil, ierrors.Wrap(
-						ierrors.From(ev).InternalServer(),
+						ierrors.New(ev).InternalServer(),
 						"kafka error = all brokers are down",
 					)
 				}
@@ -149,7 +149,7 @@ func (reader *Reader) newSingleChannelConsumer(channel, resolved string) error {
 		"enable.auto.commit": false,
 	})
 	if errKafkaConsumer != nil {
-		return ierrors.From(errKafkaConsumer).InternalServer()
+		return ierrors.New(errKafkaConsumer).InternalServer()
 	}
 
 	logger.Debug("subscribing new consumer",

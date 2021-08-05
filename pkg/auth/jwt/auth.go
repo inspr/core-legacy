@@ -66,7 +66,7 @@ func (JA *JWTauth) Validate(token []byte) (*auth.Payload, []byte, error) {
 				return nil,
 					token,
 					ierrors.Wrap(
-						ierrors.From(err).InternalServer(),
+						ierrors.New(err).InternalServer(),
 						"error refreshing token",
 					)
 			}
@@ -111,7 +111,7 @@ func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
 	if err != nil {
 		logger.Error("error initializing cluster", zap.Error(err))
 		err = ierrors.Wrap(
-			ierrors.From(err).InternalServer(),
+			err,
 			"error initializing cluster",
 		)
 		return nil, err
@@ -136,7 +136,6 @@ func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
 
 	if err != nil {
 		logger.Error("unable to tokenize data", zap.Any("data", load), zap.String("auth-service", JA.authURL), zap.Error(err))
-		err = ierrors.From(err).InternalServer()
 		return nil, err
 	}
 
@@ -164,7 +163,6 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 
 	if err != nil {
 		logger.Error("unable to refresh token", zap.String("auth-service", JA.authURL), zap.Error(err))
-		err = ierrors.From(err).InternalServer()
 		return nil, err
 	}
 

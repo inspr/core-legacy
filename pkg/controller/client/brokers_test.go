@@ -123,7 +123,7 @@ func TestBrokersClient_Create(t *testing.T) {
 			handler := func(w http.ResponseWriter, r *http.Request) {
 				if tt.want != nil {
 					w.WriteHeader(http.StatusBadRequest)
-					rest.ERROR(w, ierrors.From(tt.want).BadRequest())
+					rest.ERROR(w, ierrors.New(tt.want).BadRequest())
 					return
 				}
 

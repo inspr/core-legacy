@@ -35,15 +35,15 @@ func (tmm *TypeMemoryManager) Create(scope string, insprType *meta.Type) error {
 	l.Info("received type creation request")
 
 	l.Debug("validating Type structure")
-	nameErr := utils.StructureNameIsValid(insprType.Meta.Name)
-	if nameErr != nil {
+	err := utils.StructureNameIsValid(insprType.Meta.Name)
+	if err != nil {
 		l.Error("invalid Type name")
-		return ierrors.From(nameErr)
+		return err
 	}
 
 	l.Debug("checking if Type already exists")
 
-	_, err := tmm.Get(scope, insprType.Meta.Name)
+	_, err = tmm.Get(scope, insprType.Meta.Name)
 	if err == nil {
 		l.Info("type already exists")
 		return ierrors.New(
@@ -55,7 +55,7 @@ func (tmm *TypeMemoryManager) Create(scope string, insprType *meta.Type) error {
 	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
 		newError := ierrors.Wrap(
-			ierrors.From(err).InvalidType(),
+			err,
 			"couldn't create Type %v", insprType.Meta.Name,
 		)
 		return newError
@@ -86,7 +86,7 @@ func (tmm *TypeMemoryManager) Get(scope, name string) (*meta.Type, error) {
 	if err != nil {
 		l.Debug("parent app does not exist, returning error")
 		return nil, ierrors.Wrap(
-			ierrors.From(err).BadRequest(),
+			err,
 			"target dApp doesn't exist",
 		)
 	}
@@ -135,7 +135,7 @@ func (tmm *TypeMemoryManager) Delete(scope, name string) error {
 	if err != nil {
 		l.Info("unable to get dApp from memory tree")
 		return ierrors.Wrap(
-			ierrors.From(err).NotFound(),
+			err,
 			"target app doesn't exist",
 		)
 	}
@@ -172,7 +172,7 @@ func (tmm *TypeMemoryManager) Update(scope string, insprType *meta.Type) error {
 	parentApp, err := tmm.Apps().Get(scope)
 	if err != nil {
 		return ierrors.Wrap(
-			ierrors.From(err).InternalServer(),
+			err,
 			"target app doesn't exist",
 		)
 	}
@@ -206,7 +206,7 @@ func (trg *TypePermTreeGetter) Get(scope, name string) (*meta.Type, error) {
 	if err != nil {
 		l.Info("unable to find parent dapp")
 		return nil, ierrors.Wrap(
-			ierrors.From(err).BadRequest(),
+			err,
 			"target dApp does not exist on root",
 		)
 	}
@@ -219,7 +219,5 @@ func (trg *TypePermTreeGetter) Get(scope, name string) (*meta.Type, error) {
 
 	l.Info("unable to get Type in given scope (root-tree)")
 
-	return nil, ierrors.New(
-		"Type not found for given query on root",
-	).NotFound()
+	return nil, ierrors.New("Type not found for given query on root").NotFound()
 }

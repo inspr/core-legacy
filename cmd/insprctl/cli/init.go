@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -53,9 +52,12 @@ var initCommand = cmd.NewCmd("init").
 				if os.IsNotExist(err) {
 					os.Mkdir(defaultFolder, os.ModePerm)
 				} else if err != nil {
-					return ierrors.From(err)
+					return ierrors.Wrap(
+						err,
+						fmt.Sprintf("error processing the %v", defaultFolder),
+					)
 				} else {
-					return errors.New("default folder already defined as a file. did you name something .inspr in your home folder?")
+					return ierrors.New("default folder already defined as a file. did you name something .inspr in your home folder?")
 				}
 			}
 

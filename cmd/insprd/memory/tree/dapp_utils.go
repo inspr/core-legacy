@@ -125,13 +125,13 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 	}
 	_, err := amm.ResolveBoundary(app, false)
 	if err != nil {
-		merr.Add(ierrors.From(err))
+		merr.Add(ierrors.New(err))
 		return &merr
 	}
 	for _, childApp := range app.Spec.Apps {
 		err = amm.recursiveBoundaryValidation(childApp)
 		if err != nil {
-			merr.Add(ierrors.From(err))
+			merr.Add(err)
 		}
 	}
 

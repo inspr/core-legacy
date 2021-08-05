@@ -78,7 +78,7 @@ func getSchema(ch string) (string, error) {
 	if err != nil {
 		logger.Error("unable to get channel schema", zap.Any("error", err))
 
-		return "", ierrors.From(err)
+		return "", err
 	}
 
 	return schema, nil
@@ -93,7 +93,7 @@ func getCodec(schema string) (*goavro.Codec, error) {
 	if err != nil {
 		logger.Error("unable to get Avro codec", zap.Any("error", err))
 
-		return nil, ierrors.From(err)
+		return nil, ierrors.New(err)
 	}
 
 	return codec, nil

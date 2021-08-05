@@ -74,7 +74,7 @@ func (c *ChannelOperator) Get(ctx context.Context, context string, name string) 
 	if err != nil {
 		l.Error("unable to get Kafka Topic", zap.Error(err))
 		return nil, ierrors.Wrap(
-			ierrors.From(err).InternalServer(),
+			ierrors.New(err).InternalServer(),
 			"unable to get topic from kafka",
 		)
 	}
@@ -92,7 +92,7 @@ func (c *ChannelOperator) GetAll(ctx context.Context, context string) (ret []*me
 	if err != nil {
 		logger.Error("unable to get all Kafka Topics", zap.Any("error", err))
 		return nil, ierrors.Wrap(
-			ierrors.From(err).InternalServer(),
+			ierrors.New(err).InternalServer(),
 			"unable to get topics from kafka",
 		)
 	}
@@ -128,7 +128,7 @@ func (c *ChannelOperator) Create(ctx context.Context, context string, channel *m
 	if err != nil {
 		l.Error("error creating Kafka Topic", zap.Error(err))
 		return ierrors.Wrap(
-			ierrors.From(err).InternalServer(),
+			ierrors.New(err).InternalServer(),
 			"unable to create kafka topic",
 		)
 	}
@@ -156,7 +156,7 @@ func (c *ChannelOperator) Delete(ctx context.Context, context string, name strin
 	if err != nil {
 		logger.Error("error deleting Kafka Topic", zap.Any("error", err))
 		return ierrors.Wrap(
-			ierrors.From(err).InternalServer(),
+			ierrors.New(err).InternalServer(),
 			"unable to delete kafka topic",
 		)
 	}

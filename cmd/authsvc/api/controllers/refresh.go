@@ -39,7 +39,7 @@ func (server *Server) Refresh() rest.Handler {
 		)
 		if err != nil && err.Error() != `exp not satisfied` {
 			err := ierrors.Wrap(
-				ierrors.From(err).Forbidden(),
+				ierrors.New(err).Forbidden(),
 				"couldn't parse token",
 			)
 			rest.ERROR(w, err)
@@ -50,7 +50,7 @@ func (server *Server) Refresh() rest.Handler {
 		load, err := auth.Desserialize(token)
 		if err != nil {
 			err := ierrors.Wrap(
-				ierrors.From(err).Forbidden(),
+				err,
 				"couldn't desserialize token",
 			)
 			rest.ERROR(w, err)
@@ -63,7 +63,7 @@ func (server *Server) Refresh() rest.Handler {
 		payload, err := refreshPayload(load.Refresh, load.RefreshURL)
 		if err != nil {
 			err := ierrors.Wrap(
-				ierrors.From(err).InternalServer(),
+				err,
 				"couldn't refresh payload",
 			)
 			rest.ERROR(w, err)
@@ -74,7 +74,6 @@ func (server *Server) Refresh() rest.Handler {
 
 		signed, err := server.tokenize(*payload, time.Now().Add(time.Minute*8))
 		if err != nil {
-			err := ierrors.From(err).InternalServer()
 			rest.ERROR(w, err)
 			return
 		}
@@ -95,13 +94,13 @@ func refreshPayload(refreshToken []byte, refreshURL string) (*auth.Payload, erro
 	}
 	reqBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		err = ierrors.From(err).InternalServer()
+		err = ierrors.New(err).InternalServer()
 		return nil, err
 	}
 
 	resp, err := http.Post(refreshURL, "application/json", bytes.NewBuffer(reqBytes))
 	if err != nil || resp.StatusCode != http.StatusOK {
-		err = ierrors.From(err).InternalServer()
+		err = ierrors.New(err).InternalServer()
 		return nil, err
 	}
 	defer resp.Body.Close()

@@ -48,7 +48,7 @@ func (s *Server) Init() {
 				zap.Any("error", err))
 
 			err = ierrors.Wrap(
-				ierrors.From(err).InternalServer(),
+				ierrors.New(err).InternalServer(),
 				"error parsing RSA private key",
 			)
 			panic(err)

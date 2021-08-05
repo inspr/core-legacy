@@ -108,10 +108,7 @@ func (h *Handler) InitHandler() rest.Handler {
 			l.Error("error authenticating token", zap.Error(err))
 			rest.ERROR(
 				w,
-				ierrors.Wrap(
-					ierrors.From(err).InternalServer(),
-					"unable to authenticate token",
-				),
+				ierrors.Wrap(err, "unable to authenticate token"),
 			)
 			return
 		}

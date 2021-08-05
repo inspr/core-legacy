@@ -51,10 +51,7 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 	broker := config.Broker()
 
 	if _, ok := mem.Available[broker]; ok {
-		return ierrors.New(
-			"broker %s is already configured on memory",
-			broker,
-		)
+		return ierrors.New("broker %s is already configured on memory", broker)
 	}
 
 	var factory models.SidecarFactory
@@ -65,10 +62,7 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 		factory = sidecars.KafkaToDeployment(*obj)
 	default:
 		l.Debug("found unsupported broker config, rejecting request")
-		return ierrors.New(
-			"broker %s is not supported",
-			broker,
-		)
+		return ierrors.New("broker %s is not supported", broker)
 	}
 
 	l.Debug("subscribing broker to sidecar factory")
@@ -100,10 +94,7 @@ func (bmm *brokerMemoryManager) SetDefault(broker string) error {
 
 	if _, ok := mem.Available[broker]; !ok {
 		l.Debug("broker not configured")
-		return ierrors.New(
-			"broker %s is not configured on memory",
-			broker,
-		)
+		return ierrors.New("broker %s is not configured on memory", broker)
 	}
 
 	mem.Default = broker
@@ -130,10 +121,7 @@ func (bmm *brokerMemoryManager) Configs(broker string) (brokers.BrokerConfigurat
 
 	config, ok := mem.Available[broker]
 	if !ok {
-		return nil, ierrors.New(
-			"broker %s is not configured on memory",
-			broker,
-		)
+		return nil, ierrors.New("broker %s is not configured on memory", broker)
 	}
 
 	return config, nil

@@ -24,7 +24,7 @@ func (server *Server) Tokenize() rest.Handler {
 				zap.Any("error", err))
 
 			err = ierrors.Wrap(
-				ierrors.From(err).BadRequest(),
+				ierrors.New(err).BadRequest(),
 				"invalid body",
 			)
 
@@ -54,8 +54,9 @@ func (server *Server) tokenize(payload auth.Payload, exp time.Time) ([]byte, err
 	signed, err := jwt.Sign(token, jwa.RS256, server.privKey)
 	if err != nil {
 		server.logger.Error("unable to sign JWT with provided RSA private key", zap.Any("error", err))
-		err := ierrors.New("unable to sign JWT with available RSA private key").InternalServer()
-		return nil, err
+		return nil, ierrors.New(
+			"unable to sign JWT with available RSA private key",
+		).InternalServer()
 	}
 	return signed, nil
 }

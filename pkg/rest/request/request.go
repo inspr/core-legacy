@@ -34,7 +34,7 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 	buf, err := c.encoder(body)
 	if err != nil {
 		return ierrors.Wrap(
-			ierrors.From(err).BadRequest(),
+			ierrors.New(err).BadRequest(),
 			"error encoding body to json",
 		)
 	}
@@ -46,10 +46,7 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 		bytes.NewBuffer(buf),
 	)
 	if err != nil {
-		return ierrors.Wrap(
-			ierrors.From(err).BadRequest(),
-			"error creating request",
-		)
+		return ierrors.Wrap(err, "error creating request")
 	}
 	defer req.Body.Close()
 
@@ -60,17 +57,14 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 	if c.auth != nil {
 		token, err := c.auth.GetToken()
 		if err != nil {
-			return ierrors.Wrap(
-				ierrors.From(err).BadRequest(),
-				"unable to get token from configuration",
-			)
+			return ierrors.Wrap(err, "unable to get token from configuration")
 		}
 		req.Header.Add("Authorization", string(token))
 	}
 
 	resp, err := c.c.Do(req)
 	if err != nil {
-		return ierrors.From(err).BadRequest()
+		return ierrors.New(err).BadRequest()
 	}
 	defer resp.Body.Close()
 
@@ -83,10 +77,7 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 	if c.auth != nil && updatedToken != "" {
 		err := c.auth.SetToken([]byte(updatedToken))
 		if err != nil {
-			return ierrors.Wrap(
-				ierrors.From(err).BadRequest(),
-				"unable to update token",
-			)
+			return ierrors.Wrap(err, "unable to update token")
 		}
 	}
 

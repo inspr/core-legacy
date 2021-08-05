@@ -13,7 +13,7 @@ func Desserialize(tokenBytes []byte) (*Payload, error) {
 	token, err := jwt.Parse(tokenBytes)
 	if err != nil {
 		err = ierrors.Wrap(
-			ierrors.From(err).InternalServer(),
+			ierrors.New(err).InternalServer(),
 			"jwt parsing failed",
 		)
 		return nil, err
@@ -29,13 +29,13 @@ func Desserialize(tokenBytes []byte) (*Payload, error) {
 
 	jwtJSON, err := json.Marshal(load)
 	if err != nil {
-		return nil, err
+		return nil, ierrors.New(err).InternalServer()
 	}
 
 	var payload Payload
 	err = json.Unmarshal(jwtJSON, &payload)
 	if err != nil {
-		return nil, err
+		return nil, ierrors.New(err).InternalServer()
 	}
 	return &payload, nil
 }

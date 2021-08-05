@@ -40,9 +40,7 @@ func GetResolvedBoundaryChannelList(channels []brokers.ChannelBroker) utils.Stri
 func GetSchema(channel string) (string, error) {
 	schema, ok := os.LookupEnv(channel + "_SCHEMA")
 	if !ok {
-		return "", ierrors.New(
-			"schema for channel %s not found", channel,
-		).NotFound()
+		return "", ierrors.New("schema for channel %s not found", channel).NotFound()
 	}
 	return schema, nil
 }

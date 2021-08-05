@@ -39,7 +39,7 @@ func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) 
 	if err != nil {
 		logger.Debug("unable to find channel")
 		newError := ierrors.Wrap(
-			ierrors.From(err).NotFound(),
+			err,
 			"channel not found, the scope '%v' is invalid", scope,
 		)
 		return nil, newError
@@ -72,7 +72,7 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers 
 	if nameErr != nil {
 		l.Debug("invalid Channel name",
 			zap.String("channel", ch.Meta.Name))
-		return ierrors.From(nameErr)
+		return ierrors.Wrap(nameErr, "failed to create Channel")
 	}
 
 	l.Debug("checking if Channel already exists")
@@ -90,7 +90,7 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers 
 	parentApp, err := chh.Apps().Get(scope)
 	if err != nil {
 		newError := ierrors.Wrap(
-			ierrors.From(err).InvalidChannel(),
+			err,
 			"couldn't create channel %v", ch.Meta.Name,
 		)
 		return newError
@@ -148,7 +148,7 @@ func (chh *ChannelMemoryManager) Delete(scope, name string) error {
 
 	if err != nil {
 		newError := ierrors.Wrap(
-			ierrors.From(err).NotFound(),
+			err,
 			"channel %s not found", name,
 		)
 		return newError
@@ -199,7 +199,7 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	oldCh, err := chh.Get(scope, ch.Meta.Name)
 	if err != nil {
 		newError := ierrors.Wrap(
-			ierrors.From(err).NotFound(),
+			err,
 			"channel %s not found", ch.Meta.Name,
 		)
 		return newError
@@ -253,7 +253,7 @@ func (cmm *ChannelPermTreeGetter) Get(scope, name string) (*meta.Channel, error)
 	parentApp, err := cmm.Apps().Get(scope)
 	if err != nil {
 		newError := ierrors.Wrap(
-			ierrors.From(err).NotFound(),
+			err,
 			"the '%v' scope is invalid", scope,
 		)
 		return nil, newError

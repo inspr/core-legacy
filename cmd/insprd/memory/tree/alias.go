@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"fmt"
 	"strings"
 
 	"go.uber.org/zap"
@@ -44,9 +45,9 @@ func (amm *AliasMemoryManager) Get(scope, aliasKey string) (*meta.Alias, error) 
 	// check if alias key exist in scope
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
 		l.Debug("alias not found for the key")
-		return nil, ierrors.
-			New("alias not found for the given key %v", aliasKey).
-			BadRequest()
+		return nil, ierrors.New(
+			"alias not found for the given key %v", aliasKey,
+		).BadRequest()
 	}
 
 	//return alias
@@ -75,8 +76,7 @@ func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.
 		l.Debug("invalid dApp boundary for Alias",
 			zap.String("targeted boundary", targetBoundary))
 		return ierrors.New(
-			"target boundary doesn't exist in %v",
-			app.Meta.Name,
+			"target boundary doesn't exist in %v", app.Meta.Name,
 		).BadRequest()
 	}
 
@@ -132,8 +132,8 @@ func (amm *AliasMemoryManager) Update(scope, aliasKey string, alias *meta.Alias)
 	oldAlias, err := amm.Get(scope, aliasKey)
 	if err != nil {
 		newError := ierrors.Wrap(
-			ierrors.From(err).NotFound(),
-			"alias '%s' not found on scope '%s'", aliasKey, scope,
+			err,
+			fmt.Sprintf("alias '%s' not found on scope '%s'", aliasKey, scope),
 		)
 		return newError
 	}
@@ -178,9 +178,9 @@ func (amm *AliasMemoryManager) Delete(scope, aliasKey string) error {
 	l.Debug("checking if Alias to be deleted exists in given scope")
 	// check if alias key exist in scope
 	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		return ierrors.
-			New("alias not found for the given key %v", aliasKey).
-			BadRequest()
+		return ierrors.New(
+			"alias not found for the given key %v", aliasKey,
+		).BadRequest()
 	}
 
 	childName := strings.Split(aliasKey, ".")[0]
