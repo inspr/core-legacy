@@ -207,7 +207,9 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 				auth:      authmock.NewMockAuth(nil),
 				memory:    tree.GetTreeMemory(),
 			}
+			tree.GetTreeMemory().InitTransaction()
 			_, err := nop.CreateNode(tt.args.ctx, tt.args.app)
+			tree.GetTreeMemory().Cancel()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NodeOperator.CreateNode() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -340,7 +342,9 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 				auth:      authmock.NewMockAuth(nil),
 				memory:    tree.GetTreeMemory(),
 			}
+			tree.GetTreeMemory().InitTransaction()
 			_, err := nop.UpdateNode(tt.args.ctx, tt.args.app)
+			tree.GetTreeMemory().Cancel()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NodeOperator.UpdateNode() error = %v, wantErr %v", err, tt.wantErr)
 				return
