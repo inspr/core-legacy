@@ -112,8 +112,11 @@ func FormatError(err error) string {
 	ie := from(err)
 	stack := strings.TrimPrefix(ie.err.Error(), prefixMessage)
 
-	// reverses the stack to so they are inserted in the proper order
 	messages := strings.Split(stack, ":")
+	// reverses the stack to so they are inserted in the proper order
+	for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
+		messages[i], messages[j] = messages[j], messages[i]
+	}
 
 	var message string
 	for i, msg := range messages {

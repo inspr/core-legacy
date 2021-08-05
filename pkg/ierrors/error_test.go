@@ -215,7 +215,7 @@ func TestFormatError(t *testing.T) {
 					"wrapper_3",
 				),
 			},
-			want: "error : wrapper_3\n\twrapper_2\n\twrapper_1\n\tmock_err\n",
+			want: "error : mock_err\n\twrapper_1\n\twrapper_2\n\twrapper_3\n",
 		},
 	}
 
