@@ -25,21 +25,29 @@ const (
 	// prefixMessage is used by the stackToErr to remove the error message
 	// before processing the stack of errors
 	prefixMessage = "error :"
-	separator     = ":"
+
+	// separator is the content that will be between the error and each
+	// additional context inserted by a Wrap message
+	separator = ":"
 )
 
-// New is the function used to create an ierror, it accepts an interface since
+// New is the function used to create an ierror, it accepts an interface{} since
 // an ierror can be created from one of the following:
 //
-// - A previous ierror
+// - A string value
 // - An error interface
-// - Just a string value
 //
 // If none of the above are provided as a argument the function will return nil.
 //
 // One useful way of handling errors from an external pkg is to use this
 // function to translate it to an ierror, allowing the customization of the
 // ErrCode.
+//
+// Some examples of the usage of the `New` func are:
+//	- ierrors.New("my_custom_err")
+//	- ierrors.New("error on the URL %v and route %v", myURL, routeName)
+//	- ierrors.New(io.EOF) // error defined in the standard library io pkg
+//
 func New(param interface{}, a ...interface{}) *ierror {
 	var ie *ierror
 
@@ -55,7 +63,7 @@ func New(param interface{}, a ...interface{}) *ierror {
 	return ie
 }
 
-// new is the func similar to the standard library `errors.New` but it
+// newIerror is the func similar to the standard library `errors.New` but it
 // returns the inspr error structure, containing an error code and the
 // capability of wrapping the message with extra context messages
 func newIerror(format string, values ...interface{}) *ierror {
@@ -72,7 +80,8 @@ func newIerror(format string, values ...interface{}) *ierror {
 	}
 }
 
-// from is the func to create an ierror structure using as a base the an error interface
+// from is the func to create an ierror structure using as a base the an error
+// interface
 func from(err error) *ierror {
 	ierr, ok := err.(*ierror)
 	if !ok {
@@ -125,6 +134,9 @@ func FormatError(err error) string {
 // When using errors.Is(source Ierror, target error) it will return true if the
 // `source` fully unwrapped is the same as `target` or if both of them have the
 // same ErrCode.
+//
+// An observation is that by default ierrors with the Unknown error code will
+// not be considered equal to another ierror with that code.
 func (ie *ierror) Is(err error) bool {
 	// checks if is another type of error inside the error stack
 	if errors.Is(ie.err, err) {
