@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"reflect"
 	"testing"
 )
@@ -729,6 +730,44 @@ func TestErrCode(t *testing.T) {
 
 			if !reflect.DeepEqual(got.code, tt.want) {
 				t.Errorf("ErrCode = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsProperties(t *testing.T) {
+
+	type args struct {
+		l error
+		r error
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "comparing_ierror_to_ioErr",
+			args: args{
+				l: Wrap(New(io.EOF), "wrapper_1"),
+				r: io.EOF,
+			},
+			want: true,
+		}, {
+			name: "comparing_ierror_to_wrong_err",
+			args: args{
+				l: Wrap(New(io.EOF), "wrapper_1"),
+				r: io.ErrClosedPipe,
+			},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := errors.Is(tt.args.l, tt.args.r)
+			if got != tt.want {
+				t.Errorf("errors.Is() got '%v', wanted '%v'", got, tt.want)
 			}
 		})
 	}

@@ -88,7 +88,6 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 		if errors.Is(err, io.EOF) {
 			return nil
 		}
-
 	}
 
 	return err
@@ -120,8 +119,8 @@ func (c Client) handleResponseErr(resp *http.Response) error {
 	default:
 		decoder.Decode(&err)
 		if err == nil {
-			err = DefaultErr
+			return ierrors.Wrap(DefaultErr, "failed decoding error in body")
 		}
-		return ierrors.Wrap(err, "")
+		return err
 	}
 }

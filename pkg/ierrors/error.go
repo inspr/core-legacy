@@ -87,7 +87,6 @@ func from(err error) *ierror {
 // Error returns the ierror Message
 func (ie *ierror) Error() string {
 	return fmt.Sprintf("%v %v", prefixMessage, ie.err)
-	// return FormatError(ie)
 }
 
 // FormatError is a simple function with the intention of handling the default
@@ -130,6 +129,12 @@ func (ie *ierror) Is(err error) bool {
 	// checks if is another type of error inside the error stack
 	if errors.Is(ie.err, err) {
 		return true
+	}
+
+	// when using an ierror with unkown error in the comparison the result will
+	// always be false
+	if ie.code == Unknown {
+		return false
 	}
 
 	// converts target to ierror structure, if possible
