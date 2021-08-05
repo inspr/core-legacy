@@ -21,4 +21,3 @@ Summary:
 > Important parts of the code that require special attention
 
 
-"kebab-case-hello-world"
