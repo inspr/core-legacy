@@ -119,7 +119,7 @@ func (c Client) handleResponseErr(resp *http.Response) error {
 	default:
 		decoder.Decode(&err)
 		if err == nil {
-			return ierrors.Wrap(DefaultErr, "failed decoding error in body")
+			return DefaultErr
 		}
 		return err
 	}
