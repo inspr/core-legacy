@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"inspr.dev/inspr/pkg/cmd"
 	"inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // NewClusterCommand creates cluster command for Inspr CLI
@@ -29,7 +30,7 @@ func authInit(c context.Context, args []string) error {
 
 	token, err := utils.GetCliClient().Authorization().Init(c, args[0])
 	if err != nil {
-		fmt.Fprintf(out, "%v\n", err)
+		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 		return err
 	}
 
