@@ -45,5 +45,5 @@ func (server *Server) HandleInit() rest.Handler {
 		}
 		rest.JSON(w, 200, auth.JwtDO{Token: token})
 
-	}).Post().JSON().Recover()
+	}).Post().JSON().Recover(nil)
 }

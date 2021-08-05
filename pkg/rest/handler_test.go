@@ -216,7 +216,7 @@ func TestHandler_Put(t *testing.T) {
 func TestHandler_Recover(t *testing.T) {
 	var manipulation = func(h Handler) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
-			h.Recover()(w, r)
+			h.Recover(nil)(w, r)
 		}
 	}
 

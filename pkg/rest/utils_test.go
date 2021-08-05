@@ -129,7 +129,7 @@ func TestERROR(t *testing.T) {
 
 func TestRecoverFromPanic(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer RecoverFromPanic(w)
+		defer RecoverFromPanic(w, nil)
 		panic("This is a panic error")
 	}))
 	defer ts.Close()

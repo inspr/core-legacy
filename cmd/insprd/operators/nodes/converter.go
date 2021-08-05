@@ -135,6 +135,7 @@ func (no *NodeOperator) getAllSidecarBrokers(app *meta.App, usePermTree bool) ut
 	logger.Debug("resolving Node Boundary in the cluster",
 		zap.String("operation", "getAllSidecarBrokers"),
 		zap.Bool("useperm", usePermTree),
+		zap.String("app:", app.Meta.Name),
 	)
 
 	resolves, err := no.memory.Apps().ResolveBoundary(app, usePermTree)
