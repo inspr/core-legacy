@@ -4,7 +4,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -19,6 +18,7 @@ type Server struct {
 	Mux     *http.ServeMux
 	logger  *zap.Logger
 	privKey *rsa.PrivateKey
+	alevel  *zap.AtomicLevel
 }
 
 // Init - configures the server
@@ -73,6 +73,6 @@ func (s *Server) Init() {
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
-	fmt.Printf("authsvc rest api is up! Listening on port: %s\n", addr)
+	s.logger.Info("authsvc rest api is up!", zap.String("Port", addr))
 	s.logger.Fatal("authsvc crashed: ", zap.Any("error", http.ListenAndServe(addr, s.Mux)))
 }

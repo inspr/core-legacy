@@ -256,7 +256,6 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (m
 
 	if usePermTree {
 		parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
-		// parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
 		if err != nil {
 			return nil, err
 		}
