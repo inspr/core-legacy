@@ -33,7 +33,7 @@ func getBrokers(ctx context.Context) error {
 	out := utils.GetCliOutput()
 	resp, err := client.Brokers().Get(context.Background())
 	if err != nil {
-		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
+		fmt.Fprint(out, ierrors.FormatError(err))
 		return err
 	}
 

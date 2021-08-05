@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -325,8 +324,7 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.New("unauthorized").Unauthorized(),
-			errMsg: fmt.Sprintf(
-				"%v\n",
+			errMsg: ierrors.FormatError(
 				ierrors.Wrap(
 					ierrors.New("unauthorized").Unauthorized(),
 					filePath,
@@ -341,8 +339,7 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.New("forbidden").Forbidden(),
-			errMsg: fmt.Sprintf(
-				"%v\n",
+			errMsg: ierrors.FormatError(
 				ierrors.Wrap(
 					ierrors.New("forbidden").Forbidden(),
 					filePath,
@@ -357,10 +354,10 @@ func Test_applyValidFiles(t *testing.T) {
 			},
 			want:    nil,
 			funcErr: ierrors.New("default_error").BadRequest(),
-			errMsg: fmt.Sprintf("%v\n", ierrors.Wrap(
+			errMsg: ierrors.FormatError(ierrors.Wrap(
 				ierrors.New("default_error").BadRequest(),
 				filePath,
-			).Error()),
+			)),
 		},
 		{
 			name: "Unknown_error",
@@ -369,10 +366,10 @@ func Test_applyValidFiles(t *testing.T) {
 				files: tempFiles,
 			},
 			funcErr: ierrors.New("unknown_Error"),
-			errMsg: fmt.Sprintf("%v\n", ierrors.Wrap(
+			errMsg: ierrors.FormatError(ierrors.Wrap(
 				ierrors.New("unknown_Error"),
 				filePath,
-			).Error()),
+			)),
 		},
 	}
 	for _, tt := range tests {

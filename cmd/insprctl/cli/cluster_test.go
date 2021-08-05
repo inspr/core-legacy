@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -66,7 +65,7 @@ func Test_authInit(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.New("error"))
 			},
-			expectedOutput: fmt.Sprintf("%v\n", ierrors.New("error")),
+			expectedOutput: ierrors.FormatError(ierrors.New("error")),
 		},
 		{
 			name:         "Should_return_default_request_error",
@@ -74,7 +73,7 @@ func Test_authInit(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, nil)
 			},
-			expectedOutput: fmt.Sprintf("%v\n", request.DefaultErr),
+			expectedOutput: ierrors.FormatError(request.DefaultErr),
 		},
 	}
 	for _, tt := range tests {

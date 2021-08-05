@@ -30,7 +30,7 @@ func authInit(c context.Context, args []string) error {
 
 	token, err := utils.GetCliClient().Authorization().Init(c, args[0])
 	if err != nil {
-		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
+		fmt.Fprint(out, ierrors.FormatError(err))
 		return err
 	}
 

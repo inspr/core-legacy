@@ -67,9 +67,8 @@ func Test_getBrokers(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				rest.ERROR(w, ierrors.New("mock_error"))
 			},
-			expectedOutput: fmt.Sprintf(
-				"%v\n",
-				ierrors.New("mock_error").Error(),
+			expectedOutput: ierrors.FormatError(
+				ierrors.New("mock_error"),
 			),
 		},
 	}
