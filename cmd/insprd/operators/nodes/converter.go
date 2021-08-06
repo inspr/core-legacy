@@ -212,11 +212,11 @@ func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.Contai
 				ct, cterr = no.memory.Types().Get(parent, ch.Spec.Type)
 			}
 			if cherr != nil {
-				logger.Error("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+				logger.Error("Unable to get channel to resolve with boundary", zap.String("channel", chName))
 				panic(err)
 			}
 			if cterr != nil {
-				logger.Error("taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+				logger.Error("Unable to get channel type to resolve with boundary", zap.String("type", ch.Spec.Type))
 				panic(err)
 			}
 			resolved = "INSPR_" + ch.Meta.UUID

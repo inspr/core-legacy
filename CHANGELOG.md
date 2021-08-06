@@ -6,7 +6,7 @@
     - panic recovery methods now receive a cancellation function that, when not null, is executed when panics are recovered.
 ---
 
-### #100 Tech CORE-492 | Correction on the controller operation
+### #106 Tech CORE-492 | Correction on the controller operation
 - misc: 
     - improved debugging messages for dapp creation and deletion
 - fix:
