@@ -18,6 +18,7 @@ type CRUDHandler interface {
 	HandleUpdate() Handler
 	HandleGet() Handler
 	GetAuth() auth.Auth
+	GetCancel() func()
 }
 
 // HandleCRUD uses a CRUDHandler to handle HTTP requests for a CRUD resource
@@ -30,28 +31,28 @@ func HandleCRUD(handler CRUDHandler) Handler {
 				HandleGet().
 				Validate(handler.GetAuth()).
 				JSON().
-				Recover()(w, r)
+				Recover(handler.GetCancel())(w, r)
 
 		case http.MethodPost:
 			handler.
 				HandleCreate().
 				Validate(handler.GetAuth()).
 				JSON().
-				Recover()(w, r)
+				Recover(handler.GetCancel())(w, r)
 
 		case http.MethodPut:
 			handler.
 				HandleUpdate().
 				Validate(handler.GetAuth()).
 				JSON().
-				Recover()(w, r)
+				Recover(handler.GetCancel())(w, r)
 
 		case http.MethodDelete:
 			handler.
 				HandleDelete().
 				Validate(handler.GetAuth()).
 				JSON().
-				Recover()(w, r)
+				Recover(handler.GetCancel())(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)

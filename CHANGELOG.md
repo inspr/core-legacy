@@ -1,12 +1,18 @@
 
 # Changelog
 
+### #107 Bug CORE-550 | Mutex not unlocking on panics
+- fix:
+    - panic recovery methods now receive a cancellation function that, when not null, is executed when panics are recovered.
+---
+
 ### #106 Tech CORE-492 | Correction on the controller operation
 - misc: 
     - improved debugging messages for dapp creation and deletion
 - fix:
     - created a controll variable on k8s operator that alternates between permanent and changed memory throughout the the entire operation on nodes
     - Added log level controll to authservice
+---
 
 ### #100 Feat/Fix Pprof/memLeak | adding pprof routes to servers and fixing memory leak
 - fix:
