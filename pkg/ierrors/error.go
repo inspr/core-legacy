@@ -48,14 +48,14 @@ const (
 //	- ierrors.New("error on the URL %v and route %v", myURL, routeName)
 //	- ierrors.New(io.EOF) // error defined in the standard library io pkg
 //
-func New(param interface{}, a ...interface{}) *ierror {
+func New(value interface{}, args ...interface{}) *ierror {
 	var ie *ierror
 
-	switch v := param.(type) {
+	switch v := value.(type) {
 	case error:
 		ie = from(v)
 	case string:
-		ie = newIerror(v, a...)
+		ie = newIerror(v, args...)
 	default:
 		ie = nil
 	}
@@ -66,10 +66,10 @@ func New(param interface{}, a ...interface{}) *ierror {
 // newIerror is the func similar to the standard library `errors.New` but it
 // returns the inspr error structure, containing an error code and the
 // capability of wrapping the message with extra context messages
-func newIerror(format string, values ...interface{}) *ierror {
+func newIerror(format string, args ...interface{}) *ierror {
 	var msg string
-	if len(values) > 0 {
-		msg = fmt.Sprintf(format, values...)
+	if len(args) > 0 {
+		msg = fmt.Sprintf(format, args...)
 	} else {
 		msg = format
 	}
