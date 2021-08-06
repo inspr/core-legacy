@@ -54,7 +54,7 @@ func (h *Handler) ControllerRefreshHandler() rest.Handler {
 		l.Debug("sucessfully refreshed token")
 		rest.JSON(w, 200, payload)
 
-	}).Recover(nil).Post().JSON()
+	}).Recover().Post().JSON()
 }
 
 // TokenHandler handles requests for token creation on Insprd
@@ -82,7 +82,7 @@ func (h *Handler) TokenHandler() rest.Handler {
 			Token: token,
 		})
 
-	}).Recover(nil).Post().JSON()
+	}).Recover().Post().JSON()
 }
 
 // InitHandler handles requests for cluster auth initialization
@@ -113,5 +113,5 @@ func (h *Handler) InitHandler() rest.Handler {
 		rest.JSON(w, http.StatusOK, auth.JwtDO{
 			Token: token,
 		})
-	}).Recover(nil).Post().JSON()
+	}).Recover().Post().JSON()
 }

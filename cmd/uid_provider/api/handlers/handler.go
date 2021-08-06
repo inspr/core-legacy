@@ -61,7 +61,7 @@ func (h *Handler) CreateUserHandler() rest.Handler {
 		}
 
 		l.Info("user created")
-	}).Post().JSON().Recover(nil)
+	}).Post().JSON().Recover()
 }
 
 // DeleteUserHandler handles user deletion requests
@@ -89,7 +89,7 @@ func (h *Handler) DeleteUserHandler() rest.Handler {
 		}
 
 		l.Info("user deleted")
-	}).Delete().JSON().Recover(nil)
+	}).Delete().JSON().Recover()
 }
 
 // UpdatePasswordHandler handles requests to update an user password
@@ -118,7 +118,7 @@ func (h *Handler) UpdatePasswordHandler() rest.Handler {
 		}
 
 		l.Info("user updated")
-	}).Put().JSON().Recover(nil)
+	}).Put().JSON().Recover()
 }
 
 // LoginHandler handles login requests
@@ -147,7 +147,7 @@ func (h *Handler) LoginHandler() rest.Handler {
 		}
 
 		rest.JSON(w, 200, token)
-	}).Post().JSON().Recover(nil)
+	}).Post().JSON().Recover()
 }
 
 // RefreshTokenHandler handles token refresh requests
@@ -175,5 +175,5 @@ func (h *Handler) RefreshTokenHandler() rest.Handler {
 		}
 
 		rest.JSON(w, 200, payload)
-	}).Post().JSON().Recover(nil)
+	}).Post().JSON().Recover()
 }
