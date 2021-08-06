@@ -48,7 +48,7 @@ func doConfigChange(_ context.Context, args []string) error {
 
 	// updates
 	if key == cliutils.ServerIpKey() {
-		if !strings.HasPrefix(value, "http://") {
+		if !strings.HasPrefix(value, "http") {
 			value = fmt.Sprintf("http://%s", value)
 		}
 	}

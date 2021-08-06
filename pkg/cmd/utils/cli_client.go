@@ -21,7 +21,7 @@ var defaults cliGlobalStructure
 //GetCliClient returns the default controller client for cli.
 func GetCliClient() controller.Interface {
 	if defaults.client == nil {
-		SetGlobalClient()
+		setGlobalClient()
 	}
 	return defaults.client
 }
@@ -35,7 +35,7 @@ func GetCliOutput() io.Writer {
 }
 
 //setGlobalClient creates cli's controller client from viper's configured serverIp
-func SetGlobalClient() {
+func setGlobalClient() {
 	url := GetConfiguredServerIP()
 	host := GetConfiguredHost()
 
