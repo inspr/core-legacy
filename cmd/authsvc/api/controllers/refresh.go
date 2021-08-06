@@ -59,7 +59,7 @@ func (server *Server) Refresh() rest.Handler {
 
 		server.logger.Debug("received payload", zap.Any("content", load))
 
-		server.logger.Info("refreshing old payload")
+		server.logger.Info("refreshing old payload", zap.String("refresh-servide", load.RefreshURL))
 		payload, err := refreshPayload(load.Refresh, load.RefreshURL)
 		if err != nil {
 			err := ierrors.Wrap(

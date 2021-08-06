@@ -33,7 +33,7 @@ func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) 
 		zap.String("channel", name),
 		zap.String("scope", scope),
 	)
-	l.Debug("recevide channel retrieval request")
+	l.Debug("recevid channel retrieval request")
 
 	parentApp, err := chh.Apps().Get(scope)
 	if err != nil {

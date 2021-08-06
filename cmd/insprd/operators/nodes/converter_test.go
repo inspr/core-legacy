@@ -96,7 +96,7 @@ func Test_intToint32(t *testing.T) {
 	}
 }
 
-func TestNodeOperator_withBoundary(t *testing.T) {
+func TestNodeOperator_withBoundary(t *testing.T) { // needs more testing, longer creates, updates, and deletes
 	mem := fake.MockTreeMemory(nil)
 	mem.InitTransaction()
 	mem.Channels().Create("", &meta.Channel{
@@ -280,7 +280,7 @@ func TestNodeOperator_withBoundary(t *testing.T) {
 				auth:      tt.fields.auth,
 			}
 			got := &kubeCore.Container{}
-			option := no.withBoundary(tt.args.app)
+			option := no.withBoundary(tt.args.app, false)
 			option(got)
 			if !cmp.Equal(got, tt.want, cmp.Comparer(func(a1, a2 []kubeCore.EnvVar) bool {
 				a1cmp, a2cmp := envVarArr(a1), envVarArr(a2)
@@ -487,10 +487,10 @@ func TestNodeOperator_withLBSidecarImage(t *testing.T) {
 
 func Test_withLBSidecarConfiguration(t *testing.T) {
 	tests := []struct {
-		name string
-		want *kubeCore.Container
+		name   string
+		want   *kubeCore.Container
 		before func()
-		after func()
+		after  func()
 	}{
 		{
 			before: func() {
