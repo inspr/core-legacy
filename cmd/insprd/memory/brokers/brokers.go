@@ -14,7 +14,11 @@ func (bmm *brokerMemoryManager) Get() (*apimodels.BrokersDI, error) {
 	l := logger.With(zap.String("operation", "get"))
 	l.Debug("received broker get request")
 	bmm.available.Lock()
+	l.Debug("available mutex locked", zap.String("type", "mutex"))
+
+	defer l.Debug("available mutex unlocked", zap.String("type", "mutex"))
 	defer bmm.available.Unlock()
+
 	mem, err := bmm.get()
 	if err != nil {
 		l.Debug("unable to get memory manager")
@@ -41,7 +45,11 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 		zap.Any("configs", config),
 	)
 	bmm.available.Lock()
+	l.Debug("available mutex locked", zap.String("type", "mutex"))
+
+	defer l.Debug("available mutex unlocked", zap.String("type", "mutex"))
 	defer bmm.available.Unlock()
+
 	l.Info("creating new broker")
 	mem, err := bmm.get()
 	if err != nil {
@@ -84,7 +92,11 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 func (bmm *brokerMemoryManager) SetDefault(broker string) error {
 	l := logger.With(zap.String("operation", "set-default"), zap.String("broker", broker))
 	bmm.def.Lock()
+	l.Debug("def mutex locked", zap.String("type", "mutex"))
+
+	defer l.Debug("def mutex unlocked", zap.String("type", "mutex"))
 	defer bmm.def.Unlock()
+
 	l.Debug("received default broker change request")
 	mem, err := bmm.get()
 	if err != nil {
@@ -111,7 +123,10 @@ func (bmm *brokerMemoryManager) Factory() SidecarManager {
 func (bmm *brokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
 	l := logger.With(zap.String("operation", "get-configs"), zap.String("broker", broker))
 	bmm.available.Lock()
+	l.Debug("available mutex locked", zap.String("type", "mutex"))
+	defer l.Debug("available mutex unlocked", zap.String("type", "mutex"))
 	defer bmm.available.Unlock()
+
 	l.Info("getting config for broker sidecar")
 
 	mem, err := bmm.get()

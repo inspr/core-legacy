@@ -51,9 +51,9 @@ func (no *NodeOperator) Deployments() v1.DeploymentInterface {
 // Otherwise, returns an error
 func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	logger.Info("deploying a Node structure in k8s",
-		zap.Any("node", app))
+		zap.Any("node", app), zap.String("operation", "create"))
 
-	for _, applicable := range no.dappApplications(app) {
+	for _, applicable := range no.dappApplications(app, false) {
 		if applicable == nil {
 			continue
 		}
@@ -70,9 +70,9 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 // Otherwise, returns an error.
 func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
 	logger.Info("deploying a Node structure in k8s",
-		zap.Any("node", app))
+		zap.Any("node", app), zap.String("operation", "update"))
 
-	for _, applicable := range no.dappApplications(app) {
+	for _, applicable := range no.dappApplications(app, false) {
 		err := applicable.update(no)
 		if err != nil {
 			return nil, err
@@ -100,7 +100,7 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 	logger.Debug("deleting a Node structure in k8s",
 		zap.Any("node", app))
 
-	for _, applicable := range no.dappApplications(app) {
+	for _, applicable := range no.dappApplications(app, true) {
 		err := applicable.del(no)
 		if err != nil {
 			return err
