@@ -47,7 +47,7 @@ func Test_setGlobalClient(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defaults.client = nil
-			setGlobalClient()
+			SetGlobalClient()
 			if defaults.client == nil {
 				t.Errorf(
 					"GetCliClient() = %v, want %v",
