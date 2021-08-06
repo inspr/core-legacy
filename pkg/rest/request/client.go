@@ -98,6 +98,7 @@ func (c Client) HTTPClient(client http.Client) Client {
 	return c
 }
 
+// Host sets the host for the client that is being built
 func (c Client) Host(value string) Client {
 	c.host = value
 	return c
