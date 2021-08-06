@@ -40,7 +40,7 @@ var initCommand = cmd.NewCmd("init").
 		if config.ServerIP == "" {
 			config.ServerIP = "http://localhost:8080"
 		}
-		fmt.Print("enter insprd host (http://example.inspr.dev) Opitional config:")
+		fmt.Print("Opitional config: insprd host (http://example.inspr.dev):")
 		fmt.Scanln(&config.ServertHost)
 		fmt.Print("enter default scope (\"\"):")
 		fmt.Scanln(&config.DefaultScope)
