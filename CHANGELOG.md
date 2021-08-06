@@ -12,6 +12,11 @@
     - changed 80+ files tests
     - redid the tests of the ierror pkg
 ---
+### #107 Bug CORE-550 | Mutex not unlocking on panics
+- fix:
+    - panic recovery methods now receive a cancellation function that, when not null, is executed when panics are recovered.
+---
+
 ### #106 Tech CORE-492 | Correction on the controller operation
 - misc: 
     - improved debugging messages for dapp creation and deletion

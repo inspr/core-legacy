@@ -72,3 +72,8 @@ func (handler *Handler) applyChangesInDiff(changes diff.Changelog) error {
 
 	return ierrors.New(errs.Error())
 }
+
+// GetCancel returns the transaction cancelation function for the operations
+func (handler *Handler) GetCancel() func() {
+	return handler.Memory.Tree().Cancel
+}
