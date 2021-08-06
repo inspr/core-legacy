@@ -15,10 +15,9 @@ func CheckEmptyArgs(args map[string]string) error {
 		if v == "" {
 			errorMessage := fmt.Sprintf("arg '%v' is empty", k)
 			if err == nil {
-				err = ierrors.NewError().Message(errorMessage).InvalidArgs().Build()
+				err = ierrors.New(errorMessage).InvalidArgs()
 			} else {
-				ierr := err.(*ierrors.InsprError)
-				ierr.Wrap(errorMessage)
+				err = ierrors.Wrap(err, errorMessage)
 			}
 		}
 	}
@@ -33,7 +32,7 @@ func ProcessArg(arg, scope string) (string, string, error) {
 
 	if err := utils.StructureNameIsValid(arg); err != nil {
 		if !utils.IsValidScope(arg) {
-			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
+			return "", "", ierrors.New("invalid scope").BadRequest()
 		}
 
 		newScope, lastName, _ := utils.RemoveLastPartInScope(arg)
@@ -54,7 +53,7 @@ func ProcessAliasArg(arg, scope string) (string, string, error) {
 
 	if err := utils.AliasNameIsValid(arg); err != nil {
 		if !utils.IsValidScope(arg) {
-			return "", "", ierrors.NewError().Message("invalid scope").BadRequest().Build()
+			return "", "", ierrors.New("invalid scope").BadRequest()
 		}
 
 		newScope, lastName, _ := utils.RemoveAliasInScope(arg)

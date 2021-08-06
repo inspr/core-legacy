@@ -1,5 +1,7 @@
 PASS=""
 
+DIRS=( )
+
 for file in $(git diff --cached --name-only --diff-filter=ATMR --line-prefix=./ | grep "\.go\$")
 do
     # formats the file
@@ -8,24 +10,24 @@ do
 		PASS="go fmt error"
 	fi
 
-    golint $file
-    if [[ $? -ne 0 ]]; then
-		PASS="golint error"
-	fi
+    # adds directory of the file to be tested by staticcheck
+    DIRS+=("$(dirname $file)")
 done
 
-# runs linter in the entire repo
-staticcheck ./...
-if [[ $? -ne 0 ]]; then
-    PASS="staticcheck error"
-fi
+for d in $DIRS; do
+    # vets each pkg altered
+    go vet $d
+    if [[ $? != 0 ]]; then
+        PASS="go vet error"
+    fi
 
-# go vet reports suspicious constructs
-go vet ./...
-if [[ $? != 0 ]]; then
-    PASS="go vet error"
-fi
+    # staticcheck each pkg altered
+    staticcheck $d
+    if [[ $? -ne 0 ]]; then
+        PASS="staticcheck error"
+    fi
 
+done
 
 if [ ! -z "$PASS" ]; then
     echo "COMMIT FAILED - $PASS"

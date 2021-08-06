@@ -110,7 +110,7 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 			name: "It should return a invalid Channel on a invalid App",
 			fields: fields{
 				root:   getMockChannels(),
-				appErr: ierrors.NewError().NotFound().Build(),
+				appErr: ierrors.New("").NotFound(),
 				mockA:  true,
 				mockC:  false,
 				mockCT: true,
@@ -234,7 +234,7 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 			name: "It should not create a new Channel because the context is invalid",
 			fields: fields{
 				root:   getMockChannels(),
-				appErr: ierrors.NewError().NotFound().Build(),
+				appErr: ierrors.New("").NotFound(),
 				mockA:  true,
 				mockC:  false,
 				mockCT: true,
@@ -446,7 +446,7 @@ func TestChannelMemoryManager_Delete(t *testing.T) {
 			name: "It shoud not delete the Channel because the context is invalid.",
 			fields: fields{
 				root:   nil,
-				appErr: ierrors.NewError().NotFound().Build(),
+				appErr: ierrors.New("").NotFound(),
 				mockA:  true,
 				mockC:  false,
 				mockCT: true,
@@ -598,7 +598,7 @@ func TestChannelMemoryManager_Update(t *testing.T) {
 			name: "It should not update a Channel because the context is invalid",
 			fields: fields{
 				root:   getMockChannels(),
-				appErr: ierrors.NewError().NotFound().Build(),
+				appErr: ierrors.New("").NotFound(),
 				mockA:  true,
 				mockC:  false,
 				mockCT: true,

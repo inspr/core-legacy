@@ -73,7 +73,10 @@ func (c *ChannelOperator) Get(ctx context.Context, context string, name string) 
 	meta, err := c.k.GetMetadata(&topic, false, 1000)
 	if err != nil {
 		l.Error("unable to get Kafka Topic", zap.Error(err))
-		return nil, ierrors.NewError().InnerError(err).InternalServer().Message("unable to get topic from kafka").Build()
+		return nil, ierrors.Wrap(
+			ierrors.New(err).InternalServer(),
+			"unable to get topic from kafka",
+		)
 	}
 
 	return fromTopic(name, meta), err
@@ -88,7 +91,10 @@ func (c *ChannelOperator) GetAll(ctx context.Context, context string) (ret []*me
 	metas, err := c.k.GetMetadata(nil, true, 1000)
 	if err != nil {
 		logger.Error("unable to get all Kafka Topics", zap.Any("error", err))
-		return nil, ierrors.NewError().InnerError(err).InternalServer().Message("unable to get topics from kafka").Build()
+		return nil, ierrors.Wrap(
+			ierrors.New(err).InternalServer(),
+			"unable to get topics from kafka",
+		)
 	}
 	for _, topic := range metas.Topics {
 		ch := fromTopic(topic.Topic, metas)
@@ -121,7 +127,10 @@ func (c *ChannelOperator) Create(ctx context.Context, context string, channel *m
 	_, err = c.k.CreateTopics(ctx, configs)
 	if err != nil {
 		l.Error("error creating Kafka Topic", zap.Error(err))
-		return ierrors.NewError().InnerError(err).InternalServer().Message("unable to create kafka topic").Build()
+		return ierrors.Wrap(
+			ierrors.New(err).InternalServer(),
+			"unable to create kafka topic",
+		)
 	}
 	return nil
 }
@@ -146,7 +155,10 @@ func (c *ChannelOperator) Delete(ctx context.Context, context string, name strin
 	_, err := c.k.DeleteTopics(ctx, topics)
 	if err != nil {
 		logger.Error("error deleting Kafka Topic", zap.Any("error", err))
-		return ierrors.NewError().InternalServer().InnerError(err).Message("unable to delete kafka topic").Build()
+		return ierrors.Wrap(
+			ierrors.New(err).InternalServer(),
+			"unable to delete kafka topic",
+		)
 	}
 	return nil
 }

@@ -29,7 +29,7 @@ func (o ChannelOperator) Create(ctx context.Context, context string, ch *meta.Ch
 		return o.err
 	}
 	if _, ok := o.channels[context+ch.Meta.Name]; ok {
-		return ierrors.NewError().AlreadyExists().Message("channel already exists").Build()
+		return ierrors.New("channel already exists").AlreadyExists()
 	}
 	o.channels[context+ch.Meta.Name] = ch
 	return nil
@@ -43,11 +43,7 @@ func (o ChannelOperator) Get(ctx context.Context, context string, name string) (
 	channelKey := context + name
 	ch, ok := o.channels[channelKey]
 	if !ok {
-		return nil, ierrors.
-			NewError().
-			NotFound().
-			Message("channel %s not found", channelKey).
-			Build()
+		return nil, ierrors.New("channel %s not found", channelKey).NotFound()
 	}
 	return ch, nil
 }
@@ -60,11 +56,7 @@ func (o ChannelOperator) Update(ctx context.Context, context string, ch *meta.Ch
 
 	channelKey := context + ch.Meta.Name
 	if _, ok := o.channels[channelKey]; !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("channel %s not found", channelKey).
-			Build()
+		return ierrors.New("channel %s not found", channelKey).NotFound()
 	}
 	o.channels[channelKey] = ch
 	return nil
@@ -79,11 +71,7 @@ func (o ChannelOperator) Delete(ctx context.Context, context string, name string
 	channelKey := context + name
 	_, ok := o.channels[channelKey]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("channel %s not found", channelKey).
-			Build()
+		return ierrors.New("channel %s not found", channelKey).NotFound()
 	}
 	delete(o.channels, channelKey)
 	return nil

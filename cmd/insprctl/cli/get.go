@@ -77,7 +77,7 @@ func getApps(_ context.Context) error {
 	out := cliutils.GetCliOutput()
 	scope, err := cliutils.GetScope()
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		fmt.Fprint(out, ierrors.FormatError(err))
 		return err
 	}
 
@@ -96,13 +96,13 @@ func getChannels(_ context.Context) error {
 	out := cliutils.GetCliOutput()
 	scope, err := cliutils.GetScope()
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		fmt.Fprint(out, ierrors.FormatError(err))
 		return err
 	}
 
 	_, err = client.Channels().Get(context.Background(), scope, "")
 	if ierrors.HasCode(err, ierrors.Forbidden) {
-		cliutils.RequestErrorMessage(err, out)
+		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 		return err
 	}
 
@@ -122,13 +122,13 @@ func getTypes(_ context.Context) error {
 	out := cliutils.GetCliOutput()
 	scope, err := cliutils.GetScope()
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		fmt.Fprint(out, ierrors.FormatError(err))
 		return err
 	}
 
 	_, err = client.Types().Get(context.Background(), scope, "")
 	if ierrors.HasCode(err, ierrors.Forbidden) {
-		cliutils.RequestErrorMessage(err, out)
+		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 		return err
 	}
 
@@ -149,13 +149,13 @@ func getAlias(_ context.Context) error {
 	out := cliutils.GetCliOutput()
 	scope, err := cliutils.GetScope()
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		fmt.Fprint(out, ierrors.FormatError(err))
 		return err
 	}
 
 	_, err = client.Alias().Get(context.Background(), scope, "")
 	if ierrors.HasCode(err, ierrors.Forbidden) {
-		cliutils.RequestErrorMessage(err, out)
+		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 		return err
 	}
 
@@ -176,7 +176,7 @@ func getNodes(_ context.Context) error {
 	out := cliutils.GetCliOutput()
 	scope, err := cliutils.GetScope()
 	if err != nil {
-		fmt.Fprint(out, err.Error()+"\n")
+		fmt.Fprint(out, ierrors.FormatError(err))
 		return err
 	}
 
@@ -195,7 +195,7 @@ func getNodes(_ context.Context) error {
 func getObj(printObj func(*meta.App, *[]string), lines *[]string, client controller.Interface, out io.Writer, scope string) error {
 	resp, err := client.Apps().Get(context.Background(), scope)
 	if err != nil {
-		cliutils.RequestErrorMessage(err, out)
+		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 		return err
 	}
 

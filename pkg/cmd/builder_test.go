@@ -532,39 +532,6 @@ func Test_builder_Super(t *testing.T) {
 	}
 }
 
-func Test_handleWellKnownErrors(t *testing.T) {
-	type args struct {
-		err error
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "handling_error",
-			args: args{
-				err: errors.New("new error"),
-			},
-			wantErr: true,
-		},
-		{
-			name: "handling_no_error",
-			args: args{
-				err: nil,
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := handleWellKnownErrors(tt.args.err); (err != nil) != tt.wantErr {
-				t.Errorf("handleWellKnownErrors() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func Test_builder_WithAliases(t *testing.T) {
 	type fields struct {
 		cmd cobra.Command

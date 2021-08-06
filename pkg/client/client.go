@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"go.uber.org/zap"
-	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/rest/request"
@@ -83,7 +82,7 @@ func (c *Client) HandleChannel(channel string, handler func(ctx context.Context,
 		err := handler(context.Background(), r.Body)
 		if err != nil {
 			l.Error("error handling message", zap.Error(err))
-			rest.ERROR(w, ierrors.NewError().InternalServer().InnerError(err).Build())
+			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, 200, nil)

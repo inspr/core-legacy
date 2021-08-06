@@ -30,7 +30,7 @@ func NewApplyType() RunMethod {
 			return err
 		}
 		if insprType.Meta.Name == "" {
-			return ierrors.NewError().Message("type without name").Build()
+			return ierrors.New("type without name")
 		}
 
 		if schemaNeedsInjection(insprType.Schema) {

@@ -79,7 +79,7 @@ func deleteApps(_ context.Context, args []string) error {
 	for _, arg := range args {
 		if !utils.IsValidScope(arg) {
 			fmt.Fprint(out, "invalid args\n")
-			return ierrors.NewError().Message("invalid args").BadRequest().Build()
+			return ierrors.New("invalid args").BadRequest()
 		}
 		path, _ := utils.JoinScopes(scope, arg)
 
@@ -89,7 +89,7 @@ func deleteApps(_ context.Context, args []string) error {
 			cmd.InsprOptions.DryRun,
 		)
 		if err != nil {
-			cliutils.RequestErrorMessage(err, out)
+			fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 			return err
 		}
 		cl.Print(out)
@@ -119,7 +119,7 @@ func deleteChannels(_ context.Context, args []string) error {
 			cmd.InsprOptions.DryRun,
 		)
 		if err != nil {
-			cliutils.RequestErrorMessage(err, out)
+			fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 			return err
 		}
 		cl.Print(out)
@@ -150,7 +150,7 @@ func deleteTypes(_ context.Context, args []string) error {
 			cmd.InsprOptions.DryRun,
 		)
 		if err != nil {
-			cliutils.RequestErrorMessage(err, out)
+			fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 			return err
 		}
 		cl.Print(out)
@@ -181,7 +181,7 @@ func deleteAlias(_ context.Context, args []string) error {
 			cmd.InsprOptions.DryRun,
 		)
 		if err != nil {
-			cliutils.RequestErrorMessage(err, out)
+			fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 			return err
 		}
 		cl.Print(out)

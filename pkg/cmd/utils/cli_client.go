@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -10,7 +9,6 @@ import (
 	"inspr.dev/inspr/pkg/controller"
 	"inspr.dev/inspr/pkg/controller/client"
 	"inspr.dev/inspr/pkg/controller/mocks"
-	"inspr.dev/inspr/pkg/ierrors"
 )
 
 type cliGlobalStructure struct {
@@ -71,23 +69,4 @@ func SetClient(url string) {
 //SetMockedClient configures singleton's client as a mocked client given a error
 func SetMockedClient(err error) {
 	defaults.client = mocks.NewClientMock(err)
-}
-
-// RequestErrorMessage prints an error to the user based on the error given, in
-// actuality it converts the error to an insprErr and then process what type
-// of return the apply request returned.
-func RequestErrorMessage(err error, w io.Writer) {
-	ierr, ok := err.(*ierrors.InsprError)
-	if ok {
-		switch ierr.Code {
-		case ierrors.Unauthorized:
-			fmt.Fprintf(w, "failed to authenticate with the cluster. Is your token configured correctly?\n")
-		case ierrors.Forbidden:
-			fmt.Fprintf(w, "forbidden operation, please check for the scope.\n")
-		default:
-			fmt.Fprintf(w, "unexpected inspr error: %v\n", err.Error())
-		}
-	} else {
-		fmt.Fprintf(w, "non inspr error: %v\n", err.Error())
-	}
 }

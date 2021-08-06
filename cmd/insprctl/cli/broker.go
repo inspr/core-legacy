@@ -33,7 +33,7 @@ func getBrokers(ctx context.Context) error {
 	out := utils.GetCliOutput()
 	resp, err := client.Brokers().Get(context.Background())
 	if err != nil {
-		utils.RequestErrorMessage(err, out)
+		fmt.Fprint(out, ierrors.FormatError(err))
 		return err
 	}
 
@@ -71,7 +71,7 @@ func brokerConfig(brokerName, filePath string) error {
 		}
 
 		fmt.Fprintf(output, "not a yaml file\n")
-		return ierrors.NewError().Message("not a yaml file").InvalidFile().Build()
+		return ierrors.New("not a yaml file").InvalidFile()
 	}
 
 	bytes, err := os.ReadFile(filePath)

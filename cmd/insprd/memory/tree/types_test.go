@@ -107,7 +107,7 @@ func TestTypeMemoryManager_GetType(t *testing.T) {
 			name: "Getting any Type on a invalid app",
 			fields: fields{
 				root:   getMockTypes(),
-				appErr: ierrors.NewError().NotFound().Build(),
+				appErr: ierrors.New("").NotFound(),
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
@@ -235,7 +235,7 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 			name: "Trying to create an Type on a invalid app",
 			fields: fields{
 				root:   getMockTypes(),
-				appErr: ierrors.NewError().NotFound().Build(),
+				appErr: ierrors.New("").NotFound(),
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
@@ -370,7 +370,7 @@ func TestTypeMemoryManager_Delete(t *testing.T) {
 			name: "Deleting any Type on a invalid app",
 			fields: fields{
 				root:   getMockTypes(),
-				appErr: ierrors.NewError().NotFound().Build(),
+				appErr: ierrors.New("").NotFound(),
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,
@@ -515,7 +515,7 @@ func TestTypeMemoryManager_Update(t *testing.T) {
 			name: "Updating any Type on a invalid app",
 			fields: fields{
 				root:   nil,
-				appErr: ierrors.NewError().NotFound().Build(),
+				appErr: ierrors.New("").NotFound(),
 				mockA:  true,
 				mockC:  true,
 				mockCT: false,

@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strings"
 	"testing"
 
 	"inspr.dev/inspr/pkg/ierrors"
@@ -95,7 +94,7 @@ func TestClient_Send(t *testing.T) {
 			fields: fields{
 				c: http.Client{},
 				middleware: func(i interface{}) ([]byte, error) {
-					return nil, ierrors.NewError().Build()
+					return nil, ierrors.New("")
 				},
 				decoderGenerator: JSONDecoderGenerator,
 				auth:             nil,
@@ -153,12 +152,16 @@ func TestClient_Send(t *testing.T) {
 
 				if r.Method != tt.args.method {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest().Message("methods are not equal").Build())
+					encoder.Encode(ierrors.New(
+						"methods are not equal",
+					).BadRequest())
 					return
 				}
 				if r.URL.Path != tt.args.route {
 					w.WriteHeader(http.StatusNotFound)
-					encoder.Encode(ierrors.NewError().BadRequest().Message("paths are not equal").Build())
+					encoder.Encode(ierrors.New(
+						"paths are not equal",
+					).BadRequest())
 					return
 				}
 
@@ -167,7 +170,9 @@ func TestClient_Send(t *testing.T) {
 
 				if tt.wantErrReq {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest().Message("wants error").Build())
+					encoder.Encode(ierrors.New(
+						"wants error",
+					).BadRequest())
 					return
 				}
 
@@ -176,7 +181,7 @@ func TestClient_Send(t *testing.T) {
 				decoder.Decode(&body)
 				if !reflect.DeepEqual(tt.args.body, body) {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest().Build())
+					encoder.Encode(ierrors.New("").BadRequest())
 					return
 				}
 				encoder.Encode(tt.want)
@@ -240,7 +245,7 @@ func TestClient_handleResponseErr(t *testing.T) {
 					}(),
 				},
 			},
-			wantMessage: "cannot retrieve error from server",
+			wantMessage: DefaultErr.Error(),
 		},
 		{
 			name: "default_error_message_unauthorized_code",
@@ -251,12 +256,16 @@ func TestClient_handleResponseErr(t *testing.T) {
 				&http.Response{
 					StatusCode: http.StatusUnauthorized,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal(nil)
+						b, _ := json.Marshal(
+							ierrors.New("mock_error").Unauthorized())
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantMessage: "cannot retrieve error from server",
+			wantMessage: ierrors.Wrap(
+				ierrors.New("mock_error"),
+				"status unauthorized",
+			).Error(),
 		},
 		{
 			name: "default_error_message_forbidden_code",
@@ -267,12 +276,16 @@ func TestClient_handleResponseErr(t *testing.T) {
 				&http.Response{
 					StatusCode: http.StatusForbidden,
 					Body: func() io.ReadCloser {
-						b, _ := json.Marshal(nil)
+						b, _ := json.Marshal(
+							ierrors.New("mock_error").Forbidden())
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantMessage: "cannot retrieve error from server",
+			wantMessage: ierrors.Wrap(
+				ierrors.New("mock_error"),
+				"status forbidden",
+			).Error(),
 		},
 		{
 			name: "response with custom error",
@@ -284,15 +297,12 @@ func TestClient_handleResponseErr(t *testing.T) {
 					StatusCode: http.StatusBadRequest,
 					Body: func() io.ReadCloser {
 						b, _ := json.
-							Marshal(ierrors.NewError().
-								Message("this is an error").
-								Build(),
-							)
+							Marshal(ierrors.New("this is an error"))
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantMessage: "this is an error",
+			wantMessage: ierrors.New("this is an error").Error(),
 		},
 		{
 			name: "response with unauthorized error",
@@ -304,15 +314,16 @@ func TestClient_handleResponseErr(t *testing.T) {
 					StatusCode: http.StatusUnauthorized,
 					Body: func() io.ReadCloser {
 						b, _ := json.Marshal(
-							ierrors.NewError().
-								InnerError(errors.New("mock_error")).
-								Unauthorized().
-								Build())
+							ierrors.New("mock_error").Unauthorized(),
+						)
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantMessage: "status unauthorized",
+			wantMessage: ierrors.Wrap(
+				ierrors.New("mock_error").Unauthorized(),
+				"status unauthorized",
+			).Error(),
 		},
 		{
 			name: "response with forbidden error",
@@ -324,16 +335,16 @@ func TestClient_handleResponseErr(t *testing.T) {
 					StatusCode: http.StatusForbidden,
 					Body: func() io.ReadCloser {
 						b, _ := json.Marshal(
-							ierrors.NewError().
-								InnerError(errors.New("mock_error")).
-								Forbidden().
-								Build(),
+							ierrors.New("mock_error").Forbidden(),
 						)
 						return ioutil.NopCloser(bytes.NewReader(b))
 					}(),
 				},
 			},
-			wantMessage: "status forbidden",
+			wantMessage: ierrors.Wrap(
+				ierrors.New("mock_error").Unauthorized(),
+				"status forbidden",
+			).Error(),
 		},
 	}
 	for _, tt := range tests {
@@ -345,21 +356,10 @@ func TestClient_handleResponseErr(t *testing.T) {
 				decoderGenerator: tt.fields.decoderGenerator,
 			}
 			err := c.handleResponseErr(tt.args.resp)
-			var got string
-
-			// does it wrap?
-			wrapContent := errors.Unwrap(err)
-
-			if wrapContent == nil {
-				got = err.Error()
-			} else {
-				got = wrapContent.Error()
-			}
-
-			if strings.TrimSuffix(got, ": ") != tt.wantMessage {
+			if err.Error() != tt.wantMessage {
 				t.Errorf(
 					"Client.handleResponseErr() error = %v, wantErr %v",
-					got,
+					err.Error(),
 					tt.wantMessage,
 				)
 			}

@@ -1,6 +1,17 @@
 
 # Changelog
 
+### #105 Tech CORE-442 | Refactor of the error structure in the project
+- features:
+    - refactor of the ierror pkg, removal of the builder concept, now has
+      similar behaviour to the standard library errors pkg but functions to add
+      more context to the error.
+    - The main focus was to develop a secluded pkg to be used for testing and
+      error context, should be used as a referenced in future features.
+- tests:
+    - changed 80+ files tests
+    - redid the tests of the ierror pkg
+---
 ### #107 Bug CORE-550 | Mutex not unlocking on panics
 - fix:
     - panic recovery methods now receive a cancellation function that, when not null, is executed when panics are recovered.
@@ -13,12 +24,12 @@
     - created a controll variable on k8s operator that alternates between permanent and changed memory throughout the the entire operation on nodes
     - Added log level controll to authservice
 ---
-
 ### #100 Feat/Fix Pprof/memLeak | adding pprof routes to servers and fixing memory leak
 - fix:
     - closed the http.Requests and http.Response
 - features:
     - added the pprof routes in the loadbalancer and services
+---
 
 ### #101 Fix | adds routine for collecting kafka events
 - fix:

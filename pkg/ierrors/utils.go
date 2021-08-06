@@ -1,26 +1,11 @@
 package ierrors
 
-// HasCode checks if an error is an InsprError and if it is,
-//  checks if it has the error code given
-func HasCode(target error, code InsprErrorCode) bool {
-	t, ok := target.(*InsprError)
+// HasCode tries to convert the error interface to an ierror structure and then
+// assert if the structure contains the ErrCode provided as an argument
+func HasCode(err error, code ErrCode) bool {
+	e, ok := err.(*ierror)
 	if !ok {
 		return false
 	}
-	return t.Code&code > 0
-}
-
-// IsIerror checks if an error is an InsprError and if it is,
-//  checks if it has any type of error
-func IsIerror(target error) bool {
-	t, ok := target.(*InsprError)
-	if !ok {
-		return false
-	}
-
-	// going through all the errors of the ierror pkg
-	if t.Code > 0 {
-		return true
-	}
-	return false
+	return (code & e.code) > 0
 }

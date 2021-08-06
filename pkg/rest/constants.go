@@ -1,6 +1,10 @@
 package rest
 
-import "net/http"
+import (
+	"net/http"
+
+	"inspr.dev/inspr/pkg/ierrors"
+)
 
 const (
 	// HeaderScopeKey is used to obtain or to change the scope in the http
@@ -27,3 +31,7 @@ var routeTranslator = map[string]string{
 	"types":    "type",
 	"auth":     "token",
 }
+
+var defaultErr = ierrors.
+	New("cannot retrieve error from server").
+	InternalServer()

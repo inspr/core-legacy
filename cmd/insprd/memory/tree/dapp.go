@@ -38,17 +38,15 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 
 	if amm.root == nil {
 		l.Error("root of the tree is nil, no transaction started")
-		return nil, ierrors.NewError().InternalServer().Message("root of the tree is nil, no transaction started").Build()
+		return nil, ierrors.New(
+			"root of the tree is nil, no transaction started",
+		).InternalServer()
 	}
 	if query == "" {
 		return amm.root, nil
 	}
 
-	err := ierrors.
-		NewError().
-		NotFound().
-		Message("dApp not found for given query: %s", query).
-		Build()
+	err := ierrors.New("dApp not found for given query: %s", query).NotFound()
 
 	reference := strings.Split(query, ".")
 	nextApp := amm.root
@@ -85,7 +83,9 @@ func (amm *AppMemoryManager) Create(scope string, app *meta.App, brokers *apimod
 
 	if _, ok := parentApp.Spec.Apps[app.Meta.Name]; ok {
 		l.Debug("dapp already exists - refusing request")
-		return ierrors.NewError().InvalidApp().Message("this app already exists in parentApp").Build()
+		return ierrors.New(
+			"this app already exists in parentApp",
+		).InvalidApp()
 	}
 
 	l.Debug("checking dApp structure")
@@ -125,7 +125,7 @@ func (amm *AppMemoryManager) Delete(query string) error {
 
 	if query == "" {
 		l.Debug("unable to delete root dApp - refusing request")
-		return ierrors.NewError().BadRequest().Message("can't delete root dApp").Build()
+		return ierrors.New("can't delete root dApp").BadRequest()
 	}
 
 	l.Debug("getting dApp to be deleted")
@@ -169,11 +169,15 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App, brokers *apimod
 	l.Debug("validating new dApp structure")
 	if currentApp.Meta.Name != app.Meta.Name {
 		l.Debug("invalid name change operation", zap.String("old-dapp", currentApp.Meta.Name))
-		return ierrors.NewError().InvalidName().Message("dApp's name mustn't change when updating").Build()
+		return ierrors.New(
+			"dApp's name mustn't change when updating",
+		).InvalidName()
 	}
 	if !nodeIsEmpty(app.Spec.Node) && !(len(app.Spec.Apps) == 0) {
 		l.Debug("a Node can't contain child dApps")
-		return ierrors.NewError().InvalidApp().Message("dApp mustn't have a Node and other dApps at the same time").Build()
+		return ierrors.New(
+			"dApp mustn't have a Node and other dApps at the same time",
+		).InvalidApp()
 	}
 
 	parent, errParent := getParentApp(query, amm.treeMemoryManager)
@@ -216,14 +220,18 @@ func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
 
 	if amm.tree == nil {
 		l.Error("root of the tree is nil, no transaction started")
-		return nil, ierrors.NewError().InternalServer().Message("root of the tree is nil, no transaction started").Build()
+		return nil, ierrors.New(
+			"root of the tree is nil, no transaction started",
+		).InternalServer()
 	}
 	if query == "" {
 		return amm.tree, nil
 	}
 
 	reference := strings.Split(query, ".")
-	err := ierrors.NewError().NotFound().Message("dApp not found for given query '%v'", query).Build()
+	err := ierrors.New(
+		"dApp not found for given query '%v'", query,
+	).NotFound()
 
 	nextApp := amm.tree
 	for _, element := range reference {
@@ -307,14 +315,14 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, val) // if boundary exists, setup to resolve in parernt
 			continue
 		}
-		merr.Add(ierrors.NewError().Message("invalid boundary: %s invalid", key).Build())
+		merr.Add(ierrors.New("invalid boundary: %s invalid", key))
 		delete(unresolved, key)
 
 	}
 	if !merr.Empty() {
 		// throwing erros for boundaries couldn't be resolved because of some invalid boundary
 		for key := range unresolved {
-			merr.Add(ierrors.NewError().Message("invalid boundary: %s unresolved", key).Build())
+			merr.Add(ierrors.New("invalid boundary: %s unresolved", key))
 		}
 		return &merr
 	}

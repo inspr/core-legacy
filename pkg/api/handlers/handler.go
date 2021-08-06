@@ -70,7 +70,7 @@ func (handler *Handler) applyChangesInDiff(changes diff.Changelog) error {
 		return nil
 	}
 
-	return ierrors.NewError().Message(errs.Error()).Build()
+	return ierrors.New(errs.Error())
 }
 
 // GetCancel returns the transaction cancelation function for the operations

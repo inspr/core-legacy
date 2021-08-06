@@ -42,7 +42,7 @@ func doConfigChange(_ context.Context, args []string) error {
 		errMsg := "error: key inserted does not exist in the insprctl config"
 		fmt.Fprintln(out, errMsg)
 		printExistingKeys()
-		return ierrors.NewError().Message(errMsg).Build()
+		return ierrors.New(errMsg)
 	}
 
 	// updates
