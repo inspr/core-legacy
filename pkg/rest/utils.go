@@ -26,8 +26,11 @@ func AttachProfiler(m *http.ServeMux) {
 }
 
 // RecoverFromPanic will handle panic
-func RecoverFromPanic(w http.ResponseWriter) {
+func RecoverFromPanic(w http.ResponseWriter, execOnRecover ...func()) {
 	if recoveryMessage := recover(); recoveryMessage != nil {
+		for _, exec := range execOnRecover {
+			exec()
+		}
 		ERROR(w, ierrors.NewError().InternalServer().Message("%s", recoveryMessage).Build())
 	}
 }

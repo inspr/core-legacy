@@ -96,7 +96,7 @@ func Test_intToint32(t *testing.T) {
 	}
 }
 
-func TestNodeOperator_withBoundary(t *testing.T) { // needs more testing, longer creates, updates, and deletes
+func TestNodeOperator_withBoundary(t *testing.T) { //TODO needs more testing, longer creates, updates, and deletes
 	mem := fake.MockTreeMemory(nil)
 	mem.InitTransaction()
 	mem.Channels().Create("", &meta.Channel{
