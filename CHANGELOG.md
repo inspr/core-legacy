@@ -1,6 +1,14 @@
 
 # Changelog
 
+### #108 Tech CORE-549 | Add support to request Host header in the cli
+- features:
+    - Add a host to the insprctl config to the user set the host on the insprctl init or insprctl config host "user-host" commands.
+    - Create the host flag if the user wants to manually insert the host via cli without change the config host that is already set.
+- tests:
+    - Updated the set client argument to fit on the new host request call
+---
+
 ### #105 Tech CORE-442 | Refactor of the error structure in the project
 - features:
     - refactor of the ierror pkg, removal of the builder concept, now has
