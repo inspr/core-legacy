@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -10,7 +9,6 @@ import (
 	"testing"
 
 	"inspr.dev/inspr/pkg/controller"
-	"inspr.dev/inspr/pkg/ierrors"
 )
 
 func TestGetCliClient(t *testing.T) {
@@ -184,48 +182,6 @@ func TestSetMockedClient(t *testing.T) {
 			SetMockedClient(tt.args.err)
 			if defaults.client == nil {
 				t.Errorf("wanted non nil structure")
-			}
-		})
-	}
-}
-
-func TestRequestErrorMessage(t *testing.T) {
-	type args struct {
-		err error
-	}
-	tests := []struct {
-		name  string
-		args  args
-		wantW string
-	}{
-		{
-			name: "ierror-unauthorized",
-			args: args{
-				ierrors.NewError().Unauthorized().Build(),
-			},
-			wantW: "failed to authenticate with the cluster. Is your token configured correctly?\n",
-		},
-		{
-			name: "ierror-forbidden",
-			args: args{
-				ierrors.NewError().Forbidden().Build(),
-			},
-			wantW: "forbidden operation, please check for the scope.\n",
-		},
-		{
-			name: "ierror-unauthorized",
-			args: args{
-				err: errors.New("mock-error"),
-			},
-			wantW: "non inspr error: mock-error\n",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			w := &bytes.Buffer{}
-			RequestErrorMessage(tt.args.err, w)
-			if gotW := w.String(); gotW != tt.wantW {
-				t.Errorf("RequestErrorMessage() = %v, want %v", gotW, tt.wantW)
 			}
 		})
 	}

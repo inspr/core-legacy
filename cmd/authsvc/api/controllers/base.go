@@ -4,7 +4,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -19,6 +18,7 @@ type Server struct {
 	Mux     *http.ServeMux
 	logger  *zap.Logger
 	privKey *rsa.PrivateKey
+	alevel  *zap.AtomicLevel
 }
 
 // Init - configures the server
@@ -35,7 +35,7 @@ func (s *Server) Init() {
 	var privPemBytes []byte
 	if privKey.Type != "RSA PRIVATE KEY" {
 		s.logger.Error("RSA private key is of the wrong type")
-		err = ierrors.NewError().InternalServer().Message("RSA private key is of the wrong type").Build()
+		err = ierrors.New("RSA private key is of the wrong type").InternalServer()
 		panic(err)
 	}
 
@@ -47,7 +47,10 @@ func (s *Server) Init() {
 			s.logger.Error("unable to parse RSA private key",
 				zap.Any("error", err))
 
-			err = ierrors.NewError().InternalServer().Message("error parsing RSA private key: %v", err).Build()
+			err = ierrors.Wrap(
+				ierrors.New(err).InternalServer(),
+				"error parsing RSA private key",
+			)
 			panic(err)
 		}
 	}
@@ -55,14 +58,14 @@ func (s *Server) Init() {
 	privateKey, ok := parsedKey.(*rsa.PrivateKey)
 	if !ok {
 		s.logger.Error("unable to parse RSA private key")
-		err = ierrors.NewError().InternalServer().Message("unable to parse RSA private key").Build()
+		err = ierrors.New("unable to parse RSA private key").InternalServer()
 		panic(err)
 	}
 
 	err = privateKey.Validate()
 	if err != nil {
 		s.logger.Error("unable to validate private key", zap.Any("error", err))
-		err = ierrors.NewError().InternalServer().Message("unable to validate private key").Build()
+		err = ierrors.New("unable to validate private key").InternalServer()
 		panic(err)
 	}
 
@@ -73,6 +76,6 @@ func (s *Server) Init() {
 
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
-	fmt.Printf("authsvc rest api is up! Listening on port: %s\n", addr)
+	s.logger.Info("authsvc rest api is up!", zap.String("Port", addr))
 	s.logger.Fatal("authsvc crashed: ", zap.Any("error", http.ListenAndServe(addr, s.Mux)))
 }

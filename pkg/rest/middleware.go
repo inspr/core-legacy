@@ -18,6 +18,7 @@ type CRUDHandler interface {
 	HandleUpdate() Handler
 	HandleGet() Handler
 	GetAuth() auth.Auth
+	GetCancel() func()
 }
 
 // HandleCRUD uses a CRUDHandler to handle HTTP requests for a CRUD resource
@@ -30,28 +31,28 @@ func HandleCRUD(handler CRUDHandler) Handler {
 				HandleGet().
 				Validate(handler.GetAuth()).
 				JSON().
-				Recover()(w, r)
+				Recover(handler.GetCancel())(w, r)
 
 		case http.MethodPost:
 			handler.
 				HandleCreate().
 				Validate(handler.GetAuth()).
 				JSON().
-				Recover()(w, r)
+				Recover(handler.GetCancel())(w, r)
 
 		case http.MethodPut:
 			handler.
 				HandleUpdate().
 				Validate(handler.GetAuth()).
 				JSON().
-				Recover()(w, r)
+				Recover(handler.GetCancel())(w, r)
 
 		case http.MethodDelete:
 			handler.
 				HandleDelete().
 				Validate(handler.GetAuth()).
 				JSON().
-				Recover()(w, r)
+				Recover(handler.GetCancel())(w, r)
 
 		default:
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
@@ -78,7 +79,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		if (len(headerContent) == 0) ||
 			(!strings.HasPrefix(headerContent[0], "Bearer ")) {
 			logger.Info("invalid token received")
-			ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token format").Build())
+			ERROR(w, ierrors.New("invalid token format").Unauthorized())
 			return
 		}
 
@@ -94,12 +95,12 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 			// check for invalid error or non existent
 			if ierrors.HasCode(err, ierrors.InvalidToken) {
 				logger.Info("invalid token received, refusing request")
-				ERROR(w, ierrors.NewError().Unauthorized().Message("invalid token").Build())
+				ERROR(w, ierrors.New("invalid token").Unauthorized())
 				return
 			}
 
 			// default error message
-			ERROR(w, ierrors.NewError().Message(err.Error()).Build())
+			ERROR(w, ierrors.New(err))
 			return
 		}
 
@@ -133,11 +134,9 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		logger.Info("insufficient credentials, refusing request", zap.String("requested-permission", perm), zap.Strings("requested-scopes", reqScopes))
 		ERROR(
 			w,
-			ierrors.
-				NewError().
-				Forbidden().
-				Message("not enought permissions to perform request").
-				Build(),
+			ierrors.New(
+				"not enought permissions to perform request",
+			).Forbidden(),
 		)
 	}
 }

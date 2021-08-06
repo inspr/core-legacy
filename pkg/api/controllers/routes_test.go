@@ -18,7 +18,9 @@ import (
 // the requests
 func TestServer_initRoutes(t *testing.T) {
 	testServer := &Server{
-		auth:   authmock.NewMockAuth(errors.New("unauthorized")),
+		auth: authmock.NewMockAuth(
+			errors.New("unauthorized"),
+		),
 		memory: fake.GetMockMemoryManager(nil, nil),
 		mux:    http.NewServeMux(),
 	}

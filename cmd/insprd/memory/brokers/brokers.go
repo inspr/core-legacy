@@ -14,7 +14,11 @@ func (bmm *brokerMemoryManager) Get() (*apimodels.BrokersDI, error) {
 	l := logger.With(zap.String("operation", "get"))
 	l.Debug("received broker get request")
 	bmm.available.Lock()
+	l.Debug("available mutex locked", zap.String("type", "mutex"))
+
+	defer l.Debug("available mutex unlocked", zap.String("type", "mutex"))
 	defer bmm.available.Unlock()
+
 	mem, err := bmm.get()
 	if err != nil {
 		l.Debug("unable to get memory manager")
@@ -29,7 +33,7 @@ func (bmm *brokerMemoryManager) Get() (*apimodels.BrokersDI, error) {
 
 func (bmm *brokerMemoryManager) get() (*brokers.Brokers, error) {
 	if bmm.broker == nil {
-		return nil, ierrors.NewError().Message("broker status memory is empty").Build()
+		return nil, ierrors.New("broker status memory is empty")
 	}
 	return bmm.broker, nil
 }
@@ -41,7 +45,11 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 		zap.Any("configs", config),
 	)
 	bmm.available.Lock()
+	l.Debug("available mutex locked", zap.String("type", "mutex"))
+
+	defer l.Debug("available mutex unlocked", zap.String("type", "mutex"))
 	defer bmm.available.Unlock()
+
 	l.Info("creating new broker")
 	mem, err := bmm.get()
 	if err != nil {
@@ -51,7 +59,7 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 	broker := config.Broker()
 
 	if _, ok := mem.Available[broker]; ok {
-		return ierrors.NewError().Message("broker %s is already configured on memory", broker).Build()
+		return ierrors.New("broker %s is already configured on memory", broker)
 	}
 
 	var factory models.SidecarFactory
@@ -62,7 +70,7 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 		factory = sidecars.KafkaToDeployment(*obj)
 	default:
 		l.Debug("found unsupported broker config, rejecting request")
-		return ierrors.NewError().Message("broker %s is not supported", broker).Build()
+		return ierrors.New("broker %s is not supported", broker)
 	}
 
 	l.Debug("subscribing broker to sidecar factory")
@@ -84,7 +92,11 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 func (bmm *brokerMemoryManager) SetDefault(broker string) error {
 	l := logger.With(zap.String("operation", "set-default"), zap.String("broker", broker))
 	bmm.def.Lock()
+	l.Debug("def mutex locked", zap.String("type", "mutex"))
+
+	defer l.Debug("def mutex unlocked", zap.String("type", "mutex"))
 	defer bmm.def.Unlock()
+
 	l.Debug("received default broker change request")
 	mem, err := bmm.get()
 	if err != nil {
@@ -94,7 +106,7 @@ func (bmm *brokerMemoryManager) SetDefault(broker string) error {
 
 	if _, ok := mem.Available[broker]; !ok {
 		l.Debug("broker not configured")
-		return ierrors.NewError().Message("broker %s is not configured on memory", broker).Build()
+		return ierrors.New("broker %s is not configured on memory", broker)
 	}
 
 	mem.Default = broker
@@ -111,7 +123,10 @@ func (bmm *brokerMemoryManager) Factory() SidecarManager {
 func (bmm *brokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
 	l := logger.With(zap.String("operation", "get-configs"), zap.String("broker", broker))
 	bmm.available.Lock()
+	l.Debug("available mutex locked", zap.String("type", "mutex"))
+	defer l.Debug("available mutex unlocked", zap.String("type", "mutex"))
 	defer bmm.available.Unlock()
+
 	l.Info("getting config for broker sidecar")
 
 	mem, err := bmm.get()
@@ -121,7 +136,7 @@ func (bmm *brokerMemoryManager) Configs(broker string) (brokers.BrokerConfigurat
 
 	config, ok := mem.Available[broker]
 	if !ok {
-		return nil, ierrors.NewError().Message("broker %s is not configured on memory", broker).Build()
+		return nil, ierrors.New("broker %s is not configured on memory", broker)
 	}
 
 	return config, nil

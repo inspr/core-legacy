@@ -45,7 +45,7 @@ func TestNewApplyType(t *testing.T) {
 			args: args{
 				b: chanTypeWithoutNameBytes,
 			},
-			want: ierrors.NewError().Message("type without name").Build(),
+			want: ierrors.New("type without name"),
 		},
 		{
 			name: "error_testing",

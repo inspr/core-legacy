@@ -28,7 +28,7 @@ func NewApplyChannel() RunMethod {
 		}
 
 		if channel.Meta.Name == "" {
-			return ierrors.NewError().Message("channel without name").Build()
+			return ierrors.New("channel without name")
 		}
 
 		flagDryRun := cmd.InsprOptions.DryRun

@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"inspr.dev/inspr/pkg/cmd"
 	"inspr.dev/inspr/pkg/cmd/utils"
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // NewClusterCommand creates cluster command for Inspr CLI
@@ -25,15 +26,15 @@ func NewClusterCommand() *cobra.Command {
 }
 
 func authInit(c context.Context, args []string) error {
-	output := utils.GetCliOutput()
+	out := utils.GetCliOutput()
 
 	token, err := utils.GetCliClient().Authorization().Init(c, args[0])
 	if err != nil {
-		utils.RequestErrorMessage(err, output)
+		fmt.Fprint(out, ierrors.FormatError(err))
 		return err
 	}
 
-	fmt.Fprintln(output, "This is a root token for authentication within your insprd. This will not be generated again. Save it wisely.")
-	fmt.Fprintf(output, "%s\n", token)
+	fmt.Fprintln(out, "This is a root token for authentication within your insprd. This will not be generated again. Save it wisely.")
+	fmt.Fprintf(out, "%s\n", token)
 	return nil
 }

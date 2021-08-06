@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strings"
 	"testing"
 
 	"inspr.dev/inspr/pkg/ierrors"
@@ -61,52 +60,52 @@ func TestERROR(t *testing.T) {
 	}{
 		{
 			name: "non_InsprErrors",
-			err:  errors.New("server crashed"),
+			err:  errors.New(""),
 			want: http.StatusInternalServerError,
 		},
 		{
 			name: "InsprErrors_NotFound",
-			err:  ierrors.NewError().NotFound().Build(),
+			err:  ierrors.New("").NotFound(),
 			want: http.StatusNotFound,
 		},
 		{
 			name: "InsprErrors_AlreadyExists",
-			err:  ierrors.NewError().AlreadyExists().Build(),
+			err:  ierrors.New("").AlreadyExists(),
 			want: http.StatusConflict,
 		},
 		{
 			name: "InsprErrors_InternalServer",
-			err:  ierrors.NewError().InternalServer().Build(),
+			err:  ierrors.New("").InternalServer(),
 			want: http.StatusInternalServerError,
 		},
 		{
 			name: "InsprErrors_InvalidName",
-			err:  ierrors.NewError().InvalidName().Build(),
+			err:  ierrors.New("").InvalidName(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_InvalidApp",
-			err:  ierrors.NewError().InvalidApp().Build(),
+			err:  ierrors.New("").InvalidApp(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_InvalidChannel",
-			err:  ierrors.NewError().InvalidChannel().Build(),
+			err:  ierrors.New("").InvalidChannel(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_InvalidType",
-			err:  ierrors.NewError().InvalidType().Build(),
+			err:  ierrors.New("").InvalidType(),
 			want: http.StatusForbidden,
 		},
 		{
 			name: "InsprErrors_BadRequest",
-			err:  ierrors.NewError().BadRequest().Build(),
+			err:  ierrors.New("").BadRequest(),
 			want: http.StatusBadRequest,
 		},
 		{
 			name: "InsprErrors_Unknown_ErrCode",
-			err:  &ierrors.InsprError{Code: 9999},
+			err:  ierrors.New(""),
 			want: http.StatusInternalServerError,
 		},
 	}
@@ -117,11 +116,15 @@ func TestERROR(t *testing.T) {
 			if status := rr.Result().StatusCode; status != tt.want {
 				t.Errorf("JSON(w,code,data)=%v, want %v", status, tt.want)
 			}
-			var errorMessage ierrors.InsprError
+
+			errorMessage := ierrors.New("")
 			json.Unmarshal(rr.Body.Bytes(), &errorMessage)
 
-			if !reflect.DeepEqual(errorMessage.Message, tt.err.Error()) {
-				t.Errorf("JSON(w,code,data)=%v, want %v", errorMessage.Message, tt.err.Error())
+			gotCode := ierrors.Code(errorMessage)
+			wantCode := ierrors.Code(tt.err)
+
+			if !reflect.DeepEqual(gotCode, wantCode) {
+				t.Errorf("JSON(w,code,data)=%v, want %v", gotCode, wantCode)
 			}
 		})
 	}
@@ -139,12 +142,12 @@ func TestRecoverFromPanic(t *testing.T) {
 		fmt.Println(err)
 	}
 
-	var got *ierrors.InsprError
+	got := ierrors.New("")
 	json.NewDecoder(resp.Body).Decode(&got)
 
-	want := ierrors.NewError().InternalServer().Message("This is a panic error").Build()
+	want := ierrors.New("This is a panic error").InternalServer()
 
-	if !reflect.DeepEqual(want.Message, got.Message) || !reflect.DeepEqual(want.Code, got.Code) {
+	if !reflect.DeepEqual(want.Error(), got.Error()) {
 		t.Errorf("RecoverFromPanic=%v, want %v", got, want)
 	}
 
@@ -154,36 +157,45 @@ func TestUnmarshalERROR(t *testing.T) {
 	type args struct {
 		r io.Reader
 	}
-	errBody := ierrors.
-		NewError().
-		InternalServer().
-		Message("cannot retrieve error from server").
-		Build()
-	errBytes, _ := json.Marshal(errBody)
+
+	generateBody := func(body string) io.Reader {
+		bodyBytes, _ := json.Marshal(body)
+		return bytes.NewBuffer(bodyBytes)
+	}
+	generateErrBody := func(err error) io.Reader {
+		errBytes, _ := json.Marshal(err)
+		return bytes.NewBuffer(errBytes)
+	}
 
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name     string
+		args     args
+		want     error
+		wantCode ierrors.ErrCode
 	}{
 		{
-			name:    "basic_unmarshal_error",
-			args:    args{r: bytes.NewBuffer(errBytes)},
-			wantErr: true,
+			name: "basic_unmarshal_error",
+			args: args{r: generateErrBody(
+				ierrors.New("no permission to create dapp").Forbidden(),
+			)},
+			want:     ierrors.New("no permission to create dapp").Forbidden(),
+			wantCode: ierrors.Forbidden,
 		},
 		{
-			name:    "basic_unmarshal_empty_error",
-			args:    args{r: strings.NewReader("nothing")},
-			wantErr: true,
+			name:     "basic_unmarshal_empty_error",
+			args:     args{r: generateBody("nothing")},
+			want:     defaultErr,
+			wantCode: ierrors.Unknown,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.r)
 			err := UnmarshalERROR(tt.args.r)
-			if (err.Error() != "") != tt.wantErr {
+			if err.Error() != tt.want.Error() {
 				t.Errorf("UnmarshalERROR() error = %v, wantErr %v",
-					err.Error(),
-					tt.wantErr,
+					err,
+					tt.want,
 				)
 			}
 		})

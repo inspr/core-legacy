@@ -88,10 +88,9 @@ func MakeStrSet(obj interface{}) (StrSet, error) {
 
 	default:
 		objType := reflect.TypeOf(obj)
-		return nil, ierrors.NewError().
-			InternalServer().
-			Message("error while making set: '" + objType.Name() + "' type not supported").
-			Build()
+		return nil, ierrors.New(
+			"error while making set: '" + objType.Name() + "' type not supported",
+		).InternalServer()
 	}
 }
 

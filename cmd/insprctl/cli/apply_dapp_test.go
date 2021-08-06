@@ -35,7 +35,7 @@ func TestNewApplyApp(t *testing.T) {
 			args: args{
 				b: appWithoutNameBytes,
 			},
-			want: ierrors.NewError().Message("dapp without name").Build(),
+			want: ierrors.New("dapp without name"),
 		},
 		{
 			name: "error_testing",

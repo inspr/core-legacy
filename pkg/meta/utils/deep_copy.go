@@ -10,7 +10,7 @@ import (
 //DeepCopy is a copy method for dapps tree structures
 func DeepCopy(orig, dest interface{}) error {
 	if reflect.ValueOf(dest).Kind() != reflect.Ptr {
-		return ierrors.NewError().Message("dest must be a pointer").InvalidName().Build()
+		return ierrors.New("dest must be a pointer").InvalidName()
 	}
 
 	rootObj, _ := json.Marshal(orig)

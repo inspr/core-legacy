@@ -88,7 +88,7 @@ func doApply(_ context.Context) error {
 			out,
 			"Invalid command call\nFor help, type 'insprctl apply --help'",
 		)
-		return ierrors.NewError().Message("invalid flag arguments").Build()
+		return ierrors.New("invalid flag arguments")
 	}
 
 	if hasFileFlag {
@@ -153,7 +153,8 @@ func applyValidFiles(path string, files []string, out io.Writer) []applied {
 
 		err = apply(file.content, out)
 		if err != nil {
-			cliutils.RequestErrorMessage(err, out)
+			ierrors.Wrap(err, file.fileName)
+			fmt.Fprint(out, ierrors.FormatError(err))
 			continue
 		}
 

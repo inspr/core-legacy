@@ -94,7 +94,7 @@ func Test_getApps(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
@@ -165,7 +165,7 @@ func Test_getChannels(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
@@ -235,7 +235,7 @@ func Test_gettypes(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
@@ -306,7 +306,7 @@ func Test_getNodes(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
@@ -373,7 +373,7 @@ func Test_getObj(t *testing.T) {
 			lines:   &[]string{"appParent\n", "app1\n", "thenewapp\n"},
 			wantErr: true,
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
@@ -690,7 +690,7 @@ func Test_getAlias(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}

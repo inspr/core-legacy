@@ -362,7 +362,7 @@ func Test_deleteApps(t *testing.T) {
 		}
 
 		if scope != "appParent.app1" {
-			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
+			rest.ERROR(w, ierrors.New("error test"))
 			return
 		}
 
@@ -443,7 +443,7 @@ func Test_deleteChannels(t *testing.T) {
 		}
 
 		if scope != "appParent" || data.ChName != "ch1" {
-			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
+			rest.ERROR(w, ierrors.New("error test"))
 			return
 		}
 
@@ -524,7 +524,7 @@ func Test_deletetypes(t *testing.T) {
 		}
 
 		if scope != "appParent" || data.TypeName != "t1" {
-			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
+			rest.ERROR(w, ierrors.New("error test"))
 			return
 		}
 
@@ -608,7 +608,7 @@ func Test_deleteAlias(t *testing.T) {
 		if (scope != "appParent" && scope != "") ||
 			(data.Key != "alias.name" && data.Key != "appParent.alias.name") {
 
-			rest.ERROR(w, ierrors.NewError().Message("error test").Build())
+			rest.ERROR(w, ierrors.New("error test"))
 			return
 		}
 

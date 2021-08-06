@@ -2,8 +2,8 @@ package ierrors
 
 // MultiError is a type that handles multiple errors that can happen in a process
 type MultiError struct {
-	Errors []error
-	Code   InsprErrorCode
+	Errors []error `yaml:"errors" json:"slices"`
+	Code   ErrCode `yaml:"code" json:"code"`
 }
 
 // Error return the errors in the multierror concatenated with new lines
@@ -22,8 +22,8 @@ func (e *MultiError) Error() (ret string) {
 func (e *MultiError) Add(err error) {
 	if err != nil {
 		e.Errors = append(e.Errors, err)
-		if ierr, ok := err.(*InsprError); ok {
-			e.Code |= ierr.Code
+		if ierr, ok := err.(*ierror); ok {
+			e.Code |= ierr.code
 		}
 	}
 }
