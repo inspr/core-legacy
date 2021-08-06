@@ -6,27 +6,27 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-    - host: inspr.com
+    - host: inspr.dev
       http:
         paths:
           - path: /update
             pathType: Prefix
             backend:
               service:
-                name: node-de64309b-0b62-43db-98b3-0f519c6a2711
+                name: node-2d42a680-39ef-4b44-9b57-a58c0e0a6ca4
                 port:
                   number: 8080
           - path: /delete
             pathType: Prefix
             backend:
               service:
-                name: node-de64309b-0b62-43db-98b3-0f519c6a2711
+                name: node-2d42a680-39ef-4b44-9b57-a58c0e0a6ca4
                 port:
                   number: 8080
           - path: /create
             pathType: Prefix
             backend:
               service:
-                name: node-de64309b-0b62-43db-98b3-0f519c6a2711
+                name: node-2d42a680-39ef-4b44-9b57-a58c0e0a6ca4
                 port:
                   number: 8080
