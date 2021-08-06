@@ -1,3 +1,4 @@
+{{- if not .Release.IsUpgrade -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -36,3 +37,4 @@ spec:
             - name: ADMIN_PASSWORD_GENERATE
               value: "true"
             {{- end }}
+{{- end -}}

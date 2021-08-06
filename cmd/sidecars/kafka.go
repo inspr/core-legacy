@@ -9,6 +9,7 @@ import (
 	"inspr.dev/inspr/pkg/operator/k8s"
 	"inspr.dev/inspr/pkg/sidecars/models"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 // KafkaConfig configurations used to create the KafkaSidecar
@@ -85,6 +86,10 @@ func getKafkaContainerOptions(app *meta.App, config KafkaConfig, envVars k8s.Con
 		KafkaEnvConfig(config),
 		envVars,
 		k8s.ContainerWithPullPolicy(corev1.PullAlways),
+		k8s.ContainerWithPorts(v1.ContainerPort{
+			Name:          "tcp-kfk-metrics",
+			ContainerPort: 16001,
+		}),
 	}
 
 	return append(stdOptions, opts...)

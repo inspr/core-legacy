@@ -15,6 +15,7 @@ require (
 	github.com/lestrrat-go/jwx v1.1.7
 	github.com/linkedin/goavro v2.1.0+incompatible
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
+	github.com/prometheus/client_golang v0.9.3
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5

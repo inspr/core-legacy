@@ -108,3 +108,6 @@ uidp:
       secret:
         key: key
         name: '{{ include "insprd.fullname" $ }}-init-key'
+
+prometheus:
+  enabled: true

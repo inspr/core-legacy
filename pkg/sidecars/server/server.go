@@ -7,12 +7,21 @@ import (
 	"os"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
+	"inspr.dev/inspr/pkg/environment"
 	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
+
+type channelMetric struct {
+	messagesRead prometheus.Counter
+	messagesSent prometheus.Counter
+}
 
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
@@ -25,6 +34,7 @@ type Server struct {
 	client       *http.Client
 	runningRead  bool
 	runningWrite bool
+	metrics      map[string]channelMetric
 }
 
 var logger *zap.Logger
@@ -62,7 +72,45 @@ func Init(r models.Reader, w models.Writer, broker string) *Server {
 	// implementations of write and read for a specific sidecar
 	server.Reader = r
 	server.Writer = w
+	server.metrics = make(map[string]channelMetric)
 	return server
+}
+
+func (s *Server) GetMetric(channel string) channelMetric {
+	metric, ok := s.metrics[channel]
+	if ok {
+		return metric
+	}
+	resolved, _ := environment.GetResolvedChannel(channel, environment.GetInputChannelsData(), environment.GetOutputChannelsData())
+	broker, _ := environment.GetChannelBroker(channel)
+	s.metrics[channel] = channelMetric{
+		messagesSent: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "messages_sent",
+			ConstLabels: prometheus.Labels{
+				"inspr_app_id":           environment.GetInsprAppID(),
+				"inspr_channel":          channel,
+				"inspr_resolved_channel": resolved,
+				"broker":                 broker,
+			},
+		}),
+
+		messagesRead: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "messages_read",
+			ConstLabels: prometheus.Labels{
+				"inspr_app_id":           environment.GetInsprAppID(),
+				"inspr_channel":          channel,
+				"inspr_resolved_channel": resolved,
+				"broker":                 broker,
+			},
+		}),
+	}
+
+	return s.metrics[channel]
+
 }
 
 // Run starts the server on the port given in addr
@@ -70,7 +118,6 @@ func (s *Server) Run(ctx context.Context) error {
 	mux := http.NewServeMux()
 
 	rest.AttachProfiler(mux)
-	mux.Handle("/log/level", alevel)
 	mux.Handle("/", s.writeMessageHandler().Post().JSON())
 
 	server := &http.Server{
@@ -79,6 +126,21 @@ func (s *Server) Run(ctx context.Context) error {
 	}
 
 	errCh := make(chan error)
+	admin := http.NewServeMux()
+	admin.Handle("/log/level", alevel)
+	admin.Handle("/metrics", promhttp.Handler())
+	adminServer := &http.Server{
+		Handler: admin,
+		Addr:    fmt.Sprintf("0.0.0.0:16001"),
+	}
+	go func() {
+		logger.Info("admin server listening at localhos:16001")
+		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			errCh <- err
+			logger.Error("an error occurred in LB Sidecar write server",
+				zap.Error(err))
+		}
+	}()
 	// create read message routine and captures its error
 	go func() { errCh <- s.readMessageRoutine(ctx) }()
 
