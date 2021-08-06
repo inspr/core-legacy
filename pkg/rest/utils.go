@@ -28,10 +28,7 @@ func AttachProfiler(m *http.ServeMux) {
 // RecoverFromPanic will handle panic
 func RecoverFromPanic(w http.ResponseWriter, execOnRecover ...func()) {
 	if recoveryMessage := recover(); recoveryMessage != nil {
-		for _, exec := range execOnRecover {
-			exec()
-		}
-		ERROR(w, ierrors.NewError().InternalServer().Message("%s", recoveryMessage).Build())
+		ERROR(w, ierrors.New("%s", recoveryMessage).InternalServer())
 	}
 }
 
@@ -46,58 +43,42 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 
 // ERROR reports the error back to the user within a JSON format
 func ERROR(w http.ResponseWriter, err error) {
-	switch e := err.(type) {
-	case *ierrors.InsprError:
-		switch e.Code {
-		case ierrors.AlreadyExists:
-			JSON(w, http.StatusConflict, e)
-		case ierrors.NotFound:
-			JSON(w, http.StatusNotFound, e)
-		case ierrors.InternalServer:
-			JSON(w, http.StatusInternalServerError, e)
-		case ierrors.InvalidName:
-			JSON(w, http.StatusForbidden, e)
-		case ierrors.InvalidApp:
-			JSON(w, http.StatusForbidden, e)
-		case ierrors.InvalidChannel:
-			JSON(w, http.StatusForbidden, e)
-		case ierrors.InvalidType:
-			JSON(w, http.StatusForbidden, e)
-		case ierrors.BadRequest:
-			JSON(w, http.StatusBadRequest, e)
-		case ierrors.Unauthorized:
-			JSON(w, http.StatusUnauthorized, e)
-		case ierrors.Forbidden:
-			JSON(w, http.StatusForbidden, e)
-		default:
-			JSON(w, http.StatusInternalServerError, e)
-		}
-
-	// default case
-	case error:
-		defaultInsprErr := ierrors.InsprError{
-			Message: e.Error(),
-			Code:    http.StatusInternalServerError,
-		}
-		JSON(w, http.StatusInternalServerError, defaultInsprErr)
+	switch ierrors.Code(err) {
+	case ierrors.AlreadyExists:
+		JSON(w, http.StatusConflict, err)
+	case ierrors.NotFound:
+		JSON(w, http.StatusNotFound, err)
+	case ierrors.InternalServer:
+		JSON(w, http.StatusInternalServerError, err)
+	case ierrors.InvalidName:
+		JSON(w, http.StatusForbidden, err)
+	case ierrors.InvalidApp:
+		JSON(w, http.StatusForbidden, err)
+	case ierrors.InvalidChannel:
+		JSON(w, http.StatusForbidden, err)
+	case ierrors.InvalidType:
+		JSON(w, http.StatusForbidden, err)
+	case ierrors.BadRequest:
+		JSON(w, http.StatusBadRequest, err)
+	case ierrors.Unauthorized:
+		JSON(w, http.StatusUnauthorized, err)
+	case ierrors.Forbidden:
+		JSON(w, http.StatusForbidden, err)
+	default: // default case
+		JSON(w, http.StatusInternalServerError, err)
 	}
 }
 
-// UnmarshalERROR generates a golang error with the
-// response body created by the ERROR function
+// UnmarshalERROR generates an ierror error with the response body created by
+// the ERROR function.
+//
+// Note that this function will always return an error no
+// matter if it found the error on the body or not, that means that if the
+// error details cannot be found on the body of the response body it will
+// generate a unkown error
 func UnmarshalERROR(body io.Reader) error {
-	defaultErr := ierrors.
-		NewError().
-		InternalServer().
-		Message("cannot retrieve error from server").
-		Build()
-
-	var err *ierrors.InsprError
+	err := defaultErr
 	decoder := json.NewDecoder(body)
 	decoder.Decode(&err)
-
-	if err != nil {
-		return err
-	}
-	return defaultErr
+	return err
 }

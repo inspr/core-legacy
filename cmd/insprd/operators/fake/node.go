@@ -29,7 +29,7 @@ func (o *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Nod
 		return nil, o.err
 	}
 	if _, ok := o.nodes[app.Meta.Parent+app.Meta.Name]; ok {
-		return nil, ierrors.NewError().AlreadyExists().Message("node already exists").Build()
+		return nil, ierrors.New("node already exists").AlreadyExists()
 	}
 	o.nodes[app.Meta.Parent+app.Meta.Name] = app
 	return &app.Spec.Node, nil
@@ -44,11 +44,9 @@ func (o *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, 
 	nodeKey := app.Meta.Parent + app.Meta.Name
 	node, ok := o.nodes[nodeKey]
 	if !ok {
-		return nil, ierrors.
-			NewError().
-			NotFound().
-			Message("node not found, searched for: %s", nodeKey).
-			Build()
+		return nil, ierrors.New(
+			"node not found, searched for: %s", nodeKey,
+		).NotFound()
 	}
 	return &node.Spec.Node, nil
 }
@@ -61,11 +59,9 @@ func (o *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Nod
 
 	nodeKey := app.Meta.Parent + app.Meta.Name
 	if _, ok := o.nodes[nodeKey]; !ok {
-		return nil, ierrors.
-			NewError().
-			NotFound().
-			Message("node not found, searched for: %s", nodeKey).
-			Build()
+		return nil, ierrors.New(
+			"node not found, searched for: %s", nodeKey,
+		).NotFound()
 	}
 	o.nodes[app.Meta.Parent+app.Meta.Name] = app
 	return &app.Spec.Node, nil
@@ -80,11 +76,9 @@ func (o *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeN
 	nodeKey := nodeContext + nodeName
 	_, ok := o.nodes[nodeKey]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("node not found, searched for: %s", nodeKey).
-			Build()
+		return ierrors.New(
+			"node not found, searched for: %s", nodeKey,
+		).NotFound()
 	}
 
 	delete(o.nodes, nodeKey)

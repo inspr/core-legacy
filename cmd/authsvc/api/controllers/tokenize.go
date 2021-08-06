@@ -23,8 +23,10 @@ func (server *Server) Tokenize() rest.Handler {
 			server.logger.Error("unable to decode payload",
 				zap.Any("error", err))
 
-			err = ierrors.NewError().BadRequest().
-				Message("invalid body, error: %s", err.Error()).Build()
+			err = ierrors.Wrap(
+				ierrors.New(err).BadRequest(),
+				"invalid body",
+			)
 
 			rest.ERROR(w, err)
 			return
@@ -52,8 +54,9 @@ func (server *Server) tokenize(payload auth.Payload, exp time.Time) ([]byte, err
 	signed, err := jwt.Sign(token, jwa.RS256, server.privKey)
 	if err != nil {
 		server.logger.Error("unable to sign JWT with provided RSA private key", zap.Any("error", err))
-		err := ierrors.NewError().InternalServer().Message("unable to sign JWT with available RSA private key").Build()
-		return nil, err
+		return nil, ierrors.New(
+			"unable to sign JWT with available RSA private key",
+		).InternalServer()
 	}
 	return signed, nil
 }

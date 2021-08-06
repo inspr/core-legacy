@@ -6,7 +6,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // Option is an option to be applied on the construction of a command
@@ -165,8 +164,7 @@ func (b *builder) ExactArgs(argCount int, action func(context.Context, []string)
 	}
 	b.cmd.Args = cobra.ExactArgs(argCount)
 	b.cmd.RunE = func(_ *cobra.Command, args []string) error {
-		err := handleWellKnownErrors(action(b.cmd.Context(), args))
-		return err
+		return (action(b.cmd.Context(), args))
 	}
 	return &b.cmd
 }
@@ -177,8 +175,7 @@ func (b *builder) ExactArgs(argCount int, action func(context.Context, []string)
 func (b *builder) MinimumArgs(minArgs int, action func(context.Context, []string) error) *cobra.Command {
 	b.cmd.Args = cobra.MinimumNArgs(minArgs)
 	b.cmd.RunE = func(_ *cobra.Command, args []string) error {
-		err := handleWellKnownErrors(action(b.cmd.Context(), args))
-		return err
+		return (action(b.cmd.Context(), args))
 	}
 	return &b.cmd
 }
@@ -188,8 +185,7 @@ func (b *builder) MinimumArgs(minArgs int, action func(context.Context, []string
 func (b *builder) NoArgs(action func(context.Context) error) *cobra.Command {
 	b.cmd.Args = cobra.NoArgs
 	b.cmd.RunE = func(*cobra.Command, []string) error {
-		err := handleWellKnownErrors(action(b.cmd.Context()))
-		return err
+		return (action(b.cmd.Context()))
 	}
 	return &b.cmd
 }
@@ -201,18 +197,6 @@ func (b *builder) Super() *cobra.Command {
 		return cmd.Help()
 	}
 	return &b.cmd
-}
-
-// handleWellKnownErrors - responsible for handling the cli common errors and
-// returning them in a proper manner to the user
-func handleWellKnownErrors(err error) error {
-	if err == nil {
-		return err
-	}
-
-	return ierrors.NewError().
-		Message(err.Error()).
-		Build()
 }
 
 // WithAliases adds command aliases

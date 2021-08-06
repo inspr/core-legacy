@@ -20,11 +20,7 @@ func (a *Alias) Get(scope, aliasKey string) (*meta.Alias, error) {
 
 	alias, ok := a.alias[scope]
 	if !ok {
-		return nil, ierrors.
-			NewError().
-			NotFound().
-			Message("alias %s not found", scope).
-			Build()
+		return nil, ierrors.New("alias %s not found", scope).NotFound()
 	}
 
 	return alias, nil
@@ -38,11 +34,7 @@ func (a *Alias) Create(query, targetBoundary string, alias *meta.Alias) error {
 
 	_, ok := a.alias[query]
 	if ok {
-		return ierrors.
-			NewError().
-			AlreadyExists().
-			Message("alias %s already exists", query).
-			Build()
+		return ierrors.New("alias %s already exists", query).AlreadyExists()
 	}
 	a.alias[query] = alias
 	return nil
@@ -56,11 +48,7 @@ func (a *Alias) Delete(scope, aliasKey string) error {
 
 	_, ok := a.alias[scope]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("type %s not found", scope).
-			Build()
+		return ierrors.New("type %s not found", scope).NotFound()
 	}
 
 	delete(a.alias, scope)
@@ -74,11 +62,7 @@ func (a *Alias) Update(scope, aliasKey string, alias *meta.Alias) error {
 	}
 	_, ok := a.alias[scope]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("type %s not found", scope).
-			Build()
+		return ierrors.New("type %s not found", scope).NotFound()
 	}
 	a.alias[scope] = alias
 	return nil

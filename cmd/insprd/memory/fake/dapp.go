@@ -21,11 +21,7 @@ func (a *Apps) Get(query string) (*meta.App, error) {
 	}
 	ct, ok := a.apps[query]
 	if !ok {
-		return nil, ierrors.
-			NewError().
-			NotFound().
-			Message("dapp %s not found", query).
-			Build()
+		return nil, ierrors.New("dapp %s not found", query).NotFound()
 	}
 	return ct, nil
 }
@@ -39,11 +35,7 @@ func (a *Apps) Create(scope string, app *meta.App, brokers *apimodels.BrokersDI)
 
 	_, ok := a.apps[query]
 	if ok {
-		return ierrors.
-			NewError().
-			AlreadyExists().
-			Message("dapp %s already exists", query).
-			Build()
+		return ierrors.New("dapp %s already exists", query).AlreadyExists()
 	}
 	a.apps[query] = app
 	return nil
@@ -56,11 +48,7 @@ func (a *Apps) Delete(query string) error {
 	}
 	_, ok := a.apps[query]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("dapp %s not found", query).
-			Build()
+		return ierrors.New("dapp %s not found", query).NotFound()
 	}
 
 	delete(a.apps, query)
@@ -75,11 +63,7 @@ func (a *Apps) Update(scope string, app *meta.App, brokers *apimodels.BrokersDI)
 	query, _ := utils.JoinScopes(scope, app.Meta.Name)
 	_, ok := a.apps[query]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("dapp %s not found", query).
-			Build()
+		return ierrors.New("dapp %s not found", query).NotFound()
 	}
 	a.apps[query] = app
 	return nil

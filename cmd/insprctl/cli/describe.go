@@ -81,14 +81,14 @@ func displayAppState(_ context.Context, args []string) error {
 
 	if !utils.IsValidScope(args[0]) {
 		fmt.Fprint(out, "invalid args\n")
-		return ierrors.NewError().Message("Invalid args").BadRequest().Build()
+		return ierrors.New("Invalid args").BadRequest()
 	}
 
 	path, _ := utils.JoinScopes(scope, args[0])
 
 	app, err := client.Apps().Get(context.Background(), path)
 	if err != nil {
-		cliutils.RequestErrorMessage(err, out)
+		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 		return err
 	}
 
@@ -113,7 +113,7 @@ func displayChannelState(_ context.Context, args []string) error {
 
 	channel, err := client.Channels().Get(context.Background(), path, chName)
 	if err != nil {
-		cliutils.RequestErrorMessage(err, out)
+		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 		return err
 	}
 	utils.PrintChannelTree(channel, out)
@@ -137,7 +137,7 @@ func displayTypeState(_ context.Context, args []string) error {
 
 	insprType, err := client.Types().Get(context.Background(), path, typeName)
 	if err != nil {
-		cliutils.RequestErrorMessage(err, out)
+		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 		return err
 	}
 	utils.PrintTypeTree(insprType, out)
@@ -161,7 +161,7 @@ func displayAlias(_ context.Context, args []string) error {
 
 	alias, err := client.Alias().Get(context.Background(), path, aliasKey)
 	if err != nil {
-		cliutils.RequestErrorMessage(err, out)
+		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
 		return err
 	}
 

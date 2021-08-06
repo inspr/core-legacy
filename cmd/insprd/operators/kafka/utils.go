@@ -30,13 +30,10 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 		if err != nil {
 			config.numberOfPartitions = 1
 			logger.Error("invalid 'kafka.partition.number' in Channels annotations")
-			return config, ierrors.NewError().
-				InvalidChannel().
-				Message(
-					"invalid partition configuration %s",
-					ch.Meta.Annotations["kafka.partition.number"],
-				).
-				Build()
+			return config, ierrors.New(
+				"invalid partition configuration %s",
+				ch.Meta.Annotations["kafka.partition.number"],
+			).InvalidChannel()
 		}
 	}
 
@@ -46,13 +43,10 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 		if err != nil {
 			config.replicationFactor = 1
 			logger.Error("invalid 'kafka.replication.factor' in Channels annotations")
-			return config, ierrors.NewError().
-				InvalidChannel().
-				Message(
-					"invalid replication configuration %s",
-					ch.Meta.Annotations["kafka.replication.factor"],
-				).
-				Build()
+			return config, ierrors.New(
+				"invalid replication configuration %s",
+				ch.Meta.Annotations["kafka.replication.factor"],
+			).InvalidChannel()
 		}
 	}
 

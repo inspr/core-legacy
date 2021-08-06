@@ -86,7 +86,7 @@ func (g GenOp) setOperator(config metabrokers.BrokerConfiguration) error {
 			}
 		}
 	default:
-		err = ierrors.NewError().Message("").Build()
+		err = ierrors.New("")
 	}
 	return err
 }

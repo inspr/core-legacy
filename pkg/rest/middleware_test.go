@@ -91,7 +91,7 @@ func TestHandler_Validate(t *testing.T) {
 			name: "invalid_token",
 			args: args{
 				auth: authMock.NewMockAuth(
-					&ierrors.InsprError{Code: ierrors.InvalidToken},
+					ierrors.New("").InvalidToken(),
 				),
 				Authorization: "Bearer mock_token",
 				httpMethod:    http.MethodPost,
@@ -180,7 +180,6 @@ func TestHandler_Validate(t *testing.T) {
 
 			// does request
 			res, err := client.Do(req)
-
 			if err != nil {
 				t.Error("couldn't receive response")
 			}

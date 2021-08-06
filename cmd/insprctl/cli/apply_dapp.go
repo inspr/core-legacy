@@ -28,7 +28,7 @@ func NewApplyApp() RunMethod {
 			return err
 		}
 		if app.Meta.Name == "" {
-			return ierrors.NewError().Message("dapp without name").Build()
+			return ierrors.New("dapp without name")
 		}
 
 		err := recursiveSchemaInjection(&app)

@@ -34,7 +34,7 @@ func TestNewApplyAlias(t *testing.T) {
 			args: args{
 				b: chanWithoutNameBytes,
 			},
-			want: ierrors.NewError().Message("alias without name").Build(),
+			want: ierrors.New("alias without name"),
 		},
 		{
 			name: "error_testing",

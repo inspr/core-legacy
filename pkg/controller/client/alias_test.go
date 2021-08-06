@@ -58,7 +58,7 @@ func TestAliasClient_Get(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest().Build())
+					encoder.Encode(ierrors.New("").BadRequest())
 					return
 				}
 
@@ -146,7 +146,7 @@ func TestAliasClient_Create(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest().Build())
+					encoder.Encode(ierrors.New("").BadRequest())
 					return
 				}
 
@@ -222,7 +222,7 @@ func TestAliasClient_Delete(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest().Build())
+					encoder.Encode(ierrors.New("").BadRequest())
 					return
 				}
 
@@ -305,7 +305,7 @@ func TestAliasClient_Update(t *testing.T) {
 				encoder := json.NewEncoder(w)
 				if tt.wantErr {
 					w.WriteHeader(http.StatusBadRequest)
-					encoder.Encode(ierrors.NewError().BadRequest().Build())
+					encoder.Encode(ierrors.New("").BadRequest())
 					return
 				}
 

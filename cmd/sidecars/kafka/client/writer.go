@@ -37,7 +37,7 @@ func NewWriter() (*Writer, error) {
 	}(kProd.Events())
 
 	if err != nil {
-		return nil, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.New(err)
 	}
 
 	return &Writer{kProd}, nil

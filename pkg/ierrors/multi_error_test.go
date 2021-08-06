@@ -1,13 +1,14 @@
 package ierrors
 
 import (
+	"fmt"
 	"testing"
 )
 
 func TestMultiError_Error(t *testing.T) {
 	type fields struct {
 		Errors []error
-		Code   InsprErrorCode
+		Code   ErrCode
 	}
 	tests := []struct {
 		name    string
@@ -26,12 +27,16 @@ func TestMultiError_Error(t *testing.T) {
 			name: "Multiple errors",
 			fields: fields{
 				Errors: []error{
-					NewError().Message("err1").Build(),
-					NewError().Message("err2").Build(),
+					New("err1"),
+					New("err2"),
 				},
 				Code: 128,
 			},
-			wantRet: "err1\nerr2",
+			wantRet: fmt.Sprintf(
+				"%v\n%v",
+				New("err1"),
+				New("err2"),
+			),
 		},
 	}
 	for _, tt := range tests {
@@ -50,7 +55,7 @@ func TestMultiError_Error(t *testing.T) {
 func TestMultiError_Add(t *testing.T) {
 	type fields struct {
 		Errors []error
-		Code   InsprErrorCode
+		Code   ErrCode
 	}
 	type args struct {
 		err error
@@ -64,13 +69,17 @@ func TestMultiError_Add(t *testing.T) {
 		{
 			name: "Adds error",
 			fields: fields{
-				Errors: []error{NewError().Message("err1").Build()},
+				Errors: []error{New("err1")},
 				Code:   128,
 			},
 			args: args{
-				NewError().Message("err2").Build(),
+				New("err2"),
 			},
-			wantRet: "err1\nerr2",
+			wantRet: fmt.Sprintf(
+				"%v\n%v",
+				New("err1"),
+				New("err2"),
+			),
 		},
 	}
 	for _, tt := range tests {
@@ -90,7 +99,7 @@ func TestMultiError_Add(t *testing.T) {
 func TestMultiError_Empty(t *testing.T) {
 	type fields struct {
 		Errors []error
-		Code   InsprErrorCode
+		Code   ErrCode
 	}
 	tests := []struct {
 		name   string
@@ -109,7 +118,7 @@ func TestMultiError_Empty(t *testing.T) {
 			name: "Non empty error",
 			fields: fields{
 				Errors: []error{
-					NewError().Message("err2").Build(),
+					New("err2"),
 				},
 				Code: 128,
 			},

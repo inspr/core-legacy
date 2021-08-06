@@ -36,11 +36,11 @@ func mockMessage() interface{} {
 func mockHandlerFunc(path string, expectedData interface{}) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		if r.URL.Path != path {
-			w.WriteHeader(404)
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 
@@ -48,13 +48,13 @@ func mockHandlerFunc(path string, expectedData interface{}) http.HandlerFunc {
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&body)
 		if err != nil && reflect.DeepEqual(body, expectedData) {
-			data := ierrors.NewError().BadRequest().Build()
-			rest.JSON(w, 500, data)
+			data := ierrors.New("").BadRequest()
+			rest.JSON(w, http.StatusInternalServerError, data)
 			return
 		}
 		if path == "/readMessage" {
 			data := mockMessage()
-			rest.JSON(w, 200, data)
+			rest.JSON(w, http.StatusOK, data)
 			return
 		}
 	})

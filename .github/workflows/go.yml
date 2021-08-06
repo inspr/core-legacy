@@ -12,10 +12,12 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: "^1.16.0"
-      - name: Download golint
-        run: go get -u golang.org/x/lint/golint
-      - name: Lint packages
-        run: golint -set_exit_status ./...
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          args: -D errcheck -D deadcode -D varcheck
+          skip-pkg-cache: true
 
   coverage:
     runs-on: ubuntu-latest
