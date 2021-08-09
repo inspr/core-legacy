@@ -26,6 +26,7 @@ func TestClient_Send(t *testing.T) {
 		ctx    context.Context
 		route  string
 		method string
+		host   string
 		body   interface{}
 	}
 	tests := []struct {
@@ -123,8 +124,7 @@ func TestClient_Send(t *testing.T) {
 				body:   "hello",
 			},
 			wantErr: true,
-
-			want: "hello",
+			want:    "hello",
 		},
 		{
 			name: "test_auth_token_errorSet",
@@ -141,6 +141,24 @@ func TestClient_Send(t *testing.T) {
 				body:   "hello",
 			},
 			wantErr: true,
+			want:    "hello",
+		},
+		{
+			name: "test_new_host",
+			fields: fields{
+				c:                http.Client{},
+				middleware:       json.Marshal,
+				decoderGenerator: JSONDecoderGenerator,
+				auth:             nil,
+			},
+			args: args{
+				ctx:    context.Background(),
+				route:  "/host",
+				method: http.MethodPost,
+				host:   "teste.inspr.dev",
+				body:   "hello",
+			},
+			wantErr: false,
 			want:    "hello",
 		},
 	}
@@ -161,6 +179,14 @@ func TestClient_Send(t *testing.T) {
 					w.WriteHeader(http.StatusNotFound)
 					encoder.Encode(ierrors.New(
 						"paths are not equal",
+					).BadRequest())
+					return
+				}
+				// if args.host is given to the client then r.host has to be overwrite
+				if tt.args.host != "" && r.Host != tt.args.host {
+					w.WriteHeader(http.StatusBadRequest)
+					encoder.Encode(ierrors.New(
+						"hosts are not equal",
 					).BadRequest())
 					return
 				}
@@ -195,6 +221,7 @@ func TestClient_Send(t *testing.T) {
 				baseURL:          s.URL,
 				encoder:          tt.fields.middleware,
 				decoderGenerator: tt.fields.decoderGenerator,
+				host:             tt.args.host,
 				auth:             tt.fields.auth,
 			}
 

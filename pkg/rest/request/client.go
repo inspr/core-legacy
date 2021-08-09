@@ -57,7 +57,7 @@ func NewJSONClient(baseURL string) *Client {
 		Pointer()
 }
 
-// BaseURL sets the base URL for the client that is being built
+// BaseURL sets the base URL for the client strucuture
 func (c Client) BaseURL(url string) Client {
 	c.baseURL = url
 	return c
@@ -68,15 +68,21 @@ func (c Client) Pointer() *Client {
 	return &c
 }
 
-// Encoder sets the encoder for the client that is being built
+// Encoder sets the encoder for the client strucuture
 func (c Client) Encoder(encoder Encoder) Client {
 	c.encoder = encoder
 	return c
 }
 
-// Decoder sets the decoder for the client that is being built
+// Decoder sets the decoder for the client strucuture
 func (c Client) Decoder(decoder DecoderGenerator) Client {
 	c.decoderGenerator = decoder
+	return c
+}
+
+// Host sets the host for the client strucuture
+func (c Client) Host(value string) Client {
+	c.host = value
 	return c
 }
 
@@ -95,12 +101,6 @@ func (c Client) Token(token []byte) Client {
 // HTTPClient sets the http client for the client that is being built
 func (c Client) HTTPClient(client http.Client) Client {
 	c.c = client
-	return c
-}
-
-// Host sets the host for the client that is being built
-func (c Client) Host(value string) Client {
-	c.host = value
 	return c
 }
 
