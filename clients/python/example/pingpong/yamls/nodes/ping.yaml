@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: dapp
+
+meta:
+  name: ping
+  parent: pptable
+spec:
+  logLevel: debug
+  node:
+    spec:
+      replicas: 3
+      image: gcr.io/insprlabs/inspr/example/python/ping:latest
+      environment:
+        SUPER_SECRET_0001: "false"
+  boundary:
+    input:
+      - pinginput
+    output:
+      - pingoutput

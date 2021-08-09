@@ -1,7 +1,8 @@
 import os
 from flask import Flask, request
 from http import HTTPStatus
-from rest import *
+from .rest import *
+from types import FunctionType
 
 SIDECAR_READ_PORT = "INSPR_SCCLIENT_READ_PORT"
 SIDECAR_WRITE_PORT = "INSPR_LBSIDECAR_WRITE_PORT"
@@ -9,8 +10,8 @@ SIDECAR_WRITE_PORT = "INSPR_LBSIDECAR_WRITE_PORT"
 class Client:
     def __init__(self) -> None:
         self.readPort = os.getenv(SIDECAR_READ_PORT)
-        self.writeAddress = ":" + os.getenv(SIDECAR_WRITE_PORT)
-        self.app = Flask()
+        self.writeAddress = ":" + str(os.getenv(SIDECAR_WRITE_PORT))
+        self.app = Flask(__name__)
 
     
     def writeMessage(self, channel:str, msg) -> None:
@@ -24,7 +25,7 @@ class Client:
             raise ValueError
 
     
-    def handleChannel(self, channel:str, handleFunc:function) -> None:
+    def handleChannel(self, channel:str, handleFunc:FunctionType) -> None:
         def routeFunc():
             data = request.json
             try:
