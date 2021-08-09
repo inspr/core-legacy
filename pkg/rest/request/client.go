@@ -57,7 +57,7 @@ func NewJSONClient(baseURL string) *Client {
 		Pointer()
 }
 
-// BaseURL sets the base URL for the client strucuture
+// BaseURL sets the base URL for the client structure
 func (c Client) BaseURL(url string) Client {
 	c.baseURL = url
 	return c
