@@ -75,25 +75,25 @@ func AddDefaultFlagCompletion() cmd.Option {
 }
 
 //ServetIpKey returns the key value of ConfigServerIP
-//Avoids having to constants public
+//Avoids having public constants
 func ServerIpKey() string {
 	return configServerIP
 }
 
 //GetConfiguredServerIP is responsible for returning config value for serverIp.
-//Avoids having to constants public.
+//Avoids having public constants
 func GetConfiguredServerIP() string {
 	return viper.GetString(configServerIP)
 }
 
 //GetConfiguredScope is responsible for returning config value for scope.
-//Avoids having to constants public.
+//Avoids having public constants
 func GetConfiguredScope() string {
 	return viper.GetString(configScope)
 }
 
 //GetConfiguredHost is responsible for returning config value for host.
-//Avoids having to constants public.
+//Avoids having public constants
 func GetConfiguredHost() string {
 	return viper.GetString(configHost)
 }
