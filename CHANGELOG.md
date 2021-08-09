@@ -3,10 +3,12 @@
 
 ### #108 Tech CORE-549 | Add support to request Host header in the cli
 - features:
-    - Add a host to the insprctl config to the user set the host on the insprctl init or insprctl config host "user-host" commands.
-    - Create the host flag if the user wants to manually insert the host via cli without change the config host that is already set.
+    - added host to the client structure in the request and controller pkg, to direct serverip requests
+    - created host flag `--host` to overwrite host configuration on insprctl commands without changing the host configured on the client
+    
 - tests:
-    - Updated the set client argument to fit on the new host request call
+    - updated the set client argument to fit on the new host request call
+    - add request test host arg and `test_new_host` case  
 ---
 
 ### #105 Tech CORE-442 | Refactor of the error structure in the project
