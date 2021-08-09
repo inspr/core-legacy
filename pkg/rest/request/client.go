@@ -68,26 +68,26 @@ func (c Client) Pointer() *Client {
 	return &c
 }
 
-// Encoder sets the encoder for the client strucuture
+// Encoder sets the encoder for the client structure
 func (c Client) Encoder(encoder Encoder) Client {
 	c.encoder = encoder
 	return c
 }
 
-// Decoder sets the decoder for the client strucuture
+// Decoder sets the decoder for the client structure
 func (c Client) Decoder(decoder DecoderGenerator) Client {
 	c.decoderGenerator = decoder
 	return c
 }
 
-// Host sets the host for the client strucuture
+// Host sets the host for the client structure
 func (c Client) Host(value string) Client {
 	c.host = value
 	return c
 }
 
 // Authenticator adds the authentication interface implementation to the
-// Client strucuture.
+// Client structure.
 func (c Client) Authenticator(au Authenticator) Client {
 	c.auth = au
 	return c
