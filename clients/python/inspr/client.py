@@ -31,13 +31,12 @@ class Client:
     def handleChannel(self, channel:str, handleFunc:FunctionType) -> None:
         print("channel =", channel)
         def routeFunc():
-            data = request.json
-            print("data =", data, file=sys.stderr)
+            data = request.get_json(force=True)
             try:
-                handleFunc(data)
+                handleFunc(data["data"])
             except:
                 err = "Error handling message"
-                return err, HTTPStatus.SERVICE_UNAVAILABLE
+                return err, HTTPStatus.INTERNAL_SERVER_ERROR
 
             return '', HTTPStatus.OK
 
@@ -48,7 +47,7 @@ class Client:
         links = []
         for rule in self.app.url_map.iter_rules():
             links.append(rule.endpoint)
-        print("registered routes =", links)
+        print("registered routes =", links, file=sys.stderr)
 
         self.app.run(port=self.readPort)
 

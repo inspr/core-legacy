@@ -10,9 +10,11 @@ def main():
 
     def readPongAndSendPing(data):
 
-        print("data =", data, file=sys.stderr)
-        print("Pong!", file=sys.stderr)
-        
+        if data == 'Pong!':
+            print(data, file=sys.stderr)
+        else:
+            print('Not received Pong', file=sys.stderr)
+
         try:
             client.writeMessage(PING_OUTPUT_CHANNEL, msg)
         except:
@@ -22,7 +24,7 @@ def main():
     try:
         client.writeMessage(PING_OUTPUT_CHANNEL, msg)
     except:
-        print("An error has occured")
+        print("An error has occured", file=sys.stderr)
         return
 
     client.handleChannel(PING_INPUT_CHANNEL, readPongAndSendPing)
