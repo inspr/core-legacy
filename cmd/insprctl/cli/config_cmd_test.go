@@ -100,7 +100,7 @@ func Test_doConfigChange(t *testing.T) {
 			expectedOutput: outResp,
 		},
 		{
-			name:           "Should make the change and ",
+			name:           "Should make the serverip http change",
 			flagsAndArgs:   []string{"serverip", "new_value"},
 			expectedOutput: outResp3,
 		},
