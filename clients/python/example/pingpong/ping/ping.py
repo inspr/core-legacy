@@ -1,4 +1,5 @@
 from inspr import *
+import sys
 
 PING_INPUT_CHANNEL = "pinginput"
 PING_OUTPUT_CHANNEL = "pingoutput"
@@ -8,12 +9,9 @@ def main():
     msg = "Ping!"
 
     def readPongAndSendPing(data):
-        if data == "Pong!":
-            print(data)
-        else:
-            print("Not received pong :(")
-            print("received = ", data)
-            raise Exception
+
+        print("data =", data, file=sys.stderr)
+        print("Pong!", file=sys.stderr)
         
         try:
             client.writeMessage(PING_OUTPUT_CHANNEL, msg)
