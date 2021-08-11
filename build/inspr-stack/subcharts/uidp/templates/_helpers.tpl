@@ -81,7 +81,7 @@ imagePullSecrets:
 {{/*
 Renders the image value while overriding the image registry
 */}}
-{{- define "common.images.image" -}}
+{{- define "uidp.images.image" -}}
 {{- $registry := .global.imageRegistry | default .image.registry -}}
 {{- if $registry -}}
 "{{ $registry }}/{{ .image.repository }}:{{ .image.tag }}"
@@ -100,6 +100,15 @@ Renders the image value while overriding the image registry
     - "until curl -s {{ include "insprd.address" $ }}/heathz; do echo waiting for insprd; sleep 2; done"
 {{- end -}}
 
+{{- define "uidp.redis.init-check" -}}
+- name: init-redis
+  image: curlimages/curl:7.75.0
+  imagePullPolicy: IfNotPresent
+  command:
+    - "sh"
+    - "-c"
+    - "until curl -s {{ include "uidp.redis.address" $ }}; do echo waiting for redis; sleep 2; done"
+{{- end -}}
 
 {{- define "insprd.address" -}}
 {{ tpl .Values.insprd.address . }}
@@ -117,4 +126,38 @@ readinessProbe:
     port: {{ .service.targetPort }}
   initialDelaySeconds: 5
   periodSeconds: 3
+{{- end -}}
+
+{{- define "uidp.redis.host" -}}
+{{- if .Values.redis.create -}}
+{{ include "common.names.fullname" (dict "Release" .Release "Chart" (dict "Name" "redis") "Values" .Values.redis) }}
+{{- else -}}
+{{ .Values.redis.existing.host }}
+{{- end -}}
+{{- end -}}
+
+{{- define "uidp.redis.port" -}}
+{{- if .Values.redis.create -}}
+{{- if .Values.redis.service -}}
+{{ .Values.redis.service.port | default 6379 }}
+{{- else -}}
+6379
+{{- end -}}
+{{- else -}}
+{{ .Values.redis.existing.port }}
+{{- end -}}
+{{- end -}}
+
+{{- define "uidp.redis.password" -}}
+{{- if not (empty .Values.global.redis.password) }}
+    {{- .Values.global.redis.password -}}
+{{- else if not (empty .Values.redis.password) -}}
+    {{- .Values.redis.password -}}
+{{- else -}}
+    {{- randAlphaNum 10 -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "uidp.redis.address" -}}
+http://{{ include "uidp.redis.host" . }}:{{ include "uidp.redis.port" . }}
 {{- end -}}

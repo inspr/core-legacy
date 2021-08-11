@@ -20,7 +20,7 @@ spec:
       {{- include "insprd.init-check" . | nindent 8 }}
       containers:
         - name: {{ include "uidp.fullname" . }}
-          image: {{ include "common.images.image" (dict "image" .Values.image "global" $) }}
+          image: {{ include "uidp.images.image" (dict "image" .Values.image "global" $) }}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
