@@ -35,10 +35,15 @@ spec:
             - name: INSPR_CLUSTER_ADDR
               value: {{ include "insprd.address" . }}
             - name: REDIS_HOST
-              value: {{ .Values.redis.host }}
+              value: {{ include "uidp.redis.host" . }}
             - name: REDIS_PORT
-              value: {{ .Values.redis.port | quote }}
+              value: {{ include "uidp.redis.port" . | quote }}
             - name: REFRESH_URL
               value: {{ if .Values.refreshURL }}{{ .Values.refreshURL }}{{ else }}http://{{ include "uidp.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}{{ end }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.redis.existingSecret }}
+                  key: {{ .Values.redis.existingSecretPasswordKey | default "redis-password" }}
           {{- include "uidp.healthcheck" .Values | nindent 10 }}
 
