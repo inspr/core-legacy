@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #110 Story CORE-246 | Develop a client (for sidecar communication) with Python
+- features:
+    - Created the newClient, writeMessage, handleChannel and run functions for the lb sidecar client for python
+    - Created a ping pong example
+---
+
 ### #108 Tech CORE-549 | Add support to request Host header in the cli
 - features:
     - added host to the client structure in the request and controller pkg, to direct serverip requests
