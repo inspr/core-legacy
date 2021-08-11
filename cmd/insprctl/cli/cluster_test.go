@@ -45,6 +45,7 @@ func Test_authInit(t *testing.T) {
 
 	tests := []struct {
 		name           string
+		host           string
 		flagsAndArgs   []string
 		expectedOutput string
 		handlerFunc    func(w http.ResponseWriter, r *http.Request)
@@ -86,7 +87,7 @@ func Test_authInit(t *testing.T) {
 			cmd.SetArgs(tt.flagsAndArgs)
 
 			server := httptest.NewServer(http.HandlerFunc(tt.handlerFunc))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			defer server.Close()
 

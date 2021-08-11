@@ -29,6 +29,7 @@ type Client struct {
 	encoder          Encoder
 	decoderGenerator DecoderGenerator
 	headers          map[string]stringSlice
+	host             string
 	auth             Authenticator
 }
 
@@ -56,7 +57,7 @@ func NewJSONClient(baseURL string) *Client {
 		Pointer()
 }
 
-// BaseURL sets the base URL for the client that is being built
+// BaseURL sets the base URL for the client structure
 func (c Client) BaseURL(url string) Client {
 	c.baseURL = url
 	return c
@@ -67,20 +68,26 @@ func (c Client) Pointer() *Client {
 	return &c
 }
 
-// Encoder sets the encoder for the client that is being built
+// Encoder sets the encoder for the client structure
 func (c Client) Encoder(encoder Encoder) Client {
 	c.encoder = encoder
 	return c
 }
 
-// Decoder sets the decoder for the client that is being built
+// Decoder sets the decoder for the client structure
 func (c Client) Decoder(decoder DecoderGenerator) Client {
 	c.decoderGenerator = decoder
 	return c
 }
 
+// Host sets the host for the client structure
+func (c Client) Host(value string) Client {
+	c.host = value
+	return c
+}
+
 // Authenticator adds the authentication interface implementation to the
-// Client strucuture.
+// Client structure.
 func (c Client) Authenticator(au Authenticator) Client {
 	c.auth = au
 	return c

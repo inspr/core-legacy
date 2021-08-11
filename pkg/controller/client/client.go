@@ -17,6 +17,7 @@ type ControllerConfig struct {
 	Auth  request.Authenticator
 	Scope string
 	URL   string
+	Host  string
 }
 
 type authenticator struct{}
@@ -57,6 +58,7 @@ func NewControllerClient(config ControllerConfig) controller.Interface {
 			BaseURL(config.URL).
 			Encoder(json.Marshal).
 			Decoder(request.JSONDecoderGenerator).
+			Host(config.Host).
 			Authenticator(config.Auth).
 			Pointer(),
 	}

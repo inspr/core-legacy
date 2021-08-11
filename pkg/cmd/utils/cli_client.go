@@ -37,7 +37,13 @@ func GetCliOutput() io.Writer {
 //setGlobalClient creates cli's controller client from viper's configured serverIp
 func setGlobalClient() {
 	url := GetConfiguredServerIP()
-	SetClient(url)
+	host := GetConfiguredHost()
+
+	if cmd.InsprOptions.Host != "" {
+		host = cmd.InsprOptions.Host
+	}
+
+	SetClient(url, host)
 }
 
 func setGlobalOutput() {
@@ -50,7 +56,7 @@ func SetOutput(out io.Writer) {
 }
 
 // SetClient sets the default server IP of CLI
-func SetClient(url string) {
+func SetClient(url string, host string) {
 	if cmd.InsprOptions.Token == "" {
 		dir, _ := os.UserHomeDir()
 		cmd.InsprOptions.Token = filepath.Join(dir, ".inspr/token")
@@ -60,7 +66,8 @@ func SetClient(url string) {
 		Auth: Authenticator{
 			cmd.InsprOptions.Token,
 		},
-		URL: url,
+		URL:  url,
+		Host: host,
 	}
 
 	defaults.client = client.NewControllerClient(config)

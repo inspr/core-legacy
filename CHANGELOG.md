@@ -1,6 +1,16 @@
 
 # Changelog
 
+### #108 Tech CORE-549 | Add support to request Host header in the cli
+- features:
+    - added host to the client structure in the request and controller pkg, to direct serverip requests
+    - created host flag `--host` to overwrite host configuration on insprctl commands without changing the host configured on the client
+    
+- tests:
+    - updated the set client argument to fit on the new host request call
+    - add on request_test.go `host` arg and `test_new_host` case  
+---
+
 ### #105 Tech CORE-442 | Refactor of the error structure in the project
 - features:
     - refactor of the ierror pkg, removal of the builder concept, now has

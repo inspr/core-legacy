@@ -14,6 +14,7 @@ import (
 type insprConfiguration struct {
 	ServerIP     string `yaml:"serverip"`
 	DefaultScope string `yaml:"scope"`
+	ServerHost   string `yaml:"host"`
 }
 type initOptionsDT struct {
 	folder string
@@ -34,11 +35,13 @@ var initCommand = cmd.NewCmd("init").
 	).NoArgs(
 	func(c context.Context) error {
 		config := insprConfiguration{}
-		fmt.Print("enter insprd host (http://localhost:8080):")
+		fmt.Print("enter insprd IP or URL (localhost:8080):")
 		fmt.Scanln(&config.ServerIP)
 		if config.ServerIP == "" {
 			config.ServerIP = "http://localhost:8080"
 		}
+		fmt.Print("Opitional config: insprd host (example.inspr.dev):")
+		fmt.Scanln(&config.ServerHost)
 		fmt.Print("enter default scope (\"\"):")
 		fmt.Scanln(&config.DefaultScope)
 		var output *os.File
