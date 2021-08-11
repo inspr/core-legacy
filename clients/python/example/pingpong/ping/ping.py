@@ -8,6 +8,7 @@ def main():
     client = Client()
     msg = "Ping!"
 
+    @client.handleChannel(PING_INPUT_CHANNEL)
     def readPongAndSendPing(data):
 
         if data == 'Pong!':
@@ -27,7 +28,6 @@ def main():
         print("An error has occured", file=sys.stderr)
         return
 
-    client.handleChannel(PING_INPUT_CHANNEL, readPongAndSendPing)
     client.run()
 
 if __name__ == "__main__":
