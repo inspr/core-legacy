@@ -17,6 +17,7 @@ type ControllerConfig struct {
 	Auth  request.Authenticator
 	Scope string
 	URL   string
+	Host  string
 }
 
 type authenticator struct{}
@@ -35,9 +36,7 @@ func GetInClusterConfigs() (*ControllerConfig, error) {
 	scope, scopeok := os.LookupEnv("INSPR_CONTROLLER_SCOPE")
 	_, tknok := os.LookupEnv("INSPR_CONTROLLER_TOKEN")
 	if !urlok || !scopeok || !tknok {
-		return nil, ierrors.NewError().
-			Message(inClusterEnviromentError).
-			Build()
+		return nil, ierrors.New(inClusterEnviromentError)
 	}
 	return &ControllerConfig{
 		Auth:  authenticator{},
@@ -59,6 +58,7 @@ func NewControllerClient(config ControllerConfig) controller.Interface {
 			BaseURL(config.URL).
 			Encoder(json.Marshal).
 			Decoder(request.JSONDecoderGenerator).
+			Host(config.Host).
 			Authenticator(config.Auth).
 			Pointer(),
 	}

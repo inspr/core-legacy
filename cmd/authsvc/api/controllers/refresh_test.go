@@ -61,7 +61,7 @@ func TestServer_Refresh(t *testing.T) {
 		},
 		{
 			name: "Invalid refresh, invalid token payload",
-			want: http.StatusForbidden,
+			want: http.StatusInternalServerError,
 			token: func(auth.Payload) []byte {
 				token := jwt.New()
 				payload := struct {
@@ -134,7 +134,7 @@ func TestServer_Refresh(t *testing.T) {
 				return
 			}
 
-			if tt.want == 200 {
+			if tt.want == http.StatusOK {
 				jwtdo := auth.JwtDO{}
 				err = json.NewDecoder(res.Body).Decode(&jwtdo)
 				if err != nil {

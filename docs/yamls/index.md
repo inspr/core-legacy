@@ -11,7 +11,7 @@ In this way, when the file is written in one of the formats described below it c
 [definitions and examples](dapp.md)
 
 ## Channels
-> Strucutures that make it possible to establish the communication between two dApps via a message broker. It must have a Type defined.
+> Structures that make it possible to establish the communication between two dApps via a message broker. It must have a Type defined.
 
 [definitions and examples](channel.md)
 

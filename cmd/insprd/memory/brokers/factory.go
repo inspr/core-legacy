@@ -23,16 +23,16 @@ func (abf *AbstractBrokerFactory) Subscribe(broker string, factory models.Sideca
 		factories[broker] = factory
 		return nil
 	}
-	return ierrors.NewError().Message("%s broker already subscribed", broker).Build()
+	return ierrors.New("%s broker already subscribed", broker)
 }
 
 // Get returns a factory for the specifyed broker
 func (abf *AbstractBrokerFactory) Get(broker string) (models.SidecarFactory, error) {
 	if factories == nil {
-		return nil, ierrors.NewError().Message("no brokers are allowed").Build()
+		return nil, ierrors.New("no brokers are allowed")
 	}
 	if factory, ok := factories[broker]; ok {
 		return factory, nil
 	}
-	return nil, ierrors.NewError().Message("%s broker not allowed", broker).Build()
+	return nil, ierrors.New("%s broker not allowed", broker)
 }

@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"inspr.dev/inspr/pkg/ierrors"
 )
 
 // Authenticator is responsible for implementing the interface methods
@@ -19,7 +21,7 @@ var bearer = []byte("Bearer ")
 func (a Authenticator) GetToken() ([]byte, error) {
 	token, err := ioutil.ReadFile(a.TokenPath)
 	if err != nil {
-		return nil, err
+		return nil, ierrors.New(err).InvalidFile()
 	}
 
 	token = []byte(strings.TrimSpace(string(token)))
@@ -33,7 +35,7 @@ func (a Authenticator) SetToken(token []byte) error {
 	token = token[len(bearer):]
 	err := ioutil.WriteFile(a.TokenPath, token, os.ModePerm)
 	if err != nil {
-		return err
+		return ierrors.New(err).InvalidFile()
 	}
 	return nil
 }

@@ -4,339 +4,422 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/fs"
+	"io"
 	"reflect"
 	"testing"
 )
 
-func TestInsprError_Error(t *testing.T) {
-	type fields struct {
-		Message string
-		Err     error
-		Stack   string
-		Code    InsprErrorCode
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
-		{
-			name: "testing the error message of inspr error",
-			fields: fields{
-				Message: "mock_message",
-				Err:     nil,
-				Stack:   "no_stack",
-				Code:    0,
-			},
-			want: "mock_message",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := &InsprError{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Stack:   tt.fields.Stack,
-				Code:    tt.fields.Code,
-			}
-			if got := err.Error(); got != tt.want {
-				t.Errorf("InsprError.Error() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+func TestNew(t *testing.T) {
 
-func TestInsprError_Is(t *testing.T) {
 	type fields struct {
-		Message string
-		Err     error
-		Code    InsprErrorCode
-	}
-	type args struct {
-		target error
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		{
-			name: "It should return true since the two Errors Codes are equal",
-			fields: fields{
-				Code:    BadRequest,
-				Err:     nil,
-				Message: "A new message",
-			},
-			args: args{
-				target: &InsprError{
-					Code:    BadRequest,
-					Message: "Another message",
-					Err:     nil,
-				},
-			},
-			want: true,
-		},
-		{
-			name: "It should return false since the two Errors Codes are different",
-			fields: fields{
-				Code:    BadRequest,
-				Err:     nil,
-				Message: "A new message",
-			},
-			args: args{
-				target: &InsprError{
-					Code:    InternalServer,
-					Message: "Another message",
-					Err:     nil,
-				},
-			},
-			want: false,
-		},
-		{
-			name: "The error given is in the error stack",
-			fields: fields{
-				Err: fmt.Errorf(
-					"layer2: %w",
-					fmt.Errorf(
-						"layer1: %w",
-						fs.ErrClosed,
-					),
-				),
-			},
-			args: args{
-				target: fs.ErrClosed,
-			},
-			want: true,
-		},
-		{
-			name: "The error given is NOT in the error stack",
-			fields: fields{
-				Err: fmt.Errorf(
-					"layer2: %w",
-					fmt.Errorf(
-						"layer1: %w",
-						fs.ErrClosed,
-					),
-				),
-			},
-			args: args{
-				target: fs.SkipDir,
-			},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := &InsprError{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Code:    tt.fields.Code,
-			}
-			if got := err.Is(tt.args.target); got != tt.want {
-				t.Errorf("InsprError.Is() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInsprError_HasCode(t *testing.T) {
-	type fields struct {
-		Message string
-		Err     error
-		Code    InsprErrorCode
-	}
-	type args struct {
-		code InsprErrorCode
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		{
-			name: "It should return true since the Error code and the code are equal",
-			fields: fields{
-				Code:    BadRequest,
-				Err:     nil,
-				Message: "A new message",
-			},
-			args: args{
-				code: BadRequest,
-			},
-			want: true,
-		},
-		{
-			name: "It should return false since the Error code and the code are different",
-			fields: fields{
-				Code:    BadRequest,
-				Err:     nil,
-				Message: "A new message",
-			},
-			args: args{
-				code: AlreadyExists,
-			},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := &InsprError{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Code:    tt.fields.Code,
-			}
-			if got := err.HasCode(tt.args.code); got != tt.want {
-				t.Errorf("InsprError.HasCode() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInsprError_Wrap(t *testing.T) {
-	type fields struct {
-		Message string
-		Err     error
-		Stack   string
-		Code    InsprErrorCode
-	}
-	type args struct {
-		message string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   string
-	}{
-		{
-			name: "wrap_simple_test",
-			fields: fields{
-				Message: "",
-				Err:     nil,
-				Stack:   "",
-				Code:    0,
-			},
-			args: args{
-				message: "mock_message",
-			},
-			want: "mock_message",
-		},
-		{
-			name: "wrap_composed_test",
-			fields: fields{
-				Message: "",
-				Err:     errors.New("first"),
-				Stack:   "",
-				Code:    0,
-			},
-			args: args{
-				message: "second",
-			},
-			want: "second: first",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ierror := &InsprError{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Stack:   tt.fields.Stack,
-				Code:    tt.fields.Code,
-			}
-			ierror.Wrap(tt.args.message)
-
-			got := ierror.Stack
-			if got != tt.want {
-				t.Errorf("InsprError.Wrap() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInsprError_Wrapf(t *testing.T) {
-	type fields struct {
-		Message string
-		Err     error
-		Stack   string
-		Code    InsprErrorCode
-	}
-	type args struct {
-		format string
+		arg    interface{}
 		values []interface{}
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		args   args
-		want   string
+		want   *ierror
 	}{
 		{
-			name: "wrap_simple_test",
+			name: "ierror_from_string",
 			fields: fields{
-				Message: "",
-				Err:     nil,
-				Stack:   "",
-				Code:    0,
+				arg:    "mock",
+				values: []interface{}{},
 			},
-			args: args{
-				format: "%s",
-				values: []interface{}{"mock_message"},
+			want: &ierror{
+				err:  errors.New("mock"),
+				code: Unknown,
 			},
-			want: "mock_message",
-		},
-		{
-			name: "wrap_composed_test",
+		}, {
+			name: "ierror_from_composed_string",
 			fields: fields{
-				Message: "",
-				Err:     errors.New("first"),
-				Stack:   "",
-				Code:    0,
+				arg:    "mock-%v-%d",
+				values: []interface{}{"string_value", 20},
 			},
-			args: args{
-				format: "%s-%s",
-				values: []interface{}{"third", "second"},
+			want: &ierror{
+				err:  errors.New("mock-string_value-20"),
+				code: Unknown,
 			},
-			want: "third-second: first",
+		}, {
+			name: "ierror_from_standard_error",
+			fields: fields{
+				arg: errors.New("mock"),
+			},
+			want: &ierror{
+				err:  errors.New("mock"),
+				code: Unknown,
+			},
+		}, {
+			name: "ierror_from_ierror",
+			fields: fields{
+				arg: &ierror{
+					err:  errors.New("mock"),
+					code: Unknown,
+				},
+			},
+			want: &ierror{
+				err:  errors.New("mock"),
+				code: Unknown,
+			},
+		}, {
+			name: "invalid_interface",
+			fields: fields{
+				arg: 10,
+			},
+			want: nil,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ierror := &InsprError{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Stack:   tt.fields.Stack,
-				Code:    tt.fields.Code,
-			}
-			ierror.Wrapf(tt.args.format, tt.args.values...)
+			got := New(tt.fields.arg, tt.fields.values...)
 
-			got := ierror.Stack
-			if got != tt.want {
-				t.Errorf("InsprError.Wrap() = %v, want %v", got, tt.want)
+			if got == nil && got != tt.want {
+				t.Errorf(
+					"ierrors.New() got '%v', expected '%v'",
+					got, tt.want,
+				)
+			}
+
+			if got != nil && got.Error() != tt.want.Error() {
+				t.Errorf(
+					"ierrors.New() got '%v', expected '%v'",
+					got.Error(), tt.want.Error(),
+				)
 			}
 		})
 	}
 }
 
-func TestInsprError_MarshalJSON(t *testing.T) {
+func TestNewIerror(t *testing.T) {
 	type fields struct {
-		Message string
-		Err     error
-		Stack   string
-		Code    InsprErrorCode
+		format string
+		values string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   ierror
+	}{
+		{
+			name: "simple_creation",
+			fields: fields{
+				format: "something",
+			},
+			want: ierror{err: errors.New("something"), code: Unknown},
+		}, {
+			name: "creation_with_values",
+			fields: fields{
+				format: "%v---",
+				values: "value",
+			},
+			want: ierror{err: errors.New("value---"), code: Unknown},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got *ierror
+			if tt.fields.values == "" {
+				got = newIerror(tt.fields.format)
+			} else {
+				got = newIerror(tt.fields.format, tt.fields.values)
+			}
+
+			if !reflect.DeepEqual(got.err.Error(), tt.want.err.Error()) {
+				t.Errorf("Expected '%v', got '%v'", tt.want.err, got.err)
+			}
+			if !reflect.DeepEqual(got.code, tt.want.code) {
+				t.Errorf("Expected %v, got %v", tt.want.code, got.code)
+			}
+		})
+	}
+}
+
+func TestFrom(t *testing.T) {
+	type fields struct {
+		err error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   error
+	}{
+		{
+			name:   "test_from_errors",
+			fields: fields{err: errors.New("mock_err")},
+			want: &ierror{
+				err:  errors.New("mock_err"),
+				code: Unknown,
+			},
+		},
+		{
+			name:   "test_from_ierrors",
+			fields: fields{err: New("mock_err").InternalServer()},
+			want: &ierror{
+				err:  errors.New("mock_err"),
+				code: InternalServer,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := from(tt.fields.err)
+			if got.Error() != tt.want.Error() {
+				t.Errorf("Expected %v, got %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIerror_Error(t *testing.T) {
+	type fields struct {
+		err *ierror
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name:   "testing the error message of inspr error",
+			fields: fields{err: New("mock_message")},
+			want:   New("mock_message").Error(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			if got := tt.fields.err.Error(); got != tt.want {
+				t.Errorf("ierror.Error() = '%v', want '%v'", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatError(t *testing.T) {
+	type fields struct {
+		err error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "converting_nil",
+			fields: fields{
+				err: Wrap(
+					New("mock_err"),
+					"wrapper_1",
+					"wrapper_2",
+					"wrapper_3",
+				),
+			},
+			want: "error : mock_err\n\twrapper_1\n\twrapper_2\n\twrapper_3\n",
+		},
 	}
 
-	// mocking the insprErr and getting it's bytes representation
-	ie := InsprError{
-		Message: "mock",
-		Err:     nil,
-		Stack:   "mock",
-		Code:    0,
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := FormatError(tt.fields.err)
+			if got != tt.want {
+				t.Errorf(
+					"FormatError got '%v', want '%v'",
+					got, tt.want,
+				)
+			}
+		})
 	}
-	bytes, _ := json.Marshal(ie)
+}
 
+func TestCode(t *testing.T) {
+	type fields struct {
+		err error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   ErrCode
+	}{
+		{
+			name:   "test_from_errors",
+			fields: fields{err: errors.New("mock_err")},
+			want:   Unknown,
+		},
+		{
+			name:   "test_from_ierrors",
+			fields: fields{err: New("mock_err").InternalServer()},
+			want:   InternalServer,
+		},
+	}
+	for _, tt := range tests {
+		got := Code(tt.fields.err)
+		if got != tt.want {
+			t.Errorf("Expected %v, got %v", got, tt.want)
+		}
+	}
+}
+
+func TestIerror_Wrap(t *testing.T) {
+	type fields struct {
+		err error
+	}
+	type args struct {
+		msg string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    string
+		wantNil bool
+	}{
+		{
+			name: "wrap_no_error",
+			fields: fields{
+				err: nil,
+			},
+			want:    "",
+			wantNil: true,
+		},
+		{
+			name: "wrap_standard_error_no_message",
+			fields: fields{
+				err: errors.New("mock_err"),
+			},
+			want: New("mock_err").Error(),
+		},
+		{
+			name: "wrap_standard_error_with_message",
+			fields: fields{
+				err: errors.New("mock_err"),
+			},
+			args: args{
+				msg: "wrapper_context",
+			},
+			want: fmt.Errorf(
+				"error : %v : %w", "wrapper_context", errors.New("mock_err"),
+			).Error(),
+		},
+		{
+			name: "wrap_ierror_no_message",
+			fields: fields{
+				err: New("mock_err"),
+			},
+			want: New("mock_err").Error(),
+		},
+		{
+			name: "wrap_ierror_with_message",
+			fields: fields{
+				err: New("mock_err"),
+			},
+			args: args{
+				msg: "wrapper_context",
+			},
+			want: fmt.Errorf(
+				"error : %v : %w", "wrapper_context", errors.New("mock_err"),
+			).Error(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Wrap(tt.fields.err, tt.args.msg)
+
+			if (got == nil) != tt.wantNil {
+				t.Errorf("expected nil, got %v", got)
+			}
+			if got != nil && got.Error() != tt.want {
+				t.Errorf("ierror.Wrap() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUnwrap(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name string
+		args args
+		want error
+	}{
+		{
+			name: "unwrap_empty_err_stack",
+			args: args{err: nil},
+			want: nil,
+		},
+		{
+			name: "unwrap_err_without_previous_wrap",
+			args: args{err: errors.New("mock")},
+			want: nil,
+		},
+		{
+			name: "unwrap_err_with_previous_wrap",
+			args: args{err: fmt.Errorf("wrap : %w", errors.New("mock"))},
+			want: newIerror("mock"),
+		},
+		{
+			name: "unwrap_ierror_without_previous_wrap",
+			args: args{err: New("mock")},
+			want: nil,
+		},
+		{
+			name: "unwrap_ierror_with_previous_wrap",
+			args: args{err: Wrap(New("mock"), "simple_wrap")},
+			want: newIerror("mock"),
+		},
+		{
+			name: "unwrap_ierror_with_previous_formatted_wrap",
+			args: args{err: Wrap(New("mock"), "simple_wrap")},
+			want: New("mock"),
+		},
+		{
+			name: "unwrap_ierror_with_multiple_previous_wraps",
+			args: args{
+				err: Wrap(
+					New("mock"),
+					"first_context",
+					"second_context",
+					"third context",
+				),
+			},
+			want: Wrap(
+				New("mock"),
+				"first_context",
+				"second_context",
+			),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Unwrap(tt.args.err)
+
+			if got == nil && got != tt.want {
+				t.Errorf("Expected %v, received %v", tt.want, got)
+			}
+
+			if got != nil && got.Error() != tt.want.Error() {
+				t.Errorf("Unwrap() error = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIerror_MarshalJSON(t *testing.T) {
+
+	expetedIerrorBytes := func(err *ierror) []byte {
+		ps := parseStruct{
+			Stack: err.err.Error(),
+			Code:  err.code,
+		}
+		data, _ := json.Marshal(ps)
+		return data
+	}
+
+	type fields struct {
+		Err *ierror
+	}
 	tests := []struct {
 		name    string
 		fields  fields
@@ -344,33 +427,41 @@ func TestInsprError_MarshalJSON(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:   "simple_marshall",
-			fields: fields(ie),
-			// json.Marshal result of the above structure inside an IError
-			want:    bytes,
-			wantErr: false,
+			name: "simple_marshall",
+			fields: fields{
+				Err: New("mock_err"),
+			},
+			want: expetedIerrorBytes(New("mock_err")),
+		},
+		{
+			// testing for the inner error being nil
+			name: "inner_error_nil",
+			fields: fields{
+				Err: &ierror{err: nil},
+			},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ierror := &InsprError{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Stack:   tt.fields.Stack,
-				Code:    tt.fields.Code,
-			}
-			got, err := ierror.MarshalJSON()
+
+			got, err := json.Marshal(tt.fields.Err)
+
+			// error on marshal
 			if (err != nil) != tt.wantErr {
 				t.Errorf(
-					"InsprError.MarshalJSON() error = %v, wantErr %v",
+					"ierror.MarshalJSON() error = %v, wantErr %v",
 					err,
 					tt.wantErr,
 				)
 				return
 			}
+
+			// comparing byte slices produced by parseStruct
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf(
-					"InsprError.MarshalJSON() = %v, want %v",
+					"ierror.MarshalJSON() = %v, want %v",
 					got,
 					tt.want,
 				)
@@ -379,103 +470,91 @@ func TestInsprError_MarshalJSON(t *testing.T) {
 	}
 }
 
-func TestInsprError_UnmarshalJSON(t *testing.T) {
-	type fields struct {
-		Message string
-		Err     error
-		Stack   string
-		Code    InsprErrorCode
+func TestIerror_UnmarshalJSON(t *testing.T) {
+
+	generateIerrorBytes := func(err *ierror) []byte {
+		data, _ := json.Marshal(err)
+		return data
 	}
+
 	type args struct {
 		data []byte
 	}
-
-	wanted := InsprError{
-		Message: "mock_error",
-		Err:     errors.New("mock_error"),
-		Stack:   "mock_error",
-		Code:    0,
-	}
-	wantedBytes, _ := json.Marshal(wanted)
-
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name string
+		args args
+		want error
 	}{
 		{
-			name: "basic_test",
-			fields: fields{
-				Message: wanted.Message,
-				Err:     wanted.Err,
-				Stack:   wanted.Stack,
-				Code:    0,
-			},
-			args:    args{data: wantedBytes},
-			wantErr: false,
+			name: "unmarshal_simple_ierror",
+			args: args{data: generateIerrorBytes(New("mock_err"))},
+			want: New("mock_err"),
 		},
 		{
-			name:    "error_test",
-			fields:  fields{},
-			args:    args{data: []byte{0}},
-			wantErr: true,
+			name: "unmarshal_wrapped_error",
+			args: args{data: generateIerrorBytes(
+				from(
+					Wrap(
+						New("mock_err"),
+						"mock_context",
+					),
+				),
+			)},
+			want: Wrap(
+				New("mock_err"),
+				"mock_context",
+			),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ierror := InsprError{
-				Message: tt.fields.Message,
-				Err:     tt.fields.Err,
-				Stack:   tt.fields.Stack,
-				Code:    tt.fields.Code,
-			}
+			ierr := New("")
+			err := json.Unmarshal(tt.args.data, &ierr)
 
-			// ierror.Unmarshal could be used but
-			err := json.Unmarshal(tt.args.data, &ierror)
-
-			if (err != nil) != tt.wantErr {
+			if (err != nil) && !errors.Is(ierr, tt.want) {
 				t.Errorf(
-					"InsprError.UnmarshalJSON() error = %v, wantErr %v",
+					"json.Unmarshal(ierror) got = %v, wanted %v",
 					err,
-					tt.wantErr,
+					tt.want,
 				)
 			}
 		})
 	}
 }
 
-func TestInsprError_StackToError(t *testing.T) {
+func TestIerror_stackError(t *testing.T) {
 	type fields struct {
-		Err   error
-		Stack string
+		stack string
+		code  ErrCode
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		wanted string // used for comparison with err.Error()
+		wanted error
 	}{
 		{
 			name: "basic_test",
 			fields: fields{
-				Err:   nil,
-				Stack: "hello: stack: test",
+				stack: Wrap(
+					errors.New("mock_err"),
+					"wrap_1",
+				).Error(),
+				code: Unknown,
 			},
-			wanted: "hello: stack: test",
+
+			wanted: Wrap(
+				errors.New("mock_err"),
+				"wrap_1",
+			),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ierror := &InsprError{
-				Err:   tt.fields.Err,
-				Stack: tt.fields.Stack,
-			}
-			ierror.StackToError()
+			got := stackToError(tt.fields.stack, Unknown)
 
-			got := ierror.Err.Error()
-			if got != tt.wanted {
+			if got.Error() != tt.wanted.Error() {
 				t.Errorf(
-					"InsprError.StackToError() error = %v, wanted = %v",
+					"ierror.StackToError() error = '%v', wanted = '%v'",
 					got,
 					tt.wanted,
 				)
@@ -484,43 +563,211 @@ func TestInsprError_StackToError(t *testing.T) {
 	}
 }
 
-func TestUnwrap(t *testing.T) {
-	mutipleErrors := NewError().InnerError(errors.New("mock")).Build()
-	mutipleErrors.Wrap("new_error_message")
-
-	type args struct {
-		err error
+func TestErrCode(t *testing.T) {
+	type fields struct {
+		err *ierror
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name   string
+		fields fields
+		exec   func(e *ierror) *ierror
+		want   ErrCode
 	}{
 		{
-			name:    "unwrap_empty_err_stack",
-			args:    args{err: nil},
-			wantErr: false,
+			name: "It should receive the error Unknown",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e
+			},
+			want: Unknown,
 		},
 		{
-			name:    "unwrap_simple_err_stack",
-			args:    args{err: errors.New("mock")},
-			wantErr: false,
+			name: "It should add the code NotFound to the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.NotFound()
+			},
+			want: NotFound,
 		},
 		{
-			name:    "unwrap_simple_inspr_err_stack",
-			args:    args{err: NewError().InnerError(errors.New("mock")).Build()},
-			wantErr: false,
+			name: "It should add the code AlreadyExists the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.AlreadyExists()
+			},
+			want: AlreadyExists,
 		},
 		{
-			name:    "unwrap_complex_inspr_err_stack",
-			args:    args{err: mutipleErrors},
-			wantErr: true,
+			name: "It should add the code BadRequest the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.BadRequest()
+			},
+			want: BadRequest,
+		},
+		{
+			name: "It should add the code InternalServer the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InternalServer()
+			},
+			want: InternalServer,
+		},
+		{
+			name: "It should add the code InvalidName the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidName()
+			},
+			want: InvalidName,
+		},
+		{
+			name: "It should add the code InvalidApp the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidApp()
+			},
+			want: InvalidApp,
+		},
+		{
+			name: "It should add the code InvalidChannel the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidChannel()
+			},
+			want: InvalidChannel,
+		},
+		{
+			name: "It should add the code InvalidType the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidType()
+			},
+			want: InvalidType,
+		},
+		{
+			name: "It should add the code InvalidFile the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidFile()
+			},
+			want: InvalidFile,
+		},
+		{
+			name: "It should add the code InvalidArgs the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidArgs()
+			},
+			want: InvalidArgs,
+		},
+		{
+			name: "It should add the code Forbidden the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.Forbidden()
+			},
+			want: Forbidden,
+		},
+		{
+			name: "It should add the code Unauthorized the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.Unauthorized()
+			},
+			want: Unauthorized,
+		},
+		{
+			name: "It should add the code ExternalErr the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.ExternalErr()
+			},
+			want: ExternalPkg,
+		},
+		{
+			name: "It should add the code InvalidToken the new error",
+			fields: fields{
+				err: New(""),
+			},
+			exec: func(e *ierror) *ierror {
+				return e.InvalidToken()
+			},
+			want: InvalidToken,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Unwrap(tt.args.err); (err != nil) != tt.wantErr {
-				t.Errorf("Unwrap() error = %v, wantErr %v", err, tt.wantErr)
+			got := tt.exec(tt.fields.err)
+
+			if !reflect.DeepEqual(got.code, tt.want) {
+				t.Errorf("ErrCode = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsProperties(t *testing.T) {
+
+	type args struct {
+		l error
+		r error
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "comparing_ierror_to_ioErr",
+			args: args{
+				l: Wrap(New(io.EOF), "wrapper_1"),
+				r: io.EOF,
+			},
+			want: true,
+		}, {
+			name: "comparing_ierror_to_wrong_err",
+			args: args{
+				l: Wrap(New(io.EOF), "wrapper_1"),
+				r: io.ErrClosedPipe,
+			},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := errors.Is(tt.args.l, tt.args.r)
+			if got != tt.want {
+				t.Errorf("errors.Is() got '%v', wanted '%v'", got, tt.want)
 			}
 		})
 	}

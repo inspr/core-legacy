@@ -13,13 +13,15 @@ import (
 func GetPublicKey() (*rsa.PublicKey, error) {
 	pubBytes, ok := os.LookupEnv("JWT_PUBLIC_KEY")
 	if !ok {
-		err := ierrors.NewError().Message("JWT_PUBLIC_KEY unavailable").Build()
+		err := ierrors.New("JWT_PUBLIC_KEY unavailable")
 		return nil, err
 	}
 
 	pubBlock, _ := pem.Decode([]byte(pubBytes))
 	if pubBlock.Type != "RSA PUBLIC KEY" {
-		err := ierrors.NewError().InternalServer().Message("RSA public key is of the wrong type").Build()
+		err := ierrors.New(
+			"RSA public key is of the wrong type",
+		).InternalServer()
 		return nil, err
 	}
 

@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,10 +43,15 @@ func doConfigChange(_ context.Context, args []string) error {
 		errMsg := "error: key inserted does not exist in the insprctl config"
 		fmt.Fprintln(out, errMsg)
 		printExistingKeys()
-		return ierrors.NewError().Message(errMsg).Build()
+		return ierrors.New(errMsg)
 	}
 
 	// updates
+	if key == cliutils.ServerIpKey() {
+		if !strings.HasPrefix(value, "http") {
+			value = fmt.Sprintf("http://%s", value)
+		}
+	}
 	if err := cliutils.ChangeViperValues(key, value); err != nil {
 		return err
 	}

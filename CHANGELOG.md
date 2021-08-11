@@ -1,6 +1,52 @@
 
 # Changelog
 
+### #108 Tech CORE-549 | Add support to request Host header in the cli
+- features:
+    - added host to the client structure in the request and controller pkg, to direct serverip requests
+    - created host flag `--host` to overwrite host configuration on insprctl commands without changing the host configured on the client
+    
+- tests:
+    - updated the set client argument to fit on the new host request call
+    - add on request_test.go `host` arg and `test_new_host` case  
+---
+
+### #105 Tech CORE-442 | Refactor of the error structure in the project
+- features:
+    - refactor of the ierror pkg, removal of the builder concept, now has
+      similar behaviour to the standard library errors pkg but functions to add
+      more context to the error.
+    - The main focus was to develop a secluded pkg to be used for testing and
+      error context, should be used as a referenced in future features.
+- tests:
+    - changed 80+ files tests
+    - redid the tests of the ierror pkg
+---
+### #107 Bug CORE-550 | Mutex not unlocking on panics
+- fix:
+    - panic recovery methods now receive a cancellation function that, when not null, is executed when panics are recovered.
+---
+
+### #106 Tech CORE-492 | Correction on the controller operation
+- misc: 
+    - improved debugging messages for dapp creation and deletion
+- fix:
+    - created a controll variable on k8s operator that alternates between permanent and changed memory throughout the the entire operation on nodes
+    - Added log level controll to authservice
+---
+### #100 Feat/Fix Pprof/memLeak | adding pprof routes to servers and fixing memory leak
+- fix:
+    - closed the http.Requests and http.Response
+- features:
+    - added the pprof routes in the loadbalancer and services
+---
+
+### #101 Fix | adds routine for collecting kafka events
+- fix:
+    - update kafka go version to 1.7.0
+    - adds go routine for collecting kafka writer events
+---
+
 ### #103 Tech CORE-542 | Change broker commands and sub-commands
 - features:
     - change clusters cli sub-commands.

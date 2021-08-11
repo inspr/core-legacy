@@ -36,7 +36,7 @@ func (h *Handler) ControllerRefreshHandler() rest.Handler {
 		appQuery := string(received.RefreshToken)
 
 		l.Debug("querying app to get its credentials", zap.String("app-query", appQuery))
-		app, err := h.Memory.Tree().Apps().Get(appQuery)
+		app, err := h.Memory.Tree().Perm().Apps().Get(appQuery)
 		if err != nil {
 			l.Error("error finding dApp from request", zap.String("app-query", appQuery))
 			rest.ERROR(w, err)
@@ -49,7 +49,7 @@ func (h *Handler) ControllerRefreshHandler() rest.Handler {
 				app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
 			},
 			Refresh:    []byte(appQuery),
-			RefreshURL: fmt.Sprintf("%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
+			RefreshURL: fmt.Sprintf("http://%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
 		}
 		l.Debug("sucessfully refreshed token")
 		rest.JSON(w, 200, payload)
@@ -106,7 +106,10 @@ func (h *Handler) InitHandler() rest.Handler {
 		token, err := h.Auth.Init(res.Key, load)
 		if err != nil {
 			l.Error("error authenticating token", zap.Error(err))
-			rest.ERROR(w, ierrors.NewError().InternalServer().Message("unable to authenticate token").InnerError(err).Build())
+			rest.ERROR(
+				w,
+				ierrors.Wrap(err, "unable to authenticate token"),
+			)
 			return
 		}
 		l.Debug("successfully initialized cluster")

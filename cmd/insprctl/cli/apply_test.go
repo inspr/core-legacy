@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -324,8 +323,13 @@ func Test_applyValidFiles(t *testing.T) {
 				files: tempFiles,
 			},
 			want:    nil,
-			funcErr: ierrors.NewError().Message("unauthorized").Unauthorized().Build(),
-			errMsg:  "failed to authenticate with the cluster. Is your token configured correctly?\n",
+			funcErr: ierrors.New("unauthorized").Unauthorized(),
+			errMsg: ierrors.FormatError(
+				ierrors.Wrap(
+					ierrors.New("unauthorized").Unauthorized(),
+					filePath,
+				),
+			),
 		},
 		{
 			name: "forbidden_error",
@@ -334,8 +338,13 @@ func Test_applyValidFiles(t *testing.T) {
 				files: tempFiles,
 			},
 			want:    nil,
-			funcErr: ierrors.NewError().Message("forbidden").Forbidden().Build(),
-			errMsg:  "forbidden operation, please check for the scope.\n",
+			funcErr: ierrors.New("forbidden").Forbidden(),
+			errMsg: ierrors.FormatError(
+				ierrors.Wrap(
+					ierrors.New("forbidden").Forbidden(),
+					filePath,
+				),
+			),
 		},
 		{
 			name: "default_ierror_message",
@@ -344,8 +353,11 @@ func Test_applyValidFiles(t *testing.T) {
 				files: tempFiles,
 			},
 			want:    nil,
-			funcErr: ierrors.NewError().Message("default_error").BadRequest().Build(),
-			errMsg:  "unexpected inspr error: default_error\n",
+			funcErr: ierrors.New("default_error").BadRequest(),
+			errMsg: ierrors.FormatError(ierrors.Wrap(
+				ierrors.New("default_error").BadRequest(),
+				filePath,
+			)),
 		},
 		{
 			name: "Unknown_error",
@@ -353,9 +365,11 @@ func Test_applyValidFiles(t *testing.T) {
 				path:  "",
 				files: tempFiles,
 			},
-			want:    nil,
-			funcErr: errors.New("unknown_Error"),
-			errMsg:  "non inspr error: unknown_Error\n",
+			funcErr: ierrors.New("unknown_Error"),
+			errMsg: ierrors.FormatError(ierrors.Wrap(
+				ierrors.New("unknown_Error"),
+				filePath,
+			)),
 		},
 	}
 	for _, tt := range tests {

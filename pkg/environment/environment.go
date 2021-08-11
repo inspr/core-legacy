@@ -45,8 +45,9 @@ func getEnv(name string) string {
 	panic("[ENV VAR] " + name + " not found")
 }
 
-// RefreshEnviromentVariables "refreshes" the value of inspr environment variables.
-// This was develop for testing and probably sholdn't be used in other cases.
+// RefreshEnviromentVariables "refreshes" the value of inspr environment
+// variables.  This was develop for testing and probably sholdn't be used in
+// other cases.
 func RefreshEnviromentVariables() *InsprEnvVars {
 	env = &InsprEnvVars{
 		InputChannels:    getRawInputChannels(),
@@ -59,14 +60,16 @@ func RefreshEnviromentVariables() *InsprEnvVars {
 	return env
 }
 
-// RecoverEnvironmentErrors recovers environment errors when instantiating the environment. It sends any recovered
-// errors to the channel in the parameter of the function.
+// RecoverEnvironmentErrors recovers environment errors when instantiating the
+// environment. It sends any recovered errors to the channel in the parameter
+// of the function.
 //
-// The channel that is passed through to the parameter must have at least one buffer spot, so that the error can be easily consumed.
+// The channel that is passed through to the parameter must have at least one
+// buffer spot, so that the error can be easily consumed.
 func RecoverEnvironmentErrors(errch chan<- error) {
 	err := recover()
 	if err != nil {
-		errch <- ierrors.NewError().Message(err.(string)).Build()
+		errch <- ierrors.New(err.(string))
 	}
 	errch <- nil
 }
@@ -81,7 +84,8 @@ func GetOutputChannelsData() []brokers.ChannelBroker {
 	return getChannelData(getRawOutputChannels())
 }
 
-// GetInputBrokerChannels returns environment variable which contains the input channels
+// GetInputBrokerChannels returns environment variable which contains the input
+// channels
 func GetInputBrokerChannels(broker string) utils.StringArray {
 	channels := getChannelData(getRawInputChannels())
 	return filterChannelsByBroker(broker, channels)
@@ -95,60 +99,68 @@ func GetChannelBroker(channel string) (string, error) {
 			return boundary.Broker, nil
 		}
 	}
-	return "", ierrors.NewError().
-		NotFound().
-		Message("[ENV VAR] %v_BROKER not found", channel).
-		Build()
+	return "", ierrors.New(
+		fmt.Sprintf("[ENV VAR] %v_BROKER not found", channel),
+	).NotFound()
 }
 
-// GetOutputBrokerChannels returns environment variable which contains the output channels
+// GetOutputBrokerChannels returns environment variable which contains the
+// output channels
 func GetOutputBrokerChannels(broker string) utils.StringArray {
 	channels := getChannelData(getRawOutputChannels())
 	return filterChannelsByBroker(broker, channels)
 }
 
-// getRawInputChannels returns environment variable which contains the input channels
+// getRawInputChannels returns environment variable which contains the input
+// channels
 func getRawInputChannels() string {
 	return getEnv("INSPR_INPUT_CHANNELS")
 }
 
-// getRawOutputChannels returns environment variable which contains the output channels
+// getRawOutputChannels returns environment variable which contains the output
+// channels
 func getRawOutputChannels() string {
 	return getEnv("INSPR_OUTPUT_CHANNELS")
 }
 
-// GetSidecarImage returns environment variable which contains the sidecar image reference
+// GetSidecarImage returns environment variable which contains the sidecar
+// image reference
 func GetSidecarImage() string {
 	return getEnv("INSPR_LBSIDECAR_IMAGE")
 }
 
-// GetInsprAppScope returns environment variable which contains the current dApp context
+// GetInsprAppScope returns environment variable which contains the current
+// dApp context
 func GetInsprAppScope() string {
 	return getEnv("INSPR_APP_SCOPE")
 }
 
-// GetInsprEnvironment returns Inspr's current environment (test, production, qa, etc.)
+// GetInsprEnvironment returns Inspr's current environment (test, production,
+// qa, etc.)
 func GetInsprEnvironment() string {
 	return getEnv("INSPR_ENV")
 }
 
-// GetInsprAppID returns environment variable which contains the current dApp's ID
+// GetInsprAppID returns environment variable which contains the current dApp's
+// ID
 func GetInsprAppID() string {
 	return getEnv("INSPR_APP_ID")
 }
 
-// GetBrokerWritePort returns environment variable that contains given broker's write port
+// GetBrokerWritePort returns environment variable that contains given broker's
+// write port
 func GetBrokerWritePort(broker string) string {
 	return getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_WRITE_PORT", strings.ToUpper(broker)))
 }
 
-// GetBrokerReadPort returns environment variable that contains given broker's read port
+// GetBrokerReadPort returns environment variable that contains given broker's
+// read port
 func GetBrokerReadPort(broker string) string {
 	return getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_READ_PORT", strings.ToUpper(broker)))
 }
 
-// GetBrokerSpecificSidecarAddr returns environment variable that contains given broker's
-// sidecar address
+// GetBrokerSpecificSidecarAddr returns environment variable that contains
+// given broker's sidecar address
 func GetBrokerSpecificSidecarAddr(broker string) string {
 	return getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_ADDR", strings.ToUpper(broker)))
 }

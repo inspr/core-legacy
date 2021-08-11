@@ -118,7 +118,7 @@ func (ah *AppHandler) HandleGet() rest.Handler {
 		l.Debug("initiating dApp get transaction")
 		ah.Memory.Tree().InitTransaction()
 
-		app, err := ah.Memory.Tree().Perm().Apps().Get(scope)
+		app, err := ah.Memory.Tree().Apps().Get(scope)
 		if err != nil {
 			l.Error("unable to get dApp", zap.Error(err))
 			rest.ERROR(w, err)

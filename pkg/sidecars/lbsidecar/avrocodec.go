@@ -40,7 +40,7 @@ func encode(ch string, message interface{}) ([]byte, error) {
 	if err != nil {
 		logger.Error("unable to encode message", zap.Any("error", err))
 
-		return nil, ierrors.NewError().Message("[ENCODE] %v", err.Error()).Build()
+		return nil, ierrors.New("[ENCODE] %v", err.Error())
 	}
 
 	return messageEncoded, nil
@@ -63,7 +63,7 @@ func decode(ch string, messageEncoded []byte) (interface{}, error) {
 	if err != nil {
 		logger.Error("unable to decode message", zap.Any("error", err))
 
-		return nil, ierrors.NewError().Message("[DECODE] %v", err.Error()).Build()
+		return nil, ierrors.New("[DECODE] %v", err.Error())
 	}
 
 	return message, nil
@@ -78,7 +78,7 @@ func getSchema(ch string) (string, error) {
 	if err != nil {
 		logger.Error("unable to get channel schema", zap.Any("error", err))
 
-		return "", ierrors.NewError().Message(err.Error()).Build()
+		return "", err
 	}
 
 	return schema, nil
@@ -93,7 +93,7 @@ func getCodec(schema string) (*goavro.Codec, error) {
 	if err != nil {
 		logger.Error("unable to get Avro codec", zap.Any("error", err))
 
-		return nil, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.New(err)
 	}
 
 	return codec, nil

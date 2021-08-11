@@ -59,6 +59,7 @@ func Test_getApps(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
+		host    string
 		args    args
 		wantErr bool
 		tab     string
@@ -93,14 +94,14 @@ func Test_getApps(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.handler))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getApps(tt.args.in0)
@@ -129,6 +130,7 @@ func Test_getChannels(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
+		host    string
 		args    args
 		wantErr bool
 		tab     string
@@ -163,14 +165,14 @@ func Test_getChannels(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.handler))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getChannels(tt.args.in0)
@@ -198,6 +200,7 @@ func Test_gettypes(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
+		host    string
 		args    args
 		wantErr bool
 		tab     string
@@ -232,14 +235,14 @@ func Test_gettypes(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.handler))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getTypes(tt.args.in0)
@@ -268,6 +271,7 @@ func Test_getNodes(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
+		host    string
 		args    args
 		wantErr bool
 		tab     string
@@ -302,14 +306,14 @@ func Test_getNodes(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.handler))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getNodes(tt.args.in0)
@@ -332,6 +336,7 @@ func Test_getObj(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
+		host    string
 		args    args
 		lines   *[]string
 		wantErr bool
@@ -368,14 +373,14 @@ func Test_getObj(t *testing.T) {
 			lines:   &[]string{"appParent\n", "app1\n", "thenewapp\n"},
 			wantErr: true,
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.handler))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 
 			client := cliutils.GetCliClient()
 			out := cliutils.GetCliOutput()
@@ -650,6 +655,7 @@ func Test_getAlias(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
+		host    string
 		args    args
 		wantErr bool
 		tab     string
@@ -684,14 +690,14 @@ func Test_getAlias(t *testing.T) {
 			wantErr: true,
 			tab:     bufResp.String(),
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				rest.ERROR(w, ierrors.NewError().Message("error").Build())
+				rest.ERROR(w, ierrors.New("error"))
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.handler))
-			cliutils.SetClient(server.URL)
+			cliutils.SetClient(server.URL, tt.host)
 			buf := bytes.NewBufferString("")
 			cliutils.SetOutput(buf)
 			err := getAlias(tt.args.in0)

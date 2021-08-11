@@ -34,7 +34,7 @@ func TestNewApplyChannel(t *testing.T) {
 			args: args{
 				b: chanWithoutNameBytes,
 			},
-			want: ierrors.NewError().Message("channel without name").Build(),
+			want: ierrors.New("channel without name"),
 		},
 		{
 			name: "error_testing",

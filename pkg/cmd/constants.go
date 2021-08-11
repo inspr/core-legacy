@@ -17,4 +17,6 @@ var InsprOptions struct {
 	Token string
 
 	Config string
+	// Host receives the request Host/Header field from the cli
+	Host string
 }

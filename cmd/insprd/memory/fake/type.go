@@ -22,11 +22,7 @@ func (t *Types) Get(scope, name string) (*meta.Type, error) {
 	query := fmt.Sprintf("%s.%s", scope, name)
 	ct, ok := t.insprTypes[query]
 	if !ok {
-		return nil, ierrors.
-			NewError().
-			NotFound().
-			Message("type %s not found", query).
-			Build()
+		return nil, ierrors.New("type %s not found", query).NotFound()
 	}
 	return ct, nil
 }
@@ -39,11 +35,7 @@ func (t *Types) Create(scope string, tp *meta.Type) error {
 	query := fmt.Sprintf("%s.%s", scope, tp.Meta.Name)
 	_, ok := t.insprTypes[query]
 	if ok {
-		return ierrors.
-			NewError().
-			AlreadyExists().
-			Message("type %s already exists", query).
-			Build()
+		return ierrors.New("type %s already exists", query).AlreadyExists()
 	}
 	t.insprTypes[query] = tp
 	return nil
@@ -57,11 +49,7 @@ func (t *Types) Delete(scope, name string) error {
 	query := fmt.Sprintf("%s.%s", scope, name)
 	_, ok := t.insprTypes[query]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("type %s not found", query).
-			Build()
+		return ierrors.New("type %s not found", query).NotFound()
 	}
 
 	delete(t.insprTypes, query)
@@ -76,11 +64,7 @@ func (t *Types) Update(scope string, tp *meta.Type) error {
 	query := fmt.Sprintf("%s.%s", scope, tp.Meta.Name)
 	_, ok := t.insprTypes[query]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("type %s not found", query).
-			Build()
+		return ierrors.New("type %s not found", query).NotFound()
 	}
 	t.insprTypes[query] = tp
 	return nil

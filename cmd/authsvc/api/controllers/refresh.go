@@ -22,7 +22,9 @@ func (server *Server) Refresh() rest.Handler {
 
 		if len(headerContent) != 1 ||
 			!strings.HasPrefix(headerContent[0], "Bearer ") {
-			err := ierrors.NewError().Unauthorized().Message("bad Request, expected: Authorization: Bearer <token>").Build()
+			err := ierrors.New(
+				"bad Request, expected: Authorization: Bearer <token>",
+			).Unauthorized()
 			rest.ERROR(w, err)
 			return
 		}
@@ -36,9 +38,10 @@ func (server *Server) Refresh() rest.Handler {
 			jwt.WithVerify(jwa.RS256, server.privKey.PublicKey),
 		)
 		if err != nil && err.Error() != `exp not satisfied` {
-			err := ierrors.NewError().Forbidden().
-				Message("couldn't parse token: %v", err).Build()
-
+			err := ierrors.Wrap(
+				ierrors.New(err).Forbidden(),
+				"couldn't parse token",
+			)
 			rest.ERROR(w, err)
 			return
 		}
@@ -46,21 +49,23 @@ func (server *Server) Refresh() rest.Handler {
 		server.logger.Info("deserializing parsed token")
 		load, err := auth.Desserialize(token)
 		if err != nil {
-			err := ierrors.NewError().Forbidden().
-				Message("couldn't desserialize token: %v", err).Build()
-
+			err := ierrors.Wrap(
+				err,
+				"couldn't desserialize token",
+			)
 			rest.ERROR(w, err)
 			return
 		}
 
 		server.logger.Debug("received payload", zap.Any("content", load))
 
-		server.logger.Info("refreshing old payload")
+		server.logger.Info("refreshing old payload", zap.String("refresh-servide", load.RefreshURL))
 		payload, err := refreshPayload(load.Refresh, load.RefreshURL)
 		if err != nil {
-			err := ierrors.NewError().InternalServer().
-				Message("couldn't refresh payload: %v", err).Build()
-
+			err := ierrors.Wrap(
+				err,
+				"couldn't refresh payload",
+			)
 			rest.ERROR(w, err)
 			return
 		}
@@ -69,8 +74,6 @@ func (server *Server) Refresh() rest.Handler {
 
 		signed, err := server.tokenize(*payload, time.Now().Add(time.Minute*8))
 		if err != nil {
-			err := ierrors.NewError().InternalServer().Message(err.Error()).Build()
-
 			rest.ERROR(w, err)
 			return
 		}
@@ -91,13 +94,13 @@ func refreshPayload(refreshToken []byte, refreshURL string) (*auth.Payload, erro
 	}
 	reqBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		err = ierrors.New(err).InternalServer()
 		return nil, err
 	}
 
 	resp, err := http.Post(refreshURL, "application/json", bytes.NewBuffer(reqBytes))
 	if err != nil || resp.StatusCode != http.StatusOK {
-		err = ierrors.NewError().InternalServer().Message(err.Error()).Build()
+		err = ierrors.New(err).InternalServer()
 		return nil, err
 	}
 	defer resp.Body.Close()

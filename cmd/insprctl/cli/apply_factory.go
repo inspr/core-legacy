@@ -38,10 +38,9 @@ func (af *ApplyFactory) GetRunMethod(component meta.Component) (RunMethod, error
 	if method, ok := af.applyDict[component]; ok {
 		return method, nil
 	}
-	return nil, ierrors.NewError().
-		InvalidName().
-		Message("component not subscribed in the ApplyFactory dictionary").
-		Build()
+	return nil, ierrors.New(
+		"component not subscribed in the ApplyFactory dictionary",
+	).InvalidName()
 }
 
 // Subscribe adds to the apply factory dictonary the
@@ -49,17 +48,13 @@ func (af *ApplyFactory) GetRunMethod(component meta.Component) (RunMethod, error
 // runMethod
 func (af *ApplyFactory) Subscribe(component meta.Component, method RunMethod) error {
 	if component.Kind == "" || component.APIVersion == "" {
-		return ierrors.NewError().
-			InvalidName().
-			Message("component must have a not empty kind and apiVersion").
-			Build()
+		return ierrors.New(
+			"component must have a not empty kind and apiVersion",
+		).InvalidName()
 	}
 
 	if _, ok := af.applyDict[component]; ok {
-		return ierrors.NewError().
-			InvalidName().
-			Message("component already subscribed").
-			Build()
+		return ierrors.New("component already subscribed").InvalidName()
 	}
 
 	af.applyDict[component] = method

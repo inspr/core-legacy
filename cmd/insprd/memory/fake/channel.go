@@ -23,11 +23,7 @@ func (ch *Channels) Get(scope, name string) (*meta.Channel, error) {
 	query := fmt.Sprintf("%s.%s", scope, name)
 	ct, ok := ch.channels[query]
 	if !ok {
-		return nil, ierrors.
-			NewError().
-			NotFound().
-			Message("channel %s not found", query).
-			Build()
+		return nil, ierrors.New("channel %s not found", query).NotFound()
 	}
 	return ct, nil
 }
@@ -40,11 +36,7 @@ func (ch *Channels) Create(scope string, channel *meta.Channel, brokers *apimode
 	query := fmt.Sprintf("%s.%s", scope, channel.Meta.Name)
 	_, ok := ch.channels[query]
 	if ok {
-		return ierrors.
-			NewError().
-			AlreadyExists().
-			Message("channel %s already exists", query).
-			Build()
+		return ierrors.New("channel %s already exists", query).AlreadyExists()
 	}
 	ch.channels[query] = channel
 	return nil
@@ -58,11 +50,7 @@ func (ch *Channels) Delete(scope, name string) error {
 	query := fmt.Sprintf("%s.%s", scope, name)
 	_, ok := ch.channels[query]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("channel %s not found", query).
-			Build()
+		return ierrors.New("channel %s not found", query).NotFound()
 	}
 
 	delete(ch.channels, query)
@@ -77,11 +65,7 @@ func (ch *Channels) Update(scope string, channel *meta.Channel) error {
 	query := fmt.Sprintf("%s.%s", scope, channel.Meta.Name)
 	_, ok := ch.channels[query]
 	if !ok {
-		return ierrors.
-			NewError().
-			NotFound().
-			Message("channel %s not found", query).
-			Build()
+		return ierrors.New("channel %s not found", query).NotFound()
 	}
 	ch.channels[query] = channel
 	return nil

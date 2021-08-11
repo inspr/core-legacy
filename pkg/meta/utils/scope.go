@@ -33,7 +33,7 @@ func IsValidScope(scope string) bool {
 // and returns the new scope and the element that was removed
 func RemoveLastPartInScope(scope string) (string, string, error) {
 	if !IsValidScope(scope) {
-		return "", "", ierrors.NewError().Message("invalid scope: " + scope).InvalidName().Build()
+		return "", "", ierrors.New("invalid scope: " + scope).InvalidName()
 	}
 
 	names := strings.Split(scope, ".")
@@ -49,7 +49,7 @@ func RemoveLastPartInScope(scope string) (string, string, error) {
 // JoinScopes join two scopes and return the new scope
 func JoinScopes(s1, s2 string) (string, error) {
 	if !IsValidScope(s1) || !IsValidScope(s2) {
-		return "", ierrors.NewError().Message("invalid scope in args").InvalidName().Build()
+		return "", ierrors.New("invalid scope in args").InvalidName()
 	}
 
 	if s2 == "" {
@@ -74,7 +74,7 @@ func IsInnerScope(s1, s2 string) bool {
 // and returns the new scope and the alias that was removed
 func RemoveAliasInScope(scope string) (string, string, error) {
 	if !IsValidScope(scope) {
-		return "", "", ierrors.NewError().Message("invalid scope: %s", scope).InvalidName().Build()
+		return "", "", ierrors.New("invalid scope: %s", scope).InvalidName()
 	}
 
 	names := strings.Split(scope, ".")

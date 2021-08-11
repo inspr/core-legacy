@@ -1,11 +1,12 @@
 package ierrors
 
-// InsprErrorCode is error codes for inspr errors
-type InsprErrorCode int32
+// ErrCode is error codes for inspr errors
+type ErrCode uint32
 
 // Error codes for inspr errors
 const (
-	NotFound InsprErrorCode = 1 << iota
+	Unknown ErrCode = 1 << iota
+	NotFound
 	AlreadyExists
 	InternalServer
 	InvalidName
@@ -19,4 +20,5 @@ const (
 	ExpiredToken
 	Unauthorized
 	Forbidden
+	ExternalPkg
 )

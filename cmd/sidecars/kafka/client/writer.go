@@ -1,8 +1,8 @@
 package kafkasc
 
 import (
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"go.uber.org/zap"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"inspr.dev/inspr/pkg/environment"
 	"inspr.dev/inspr/pkg/ierrors"
 )
@@ -24,15 +24,26 @@ func NewWriter() (*Writer, error) {
 		"bootstrap.servers": bootstrapServers,
 	})
 
+	go func(events <-chan kafka.Event) {
+		for {
+			switch ev := (<-events).(type) {
+			case *kafka.Error:
+				logger.Warn("kafka has created an error event", zap.Error(ev))
+			case *kafka.LogEvent:
+				logger.Debug(ev.Message, zap.String("sub-section", ev.Tag))
+			default:
+			}
+		}
+	}(kProd.Events())
+
 	if err != nil {
-		return nil, ierrors.NewError().Message(err.Error()).Build()
+		return nil, ierrors.New(err)
 	}
 
 	return &Writer{kProd}, nil
 }
 
-// Producer returns a Writer's producer
-func (writer *Writer) Producer() *kafka.Producer {
+func (writer *Writer) getProducer() *kafka.Producer {
 	return writer.producer
 }
 
