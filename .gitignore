@@ -245,3 +245,6 @@ $RECYCLE.BIN/
 *.lnk
 
 **/charts
+
+# python builds
+clients/python/build
