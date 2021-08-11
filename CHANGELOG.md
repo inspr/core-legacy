@@ -1,6 +1,10 @@
 
 # Changelog
 
+### #111 Feature | adds redis as a dependency for the uidp helm chart
+- features:
+  - adds redis as a uidp helm dependency
+
 ### #108 Tech CORE-549 | Add support to request Host header in the cli
 - features:
     - added host to the client structure in the request and controller pkg, to direct serverip requests
