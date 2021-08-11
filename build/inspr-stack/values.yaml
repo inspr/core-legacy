@@ -25,7 +25,7 @@ insprd:
   replicaCount: 1
 
   apps:
-    namespace:
+    createNamespace: true
 
   ingress:
     enabled: false
