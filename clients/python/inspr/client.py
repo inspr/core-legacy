@@ -11,35 +11,35 @@ SIDECAR_WRITE_PORT = "INSPR_LBSIDECAR_WRITE_PORT"
 
 class Client:
     def __init__(self) -> None:
-        self.readPort = os.getenv(SIDECAR_READ_PORT)
-        self.writeAddress = "http://localhost:" + str(os.getenv(SIDECAR_WRITE_PORT))
+        self.read_port = os.getenv(SIDECAR_READ_PORT)
+        self.write_address = "http://localhost:" + str(os.getenv(SIDECAR_WRITE_PORT))
         self.app = Flask(__name__)
 
-    def writeMessage(self, channel:str, msg) -> None:
-        msgBody = {
+    def write_message(self, channel:str, msg) -> None:
+        msg_body = {
             "data": msg
         }
-        jsonObj = json.dumps(msgBody, indent=4)
+        json_obj = json.dumps(msg_body, indent=4)
         try:
-            sendPostRequest(self.writeAddress + "/" + channel, jsonObj)
+            send_post_request(self.write_address + "/" + channel, json_obj)
         except Exception as e:
             print(f"Error while trying to write message: {e}")
             raise Exception("failed to deliver message: channel: {}".format(channel))
 
-    def handleChannel(self, channel:str) -> Callable[[Callable[[Any], Any]], Callable[[Any], Any]]:
-        def wrapper(handleFunc: Callable[[Any], Any]):
-            def routeFunc():
+    def handle_channel(self, channel:str) -> Callable[[Callable[[Any], Any]], Callable[[Any], Any]]:
+        def wrapper(handle_func: Callable[[Any], Any]):
+            def route_func():
                 data = request.get_json(force=True)
                 try:
-                    handleFunc(data["data"])
+                    handle_func(data["data"])
                 except:
                     err = "Error handling message"
                     return err, HTTPStatus.INTERNAL_SERVER_ERROR
 
                 return '', HTTPStatus.OK
 
-            self.app.add_url_rule("/" + channel, endpoint = channel, view_func = routeFunc, methods=["POST"])
-            return handleFunc
+            self.app.add_url_rule("/" + channel, endpoint = channel, view_func = route_func, methods=["POST"])
+            return handle_func
         return wrapper
 
     def run(self) -> None:
@@ -48,4 +48,4 @@ class Client:
             links.append(rule.endpoint)
         print("registered routes =", links, file=sys.stderr)
 
-        self.app.run(port=self.readPort)
+        self.app.run(port=self.read_port)

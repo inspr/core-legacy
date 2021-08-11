@@ -8,22 +8,21 @@ def main():
     client = Client()
     msg = "Pong!"
 
-    @client.handleChannel(PONG_INPUT_CHANNEL)
-    def readPingAndSendPong(data):
-
+    @client.handle_channel(PONG_INPUT_CHANNEL)
+    def read_ping_and_send_pong(data):
         if data == 'Ping!':
             print(data, file=sys.stderr)
         else:
             print('Not received Ping', file=sys.stderr)
 
         try:
-            client.writeMessage(PONG_OUTPUT_CHANNEL, msg)
+            client.write_message(PONG_OUTPUT_CHANNEL, msg)
         except:
             raise Exception
 
 
     try:
-        client.writeMessage(PONG_OUTPUT_CHANNEL, msg)
+        client.write_message(PONG_OUTPUT_CHANNEL, msg)
     except:
         print("An error has occured", file=sys.stderr)
         return
