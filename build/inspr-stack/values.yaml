@@ -93,9 +93,7 @@ uidp:
     generatePassword: true
 
   redis:
-    password: ""
-    host:
-    port:
+    create: true
 
   ingress:
     enabled: false
