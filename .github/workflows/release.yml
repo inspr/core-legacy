@@ -37,20 +37,23 @@ jobs:
           export_default_credentials: true
 
       - name: Create file with GCR stuff
-        run: 'echo "$GCR_KEY" > $GCR_FILENAME.json'
+        run: 'echo "$GCR_KEY" > /tmp/$GCR_FILENAME.json'
         shell: bash
         env:
           GCR_KEY: ${{ secrets.GCR_ACCOUNT_KEY }}
 
       - name: Configure GCR service account
         run: |
-          gcloud auth activate-service-account ${{ secrets.GCR_ACCOUNT }} --key-file=$GCR_FILENAME.json
+          gcloud auth activate-service-account ${{ secrets.GCR_ACCOUNT }} --key-file=/tmp/$GCR_FILENAME.json
 
       - name: Run skaffold build
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: $GCR_FILENAME.json
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/$GCR_FILENAME.json
         run: |
           skaffold build --profile=inspr-stack --filename=/home/runner/work/inspr/inspr/skaffold.yaml
+
+      - name: Publish helm charts
+        run: "cd scripts && bash update-charts.sh"
 
       - name: Build CLI
         run: bash .github/scripts/buildcli.sh
