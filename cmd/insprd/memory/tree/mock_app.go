@@ -20,7 +20,11 @@ func (mock *MockAppManager) Get(scope string) (*meta.App, error) {
 }
 
 // Create Mock
-func (mock *MockAppManager) Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
+func (mock *MockAppManager) Create(
+	scope string,
+	app *meta.App,
+	brokers *apimodels.BrokersDI,
+) error {
 	return nil
 }
 
@@ -30,11 +34,18 @@ func (mock *MockAppManager) Delete(scope string) error {
 }
 
 // Update Mock
-func (mock *MockAppManager) Update(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
+func (mock *MockAppManager) Update(
+	scope string,
+	app *meta.App,
+	brokers *apimodels.BrokersDI,
+) error {
 	return nil
 }
 
 // ResolveBoundary Mock
-func (mock *MockAppManager) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
+func (mock *MockAppManager) ResolveBoundary(
+	app *meta.App,
+	usePermTree bool,
+) (map[string]string, error) {
 	return nil, nil
 }

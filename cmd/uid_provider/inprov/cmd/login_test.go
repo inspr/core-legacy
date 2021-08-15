@@ -49,10 +49,18 @@ func Test_login(t *testing.T) {
 			cl = mockCl{
 				login: func(c context.Context, s1, s2 string) (string, error) {
 					if s1 != tt.args.login {
-						t.Errorf("login is not passed correctly \n%v\n!=\n%v", s1, tt.args.login)
+						t.Errorf(
+							"login is not passed correctly \n%v\n!=\n%v",
+							s1,
+							tt.args.login,
+						)
 					}
 					if s2 != tt.args.password {
-						t.Errorf("password is not passed correctly \n%v\n!=\n%v", s2, tt.args.password)
+						t.Errorf(
+							"password is not passed correctly \n%v\n!=\n%v",
+							s2,
+							tt.args.password,
+						)
 					}
 					if tt.err != nil {
 						return "", tt.err
@@ -160,17 +168,29 @@ func Test_loginAction(t *testing.T) {
 			cl = mockCl{
 				login: func(c context.Context, s1, s2 string) (string, error) {
 					if s1 != tt.options.user {
-						t.Errorf("username is not set correctly\n%v\n!=\n%v", s1, tt.options.user)
+						t.Errorf(
+							"username is not set correctly\n%v\n!=\n%v",
+							s1,
+							tt.options.user,
+						)
 					}
 					if s2 != tt.options.password {
-						t.Errorf("password is not set correctly\n%v\n!=\n%v", s2, tt.options.password)
+						t.Errorf(
+							"password is not set correctly\n%v\n!=\n%v",
+							s2,
+							tt.options.password,
+						)
 					}
 					return "this is a test", nil
 				},
 			}
 
 			if err := loginAction(tt.args.c); (err != nil) != tt.wantErr {
-				t.Errorf("loginAction() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"loginAction() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			writer.Close()
 
@@ -180,12 +200,20 @@ func Test_loginAction(t *testing.T) {
 			bytes, err := ioutil.ReadAll(reader)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("loginAction() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"loginAction() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 
 			if tt.options.stdout {
 				if (string(bytes) != "Successfully logged in!\nthis is a test") != tt.wantErr {
-					t.Errorf("loginAction() = %v, want %v", string(bytes), "Successfully logged in!\nthis is a test")
+					t.Errorf(
+						"loginAction() = %v, want %v",
+						string(bytes),
+						"Successfully logged in!\nthis is a test",
+					)
 				}
 
 			} else {

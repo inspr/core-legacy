@@ -65,14 +65,26 @@ func setTree(tmm *treeMemoryManager) {
 //InitTransaction copies and reserves the current tree structure so that changes can be reversed
 func (tmm *treeMemoryManager) InitTransaction() {
 	tmm.Lock()
-	logger.Debug("locked mutex", zap.String("operation", "InitTransaction"), zap.String("type", "mutex"))
+	logger.Debug(
+		"locked mutex",
+		zap.String("operation", "InitTransaction"),
+		zap.String("type", "mutex"),
+	)
 	utils.DeepCopy(tmm.tree, &tmm.root)
-	logger.Debug("transaction initialized", zap.String("operation", "InitTransaction"), zap.String("type", "mutex"))
+	logger.Debug(
+		"transaction initialized",
+		zap.String("operation", "InitTransaction"),
+		zap.String("type", "mutex"),
+	)
 }
 
 //Commit applies changes from a transaction in to the tree structure
 func (tmm *treeMemoryManager) Commit() {
-	defer logger.Debug("freed mutex", zap.String("operation", "Commit"), zap.String("type", "mutex"))
+	defer logger.Debug(
+		"freed mutex",
+		zap.String("operation", "Commit"),
+		zap.String("type", "mutex"),
+	)
 	defer tmm.Unlock()
 	tmm.tree = tmm.root
 	tmm.root = nil
@@ -80,7 +92,11 @@ func (tmm *treeMemoryManager) Commit() {
 
 //Cancel discarts changes made in the last transaction
 func (tmm *treeMemoryManager) Cancel() {
-	defer logger.Debug("freed mutex", zap.String("operation", "Cancel"), zap.String("type", "mutex"))
+	defer logger.Debug(
+		"freed mutex",
+		zap.String("operation", "Cancel"),
+		zap.String("type", "mutex"),
+	)
 	defer tmm.Unlock()
 	tmm.root = nil
 }

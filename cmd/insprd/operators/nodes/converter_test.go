@@ -87,7 +87,11 @@ func Test_intToint32(t *testing.T) {
 			got := intToint32(tt.args.v)
 
 			if reflect.TypeOf(got) != reflect.TypeOf(tt.want) {
-				t.Errorf("intToint32().Type() = %v, want %v", reflect.TypeOf(got), reflect.TypeOf(tt.want))
+				t.Errorf(
+					"intToint32().Type() = %v, want %v",
+					reflect.TypeOf(got),
+					reflect.TypeOf(tt.want),
+				)
 			}
 			if *got != *tt.want {
 				t.Errorf("intToint32() = %v, want %v", got, tt.want)
@@ -96,7 +100,9 @@ func Test_intToint32(t *testing.T) {
 	}
 }
 
-func TestNodeOperator_withBoundary(t *testing.T) { //TODO needs more testing, longer creates, updates, and deletes
+func TestNodeOperator_withBoundary(
+	t *testing.T,
+) { //TODO needs more testing, longer creates, updates, and deletes
 	mem := fake.MockTreeMemory(nil)
 	mem.InitTransaction()
 	mem.Channels().Create("", &meta.Channel{
@@ -172,7 +178,9 @@ func TestNodeOperator_withBoundary(t *testing.T) { //TODO needs more testing, lo
 							},
 							"channel2": {
 								Meta: meta.Metadata{Name: "channel2"},
-								Spec: meta.ChannelSpec{SelectedBroker: "someBroker"},
+								Spec: meta.ChannelSpec{
+									SelectedBroker: "someBroker",
+								},
 							},
 						},
 					},
@@ -228,11 +236,15 @@ func TestNodeOperator_withBoundary(t *testing.T) { //TODO needs more testing, lo
 						Channels: map[string]*meta.Channel{
 							"channel1": {
 								Meta: meta.Metadata{Name: "channel1"},
-								Spec: meta.ChannelSpec{SelectedBroker: "someBroker"},
+								Spec: meta.ChannelSpec{
+									SelectedBroker: "someBroker",
+								},
 							},
 							"channel2": {
 								Meta: meta.Metadata{Name: "channel2"},
-								Spec: meta.ChannelSpec{SelectedBroker: "someBroker"},
+								Spec: meta.ChannelSpec{
+									SelectedBroker: "someBroker",
+								},
 							},
 						},
 					},
@@ -282,14 +294,22 @@ func TestNodeOperator_withBoundary(t *testing.T) { //TODO needs more testing, lo
 			got := &kubeCore.Container{}
 			option := no.withBoundary(tt.args.app, false)
 			option(got)
-			if !cmp.Equal(got, tt.want, cmp.Comparer(func(a1, a2 []kubeCore.EnvVar) bool {
-				a1cmp, a2cmp := envVarArr(a1), envVarArr(a2)
-				sort.Sort(a1cmp)
-				sort.Sort(a2cmp)
+			if !cmp.Equal(
+				got,
+				tt.want,
+				cmp.Comparer(func(a1, a2 []kubeCore.EnvVar) bool {
+					a1cmp, a2cmp := envVarArr(a1), envVarArr(a2)
+					sort.Sort(a1cmp)
+					sort.Sort(a2cmp)
 
-				return cmp.Equal(a1cmp, a2cmp)
-			})) {
-				t.Errorf("TestNodeOperator_withBoundary got = \n%v, \nwant \n%v", got, tt.want)
+					return cmp.Equal(a1cmp, a2cmp)
+				}),
+			) {
+				t.Errorf(
+					"TestNodeOperator_withBoundary got = \n%v, \nwant \n%v",
+					got,
+					tt.want,
+				)
 			}
 
 		})
@@ -445,7 +465,11 @@ func Test_withLBSidecarPorts(t *testing.T) {
 			option(got)
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("withLBSidecarPorts() got = %v, want = %v", got, tt.want)
+				t.Errorf(
+					"withLBSidecarPorts() got = %v, want = %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -479,7 +503,11 @@ func TestNodeOperator_withLBSidecarImage(t *testing.T) {
 			option(got)
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("withLBSidecarPorts() got = %v, want = %v", got, tt.want)
+				t.Errorf(
+					"withLBSidecarPorts() got = %v, want = %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -494,7 +522,10 @@ func Test_withLBSidecarConfiguration(t *testing.T) {
 	}{
 		{
 			before: func() {
-				os.Setenv("INSPR_LBSIDECAR_CONFIGMAP", "inspr-lbsidecar-configuration")
+				os.Setenv(
+					"INSPR_LBSIDECAR_CONFIGMAP",
+					"inspr-lbsidecar-configuration",
+				)
 			},
 			name: "correct configmap configuration",
 			want: &kubeCore.Container{
@@ -522,7 +553,11 @@ func Test_withLBSidecarConfiguration(t *testing.T) {
 			option(got)
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("withLBSidecarConfiguration() got = %v, want = %v", got, tt.want)
+				t.Errorf(
+					"withLBSidecarConfiguration() got = %v, want = %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -586,7 +621,10 @@ func TestNodeOperator_toSecret(t *testing.T) {
 				memory:    tt.fields.memory,
 				auth:      tt.fields.auth,
 			}
-			if got := no.toSecret(tt.args.app); !reflect.DeepEqual(got, tt.want) {
+			if got := no.toSecret(tt.args.app); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("NodeOperator.toSecret() = %v, want %v", got, tt.want)
 			}
 		})

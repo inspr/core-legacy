@@ -18,7 +18,9 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = logs.Logger(zap.Fields(zap.String("section", "uidp-api-handlers")))
+	logger, _ = logs.Logger(
+		zap.Fields(zap.String("section", "uidp-api-handlers")),
+	)
 }
 
 // Handler is a structure which cointains methods to handle
@@ -40,7 +42,10 @@ func NewHandler(ctx context.Context, rdb client.RedisManager) *Handler {
 
 // CreateUserHandler handles user creation requests
 func (h *Handler) CreateUserHandler() rest.Handler {
-	l := logger.With(zap.String("subSection", "users"), zap.String("operation", "create"))
+	l := logger.With(
+		zap.String("subSection", "users"),
+		zap.String("operation", "create"),
+	)
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
 		l = l.With(zap.String("host", r.Host))
 		l.Info("received create user request")
@@ -52,7 +57,10 @@ func (h *Handler) CreateUserHandler() rest.Handler {
 			rest.ERROR(w, err)
 			return
 		}
-		l.With(zap.String("user-creator", data.UID), zap.String("user-created", data.User.UID))
+		l.With(
+			zap.String("user-creator", data.UID),
+			zap.String("user-created", data.User.UID),
+		)
 		l.Debug("creating user in redis")
 		if err := h.rdb.CreateUser(h.ctx, data.UID, data.Password, data.User); err != nil {
 			l.Error("error creating user in redis", zap.Error(err))
@@ -66,7 +74,10 @@ func (h *Handler) CreateUserHandler() rest.Handler {
 
 // DeleteUserHandler handles user deletion requests
 func (h *Handler) DeleteUserHandler() rest.Handler {
-	l := logger.With(zap.String("subSection", "users"), zap.String("operation", "delete"))
+	l := logger.With(
+		zap.String("subSection", "users"),
+		zap.String("operation", "delete"),
+	)
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
 		l = l.With(zap.String("host", r.Host))
 		l.Info("received delete user request")
@@ -79,7 +90,10 @@ func (h *Handler) DeleteUserHandler() rest.Handler {
 			return
 		}
 
-		l = l.With(zap.String("user-deleter", data.UID), zap.String("user-deleted", data.UserToBeDeleted))
+		l = l.With(
+			zap.String("user-deleter", data.UID),
+			zap.String("user-deleted", data.UserToBeDeleted),
+		)
 
 		l.Debug("deleting user in redis")
 		if err := h.rdb.DeleteUser(h.ctx, data.UID, data.Password, data.UserToBeDeleted); err != nil {
@@ -94,7 +108,10 @@ func (h *Handler) DeleteUserHandler() rest.Handler {
 
 // UpdatePasswordHandler handles requests to update an user password
 func (h *Handler) UpdatePasswordHandler() rest.Handler {
-	l := logger.With(zap.String("subSection", "users"), zap.String("operation", "update"))
+	l := logger.With(
+		zap.String("subSection", "users"),
+		zap.String("operation", "update"),
+	)
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
 		l = l.With(zap.String("host", r.Host))
 		l.Info("received update request")
@@ -107,7 +124,10 @@ func (h *Handler) UpdatePasswordHandler() rest.Handler {
 			return
 		}
 
-		l = l.With(zap.String("user-updater", data.UID), zap.String("user-updated", data.UID))
+		l = l.With(
+			zap.String("user-updater", data.UID),
+			zap.String("user-updated", data.UID),
+		)
 
 		l.Debug("updating user in redis")
 		if err := h.rdb.UpdatePassword(h.ctx, data.UID, data.Password,
@@ -123,7 +143,10 @@ func (h *Handler) UpdatePasswordHandler() rest.Handler {
 
 // LoginHandler handles login requests
 func (h *Handler) LoginHandler() rest.Handler {
-	l := logger.With(zap.String("subSection", "users"), zap.String("operation", "login"))
+	l := logger.With(
+		zap.String("subSection", "users"),
+		zap.String("operation", "login"),
+	)
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
 		l = l.With(zap.String("host", r.Host))
 		l.Info("received login request")
@@ -152,7 +175,10 @@ func (h *Handler) LoginHandler() rest.Handler {
 
 // RefreshTokenHandler handles token refresh requests
 func (h *Handler) RefreshTokenHandler() rest.Handler {
-	l := logger.With(zap.String("subSection", "token"), zap.String("operation", "refresh"))
+	l := logger.With(
+		zap.String("subSection", "token"),
+		zap.String("operation", "refresh"),
+	)
 	return rest.Handler(func(w http.ResponseWriter, r *http.Request) {
 		l = l.With(zap.String("host", r.Host))
 		l.Info("received refresh token request")

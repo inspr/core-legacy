@@ -27,7 +27,9 @@ func (tmm *treeMemoryManager) Channels() ChannelMemory {
 // Get receives a scope and a channel name. The scope defines
 // the path to an App. If this App has a pointer to a channel that has the
 // same name as the name passed as an argument, the pointer to that channel is returned
-func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) {
+func (chh *ChannelMemoryManager) Get(
+	scope, name string,
+) (*meta.Channel, error) {
 	l := chh.logger.With(
 		zap.String("operation", "get"),
 		zap.String("channel", name),
@@ -60,7 +62,11 @@ func (chh *ChannelMemoryManager) Get(scope, name string) (*meta.Channel, error) 
 
 // Create receives a scope that defines a path to the App
 // in which to add a pointer to the channel passed as an argument
-func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers *apimodels.BrokersDI) error {
+func (chh *ChannelMemoryManager) Create(
+	scope string,
+	ch *meta.Channel,
+	brokers *apimodels.BrokersDI,
+) error {
 	l := chh.logger.With(
 		zap.String("operation", "create"),
 		zap.String("channel", ch.Meta.Name),
@@ -110,9 +116,15 @@ func (chh *ChannelMemoryManager) Create(scope string, ch *meta.Channel, brokers 
 		parentApp.Spec.Types[ch.Spec.Type].ConnectedChannels = connectedChannels
 	}
 
-	l.Debug("channel broker priority list", zap.Any("list", ch.Spec.BrokerPriorityList))
+	l.Debug(
+		"channel broker priority list",
+		zap.Any("list", ch.Spec.BrokerPriorityList),
+	)
 
-	broker, err := SelectBrokerFromPriorityList(ch.Spec.BrokerPriorityList, brokers)
+	broker, err := SelectBrokerFromPriorityList(
+		ch.Spec.BrokerPriorityList,
+		brokers,
+	)
 	if err != nil {
 		return err
 	}
@@ -242,7 +254,9 @@ type ChannelPermTreeGetter struct {
 // memory tree until it finds the Channel which name is equal to the last query element.
 // If the specified Channel is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (cmm *ChannelPermTreeGetter) Get(scope, name string) (*meta.Channel, error) {
+func (cmm *ChannelPermTreeGetter) Get(
+	scope, name string,
+) (*meta.Channel, error) {
 	l := cmm.logs.With(
 		zap.String("operation", "get-root"),
 		zap.String("channel", name),

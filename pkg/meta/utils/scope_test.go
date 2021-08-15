@@ -97,14 +97,26 @@ func TestRemoveLastPartInScope(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, got1, err := RemoveLastPartInScope(tt.args.scope)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("RemoveLastPartInScope() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"RemoveLastPartInScope() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("RemoveLastPartInScope() got = %v, want %v", got, tt.want)
+				t.Errorf(
+					"RemoveLastPartInScope() got = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 			if got1 != tt.want1 {
-				t.Errorf("RemoveLastPartInScope() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf(
+					"RemoveLastPartInScope() got1 = %v, want %v",
+					got1,
+					tt.want1,
+				)
 			}
 		})
 	}
@@ -238,14 +250,26 @@ func TestRemoveAliasInScope(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, got1, err := RemoveAliasInScope(tt.args.scope)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("RemoveAliasInScope() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"RemoveAliasInScope() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if got != tt.newScope {
-				t.Errorf("RemoveAliasInScope() got = %v, want %v", got, tt.newScope)
+				t.Errorf(
+					"RemoveAliasInScope() got = %v, want %v",
+					got,
+					tt.newScope,
+				)
 			}
 			if got1 != tt.alias {
-				t.Errorf("RemoveAliasInScope() got1 = %v, want %v", got1, tt.alias)
+				t.Errorf(
+					"RemoveAliasInScope() got1 = %v, want %v",
+					got1,
+					tt.alias,
+				)
 			}
 		})
 	}

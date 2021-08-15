@@ -73,10 +73,18 @@ func TestTypeClient_Delete(t *testing.T) {
 				}
 
 				if scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 				if di.TypeName != tt.args.name {
-					t.Errorf("name set incorrectly. want = %v, got = %v", di.TypeName, tt.args.name)
+					t.Errorf(
+						"name set incorrectly. want = %v, got = %v",
+						di.TypeName,
+						tt.args.name,
+					)
 				}
 
 				encoder.Encode(diff.Changelog{})
@@ -87,7 +95,11 @@ func TestTypeClient_Delete(t *testing.T) {
 				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Delete(tt.args.ctx, tt.args.context, tt.args.name, false); (err != nil) != tt.wantErr {
-				t.Errorf("TypeClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"TypeClient.Delete() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -158,10 +170,18 @@ func TestTypeClient_Get(t *testing.T) {
 				}
 
 				if scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 				if di.TypeName != tt.args.name {
-					t.Errorf("name set incorrectly. want = %v, got = %v", di.TypeName, tt.args.name)
+					t.Errorf(
+						"name set incorrectly. want = %v, got = %v",
+						di.TypeName,
+						tt.args.name,
+					)
 				}
 
 				encoder.Encode(tt.want)
@@ -174,7 +194,11 @@ func TestTypeClient_Get(t *testing.T) {
 			}
 			got, err := ac.Get(tt.args.ctx, tt.args.context, tt.args.name)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TypeClient.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"TypeClient.Get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("TypeClient.Get() got = %v, want %v", got, tt.want)
@@ -247,11 +271,19 @@ func TestTypeClient_Create(t *testing.T) {
 				}
 
 				if scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 
 				if !reflect.DeepEqual(di.Type, *tt.args.ch) {
-					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.Type, tt.args.ch)
+					t.Errorf(
+						"request is different. want = \n%+v, \ngot = \n%+v",
+						di.Type,
+						tt.args.ch,
+					)
 				}
 				encoder.Encode(diff.Changelog{})
 			}
@@ -261,7 +293,11 @@ func TestTypeClient_Create(t *testing.T) {
 				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
-				t.Errorf("TypeClient.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"TypeClient.Create() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -331,11 +367,19 @@ func TestTypeClient_Update(t *testing.T) {
 				}
 
 				if scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 
 				if !reflect.DeepEqual(di.Type, *tt.args.ch) {
-					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.Type, tt.args.ch)
+					t.Errorf(
+						"request is different. want = \n%+v, \ngot = \n%+v",
+						di.Type,
+						tt.args.ch,
+					)
 				}
 				encoder.Encode(diff.Changelog{})
 			}
@@ -345,7 +389,11 @@ func TestTypeClient_Update(t *testing.T) {
 				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
-				t.Errorf("TypeClient.Update() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"TypeClient.Update() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

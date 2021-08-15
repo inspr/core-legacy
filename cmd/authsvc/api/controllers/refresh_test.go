@@ -100,9 +100,11 @@ func TestServer_Refresh(t *testing.T) {
 			defer ts.Close()
 
 			// Test server for mocking UID server
-			mockUIDHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				rest.JSON(w, tt.status, tt.payload)
-			})
+			mockUIDHandler := http.HandlerFunc(
+				func(w http.ResponseWriter, r *http.Request) {
+					rest.JSON(w, tt.status, tt.payload)
+				},
+			)
 			mockUIDServer := httptest.NewServer(mockUIDHandler)
 			defer mockUIDServer.Close()
 
@@ -116,7 +118,10 @@ func TestServer_Refresh(t *testing.T) {
 			req, _ := http.NewRequest(http.MethodGet, ts.URL+"/refresh", nil)
 			head := http.Header{}
 			if tt.headToken {
-				head.Add("Authorization", fmt.Sprintf("Bearer %v", string(signed)))
+				head.Add(
+					"Authorization",
+					fmt.Sprintf("Bearer %v", string(signed)),
+				)
 			}
 			req.Header = head
 
@@ -124,13 +129,20 @@ func TestServer_Refresh(t *testing.T) {
 
 			res, err := testClient.Do(req)
 			if err != nil {
-				t.Errorf("error making a GET in the httptest server, error: %s", err.Error())
+				t.Errorf(
+					"error making a GET in the httptest server, error: %s",
+					err.Error(),
+				)
 				return
 			}
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want {
-				t.Errorf("AuthHandlers_Tokenize() = %v, want %v", res.StatusCode, tt.want)
+				t.Errorf(
+					"AuthHandlers_Tokenize() = %v, want %v",
+					res.StatusCode,
+					tt.want,
+				)
 				return
 			}
 
@@ -149,7 +161,11 @@ func TestServer_Refresh(t *testing.T) {
 				}
 
 				if !reflect.DeepEqual(*payload, tt.payload) {
-					t.Errorf("AuthHandlers_Tokenize() = %v, want %v", payload, tt.payload)
+					t.Errorf(
+						"AuthHandlers_Tokenize() = %v, want %v",
+						payload,
+						tt.payload,
+					)
 					return
 				}
 			}

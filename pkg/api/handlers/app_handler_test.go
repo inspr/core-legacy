@@ -52,67 +52,120 @@ func appDICases(funcName string) []appAPITest {
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager(nil, nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(nil, nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((errors.New("test_error")), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((errors.New("test_error")), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager(nil, nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(nil, nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: wrongFormatData, scope: Scope},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "not_found_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").NotFound()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").NotFound()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusNotFound},
 		},
 		{
 			name: "already_exists_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").AlreadyExists()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(
+					(ierrors.New("").AlreadyExists()),
+					nil,
+				),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusConflict},
 		},
 		{
 			name: "internal_server_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InternalServer()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(
+					(ierrors.New("").InternalServer()),
+					nil,
+				),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "invalid_name_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InvalidName()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").InvalidName()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_app_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InvalidApp()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").InvalidApp()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InvalidChannel()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(
+					(ierrors.New("").InvalidChannel()),
+					nil,
+				),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_type_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InvalidType()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").InvalidType()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").BadRequest()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").BadRequest()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedAppDI, scope: Scope},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -129,67 +182,120 @@ func appQueryDICases(funcName string) []appAPITest {
 	return []appAPITest{
 		{
 			name: "successful_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager(nil, nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(nil, nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusOK},
 		},
 		{
 			name: "unsuccessful_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((errors.New("test_error")), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((errors.New("test_error")), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "failed_parsing_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager(nil, nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(nil, nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: wrongFormatData, scope: scope},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "not_found_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").NotFound()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").NotFound()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusNotFound},
 		},
 		{
 			name: "already_exists_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").AlreadyExists()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(
+					(ierrors.New("").AlreadyExists()),
+					nil,
+				),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusConflict},
 		},
 		{
 			name: "internal_server_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InternalServer()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(
+					(ierrors.New("").InternalServer()),
+					nil,
+				),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusInternalServerError},
 		},
 		{
 			name: "invalid_name_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InvalidName()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").InvalidName()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_app_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InvalidApp()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").InvalidApp()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InvalidChannel()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager(
+					(ierrors.New("").InvalidChannel()),
+					nil,
+				),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "invalid_channel_type_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").InvalidType()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").InvalidType()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusForbidden},
 		},
 		{
 			name: "bad_request_" + funcName,
-			ah:   NewHandler(fake.GetMockMemoryManager((ierrors.New("").BadRequest()), nil), ofake.NewFakeOperator(), authmock.NewMockAuth(nil)).NewAppHandler(),
+			ah: NewHandler(
+				fake.GetMockMemoryManager((ierrors.New("").BadRequest()), nil),
+				ofake.NewFakeOperator(),
+				authmock.NewMockAuth(nil),
+			).NewAppHandler(),
 			send: sendInRequest{body: parsedQueryAppDI, scope: scope},
 			want: expectedResponse{status: http.StatusBadRequest},
 		},
@@ -220,7 +326,10 @@ func TestNewAppHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := h.NewAppHandler(); !reflect.DeepEqual(got.Handler, tt.want.Handler) {
+			if got := h.NewAppHandler(); !reflect.DeepEqual(
+				got.Handler,
+				tt.want.Handler,
+			) {
 				t.Errorf("NewAppHandler() = %v, want %v", got, tt.want)
 			}
 		})
@@ -236,7 +345,11 @@ func TestAppHandler_HandleCreate(t *testing.T) {
 			defer ts.Close()
 
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
+			res, err := client.Post(
+				ts.URL,
+				"application/json",
+				bytes.NewBuffer(tt.send.body),
+			)
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
@@ -244,7 +357,11 @@ func TestAppHandler_HandleCreate(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AppHandler.HandleCreate() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf(
+					"AppHandler.HandleCreate() = %v, want %v",
+					res.StatusCode,
+					tt.want.status,
+				)
 			}
 		})
 	}
@@ -258,7 +375,9 @@ func TestAppHandler_HandleGet(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Tree().Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}}, &models.BrokersDI{})
+			tt.ah.Memory.Tree().
+				Apps().
+				Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}}, &models.BrokersDI{})
 
 			client := ts.Client()
 			req, _ := http.NewRequest(
@@ -276,7 +395,11 @@ func TestAppHandler_HandleGet(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AppHandler.HandleDelete() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf(
+					"AppHandler.HandleDelete() = %v, want %v",
+					res.StatusCode,
+					tt.want.status,
+				)
 			}
 		})
 	}
@@ -291,10 +414,16 @@ func TestAppHandler_HandleUpdate(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Tree().Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}}, &models.BrokersDI{})
+			tt.ah.Memory.Tree().
+				Apps().
+				Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}}, &models.BrokersDI{})
 
 			client := ts.Client()
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
+			res, err := client.Post(
+				ts.URL,
+				"application/json",
+				bytes.NewBuffer(tt.send.body),
+			)
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
@@ -302,7 +431,11 @@ func TestAppHandler_HandleUpdate(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AppHandler.HandleDelete() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf(
+					"AppHandler.HandleDelete() = %v, want %v",
+					res.StatusCode,
+					tt.want.status,
+				)
 			}
 		})
 	}
@@ -316,7 +449,9 @@ func TestAppHandler_HandleDelete(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Tree().Apps().Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}}, &models.BrokersDI{})
+			tt.ah.Memory.Tree().
+				Apps().
+				Create("", &meta.App{Meta: meta.Metadata{Name: "mock_app"}}, &models.BrokersDI{})
 
 			client := ts.Client()
 			req, _ := http.NewRequest(
@@ -334,7 +469,11 @@ func TestAppHandler_HandleDelete(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.status {
-				t.Errorf("AppHandler.HandleDelete() = %v, want %v", res.StatusCode, tt.want.status)
+				t.Errorf(
+					"AppHandler.HandleDelete() = %v, want %v",
+					res.StatusCode,
+					tt.want.status,
+				)
 			}
 		})
 	}

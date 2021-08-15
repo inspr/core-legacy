@@ -41,7 +41,10 @@ func (c *Client) initAdminUser() error {
 
 	password := os.Getenv("ADMIN_PASSWORD")
 	logger.Debug("received password, generating encryption")
-	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPwd, err := bcrypt.GenerateFromPassword(
+		[]byte(password),
+		bcrypt.DefaultCost,
+	)
 	if err != nil {
 		return ierrors.New(err).InternalServer()
 	}
@@ -61,7 +64,11 @@ func (c *Client) initAdminUser() error {
 	logger.Info("requesting new token from insprd")
 	token, err := c.requestNewToken(context.Background(), *payload)
 	if err != nil {
-		logger.Error("error requesting new token", zap.Error(err), zap.String("insprd-address", c.insprdAddress))
+		logger.Error(
+			"error requesting new token",
+			zap.Error(err),
+			zap.String("insprd-address", c.insprdAddress),
+		)
 		return err
 	}
 	os.Setenv("ADMIN_TOKEN", token)
@@ -78,7 +85,11 @@ func NewRedisClient() *Client {
 	redisPort := getEnv("REDIS_PORT")
 	redisAddress := fmt.Sprintf("%s:%s", redisHost, redisPort)
 	refreshPath := fmt.Sprintf("%s/refreshtoken", refreshURL)
-	logger = logger.With(zap.String("redis-address", redisAddress), zap.String("refresh-path", refreshPath), zap.String("insprd-address", insprdAddress))
+	logger = logger.With(
+		zap.String("redis-address", redisAddress),
+		zap.String("refresh-path", refreshPath),
+		zap.String("insprd-address", insprdAddress),
+	)
 	userLogger = logger.With(zap.String("subSection", "user"))
 	c := &Client{
 		rdb: redis.NewClusterClient(&redis.ClusterOptions{
@@ -100,8 +111,16 @@ func NewRedisClient() *Client {
 var userLogger *zap.Logger
 
 // CreateUser inserts a new user into Redis
-func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) error {
-	l := userLogger.With(zap.String("operation", "create"), zap.String("user-creator", uid), zap.String("user-created", newUser.UID))
+func (c *Client) CreateUser(
+	ctx context.Context,
+	uid, pwd string,
+	newUser User,
+) error {
+	l := userLogger.With(
+		zap.String("operation", "create"),
+		zap.String("user-creator", uid),
+		zap.String("user-created", newUser.UID),
+	)
 	l.Debug("checking user permissions")
 	err := hasPermission(ctx, c.rdb, uid, pwd, newUser, true)
 
@@ -110,7 +129,10 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 		return ierrors.New(err).Forbidden()
 	}
 
-	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	hashedPwd, err := bcrypt.GenerateFromPassword(
+		[]byte(newUser.Password),
+		bcrypt.DefaultCost,
+	)
 	if err != nil {
 		l.Error("unable to hash password", zap.Error(err))
 		return ierrors.New(err).InternalServer()
@@ -126,8 +148,15 @@ func (c *Client) CreateUser(ctx context.Context, uid, pwd string, newUser User) 
 }
 
 // DeleteUser deletes an user from Redis, if it exists
-func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string) error {
-	l := userLogger.With(zap.String("operation", "delete"), zap.String("user-deletor", uid), zap.String("user-deleted", usrToBeDeleted))
+func (c *Client) DeleteUser(
+	ctx context.Context,
+	uid, pwd, usrToBeDeleted string,
+) error {
+	l := userLogger.With(
+		zap.String("operation", "delete"),
+		zap.String("user-deletor", uid),
+		zap.String("user-deleted", usrToBeDeleted),
+	)
 	l.Debug("getting user from redis")
 	user, err := get(ctx, c.rdb, usrToBeDeleted)
 	if err != nil {
@@ -151,8 +180,15 @@ func (c *Client) DeleteUser(ctx context.Context, uid, pwd, usrToBeDeleted string
 }
 
 // UpdatePassword changes an users password, if that user exists
-func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, newPwd string) error {
-	l := userLogger.With(zap.String("operation", "update"), zap.String("user-updator", uid), zap.String("user-updated", usrToBeUpdated))
+func (c *Client) UpdatePassword(
+	ctx context.Context,
+	uid, pwd, usrToBeUpdated, newPwd string,
+) error {
+	l := userLogger.With(
+		zap.String("operation", "update"),
+		zap.String("user-updator", uid),
+		zap.String("user-updated", usrToBeUpdated),
+	)
 
 	l.Debug("getting user from redis")
 	user, err := get(ctx, c.rdb, usrToBeUpdated)
@@ -169,7 +205,10 @@ func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, n
 	}
 
 	l.Debug("updating password")
-	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(newPwd), bcrypt.DefaultCost)
+	hashedPwd, err := bcrypt.GenerateFromPassword(
+		[]byte(newPwd),
+		bcrypt.DefaultCost,
+	)
 	if err != nil {
 		l.Error("unable to encript password")
 		return ierrors.New(err).InternalServer()
@@ -189,7 +228,10 @@ func (c *Client) UpdatePassword(ctx context.Context, uid, pwd, usrToBeUpdated, n
 // If so, it sends a request to Insprd so it can generate a new token for the
 // given user, and returns the toker if it's creation was successful
 func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
-	l := userLogger.With(zap.String("operation", "login"), zap.String("user", uid))
+	l := userLogger.With(
+		zap.String("operation", "login"),
+		zap.String("user", uid),
+	)
 	l.Debug("getting user key from redis")
 	user, err := get(ctx, c.rdb, uid)
 	if err != nil {
@@ -223,8 +265,14 @@ func (c *Client) Login(ctx context.Context, uid, pwd string) (string, error) {
 // RefreshToken receives a refreshToken and checks if it's valid.
 // If so, it returns a payload containing the updated user info
 // (user which is associated with the given refreshToken)
-func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.Payload, error) {
-	l := logger.With(zap.String("subSection", "token"), zap.String("operation", "refresh"))
+func (c *Client) RefreshToken(
+	ctx context.Context,
+	refreshToken []byte,
+) (*auth.Payload, error) {
+	l := logger.With(
+		zap.String("subSection", "token"),
+		zap.String("operation", "refresh"),
+	)
 	l.Debug("decripting refresh token")
 	oldUser, err := c.decrypt(refreshToken)
 	if err != nil {
@@ -252,7 +300,10 @@ func (c *Client) RefreshToken(ctx context.Context, refreshToken []byte) (*auth.P
 }
 
 func (c *Client) encrypt(user User) (*auth.Payload, error) {
-	l := logger.With(zap.String("subSection", "token"), zap.String("operation", "encript"))
+	l := logger.With(
+		zap.String("subSection", "token"),
+		zap.String("operation", "encript"),
+	)
 	stringToEncrypt := fmt.Sprintf("%s:%s", user.UID, user.Password)
 
 	//Since the key is in string, we need to convert decode it to bytes
@@ -299,7 +350,10 @@ func (c *Client) encrypt(user User) (*auth.Payload, error) {
 }
 
 func (c *Client) decrypt(encryptedString []byte) (*User, error) {
-	l := logger.With(zap.String("subSection", "token"), zap.String("operation", "encript"))
+	l := logger.With(
+		zap.String("subSection", "token"),
+		zap.String("operation", "encript"),
+	)
 	l.Debug("decoding refresh key")
 	key, err := hex.DecodeString(c.refreshKey)
 	if err != nil {
@@ -311,7 +365,11 @@ func (c *Client) decrypt(encryptedString []byte) (*User, error) {
 	l.Debug("creating cipher block from key")
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		l.Error("unable to create aes cipher from key", zap.Binary("key", key), zap.Error(err))
+		l.Error(
+			"unable to create aes cipher from key",
+			zap.Binary("key", key),
+			zap.Error(err),
+		)
 		return nil, err
 	}
 
@@ -342,7 +400,10 @@ func (c *Client) decrypt(encryptedString []byte) (*User, error) {
 	plaintext := string(bytetext)
 	usrData := strings.Split(plaintext, ":")
 	if len(usrData) != 2 {
-		l.Error("invalid refresh token", zap.String("error", "not enough fields on refresh token"))
+		l.Error(
+			"invalid refresh token",
+			zap.String("error", "not enough fields on refresh token"),
+		)
 		return nil, fmt.Errorf("invalid refresh token")
 	}
 
@@ -359,7 +420,10 @@ func (authorizer) SetToken(token []byte) error {
 	return nil
 }
 
-func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (string, error) {
+func (c *Client) requestNewToken(
+	ctx context.Context,
+	payload auth.Payload,
+) (string, error) {
 
 	config := client.ControllerConfig{
 		Auth: authorizer{},
@@ -370,7 +434,11 @@ func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (str
 
 	token, err := ncc.Authorization().GenerateToken(ctx, payload)
 	if err != nil {
-		logger.Error("error generating new token", zap.String("insprd-address", c.insprdAddress), zap.Error(err))
+		logger.Error(
+			"error generating new token",
+			zap.String("insprd-address", c.insprdAddress),
+			zap.Error(err),
+		)
 		return "", err
 	}
 
@@ -380,7 +448,11 @@ func (c *Client) requestNewToken(ctx context.Context, payload auth.Payload) (str
 // Auxiliar methods
 
 func set(ctx context.Context, rdb *redis.ClusterClient, data User) error {
-	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "set"), zap.String("key", data.UID))
+	l := logger.With(
+		zap.String("subSection", "redis"),
+		zap.String("operation", "set"),
+		zap.String("key", data.UID),
+	)
 	strData, err := json.Marshal(data)
 	if err != nil {
 		l.Error("error marshalling data", zap.Error(err))
@@ -396,8 +468,16 @@ func set(ctx context.Context, rdb *redis.ClusterClient, data User) error {
 	return nil
 }
 
-func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, error) {
-	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "get"), zap.String("key", key))
+func get(
+	ctx context.Context,
+	rdb *redis.ClusterClient,
+	key string,
+) (*User, error) {
+	l := logger.With(
+		zap.String("subSection", "redis"),
+		zap.String("operation", "get"),
+		zap.String("key", key),
+	)
 	var parsedValue User
 	l.Debug("retrieving key from redis")
 	value, err := rdb.Get(ctx, key).Result()
@@ -419,7 +499,11 @@ func get(ctx context.Context, rdb *redis.ClusterClient, key string) (*User, erro
 }
 
 func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
-	l := logger.With(zap.String("subSection", "redis"), zap.String("operation", "delete"), zap.String("key", key))
+	l := logger.With(
+		zap.String("subSection", "redis"),
+		zap.String("operation", "delete"),
+		zap.String("key", key),
+	)
 	numDeleted, err := rdb.Del(ctx, key).Result()
 	if err != nil {
 		l.Error("error deleting redis key", zap.Error(err))
@@ -431,8 +515,18 @@ func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
 	return nil
 }
 
-func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string, newUser User, isCreation bool) error {
-	l := logger.With(zap.String("subSection", "permission"), zap.String("operation", "check"), zap.String("user", uid))
+func hasPermission(
+	ctx context.Context,
+	rdb *redis.ClusterClient,
+	uid, pwd string,
+	newUser User,
+	isCreation bool,
+) error {
+	l := logger.With(
+		zap.String("subSection", "permission"),
+		zap.String("operation", "check"),
+		zap.String("user", uid),
+	)
 	requestor, err := get(ctx, rdb, uid)
 	if err != nil {
 		l.Error("error getting user", zap.Error(err))
@@ -447,7 +541,13 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	for newUserPermissionScope, newUserPermissions := range newUser.Permissions {
 		isAllowed := false
 		for requestorPermissionScope, requestorPermissions := range requestor.Permissions {
-			if isPermissionAllowed(newUserPermissionScope, requestorPermissionScope, newUserPermissions, requestorPermissions, isCreation) {
+			if isPermissionAllowed(
+				newUserPermissionScope,
+				requestorPermissionScope,
+				newUserPermissions,
+				requestorPermissions,
+				isCreation,
+			) {
 				isAllowed = true
 				break
 			}
@@ -465,13 +565,21 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	return nil
 }
 
-func isPermissionAllowed(newUserPermissionScope, requestorPermissionScope string, newUserPermissions, requestorPermissions []string, isCreation bool) bool {
-	if !metautils.IsInnerScope(requestorPermissionScope, newUserPermissionScope) {
+func isPermissionAllowed(
+	newUserPermissionScope, requestorPermissionScope string,
+	newUserPermissions, requestorPermissions []string,
+	isCreation bool,
+) bool {
+	if !metautils.IsInnerScope(
+		requestorPermissionScope,
+		newUserPermissionScope,
+	) {
 		return false
 	}
 
 	for _, permission := range newUserPermissions {
-		if (isCreation && !utils.Includes(requestorPermissions, permission)) || !utils.Includes(requestorPermissions, auth.CreateToken) {
+		if (isCreation && !utils.Includes(requestorPermissions, permission)) ||
+			!utils.Includes(requestorPermissions, auth.CreateToken) {
 			return false
 		}
 	}

@@ -60,7 +60,9 @@ func (s *Server) readMessageRoutine(ctx context.Context) error {
 
 	for _, channel := range environment.InputBrokerChannels(s.broker) {
 		// separates several threads for each channel of this broker
-		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(channel)
+		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(
+			channel,
+		)
 	}
 
 	select {
@@ -72,7 +74,10 @@ func (s *Server) readMessageRoutine(ctx context.Context) error {
 
 }
 
-func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) error {
+func (s *Server) channelReadMessageRoutine(
+	ctx context.Context,
+	channel string,
+) error {
 	for {
 		select {
 		case <-ctx.Done():
@@ -99,7 +104,10 @@ func (s *Server) channelReadMessageRoutine(ctx context.Context, channel string) 
 	}
 }
 
-func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerMsg []byte, err error) {
+func (s *Server) readWithRetry(
+	ctx context.Context,
+	channel string,
+) (brokerMsg []byte, err error) {
 	for i := 0; ; i++ {
 		brokerMsg, err = s.Reader.ReadMessage(ctx, channel)
 		if err != nil {
@@ -112,7 +120,11 @@ func (s *Server) readWithRetry(ctx context.Context, channel string) (brokerMsg [
 	}
 }
 
-func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte) (status int, err error) {
+func (s *Server) writeWithRetry(
+	ctx context.Context,
+	channel string,
+	data []byte,
+) (status int, err error) {
 	var resp *http.Response
 	for i := 0; i <= maxBrokerRetries; i++ {
 		writeAddr := fmt.Sprintf("%s/%s", s.outAddr, channel)
@@ -120,7 +132,11 @@ func (s *Server) writeWithRetry(ctx context.Context, channel string, data []byte
 			zap.Any("addr", writeAddr),
 			zap.Any("write conter", i))
 
-		resp, err = s.client.Post(writeAddr, "application/octet-stream", bytes.NewBuffer(data))
+		resp, err = s.client.Post(
+			writeAddr,
+			"application/octet-stream",
+			bytes.NewBuffer(data),
+		)
 		status = resp.StatusCode
 		if err == nil && status == http.StatusOK {
 			return

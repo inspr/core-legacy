@@ -383,8 +383,13 @@ func Test_deleteApps(t *testing.T) {
 			expectedOutput: bufResp.String(),
 		},
 		{
-			name:           "Invalid scope flag, should not print",
-			flagsAndArgs:   []string{"a", "appParent", "--scope", "invalid..scope"},
+			name: "Invalid scope flag, should not print",
+			flagsAndArgs: []string{
+				"a",
+				"appParent",
+				"--scope",
+				"invalid..scope",
+			},
 			handlerFunc:    handler,
 			expectedOutput: "",
 		},
@@ -395,8 +400,13 @@ func Test_deleteApps(t *testing.T) {
 			expectedOutput: bufResp.String(),
 		},
 		{
-			name:           "Invalid arg",
-			flagsAndArgs:   []string{"a", "invalid..args", "--scope", "appParent"},
+			name: "Invalid arg",
+			flagsAndArgs: []string{
+				"a",
+				"invalid..args",
+				"--scope",
+				"appParent",
+			},
 			handlerFunc:    handler,
 			expectedOutput: "invalid args\n",
 		},
@@ -464,8 +474,13 @@ func Test_deleteChannels(t *testing.T) {
 			expectedOutput: bufResp.String(),
 		},
 		{
-			name:           "Invalid scope flag, should not print",
-			flagsAndArgs:   []string{"ch", "appParent.ch1", "--scope", "invalid..scope"},
+			name: "Invalid scope flag, should not print",
+			flagsAndArgs: []string{
+				"ch",
+				"appParent.ch1",
+				"--scope",
+				"invalid..scope",
+			},
 			handlerFunc:    handler,
 			expectedOutput: "",
 		},
@@ -476,8 +491,13 @@ func Test_deleteChannels(t *testing.T) {
 			expectedOutput: bufResp.String(),
 		},
 		{
-			name:           "Invalid arg",
-			flagsAndArgs:   []string{"ch", "invalid..args", "--scope", "appParent.ch1"},
+			name: "Invalid arg",
+			flagsAndArgs: []string{
+				"ch",
+				"invalid..args",
+				"--scope",
+				"appParent.ch1",
+			},
 			handlerFunc:    handler,
 			expectedOutput: "",
 		},
@@ -499,7 +519,11 @@ func Test_deleteChannels(t *testing.T) {
 			got := buf.String()
 
 			if !reflect.DeepEqual(got, tt.expectedOutput) {
-				t.Errorf("deleteChannels() = %v, want %v", got, tt.expectedOutput)
+				t.Errorf(
+					"deleteChannels() = %v, want %v",
+					got,
+					tt.expectedOutput,
+				)
 			}
 		})
 	}
@@ -545,8 +569,13 @@ func Test_deletetypes(t *testing.T) {
 			expectedOutput: bufResp.String(),
 		},
 		{
-			name:           "Invalid scope flag, should not print",
-			flagsAndArgs:   []string{"t", "appParent.ct1", "--scope", "invalid..scope"},
+			name: "Invalid scope flag, should not print",
+			flagsAndArgs: []string{
+				"t",
+				"appParent.ct1",
+				"--scope",
+				"invalid..scope",
+			},
 			handlerFunc:    handler,
 			expectedOutput: "",
 		},
@@ -557,8 +586,13 @@ func Test_deletetypes(t *testing.T) {
 			expectedOutput: bufResp.String(),
 		},
 		{
-			name:           "Invalid arg",
-			flagsAndArgs:   []string{"t", "invalid..args", "--scope", "appParent.t1"},
+			name: "Invalid arg",
+			flagsAndArgs: []string{
+				"t",
+				"invalid..args",
+				"--scope",
+				"appParent.t1",
+			},
 			handlerFunc:    handler,
 			expectedOutput: "",
 		},
@@ -629,20 +663,35 @@ func Test_deleteAlias(t *testing.T) {
 			expectedOutput: bufResp.String(),
 		},
 		{
-			name:           "Invalid scope flag, should not print",
-			flagsAndArgs:   []string{"al", "appParent.alias.name", "--scope", "invalid..scope"},
+			name: "Invalid scope flag, should not print",
+			flagsAndArgs: []string{
+				"al",
+				"appParent.alias.name",
+				"--scope",
+				"invalid..scope",
+			},
 			handlerFunc:    handler,
 			expectedOutput: "",
 		},
 		{
-			name:           "Valid scope flag",
-			flagsAndArgs:   []string{"al", "alias.name", "--scope", "appParent"},
+			name: "Valid scope flag",
+			flagsAndArgs: []string{
+				"al",
+				"alias.name",
+				"--scope",
+				"appParent",
+			},
 			handlerFunc:    handler,
 			expectedOutput: bufResp.String(),
 		},
 		{
-			name:           "Invalid arg",
-			flagsAndArgs:   []string{"al", "invalid..args", "--scope", "appParent.ct1"},
+			name: "Invalid arg",
+			flagsAndArgs: []string{
+				"al",
+				"invalid..args",
+				"--scope",
+				"appParent.ct1",
+			},
 			handlerFunc:    handler,
 			expectedOutput: "",
 		},

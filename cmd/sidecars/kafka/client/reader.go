@@ -29,10 +29,14 @@ func NewReader() (*Reader, error) {
 	logger.Info("creating new kafka reader")
 	var reader Reader
 	reader.kafkaEnv = GetKafkaEnvironment()
-	channelsList := globalEnv.GetChannelBoundaryList(globalEnv.GetInputChannelsData())
+	channelsList := globalEnv.GetChannelBoundaryList(
+		globalEnv.GetInputChannelsData(),
+	)
 
 	logger.Debug("getting resolved channels list")
-	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(globalEnv.GetInputChannelsData())
+	resolvedChList := globalEnv.GetResolvedBoundaryChannelList(
+		globalEnv.GetInputChannelsData(),
+	)
 	if len(resolvedChList) == 0 {
 		logger.Error("invalid resolved channel list")
 		return nil, ierrors.New(
@@ -64,8 +68,15 @@ func (reader *Reader) Consumers() map[string]Consumer {
 
 // ReadMessage reads message by message. Returns channel the message belongs to,
 // the message and an error if any occurred.
-func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, error) {
-	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannelsData(), nil)
+func (reader *Reader) ReadMessage(
+	ctx context.Context,
+	channel string,
+) ([]byte, error) {
+	resolved, _ := globalEnv.GetResolvedChannel(
+		channel,
+		globalEnv.GetInputChannelsData(),
+		nil,
+	)
 
 	logger.Info("trying to read message from topic",
 		zap.String("channel", channel),

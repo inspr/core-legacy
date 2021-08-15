@@ -78,7 +78,11 @@ func TestBrokersClient_Get(t *testing.T) {
 			}
 			got, err := cc.Get(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("BrokersClient.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"BrokersClient.Get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -154,7 +158,11 @@ func TestBrokersClient_Create(t *testing.T) {
 			}
 
 			if (tt.want != nil) && got != tt.want.Error() {
-				t.Errorf("BrokersClient.Create() error = %v, want %v", err, tt.want)
+				t.Errorf(
+					"BrokersClient.Create() error = %v, want %v",
+					err,
+					tt.want,
+				)
 			}
 		})
 	}

@@ -42,7 +42,13 @@ func NewApplyAlias() RunMethod {
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentScope, alias.Meta.Name, &alias, flagDryRun)
+			log, err = c.Update(
+				context.Background(),
+				parentScope,
+				alias.Meta.Name,
+				&alias,
+				flagDryRun,
+			)
 		} else {
 			log, err = c.Create(context.Background(), parentScope, alias.Meta.Name, &alias, flagDryRun)
 		}

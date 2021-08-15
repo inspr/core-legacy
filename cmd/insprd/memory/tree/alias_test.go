@@ -36,7 +36,10 @@ func TestMemoryManager_Alias(t *testing.T) {
 				root: tt.fields.root,
 			}
 
-			if got := tmm.Alias(); !reflect.DeepEqual(got.(*AliasMemoryManager).root, tt.want.(*AliasMemoryManager).root) {
+			if got := tmm.Alias(); !reflect.DeepEqual(
+				got.(*AliasMemoryManager).root,
+				tt.want.(*AliasMemoryManager).root,
+			) {
 				t.Errorf("MemoryManager.Alias() = %v, want %v", got, tt.want)
 			}
 		})
@@ -133,7 +136,11 @@ func TestAliasMemoryManager_Create(t *testing.T) {
 			}
 			amm := mem.Alias()
 			if err := amm.Create(tt.args.query, tt.args.targetBoundary, tt.args.alias); (err != nil) != tt.wantErr {
-				t.Errorf("AliasMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AliasMemoryManager.Create() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -202,7 +209,11 @@ func TestAliasMemoryManager_Get(t *testing.T) {
 
 			got, err := amm.Get(tt.args.context, tt.args.aliasKey)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AliasMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AliasMemoryManager.Get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -289,7 +300,11 @@ func TestAliasMemoryManager_Update(t *testing.T) {
 			amm := mem.Alias()
 
 			if err := amm.Update(tt.args.context, tt.args.aliasKey, tt.args.alias); (err != nil) != tt.wantErr {
-				t.Errorf("AliasMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AliasMemoryManager.Update() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -364,7 +379,11 @@ func TestAliasMemoryManager_Delete(t *testing.T) {
 
 			amm := mem.Alias()
 			if err := amm.Delete(tt.args.context, tt.args.aliasKey); (err != nil) != tt.wantErr {
-				t.Errorf("AliasMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AliasMemoryManager.Delete() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -408,7 +427,11 @@ func Test_validTargetChannel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := validTargetChannel(tt.args.parentApp, tt.args.targetChannel); (err != nil) != tt.wantErr {
-				t.Errorf("validTargetChannel() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"validTargetChannel() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -469,11 +492,18 @@ func getMockAlias() *meta.App {
 									Parent:      "app1",
 									UUID:        "",
 								},
-								ConnectedChannels: []string{"ch2app1Update", "ch1app1"},
+								ConnectedChannels: []string{
+									"ch2app1Update",
+									"ch1app1",
+								},
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"channel1", "aliaschannel", "aliaschannel2"},
+							Input: []string{
+								"channel1",
+								"aliaschannel",
+								"aliaschannel2",
+							},
 							Output: []string{},
 						},
 					},

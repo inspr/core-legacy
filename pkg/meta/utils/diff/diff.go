@@ -191,7 +191,13 @@ func (change *Change) diffAliases(from, to metautils.MAliases) {
 }
 
 func (change *Change) diffNodes(from, to meta.Node) error {
-	err := change.diffMetadata(from.Meta.Name, NodeKind, from.Meta, to.Meta, "Spec.Node.")
+	err := change.diffMetadata(
+		from.Meta.Name,
+		NodeKind,
+		from.Meta,
+		to.Meta,
+		"Spec.Node.",
+	)
 	if err != nil {
 		return err
 	}
@@ -224,12 +230,18 @@ func (change *Change) diffNodes(from, to meta.Node) error {
 	return nil
 }
 
-func (change *Change) diffEnv(from utils.EnvironmentMap, to utils.EnvironmentMap) {
+func (change *Change) diffEnv(
+	from utils.EnvironmentMap,
+	to utils.EnvironmentMap,
+) {
 	for key, fromValue := range from {
 		if toValue, ok := to[key]; ok {
 			if toValue != fromValue {
 				change.Diff = append(change.Diff, Difference{
-					Field:     fmt.Sprintf("Spec.Node.Spec.Environment[%s]", key),
+					Field: fmt.Sprintf(
+						"Spec.Node.Spec.Environment[%s]",
+						key,
+					),
 					From:      fromValue,
 					To:        toValue,
 					Kind:      EnvironmentKind,
@@ -432,7 +444,13 @@ func (change *Change) diffChannels(from, to metautils.MChannels) error {
 			change.Operation |= Update
 		}
 
-		err := change.diffMetadata(ch, ChannelKind, fromCh.Meta, toCh.Meta, "Spec.Channels["+ch+"].")
+		err := change.diffMetadata(
+			ch,
+			ChannelKind,
+			fromCh.Meta,
+			toCh.Meta,
+			"Spec.Channels["+ch+"].",
+		)
 		if err != nil {
 			return err
 		}
@@ -493,7 +511,13 @@ func (change *Change) diffTypes(from, to metautils.MTypes) error {
 			change.Operation |= Update
 		}
 
-		err := change.diffMetadata(ct, TypeKind, fromCT.Meta, toCT.Meta, fmt.Sprintf("Spec.Types[%s].", ct))
+		err := change.diffMetadata(
+			ct,
+			TypeKind,
+			fromCT.Meta,
+			toCT.Meta,
+			fmt.Sprintf("Spec.Types[%s].", ct),
+		)
 		if err != nil {
 			return err
 		}
@@ -503,7 +527,12 @@ func (change *Change) diffTypes(from, to metautils.MTypes) error {
 	return nil
 }
 
-func (change *Change) diffMetadata(parentElement string, parentKind Kind, from, to meta.Metadata, ctx string) error {
+func (change *Change) diffMetadata(
+	parentElement string,
+	parentKind Kind,
+	from, to meta.Metadata,
+	ctx string,
+) error {
 
 	if from.Name != to.Name {
 		change.Diff = append(change.Diff, Difference{

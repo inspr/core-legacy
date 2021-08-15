@@ -24,7 +24,9 @@ func CompareWithUUID(first, second interface{}) bool {
 	return cmp.Equal(first, second)
 }
 
-var regexUUID = regexp.MustCompile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+var regexUUID = regexp.MustCompile(
+	"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+)
 
 // ValidateUUID validates the formatting of a string to check whether the string contains a proper UUID
 func ValidateUUID(uuid string) bool {
@@ -34,7 +36,12 @@ func ValidateUUID(uuid string) bool {
 // RecursiveValidateUUIDS validates UUIDs on a structure recursively
 func RecursiveValidateUUIDS(name string, app *meta.App, t *testing.T) {
 	if !ValidateUUID(app.Meta.UUID) {
-		t.Errorf("%s invalid UUID on %s, uuid=%v", name, app.Meta.Name, app.Meta.UUID)
+		t.Errorf(
+			"%s invalid UUID on %s, uuid=%v",
+			name,
+			app.Meta.Name,
+			app.Meta.UUID,
+		)
 	}
 	for _, a := range app.Spec.Apps {
 
@@ -42,7 +49,12 @@ func RecursiveValidateUUIDS(name string, app *meta.App, t *testing.T) {
 	}
 	for _, c := range app.Spec.Channels {
 		if !ValidateUUID(c.Meta.UUID) {
-			t.Errorf("%s invalid channel UUID on %s, uuid = %v", name, c.Meta.Name, c.Meta.UUID)
+			t.Errorf(
+				"%s invalid channel UUID on %s, uuid = %v",
+				name,
+				c.Meta.Name,
+				c.Meta.UUID,
+			)
 		}
 	}
 
@@ -59,7 +71,12 @@ func RecursiveValidateUUIDS(name string, app *meta.App, t *testing.T) {
 
 	for _, a := range app.Spec.Aliases {
 		if !ValidateUUID(a.Meta.UUID) {
-			t.Errorf("%s invalid alias UUID on %s, uuid = %v", name, a.Meta.Name, a.Meta.UUID)
+			t.Errorf(
+				"%s invalid alias UUID on %s, uuid = %v",
+				name,
+				a.Meta.Name,
+				a.Meta.UUID,
+			)
 		}
 	}
 

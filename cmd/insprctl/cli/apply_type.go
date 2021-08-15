@@ -58,7 +58,12 @@ func NewApplyType() RunMethod {
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentScope, &insprType, flagDryRun)
+			log, err = c.Update(
+				context.Background(),
+				parentScope,
+				&insprType,
+				flagDryRun,
+			)
 		} else {
 			log, err = c.Create(context.Background(), parentScope, &insprType, flagDryRun)
 		}

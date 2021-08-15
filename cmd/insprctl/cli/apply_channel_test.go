@@ -13,7 +13,9 @@ import (
 func TestNewApplyChannel(t *testing.T) {
 	prepareToken(t)
 	chanWithoutNameBytes, _ := yaml.Marshal(meta.Channel{})
-	chanDefaultBytes, _ := yaml.Marshal(meta.Channel{Meta: meta.Metadata{Name: "mock"}})
+	chanDefaultBytes, _ := yaml.Marshal(
+		meta.Channel{Meta: meta.Metadata{Name: "mock"}},
+	)
 	type args struct {
 		b []byte
 	}
@@ -53,7 +55,11 @@ func TestNewApplyChannel(t *testing.T) {
 
 			if r != nil && tt.want != nil {
 				if r.Error() != tt.want.Error() {
-					t.Errorf("NewApplyChannel() = %v, want %v", r.Error(), tt.want.Error())
+					t.Errorf(
+						"NewApplyChannel() = %v, want %v",
+						r.Error(),
+						tt.want.Error(),
+					)
 				}
 			} else {
 				if r != tt.want {

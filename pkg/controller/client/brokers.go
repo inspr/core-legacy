@@ -32,7 +32,11 @@ func (bc *BrokersClient) Get(ctx context.Context) (*models.BrokersDI, error) {
 }
 
 // Create creates a broker into the cluster via insprd
-func (bc *BrokersClient) Create(ctx context.Context, brokerName string, config []byte) error {
+func (bc *BrokersClient) Create(
+	ctx context.Context,
+	brokerName string,
+	config []byte,
+) error {
 	dataBody := models.BrokerConfigDI{
 		BrokerName:   brokerName,
 		FileContents: config,

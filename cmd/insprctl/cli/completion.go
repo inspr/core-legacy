@@ -115,23 +115,41 @@ func aliasesFromApp(app *meta.App) utils.StringArray {
 	return scopes
 }
 
-func completeDapps(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func completeDapps(
+	cm *cobra.Command,
+	args []string,
+	toComplete string,
+) ([]string, cobra.ShellCompDirective) {
 	return generateCompletion(appsFromApp)(cm, args, toComplete)
 }
 
-func completeChannels(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func completeChannels(
+	cm *cobra.Command,
+	args []string,
+	toComplete string,
+) ([]string, cobra.ShellCompDirective) {
 	return generateCompletion(channelsFromApp)(cm, args, toComplete)
 }
 
-func completeTypes(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func completeTypes(
+	cm *cobra.Command,
+	args []string,
+	toComplete string,
+) ([]string, cobra.ShellCompDirective) {
 	return generateCompletion(typesFromApp)(cm, args, toComplete)
 }
 
-func completeAliases(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func completeAliases(
+	cm *cobra.Command,
+	args []string,
+	toComplete string,
+) ([]string, cobra.ShellCompDirective) {
 	return generateCompletion(aliasesFromApp)(cm, args, toComplete)
 }
 
-func generateCompletion(tg func(*meta.App) utils.StringArray) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+func generateCompletion(
+	tg func(*meta.App) utils.StringArray,
+) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
 	return func(cm *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		newScope, app, err := getCurrentValidApp(toComplete)
 		if err != nil {

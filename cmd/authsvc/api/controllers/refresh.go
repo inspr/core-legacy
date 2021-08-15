@@ -59,7 +59,10 @@ func (server *Server) Refresh() rest.Handler {
 
 		server.logger.Debug("received payload", zap.Any("content", load))
 
-		server.logger.Info("refreshing old payload", zap.String("refresh-servide", load.RefreshURL))
+		server.logger.Info(
+			"refreshing old payload",
+			zap.String("refresh-servide", load.RefreshURL),
+		)
 		payload, err := refreshPayload(load.Refresh, load.RefreshURL)
 		if err != nil {
 			err := ierrors.Wrap(
@@ -88,7 +91,10 @@ func (server *Server) Refresh() rest.Handler {
 	}
 }
 
-func refreshPayload(refreshToken []byte, refreshURL string) (*auth.Payload, error) {
+func refreshPayload(
+	refreshToken []byte,
+	refreshURL string,
+) (*auth.Payload, error) {
 	reqBody := auth.ResfreshDO{
 		RefreshToken: refreshToken,
 	}
@@ -98,7 +104,11 @@ func refreshPayload(refreshToken []byte, refreshURL string) (*auth.Payload, erro
 		return nil, err
 	}
 
-	resp, err := http.Post(refreshURL, "application/json", bytes.NewBuffer(reqBytes))
+	resp, err := http.Post(
+		refreshURL,
+		"application/json",
+		bytes.NewBuffer(reqBytes),
+	)
 	if err != nil || resp.StatusCode != http.StatusOK {
 		err = ierrors.New(err).InternalServer()
 		return nil, err

@@ -61,8 +61,12 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 		nodeSpec.Add(fmt.Sprintf("Replicas: %d", app.Spec.Node.Spec.Replicas))
 
 		sidecarPort := nodeSpec.Add("SidecarPort")
-		sidecarPort.Add(fmt.Sprintf("LBRead: %d", app.Spec.Node.Spec.SidecarPort.LBRead))
-		sidecarPort.Add(fmt.Sprintf("LBWrite: %d", app.Spec.Node.Spec.SidecarPort.LBWrite))
+		sidecarPort.Add(
+			fmt.Sprintf("LBRead: %d", app.Spec.Node.Spec.SidecarPort.LBRead),
+		)
+		sidecarPort.Add(
+			fmt.Sprintf("LBWrite: %d", app.Spec.Node.Spec.SidecarPort.LBWrite),
+		)
 
 		if len(app.Spec.Node.Spec.Ports) > 0 {
 			ports := spec.Add("Ports")

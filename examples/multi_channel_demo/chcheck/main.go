@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"context"
+
 	dappclient "inspr.dev/inspr/pkg/client"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
@@ -21,22 +22,25 @@ func main() {
 
 	for i := 0; i < 3; i++ {
 		testChannel := testChannels[i]
-		client.HandleChannel(testChannel, func(ctx context.Context, body io.Reader) error {
-			decoder := json.NewDecoder(body)
-			var testMsg models.BrokerMessage
-			err := decoder.Decode(&testMsg)
-			if err != nil {
-				return err
-			}
+		client.HandleChannel(
+			testChannel,
+			func(ctx context.Context, body io.Reader) error {
+				decoder := json.NewDecoder(body)
+				var testMsg models.BrokerMessage
+				err := decoder.Decode(&testMsg)
+				if err != nil {
+					return err
+				}
 
-			fmt.Println(testMsg)
+				fmt.Println(testMsg)
 
-			checkMessage := fmt.Sprintf("%s Check!", testChannel)
-			if err := client.WriteMessage(ctx, checkChannel, checkMessage); err != nil {
-				return err
-			}
-			return nil
-		})
+				checkMessage := fmt.Sprintf("%s Check!", testChannel)
+				if err := client.WriteMessage(ctx, checkChannel, checkMessage); err != nil {
+					return err
+				}
+				return nil
+			},
+		)
 
 	}
 	log.Fatalln(client.Run(ctx))

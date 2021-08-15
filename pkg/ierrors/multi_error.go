@@ -3,7 +3,7 @@ package ierrors
 // MultiError is a type that handles multiple errors that can happen in a process
 type MultiError struct {
 	Errors []error `yaml:"errors" json:"slices"`
-	Code   ErrCode `yaml:"code" json:"code"`
+	Code   ErrCode `yaml:"code"   json:"code"`
 }
 
 // Error return the errors in the multierror concatenated with new lines

@@ -103,7 +103,10 @@ func (th *TypeHandler) HandleGet() rest.Handler {
 		l.Debug("initiating Type get transaction")
 		th.Memory.Tree().InitTransaction()
 
-		insprType, err := th.Memory.Tree().Perm().Types().Get(scope, data.TypeName)
+		insprType, err := th.Memory.Tree().
+			Perm().
+			Types().
+			Get(scope, data.TypeName)
 		if err != nil {
 			l.Error("unable to get Type", zap.Error(err))
 			rest.ERROR(w, err)
@@ -162,7 +165,10 @@ func (th *TypeHandler) HandleUpdate() rest.Handler {
 			l.Debug("applying Type update changes in diff")
 			err = th.applyChangesInDiff(diff)
 			if err != nil {
-				l.Error("unable to apply Type update changes in diff", zap.Error(err))
+				l.Error(
+					"unable to apply Type update changes in diff",
+					zap.Error(err),
+				)
 				rest.ERROR(w, err)
 				th.Memory.Tree().Cancel()
 				return

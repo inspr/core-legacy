@@ -164,7 +164,11 @@ func Test_printAppliedFiles(t *testing.T) {
 			out := &bytes.Buffer{}
 			printAppliedFiles(tt.args.appliedFiles, out)
 			if gotOut := out.String(); gotOut != tt.wantOut {
-				t.Errorf("printAppliedFiles() = %v, want %v", gotOut, tt.wantOut)
+				t.Errorf(
+					"printAppliedFiles() = %v, want %v",
+					gotOut,
+					tt.wantOut,
+				)
 			}
 		})
 	}
@@ -264,7 +268,11 @@ func Test_getFilesFromFolder(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := getFilesFromFolder(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getFilesFromFolder() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"getFilesFromFolder() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -463,7 +471,10 @@ func Test_getOrderedFiles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getOrderedFiles(tt.args.path, tt.args.files); !reflect.DeepEqual(got, tt.want) {
+			if got := getOrderedFiles(tt.args.path, tt.args.files); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("getOrderedFiles() = %v, want %v", got, tt.want)
 			}
 		})

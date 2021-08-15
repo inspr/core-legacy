@@ -61,8 +61,15 @@ func Test_builder_WithDescription(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.b.WithDescription(tt.args.description); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("builder.WithDescription() = %v, want %v", got, tt.want)
+			if got := tt.b.WithDescription(tt.args.description); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
+				t.Errorf(
+					"builder.WithDescription() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -89,8 +96,15 @@ func Test_builder_WithLongDescription(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.b.WithLongDescription(tt.args.long); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("builder.WithLongDescription() = %v, want %v", got, tt.want)
+			if got := tt.b.WithLongDescription(tt.args.long); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
+				t.Errorf(
+					"builder.WithLongDescription() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -115,13 +129,20 @@ func Test_builder_WithExample(t *testing.T) {
 				command: "mock_command",
 			},
 			want: &builder{cmd: cobra.Command{
-				Example: fmt.Sprintf("  # %s\n insprctl %s\n", "mock_comment", "mock_command"),
+				Example: fmt.Sprintf(
+					"  # %s\n insprctl %s\n",
+					"mock_comment",
+					"mock_command",
+				),
 			}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.b.WithExample(tt.args.comment, tt.args.command); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.b.WithExample(tt.args.comment, tt.args.command); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("builder.WithExample() = %v, want %v", got, tt.want)
 			}
 		})

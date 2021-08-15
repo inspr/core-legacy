@@ -190,7 +190,11 @@ func Test_validAppStructure(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validAppStructure(&tt.args.app, &tt.args.parentApp, tt.args.brokers)
+			err := validAppStructure(
+				&tt.args.app,
+				&tt.args.parentApp,
+				tt.args.brokers,
+			)
 			if tt.wantErr && (err == nil) {
 				t.Errorf("validAppStructure(): wanted error but received 'nil'")
 				return
@@ -303,7 +307,11 @@ func Test_getParentApp(t *testing.T) {
 			}
 			got, err := getParentApp(tt.args.sonQuery, tmm)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getParentApp() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"getParentApp() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !metautils.CompareWithoutUUID(got, tt.want) {
@@ -759,30 +767,54 @@ func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
 			amm := mem.Apps().(*AppMemoryManager)
 			err := amm.connectAppBoundary(tt.args.app)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.connectAppsThroughAliases() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppMemoryManager.connectAppsThroughAliases() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			got, _ := amm.Get(tt.sourceApp)
 			for ch, conn := range tt.wantedApps {
 				if len(got.Spec.Channels[ch].ConnectedApps) != len(conn) {
-					t.Errorf("AppMemoryManager.connectAppBoundary() on %s.ConnectedApps = %v, want = %v", ch, got.Spec.Channels[ch].ConnectedApps, conn)
+					t.Errorf(
+						"AppMemoryManager.connectAppBoundary() on %s.ConnectedApps = %v, want = %v",
+						ch,
+						got.Spec.Channels[ch].ConnectedApps,
+						conn,
+					)
 					return
 				}
 				for _, app := range conn {
 					if !got.Spec.Channels[ch].ConnectedApps.Contains(app) {
-						t.Errorf("AppMemoryManager.connectAppBoundary() on %s.ConnectedApps = %v, want = %v", ch, got.Spec.Channels[ch].ConnectedApps, conn)
+						t.Errorf(
+							"AppMemoryManager.connectAppBoundary() on %s.ConnectedApps = %v, want = %v",
+							ch,
+							got.Spec.Channels[ch].ConnectedApps,
+							conn,
+						)
 						return
 					}
 				}
 			}
 			for ch, conn := range tt.wantedAlias {
 				if len(got.Spec.Channels[ch].ConnectedAliases) != len(conn) {
-					t.Errorf("AppMemoryManager.connectAppBoundary()  on %s.ConnectedAliases = %v, want = %v", ch, got.Spec.Channels[ch].ConnectedAliases, conn)
+					t.Errorf(
+						"AppMemoryManager.connectAppBoundary()  on %s.ConnectedAliases = %v, want = %v",
+						ch,
+						got.Spec.Channels[ch].ConnectedAliases,
+						conn,
+					)
 					return
 				}
 				for _, alias := range conn {
 					if !got.Spec.Channels[ch].ConnectedAliases.Contains(alias) {
-						t.Errorf("AppMemoryManager.connectAppBoundary() on %s.ConnectedApps = %v, want = %v", ch, got.Spec.Channels[ch].ConnectedApps, conn)
+						t.Errorf(
+							"AppMemoryManager.connectAppBoundary() on %s.ConnectedApps = %v, want = %v",
+							ch,
+							got.Spec.Channels[ch].ConnectedApps,
+							conn,
+						)
 						return
 					}
 				}
@@ -838,7 +870,11 @@ func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
 			}
 			amm := mem.Apps().(*AppMemoryManager)
 			if err := amm.connectAppsBoundaries(tt.args.app); (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.connectAppsBoundaries() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppMemoryManager.connectAppsBoundaries() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -900,8 +936,11 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 				root: &meta.App{
 					Spec: meta.AppSpec{
 						Auth: meta.AppAuth{
-							Scope:       "",
-							Permissions: utils.StringArray{"permission1", "permission2"},
+							Scope: "",
+							Permissions: utils.StringArray{
+								"permission1",
+								"permission2",
+							},
 						},
 					},
 				},
@@ -913,8 +952,11 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 				},
 				Spec: meta.AppSpec{
 					Auth: meta.AppAuth{
-						Scope:       "",
-						Permissions: utils.StringArray{"permission1", "permission2"},
+						Scope: "",
+						Permissions: utils.StringArray{
+							"permission1",
+							"permission2",
+						},
 					},
 				},
 			},
@@ -940,8 +982,11 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 				root: &meta.App{
 					Spec: meta.AppSpec{
 						Auth: meta.AppAuth{
-							Scope:       "",
-							Permissions: utils.StringArray{"permission1", "permission2"},
+							Scope: "",
+							Permissions: utils.StringArray{
+								"permission1",
+								"permission2",
+							},
 						},
 					},
 				},
@@ -988,8 +1033,11 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 				root: &meta.App{
 					Spec: meta.AppSpec{
 						Auth: meta.AppAuth{
-							Scope:       "",
-							Permissions: utils.StringArray{"permission1", "permission2"},
+							Scope: "",
+							Permissions: utils.StringArray{
+								"permission1",
+								"permission2",
+							},
 						},
 					},
 				},
@@ -1011,8 +1059,10 @@ func TestAppMemoryManager_addAppInTree(t *testing.T) {
 							},
 							Spec: meta.AppSpec{
 								Auth: meta.AppAuth{
-									Scope:       "scope",
-									Permissions: utils.StringArray{"permission12"},
+									Scope: "scope",
+									Permissions: utils.StringArray{
+										"permission12",
+									},
 								},
 							},
 						},
@@ -1146,18 +1196,24 @@ func TestAppMemoryManager_updateUUID(t *testing.T) {
 								Spec: meta.AppSpec{
 									Channels: map[string]*meta.Channel{
 										"channel1": {
-											Meta: meta.Metadata{Name: "channel1"},
+											Meta: meta.Metadata{
+												Name: "channel1",
+											},
 										},
 									},
 									Types: map[string]*meta.Type{
 										"channeltype1": {
-											Meta: meta.Metadata{Name: "channel1"},
+											Meta: meta.Metadata{
+												Name: "channel1",
+											},
 										},
 									},
 
 									Aliases: map[string]*meta.Alias{
 										"alias1": {
-											Meta: meta.Metadata{Name: "channel1"},
+											Meta: meta.Metadata{
+												Name: "channel1",
+											},
 										},
 									},
 								},
@@ -1306,7 +1362,10 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := SelectBrokerFromPriorityList(tt.args.brokerList, tt.args.brokers)
+			got, err := SelectBrokerFromPriorityList(
+				tt.args.brokerList,
+				tt.args.brokers,
+			)
 
 			if !tt.wantErr && (err != nil) {
 				t.Errorf("SelectBrokerFromPriorityList() error %v", err)
@@ -1314,11 +1373,17 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 			}
 
 			if !tt.wantErr && (got != tt.want) {
-				t.Errorf("SelectBrokerFromPriorityList() got %v, want %v", got, tt.want)
+				t.Errorf(
+					"SelectBrokerFromPriorityList() got %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 
 			if tt.wantErr && (err == nil) {
-				t.Errorf("SelectBrokerFromPriorityList() wanted error but got 'nil'")
+				t.Errorf(
+					"SelectBrokerFromPriorityList() wanted error but got 'nil'",
+				)
 				return
 			}
 		})

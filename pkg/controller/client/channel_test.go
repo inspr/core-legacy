@@ -80,7 +80,11 @@ func TestChannelClient_Delete(t *testing.T) {
 					)
 				}
 				if di.ChName != tt.args.name {
-					t.Errorf("name set incorrectly. want = %v, got = %v", di.ChName, tt.args.name)
+					t.Errorf(
+						"name set incorrectly. want = %v, got = %v",
+						di.ChName,
+						tt.args.name,
+					)
 				}
 
 				encoder.Encode(diff.Changelog{})
@@ -91,7 +95,11 @@ func TestChannelClient_Delete(t *testing.T) {
 				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Delete(tt.args.ctx, tt.args.scope, tt.args.name, false); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"ChannelClient.Delete() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -188,7 +196,11 @@ func TestChannelClient_Get(t *testing.T) {
 			}
 			got, err := ac.Get(tt.args.ctx, tt.args.context, tt.args.name)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelClient.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"ChannelClient.Get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ChannelClient.Get() got = %v, want %v", got, tt.want)
@@ -271,7 +283,11 @@ func TestChannelClient_Create(t *testing.T) {
 				}
 
 				if !reflect.DeepEqual(di.Channel, *tt.args.ch) {
-					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.Channel, tt.args.ch)
+					t.Errorf(
+						"request is different. want = \n%+v, \ngot = \n%+v",
+						di.Channel,
+						tt.args.ch,
+					)
 				}
 				encoder.Encode(diff.Changelog{})
 			}
@@ -281,7 +297,11 @@ func TestChannelClient_Create(t *testing.T) {
 				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelClient.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"ChannelClient.Create() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -361,7 +381,11 @@ func TestChannelClient_Update(t *testing.T) {
 				}
 
 				if !reflect.DeepEqual(di.Channel, *tt.args.ch) {
-					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.Channel, tt.args.ch)
+					t.Errorf(
+						"request is different. want = \n%+v, \ngot = \n%+v",
+						di.Channel,
+						tt.args.ch,
+					)
 				}
 				encoder.Encode(diff.Changelog{})
 			}
@@ -371,7 +395,11 @@ func TestChannelClient_Update(t *testing.T) {
 				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelClient.Update() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"ChannelClient.Update() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

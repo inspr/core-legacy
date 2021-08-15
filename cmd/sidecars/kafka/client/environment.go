@@ -27,8 +27,12 @@ func init() {
 func GetKafkaEnvironment() *Environment {
 	if env == nil {
 		env = &Environment{
-			KafkaBootstrapServers: getEnv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS"),
-			KafkaAutoOffsetReset:  getEnv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET"),
+			KafkaBootstrapServers: getEnv(
+				"INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS",
+			),
+			KafkaAutoOffsetReset: getEnv(
+				"INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET",
+			),
 		}
 	}
 	return env

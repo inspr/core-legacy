@@ -45,7 +45,9 @@ func TestServer_Init(t *testing.T) {
 
 func setup() {
 	redisServer = mockRedis()
-	insprServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	insprServer = httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}),
+	)
 
 	os.Setenv("INSPR_CLUSTER_ADDR", insprServer.URL)
 	os.Setenv("REFRESH_URL", "randomurl")

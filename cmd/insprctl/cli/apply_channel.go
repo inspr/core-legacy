@@ -48,7 +48,12 @@ func NewApplyChannel() RunMethod {
 
 		// creates or updates it
 		if flagIsUpdate {
-			log, err = c.Update(context.Background(), parentScope, &channel, flagDryRun)
+			log, err = c.Update(
+				context.Background(),
+				parentScope,
+				&channel,
+				flagDryRun,
+			)
 		} else {
 			log, err = c.Create(context.Background(), parentScope, &channel, flagDryRun)
 		}

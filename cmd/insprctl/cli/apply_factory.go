@@ -34,7 +34,9 @@ func GetFactory() *ApplyFactory {
 // GetRunMethod returns the runMethod registered for the
 // given component. If the component is not found in the
 // dictionary, it returns a ierror
-func (af *ApplyFactory) GetRunMethod(component meta.Component) (RunMethod, error) {
+func (af *ApplyFactory) GetRunMethod(
+	component meta.Component,
+) (RunMethod, error) {
 	if method, ok := af.applyDict[component]; ok {
 		return method, nil
 	}
@@ -46,7 +48,10 @@ func (af *ApplyFactory) GetRunMethod(component meta.Component) (RunMethod, error
 // Subscribe adds to the apply factory dictonary the
 // given component with the value equals to the given
 // runMethod
-func (af *ApplyFactory) Subscribe(component meta.Component, method RunMethod) error {
+func (af *ApplyFactory) Subscribe(
+	component meta.Component,
+	method RunMethod,
+) error {
 	if component.Kind == "" || component.APIVersion == "" {
 		return ierrors.New(
 			"component must have a not empty kind and apiVersion",

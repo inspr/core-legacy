@@ -49,7 +49,10 @@ func (no *NodeOperator) Deployments() v1.DeploymentInterface {
 
 // CreateNode deploys a new node structure, if it's information is valid.
 // Otherwise, returns an error
-func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (no *NodeOperator) CreateNode(
+	ctx context.Context,
+	app *meta.App,
+) (*meta.Node, error) {
 	logger.Info("deploying a Node structure in k8s",
 		zap.Any("node", app), zap.String("operation", "create"))
 
@@ -68,7 +71,10 @@ func (no *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.No
 
 // UpdateNode updates a node that already exists, if the new structure is valid.
 // Otherwise, returns an error.
-func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (no *NodeOperator) UpdateNode(
+	ctx context.Context,
+	app *meta.App,
+) (*meta.Node, error) {
 	logger.Info("deploying a Node structure in k8s",
 		zap.Any("node", app), zap.String("operation", "update"))
 
@@ -83,7 +89,11 @@ func (no *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.No
 }
 
 // DeleteNode deletes node with given name, if it exists. Otherwise, returns an error
-func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
+func (no *NodeOperator) DeleteNode(
+	ctx context.Context,
+	nodeContext string,
+	nodeName string,
+) error {
 	logger.Info("deleting a Node structure in k8s",
 		zap.String("node", nodeName),
 		zap.String("context", nodeContext))
@@ -110,7 +120,11 @@ func (no *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, node
 }
 
 // NewNodeOperator initializes a k8s based node operator with in cluster configuration
-func NewNodeOperator(memory tree.Manager, authenticator auth.Auth, broker brokers.Manager) (nop *NodeOperator, err error) {
+func NewNodeOperator(
+	memory tree.Manager,
+	authenticator auth.Auth,
+	broker brokers.Manager,
+) (nop *NodeOperator, err error) {
 	nop = &NodeOperator{
 		memory:  memory,
 		auth:    authenticator,

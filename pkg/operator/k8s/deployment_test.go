@@ -449,7 +449,12 @@ func TestNewDeployment(t *testing.T) {
 	}
 
 	dep := NewDeployment(name, testingOption1, testingOption2)
-	assertEQ(t, "NewDeployment", dep, &appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: name}})
+	assertEQ(
+		t,
+		"NewDeployment",
+		dep,
+		&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: name}},
+	)
 
 	assertEQ(t, "NewDeployment", ran1, true)
 	assertEQ(t, "NewDeployment", ran2, true)

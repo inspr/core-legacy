@@ -211,7 +211,9 @@ func (ie *ierror) MarshalJSON() ([]byte, error) {
 	// one would have to set it inside the ierrors pkg.
 	if ie.err == nil {
 		return []byte{},
-			New("unexpected err, ierror inner error field got set to nil").ExternalErr()
+			New(
+				"unexpected err, ierror inner error field got set to nil",
+			).ExternalErr()
 	}
 
 	t := parseStruct{

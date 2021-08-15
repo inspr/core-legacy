@@ -14,9 +14,23 @@ import (
 // the Channels in the cluster
 type ChannelInterface interface {
 	Get(ctx context.Context, scope, name string) (*meta.Channel, error)
-	Create(ctx context.Context, scope string, ch *meta.Channel, dryRun bool) (diff.Changelog, error)
-	Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error)
-	Update(ctx context.Context, scope string, ch *meta.Channel, dryRun bool) (diff.Changelog, error)
+	Create(
+		ctx context.Context,
+		scope string,
+		ch *meta.Channel,
+		dryRun bool,
+	) (diff.Changelog, error)
+	Delete(
+		ctx context.Context,
+		scope, name string,
+		dryRun bool,
+	) (diff.Changelog, error)
+	Update(
+		ctx context.Context,
+		scope string,
+		ch *meta.Channel,
+		dryRun bool,
+	) (diff.Changelog, error)
 }
 
 // AppInterface is the interface that allows to obtain or
@@ -24,9 +38,23 @@ type ChannelInterface interface {
 // the DApps in the cluster
 type AppInterface interface {
 	Get(ctx context.Context, scope string) (*meta.App, error)
-	Create(ctx context.Context, scope string, app *meta.App, dryRun bool) (diff.Changelog, error)
-	Delete(ctx context.Context, scope string, dryRun bool) (diff.Changelog, error)
-	Update(ctx context.Context, scope string, app *meta.App, dryRun bool) (diff.Changelog, error)
+	Create(
+		ctx context.Context,
+		scope string,
+		app *meta.App,
+		dryRun bool,
+	) (diff.Changelog, error)
+	Delete(
+		ctx context.Context,
+		scope string,
+		dryRun bool,
+	) (diff.Changelog, error)
+	Update(
+		ctx context.Context,
+		scope string,
+		app *meta.App,
+		dryRun bool,
+	) (diff.Changelog, error)
 }
 
 // TypeInterface is the interface that allows to
@@ -34,9 +62,23 @@ type AppInterface interface {
 // state of the Types in the cluster
 type TypeInterface interface {
 	Get(ctx context.Context, scope, name string) (*meta.Type, error)
-	Create(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error)
-	Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error)
-	Update(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error)
+	Create(
+		ctx context.Context,
+		scope string,
+		t *meta.Type,
+		dryRun bool,
+	) (diff.Changelog, error)
+	Delete(
+		ctx context.Context,
+		scope, name string,
+		dryRun bool,
+	) (diff.Changelog, error)
+	Update(
+		ctx context.Context,
+		scope string,
+		t *meta.Type,
+		dryRun bool,
+	) (diff.Changelog, error)
 }
 
 // AuthorizationInterface is the interface that allows to
@@ -52,9 +94,23 @@ type AuthorizationInterface interface {
 // state of the Alias in the cluster
 type AliasInterface interface {
 	Get(ctx context.Context, scope, key string) (*meta.Alias, error)
-	Create(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
-	Delete(ctx context.Context, scope, key string, dryRun bool) (diff.Changelog, error)
-	Update(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
+	Create(
+		ctx context.Context,
+		scope, target string,
+		alias *meta.Alias,
+		dryRun bool,
+	) (diff.Changelog, error)
+	Delete(
+		ctx context.Context,
+		scope, key string,
+		dryRun bool,
+	) (diff.Changelog, error)
+	Update(
+		ctx context.Context,
+		scope, target string,
+		alias *meta.Alias,
+		dryRun bool,
+	) (diff.Changelog, error)
 }
 
 // BrokersInterface is the interface that allows to

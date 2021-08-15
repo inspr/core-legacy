@@ -65,11 +65,19 @@ func TestGetPublicKey(t *testing.T) {
 			}
 			got, err := GetPublicKey()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetPublicKey() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"GetPublicKey() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !tt.wantErr && !privateKey.PublicKey.Equal(got) {
-				t.Errorf("GetPublicKey() = %v, want %v", got, privateKey.PublicKey)
+				t.Errorf(
+					"GetPublicKey() = %v, want %v",
+					got,
+					privateKey.PublicKey,
+				)
 			}
 		})
 	}

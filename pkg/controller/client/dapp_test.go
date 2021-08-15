@@ -72,7 +72,11 @@ func TestAppClient_Delete(t *testing.T) {
 				}
 
 				if scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 
 				encoder.Encode(diff.Changelog{})
@@ -83,7 +87,11 @@ func TestAppClient_Delete(t *testing.T) {
 				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Delete(tt.args.ctx, tt.args.context, false); (err != nil) != tt.wantErr {
-				t.Errorf("AppClient.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppClient.Delete() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -164,7 +172,11 @@ func TestAppClient_Get(t *testing.T) {
 				}
 
 				if scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 
 				encoder.Encode(tt.want)
@@ -177,7 +189,11 @@ func TestAppClient_Get(t *testing.T) {
 			}
 			got, err := ac.Get(tt.args.ctx, tt.args.context)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppClient.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppClient.Get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AppClient.Get() got = %v, want %v", got, tt.want)
@@ -260,11 +276,19 @@ func TestAppClient_Create(t *testing.T) {
 				}
 
 				if scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {
-					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.App, tt.args.ch)
+					t.Errorf(
+						"request is different. want = \n%+v, \ngot = \n%+v",
+						di.App,
+						tt.args.ch,
+					)
 				}
 				encoder.Encode(diff.Changelog{})
 			}
@@ -274,7 +298,11 @@ func TestAppClient_Create(t *testing.T) {
 				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
-				t.Errorf("AppClient.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppClient.Create() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -354,11 +382,19 @@ func TestAppClient_Update(t *testing.T) {
 				}
 
 				if scope != tt.args.context {
-					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
+					t.Errorf(
+						"context set incorrectly. want = %v, got = %v",
+						scope,
+						tt.args.context,
+					)
 				}
 
 				if !reflect.DeepEqual(di.App, *tt.args.ch) {
-					t.Errorf("request is different. want = \n%+v, \ngot = \n%+v", di.App, tt.args.ch)
+					t.Errorf(
+						"request is different. want = \n%+v, \ngot = \n%+v",
+						di.App,
+						tt.args.ch,
+					)
 				}
 				encoder.Encode(diff.Changelog{})
 			}
@@ -368,7 +404,11 @@ func TestAppClient_Update(t *testing.T) {
 				reqClient: request.NewJSONClient(s.URL),
 			}
 			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
-				t.Errorf("AppClient.Update() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppClient.Update() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

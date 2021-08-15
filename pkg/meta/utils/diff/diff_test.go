@@ -214,7 +214,11 @@ func TestChange_diffAppSpec(t *testing.T) {
 			}
 
 			if err := change.diffAppSpec(tt.args.specOrig, tt.args.specCurr); (err != nil) != tt.wantErr {
-				t.Errorf("Change.diffAppSpec() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Change.diffAppSpec() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
@@ -334,7 +338,11 @@ func TestChange_diffNodes(t *testing.T) {
 				Diff:  tt.fields.Diff,
 			}
 			if err := change.diffNodes(tt.args.nodeOrig, tt.args.nodeCurr); (err != nil) != tt.wantErr {
-				t.Errorf("Change.diffNodes() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Change.diffNodes() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
@@ -728,7 +736,11 @@ func TestChange_diffChannels(t *testing.T) {
 				Diff:  tt.fields.Diff,
 			}
 			if err := change.diffChannels(tt.args.chOrig, tt.args.chCurr); (err != nil) != tt.wantErr {
-				t.Errorf("Change.diffChannels() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Change.diffChannels() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
@@ -894,7 +906,11 @@ func TestChange_diffTypes(t *testing.T) {
 				Diff:  tt.fields.Diff,
 			}
 			if err := change.diffTypes(tt.args.chtOrig, tt.args.chtCurr); (err != nil) != tt.wantErr {
-				t.Errorf("Change.diffTypes() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Change.diffTypes() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)
@@ -1118,7 +1134,11 @@ func TestChange_diffMetadata(t *testing.T) {
 				changelog: &Changelog{},
 			}
 			if err := change.diffMetadata(tt.args.parentElement, tt.args.parentKind, tt.args.metaOrig, tt.args.metaCurr, tt.args.ctx); (err != nil) != tt.wantErr {
-				t.Errorf("Change.diffMetadata() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Change.diffMetadata() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !equalChanges(*change, tt.want) {
 				t.Errorf("Changelog.diff() = %v, want %v", *change, tt.want)

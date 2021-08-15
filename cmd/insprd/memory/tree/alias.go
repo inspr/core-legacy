@@ -28,7 +28,9 @@ func (tmm *treeMemoryManager) Alias() AliasMemory {
 // Get receives a scope and an alias key. The scope defines
 // the path to a dApp. If this dApp has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
-func (amm *AliasMemoryManager) Get(scope, aliasKey string) (*meta.Alias, error) {
+func (amm *AliasMemoryManager) Get(
+	scope, aliasKey string,
+) (*meta.Alias, error) {
 	l := amm.logger.With(
 		zap.String("operation", "get"),
 		zap.String("alias", aliasKey),
@@ -56,7 +58,10 @@ func (amm *AliasMemoryManager) Get(scope, aliasKey string) (*meta.Alias, error) 
 
 // Create receives a scope that defines a path to the dApp.
 // The new alias will be created inside this dApp's parent.
-func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) Create(
+	scope, targetBoundary string,
+	alias *meta.Alias,
+) error {
 	l := amm.logger.With(
 		zap.String("operation", "create"),
 		zap.Any("alias", alias),
@@ -72,7 +77,8 @@ func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.
 	l.Debug("checking if dApp boundary is valid for given Alias")
 	// check if targetBoundary exists in app
 	appBound := app.Spec.Boundary
-	if !appBound.Input.Contains(targetBoundary) && !appBound.Output.Contains(targetBoundary) {
+	if !appBound.Input.Contains(targetBoundary) &&
+		!appBound.Output.Contains(targetBoundary) {
 		l.Debug("invalid dApp boundary for Alias",
 			zap.String("targeted boundary", targetBoundary))
 		return ierrors.New(
@@ -89,9 +95,11 @@ func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.
 	// check if targetChannel exists in channels or boundaries of parentApp
 	err = validTargetChannel(parentApp, targetChannel)
 	if err != nil {
-		l.Debug("unable to create Alias - invalid targeted channel or boundary in parent dApp",
+		l.Debug(
+			"unable to create Alias - invalid targeted channel or boundary in parent dApp",
 			zap.String("parent", parentApp.Meta.Name),
-			zap.String("targeted boundary", targetChannel))
+			zap.String("targeted boundary", targetChannel),
+		)
 		return err
 	}
 
@@ -119,7 +127,10 @@ func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.
 // defines the path to the dApp that contains the Alias. If the dApp has
 // a alias that has the given alias key passed as an argument,
 // that alias will be replaced by the new alias
-func (amm *AliasMemoryManager) Update(scope, aliasKey string, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) Update(
+	scope, aliasKey string,
+	alias *meta.Alias,
+) error {
 	l := amm.logger.With(
 		zap.String("operation", "update"),
 		zap.Any("alias", alias),
@@ -143,9 +154,11 @@ func (amm *AliasMemoryManager) Update(scope, aliasKey string, alias *meta.Alias)
 	// valid target channel
 	err = validTargetChannel(parentApp, alias.Target)
 	if err != nil {
-		l.Debug("unable to update Alias - invalid targeted channel or boundary in parent dApp",
+		l.Debug(
+			"unable to update Alias - invalid targeted channel or boundary in parent dApp",
 			zap.String("parent", parentApp.Meta.Name),
-			zap.String("targeted boundary", alias.Target))
+			zap.String("targeted boundary", alias.Target),
+		)
 		return err
 	}
 
@@ -190,7 +203,8 @@ func (amm *AliasMemoryManager) Delete(scope, aliasKey string) error {
 	// check if its being used by a child app
 	if childApp, ok := app.Spec.Apps[childName]; ok {
 		childBound := childApp.Spec.Boundary
-		if childBound.Input.Contains(target) || childBound.Output.Contains(target) {
+		if childBound.Input.Contains(target) ||
+			childBound.Output.Contains(target) {
 			l.Debug("unable to delete Alias that is being used by a dApp")
 			return ierrors.New(
 				"can't delete the alias since it's being used by a child app",
@@ -217,7 +231,9 @@ type AliasPermTreeGetter struct {
 // the path to an App. If this App has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
 // This method is used to get the structure as it is in the cluster, before any modifications.
-func (amm *AliasPermTreeGetter) Get(scope, aliasKey string) (*meta.Alias, error) {
+func (amm *AliasPermTreeGetter) Get(
+	scope, aliasKey string,
+) (*meta.Alias, error) {
 	l := amm.logs.With(
 		zap.String("operation", "root-get"),
 		zap.String("alias", aliasKey),
@@ -246,7 +262,9 @@ func (amm *AliasPermTreeGetter) Get(scope, aliasKey string) (*meta.Alias, error)
 func validTargetChannel(app *meta.App, targetChannel string) error {
 	logger.Debug("validating if Alias targets a valid Channel")
 	parentBound := app.Spec.Boundary
-	if _, ok := app.Spec.Channels[targetChannel]; !ok && !parentBound.Input.Contains(targetChannel) && !parentBound.Output.Contains(targetChannel) {
+	if _, ok := app.Spec.Channels[targetChannel]; !ok &&
+		!parentBound.Input.Contains(targetChannel) &&
+		!parentBound.Output.Contains(targetChannel) {
 		logger.Debug("alias targets an invalid Channel")
 		return ierrors.New("channel doesn't exist in app").BadRequest()
 	}

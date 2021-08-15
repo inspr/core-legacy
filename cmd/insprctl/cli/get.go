@@ -192,7 +192,13 @@ func getNodes(_ context.Context) error {
 	return nil
 }
 
-func getObj(printObj func(*meta.App, *[]string), lines *[]string, client controller.Interface, out io.Writer, scope string) error {
+func getObj(
+	printObj func(*meta.App, *[]string),
+	lines *[]string,
+	client controller.Interface,
+	out io.Writer,
+	scope string,
+) error {
 	resp, err := client.Apps().Get(context.Background(), scope)
 	if err != nil {
 		fmt.Fprintf(out, "%v\n", ierrors.FormatError(err))
@@ -258,7 +264,14 @@ func initTab(lines *[]string) {
 
 func printTab(lines *[]string) {
 	out := cliutils.GetCliOutput()
-	tabWriter := tabwriter.NewWriter(out, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	tabWriter := tabwriter.NewWriter(
+		out,
+		0,
+		0,
+		3,
+		' ',
+		tabwriter.AlignRight|tabwriter.Debug,
+	)
 	for _, line := range *lines {
 		fmt.Fprint(tabWriter, line)
 	}

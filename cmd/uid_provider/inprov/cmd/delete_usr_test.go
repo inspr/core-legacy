@@ -42,13 +42,25 @@ func Test_deleteAction(t *testing.T) {
 			cl = mockCl{
 				deleteUser: func(c context.Context, s1, s2, s3 string) error {
 					if s1 != tt.args.s[0] {
-						t.Errorf("username not set correctly \n%v\n!=\n%v", s1, tt.args.s[0])
+						t.Errorf(
+							"username not set correctly \n%v\n!=\n%v",
+							s1,
+							tt.args.s[0],
+						)
 					}
 					if s2 != tt.args.s[1] {
-						t.Errorf("password not set correctly \n%v\n!=\n%v", s2, tt.args.s[1])
+						t.Errorf(
+							"password not set correctly \n%v\n!=\n%v",
+							s2,
+							tt.args.s[1],
+						)
 					}
 					if s3 != tt.options.username {
-						t.Errorf("user to be deleted not set correctly \n%v\n!=\n%v", s3, tt.options.username)
+						t.Errorf(
+							"user to be deleted not set correctly \n%v\n!=\n%v",
+							s3,
+							tt.options.username,
+						)
 					}
 
 					if tt.wantErr {
@@ -58,7 +70,11 @@ func Test_deleteAction(t *testing.T) {
 				},
 			}
 			if err := deleteAction(tt.args.c, tt.args.s); (err != nil) != tt.wantErr {
-				t.Errorf("deleteAction() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"deleteAction() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

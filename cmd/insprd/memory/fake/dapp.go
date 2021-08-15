@@ -27,7 +27,11 @@ func (a *Apps) Get(query string) (*meta.App, error) {
 }
 
 // Create - simple mock
-func (a *Apps) Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
+func (a *Apps) Create(
+	scope string,
+	app *meta.App,
+	brokers *apimodels.BrokersDI,
+) error {
 	if a.fail != nil {
 		return a.fail
 	}
@@ -56,7 +60,11 @@ func (a *Apps) Delete(query string) error {
 }
 
 // Update - simple mock
-func (a *Apps) Update(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
+func (a *Apps) Update(
+	scope string,
+	app *meta.App,
+	brokers *apimodels.BrokersDI,
+) error {
 	if a.fail != nil {
 		return a.fail
 	}
@@ -70,7 +78,10 @@ func (a *Apps) Update(scope string, app *meta.App, brokers *apimodels.BrokersDI)
 }
 
 // ResolveBoundary mock
-func (*Apps) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
+func (*Apps) ResolveBoundary(
+	app *meta.App,
+	usePermTree bool,
+) (map[string]string, error) {
 	ret := map[string]string{}
 	for _, ch := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
 		ret[ch] = ch

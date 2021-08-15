@@ -28,7 +28,8 @@ func main() {
 		temp := dapp
 		temp.Meta.Annotations = make(map[string]string)
 		temp.Meta.Annotations["hahahahaha"] = "hehehehehe"
-		diff, err := c.Apps().Update(context.Background(), temp.Meta.Name, &temp, false)
+		diff, err := c.Apps().
+			Update(context.Background(), temp.Meta.Name, &temp, false)
 		diff.Print(os.Stdout)
 		if err != nil {
 			rest.ERROR(rw, err)
@@ -42,7 +43,8 @@ func main() {
 		}
 	})
 	mux.HandleFunc("/delete", func(rw http.ResponseWriter, r *http.Request) {
-		diff, err := c.Apps().Delete(context.Background(), "controllerprimes", false)
+		diff, err := c.Apps().
+			Delete(context.Background(), "controllerprimes", false)
 		diff.Print(os.Stdout)
 		if err != nil {
 			rest.ERROR(rw, err)

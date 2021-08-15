@@ -33,7 +33,10 @@ func Init() *Server {
 
 	s.writeAddr = fmt.Sprintf(":%s", wAddr)
 	s.readAddr = fmt.Sprintf(":%s", rAddr)
-	logger = logger.With(zap.String("read-address", rAddr), zap.String("write-address", wAddr))
+	logger = logger.With(
+		zap.String("read-address", rAddr),
+		zap.String("write-address", wAddr),
+	)
 	return &s
 }
 
@@ -52,7 +55,8 @@ func (s *Server) Run(ctx context.Context) error {
 		Addr:    s.writeAddr,
 	}
 	go func() {
-		if err := writeServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := writeServer.ListenAndServe(); err != nil &&
+			err != http.ErrServerClosed {
 			errCh <- err
 			logger.Error("an error occurred in LB Sidecar write server",
 				zap.Error(err))
@@ -64,7 +68,8 @@ func (s *Server) Run(ctx context.Context) error {
 		Addr:    s.readAddr,
 	}
 	go func() {
-		if err := readServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := readServer.ListenAndServe(); err != nil &&
+			err != http.ErrServerClosed {
 			errCh <- err
 			logger.Error("an error occurred in LB Sidecar read server",
 				zap.Error(err))

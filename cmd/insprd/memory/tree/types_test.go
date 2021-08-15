@@ -36,7 +36,10 @@ func TestMemoryManager_Types(t *testing.T) {
 			tmm := &treeMemoryManager{
 				root: tt.fields.root,
 			}
-			if got := tmm.Types(); !reflect.DeepEqual(got.(*TypeMemoryManager).root, tt.want.(*TypeMemoryManager).root) {
+			if got := tmm.Types(); !reflect.DeepEqual(
+				got.(*TypeMemoryManager).root,
+				tt.want.(*TypeMemoryManager).root,
+			) {
 				t.Errorf("MemoryManager.Types() = %v, want %v", got, tt.want)
 			}
 		})
@@ -134,7 +137,11 @@ func TestTypeMemoryManager_GetType(t *testing.T) {
 			ctm := mem.Types()
 			got, err := ctm.Get(tt.args.context, tt.args.ctName)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TypeMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"TypeMemoryManager.Get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -297,18 +304,29 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 			ctm := mem.Types()
 			err := ctm.Create(tt.args.context, tt.args.ct)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TypeMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"TypeMemoryManager.Create() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if tt.want != nil {
 				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
 				if !tt.wantErr {
 					if !metautils.ValidateUUID(got.Meta.UUID) {
-						t.Errorf("TypeMemoryManager.Create() invalid UUID, uuid=%v", got.Meta.UUID)
+						t.Errorf(
+							"TypeMemoryManager.Create() invalid UUID, uuid=%v",
+							got.Meta.UUID,
+						)
 					}
 				}
 				if (err != nil) || !metautils.CompareWithoutUUID(got, tt.want) {
-					t.Errorf("TypeMemoryManager.Create() = %v, want %v", got, tt.want)
+					t.Errorf(
+						"TypeMemoryManager.Create() = %v, want %v",
+						got,
+						tt.want,
+					)
 				}
 			}
 		})
@@ -422,7 +440,11 @@ func TestTypeMemoryManager_Delete(t *testing.T) {
 			}
 			ctm := mem.Types()
 			if err := ctm.Delete(tt.args.context, tt.args.ctName); (err != nil) != tt.wantErr {
-				t.Errorf("TypeMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"TypeMemoryManager.Delete() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			got, _ := ctm.Get(tt.args.context, tt.args.ctName)
@@ -550,13 +572,21 @@ func TestTypeMemoryManager_Update(t *testing.T) {
 			}
 			ctm := mem.Types()
 			if err := ctm.Update(tt.args.context, tt.args.ct); (err != nil) != tt.wantErr {
-				t.Errorf("TypeMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"TypeMemoryManager.Update() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if tt.want != nil {
 				got, err := ctm.Get(tt.args.context, tt.want.Meta.Name)
 				if (err != nil) || !metautils.CompareWithUUID(got, tt.want) {
-					t.Errorf("TypeMemoryManager.Get() = %v, want %v", got, tt.want)
+					t.Errorf(
+						"TypeMemoryManager.Get() = %v, want %v",
+						got,
+						tt.want,
+					)
 				}
 			}
 		})

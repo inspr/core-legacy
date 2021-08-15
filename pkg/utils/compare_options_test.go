@@ -17,13 +17,15 @@ func TestGetMapCompareOptions(t *testing.T) {
 			want: cmp.Options{
 				cmp.FilterValues(func(x, y interface{}) bool {
 					vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
-					flag := (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) && (vx.Kind() == reflect.Map)
+					flag := (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) &&
+						(vx.Kind() == reflect.Map)
 					return flag
 				}, cmp.Comparer(func(l, r interface{}) bool { return true })),
 
 				cmp.FilterValues(func(x, y interface{}) bool {
 					vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
-					flag := (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) && (vx.Kind() == reflect.Slice)
+					flag := (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) &&
+						(vx.Kind() == reflect.Slice)
 					return flag
 				}, cmp.Comparer(func(l, r interface{}) bool { return true })),
 			},
@@ -63,7 +65,15 @@ func TestGetMapCompareOptions(t *testing.T) {
 			// slices should always come as true
 			sliceA := []int{1, 2, 3}
 			sliceB := []int{3, 2, 6}
-			if cmp.Equal(sliceA, sliceB, got) != cmp.Equal(sliceA, sliceB, tt.want) {
+			if cmp.Equal(
+				sliceA,
+				sliceB,
+				got,
+			) != cmp.Equal(
+				sliceA,
+				sliceB,
+				tt.want,
+			) {
 				t.Errorf("comparing SLICES, GetMapcompare => %v, expect %v",
 					cmp.Equal(mapA, mapB, got),
 					cmp.Equal(mapA, mapB, tt.want),

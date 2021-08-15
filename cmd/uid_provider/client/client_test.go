@@ -56,7 +56,10 @@ func TestClient_CreateUser(t *testing.T) {
 	defer teardown()
 
 	auxPass := "none"
-	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte("none"), bcrypt.DefaultCost)
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword(
+		[]byte("none"),
+		bcrypt.DefaultCost,
+	)
 
 	auxCtx := context.Background()
 	auxUser := User{
@@ -106,9 +109,11 @@ func TestClient_CreateUser(t *testing.T) {
 				uid: auxUser2.UID,
 				pwd: auxPass,
 				newUser: User{
-					UID:         "user3",
-					Password:    "u3pwd",
-					Permissions: map[string][]string{"ascope.bscope": {auth.UpdateAlias, auth.CreateAlias}},
+					UID:      "user3",
+					Password: "u3pwd",
+					Permissions: map[string][]string{
+						"ascope.bscope": {auth.UpdateAlias, auth.CreateAlias},
+					},
 				},
 			},
 			wantErr: true,
@@ -116,13 +121,26 @@ func TestClient_CreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.c.CreateUser(auxCtx, tt.args.uid, tt.args.pwd, tt.args.newUser)
+			err := tt.c.CreateUser(
+				auxCtx,
+				tt.args.uid,
+				tt.args.pwd,
+				tt.args.newUser,
+			)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Client.CreateUser() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 
-			createdUser, err := get(auxCtx, redisClient.rdb, tt.args.newUser.UID)
+			createdUser, err := get(
+				auxCtx,
+				redisClient.rdb,
+				tt.args.newUser.UID,
+			)
 			if err != nil || reflect.DeepEqual(createdUser, User{}) {
 				t.Errorf("Client.CreateUser() error = %v", err)
 			}
@@ -135,7 +153,10 @@ func TestClient_DeleteUser(t *testing.T) {
 	defer teardown()
 
 	auxPass := "none"
-	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte("none"), bcrypt.DefaultCost)
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword(
+		[]byte("none"),
+		bcrypt.DefaultCost,
+	)
 
 	auxCtx := context.Background()
 	auxUser := User{
@@ -195,13 +216,26 @@ func TestClient_DeleteUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.c.DeleteUser(auxCtx, tt.args.uid, tt.args.pwd, tt.args.usrToBeDeleted)
+			err := tt.c.DeleteUser(
+				auxCtx,
+				tt.args.uid,
+				tt.args.pwd,
+				tt.args.usrToBeDeleted,
+			)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.DeleteUser() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Client.DeleteUser() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 
-			createdUser, err := get(auxCtx, redisClient.rdb, tt.args.usrToBeDeleted)
+			createdUser, err := get(
+				auxCtx,
+				redisClient.rdb,
+				tt.args.usrToBeDeleted,
+			)
 			if !tt.wantErr && (err == nil || createdUser != nil) {
 				t.Errorf("Client.DeleteUser() error = %v", err)
 			}
@@ -214,7 +248,10 @@ func TestClient_UpdatePassword(t *testing.T) {
 	defer teardown()
 
 	auxPass := "none"
-	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte(auxPass), bcrypt.DefaultCost)
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword(
+		[]byte(auxPass),
+		bcrypt.DefaultCost,
+	)
 
 	auxPass2 := "banana"
 
@@ -272,15 +309,32 @@ func TestClient_UpdatePassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.c.UpdatePassword(auxCtx, tt.args.uid, tt.args.pwd, tt.args.usrToBeUpdated, tt.args.newPwd)
+			err := tt.c.UpdatePassword(
+				auxCtx,
+				tt.args.uid,
+				tt.args.pwd,
+				tt.args.usrToBeUpdated,
+				tt.args.newPwd,
+			)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.UpdatePassword() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Client.UpdatePassword() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 
-			updatedUser, err := get(auxCtx, redisClient.rdb, tt.args.usrToBeUpdated)
+			updatedUser, err := get(
+				auxCtx,
+				redisClient.rdb,
+				tt.args.usrToBeUpdated,
+			)
 
-			passErr := bcrypt.CompareHashAndPassword([]byte(updatedUser.Password), []byte(tt.args.newPwd))
+			passErr := bcrypt.CompareHashAndPassword(
+				[]byte(updatedUser.Password),
+				[]byte(tt.args.newPwd),
+			)
 
 			if !tt.wantErr && (err != nil || passErr != nil) {
 				t.Errorf("Client.UpdatePassword() error = %v", err)
@@ -294,7 +348,10 @@ func TestClient_Login(t *testing.T) {
 	defer teardown()
 
 	auxPass := "none"
-	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte(auxPass), bcrypt.DefaultCost)
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword(
+		[]byte(auxPass),
+		bcrypt.DefaultCost,
+	)
 
 	auxCtx := context.Background()
 	auxUser := User{
@@ -350,7 +407,11 @@ func TestClient_Login(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.c.Login(auxCtx, tt.args.uid, tt.args.pwd)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.Login() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Client.Login() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if got != tt.want {
@@ -420,7 +481,11 @@ func TestClient_RefreshToken(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.c.RefreshToken(auxCtx, tt.args.refreshToken)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.RefreshToken() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Client.RefreshToken() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 
@@ -592,7 +657,10 @@ func Test_hasPermission(t *testing.T) {
 	defer teardown()
 
 	auxPass := "none"
-	hashedAuxPass, _ := bcrypt.GenerateFromPassword([]byte(auxPass), bcrypt.DefaultCost)
+	hashedAuxPass, _ := bcrypt.GenerateFromPassword(
+		[]byte(auxPass),
+		bcrypt.DefaultCost,
+	)
 
 	auxCtx := context.Background()
 	auxUser := User{
@@ -657,7 +725,14 @@ func Test_hasPermission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := hasPermission(auxCtx, redisClient.rdb, tt.args.uid, tt.args.pwd, auxUser, true)
+			err := hasPermission(
+				auxCtx,
+				redisClient.rdb,
+				tt.args.uid,
+				tt.args.pwd,
+				auxUser,
+				true,
+			)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -785,9 +860,16 @@ func Test_requestNewToken(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := redisClient.requestNewToken(tt.args.ctx, tt.args.payload)
+			got, err := redisClient.requestNewToken(
+				tt.args.ctx,
+				tt.args.payload,
+			)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("requestNewToken() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"requestNewToken() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !check(got, tt.want) {
@@ -870,30 +952,56 @@ func Test_isPermissionAllowed(t *testing.T) {
 		{
 			name: "requestor permissions are enough to create new user",
 			args: args{
-				newUserPermissionScope:   "a.b.c",
-				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
+				newUserPermissionScope: "a.b.c",
+				newUserPermissions: []string{
+					auth.CreateAlias,
+					auth.UpdateChannel,
+					auth.CreateDapp,
+				},
 				requestorPermissionScope: "a.b",
-				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel, auth.CreateToken},
+				requestorPermissions: []string{
+					auth.CreateAlias,
+					auth.UpdateChannel,
+					auth.CreateDapp,
+					auth.DeleteChannel,
+					auth.CreateToken,
+				},
 			},
 			want: true,
 		},
 		{
 			name: "requestor permissions (scope) are not enough to create new user",
 			args: args{
-				newUserPermissionScope:   "a.b.c",
-				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
+				newUserPermissionScope: "a.b.c",
+				newUserPermissions: []string{
+					auth.CreateAlias,
+					auth.UpdateChannel,
+					auth.CreateDapp,
+				},
 				requestorPermissionScope: "a.b.c.d",
-				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel},
+				requestorPermissions: []string{
+					auth.CreateAlias,
+					auth.UpdateChannel,
+					auth.CreateDapp,
+					auth.DeleteChannel,
+				},
 			},
 			want: false,
 		},
 		{
 			name: "requestor permissions (permissions) are not enough to create new user",
 			args: args{
-				newUserPermissionScope:   "a.b.c",
-				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
+				newUserPermissionScope: "a.b.c",
+				newUserPermissions: []string{
+					auth.CreateAlias,
+					auth.UpdateChannel,
+					auth.CreateDapp,
+				},
 				requestorPermissionScope: "a.b",
-				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel},
+				requestorPermissions: []string{
+					auth.CreateAlias,
+					auth.UpdateChannel,
+				},
 			},
 			want: false,
 		},

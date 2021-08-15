@@ -233,10 +233,18 @@ func TestClient_Send(t *testing.T) {
 				&tt.response,
 			)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.SendRequest() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Client.SendRequest() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(tt.response, tt.want) {
-				t.Errorf("Client.SendRequest() response = %v, want %v", tt.response, tt.want)
+				t.Errorf(
+					"Client.SendRequest() response = %v, want %v",
+					tt.response,
+					tt.want,
+				)
 			}
 		})
 	}

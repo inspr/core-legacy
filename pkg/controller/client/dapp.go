@@ -36,7 +36,12 @@ func (ac *AppClient) Get(ctx context.Context, scope string) (*meta.App, error) {
 // Create creates given dApp in Insprd
 // The scope refers to the parent app where the actual app will be instantiated,
 // represented with a dot separated query such as **app1.app2**.
-func (ac *AppClient) Create(ctx context.Context, scope string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+func (ac *AppClient) Create(
+	ctx context.Context,
+	scope string,
+	app *meta.App,
+	dryRun bool,
+) (diff.Changelog, error) {
 	adi := models.AppDI{
 		App:    *app,
 		DryRun: dryRun,
@@ -56,7 +61,11 @@ func (ac *AppClient) Create(ctx context.Context, scope string, app *meta.App, dr
 // Delete deletes a dApp that exists in Insprd.
 // The scope refers to the app itself, represented with a dot separated query
 // such as app1.app2
-func (ac *AppClient) Delete(ctx context.Context, scope string, dryRun bool) (diff.Changelog, error) {
+func (ac *AppClient) Delete(
+	ctx context.Context,
+	scope string,
+	dryRun bool,
+) (diff.Changelog, error) {
 	adi := models.AppQueryDI{
 		DryRun: dryRun,
 	}
@@ -75,7 +84,12 @@ func (ac *AppClient) Delete(ctx context.Context, scope string, dryRun bool) (dif
 // Update updates a dApp in Insprd, if it exists.
 // The scope refers to the parent dApp where the actual dApp is instantiated,
 // represented with a dot separated query such as app1.app2
-func (ac *AppClient) Update(ctx context.Context, scope string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+func (ac *AppClient) Update(
+	ctx context.Context,
+	scope string,
+	app *meta.App,
+	dryRun bool,
+) (diff.Changelog, error) {
 	adi := models.AppDI{
 		App:    *app,
 		DryRun: dryRun,

@@ -47,7 +47,14 @@ func TestNewGetCmd(t *testing.T) {
 func Test_getApps(t *testing.T) {
 	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
-	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	tabWriter := tabwriter.NewWriter(
+		bufResp,
+		0,
+		0,
+		3,
+		' ',
+		tabwriter.AlignRight|tabwriter.Debug,
+	)
 	fmt.Fprint(tabWriter, "NAME\n")
 	fmt.Fprint(tabWriter, "appParent\n")
 	fmt.Fprint(tabWriter, "app1\n")
@@ -119,7 +126,14 @@ func Test_getApps(t *testing.T) {
 func Test_getChannels(t *testing.T) {
 	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
-	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	tabWriter := tabwriter.NewWriter(
+		bufResp,
+		0,
+		0,
+		3,
+		' ',
+		tabwriter.AlignRight|tabwriter.Debug,
+	)
 	fmt.Fprint(tabWriter, "NAME\n")
 	fmt.Fprint(tabWriter, "ch1\n")
 	fmt.Fprint(tabWriter, "ch1app1\n")
@@ -178,7 +192,11 @@ func Test_getChannels(t *testing.T) {
 			err := getChannels(tt.args.in0)
 			got := buf.String()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getChannels() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"getChannels() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(got, tt.tab) {
 				t.Errorf("getChannels() error = %v, want %v", got, tt.tab)
@@ -190,7 +208,14 @@ func Test_getChannels(t *testing.T) {
 func Test_gettypes(t *testing.T) {
 	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
-	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	tabWriter := tabwriter.NewWriter(
+		bufResp,
+		0,
+		0,
+		3,
+		' ',
+		tabwriter.AlignRight|tabwriter.Debug,
+	)
 	fmt.Fprint(tabWriter, "NAME\n")
 	fmt.Fprint(tabWriter, "ct1\n")
 	tabWriter.Flush()
@@ -261,7 +286,14 @@ func Test_getNodes(t *testing.T) {
 	prepareToken(t)
 
 	bufResp := bytes.NewBufferString("")
-	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	tabWriter := tabwriter.NewWriter(
+		bufResp,
+		0,
+		0,
+		3,
+		' ',
+		tabwriter.AlignRight|tabwriter.Debug,
+	)
 	fmt.Fprint(tabWriter, "NAME\n")
 	fmt.Fprint(tabWriter, "thenewapp\n")
 	tabWriter.Flush()
@@ -390,7 +422,11 @@ func Test_getObj(t *testing.T) {
 				t.Errorf("getObj() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(tt.lines, tt.args.lines) {
-				t.Errorf("getObj() error = %v, want %v", tt.args.lines, tt.lines)
+				t.Errorf(
+					"getObj() error = %v, want %v",
+					tt.args.lines,
+					tt.lines,
+				)
 			}
 		})
 	}
@@ -420,7 +456,11 @@ func Test_printApps(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			printApps(tt.args.app, tt.args.lines)
 			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
-				t.Errorf("printApps() error = %v, want %v", tt.args.lines, tt.lines)
+				t.Errorf(
+					"printApps() error = %v, want %v",
+					tt.args.lines,
+					tt.lines,
+				)
 			}
 		})
 	}
@@ -450,7 +490,11 @@ func Test_printChannels(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			printChannels(tt.args.app, tt.args.lines)
 			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
-				t.Errorf("printChannels() error = %v, want %v", tt.args.lines, tt.lines)
+				t.Errorf(
+					"printChannels() error = %v, want %v",
+					tt.args.lines,
+					tt.lines,
+				)
 			}
 		})
 	}
@@ -480,7 +524,11 @@ func Test_printtypes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			printTypes(tt.args.app, tt.args.lines)
 			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
-				t.Errorf("printtypes() error = %v, want %v", tt.args.lines, tt.lines)
+				t.Errorf(
+					"printtypes() error = %v, want %v",
+					tt.args.lines,
+					tt.lines,
+				)
 			}
 		})
 	}
@@ -510,7 +558,11 @@ func Test_printNodes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			printNodes(tt.args.app, tt.args.lines)
 			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
-				t.Errorf("printNodes() error = %v, want %v", tt.args.lines, tt.lines)
+				t.Errorf(
+					"printNodes() error = %v, want %v",
+					tt.args.lines,
+					tt.lines,
+				)
 			}
 		})
 	}
@@ -540,7 +592,11 @@ func Test_printLine(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			printLine(tt.args.name, tt.args.lines)
 			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
-				t.Errorf("printLine() error = %v, want %v", tt.args.lines, tt.lines)
+				t.Errorf(
+					"printLine() error = %v, want %v",
+					tt.args.lines,
+					tt.lines,
+				)
 			}
 		})
 	}
@@ -568,7 +624,11 @@ func Test_initTab(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			initTab(tt.args.lines)
 			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
-				t.Errorf("initTab() error = %v, want %v", tt.args.lines, tt.lines)
+				t.Errorf(
+					"initTab() error = %v, want %v",
+					tt.args.lines,
+					tt.lines,
+				)
 			}
 		})
 	}
@@ -577,7 +637,14 @@ func Test_initTab(t *testing.T) {
 func Test_printTab(t *testing.T) {
 	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
-	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	tabWriter := tabwriter.NewWriter(
+		bufResp,
+		0,
+		0,
+		3,
+		' ',
+		tabwriter.AlignRight|tabwriter.Debug,
+	)
 
 	fmt.Fprint(tabWriter, "line\n")
 	tabWriter.Flush()
@@ -636,7 +703,11 @@ func Test_printAliases(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			printAliases(tt.args.app, tt.args.lines)
 			if !reflect.DeepEqual(tt.lines, tt.args.lines) {
-				t.Errorf("printAliases() error = %v, want %v", tt.args.lines, tt.lines)
+				t.Errorf(
+					"printAliases() error = %v, want %v",
+					tt.args.lines,
+					tt.lines,
+				)
 			}
 		})
 	}
@@ -645,7 +716,14 @@ func Test_printAliases(t *testing.T) {
 func Test_getAlias(t *testing.T) {
 	prepareToken(t)
 	bufResp := bytes.NewBufferString("")
-	tabWriter := tabwriter.NewWriter(bufResp, 0, 0, 3, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	tabWriter := tabwriter.NewWriter(
+		bufResp,
+		0,
+		0,
+		3,
+		' ',
+		tabwriter.AlignRight|tabwriter.Debug,
+	)
 	fmt.Fprint(tabWriter, "NAME\n")
 	fmt.Fprint(tabWriter, "alias.name\n")
 	tabWriter.Flush()

@@ -19,21 +19,27 @@ func WithSelector(sel *metav1.LabelSelector) DeploymentOption {
 // WithContainer adds containers to the deployment
 func WithContainer(cont ...corev1.Container) DeploymentOption {
 	return func(d *appsv1.Deployment) {
-		d.Spec.Template.Spec.Containers = append(d.Spec.Template.Spec.Containers, cont...)
+		d.Spec.Template.Spec.Containers = append(
+			d.Spec.Template.Spec.Containers,
+			cont...)
 	}
 }
 
 // WithInitContainers adds initialization containers to the deployment
 func WithInitContainers(cont ...corev1.Container) DeploymentOption {
 	return func(d *appsv1.Deployment) {
-		d.Spec.Template.Spec.InitContainers = append(d.Spec.Template.Spec.InitContainers, cont...)
+		d.Spec.Template.Spec.InitContainers = append(
+			d.Spec.Template.Spec.InitContainers,
+			cont...)
 	}
 }
 
 // WithVolumes adds volumes to a deployment
 func WithVolumes(vol ...corev1.Volume) DeploymentOption {
 	return func(d *appsv1.Deployment) {
-		d.Spec.Template.Spec.Volumes = append(d.Spec.Template.Spec.Volumes, vol...)
+		d.Spec.Template.Spec.Volumes = append(
+			d.Spec.Template.Spec.Volumes,
+			vol...)
 	}
 }
 
@@ -85,7 +91,10 @@ func WithAnnotations(labels map[string]string) DeploymentOption {
 }
 
 // NewDeployment creates a deployment with the given options applied to it
-func NewDeployment(name string, options ...DeploymentOption) *appsv1.Deployment {
+func NewDeployment(
+	name string,
+	options ...DeploymentOption,
+) *appsv1.Deployment {
 	cont := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,

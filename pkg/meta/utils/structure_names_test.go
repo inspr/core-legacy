@@ -123,7 +123,11 @@ func TestStructureNameIsValid(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := StructureNameIsValid(tt.args.name)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("StructureNameIsValid() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"StructureNameIsValid() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 		})
@@ -164,7 +168,11 @@ func TestAliasNameIsValid(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := AliasNameIsValid(tt.args.name); (err != nil) != tt.wantErr {
-				t.Errorf("AliasNameIsValid() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AliasNameIsValid() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

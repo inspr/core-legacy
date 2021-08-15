@@ -71,7 +71,12 @@ func (h Handler) JSON() Handler {
 
 // Validate handles the token validation of the http requests made, it receives an implementation of the auth interface as a parameter.
 func (h Handler) Validate(auth auth.Auth) Handler {
-	logger, _ := logs.Logger(zap.Fields(zap.String("section", "api"), zap.String("subSection", "authorization-middleware")))
+	logger, _ := logs.Logger(
+		zap.Fields(
+			zap.String("section", "api"),
+			zap.String("subSection", "authorization-middleware"),
+		),
+	)
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Authorization: Bearer <token>
 		headerContent := r.Header["Authorization"]
@@ -106,24 +111,42 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 
 		// used for checking scope authorization
 		reqScopes := r.Header[HeaderScopeKey]
-		logger.Debug("payload permissions", zap.Any("permissions", payload.Permissions))
+		logger.Debug(
+			"payload permissions",
+			zap.Any("permissions", payload.Permissions),
+		)
 
 		// used for checking permissions
 		operation := getOperation(r)
 		target := getTarget(r)
 		perm := operation + ":" + target
-		logger.Info("validating permissions for request", zap.String("operation", operation), zap.String("target", target))
+		logger.Info(
+			"validating permissions for request",
+			zap.String("operation", operation),
+			zap.String("target", target),
+		)
 
 		for scope := range payload.Permissions {
-			logger.Debug("checking permissions for scope", zap.String("token-scope", scope))
+			logger.Debug(
+				"checking permissions for scope",
+				zap.String("token-scope", scope),
+			)
 
 			// usually the request will one have one scope
 			for _, rs := range reqScopes {
-				logger.Debug("comparing scope with token scope", zap.String("request-scope", rs))
+				logger.Debug(
+					"comparing scope with token scope",
+					zap.String("request-scope", rs),
+				)
 
 				if strings.HasPrefix(rs, scope) &&
 					utils.Includes(payload.Permissions[scope], perm) {
-					logger.Info("permission granted for request", zap.String("request-scope", rs), zap.String("token-scope", scope), zap.String("request", perm))
+					logger.Info(
+						"permission granted for request",
+						zap.String("request-scope", rs),
+						zap.String("token-scope", scope),
+						zap.String("request", perm),
+					)
 					h(w, r)
 					return
 				}
@@ -131,7 +154,11 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		}
 
 		// there were no valid operations
-		logger.Info("insufficient credentials, refusing request", zap.String("requested-permission", perm), zap.Strings("requested-scopes", reqScopes))
+		logger.Info(
+			"insufficient credentials, refusing request",
+			zap.String("requested-permission", perm),
+			zap.Strings("requested-scopes", reqScopes),
+		)
 		ERROR(
 			w,
 			ierrors.New(

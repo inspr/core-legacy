@@ -35,13 +35,15 @@ func GetMapCompareOptions() cmp.Options {
 	opts := cmp.Options{
 		cmp.FilterValues(func(x, y interface{}) bool {
 			vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
-			flag := (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) && (vx.Kind() == reflect.Map)
+			flag := (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) &&
+				(vx.Kind() == reflect.Map)
 			return flag
 		}, evaluatesMap),
 
 		cmp.FilterValues(func(x, y interface{}) bool {
 			vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
-			flag := (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) && (vx.Kind() == reflect.Slice)
+			flag := (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) &&
+				(vx.Kind() == reflect.Slice)
 			return flag
 		}, alwaysTrue),
 	}

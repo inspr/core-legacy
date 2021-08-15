@@ -38,12 +38,20 @@ func TestBrokersMemoryManager_Get(t *testing.T) {
 			got, err := bmm.Get()
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("BrokersMemoryManager.GetAll() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"BrokersMemoryManager.GetAll() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("BrokersMemoryManager.GetAll() = %v, want %v", got, tt.want)
+				t.Errorf(
+					"BrokersMemoryManager.GetAll() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -92,11 +100,19 @@ func TestBrokersMemoryManager_get(t *testing.T) {
 			resetBrokers()
 			got, err := tt.bmm.get()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("BrokersMemoryManager.get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"BrokersMemoryManager.get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("BrokersMemoryManager.get() = %v, want %v", got, tt.want)
+				t.Errorf(
+					"BrokersMemoryManager.get() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -164,7 +180,11 @@ func TestBrokersMemoryManager_Create_and_SetDefault(t *testing.T) {
 			bmm := GetBrokerMemory()
 			if tt.exec != nil {
 				if err := tt.exec(bmm); (err != nil) != tt.wantErr {
-					t.Errorf("BrokersMemoryManager method error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf(
+						"BrokersMemoryManager method error = %v, wantErr %v",
+						err,
+						tt.wantErr,
+					)
 					return
 				}
 			}
@@ -236,11 +256,19 @@ func Test_brokerMemoryManager_Configs(t *testing.T) {
 			}
 			got, err := bmm.Configs(tt.args.broker)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("brokerMemoryManager.Configs() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"brokerMemoryManager.Configs() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("brokerMemoryManager.Configs() = %v, want %v", got, tt.want)
+				t.Errorf(
+					"brokerMemoryManager.Configs() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}

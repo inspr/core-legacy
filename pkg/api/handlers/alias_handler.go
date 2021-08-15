@@ -20,7 +20,10 @@ type AliasHandler struct {
 func (handler *Handler) NewAliasHandler() *AliasHandler {
 	return &AliasHandler{
 		Handler: handler,
-		logger:  logger.With(zap.String("section", "api"), zap.String("subSection", "aliases")),
+		logger: logger.With(
+			zap.String("section", "api"),
+			zap.String("subSection", "aliases"),
+		),
 	}
 }
 
@@ -35,7 +38,10 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
-			l.Error("unable to decode Alias create request data", zap.Error(err))
+			l.Error(
+				"unable to decode Alias create request data",
+				zap.Error(err),
+			)
 			rest.ERROR(w, err)
 			ah.Memory.Tree().Cancel()
 			return
@@ -60,7 +66,10 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 
 		changes, err := ah.Memory.Tree().GetTransactionChanges()
 		if err != nil {
-			l.Error("unable to get Alias create request changes", zap.Error(err))
+			l.Error(
+				"unable to get Alias create request changes",
+				zap.Error(err),
+			)
 			rest.ERROR(w, err)
 			ah.Memory.Tree().Cancel()
 			return
@@ -70,7 +79,10 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 			l.Debug("applying Alias create changes in diff")
 			err = ah.applyChangesInDiff(changes)
 			if err != nil {
-				l.Error("unable to apply Alias create changes in diff", zap.Error(err))
+				l.Error(
+					"unable to apply Alias create changes in diff",
+					zap.Error(err),
+				)
 				rest.ERROR(w, err)
 				ah.Memory.Tree().Cancel()
 				return
@@ -139,7 +151,10 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
-			l.Error("unable to decode Alias update request data", zap.Error(err))
+			l.Error(
+				"unable to decode Alias update request data",
+				zap.Error(err),
+			)
 			rest.ERROR(w, err)
 			return
 		}
@@ -163,7 +178,10 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 
 		changes, err := ah.Memory.Tree().GetTransactionChanges()
 		if err != nil {
-			l.Error("unable to get Alias update request changes", zap.Error(err))
+			l.Error(
+				"unable to get Alias update request changes",
+				zap.Error(err),
+			)
 			rest.ERROR(w, err)
 			ah.Memory.Tree().Cancel()
 			return
@@ -173,7 +191,10 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 			l.Debug("applying Alias update changes in diff")
 			err = ah.applyChangesInDiff(changes)
 			if err != nil {
-				l.Error("unable to apply Alias update changes in diff", zap.Error(err))
+				l.Error(
+					"unable to apply Alias update changes in diff",
+					zap.Error(err),
+				)
 				rest.ERROR(w, err)
 				ah.Memory.Tree().Cancel()
 				return
@@ -225,7 +246,10 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 
 		changes, err := ah.Memory.Tree().Alias().GetTransactionChanges()
 		if err != nil {
-			l.Error("unable to get Alias delete request changes", zap.Error(err))
+			l.Error(
+				"unable to get Alias delete request changes",
+				zap.Error(err),
+			)
 			rest.ERROR(w, err)
 			ah.Memory.Tree().Cancel()
 			return
@@ -235,7 +259,10 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 			l.Debug("applying Alias delete changes in diff")
 			err = ah.applyChangesInDiff(changes)
 			if err != nil {
-				l.Error("unable to apply Alias delete changes in diff", zap.Error(err))
+				l.Error(
+					"unable to apply Alias delete changes in diff",
+					zap.Error(err),
+				)
 				rest.ERROR(w, err)
 				ah.Memory.Tree().Cancel()
 				return

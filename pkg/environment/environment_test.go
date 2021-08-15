@@ -124,7 +124,10 @@ func TestRefreshEnviromentVariables(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			if got := RefreshEnviromentVariables(); !reflect.DeepEqual(got, tt.want) {
+			if got := RefreshEnviromentVariables(); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("GetEnvironment() = %v, want %v", got, tt.want)
 			}
 		})
@@ -169,7 +172,11 @@ func TestRecoverEnvironmentErrors(t *testing.T) {
 			err = <-cherr
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("RecoverEnvironmentErrors() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"RecoverEnvironmentErrors() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

@@ -59,7 +59,10 @@ func (no *NodeOperator) dappToService(app *meta.App) *kubeService {
 }
 
 // dAppToDeployment translates the DApp to a k8s deployment
-func (no *NodeOperator) dAppToDeployment(app *meta.App, usePermTree bool) *kubeDeployment {
+func (no *NodeOperator) dAppToDeployment(
+	app *meta.App,
+	usePermTree bool,
+) *kubeDeployment {
 	appDeployName := toDeploymentName(app)
 	appLabels := map[string]string{
 		"inspr-app": toAppID(app),
@@ -67,7 +70,11 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App, usePermTree bool) *kubeD
 	logger.Info("constructing deployment", zap.Bool("useperm", usePermTree))
 
 	nodeContainer := createNodeContainer(app, appDeployName)
-	scContainers := no.withAllSidecarsContainers(app, appDeployName, usePermTree)
+	scContainers := no.withAllSidecarsContainers(
+		app,
+		appDeployName,
+		usePermTree,
+	)
 
 	return (*kubeDeployment)(
 		k8s.NewDeployment(
@@ -80,7 +87,11 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App, usePermTree bool) *kubeD
 		))
 }
 
-func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName string, usePermTree bool) []corev1.Container {
+func (no *NodeOperator) withAllSidecarsContainers(
+	app *meta.App,
+	appDeployName string,
+	usePermTree bool,
+) []corev1.Container {
 	var containers []corev1.Container
 	var sidecarAddrs []corev1.EnvVar
 	for _, broker := range no.getAllSidecarBrokers(app, usePermTree) {
@@ -91,7 +102,10 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 			panic(fmt.Sprintf("broker %v not allowed: %v", broker, err))
 		}
 
-		logger.Info("with all sidecars containers", zap.Bool("useperm", usePermTree))
+		logger.Info(
+			"with all sidecars containers",
+			zap.Bool("useperm", usePermTree),
+		)
 
 		container, addrEnvVar := factory(app,
 			getAvailiblePorts(),
@@ -127,7 +141,10 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 	return containers
 }
 
-func (no *NodeOperator) getAllSidecarBrokers(app *meta.App, usePermTree bool) utils.StringArray {
+func (no *NodeOperator) getAllSidecarBrokers(
+	app *meta.App,
+	usePermTree bool,
+) utils.StringArray {
 	input := app.Spec.Boundary.Input
 	output := app.Spec.Boundary.Output
 	channels := input.Union(output)
@@ -165,7 +182,10 @@ func (no *NodeOperator) getAllSidecarBrokers(app *meta.App, usePermTree bool) ut
 }
 
 // withBoundary adds the boundary configuration to the kubernetes' deployment environment variables
-func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.ContainerOption {
+func (no *NodeOperator) withBoundary(
+	app *meta.App,
+	usePermTree bool,
+) k8s.ContainerOption {
 	scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
 	if _, err := no.memory.Apps().Get(scope); err != nil {
 		return nil
@@ -197,7 +217,10 @@ func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.Contai
 			"INSPR_OUTPUT_CHANNELS": outputEnv.Join(";"),
 		}
 
-		logger.Debug("resolving with Node Boundary", zap.Bool("useperm", usePermTree))
+		logger.Debug(
+			"resolving with Node Boundary",
+			zap.Bool("useperm", usePermTree),
+		)
 		channels.Map(func(boundary string) string {
 			resolved := resolves[boundary]
 			parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
@@ -212,11 +235,17 @@ func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.Contai
 				ct, cterr = no.memory.Types().Get(parent, ch.Spec.Type)
 			}
 			if cherr != nil {
-				logger.Error("Unable to get channel to resolve with boundary", zap.String("channel", chName))
+				logger.Error(
+					"Unable to get channel to resolve with boundary",
+					zap.String("channel", chName),
+				)
 				panic(err)
 			}
 			if cterr != nil {
-				logger.Error("Unable to get channel type to resolve with boundary", zap.String("type", ch.Spec.Type))
+				logger.Error(
+					"Unable to get channel type to resolve with boundary",
+					zap.String("type", ch.Spec.Type),
+				)
 				panic(err)
 			}
 			resolved = "INSPR_" + ch.Meta.UUID
@@ -224,7 +253,10 @@ func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.Contai
 			env[boundary+"_RESOLVED"] = resolved
 			return boundary
 		})
-		logger.Debug("resolved with Node Boundary", zap.Bool("useperm", usePermTree))
+		logger.Debug(
+			"resolved with Node Boundary",
+			zap.Bool("useperm", usePermTree),
+		)
 
 		c.Env = append(c.Env, env.ParseToK8sArrEnv()...)
 	}
@@ -237,7 +269,9 @@ func (no *NodeOperator) withLBSidecarImage(app *meta.App) k8s.ContainerOption {
 	}
 }
 
-func (no *NodeOperator) returnChannelBroker(channel, pathToResolvedChannel string) string {
+func (no *NodeOperator) returnChannelBroker(
+	channel, pathToResolvedChannel string,
+) string {
 	scope, chName, err := metautils.RemoveLastPartInScope(pathToResolvedChannel)
 	if err != nil {
 		return ""
@@ -262,8 +296,11 @@ func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
 		Permissions: map[string][]string{
 			app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
 		},
-		Refresh:    []byte(scope),
-		RefreshURL: fmt.Sprintf("http://%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
+		Refresh: []byte(scope),
+		RefreshURL: fmt.Sprintf(
+			"http://%v/refreshController",
+			os.Getenv("INSPR_INSPRD_ADDRESS"),
+		),
 	}
 
 	token, err := no.auth.Tokenize(payload)

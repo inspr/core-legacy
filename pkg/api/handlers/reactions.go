@@ -12,11 +12,17 @@ import (
 var reactionLogger *zap.Logger
 
 func init() {
-	reactionLogger = logger.With(zap.String("section", "api"), zap.String("subSection", "reactions"))
+	reactionLogger = logger.With(
+		zap.String("section", "api"),
+		zap.String("subSection", "reactions"),
+	)
 }
 
 var createdNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {
-	l := reactionLogger.With(zap.String("subsection", "nodes"), zap.String("operation", "create"))
+	l := reactionLogger.With(
+		zap.String("subsection", "nodes"),
+		zap.String("operation", "create"),
+	)
 	return diff.NewChangeReaction(
 		func(c diff.Change) bool {
 			_, errFrom := handler.Memory.Tree().Perm().Apps().Get(c.Scope)
@@ -26,7 +32,8 @@ var createdNodes func(handler *Handler) diff.ChangeReaction = func(handler *Hand
 		func(c diff.Change) error {
 			l.Info("creating node", zap.String("node", c.Scope))
 			to, _ := handler.Memory.Tree().Apps().Get(c.Scope)
-			_, err := handler.Operator.Nodes().CreateNode(context.Background(), to)
+			_, err := handler.Operator.Nodes().
+				CreateNode(context.Background(), to)
 			return err
 		},
 	)
@@ -34,7 +41,10 @@ var createdNodes func(handler *Handler) diff.ChangeReaction = func(handler *Hand
 
 // apply this on deleted channels
 var deletedChannels func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
-	l := reactionLogger.With(zap.String("subsection", "channels"), zap.String("operation", "delete"))
+	l := reactionLogger.With(
+		zap.String("subsection", "channels"),
+		zap.String("operation", "delete"),
+	)
 	return diff.NewDifferenceReaction(
 		func(_ string, d diff.Difference) bool {
 			// if the diff is the diff of a channel and the channel has been deleted
@@ -42,9 +52,14 @@ var deletedChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 		},
 		func(scope string, d diff.Difference) error {
 			l.Info("deleting channel", zap.Any("channel", d.Name))
-			err := handler.Operator.Channels().Delete(context.Background(), scope, d.Name)
+			err := handler.Operator.Channels().
+				Delete(context.Background(), scope, d.Name)
 			if err != nil {
-				l.Error("unable to delete channel", zap.String("channel", d.Name), zap.String("scope", scope))
+				l.Error(
+					"unable to delete channel",
+					zap.String("channel", d.Name),
+					zap.String("scope", scope),
+				)
 			}
 			return err
 		},
@@ -53,7 +68,10 @@ var deletedChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 
 // apply this on created channels
 var createdChannels func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
-	l := reactionLogger.With(zap.String("subsection", "channels"), zap.String("operation", "create"))
+	l := reactionLogger.With(
+		zap.String("subsection", "channels"),
+		zap.String("operation", "create"),
+	)
 	return diff.NewDifferenceReaction(
 		func(scope string, d diff.Difference) bool {
 			// if the diff is the diff of a channel and the channel has been created
@@ -61,10 +79,18 @@ var createdChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 		},
 		func(scope string, d diff.Difference) error {
 			l.Info("creating channel", zap.Any("channel", d.Name))
-			ch, _ := handler.Memory.Tree().Channels().Get(scope, d.Name) // get the actual channel definition from memory
-			err := handler.Operator.Channels().Create(context.Background(), scope, ch)
+			ch, _ := handler.Memory.Tree().
+				Channels().
+				Get(scope, d.Name)
+				// get the actual channel definition from memory
+			err := handler.Operator.Channels().
+				Create(context.Background(), scope, ch)
 			if err != nil {
-				l.Error("unable to create channel", zap.String("channel", ch.Meta.Name), zap.String("scope", scope))
+				l.Error(
+					"unable to create channel",
+					zap.String("channel", ch.Meta.Name),
+					zap.String("scope", scope),
+				)
 			}
 			return err
 
@@ -74,7 +100,10 @@ var createdChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 
 // apply this on deleted apps
 var deletedApps func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
-	l := reactionLogger.With(zap.String("subsection", "apps"), zap.String("operation", "delete"))
+	l := reactionLogger.With(
+		zap.String("subsection", "apps"),
+		zap.String("operation", "delete"),
+	)
 	return diff.NewDifferenceReaction(
 		func(scope string, d diff.Difference) bool {
 			// if the diff is the diff of an app and the app has been created
@@ -83,14 +112,26 @@ var deletedApps func(handler *Handler) diff.DifferenceReaction = func(handler *H
 		func(scope string, d diff.Difference) error {
 			scope, _ = utils.JoinScopes(scope, d.Name)
 			l.Info("deleting app and subcomponents", zap.Any("app", d.Name))
-			app, err := handler.Memory.Tree().Perm().Apps().Get(scope) // get the app definition from the cluster
+			app, err := handler.Memory.Tree().
+				Perm().
+				Apps().
+				Get(scope)
+				// get the app definition from the cluster
 			if err != nil {
-				l.Error("unable to delete dapp and subcomponents", zap.String("app", scope), zap.Error(err))
+				l.Error(
+					"unable to delete dapp and subcomponents",
+					zap.String("app", scope),
+					zap.Error(err),
+				)
 				return err
 			}
 			err = handler.deleteApp(app)
 			if err != nil {
-				l.Error("unable to delete dapp and subcomponents", zap.String("app", scope), zap.Error(err))
+				l.Error(
+					"unable to delete dapp and subcomponents",
+					zap.String("app", scope),
+					zap.Error(err),
+				)
 				return err
 			}
 			return err // delete app recursively (all nodes and channels defined) from the cluster
@@ -100,7 +141,10 @@ var deletedApps func(handler *Handler) diff.DifferenceReaction = func(handler *H
 
 // apply this on updated Types
 var updatedTypes func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
-	l := reactionLogger.With(zap.String("subsection", "types"), zap.String("operation", "update"))
+	l := reactionLogger.With(
+		zap.String("subsection", "types"),
+		zap.String("operation", "update"),
+	)
 	return diff.NewDifferenceReaction(
 		func(scope string, d diff.Difference) bool {
 			// if the diff is for a Type and the Type has been updated
@@ -111,22 +155,40 @@ var updatedTypes func(handler *Handler) diff.DifferenceReaction = func(handler *
 				Errors: []error{},
 			}
 
-			l.Info("updating type and components that depend on it", zap.Any("type", d.Name))
+			l.Info(
+				"updating type and components that depend on it",
+				zap.Any("type", d.Name),
+			)
 
 			ct, _ := handler.Memory.Tree().Types().Get(scope, d.Name)
 
 			for _, channelName := range ct.ConnectedChannels { // for each channel connected to the Type
-				channel, _ := handler.Memory.Tree().Channels().Get(scope, channelName)
+				channel, _ := handler.Memory.Tree().
+					Channels().
+					Get(scope, channelName)
 
 				for _, appName := range channel.ConnectedApps { // for each app connected to each channel
 					newScope, _ := utils.JoinScopes(scope, appName)
-					app, _ := handler.Memory.Tree().Apps().Get(newScope) // get the app definition from memory
+					app, _ := handler.Memory.Tree().
+						Apps().
+						Get(newScope)
+						// get the app definition from memory
 
 					if app.Spec.Node.Spec.Image != "" { // if the app is a node, update it
-						l.Debug("updating node that depends on type", zap.String("node", app.Meta.Name), zap.String("scope", app.Meta.Parent))
-						_, err := handler.Operator.Nodes().UpdateNode(context.Background(), app)
+						l.Debug(
+							"updating node that depends on type",
+							zap.String("node", app.Meta.Name),
+							zap.String("scope", app.Meta.Parent),
+						)
+						_, err := handler.Operator.Nodes().
+							UpdateNode(context.Background(), app)
 						if err != nil {
-							l.Error("unable to update node", zap.String("node", app.Meta.Name), zap.String("scope", app.Meta.Parent), zap.Error(err))
+							l.Error(
+								"unable to update node",
+								zap.String("node", app.Meta.Name),
+								zap.String("scope", app.Meta.Parent),
+								zap.Error(err),
+							)
 							errors.Add(err)
 						}
 					}
@@ -142,7 +204,10 @@ var updatedTypes func(handler *Handler) diff.DifferenceReaction = func(handler *
 
 // apply this on updated channels
 var updatedChannels func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
-	l := reactionLogger.With(zap.String("subsection", "channels"), zap.String("operation", "update"))
+	l := reactionLogger.With(
+		zap.String("subsection", "channels"),
+		zap.String("operation", "update"),
+	)
 	return diff.NewDifferenceReaction(
 		func(scope string, d diff.Difference) bool {
 			// if the diff is for a channel and the channel has been updated
@@ -153,23 +218,39 @@ var updatedChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 				Errors: []error{},
 			}
 
-			l.Info("updating channel and nodes that are connected to it", zap.Any("channel", d.Name))
+			l.Info(
+				"updating channel and nodes that are connected to it",
+				zap.Any("channel", d.Name),
+			)
 
 			channel, _ := handler.Memory.Tree().Channels().Get(scope, d.Name)
-			err := handler.Operator.Channels().Update(context.Background(), scope, channel)
+			err := handler.Operator.Channels().
+				Update(context.Background(), scope, channel)
 			if err != nil {
 				return err
 			}
 			// this updates the connected nodes, so that the environment variables are consistent with
 			// the channel definition
 			for _, appName := range channel.ConnectedApps { // for each app connected to each channel
-				app, _ := handler.Memory.Tree().Apps().Get(scope + "." + appName)
+				app, _ := handler.Memory.Tree().
+					Apps().
+					Get(scope + "." + appName)
 
 				if app.Spec.Node.Spec.Image != "" { // if the app is a node, update it
-					l.Debug("updating node that depends on channel", zap.String("node", app.Meta.Name), zap.String("scope", app.Meta.Parent))
-					_, err := handler.Operator.Nodes().UpdateNode(context.Background(), app)
+					l.Debug(
+						"updating node that depends on channel",
+						zap.String("node", app.Meta.Name),
+						zap.String("scope", app.Meta.Parent),
+					)
+					_, err := handler.Operator.Nodes().
+						UpdateNode(context.Background(), app)
 					if err != nil {
-						l.Error("unable to update node", zap.String("node", app.Meta.Name), zap.String("scope", app.Meta.Parent), zap.Error(err))
+						l.Error(
+							"unable to update node",
+							zap.String("node", app.Meta.Name),
+							zap.String("scope", app.Meta.Parent),
+							zap.Error(err),
+						)
 						errs.Add(err)
 					}
 				}
@@ -184,7 +265,10 @@ var updatedChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 
 // apply this to updated nodes
 var updatedNodes func(handler *Handler) diff.ChangeReaction = func(handler *Handler) diff.ChangeReaction {
-	l := reactionLogger.With(zap.String("subsection", "nodes"), zap.String("operation", "update"))
+	l := reactionLogger.With(
+		zap.String("subsection", "nodes"),
+		zap.String("operation", "update"),
+	)
 	return diff.NewChangeReaction(
 		func(c diff.Change) bool {
 			from, _ := handler.Memory.Tree().Perm().Apps().Get(c.Scope)
@@ -200,9 +284,15 @@ var updatedNodes func(handler *Handler) diff.ChangeReaction = func(handler *Hand
 			if to == nil || to.Spec.Node.Spec.Image == "" {
 				return nil
 			}
-			_, err := handler.Operator.Nodes().UpdateNode(context.Background(), to) // update it in the cluster
+			_, err := handler.Operator.Nodes().
+				UpdateNode(context.Background(), to)
+				// update it in the cluster
 			if err != nil {
-				l.Error("unable to update node", zap.Any("node", c.Scope), zap.Error(err))
+				l.Error(
+					"unable to update node",
+					zap.Any("node", c.Scope),
+					zap.Error(err),
+				)
 				errs.Add(err)
 			}
 			if !errs.Empty() {
@@ -215,20 +305,34 @@ var updatedNodes func(handler *Handler) diff.ChangeReaction = func(handler *Hand
 
 // apply this to updated aliases
 var updatedAliases func(handler *Handler) diff.DifferenceReaction = func(handler *Handler) diff.DifferenceReaction {
-	l := reactionLogger.With(zap.String("subsection", "aliases"), zap.String("operation", "update"))
+	l := reactionLogger.With(
+		zap.String("subsection", "aliases"),
+		zap.String("operation", "update"),
+	)
 	return diff.NewDifferenceReaction(
 		func(scope string, d diff.Difference) bool {
 			return (d.Kind|diff.AliasKind > 0) && (d.Operation&diff.Update > 0)
 		},
 		func(scope string, d diff.Difference) error {
 			appName, boundaryName, _ := utils.RemoveLastPartInScope(d.Name)
-			logger.Info("updating alias and components that are dependent on it", zap.Any("alias", d.Name))
+			logger.Info(
+				"updating alias and components that are dependent on it",
+				zap.Any("alias", d.Name),
+			)
 			newScope, _ := utils.JoinScopes(scope, appName)
 			app, err := handler.Memory.Tree().Apps().Get(newScope)
-			if err == nil && app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(boundaryName) {
-				_, err := handler.Operator.Nodes().UpdateNode(context.Background(), app)
+			if err == nil &&
+				app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).
+					Contains(boundaryName) {
+				_, err := handler.Operator.Nodes().
+					UpdateNode(context.Background(), app)
 				if err != nil {
-					l.Error("unable to delete node", zap.String("node", app.Meta.Name), zap.String("scope", app.Meta.Parent), zap.Error(err))
+					l.Error(
+						"unable to delete node",
+						zap.String("node", app.Meta.Name),
+						zap.String("scope", app.Meta.Parent),
+						zap.Error(err),
+					)
 					return err
 				}
 			}

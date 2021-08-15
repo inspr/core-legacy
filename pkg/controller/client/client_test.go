@@ -225,7 +225,8 @@ func TestClient_Alias(t *testing.T) {
 func TestClient_Auth(t *testing.T) {
 	check := func(x interface{}) bool {
 		// Declare a type object representing AuthorizationInterface
-		authI := reflect.TypeOf((*controller.AuthorizationInterface)(nil)).Elem()
+		authI := reflect.TypeOf((*controller.AuthorizationInterface)(nil)).
+			Elem()
 		// see if implements the AuthorizationInterface
 		return reflect.PtrTo(reflect.TypeOf(x)).Implements(authI)
 	}
@@ -312,7 +313,11 @@ func TestGetInClusterConfigs(t *testing.T) {
 			}
 			got, err := GetInClusterConfigs()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetInClusterConfigs() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"GetInClusterConfigs() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !tt.wantErr {

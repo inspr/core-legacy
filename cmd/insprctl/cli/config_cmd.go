@@ -56,7 +56,12 @@ func doConfigChange(_ context.Context, args []string) error {
 		return err
 	}
 
-	fmt.Fprintf(out, "Success: insprctl config [%v] changed to '%v'\n", key, value)
+	fmt.Fprintf(
+		out,
+		"Success: insprctl config [%v] changed to '%v'\n",
+		key,
+		value,
+	)
 	return nil
 }
 

@@ -68,7 +68,11 @@ var initCommand = cmd.NewCmd("init").
 				}
 			}
 
-			output, _ = os.OpenFile(filepath.Join(defaultFolder, "config"), os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0644)
+			output, _ = os.OpenFile(
+				filepath.Join(defaultFolder, "config"),
+				os.O_TRUNC|os.O_WRONLY|os.O_CREATE,
+				0644,
+			)
 		} else {
 			var err error
 			output, err = os.OpenFile(file, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0644)

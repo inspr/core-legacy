@@ -79,7 +79,11 @@ func Test_mainCmdPreRun(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			buf := bytes.NewBufferString("")
 			if err := mainCmdPreRun(NewInsprCommand(buf, buf, ""), tt.args.args); (err != nil) != tt.wantErr {
-				t.Errorf("mainCmdPreRun() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"mainCmdPreRun() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

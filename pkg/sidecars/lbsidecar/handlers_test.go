@@ -132,7 +132,11 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			}
 
 			if !tt.wantErr && (resp.StatusCode != http.StatusOK) {
-				t.Errorf("Received status %v, wanted %v", resp.StatusCode, http.StatusOK)
+				t.Errorf(
+					"Received status %v, wanted %v",
+					resp.StatusCode,
+					http.StatusOK,
+				)
 				return
 			}
 		})
@@ -208,7 +212,11 @@ func TestServer_readMessageHandler(t *testing.T) {
 			}
 			var testServer *httptest.Server
 			if tt.port != "" {
-				testServer = createMockedServer(tt.port, tt.channel, tt.msg.Data.(string))
+				testServer = createMockedServer(
+					tt.port,
+					tt.channel,
+					tt.msg.Data.(string),
+				)
 				testServer.Start()
 				defer testServer.Close()
 			}
@@ -234,7 +242,11 @@ func TestServer_readMessageHandler(t *testing.T) {
 			}
 
 			if !tt.wantErr && (resp.StatusCode != http.StatusOK) {
-				t.Errorf("Received status %v, wanted %v", resp.StatusCode, http.StatusOK)
+				t.Errorf(
+					"Received status %v, wanted %v",
+					resp.StatusCode,
+					http.StatusOK,
+				)
 				return
 			}
 		})

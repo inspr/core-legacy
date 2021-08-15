@@ -23,7 +23,10 @@ func NewNodeOperator(err error) operators.NodeOperatorInterface {
 }
 
 // CreateNode mock
-func (o *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (o *NodeOperator) CreateNode(
+	ctx context.Context,
+	app *meta.App,
+) (*meta.Node, error) {
 
 	if o.err != nil {
 		return nil, o.err
@@ -36,7 +39,10 @@ func (o *NodeOperator) CreateNode(ctx context.Context, app *meta.App) (*meta.Nod
 }
 
 // GetNode mock
-func (o *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (o *NodeOperator) GetNode(
+	ctx context.Context,
+	app *meta.App,
+) (*meta.Node, error) {
 	if o.err != nil {
 		return nil, o.err
 	}
@@ -52,7 +58,10 @@ func (o *NodeOperator) GetNode(ctx context.Context, app *meta.App) (*meta.Node, 
 }
 
 // UpdateNode mock
-func (o *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Node, error) {
+func (o *NodeOperator) UpdateNode(
+	ctx context.Context,
+	app *meta.App,
+) (*meta.Node, error) {
 	if o.err != nil {
 		return nil, o.err
 	}
@@ -68,7 +77,11 @@ func (o *NodeOperator) UpdateNode(ctx context.Context, app *meta.App) (*meta.Nod
 }
 
 // DeleteNode mock
-func (o *NodeOperator) DeleteNode(ctx context.Context, nodeContext string, nodeName string) error {
+func (o *NodeOperator) DeleteNode(
+	ctx context.Context,
+	nodeContext string,
+	nodeName string,
+) error {
 	if o.err != nil {
 		return o.err
 	}

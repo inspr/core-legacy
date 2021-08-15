@@ -71,15 +71,28 @@ func Test_doConfigChange(t *testing.T) {
 	cliutils.ReadDefaultConfig()
 
 	bufResp := bytes.NewBufferString("")
-	fmt.Fprintf(bufResp, "Success: insprctl config [%v] changed to '%v'\n", "key_example", "new_value")
+	fmt.Fprintf(
+		bufResp,
+		"Success: insprctl config [%v] changed to '%v'\n",
+		"key_example",
+		"new_value",
+	)
 	outResp, _ := ioutil.ReadAll(bufResp)
 
 	bufResp3 := bytes.NewBufferString("")
-	fmt.Fprintf(bufResp3, "Success: insprctl config [%v] changed to '%v'\n", "serverip", "http://new_value")
+	fmt.Fprintf(
+		bufResp3,
+		"Success: insprctl config [%v] changed to '%v'\n",
+		"serverip",
+		"http://new_value",
+	)
 	outResp3, _ := ioutil.ReadAll(bufResp3)
 
 	bufResp2 := bytes.NewBufferString("")
-	fmt.Fprintf(bufResp2, "error: key inserted does not exist in the insprctl config\n")
+	fmt.Fprintf(
+		bufResp2,
+		"error: key inserted does not exist in the insprctl config\n",
+	)
 	cliutils.SetOutput(bufResp2)
 	printExistingKeys()
 	outResp2, _ := ioutil.ReadAll(bufResp2)
@@ -117,7 +130,11 @@ func Test_doConfigChange(t *testing.T) {
 			got, _ := ioutil.ReadAll(buf)
 
 			if len(got) != len(tt.expectedOutput) {
-				t.Errorf("doConfigChange() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf(
+					"doConfigChange() = %v, want %v",
+					string(got),
+					string(tt.expectedOutput),
+				)
 			}
 		})
 	}
@@ -174,7 +191,11 @@ func Test_doListConfig(t *testing.T) {
 			got, _ := ioutil.ReadAll(buf)
 
 			if len(got) != len(tt.expectedOutput) {
-				t.Errorf("doConfigChange() = %v, want %v", string(got), string(tt.expectedOutput))
+				t.Errorf(
+					"doConfigChange() = %v, want %v",
+					string(got),
+					string(tt.expectedOutput),
+				)
 			}
 
 		})

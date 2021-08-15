@@ -44,39 +44,65 @@ func mockK8sClientSet(verbsToDepAndErr map[k8sKind]map[string]struct {
 	os.Setenv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET", "earliest")
 	for verb, res := range verbsToDepAndErr {
 		for resource, act := range res {
-			client.Fake.AddReactor(resource, string(verb), func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-				mysar := act.Object
-				return true, mysar, act.error
-			})
+			client.Fake.AddReactor(
+				resource,
+				string(verb),
+				func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
+					mysar := act.Object
+					return true, mysar, act.error
+				},
+			)
 		}
 	}
 	return client
 }
 
-func mockK8sClientset(verb string, dep kubeApp.Deployment, svc kubeCore.Service, erro error, serviceErr error) kubernetes.Interface {
+func mockK8sClientset(
+	verb string,
+	dep kubeApp.Deployment,
+	svc kubeCore.Service,
+	erro error,
+	serviceErr error,
+) kubernetes.Interface {
 	environment.SetMockEnv()
 	client := &fake.Clientset{}
-	client.Fake.AddReactor(verb, "deployments", func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-		mysar := &dep
-		return true, mysar, erro
-	})
-	client.Fake.AddReactor(verb, "services", func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-		mysar := &svc
-		return true, mysar, serviceErr
-	})
+	client.Fake.AddReactor(
+		verb,
+		"deployments",
+		func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
+			mysar := &dep
+			return true, mysar, erro
+		},
+	)
+	client.Fake.AddReactor(
+		verb,
+		"services",
+		func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
+			mysar := &svc
+			return true, mysar, serviceErr
+		},
+	)
 	os.Setenv("NODES_APPS_NAMESPACE", "default.node.opr")
 	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
 	os.Setenv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET", "earliest")
 	return client
 }
 
-func mockK8sList(verb string, deps kubeApp.DeploymentList, erro error) kubernetes.Interface {
+func mockK8sList(
+	verb string,
+	deps kubeApp.DeploymentList,
+	erro error,
+) kubernetes.Interface {
 	environment.SetMockEnv()
 	client := &fake.Clientset{}
-	client.Fake.AddReactor(verb, "deployments", func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-		mysar := &deps
-		return true, mysar, erro
-	})
+	client.Fake.AddReactor(
+		verb,
+		"deployments",
+		func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
+			mysar := &deps
+			return true, mysar, erro
+		},
+	)
 	os.Setenv("NODES_APPS_NAMESPACE", "default.node.opr")
 	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", "kafka.default.svc:9092")
 	os.Setenv("INSPR_SIDECAR_KAFKA_AUTO_OFFSET_RESET", "earliest")
@@ -180,7 +206,9 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 					}{
 						k8sService: {
 							"create": {
-								error:  errors.New("this is a bad creation error"),
+								error: errors.New(
+									"this is a bad creation error",
+								),
 								Object: mockService(),
 							},
 						},
@@ -211,7 +239,11 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 			_, err := nop.CreateNode(tt.args.ctx, tt.args.app)
 			tree.GetTreeMemory().Cancel()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NodeOperator.CreateNode() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"NodeOperator.CreateNode() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 		})
@@ -315,7 +347,9 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 					}{
 						k8sService: {
 							"update": {
-								error:  errors.New("this is a bad creation error"),
+								error: errors.New(
+									"this is a bad creation error",
+								),
 								Object: mockService(),
 							},
 						},
@@ -346,7 +380,11 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 			_, err := nop.UpdateNode(tt.args.ctx, tt.args.app)
 			tree.GetTreeMemory().Cancel()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NodeOperator.UpdateNode() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"NodeOperator.UpdateNode() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 		})
@@ -415,7 +453,9 @@ func TestNodeOperator_DeleteNode(t *testing.T) {
 						},
 						k8sDeployment: {
 							"delete": {
-								error:  errors.New("error in deleting deployment"),
+								error: errors.New(
+									"error in deleting deployment",
+								),
 								Object: mockDeployment(),
 							},
 						},
@@ -462,7 +502,11 @@ func TestNodeOperator_DeleteNode(t *testing.T) {
 				auth:      authmock.NewMockAuth(nil),
 			}
 			if err := nop.DeleteNode(tt.args.ctx, tt.args.nodeContext, tt.args.nodeName); (err != nil) != tt.wantErr {
-				t.Errorf("NodeOperator.DeleteNode() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"NodeOperator.DeleteNode() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

@@ -147,8 +147,10 @@ func Test_existingKeys(t *testing.T) {
 			// checking values
 			for _, k := range tt.want {
 				if receivedValues[k] == false {
-					t.Errorf("existingKeys() => %v doesn't exist but is expected",
-						k)
+					t.Errorf(
+						"existingKeys() => %v doesn't exist but is expected",
+						k,
+					)
 				}
 			}
 		})

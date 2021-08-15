@@ -55,7 +55,11 @@ func TestAuthenticator_GetToken(t *testing.T) {
 			}
 			got, err := a.GetToken()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Authenticator.GetToken() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Authenticator.GetToken() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {

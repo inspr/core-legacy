@@ -39,7 +39,9 @@ func (bmm *brokerMemoryManager) get() (*brokers.Brokers, error) {
 }
 
 // Create configures a new broker on insprd
-func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error {
+func (bmm *brokerMemoryManager) Create(
+	config brokers.BrokerConfiguration,
+) error {
 	l := logger.With(
 		zap.String("operation", "create"),
 		zap.Any("configs", config),
@@ -90,7 +92,10 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 
 // SetDefault sets a previously configured broker as insprd's default broker
 func (bmm *brokerMemoryManager) SetDefault(broker string) error {
-	l := logger.With(zap.String("operation", "set-default"), zap.String("broker", broker))
+	l := logger.With(
+		zap.String("operation", "set-default"),
+		zap.String("broker", broker),
+	)
 	bmm.def.Lock()
 	l.Debug("def mutex locked", zap.String("type", "mutex"))
 
@@ -120,8 +125,13 @@ func (bmm *brokerMemoryManager) Factory() SidecarManager {
 }
 
 //Configs returns the configurations for a given broker
-func (bmm *brokerMemoryManager) Configs(broker string) (brokers.BrokerConfiguration, error) {
-	l := logger.With(zap.String("operation", "get-configs"), zap.String("broker", broker))
+func (bmm *brokerMemoryManager) Configs(
+	broker string,
+) (brokers.BrokerConfiguration, error) {
+	l := logger.With(
+		zap.String("operation", "get-configs"),
+		zap.String("broker", broker),
+	)
 	bmm.available.Lock()
 	l.Debug("available mutex locked", zap.String("type", "mutex"))
 	defer l.Debug("available mutex unlocked", zap.String("type", "mutex"))

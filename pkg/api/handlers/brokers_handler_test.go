@@ -60,8 +60,15 @@ func TestHandler_NewBrokerHandler(t *testing.T) {
 				diffReactions:   tt.fields.diffReactions,
 				changeReactions: tt.fields.changeReactions,
 			}
-			if got := handler.NewBrokerHandler(); !reflect.DeepEqual(got.Handler, tt.want.Handler) {
-				t.Errorf("Handler.NewBrokerHandler() = %v, want %v", got, tt.want)
+			if got := handler.NewBrokerHandler(); !reflect.DeepEqual(
+				got.Handler,
+				tt.want.Handler,
+			) {
+				t.Errorf(
+					"Handler.NewBrokerHandler() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -110,7 +117,11 @@ func TestBrokerHandler_HandleGet(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want {
-				t.Errorf("AppHandler.HandleCreate() = %v, want %v", res.StatusCode, tt.want)
+				t.Errorf(
+					"AppHandler.HandleCreate() = %v, want %v",
+					res.StatusCode,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -154,7 +165,10 @@ func TestBrokerHandler_KafkaHandler(t *testing.T) {
 			name: "broker error",
 			fields: fields{
 				Handler: &Handler{
-					Memory: fake.GetMockMemoryManager(nil, errors.New("brokerManager_error")),
+					Memory: fake.GetMockMemoryManager(
+						nil,
+						errors.New("brokerManager_error"),
+					),
 				},
 			},
 			wantCode: http.StatusInternalServerError,

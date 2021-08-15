@@ -19,7 +19,10 @@ func NewChannelMock(err error) controller.ChannelInterface {
 }
 
 // Get is the channelmock Get
-func (cm *ChannelMock) Get(ctx context.Context, scope, name string) (*meta.Channel, error) {
+func (cm *ChannelMock) Get(
+	ctx context.Context,
+	scope, name string,
+) (*meta.Channel, error) {
 	if cm.err != nil {
 		return &meta.Channel{}, cm.err
 	}
@@ -27,7 +30,12 @@ func (cm *ChannelMock) Get(ctx context.Context, scope, name string) (*meta.Chann
 }
 
 // Create is the channelmock Create
-func (cm *ChannelMock) Create(ctx context.Context, scope string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
+func (cm *ChannelMock) Create(
+	ctx context.Context,
+	scope string,
+	ch *meta.Channel,
+	dryRun bool,
+) (diff.Changelog, error) {
 	if cm.err != nil {
 		return diff.Changelog{}, cm.err
 	}
@@ -35,7 +43,11 @@ func (cm *ChannelMock) Create(ctx context.Context, scope string, ch *meta.Channe
 }
 
 // Delete is the channelmock Delete
-func (cm *ChannelMock) Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error) {
+func (cm *ChannelMock) Delete(
+	ctx context.Context,
+	scope, name string,
+	dryRun bool,
+) (diff.Changelog, error) {
 	if cm.err != nil {
 		return diff.Changelog{}, cm.err
 	}
@@ -43,7 +55,12 @@ func (cm *ChannelMock) Delete(ctx context.Context, scope, name string, dryRun bo
 }
 
 // Update is the channelmock Update
-func (cm *ChannelMock) Update(ctx context.Context, scope string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
+func (cm *ChannelMock) Update(
+	ctx context.Context,
+	scope string,
+	ch *meta.Channel,
+	dryRun bool,
+) (diff.Changelog, error) {
 	if cm.err != nil {
 		return diff.Changelog{}, cm.err
 	}

@@ -25,7 +25,10 @@ type AppHandler struct {
 func (handler *Handler) NewAppHandler() *AppHandler {
 	return &AppHandler{
 		Handler: handler,
-		logger:  logger.With(zap.String("section", "api"), zap.String("subsection", "dapps")),
+		logger: logger.With(
+			zap.String("section", "api"),
+			zap.String("subsection", "dapps"),
+		),
 	}
 }
 
@@ -46,7 +49,11 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 			ah.Memory.Tree().Cancel()
 			return
 		}
-		l = l.With(zap.String("dapp", data.App.Meta.Name), zap.String("scope", scope), zap.Bool("dry-run", data.DryRun))
+		l = l.With(
+			zap.String("dapp", data.App.Meta.Name),
+			zap.String("scope", scope),
+			zap.Bool("dry-run", data.DryRun),
+		)
 
 		l.Debug("initiating dApp create transaction")
 		ah.Memory.Tree().InitTransaction()
@@ -79,7 +86,10 @@ func (ah *AppHandler) HandleCreate() rest.Handler {
 			l.Debug("applying changes to the cluster")
 			err = ah.applyChangesInDiff(changes)
 			if err != nil {
-				l.Error("unable to apply dApp create changes in diff", zap.Error(err))
+				l.Error(
+					"unable to apply dApp create changes in diff",
+					zap.Error(err),
+				)
 				rest.ERROR(w, err)
 				ah.Memory.Tree().Cancel()
 				return
@@ -149,7 +159,11 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 			return
 		}
 
-		l = l.With(zap.String("dapp", data.App.Meta.Name), zap.String("scope", scope), zap.Bool("dry-run", data.DryRun))
+		l = l.With(
+			zap.String("dapp", data.App.Meta.Name),
+			zap.String("scope", scope),
+			zap.Bool("dry-run", data.DryRun),
+		)
 		l.Debug("initiating dApp update transaction")
 		ah.Memory.Tree().InitTransaction()
 
@@ -181,7 +195,10 @@ func (ah *AppHandler) HandleUpdate() rest.Handler {
 			l.Debug("applying dApp update changes in diff")
 			err = ah.applyChangesInDiff(changes)
 			if err != nil {
-				l.Error("unable to apply dApp update changes in diff", zap.Error(err))
+				l.Error(
+					"unable to apply dApp update changes in diff",
+					zap.Error(err),
+				)
 				rest.ERROR(w, err)
 				ah.Memory.Tree().Cancel()
 				return
@@ -239,7 +256,10 @@ func (ah *AppHandler) HandleDelete() rest.Handler {
 			l.Debug("applying dApp delete changes in diff")
 			err = ah.applyChangesInDiff(changes)
 			if err != nil {
-				l.Error("unable to apply dApp delete changes in diff", zap.Error(err))
+				l.Error(
+					"unable to apply dApp delete changes in diff",
+					zap.Error(err),
+				)
 				rest.ERROR(w, err)
 				ah.Memory.Tree().Cancel()
 				return
@@ -262,7 +282,8 @@ func (handler *Handler) deleteApp(app *meta.App) error {
 		Errors: []error{},
 	}
 	if app.Spec.Node.Spec.Image != "" {
-		err := handler.Operator.Nodes().DeleteNode(context.Background(), app.Meta.Parent, app.Meta.Name)
+		err := handler.Operator.Nodes().
+			DeleteNode(context.Background(), app.Meta.Parent, app.Meta.Name)
 		if err != nil {
 			errs.Add(err)
 		}

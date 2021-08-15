@@ -109,7 +109,10 @@ func (ch *ChannelHandler) HandleGet() rest.Handler {
 		logger.Debug("initiating Channel get transaction")
 		ch.Memory.Tree().InitTransaction()
 
-		channel, err := ch.Memory.Tree().Perm().Channels().Get(scope, data.ChName)
+		channel, err := ch.Memory.Tree().
+			Perm().
+			Channels().
+			Get(scope, data.ChName)
 		if err != nil {
 			logger.Error("unable to get Channel",
 				zap.String("channel", data.ChName),

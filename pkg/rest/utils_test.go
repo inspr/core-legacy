@@ -39,7 +39,11 @@ func TestJSON(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			JSON(tt.args.w, tt.args.statusCode, tt.args.data)
 			if status := rr.Result().StatusCode; status != tt.args.statusCode {
-				t.Errorf("JSON(w,code,data)=%v, want %v", status, tt.args.statusCode)
+				t.Errorf(
+					"JSON(w,code,data)=%v, want %v",
+					status,
+					tt.args.statusCode,
+				)
 			}
 			decodedData, _ := json.Marshal(tt.args.data)
 			bodyData, _ := ioutil.ReadAll(rr.Body)
@@ -131,13 +135,19 @@ func TestERROR(t *testing.T) {
 }
 
 func TestRecoverFromPanic(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer RecoverFromPanic(w)
-		panic("This is a panic error")
-	}))
+	ts := httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer RecoverFromPanic(w)
+			panic("This is a panic error")
+		}),
+	)
 	defer ts.Close()
 
-	resp, err := http.Post(ts.URL, "application/json", bytes.NewBuffer([]byte("")))
+	resp, err := http.Post(
+		ts.URL,
+		"application/json",
+		bytes.NewBuffer([]byte("")),
+	)
 	if err != nil {
 		fmt.Println(err)
 	}

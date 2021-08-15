@@ -73,7 +73,10 @@ func (writer *Writer) WriteMessage(channel string, message []byte) error {
 }
 
 // creates a Kafka message and sends it through the ProduceChannel
-func (writer *Writer) produceMessage(message []byte, resolvedChannel string) error {
+func (writer *Writer) produceMessage(
+	message []byte,
+	resolvedChannel string,
+) error {
 
 	logger.Debug("writing message into Kafka Topic",
 		zap.String("topic", resolvedChannel))

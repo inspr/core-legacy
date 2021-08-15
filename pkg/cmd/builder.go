@@ -22,13 +22,21 @@ type Builder interface {
 	WithFlags(...*Flag) Builder
 	WithCommonFlags() Builder
 	Hidden() Builder
-	ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command
-	MinimumArgs(argCount int, action func(context.Context, []string) error) *cobra.Command
+	ExactArgs(
+		argCount int,
+		action func(context.Context, []string) error,
+	) *cobra.Command
+	MinimumArgs(
+		argCount int,
+		action func(context.Context, []string) error,
+	) *cobra.Command
 	NoArgs(action func(context.Context) error) *cobra.Command
 	AddSubCommand(cmds ...*cobra.Command) Builder
 	Version(version string) Builder
 	WithOptions(...Option) Builder
-	ValidArgsFunc(validation func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective)) Builder
+	ValidArgsFunc(
+		validation func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective),
+	) Builder
 	WithRequiredFlag(string) Builder
 	Super() *cobra.Command
 }
@@ -54,7 +62,9 @@ func (b *builder) WithRequiredFlag(flag string) Builder {
 }
 
 // ValidArgsFunc adds a validation function to the arguments of a command. This is useful for completion
-func (b *builder) ValidArgsFunc(validation func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective)) Builder {
+func (b *builder) ValidArgsFunc(
+	validation func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective),
+) Builder {
 	b.cmd.ValidArgsFunction = validation
 	return b
 }
@@ -154,7 +164,10 @@ func (b *builder) AddSubCommand(cmds ...*cobra.Command) Builder {
 // ExactArgs - imposes the condition in which the function will only be executed
 // if the exact amount of arguments are given, if didn't received the proper args
 // it will show the cmd.help() content
-func (b *builder) ExactArgs(argCount int, action func(context.Context, []string) error) *cobra.Command {
+func (b *builder) ExactArgs(
+	argCount int,
+	action func(context.Context, []string) error,
+) *cobra.Command {
 	f := b.cmd.ValidArgsFunction
 	b.cmd.ValidArgsFunction = func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) >= argCount {
@@ -172,7 +185,10 @@ func (b *builder) ExactArgs(argCount int, action func(context.Context, []string)
 // MinimumArgs - imposes the condition in which the function will only be executed
 // if the minimum amount of arguments are given, if didn't received the proper args
 // it will show the cmd.help() content
-func (b *builder) MinimumArgs(minArgs int, action func(context.Context, []string) error) *cobra.Command {
+func (b *builder) MinimumArgs(
+	minArgs int,
+	action func(context.Context, []string) error,
+) *cobra.Command {
 	b.cmd.Args = cobra.MinimumNArgs(minArgs)
 	b.cmd.RunE = func(_ *cobra.Command, args []string) error {
 		return (action(b.cmd.Context(), args))

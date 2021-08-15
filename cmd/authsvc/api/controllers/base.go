@@ -35,7 +35,8 @@ func (s *Server) Init() {
 	var privPemBytes []byte
 	if privKey.Type != "RSA PRIVATE KEY" {
 		s.logger.Error("RSA private key is of the wrong type")
-		err = ierrors.New("RSA private key is of the wrong type").InternalServer()
+		err = ierrors.New("RSA private key is of the wrong type").
+			InternalServer()
 		panic(err)
 	}
 
@@ -77,5 +78,8 @@ func (s *Server) Init() {
 // Run starts the server on the port given in addr
 func (s *Server) Run(addr string) {
 	s.logger.Info("authsvc rest api is up!", zap.String("Port", addr))
-	s.logger.Fatal("authsvc crashed: ", zap.Any("error", http.ListenAndServe(addr, s.Mux)))
+	s.logger.Fatal(
+		"authsvc crashed: ",
+		zap.Any("error", http.ListenAndServe(addr, s.Mux)),
+	)
 }

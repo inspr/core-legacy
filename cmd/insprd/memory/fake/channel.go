@@ -29,7 +29,11 @@ func (ch *Channels) Get(scope, name string) (*meta.Channel, error) {
 }
 
 // Create - simple mock
-func (ch *Channels) Create(scope string, channel *meta.Channel, brokers *apimodels.BrokersDI) error {
+func (ch *Channels) Create(
+	scope string,
+	channel *meta.Channel,
+	brokers *apimodels.BrokersDI,
+) error {
 	if ch.fail != nil {
 		return ch.fail
 	}

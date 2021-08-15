@@ -22,7 +22,9 @@ var logger *zap.Logger
 var alevel *zap.AtomicLevel
 
 func init() {
-	logger, alevel = logs.Logger(zap.Fields(zap.String("section", "load-balancer-sidecar")))
+	logger, alevel = logs.Logger(
+		zap.Fields(zap.String("section", "load-balancer-sidecar")),
+	)
 }
 
 // writeMessageHandler handles requests sent to the write message server
@@ -33,7 +35,12 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		channel := strings.TrimPrefix(r.URL.Path, "/")
 
 		if !environment.OutputChannelList().Contains(channel) {
-			logger.Error(fmt.Sprintf("channel %s not found in output channel list", channel))
+			logger.Error(
+				fmt.Sprintf(
+					"channel %s not found in output channel list",
+					channel,
+				),
+			)
 
 			rest.ERROR(
 				w,
@@ -52,10 +59,17 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 
-		sidecarAddress := environment.GetBrokerSpecificSidecarAddr(channelBroker)
+		sidecarAddress := environment.GetBrokerSpecificSidecarAddr(
+			channelBroker,
+		)
 		sidecarWritePort := environment.GetBrokerWritePort(channelBroker)
 
-		reqAddress := fmt.Sprintf("%s:%s/%s", sidecarAddress, sidecarWritePort, channel)
+		reqAddress := fmt.Sprintf(
+			"%s:%s/%s",
+			sidecarAddress,
+			sidecarWritePort,
+			channel,
+		)
 
 		logger.Debug("encoding message to Avro schema")
 
@@ -95,7 +109,9 @@ func (s *Server) readMessageHandler() rest.Handler {
 		channel := strings.TrimPrefix(r.URL.Path, "/")
 
 		if !environment.InputChannelList().Contains(channel) {
-			logger.Error("channel " + channel + " not found in input channel list")
+			logger.Error(
+				"channel " + channel + " not found in input channel list",
+			)
 			rest.ERROR(
 				w,
 				ierrors.New("channel '%s' not found", channel).BadRequest(),
@@ -130,7 +146,11 @@ func (s *Server) readMessageHandler() rest.Handler {
 		logger.Info("sending message to node through: ",
 			zap.String("channel", channel))
 
-		reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
+		reqAddress := fmt.Sprintf(
+			"http://localhost:%v/%v",
+			clientReadPort,
+			channel,
+		)
 
 		resp, err := sendRequest(reqAddress, decodedMsg)
 		if err != nil {
@@ -205,7 +225,9 @@ func decodeFromAvro(channel string, body io.Reader) ([]byte, error) {
 func getResolvedChannel(channel string) (string, error) {
 	resolvedCh, ok := os.LookupEnv(channel + "_RESOLVED")
 	if !ok {
-		logger.Error(fmt.Sprintf("couldn't find resolution for channel %s", channel))
+		logger.Error(
+			fmt.Sprintf("couldn't find resolution for channel %s", channel),
+		)
 
 		return "", ierrors.New(
 			"resolution for channel '%s' not found", channel,

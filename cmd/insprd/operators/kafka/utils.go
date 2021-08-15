@@ -29,7 +29,9 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 		config.numberOfPartitions, err = strconv.Atoi(nPart)
 		if err != nil {
 			config.numberOfPartitions = 1
-			logger.Error("invalid 'kafka.partition.number' in Channels annotations")
+			logger.Error(
+				"invalid 'kafka.partition.number' in Channels annotations",
+			)
 			return config, ierrors.New(
 				"invalid partition configuration %s",
 				ch.Meta.Annotations["kafka.partition.number"],
@@ -42,7 +44,9 @@ func configFromChannel(ch *meta.Channel) (kafkaConfiguration, error) {
 		config.replicationFactor, err = strconv.Atoi(nPart)
 		if err != nil {
 			config.replicationFactor = 1
-			logger.Error("invalid 'kafka.replication.factor' in Channels annotations")
+			logger.Error(
+				"invalid 'kafka.replication.factor' in Channels annotations",
+			)
 			return config, ierrors.New(
 				"invalid replication configuration %s",
 				ch.Meta.Annotations["kafka.replication.factor"],
@@ -65,7 +69,9 @@ func fromTopic(name string, meta *kafka.Metadata) (ch *meta.Channel) {
 	logger.Debug("getting Channel given a Kafka Topic name",
 		zap.String("topic", name))
 
-	ch.Meta.Annotations["kafka.partition.number"] = strconv.Itoa(len(meta.Topics[name].Partitions))
+	ch.Meta.Annotations["kafka.partition.number"] = strconv.Itoa(
+		len(meta.Topics[name].Partitions),
+	)
 	splitName := strings.Split(name, "-")
 	if len(splitName) == 4 {
 		ch.Meta.Name = splitName[3]

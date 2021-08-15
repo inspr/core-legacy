@@ -28,35 +28,42 @@ var channel = "pubsubch"
 func main() {
 	c := &http.Client{}
 	client := dappclient.NewAppClient()
-	client.HandleChannel(channel, func(ctx context.Context, body io.Reader) error {
-		decoder := json.NewDecoder(body)
+	client.HandleChannel(
+		channel,
+		func(ctx context.Context, body io.Reader) error {
+			decoder := json.NewDecoder(body)
 
-		subMsg := models.BrokerMessage{}
-		err := decoder.Decode(&subMsg)
-		if err != nil {
-			return err
-		}
+			subMsg := models.BrokerMessage{}
+			err := decoder.Decode(&subMsg)
+			if err != nil {
+				return err
+			}
 
-		msg := discordMessage{
-			Content:   fmt.Sprintf("%v", subMsg.Data),
-			Username:  "Notifications",
-			AvatarURL: "",
-			TTS:       true,
-		}
+			msg := discordMessage{
+				Content:   fmt.Sprintf("%v", subMsg.Data),
+				Username:  "Notifications",
+				AvatarURL: "",
+				TTS:       true,
+			}
 
-		msgBuff, _ := json.Marshal(msg)
+			msgBuff, _ := json.Marshal(msg)
 
-		req, _ := http.NewRequest(http.MethodPost, webhook, bytes.NewBuffer(msgBuff))
-		head := http.Header{}
-		head.Add("Content-type", "application/json")
-		req.Header = head
-		_, err = c.Do(req)
-		if err != nil {
-			return err
-		}
+			req, _ := http.NewRequest(
+				http.MethodPost,
+				webhook,
+				bytes.NewBuffer(msgBuff),
+			)
+			head := http.Header{}
+			head.Add("Content-type", "application/json")
+			req.Header = head
+			_, err = c.Do(req)
+			if err != nil {
+				return err
+			}
 
-		return nil
+			return nil
 
-	})
+		},
+	)
 	log.Fatalln(client.Run(context.Background()))
 }

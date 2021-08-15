@@ -19,7 +19,9 @@ var logger *zap.Logger
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = logs.Logger(zap.Fields(zap.String("section", "kafka-channel-operator")))
+	logger, _ = logs.Logger(
+		zap.Fields(zap.String("section", "kafka-channel-operator")),
+	)
 }
 
 // ChannelOperator is a client for channel operations on kafka
@@ -30,7 +32,10 @@ type ChannelOperator struct {
 }
 
 // NewOperator returns an initialized operator from the environment variables
-func NewOperator(mem tree.Manager, config sidecars.KafkaConfig) (*ChannelOperator, error) {
+func NewOperator(
+	mem tree.Manager,
+	config sidecars.KafkaConfig,
+) (*ChannelOperator, error) {
 	logger.Debug("initializing operator")
 	var kafkaConfig *kafka.ConfigMap
 	var err error
@@ -61,7 +66,11 @@ func NewOperator(mem tree.Manager, config sidecars.KafkaConfig) (*ChannelOperato
 }
 
 // Get gets a channel from kafka
-func (c *ChannelOperator) Get(ctx context.Context, context string, name string) (*meta.Channel, error) {
+func (c *ChannelOperator) Get(
+	ctx context.Context,
+	context string,
+	name string,
+) (*meta.Channel, error) {
 	channel, _ := c.mem.Perm().Channels().Get(context, name)
 	l := logger.With(
 		zap.String("channel", name),
@@ -84,7 +93,10 @@ func (c *ChannelOperator) Get(ctx context.Context, context string, name string) 
 }
 
 // GetAll gets all channels from kafka
-func (c *ChannelOperator) GetAll(ctx context.Context, context string) (ret []*meta.Channel, err error) {
+func (c *ChannelOperator) GetAll(
+	ctx context.Context,
+	context string,
+) (ret []*meta.Channel, err error) {
 	logger.Info("trying to get all Channels from Kafka Topics",
 		zap.String("context", context))
 
@@ -104,7 +116,11 @@ func (c *ChannelOperator) GetAll(ctx context.Context, context string) (ret []*me
 }
 
 // Create creates a channel in kafka
-func (c *ChannelOperator) Create(ctx context.Context, context string, channel *meta.Channel) error {
+func (c *ChannelOperator) Create(
+	ctx context.Context,
+	context string,
+	channel *meta.Channel,
+) error {
 	l := logger.With(
 		zap.String("channel", channel.Meta.Name),
 		zap.String("context", context),
@@ -113,7 +129,10 @@ func (c *ChannelOperator) Create(ctx context.Context, context string, channel *m
 
 	config, err := configFromChannel(channel)
 	if err != nil {
-		l.Error("unable to extract Kafka config from given Channel", zap.Error(err))
+		l.Error(
+			"unable to extract Kafka config from given Channel",
+			zap.Error(err),
+		)
 		return err
 	}
 
@@ -136,7 +155,11 @@ func (c *ChannelOperator) Create(ctx context.Context, context string, channel *m
 }
 
 // Update updates a channel in kafka
-func (c *ChannelOperator) Update(ctx context.Context, context string, channel *meta.Channel) error {
+func (c *ChannelOperator) Update(
+	ctx context.Context,
+	context string,
+	channel *meta.Channel,
+) error {
 	logger.Info("trying to update a Channels in Kafka",
 		zap.String("channel", channel.Meta.Name),
 		zap.String("context", context))
@@ -145,7 +168,11 @@ func (c *ChannelOperator) Update(ctx context.Context, context string, channel *m
 }
 
 // Delete deletes a channel from kafka
-func (c *ChannelOperator) Delete(ctx context.Context, context string, name string) error {
+func (c *ChannelOperator) Delete(
+	ctx context.Context,
+	context string,
+	name string,
+) error {
 	channel, _ := c.mem.Perm().Channels().Get(context, name)
 	topics := []string{toTopic(channel)}
 	logger.Info("trying to delete a Channel from Kafka Topics",
@@ -164,21 +191,46 @@ func (c *ChannelOperator) Delete(ctx context.Context, context string, name strin
 }
 
 type kafkaAdminClient interface {
-	DeleteTopics(ctx context.Context, topics []string, options ...kafka.DeleteTopicsAdminOption) (result []kafka.TopicResult, err error)
-	CreateTopics(ctx context.Context, topics []kafka.TopicSpecification, options ...kafka.CreateTopicsAdminOption) (result []kafka.TopicResult, err error)
-	GetMetadata(topic *string, allTopics bool, timeoutMs int) (*kafka.Metadata, error)
+	DeleteTopics(
+		ctx context.Context,
+		topics []string,
+		options ...kafka.DeleteTopicsAdminOption,
+	) (result []kafka.TopicResult, err error)
+	CreateTopics(
+		ctx context.Context,
+		topics []kafka.TopicSpecification,
+		options ...kafka.CreateTopicsAdminOption,
+	) (result []kafka.TopicResult, err error)
+	GetMetadata(
+		topic *string,
+		allTopics bool,
+		timeoutMs int,
+	) (*kafka.Metadata, error)
 }
 
 type mockAdminClient struct {
 }
 
-func (*mockAdminClient) DeleteTopics(ctx context.Context, topics []string, options ...kafka.DeleteTopicsAdminOption) (result []kafka.TopicResult, err error) {
+func (*mockAdminClient) DeleteTopics(
+	ctx context.Context,
+	topics []string,
+	options ...kafka.DeleteTopicsAdminOption,
+) (result []kafka.TopicResult, err error) {
 	return nil, nil
 }
 
-func (*mockAdminClient) CreateTopics(ctx context.Context, topics []kafka.TopicSpecification, options ...kafka.CreateTopicsAdminOption) (result []kafka.TopicResult, err error) {
+func (*mockAdminClient) CreateTopics(
+	ctx context.Context,
+	topics []kafka.TopicSpecification,
+	options ...kafka.CreateTopicsAdminOption,
+) (result []kafka.TopicResult, err error) {
 	return nil, nil
 }
-func (*mockAdminClient) GetMetadata(topic *string, allTopics bool, timeoutMs int) (*kafka.Metadata, error) {
+
+func (*mockAdminClient) GetMetadata(
+	topic *string,
+	allTopics bool,
+	timeoutMs int,
+) (*kafka.Metadata, error) {
 	return nil, nil
 }

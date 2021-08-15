@@ -94,7 +94,11 @@ func TestWriter_WriteMessage(t *testing.T) {
 				producer: tt.fields.producer,
 			}
 			if err := writer.WriteMessage(tt.args.channel, tt.args.message); (err != nil) != tt.wantErr {
-				t.Errorf("Writer.WriteMessage() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Writer.WriteMessage() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -138,7 +142,11 @@ func TestWriter_produceMessage(t *testing.T) {
 				producer: tt.fields.producer,
 			}
 			if err := writer.produceMessage(tt.args.message, tt.args.channel); (err != nil) != tt.wantErr {
-				t.Errorf("Writer.produceMessage() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Writer.produceMessage() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

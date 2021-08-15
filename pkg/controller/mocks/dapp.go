@@ -27,7 +27,12 @@ func (am *AppMock) Get(ctx context.Context, scope string) (*meta.App, error) {
 }
 
 // Create is the AppMock Create
-func (am *AppMock) Create(ctx context.Context, scope string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+func (am *AppMock) Create(
+	ctx context.Context,
+	scope string,
+	app *meta.App,
+	dryRun bool,
+) (diff.Changelog, error) {
 	if am.err != nil {
 		return diff.Changelog{}, am.err
 	}
@@ -35,7 +40,11 @@ func (am *AppMock) Create(ctx context.Context, scope string, app *meta.App, dryR
 }
 
 // Delete is the AppMock Delete
-func (am *AppMock) Delete(ctx context.Context, scope string, dryRun bool) (diff.Changelog, error) {
+func (am *AppMock) Delete(
+	ctx context.Context,
+	scope string,
+	dryRun bool,
+) (diff.Changelog, error) {
 	if am.err != nil {
 		return diff.Changelog{}, am.err
 	}
@@ -43,7 +52,12 @@ func (am *AppMock) Delete(ctx context.Context, scope string, dryRun bool) (diff.
 }
 
 // Update is the AppMock Update
-func (am *AppMock) Update(ctx context.Context, scope string, app *meta.App, dryRun bool) (diff.Changelog, error) {
+func (am *AppMock) Update(
+	ctx context.Context,
+	scope string,
+	app *meta.App,
+	dryRun bool,
+) (diff.Changelog, error) {
 	if am.err != nil {
 		return diff.Changelog{}, am.err
 	}

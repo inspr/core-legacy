@@ -81,7 +81,10 @@ func TestServer_Run(t *testing.T) {
 		t.Error("Server_Run write message not initialized")
 	}
 
-	deadContext, cancelDead := context.WithTimeout(context.Background(), time.Second)
+	deadContext, cancelDead := context.WithTimeout(
+		context.Background(),
+		time.Second,
+	)
 	defer cancelDead()
 	cancel()
 	select {

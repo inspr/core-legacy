@@ -24,9 +24,10 @@ var createUsrOptions = createUserOptionsDT{}
 
 var createUserCmd = cmd.NewCmd(
 	"create { -yaml || -json || -u USR | -p PWD | -s SCOPES } <username> <password>",
-).WithDescription(
-	"Create a user in the Inspr UID Provider",
-).WithLongDescription(`
+).
+	WithDescription(
+		"Create a user in the Inspr UID Provider",
+	).WithLongDescription(`
 Creates a new user on the Insprd UID provider.
 
 For the operation to be successful one must specify the new username and
@@ -41,10 +42,11 @@ section there is a usage of the flag.
 `).WithExample(
 	"create a new user directly from the cli",
 	"inprov create --username newUsername --password newPwd -s \"\" -s app1.app2 username password",
-).WithExample(
-	"create a new user directly from a YAML file",
-	"inprov create --yaml user.yaml username password",
-).WithExample(
+).
+	WithExample(
+		"create a new user directly from a YAML file",
+		"inprov create --yaml user.yaml username password",
+	).WithExample(
 	"create a new user directly from a json file",
 	"inprov create --json user.json username password",
 ).WithFlags(

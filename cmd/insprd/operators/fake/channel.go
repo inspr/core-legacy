@@ -24,7 +24,11 @@ func NewChannelOperator(err error) operators.ChannelOperatorInterface {
 }
 
 // Create mock
-func (o ChannelOperator) Create(ctx context.Context, context string, ch *meta.Channel) error {
+func (o ChannelOperator) Create(
+	ctx context.Context,
+	context string,
+	ch *meta.Channel,
+) error {
 	if o.err != nil {
 		return o.err
 	}
@@ -36,7 +40,11 @@ func (o ChannelOperator) Create(ctx context.Context, context string, ch *meta.Ch
 }
 
 // Get mock
-func (o ChannelOperator) Get(ctx context.Context, context string, name string) (*meta.Channel, error) {
+func (o ChannelOperator) Get(
+	ctx context.Context,
+	context string,
+	name string,
+) (*meta.Channel, error) {
 	if o.err != nil {
 		return nil, o.err
 	}
@@ -49,7 +57,11 @@ func (o ChannelOperator) Get(ctx context.Context, context string, name string) (
 }
 
 // Update mock
-func (o ChannelOperator) Update(ctx context.Context, context string, ch *meta.Channel) error {
+func (o ChannelOperator) Update(
+	ctx context.Context,
+	context string,
+	ch *meta.Channel,
+) error {
 	if o.err != nil {
 		return o.err
 	}
@@ -63,7 +75,11 @@ func (o ChannelOperator) Update(ctx context.Context, context string, ch *meta.Ch
 }
 
 // Delete mock
-func (o ChannelOperator) Delete(ctx context.Context, context string, name string) error {
+func (o ChannelOperator) Delete(
+	ctx context.Context,
+	context string,
+	name string,
+) error {
 	if o.err != nil {
 		return o.err
 	}
@@ -78,7 +94,10 @@ func (o ChannelOperator) Delete(ctx context.Context, context string, name string
 }
 
 // GetAll mock
-func (o ChannelOperator) GetAll(_ context.Context, context string) (ret []*meta.Channel, err error) {
+func (o ChannelOperator) GetAll(
+	_ context.Context,
+	context string,
+) (ret []*meta.Channel, err error) {
 
 	for _, ch := range o.channels {
 		if strings.HasPrefix(ch.Meta.Parent, context) {

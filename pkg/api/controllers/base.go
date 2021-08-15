@@ -18,7 +18,9 @@ var alevel *zap.AtomicLevel
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, alevel = logs.Logger(zap.Fields(zap.String("section", "insprd-api-controllers")))
+	logger, alevel = logs.Logger(
+		zap.Fields(zap.String("section", "insprd-api-controllers")),
+	)
 }
 
 // Server is a struct that contains the variables necessary
@@ -31,7 +33,11 @@ type Server struct {
 }
 
 // Init - configures the server
-func (s *Server) Init(mem memory.Manager, op operators.OperatorInterface, auth auth.Auth) {
+func (s *Server) Init(
+	mem memory.Manager,
+	op operators.OperatorInterface,
+	auth auth.Auth,
+) {
 	logger.Info("initializing Insprd server")
 
 	s.mux = http.NewServeMux()

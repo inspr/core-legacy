@@ -80,14 +80,22 @@ func TestHandler_CreateUserHandler(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(body))
+			res, err := client.Post(
+				ts.URL,
+				"application/json",
+				bytes.NewBuffer(body),
+			)
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
 			if res.StatusCode != tt.want {
-				t.Errorf("CreateUserHandler() = %v, want %v", res.StatusCode, tt.want)
+				t.Errorf(
+					"CreateUserHandler() = %v, want %v",
+					res.StatusCode,
+					tt.want,
+				)
 				return
 			}
 		})
@@ -127,7 +135,11 @@ func TestHandler_DeleteUserHandler(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			req, _ := http.NewRequest(http.MethodDelete, ts.URL, bytes.NewBuffer(body))
+			req, _ := http.NewRequest(
+				http.MethodDelete,
+				ts.URL,
+				bytes.NewBuffer(body),
+			)
 			res, err := client.Do(req)
 			if err != nil {
 				t.Log("error making a PUT in the httptest server")
@@ -135,7 +147,11 @@ func TestHandler_DeleteUserHandler(t *testing.T) {
 			}
 			defer res.Body.Close()
 			if res.StatusCode != tt.want {
-				t.Errorf("DeleteUserHandler() = %v, want %v", res.StatusCode, tt.want)
+				t.Errorf(
+					"DeleteUserHandler() = %v, want %v",
+					res.StatusCode,
+					tt.want,
+				)
 				return
 			}
 		})
@@ -176,7 +192,11 @@ func TestHandler_UpdatePasswordHandler(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			req, _ := http.NewRequest(http.MethodPut, ts.URL, bytes.NewBuffer(body))
+			req, _ := http.NewRequest(
+				http.MethodPut,
+				ts.URL,
+				bytes.NewBuffer(body),
+			)
 			res, err := client.Do(req)
 			if err != nil {
 				t.Log("error making a PUT in the httptest server")
@@ -184,7 +204,11 @@ func TestHandler_UpdatePasswordHandler(t *testing.T) {
 			}
 			defer res.Body.Close()
 			if res.StatusCode != tt.want {
-				t.Errorf("UpdatePasswordHandler() = %v, want %v", res.StatusCode, tt.want)
+				t.Errorf(
+					"UpdatePasswordHandler() = %v, want %v",
+					res.StatusCode,
+					tt.want,
+				)
 				return
 			}
 		})
@@ -223,14 +247,22 @@ func TestHandler_LoginHandler(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(body))
+			res, err := client.Post(
+				ts.URL,
+				"application/json",
+				bytes.NewBuffer(body),
+			)
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
 			if res.StatusCode != tt.want {
-				t.Errorf("LoginHandler() = %v, want %v", res.StatusCode, tt.want)
+				t.Errorf(
+					"LoginHandler() = %v, want %v",
+					res.StatusCode,
+					tt.want,
+				)
 				return
 			}
 		})
@@ -268,14 +300,22 @@ func TestHandler_RefreshTokenHandler(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(body))
+			res, err := client.Post(
+				ts.URL,
+				"application/json",
+				bytes.NewBuffer(body),
+			)
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
 			}
 			defer res.Body.Close()
 			if res.StatusCode != tt.want {
-				t.Errorf("RefreshTokenHandler() = %v, want %v", res.StatusCode, tt.want)
+				t.Errorf(
+					"RefreshTokenHandler() = %v, want %v",
+					res.StatusCode,
+					tt.want,
+				)
 				return
 			}
 		})
@@ -284,7 +324,9 @@ func TestHandler_RefreshTokenHandler(t *testing.T) {
 
 func setup() {
 	redisServer = mockRedis()
-	insprServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	insprServer = httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}),
+	)
 
 	os.Setenv("INSPR_CLUSTER_ADDR", insprServer.URL)
 	os.Setenv("REFRESH_URL", "randomurl")

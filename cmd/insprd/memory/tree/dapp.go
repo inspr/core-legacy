@@ -33,7 +33,10 @@ func (tmm *treeMemoryManager) Apps() AppMemory {
 // The root dApp is returned if the query string is an empty string.
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
-	l := amm.logger.With(zap.String("operation", "get"), zap.String("query", query))
+	l := amm.logger.With(
+		zap.String("operation", "get"),
+		zap.String("query", query),
+	)
 	l.Debug("received dapp get request")
 
 	if amm.root == nil {
@@ -57,7 +60,10 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 		}
 		nextApp = nextApp.Spec.Apps[element]
 		if nextApp == nil {
-			l.Debug("unable to find dApp for given query", zap.String("app", element))
+			l.Debug(
+				"unable to find dApp for given query",
+				zap.String("app", element),
+			)
 			return nil, err
 		}
 	}
@@ -68,7 +74,11 @@ func (amm *AppMemoryManager) Get(query string) (*meta.App, error) {
 // Create instantiates a new dApp in the given scope.
 // If the dApp's information is invalid, returns an error. The same goes for an invalid scope.
 // In case of scope being an empty string, the dApp is created inside the root dApp.
-func (amm *AppMemoryManager) Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error {
+func (amm *AppMemoryManager) Create(
+	scope string,
+	app *meta.App,
+	brokers *apimodels.BrokersDI,
+) error {
 	l := amm.logger.With(
 		zap.String("operation", "create"),
 		zap.String("dApp", app.Meta.Name),
@@ -152,7 +162,11 @@ func (amm *AppMemoryManager) Delete(query string) error {
 // Update receives a pointer to a dApp and the path to where this dApp is inside the memory tree.
 // If the current dApp is found and the new structure is valid, it's updated.
 // Otherwise, returns an error.
-func (amm *AppMemoryManager) Update(query string, app *meta.App, brokers *apimodels.BrokersDI) error {
+func (amm *AppMemoryManager) Update(
+	query string,
+	app *meta.App,
+	brokers *apimodels.BrokersDI,
+) error {
 	l := amm.logger.With(
 		zap.String("operation", "update"),
 		zap.String("dapp", app.Meta.Name),
@@ -168,7 +182,10 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App, brokers *apimod
 
 	l.Debug("validating new dApp structure")
 	if currentApp.Meta.Name != app.Meta.Name {
-		l.Debug("invalid name change operation", zap.String("old-dapp", currentApp.Meta.Name))
+		l.Debug(
+			"invalid name change operation",
+			zap.String("old-dapp", currentApp.Meta.Name),
+		)
 		return ierrors.New(
 			"dApp's name mustn't change when updating",
 		).InvalidName()
@@ -215,7 +232,10 @@ type AppPermTreeGetter struct {
 // If the specified dApp is found, it is returned. Otherwise, returns an error.
 // This method is used to get the structure as it is in the cluster, before any modifications.
 func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
-	l := amm.logs.With(zap.String("operation", "perm-get"), zap.String("query", query))
+	l := amm.logs.With(
+		zap.String("operation", "perm-get"),
+		zap.String("query", query),
+	)
 	l.Debug("received request for dapp retrieve")
 
 	if amm.tree == nil {
@@ -249,9 +269,18 @@ func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
 
 // ResolveBoundary is the recursive method that resolves connections for dApp boundaries
 // returns a map of boundary to  their respective resolved channel query
-func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
-	l := amm.logger.With(zap.String("operation", "boundary-resolution"), zap.String("dapp", app.Meta.Name))
-	l.Debug("received boundary resolution request", zap.Bool("useperm", usePermTree))
+func (amm *AppMemoryManager) ResolveBoundary(
+	app *meta.App,
+	usePermTree bool,
+) (map[string]string, error) {
+	l := amm.logger.With(
+		zap.String("operation", "boundary-resolution"),
+		zap.String("dapp", app.Meta.Name),
+	)
+	l.Debug(
+		"received boundary resolution request",
+		zap.Bool("useperm", usePermTree),
+	)
 
 	boundaries := make(map[string]string)
 	unresolved := metautils.StrSet{}
@@ -280,7 +309,12 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (m
 	l.Debug("recursively resolving dApp boundaries",
 		zap.Any("boundaries", boundaries))
 
-	err := amm.recursivelyResolve(parentApp, boundaries, unresolved, usePermTree)
+	err := amm.recursivelyResolve(
+		parentApp,
+		boundaries,
+		unresolved,
+		usePermTree,
+	)
 	if err != nil {
 		l.Debug("couldn't resolve boundaries for given dApp",
 			zap.String("parent", parentApp.Meta.Name),
@@ -290,7 +324,12 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (m
 	return boundaries, nil
 }
 
-func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[string]string, unresolved metautils.StrSet, usePermTree bool) error {
+func (amm *AppMemoryManager) recursivelyResolve(
+	app *meta.App,
+	boundaries map[string]string,
+	unresolved metautils.StrSet,
+	usePermTree bool,
+) error {
 	_ = amm.logger.With(zap.String("operation", "boundary-resolution"))
 	merr := ierrors.MultiError{
 		Errors: []error{},
@@ -307,12 +346,19 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 		}
 		if ch, ok := app.Spec.Channels[val]; ok { // resolve in channels (direct or through alias)
 			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
-			boundaries[key], _ = metautils.JoinScopes(scope, ch.Meta.Name) // if channel exists, resolve
+			boundaries[key], _ = metautils.JoinScopes(
+				scope,
+				ch.Meta.Name,
+			) // if channel exists, resolve
 			delete(unresolved, key)
 			continue
 		}
-		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val) { //resolve in boundaries
-			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, val) // if boundary exists, setup to resolve in parernt
+		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).
+			Contains(val) { //resolve in boundaries
+			boundaries[key], _ = metautils.JoinScopes(
+				app.Meta.Name,
+				val,
+			) // if boundary exists, setup to resolve in parernt
 			continue
 		}
 		merr.Add(ierrors.New("invalid boundary: %s invalid", key))
@@ -344,7 +390,12 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 		parentApp = parApp
 	}
 
-	return amm.recursivelyResolve(parentApp, boundaries, unresolved, usePermTree)
+	return amm.recursivelyResolve(
+		parentApp,
+		boundaries,
+		unresolved,
+		usePermTree,
+	)
 }
 
 func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
@@ -355,14 +406,20 @@ func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
 	)
 	l.Debug("removing dApp from parent's Channels connected apps list")
 
-	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+	appBoundary := utils.StringSliceUnion(
+		app.Spec.Boundary.Input,
+		app.Spec.Boundary.Output,
+	)
 	resolution, _ := amm.ResolveBoundary(app, false)
 	for _, chName := range appBoundary {
 		resolved := resolution[chName]
 		_, chName, _ := metautils.RemoveLastPartInScope(resolved)
 		if _, ok := parent.Spec.Channels[chName]; ok {
 			parent.Spec.Channels[chName].ConnectedApps = utils.
-				Remove(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
+				Remove(
+					parent.Spec.Channels[chName].ConnectedApps,
+					app.Meta.Name,
+				)
 		}
 	}
 }

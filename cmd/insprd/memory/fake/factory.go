@@ -9,7 +9,10 @@ type Factory struct {
 }
 
 // Subscribe mock of factory subscription method
-func (f *Factory) Subscribe(broker string, factory models.SidecarFactory) error {
+func (f *Factory) Subscribe(
+	broker string,
+	factory models.SidecarFactory,
+) error {
 	return f.fail
 }
 

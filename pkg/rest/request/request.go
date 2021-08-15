@@ -30,7 +30,11 @@ var (
 // route and method, using
 // the encoder to encode the body and the decoder to decode the response into
 // the responsePtr
-func (c Client) Send(ctx context.Context, route, method string, body, responsePtr interface{}) (err error) {
+func (c Client) Send(
+	ctx context.Context,
+	route, method string,
+	body, responsePtr interface{},
+) (err error) {
 	buf, err := c.encoder(body)
 	if err != nil {
 		return ierrors.Wrap(

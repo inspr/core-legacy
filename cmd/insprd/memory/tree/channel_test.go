@@ -40,7 +40,10 @@ func TestMemoryManager_Channels(t *testing.T) {
 			tmm := &treeMemoryManager{
 				root: tt.fields.root,
 			}
-			if got := tmm.Channels(); !reflect.DeepEqual(got.(*ChannelMemoryManager).root, tt.want.(*ChannelMemoryManager).root) {
+			if got := tmm.Channels(); !reflect.DeepEqual(
+				got.(*ChannelMemoryManager).root,
+				tt.want.(*ChannelMemoryManager).root,
+			) {
 				t.Errorf("MemoryManager.Channels() = %v, want %v", got, tt.want)
 			}
 		})
@@ -136,11 +139,19 @@ func TestChannelMemoryManager_GetChannel(t *testing.T) {
 			chh := mem.Channels()
 			got, err := chh.Get(tt.args.context, tt.args.chName)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"ChannelMemoryManager.Get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
+				t.Errorf(
+					"ChannelMemoryManager.Get() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -367,7 +378,11 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 			chh := mem.Channels()
 			err := chh.Create(tt.args.context, tt.args.ch, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ChannelMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"ChannelMemoryManager.Create() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if tt.want != nil {
@@ -375,11 +390,18 @@ func TestChannelMemoryManager_Create(t *testing.T) {
 				got, err := chh.Get(tt.args.context, tt.want.Meta.Name)
 				if !tt.wantErr {
 					if !metautils.ValidateUUID(got.Meta.UUID) {
-						t.Errorf("ChannelMemoryManager.Create() invalid UUID, uuid=%v", got.Meta.UUID)
+						t.Errorf(
+							"ChannelMemoryManager.Create() invalid UUID, uuid=%v",
+							got.Meta.UUID,
+						)
 					}
 				}
 				if (err != nil) || !metautils.CompareWithoutUUID(got, tt.want) {
-					t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
+					t.Errorf(
+						"ChannelMemoryManager.Get() = %v, want %v",
+						got,
+						tt.want,
+					)
 				}
 			}
 			if tt.checkFunction != nil {
@@ -499,12 +521,20 @@ func TestChannelMemoryManager_Delete(t *testing.T) {
 			defer mem.Cancel()
 			chh := mem.Channels()
 			if err := chh.Delete(tt.args.context, tt.args.chName); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"ChannelMemoryManager.Delete() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			got, _ := chh.Get(tt.args.context, tt.args.chName)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
+				t.Errorf(
+					"ChannelMemoryManager.Get() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -633,14 +663,22 @@ func TestChannelMemoryManager_Update(t *testing.T) {
 			}
 			chh := mem.Channels()
 			if err := chh.Update(tt.args.context, tt.args.ch); (err != nil) != tt.wantErr {
-				t.Errorf("ChannelMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"ChannelMemoryManager.Update() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if tt.want != nil {
 				got, err := chh.Get(tt.args.context, tt.want.Meta.Name)
 
 				if (err != nil) || !metautils.CompareWithUUID(got, tt.want) {
-					t.Errorf("ChannelMemoryManager.Get() = %v, want %v", got, tt.want)
+					t.Errorf(
+						"ChannelMemoryManager.Get() = %v, want %v",
+						got,
+						tt.want,
+					)
 				}
 			}
 		})
@@ -702,7 +740,10 @@ func getMockChannels() *meta.App {
 									Parent:      "app1",
 									UUID:        "",
 								},
-								ConnectedChannels: []string{"ch2app1Update", "ch1app1"},
+								ConnectedChannels: []string{
+									"ch2app1Update",
+									"ch1app1",
+								},
 							},
 						},
 						Boundary: meta.AppBoundary{

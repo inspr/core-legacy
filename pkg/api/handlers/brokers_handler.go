@@ -32,7 +32,10 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		brokers, err := bh.Memory.Brokers().Get()
 		if err != nil {
-			l.Error("unable to obtain currently available brokers on cluster", zap.Error(err))
+			l.Error(
+				"unable to obtain currently available brokers on cluster",
+				zap.Error(err),
+			)
 			rest.ERROR(w, err)
 			return
 		}
@@ -46,7 +49,10 @@ func (bh *BrokerHandler) HandleGet() rest.Handler {
 
 // KafkaCreateHandler is the function that processes requests at the /brokers/kafka endpoint
 func (bh *BrokerHandler) KafkaCreateHandler() rest.Handler {
-	l := bh.logger.With(zap.String("operation", "create"), zap.String("broker", "kafka"))
+	l := bh.logger.With(
+		zap.String("operation", "create"),
+		zap.String("broker", "kafka"),
+	)
 	l.Info("received kafka broker create request")
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		// decode into the bytes of yaml file

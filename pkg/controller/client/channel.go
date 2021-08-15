@@ -19,7 +19,10 @@ type ChannelClient struct {
 // Get gets a channel from Insprd
 // The scope refers to the parent app of the given channel, represented with a dot separated query
 // such as app1.app2. The name is the name of the channel.
-func (cc *ChannelClient) Get(ctx context.Context, scope, name string) (*meta.Channel, error) {
+func (cc *ChannelClient) Get(
+	ctx context.Context,
+	scope, name string,
+) (*meta.Channel, error) {
 	cdi := models.ChannelQueryDI{
 		ChName: name,
 	}
@@ -38,7 +41,12 @@ func (cc *ChannelClient) Get(ctx context.Context, scope, name string) (*meta.Cha
 // Create creates given channel inside of Insprd
 // The scope refers to the parent app of the given channel, represented with a dot separated query
 // such as app1.app2
-func (cc *ChannelClient) Create(ctx context.Context, scope string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
+func (cc *ChannelClient) Create(
+	ctx context.Context,
+	scope string,
+	ch *meta.Channel,
+	dryRun bool,
+) (diff.Changelog, error) {
 	cdi := models.ChannelDI{
 		Channel: *ch,
 		DryRun:  dryRun,
@@ -58,7 +66,11 @@ func (cc *ChannelClient) Create(ctx context.Context, scope string, ch *meta.Chan
 // Delete deletes a channel inside the Insprd
 // The scope refers to the parent app of the given channel, represented with a dot separated query
 // such as app1.app2. The name is the name of the channel to be deleted
-func (cc *ChannelClient) Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error) {
+func (cc *ChannelClient) Delete(
+	ctx context.Context,
+	scope, name string,
+	dryRun bool,
+) (diff.Changelog, error) {
 	cdi := models.ChannelQueryDI{
 		ChName: name,
 		DryRun: dryRun,
@@ -78,7 +90,12 @@ func (cc *ChannelClient) Delete(ctx context.Context, scope, name string, dryRun 
 // Update updates given channel structure, if it exists in Insprd
 // The scope refers to the parent app of the given channel, represented with a dot separated query
 // such as app1.app2
-func (cc *ChannelClient) Update(ctx context.Context, scope string, ch *meta.Channel, dryRun bool) (diff.Changelog, error) {
+func (cc *ChannelClient) Update(
+	ctx context.Context,
+	scope string,
+	ch *meta.Channel,
+	dryRun bool,
+) (diff.Changelog, error) {
 	cdi := models.ChannelDI{
 		Channel: *ch,
 		DryRun:  dryRun,

@@ -34,7 +34,10 @@ func authInit(c context.Context, args []string) error {
 		return err
 	}
 
-	fmt.Fprintln(out, "This is a root token for authentication within your insprd. This will not be generated again. Save it wisely.")
+	fmt.Fprintln(
+		out,
+		"This is a root token for authentication within your insprd. This will not be generated again. Save it wisely.",
+	)
 	fmt.Fprintf(out, "%s\n", token)
 	return nil
 }

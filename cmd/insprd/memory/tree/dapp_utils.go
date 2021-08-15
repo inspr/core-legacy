@@ -13,7 +13,10 @@ import (
 
 // SelectBrokerFromPriorityList takes a broker priority list and returns the first
 // broker that is available
-func SelectBrokerFromPriorityList(brokerList []string, brokers *apimodels.BrokersDI) (string, error) {
+func SelectBrokerFromPriorityList(
+	brokerList []string,
+	brokers *apimodels.BrokersDI,
+) (string, error) {
 	logger.Info("selecting broker from priority list")
 
 	logger.Debug("available brokers", zap.Any("brokers", brokers.Available))
@@ -28,7 +31,10 @@ func SelectBrokerFromPriorityList(brokerList []string, brokers *apimodels.Broker
 		}
 	}
 
-	logger.Debug("selected the default broker: ", zap.String("broker", brokers.Default))
+	logger.Debug(
+		"selected the default broker: ",
+		zap.String("broker", brokers.Default),
+	)
 
 	return brokers.Default, nil
 }
@@ -37,7 +43,10 @@ func SelectBrokerFromPriorityList(brokerList []string, brokers *apimodels.Broker
 
 // checkApp is used when creating or updating dApps. It verifies if the dApp structure
 // is valid, not consideing boundary resolution.
-func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
+func (amm *AppMemoryManager) checkApp(
+	app, parentApp *meta.App,
+	brokers *apimodels.BrokersDI,
+) error {
 	structureErrors := amm.recursiveCheckAndRefineApp(app, parentApp, brokers)
 	if structureErrors != nil {
 		return structureErrors
@@ -45,12 +54,18 @@ func (amm *AppMemoryManager) checkApp(app, parentApp *meta.App, brokers *apimode
 	return nil
 }
 
-func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
+func (amm *AppMemoryManager) recursiveCheckAndRefineApp(
+	app, parentApp *meta.App,
+	brokers *apimodels.BrokersDI,
+) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
 
-	parentScope, _ := metautils.JoinScopes(parentApp.Meta.Parent, parentApp.Meta.Name)
+	parentScope, _ := metautils.JoinScopes(
+		parentApp.Meta.Parent,
+		parentApp.Meta.Name,
+	)
 	app.Meta.Parent = parentScope
 	if !nodeIsEmpty(app.Spec.Node) {
 		app.Spec.Node.Meta.Parent = parentScope
@@ -68,7 +83,10 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App
 	return nil
 }
 
-func validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
+func validAppStructure(
+	app, parentApp *meta.App,
+	brokers *apimodels.BrokersDI,
+) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
@@ -99,7 +117,10 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 	if parentApp.Spec.Apps == nil {
 		parentApp.Spec.Apps = make(map[string]*meta.App)
 	}
-	parentStr, _ := metautils.JoinScopes(parentApp.Meta.Parent, parentApp.Meta.Name)
+	parentStr, _ := metautils.JoinScopes(
+		parentApp.Meta.Parent,
+		parentApp.Meta.Name,
+	)
 	amm.updateUUID(app, parentStr)
 	if app.Spec.Auth.Permissions == nil {
 		app.Spec.Auth = parentApp.Spec.Auth
@@ -165,7 +186,8 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
 			continue
 		}
-		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(val.Target) {
+		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).
+			Contains(val.Target) {
 			continue
 		}
 		merr.Add(ierrors.New(
@@ -177,7 +199,10 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 		return &merr
 	}
 
-	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+	appBoundary := utils.StringSliceUnion(
+		app.Spec.Boundary.Input,
+		app.Spec.Boundary.Output,
+	)
 	for _, boundary := range appBoundary {
 		aliasKey, _ := metautils.JoinScopes(app.Meta.Name, boundary)
 		if _, ok := parentApp.Spec.Aliases[aliasKey]; ok {
@@ -187,7 +212,8 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 			ch.ConnectedApps = append(ch.ConnectedApps, app.Meta.Name)
 			continue
 		}
-		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(boundary) {
+		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).
+			Contains(boundary) {
 			continue
 		}
 		merr.Add(ierrors.New(
@@ -259,7 +285,10 @@ func nodeIsEmpty(node meta.Node) bool {
 	return noAnnotations && noName && noParent && noImage
 }
 
-func getParentApp(childQuery string, tmm *treeMemoryManager) (*meta.App, error) {
+func getParentApp(
+	childQuery string,
+	tmm *treeMemoryManager,
+) (*meta.App, error) {
 	parentQuery, childName, err := metautils.RemoveLastPartInScope(childQuery)
 	if err != nil {
 		return nil, err
@@ -307,7 +336,10 @@ func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 
 			for _, appName := range channel.ConnectedApps {
 				if _, ok := app.Spec.Apps[appName]; !ok {
-					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
+					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(
+						channel.ConnectedApps,
+						appName,
+					)
 				}
 
 				appInputs := app.Spec.Apps[appName].Spec.Boundary.Input
@@ -315,16 +347,25 @@ func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 				appBoundary := utils.StringSliceUnion(appInputs, appOutputs)
 
 				if !utils.Includes(appBoundary, channelName) {
-					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
+					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(
+						channel.ConnectedApps,
+						appName,
+					)
 				}
 			}
 
 			connectedChannels := types[channel.Spec.Type].ConnectedChannels
 			if !utils.Includes(connectedChannels, channelName) {
-				types[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
+				types[channel.Spec.Type].ConnectedChannels = append(
+					connectedChannels,
+					channelName,
+				)
 			}
 
-			broker, err := SelectBrokerFromPriorityList(channel.Spec.BrokerPriorityList, brokers)
+			broker, err := SelectBrokerFromPriorityList(
+				channel.Spec.BrokerPriorityList,
+				brokers,
+			)
 			if err != nil {
 				return err
 			}
@@ -350,10 +391,18 @@ func validAliases(app *meta.App) error {
 			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
 			continue
 		}
-		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val.Target) {
+		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).
+			Contains(val.Target) {
 			continue
 		}
-		msg = append(msg, fmt.Sprintf("alias '%s' points to an unexistent channel '%s'", key, val.Target))
+		msg = append(
+			msg,
+			fmt.Sprintf(
+				"alias '%s' points to an unexistent channel '%s'",
+				key,
+				val.Target,
+			),
+		)
 	}
 
 	if len(msg) > 0 {

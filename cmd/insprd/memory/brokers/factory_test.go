@@ -58,7 +58,11 @@ func TestAbstractBrokerFactory_Subscribe(t *testing.T) {
 			abf := &AbstractBrokerFactory{}
 			tt.exec(abf)
 			if err := abf.Subscribe(tt.args.broker, tt.args.factory); (err != nil) != tt.wantErr {
-				t.Errorf("AbstractBrokerFactory.Subscribe() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AbstractBrokerFactory.Subscribe() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -120,11 +124,19 @@ func TestAbstractBrokerFactory_Get(t *testing.T) {
 			tt.exec(abf)
 			got, err := abf.Get(tt.args.broker)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AbstractBrokerFactory.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AbstractBrokerFactory.Get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(&got, &tt.want) {
-				t.Errorf("AbstractBrokerFactory.Get() = %v, want %v", got, tt.want)
+				t.Errorf(
+					"AbstractBrokerFactory.Get() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}

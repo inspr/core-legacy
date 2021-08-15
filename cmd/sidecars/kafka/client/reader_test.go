@@ -29,7 +29,9 @@ func TestNewReader(t *testing.T) {
 			wantErr: false,
 			checkFunction: func(t *testing.T, reader *Reader) {
 				if !(reader.Consumers() != nil && len(reader.Consumers()) > 0) {
-					t.Errorf("check function error = Reader not created successfully")
+					t.Errorf(
+						"check function error = Reader not created successfully",
+					)
 				}
 			},
 		},
@@ -124,7 +126,10 @@ func TestReader_ReadMessage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*100)
+			ctx, cancel := context.WithTimeout(
+				context.Background(),
+				time.Millisecond*100,
+			)
 			defer cancel()
 			reader := &Reader{
 
@@ -136,11 +141,19 @@ func TestReader_ReadMessage(t *testing.T) {
 			got1 := bData
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Reader.ReadMessage() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Reader.ReadMessage() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got1, tt.want1) {
-				t.Errorf("Reader.ReadMessage() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf(
+					"Reader.ReadMessage() got1 = %v, want %v",
+					got1,
+					tt.want1,
+				)
 			}
 		})
 	}
@@ -188,13 +201,20 @@ func TestReader_Commit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*100)
+			ctx, cancel := context.WithTimeout(
+				context.Background(),
+				time.Millisecond*100,
+			)
 			defer cancel()
 			reader := &Reader{
 				consumers: tt.fields.consumers,
 			}
 			if err := reader.Commit(ctx, tt.uniqueChannel); (err != nil) != tt.wantErr {
-				t.Errorf("Reader.Commit() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Reader.Commit() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -243,7 +263,11 @@ func TestReader_Close(t *testing.T) {
 				consumers: tt.fields.consumers,
 			}
 			if err := reader.Close(); (err != nil) != tt.wantErr {
-				t.Errorf("Reader.Close() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Reader.Close() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}

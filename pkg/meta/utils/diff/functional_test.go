@@ -200,8 +200,15 @@ func TestChangelog_FilterDiffs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.c.FilterDiffs(tt.args.comp); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Changelog.FilterDiffs() = \n%v, want \n%v", got, tt.want)
+			if got := tt.c.FilterDiffs(tt.args.comp); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
+				t.Errorf(
+					"Changelog.FilterDiffs() = \n%v, want \n%v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -372,8 +379,15 @@ func TestChangelog_FilterDiffsByKind(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.c.FilterDiffsByKind(tt.args.kind); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Changelog.FilterDiffsByKind() = %v, want %v", got, tt.want)
+			if got := tt.c.FilterDiffsByKind(tt.args.kind); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
+				t.Errorf(
+					"Changelog.FilterDiffsByKind() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -429,7 +443,10 @@ func TestNewDifferenceKindOperation(t *testing.T) {
 				if !got.filter("", Difference{Kind: AppKind}) {
 					t.Error("did not apply filter correctly")
 				}
-				if got.filter("", Difference{Kind: ^(AnnotationKind | AppKind)}) {
+				if got.filter(
+					"",
+					Difference{Kind: ^(AnnotationKind | AppKind)},
+				) {
 					t.Error("did not apply filter correctly")
 				}
 				got.operation("", Difference{})

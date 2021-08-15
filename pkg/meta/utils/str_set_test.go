@@ -27,7 +27,10 @@ func TestArrMakeSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := MakeStrSet(tt.args.strings); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := MakeStrSet(tt.args.strings); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("ArrMakeSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -86,7 +89,10 @@ func TestArrDisjuncSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			set1, _ := MakeStrSet(tt.args.arr1)
 			set2, _ := MakeStrSet(tt.args.arr2)
-			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(got, tt.want) {
+			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("ArrDisjuncSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -112,7 +118,10 @@ func TestAppMakeSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := MakeStrSet(tt.args.apps); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := MakeStrSet(tt.args.apps); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("AppMakeSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -171,7 +180,10 @@ func TestAppDisjuncSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			set1, _ := MakeStrSet(tt.args.apps1)
 			set2, _ := MakeStrSet(tt.args.apps2)
-			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(got, tt.want) {
+			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("AppDisjuncSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -201,7 +213,10 @@ func TestAppIntersecSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			set1, _ := MakeStrSet(tt.args.apps1)
 			set2, _ := MakeStrSet(tt.args.apps2)
-			if got := IntersectSet(set1, set2); !reflect.DeepEqual(got, tt.want) {
+			if got := IntersectSet(set1, set2); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("AppIntersecSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -220,14 +235,20 @@ func TestChsMakeSet(t *testing.T) {
 		{
 			name: "Disjuction between chan arrays that returns a set",
 			args: args{
-				chans: MChannels{"ch1": &meta.Channel{}, "ch2": &meta.Channel{}},
+				chans: MChannels{
+					"ch1": &meta.Channel{},
+					"ch2": &meta.Channel{},
+				},
 			},
 			want: StrSet{"ch1": true, "ch2": true},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := MakeStrSet(tt.args.chans); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := MakeStrSet(tt.args.chans); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("ChsMakeSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -277,7 +298,10 @@ func TestChsDisjuncSet(t *testing.T) {
 			name: "Disjuction between arrays that returns a set",
 			args: args{
 				apps1: MChannels{"ch1": &meta.Channel{}},
-				apps2: MChannels{"ch1": &meta.Channel{}, "ch2": &meta.Channel{}},
+				apps2: MChannels{
+					"ch1": &meta.Channel{},
+					"ch2": &meta.Channel{},
+				},
 			},
 			want: StrSet{"ch2": true},
 		},
@@ -286,7 +310,10 @@ func TestChsDisjuncSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			set1, _ := MakeStrSet(tt.args.apps1)
 			set2, _ := MakeStrSet(tt.args.apps2)
-			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(got, tt.want) {
+			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("ChsDisjuncSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -307,7 +334,10 @@ func TestChsIntersecSet(t *testing.T) {
 			name: "Disjuction between arrays that returns a set",
 			args: args{
 				apps1: MChannels{"ch1": &meta.Channel{}},
-				apps2: MChannels{"ch1": &meta.Channel{}, "ch2": &meta.Channel{}},
+				apps2: MChannels{
+					"ch1": &meta.Channel{},
+					"ch2": &meta.Channel{},
+				},
 			},
 			want: StrSet{"ch1": true},
 		},
@@ -316,7 +346,10 @@ func TestChsIntersecSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			set1, _ := MakeStrSet(tt.args.apps1)
 			set2, _ := MakeStrSet(tt.args.apps2)
-			if got := IntersectSet(set1, set2); !reflect.DeepEqual(got, tt.want) {
+			if got := IntersectSet(set1, set2); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("ChsIntersecSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -342,7 +375,10 @@ func TestTypesMakeSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := MakeStrSet(tt.args.types); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := MakeStrSet(tt.args.types); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("TypesMakeSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -401,7 +437,10 @@ func TestTypesDisjuncSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			set1, _ := MakeStrSet(tt.args.types1)
 			set2, _ := MakeStrSet(tt.args.types2)
-			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(got, tt.want) {
+			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("TypesDisjuncSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -431,7 +470,10 @@ func TestTypesIntersecSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			set1, _ := MakeStrSet(tt.args.types1)
 			set2, _ := MakeStrSet(tt.args.types2)
-			if got := IntersectSet(set1, set2); !reflect.DeepEqual(got, tt.want) {
+			if got := IntersectSet(set1, set2); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("TypesIntersecSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -457,7 +499,10 @@ func TestStrMakeSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := MakeStrSet(tt.args.strings); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := MakeStrSet(tt.args.strings); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("StrMakeSet() = %v, want %v", got, tt.want)
 			}
 		})
@@ -516,7 +561,10 @@ func TestStrDisjuncSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			set1, _ := MakeStrSet(tt.args.strings1)
 			set2, _ := MakeStrSet(tt.args.strings2)
-			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(got, tt.want) {
+			if got := DisjunctSet(set1, set2); !reflect.DeepEqual(
+				got,
+				tt.want,
+			) {
 				t.Errorf("StrDisjuncSet() = %v, want %v", got, tt.want)
 			}
 		})

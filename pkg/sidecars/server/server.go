@@ -40,7 +40,12 @@ func Init(r models.Reader, w models.Writer, broker string) *Server {
 	// server fetches addresses variable names from models.
 	envVars := brokers.GetSidecarConnectionVars(broker)
 	if envVars == nil {
-		panic(fmt.Sprintf("%s broker's enviroment variables not configured", broker))
+		panic(
+			fmt.Sprintf(
+				"%s broker's enviroment variables not configured",
+				broker,
+			),
+		)
 	}
 	server.broker = broker
 
@@ -86,8 +91,15 @@ func (s *Server) Run(ctx context.Context) error {
 	go func() {
 		s.runningWrite = true
 		defer func() { s.runningWrite = false }()
-		if err = server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Error(fmt.Sprintf("an error ocurred in %v sidecar: %v", s.broker, err))
+		if err = server.ListenAndServe(); err != nil &&
+			err != http.ErrServerClosed {
+			logger.Error(
+				fmt.Sprintf(
+					"an error ocurred in %v sidecar: %v",
+					s.broker,
+					err,
+				),
+			)
 			errCh <- err
 		}
 	}()

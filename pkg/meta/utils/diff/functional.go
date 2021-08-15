@@ -44,7 +44,10 @@ func (c Changelog) FilterDiffs(comp DifferenceFilter) Changelog {
 					})
 					hasAdded = true
 				}
-				newChangelog[len(newChangelog)-1].Diff = append(newChangelog[len(newChangelog)-1].Diff, d)
+				newChangelog[len(newChangelog)-1].Diff = append(
+					newChangelog[len(newChangelog)-1].Diff,
+					d,
+				)
 			}
 		}
 	}
@@ -68,7 +71,10 @@ type DifferenceReaction struct {
 // NewDifferenceKindReaction creates a DifferenceOperation that filters per type.
 //
 // See DifferenceOperation
-func NewDifferenceKindReaction(kind Kind, apply DifferenceOperation) DifferenceReaction {
+func NewDifferenceKindReaction(
+	kind Kind,
+	apply DifferenceOperation,
+) DifferenceReaction {
 	return DifferenceReaction{
 		filter: func(scope string, d Difference) bool {
 			return d.Kind&kind > 0
@@ -80,7 +86,10 @@ func NewDifferenceKindReaction(kind Kind, apply DifferenceOperation) DifferenceR
 // NewDifferenceReaction creates a DifferenceOperation for the given filter and apply function
 //
 // See DifferenceOperation
-func NewDifferenceReaction(filter DifferenceFilter, apply DifferenceOperation) DifferenceReaction {
+func NewDifferenceReaction(
+	filter DifferenceFilter,
+	apply DifferenceOperation,
+) DifferenceReaction {
 	return DifferenceReaction{
 		filter, apply,
 	}
@@ -131,7 +140,10 @@ type ChangeReaction struct {
 // NewChangeReaction creates a ChangeOperation for the given filter and apply function
 //
 // See ChangeOperation
-func NewChangeReaction(filter ChangeFilter, apply ChangeOperation) ChangeReaction {
+func NewChangeReaction(
+	filter ChangeFilter,
+	apply ChangeOperation,
+) ChangeReaction {
 	return ChangeReaction{
 		filter, apply,
 	}
@@ -140,7 +152,10 @@ func NewChangeReaction(filter ChangeFilter, apply ChangeOperation) ChangeReactio
 // NewChangeKindReaction creates a ChangeOperation that filters per type.
 //
 // See ChangeOperation
-func NewChangeKindReaction(kind Kind, apply func(c Change) error) ChangeReaction {
+func NewChangeKindReaction(
+	kind Kind,
+	apply func(c Change) error,
+) ChangeReaction {
 	return ChangeReaction{
 		filter: func(c Change) bool {
 			return c.Kind&kind > 0

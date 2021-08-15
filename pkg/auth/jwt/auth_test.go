@@ -283,7 +283,11 @@ func TestJWTauth_Tokenize(t *testing.T) {
 			JA := NewJWTauth(&privKey.PublicKey)
 			got, err := JA.Tokenize(tt.args.load)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("JWTauth.Tokenize() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"JWTauth.Tokenize() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -384,7 +388,11 @@ func TestJWTauth_Refresh(t *testing.T) {
 			JA := NewJWTauth(&privKey.PublicKey)
 			got, err := JA.Refresh(tt.args.token)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("JWTauth.Tokenize() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"JWTauth.Tokenize() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {

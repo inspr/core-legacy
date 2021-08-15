@@ -72,7 +72,9 @@ func generatePrivateKey() (*rsa.PrivateKey, error) {
 	return privateKey, nil
 }
 
-func encodeKeysToPEM(privateKey *rsa.PrivateKey) (pubKey []byte, privKey []byte, err error) {
+func encodeKeysToPEM(
+	privateKey *rsa.PrivateKey,
+) (pubKey []byte, privKey []byte, err error) {
 	// Get ASN.1 DER format
 	privDER := x509.MarshalPKCS1PrivateKey(privateKey)
 	publicKeyBytes, err := generatePublicKey(&privateKey.PublicKey)
@@ -120,16 +122,24 @@ func main() {
 
 	initKube()
 
-	_, errPriv := clientSet.CoreV1().Secrets(namespace).Get(context.Background(), "jwtprivatekey", v1.GetOptions{})
-	_, errPub := clientSet.CoreV1().Secrets(namespace).Get(context.Background(), "jwtpublickey", v1.GetOptions{})
+	_, errPriv := clientSet.CoreV1().
+		Secrets(namespace).
+		Get(context.Background(), "jwtprivatekey", v1.GetOptions{})
+	_, errPub := clientSet.CoreV1().
+		Secrets(namespace).
+		Get(context.Background(), "jwtpublickey", v1.GetOptions{})
 
 	if errPriv != nil || errPub != nil {
 		if errPriv == nil {
-			clientSet.CoreV1().Secrets(namespace).Delete(context.Background(), "jwtprivatekey", v1.DeleteOptions{})
+			clientSet.CoreV1().
+				Secrets(namespace).
+				Delete(context.Background(), "jwtprivatekey", v1.DeleteOptions{})
 		}
 
 		if errPub == nil {
-			clientSet.CoreV1().Secrets(namespace).Delete(context.Background(), "jwtpublickey", v1.DeleteOptions{})
+			clientSet.CoreV1().
+				Secrets(namespace).
+				Delete(context.Background(), "jwtpublickey", v1.DeleteOptions{})
 		}
 
 		privateKey, err := generatePrivateKey()
@@ -160,11 +170,15 @@ func main() {
 				"key": publicKeyBytes,
 			},
 		}
-		_, err = clientSet.CoreV1().Secrets(namespace).Create(context.Background(), &privSec, v1.CreateOptions{})
+		_, err = clientSet.CoreV1().
+			Secrets(namespace).
+			Create(context.Background(), &privSec, v1.CreateOptions{})
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
-		_, err = clientSet.CoreV1().Secrets(namespace).Create(context.Background(), &pubSec, v1.CreateOptions{})
+		_, err = clientSet.CoreV1().
+			Secrets(namespace).
+			Create(context.Background(), &pubSec, v1.CreateOptions{})
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
@@ -173,7 +187,9 @@ func main() {
 
 	if secretName := os.Getenv("INSPRD_INIT_KEY_SECRET_NAME"); secretName != "" {
 		logger.Info("generating init key")
-		secret, err := clientSet.CoreV1().Secrets(namespace).Get(context.Background(), secretName, v1.GetOptions{})
+		secret, err := clientSet.CoreV1().
+			Secrets(namespace).
+			Get(context.Background(), secretName, v1.GetOptions{})
 		if err != nil {
 			panic(err)
 		}
@@ -181,7 +197,9 @@ func main() {
 			secret.Data = map[string][]byte{}
 		}
 		secret.Data["key"] = []byte(generatePassword())
-		_, err = clientSet.CoreV1().Secrets(namespace).Update(context.Background(), secret, v1.UpdateOptions{})
+		_, err = clientSet.CoreV1().
+			Secrets(namespace).
+			Update(context.Background(), secret, v1.UpdateOptions{})
 		if err != nil {
 			panic(err)
 		}

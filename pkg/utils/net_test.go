@@ -26,11 +26,19 @@ func TestGetFreePorts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := GetFreePorts(tt.args.count)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetFreePorts() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"GetFreePorts() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if len(got) != tt.wantedLength {
-				t.Errorf("GetFreePorts() length = %v, want %v", got, tt.wantedLength)
+				t.Errorf(
+					"GetFreePorts() length = %v, want %v",
+					got,
+					tt.wantedLength,
+				)
 			}
 		})
 	}

@@ -31,7 +31,11 @@ type Handler struct {
 
 // NewHandler creates a handler from a memory manager and an operator. It also initializes the reactors for
 // changes on the cluster.
-func NewHandler(memory memory.Manager, operator operators.OperatorInterface, auth auth.Auth) *Handler {
+func NewHandler(
+	memory memory.Manager,
+	operator operators.OperatorInterface,
+	auth auth.Auth,
+) *Handler {
 	logger.Info("creating new Insprd API handler")
 	h := Handler{
 		Memory:          memory,

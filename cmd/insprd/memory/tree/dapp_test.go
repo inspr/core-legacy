@@ -716,7 +716,10 @@ func TestMemoryManager_Apps(t *testing.T) {
 			tmm := &treeMemoryManager{
 				root: tt.fields.root,
 			}
-			if got := tmm.Apps(); !metautils.CompareWithUUID(got.(*AppMemoryManager).root, tt.want.(*AppMemoryManager).root) {
+			if got := tmm.Apps(); !metautils.CompareWithUUID(
+				got.(*AppMemoryManager).root,
+				tt.want.(*AppMemoryManager).root,
+			) {
 				t.Errorf("MemoryManager.Apps() = %v", got)
 			}
 		})
@@ -791,7 +794,11 @@ func TestAppMemoryManager_GetApp(t *testing.T) {
 			amm := mem.Apps()
 			got, err := amm.Get(tt.args.query)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppMemoryManager.Get() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !metautils.CompareWithoutUUID(got, tt.want) {
@@ -1735,18 +1742,33 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			am := mem.Apps()
 			err := am.Create(tt.args.context, tt.args.app, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppMemoryManager.Create() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !tt.wantErr {
-				scope, _ := metautils.JoinScopes(tt.args.context, tt.args.app.Meta.Name)
+				scope, _ := metautils.JoinScopes(
+					tt.args.context,
+					tt.args.app.Meta.Name,
+				)
 				got, _ := am.Get(scope)
-				metautils.RecursiveValidateUUIDS("AppMemoryManager.Create()", got, t)
+				metautils.RecursiveValidateUUIDS(
+					"AppMemoryManager.Create()",
+					got,
+					t,
+				)
 			}
 			if tt.want != nil {
 				got, err := am.Get(tt.args.searchQuery)
 				if (err != nil) || !metautils.CompareWithoutUUID(got, tt.want) {
-					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
+					t.Errorf(
+						"AppMemoryManager.Get() = %v, want %v",
+						got,
+						tt.want,
+					)
 				}
 			}
 
@@ -1858,13 +1880,21 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 			am := mem.Apps()
 			err := am.Delete(tt.args.query)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppMemoryManager.Delete() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !tt.wantErr {
 				got, err := am.Get(tt.args.query)
 				if err == nil {
-					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
+					t.Errorf(
+						"AppMemoryManager.Get() = %v, want %v",
+						got,
+						tt.want,
+					)
 				}
 			}
 			if tt.checkFunction != nil {
@@ -2328,7 +2358,11 @@ func TestAppMemoryManager_Update(t *testing.T) {
 			am := mem.Apps()
 			err := am.Update(tt.args.query, tt.args.app, tt.args.brokers)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppMemoryManager.Update() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if tt.want != nil {
@@ -2340,7 +2374,11 @@ func TestAppMemoryManager_Update(t *testing.T) {
 
 				uuidComp := metautils.CompareWithoutUUID(got, tt.want)
 				if (err != nil) || (!uuidComp && !tt.fields.updated) {
-					t.Errorf("AppMemoryManager.Get() = %v, want %v", got, tt.want)
+					t.Errorf(
+						"AppMemoryManager.Get() = %v, want %v",
+						got,
+						tt.want,
+					)
 				}
 			}
 			if tt.checkFunction != nil {
@@ -2486,11 +2524,19 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 			amm := mem.Apps()
 			got, err := amm.ResolveBoundary(tt.args.app, tt.args.usePermTree)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.ResolveBoundary() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AppMemoryManager.ResolveBoundary() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !metautils.CompareWithoutUUID(got, tt.want) {
-				t.Errorf("AppMemoryManager.ResolveBoundary() = %v, want %v", got, tt.want)
+				t.Errorf(
+					"AppMemoryManager.ResolveBoundary() = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -2559,8 +2605,15 @@ func TestAppMemoryManager_removeFromParentBoundary(t *testing.T) {
 			}
 			amm := mem.Apps().(*AppMemoryManager)
 			amm.removeFromParentBoundary(tt.args.app, tt.args.parent)
-			if !metautils.CompareWithoutUUID(tt.args.parent.Spec.Channels, tt.want) {
-				t.Errorf("removeFromParentBoundary() result =\n%#v, want\n%#v", tt.args.parent.Spec.Channels, tt.want)
+			if !metautils.CompareWithoutUUID(
+				tt.args.parent.Spec.Channels,
+				tt.want,
+			) {
+				t.Errorf(
+					"removeFromParentBoundary() result =\n%#v, want\n%#v",
+					tt.args.parent.Spec.Channels,
+					tt.want,
+				)
 			}
 
 		})

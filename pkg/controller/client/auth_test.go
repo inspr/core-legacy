@@ -76,7 +76,11 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 				}
 
 				if !reflect.DeepEqual(payload, tt.args.payload) {
-					t.Errorf("wrong token. want = %v, got = %v", payload, tt.args.payload)
+					t.Errorf(
+						"wrong token. want = %v, got = %v",
+						payload,
+						tt.args.payload,
+					)
 				}
 
 				encoder.Encode(authDI)
@@ -90,10 +94,18 @@ func TestAuthClient_GenerateToken(t *testing.T) {
 			}
 			got, err := ac.GenerateToken(tt.args.ctx, tt.args.payload)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AuthorizationClient.GenerateToken() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"AuthorizationClient.GenerateToken() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AuthorizationClient.GenerateToken() got = %v, want %v", got, tt.want)
+				t.Errorf(
+					"AuthorizationClient.GenerateToken() got = %v, want %v",
+					got,
+					tt.want,
+				)
 			}
 		})
 	}

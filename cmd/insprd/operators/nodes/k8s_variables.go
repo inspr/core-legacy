@@ -34,5 +34,7 @@ func getFromEnv(name string) string {
 // their initializers, and those are evaluated only after all the imported packages
 // have been initialized
 func init() {
-	logger, _ = logs.Logger(zap.Fields(zap.String("section", "kafka-node-operator")))
+	logger, _ = logs.Logger(
+		zap.Fields(zap.String("section", "kafka-node-operator")),
+	)
 }

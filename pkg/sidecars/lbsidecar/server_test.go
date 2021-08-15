@@ -22,8 +22,14 @@ func TestInit(t *testing.T) {
 		{
 			name: "Initializes a new server",
 			want: &Server{
-				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
-				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+				writeAddr: fmt.Sprintf(
+					":%s",
+					os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"),
+				),
+				readAddr: fmt.Sprintf(
+					":%s",
+					os.Getenv("INSPR_LBSIDECAR_READ_PORT"),
+				),
 			},
 		},
 	}
@@ -53,23 +59,41 @@ func TestServer_Run(t *testing.T) {
 		{
 			name: "Runs server and cancel its context afterwards",
 			fields: fields{
-				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
-				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+				writeAddr: fmt.Sprintf(
+					":%s",
+					os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"),
+				),
+				readAddr: fmt.Sprintf(
+					":%s",
+					os.Getenv("INSPR_LBSIDECAR_READ_PORT"),
+				),
 			},
 		},
 		{
 			name: "Tries to create read server on already-used port",
 			fields: fields{
-				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
-				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+				writeAddr: fmt.Sprintf(
+					":%s",
+					os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"),
+				),
+				readAddr: fmt.Sprintf(
+					":%s",
+					os.Getenv("INSPR_LBSIDECAR_READ_PORT"),
+				),
 			},
 			requestRead: true,
 		},
 		{
 			name: "Tries to create read server on already-used port",
 			fields: fields{
-				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
-				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+				writeAddr: fmt.Sprintf(
+					":%s",
+					os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"),
+				),
+				readAddr: fmt.Sprintf(
+					":%s",
+					os.Getenv("INSPR_LBSIDECAR_READ_PORT"),
+				),
 			},
 			requestWrite: true,
 		},
@@ -82,7 +106,9 @@ func TestServer_Run(t *testing.T) {
 			}
 
 			if tt.requestRead && tt.requestWrite {
-				t.Error("for testing purposes, choose only one of 'requestRead' and 'requestWrite'")
+				t.Error(
+					"for testing purposes, choose only one of 'requestRead' and 'requestWrite'",
+				)
 				return
 			} else if !tt.requestRead && !tt.requestWrite {
 				errChan := make(chan error)

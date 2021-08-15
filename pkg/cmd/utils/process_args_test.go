@@ -43,7 +43,11 @@ func TestCheckEmptyArgs(t *testing.T) {
 			err := CheckEmptyArgs(tt.args)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("CheckEmptyArgs() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"CheckEmptyArgs() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 
 			if tt.wantWrapper && ierrors.Unwrap(err) == nil {
@@ -172,7 +176,11 @@ func TestProcessAliasArg(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, got1, err := ProcessAliasArg(tt.args.arg, tt.args.scope)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ProcessAliasArg() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"ProcessAliasArg() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if got != tt.path {

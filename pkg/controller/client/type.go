@@ -19,7 +19,10 @@ type TypeClient struct {
 // Get gets a Type from Insprd, if it exists.
 // The scope refers to the dApp in which the Type is in, represented with a dot separated query
 // such as app1.app2
-func (tc *TypeClient) Get(ctx context.Context, scope, name string) (*meta.Type, error) {
+func (tc *TypeClient) Get(
+	ctx context.Context,
+	scope, name string,
+) (*meta.Type, error) {
 	tdi := models.TypeQueryDI{
 		TypeName: name,
 	}
@@ -38,7 +41,12 @@ func (tc *TypeClient) Get(ctx context.Context, scope, name string) (*meta.Type, 
 // Create creates given Type inside of Insprd
 // The scope refers to the dApp in which the Type will be in, represented with a dot separated query
 // such as app1.app2
-func (tc *TypeClient) Create(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error) {
+func (tc *TypeClient) Create(
+	ctx context.Context,
+	scope string,
+	t *meta.Type,
+	dryRun bool,
+) (diff.Changelog, error) {
 	tdi := models.TypeDI{
 		Type:   *t,
 		DryRun: dryRun,
@@ -58,7 +66,11 @@ func (tc *TypeClient) Create(ctx context.Context, scope string, t *meta.Type, dr
 // Delete deletes a Type from Insprd, if exists.
 // The scope refers  to the dApp in which the Type is in, represented with a dot separated query
 // such as app1.app2. The name is the name of the Type to be deleted
-func (tc *TypeClient) Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error) {
+func (tc *TypeClient) Delete(
+	ctx context.Context,
+	scope, name string,
+	dryRun bool,
+) (diff.Changelog, error) {
 	tdi := models.TypeQueryDI{
 		TypeName: name,
 		DryRun:   dryRun,
@@ -78,7 +90,12 @@ func (tc *TypeClient) Delete(ctx context.Context, scope, name string, dryRun boo
 // Update updates given Type in Insprd, if it exists.
 // The scope refers to the dApp in which the Type is in, represented with a dot separated query
 // such asapp1.app2
-func (tc *TypeClient) Update(ctx context.Context, scope string, t *meta.Type, dryRun bool) (diff.Changelog, error) {
+func (tc *TypeClient) Update(
+	ctx context.Context,
+	scope string,
+	t *meta.Type,
+	dryRun bool,
+) (diff.Changelog, error) {
 	tdi := models.TypeDI{
 		Type:   *t,
 		DryRun: dryRun,

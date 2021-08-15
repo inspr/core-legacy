@@ -81,7 +81,11 @@ func TestServer_Tokenize(t *testing.T) {
 				t.Log("error decoding payload into bytes")
 				return
 			}
-			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(body))
+			res, err := client.Post(
+				ts.URL,
+				"application/json",
+				bytes.NewBuffer(body),
+			)
 			if err != nil {
 				t.Log("error making a POST in the httptest server")
 				return
@@ -89,7 +93,11 @@ func TestServer_Tokenize(t *testing.T) {
 			defer res.Body.Close()
 
 			if res.StatusCode != tt.want {
-				t.Errorf("AuthHandlers_Tokenize() = %v, want %v", res.StatusCode, tt.want)
+				t.Errorf(
+					"AuthHandlers_Tokenize() = %v, want %v",
+					res.StatusCode,
+					tt.want,
+				)
 				return
 			}
 
@@ -105,7 +113,11 @@ func TestServer_Tokenize(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(*payload, tt.body) {
-				t.Errorf("AuthHandlers_Tokenize() = %v, want %v", payload, tt.body)
+				t.Errorf(
+					"AuthHandlers_Tokenize() = %v, want %v",
+					payload,
+					tt.body,
+				)
 				return
 			}
 		})

@@ -118,7 +118,11 @@ func TestNewAppClient(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewAppClient()
 			if got.client == nil {
-				t.Errorf("NewClient().client = %v, want %v", got.client, tt.want.client)
+				t.Errorf(
+					"NewClient().client = %v, want %v",
+					got.client,
+					tt.want.client,
+				)
 			}
 		})
 	}
@@ -197,7 +201,11 @@ func TestClient_WriteMessage(t *testing.T) {
 
 			err := c.WriteMessage(ctx, "chan1", mockMessage())
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.WriteMessage() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"Client.WriteMessage() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -234,7 +242,10 @@ func TestClient_HandleChannel(t *testing.T) {
 							return err
 						}
 						if message.Message != "message" {
-							t.Errorf("Client_HandleChannel message = %v, want message", message.Message)
+							t.Errorf(
+								"Client_HandleChannel message = %v, want message",
+								message.Message,
+							)
 						}
 
 						return nil
@@ -260,7 +271,10 @@ func TestClient_HandleChannel(t *testing.T) {
 							return err
 						}
 						if message.Message != "message" {
-							t.Errorf("Client_HandleChannel message = %v, want message", message.Message)
+							t.Errorf(
+								"Client_HandleChannel message = %v, want message",
+								message.Message,
+							)
 						}
 
 						return errors.New("Error")
@@ -288,7 +302,11 @@ func TestClient_HandleChannel(t *testing.T) {
 				&response)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client_HandleChannel response.Status = %v, wantErr = %v", response.Status, tt.wantErr)
+				t.Errorf(
+					"Client_HandleChannel response.Status = %v, wantErr = %v",
+					response.Status,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -371,7 +389,11 @@ func TestClient_Run(t *testing.T) {
 			cancel()
 			err = <-errch
 			if err != nil && err != context.Canceled {
-				t.Errorf("Client_Run error in server = %v, wantErr = %v", err, tt.wantErr)
+				t.Errorf(
+					"Client_Run error in server = %v, wantErr = %v",
+					err,
+					tt.wantErr,
+				)
 			}
 
 		})

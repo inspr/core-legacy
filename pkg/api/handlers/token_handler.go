@@ -35,10 +35,16 @@ func (h *Handler) ControllerRefreshHandler() rest.Handler {
 		// this is the path to the app
 		appQuery := string(received.RefreshToken)
 
-		l.Debug("querying app to get its credentials", zap.String("app-query", appQuery))
+		l.Debug(
+			"querying app to get its credentials",
+			zap.String("app-query", appQuery),
+		)
 		app, err := h.Memory.Tree().Perm().Apps().Get(appQuery)
 		if err != nil {
-			l.Error("error finding dApp from request", zap.String("app-query", appQuery))
+			l.Error(
+				"error finding dApp from request",
+				zap.String("app-query", appQuery),
+			)
 			rest.ERROR(w, err)
 			return
 		}
@@ -48,8 +54,11 @@ func (h *Handler) ControllerRefreshHandler() rest.Handler {
 			Permissions: map[string][]string{
 				app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
 			},
-			Refresh:    []byte(appQuery),
-			RefreshURL: fmt.Sprintf("http://%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
+			Refresh: []byte(appQuery),
+			RefreshURL: fmt.Sprintf(
+				"http://%v/refreshController",
+				os.Getenv("INSPR_INSPRD_ADDRESS"),
+			),
 		}
 		l.Debug("sucessfully refreshed token")
 		rest.JSON(w, 200, payload)

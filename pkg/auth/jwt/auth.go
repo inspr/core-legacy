@@ -100,7 +100,10 @@ func (JA *JWTauth) Init(key string, load auth.Payload) ([]byte, error) {
 	client := request.NewJSONClient(JA.authURL)
 
 	data := auth.JwtDO{}
-	logger.Debug("sending initialization request to auth service", zap.String("auth-service", JA.authURL))
+	logger.Debug(
+		"sending initialization request to auth service",
+		zap.String("auth-service", JA.authURL),
+	)
 	err := client.Send(
 		context.Background(),
 		"/init",
@@ -126,7 +129,10 @@ func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
 	client := request.NewJSONClient(JA.authURL)
 
 	data := auth.JwtDO{}
-	logger.Debug("sending request to authorization server", zap.String("auth-service", JA.authURL))
+	logger.Debug(
+		"sending request to authorization server",
+		zap.String("auth-service", JA.authURL),
+	)
 	err := client.Send(
 		context.Background(),
 		"/token",
@@ -135,7 +141,12 @@ func (JA *JWTauth) Tokenize(load auth.Payload) ([]byte, error) {
 		&data)
 
 	if err != nil {
-		logger.Error("unable to tokenize data", zap.Any("data", load), zap.String("auth-service", JA.authURL), zap.Error(err))
+		logger.Error(
+			"unable to tokenize data",
+			zap.Any("data", load),
+			zap.String("auth-service", JA.authURL),
+			zap.Error(err),
+		)
 		return nil, err
 	}
 
@@ -153,7 +164,10 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 
 	data := auth.JwtDO{}
 
-	logger.Debug("sending request to authorization server", zap.String("auth-service", JA.authURL))
+	logger.Debug(
+		"sending request to authorization server",
+		zap.String("auth-service", JA.authURL),
+	)
 	err := client.Send(
 		context.Background(),
 		"/refresh",
@@ -162,7 +176,11 @@ func (JA *JWTauth) Refresh(token []byte) ([]byte, error) {
 		&data)
 
 	if err != nil {
-		logger.Error("unable to refresh token", zap.String("auth-service", JA.authURL), zap.Error(err))
+		logger.Error(
+			"unable to refresh token",
+			zap.String("auth-service", JA.authURL),
+			zap.Error(err),
+		)
 		return nil, err
 	}
 

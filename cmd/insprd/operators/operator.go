@@ -39,12 +39,19 @@ func (op *Operator) Channels() ChannelOperatorInterface {
 }
 
 // NewOperator creates a node operator.
-func NewOperator(memory memory.Manager, authenticator auth.Auth) (OperatorInterface, error) {
+func NewOperator(
+	memory memory.Manager,
+	authenticator auth.Auth,
+) (OperatorInterface, error) {
 	var err error
 
 	chOp := NewGeneralOperator(memory.Brokers(), memory.Tree())
 
-	nOp, err := nodes.NewNodeOperator(memory.Tree(), authenticator, memory.Brokers())
+	nOp, err := nodes.NewNodeOperator(
+		memory.Tree(),
+		authenticator,
+		memory.Brokers(),
+	)
 	if err != nil {
 		return nil, err
 	}

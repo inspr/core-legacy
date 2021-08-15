@@ -150,13 +150,17 @@ func GetInsprAppID() string {
 // GetBrokerWritePort returns environment variable that contains given broker's
 // write port
 func GetBrokerWritePort(broker string) string {
-	return getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_WRITE_PORT", strings.ToUpper(broker)))
+	return getEnv(
+		fmt.Sprintf("INSPR_SIDECAR_%s_WRITE_PORT", strings.ToUpper(broker)),
+	)
 }
 
 // GetBrokerReadPort returns environment variable that contains given broker's
 // read port
 func GetBrokerReadPort(broker string) string {
-	return getEnv(fmt.Sprintf("INSPR_SIDECAR_%s_READ_PORT", strings.ToUpper(broker)))
+	return getEnv(
+		fmt.Sprintf("INSPR_SIDECAR_%s_READ_PORT", strings.ToUpper(broker)),
+	)
 }
 
 // GetBrokerSpecificSidecarAddr returns environment variable that contains

@@ -121,7 +121,10 @@ func isYaml(file string) bool {
 func printAppliedFiles(appliedFiles []applied, out io.Writer) {
 	fmt.Fprint(out, "\nApplied:\n")
 	for _, file := range appliedFiles {
-		fmt.Fprint(out, file.fileName+" | "+file.component.Kind+" | "+file.component.APIVersion+"\n")
+		fmt.Fprint(
+			out,
+			file.fileName+" | "+file.component.Kind+" | "+file.component.APIVersion+"\n",
+		)
 	}
 }
 
@@ -181,7 +184,10 @@ func getOrderedFiles(path string, files []string) []applied {
 			}
 
 			if comp.Kind == "dapp" {
-				apps = append(apps, applied{component: comp, fileName: file, content: f})
+				apps = append(
+					apps,
+					applied{component: comp, fileName: file, content: f},
+				)
 			} else if comp.Kind == "channel" {
 				channels = append(channels, applied{component: comp, fileName: file, content: f})
 			} else if comp.Kind == "type" {

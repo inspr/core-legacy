@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/docker/docker/daemon/logger"
 	"go.uber.org/zap"
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
@@ -36,7 +37,10 @@ func NewGeneralOperator(brokers brokers.Manager, memory tree.Manager) *GenOp {
 	}
 }
 
-func (g GenOp) getOperator(scope, name string, deleteCmd bool) (ChannelOperatorInterface, error) {
+func (g GenOp) getOperator(
+	scope, name string,
+	deleteCmd bool,
+) (ChannelOperatorInterface, error) {
 	var channel *meta.Channel
 	var err error
 
@@ -61,7 +65,8 @@ func (g GenOp) getOperator(scope, name string, deleteCmd bool) (ChannelOperatorI
 		return nil, err
 	}
 
-	if obj, ok := g.configs[broker]; !reflect.DeepEqual(obj.config, config) || !ok {
+	if obj, ok := g.configs[broker]; !reflect.DeepEqual(obj.config, config) ||
+		!ok {
 		err = g.setOperator(config)
 		if err != nil {
 			return nil, err
@@ -92,7 +97,10 @@ func (g GenOp) setOperator(config metabrokers.BrokerConfiguration) error {
 }
 
 //Get executes Get method of correct operator given the desired channel's broker
-func (g GenOp) Get(ctx context.Context, scope, name string) (*meta.Channel, error) {
+func (g GenOp) Get(
+	ctx context.Context,
+	scope, name string,
+) (*meta.Channel, error) {
 	logger.Info("operator trying to get channel",
 		zap.Any("channel", name),
 		zap.Any("scope", scope))
@@ -104,7 +112,11 @@ func (g GenOp) Get(ctx context.Context, scope, name string) (*meta.Channel, erro
 }
 
 //Create executes Create method of correct operator given the desired channel's broker
-func (g GenOp) Create(ctx context.Context, scope string, channel *meta.Channel) error {
+func (g GenOp) Create(
+	ctx context.Context,
+	scope string,
+	channel *meta.Channel,
+) error {
 	logger.Info("operator trying to create channel",
 		zap.Any("channel", channel.Meta.Name),
 		zap.Any("scope", scope))
@@ -116,7 +128,11 @@ func (g GenOp) Create(ctx context.Context, scope string, channel *meta.Channel) 
 }
 
 //Update executes Update method of correct operator given the desired channel's broker
-func (g GenOp) Update(ctx context.Context, scope string, channel *meta.Channel) error {
+func (g GenOp) Update(
+	ctx context.Context,
+	scope string,
+	channel *meta.Channel,
+) error {
 	logger.Info("operator trying to update channel",
 		zap.Any("channel", channel.Meta.Name),
 		zap.Any("scope", scope),

@@ -66,7 +66,11 @@ func TestDeepCopy(t *testing.T) {
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
 				if !reflect.DeepEqual(getMockedTree(), metaApp) {
-					t.Errorf("DeepCopy() got = %v, wantErr %v", metaApp, getMockedTree())
+					t.Errorf(
+						"DeepCopy() got = %v, wantErr %v",
+						metaApp,
+						getMockedTree(),
+					)
 				}
 			},
 		},
@@ -79,7 +83,11 @@ func TestDeepCopy(t *testing.T) {
 			wantErr: false,
 			checkFunction: func(t *testing.T) {
 				if !reflect.DeepEqual([]string{"A", "B", "C"}, stringArr) {
-					t.Errorf("DeepCopy() got = %v, wantErr %v", stringArr, []string{"A", "B", "C"})
+					t.Errorf(
+						"DeepCopy() got = %v, wantErr %v",
+						stringArr,
+						[]string{"A", "B", "C"},
+					)
 				}
 			},
 		},

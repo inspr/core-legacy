@@ -15,7 +15,10 @@ type AbstractBrokerFactory struct {
 }
 
 // Subscribe includes a broker specific factory on the Abstract broker factory
-func (abf *AbstractBrokerFactory) Subscribe(broker string, factory models.SidecarFactory) error {
+func (abf *AbstractBrokerFactory) Subscribe(
+	broker string,
+	factory models.SidecarFactory,
+) error {
 	if factories == nil {
 		factories = make(brokerFactory)
 	}
@@ -27,7 +30,9 @@ func (abf *AbstractBrokerFactory) Subscribe(broker string, factory models.Sideca
 }
 
 // Get returns a factory for the specifyed broker
-func (abf *AbstractBrokerFactory) Get(broker string) (models.SidecarFactory, error) {
+func (abf *AbstractBrokerFactory) Get(
+	broker string,
+) (models.SidecarFactory, error) {
 	if factories == nil {
 		return nil, ierrors.New("no brokers are allowed")
 	}

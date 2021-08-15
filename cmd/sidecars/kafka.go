@@ -60,7 +60,10 @@ func KafkaEnvConfig(config KafkaConfig) k8s.ContainerOption {
 }
 
 // KafkaSidecarConfig adds the necessary env variables to configure the sidecar in the cluster
-func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) (k8s.ContainerOption, []corev1.EnvVar) {
+func KafkaSidecarConfig(
+	config KafkaConfig,
+	conns *models.SidecarConnections,
+) (k8s.ContainerOption, []corev1.EnvVar) {
 	port := corev1.EnvVar{
 		Name:  "INSPR_SIDECAR_KAFKA_WRITE_PORT",
 		Value: strconv.Itoa(int(conns.InPort)),
@@ -77,8 +80,12 @@ func KafkaSidecarConfig(config KafkaConfig, conns *models.SidecarConnections) (k
 		[]corev1.EnvVar{port, kafkaAddr}
 }
 
-func getKafkaContainerOptions(app *meta.App, config KafkaConfig, envVars k8s.ContainerOption,
-	opts []k8s.ContainerOption) []k8s.ContainerOption {
+func getKafkaContainerOptions(
+	app *meta.App,
+	config KafkaConfig,
+	envVars k8s.ContainerOption,
+	opts []k8s.ContainerOption,
+) []k8s.ContainerOption {
 
 	stdOptions := []k8s.ContainerOption{
 		InsprAppIDConfig(app),

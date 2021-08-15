@@ -90,7 +90,11 @@ func TestMultiError_Add(t *testing.T) {
 			}
 			e.Add(tt.args.err)
 			if e.Error() != tt.wantRet {
-				t.Errorf("MultiError.Empty() = %v, want %v", e.Error(), tt.wantRet)
+				t.Errorf(
+					"MultiError.Empty() = %v, want %v",
+					e.Error(),
+					tt.wantRet,
+				)
 			}
 		})
 	}

@@ -24,7 +24,9 @@ func createSchema() string {
 func TestNewApplyType(t *testing.T) {
 	prepareToken(t)
 	chanTypeWithoutNameBytes, _ := yaml.Marshal(meta.Type{})
-	chanTypeDefaultBytes, _ := yaml.Marshal(meta.Type{Meta: meta.Metadata{Name: "mock"}})
+	chanTypeDefaultBytes, _ := yaml.Marshal(
+		meta.Type{Meta: meta.Metadata{Name: "mock"}},
+	)
 	type args struct {
 		b []byte
 	}
@@ -64,7 +66,11 @@ func TestNewApplyType(t *testing.T) {
 
 			if r != nil && tt.want != nil {
 				if r.Error() != tt.want.Error() {
-					t.Errorf("newApplyType() = %v, want %v", r.Error(), tt.want.Error())
+					t.Errorf(
+						"newApplyType() = %v, want %v",
+						r.Error(),
+						tt.want.Error(),
+					)
 				}
 			} else {
 				if r != tt.want {
@@ -159,7 +165,11 @@ func Test_injectSchema(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := injectedSchema(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("injectSchema() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"injectSchema() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			var gotJSON interface{}

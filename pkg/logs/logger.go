@@ -18,7 +18,9 @@ func Logger(options ...zap.Option) (*zap.Logger, *zap.AtomicLevel) {
 
 		err := alevel.UnmarshalText([]byte(os.Getenv("LOG_LEVEL")))
 		if err != nil {
-			log.Println("log level either not set or invalid, defaulting to info")
+			log.Println(
+				"log level either not set or invalid, defaulting to info",
+			)
 		}
 		alevel = zap.NewAtomicLevelAt(level)
 
@@ -29,7 +31,11 @@ func Logger(options ...zap.Option) (*zap.Logger, *zap.AtomicLevel) {
 		config := zap.NewProductionEncoderConfig()
 		config.EncodeTime = zapcore.RFC3339TimeEncoder
 		config.EncodeLevel = zapcore.CapitalLevelEncoder
-		core := zapcore.NewCore(zapcore.NewJSONEncoder(config), os.Stdout, zap.LevelEnablerFunc(enablerFunc))
+		core := zapcore.NewCore(
+			zapcore.NewJSONEncoder(config),
+			os.Stdout,
+			zap.LevelEnablerFunc(enablerFunc),
+		)
 		logger = zap.New(core)
 	}
 

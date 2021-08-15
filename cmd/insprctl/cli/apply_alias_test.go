@@ -13,7 +13,9 @@ import (
 func TestNewApplyAlias(t *testing.T) {
 	prepareToken(t)
 	chanWithoutNameBytes, _ := yaml.Marshal(meta.Alias{})
-	chanDefaultBytes, _ := yaml.Marshal(meta.Alias{Meta: meta.Metadata{Name: "mock"}})
+	chanDefaultBytes, _ := yaml.Marshal(
+		meta.Alias{Meta: meta.Metadata{Name: "mock"}},
+	)
 	type args struct {
 		b []byte
 	}
@@ -53,7 +55,11 @@ func TestNewApplyAlias(t *testing.T) {
 
 			if r != nil && tt.want != nil {
 				if r.Error() != tt.want.Error() {
-					t.Errorf("NewApplyAlias() = %v, want %v", r.Error(), tt.want.Error())
+					t.Errorf(
+						"NewApplyAlias() = %v, want %v",
+						r.Error(),
+						tt.want.Error(),
+					)
 				}
 			} else {
 				if r != tt.want {

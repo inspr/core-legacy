@@ -23,7 +23,10 @@ var testPorts = models.SidecarConnections{
 	OutPort: 01,
 }
 
-func extractContainerOpts(opts k8s.ContainerOption, envvars []corev1.EnvVar) k8s.ContainerOption {
+func extractContainerOpts(
+	opts k8s.ContainerOption,
+	envvars []corev1.EnvVar,
+) k8s.ContainerOption {
 	return opts
 }
 
@@ -69,7 +72,9 @@ func TestKafkaToDeployment(t *testing.T) {
 					testSidecarImage,
 					InsprAppIDConfig(&deploymentDApp),
 					KafkaEnvConfig(deploymentKafkaConfig),
-					extractContainerOpts(KafkaSidecarConfig(deploymentKafkaConfig, &testPorts)),
+					extractContainerOpts(
+						KafkaSidecarConfig(deploymentKafkaConfig, &testPorts),
+					),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
 				),
 			),

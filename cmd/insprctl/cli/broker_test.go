@@ -188,11 +188,19 @@ func Test_brokerConfig(t *testing.T) {
 			out := buf.String()
 
 			if out != tt.wantMsg {
-				t.Errorf("cluster config msg error, got '%v' want '%v'", out, tt.wantMsg)
+				t.Errorf(
+					"cluster config msg error, got '%v' want '%v'",
+					out,
+					tt.wantMsg,
+				)
 			}
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("cluster config error, got '%v' want '%v'", err, tt.wantErr)
+				t.Errorf(
+					"cluster config error, got '%v' want '%v'",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
