@@ -15,7 +15,7 @@ Before running the Inspr CLI command to create the app in your cluster be sure t
 Also, this example uses Kafka as the Channels Message Broker, so it must be first installed in the cluster, and then you must install it on Insprd.  
 
 You can install Kafka in Insprd running the following command from within `/examples/pingpong_demo` folder:
-`insprctl cluster config kafka yamls/kafkaConfig.yaml`.
+`insprctl brokers kafka yamls/kafkaConfig.yaml`.
 
 Now that everything is set and ready, run the following commands from within `/pingpong_demo` to apply the structures in defined in `/yamls` folder:
 ```

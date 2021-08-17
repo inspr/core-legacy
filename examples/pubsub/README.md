@@ -29,7 +29,7 @@ Also, this example uses Kafka as the Channels Message Broker (for `controllerpri
 
 You can install Kafka in Insprd running the following command from within `/examples/pubsub` folder:
 ```
-insprctl cluster config kafka yamls/kafka.yaml
+insprctl brokers kafka yamls/kafka.yaml
 ```
 
 Now that everything is set and ready, run the following to create the "workspace" dApp, which will contain the publisher and subscriber dApps:
