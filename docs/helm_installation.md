@@ -63,9 +63,19 @@ Insprd will be exposed via NGINX by default, so you just need to have NGINX inst
 
 To properly access the cluster via the Inspr CLI it is necessary to configure the hostname in your machine to comport the Ingress host.
 
-This can be done in unix machines editting the file `etc/hosts` and adding `<cluster_IP> <insprIngress.host>`. For further understanding of what is happening access this [link](https://debian-handbook.info/browse/stable/sect.hostname-name-service.html)
+This can be done by installing the `insprctl`([example](cli_install.md)) and running the `init` command.
 
-For Windows is recommended to follow the steps in [here](https://docs.microsoft.com/en-us/windows-server/networking/technologies/ipam/add-a-dns-resource-record).
+After the cli installatin you can change the host running the config command:
+
+```
+insprctl config host <example_host>
+```
+
+Or manualy set the host via Flag in any command:
+
+```
+insprctl get apps --host <example_host>
+```
 
 ## Exposing Inspr via port forward
 
