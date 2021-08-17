@@ -6,6 +6,11 @@
     - Updated docs and examples to host flag and Brokers command
 ---
 
+### #112 Bug CORE-569 | Cli initialization not adding "http://" to ip
+- fix:
+	- added http:// on the `serverip` on the `insprctl init` command
+---
+
 ### #110 Story CORE-246 | Develop a client (for sidecar communication) with Python
 - features:
     - Created the newClient, writeMessage, handleChannel and run functions for the lb sidecar client for python
