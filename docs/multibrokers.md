@@ -43,7 +43,7 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
    3. Once you have you configuration file all you need to do is run:
 
       ```shell
-      insprctl cluster config kafka <relative_path_to>/your_file.yaml
+      insprctl brokers kafka <relative_path_to>/your_file.yaml
       ```
 
       To which the expected response is: `successfully installed broker on insprd`. 
@@ -51,7 +51,7 @@ To demonstrate how to configure your Inspr cluster with a new broker this will b
       This command works with the following pattern :
 
       ```sh
-      insprctl cluster config <broker-name> <relative_file_path>
+      insprctl brokers <broker-name> <relative_file_path>
       ```
 
       Keep in mind:

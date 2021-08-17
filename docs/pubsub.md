@@ -313,7 +313,7 @@ Keep in mind Slack and Discord are only examples.
 Deployment:
 You have to apply every YAML we created for dApps, Channels, Type and Kafka by running the following commands (be sure to have the latest version of [Inspr CLI](cli_install.md) installed):
 ```
-insprctl cluster config kafka yamls/kafka.yaml
+insprctl brokers kafka yamls/kafka.yaml
 insprctl apply -f yamls/01.app.yaml
 insprctl apply -f yamls/02.ct.yaml
 insprctl apply -f yamls/03.ch.yaml
