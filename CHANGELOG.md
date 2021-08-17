@@ -1,6 +1,11 @@
 
 # Changelog
 
+### #113 Story CORE-560 | CLI changes documentation
+- Doc:
+    - Updated docs and examples to host flag and Brokers command
+---
+
 ### #110 Story CORE-246 | Develop a client (for sidecar communication) with Python
 - features:
     - Created the newClient, writeMessage, handleChannel and run functions for the lb sidecar client for python
