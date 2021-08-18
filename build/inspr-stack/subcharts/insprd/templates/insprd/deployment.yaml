@@ -19,7 +19,7 @@ spec:
       {{- include "common.images.pullSecrets" (dict "images" (list .image) "global" $) | nindent 6 }}
       containers:
         - name: {{ include "insprd.fullname" $ }}
-          image: {{ include "common.images.image" (dict "image" .image "global" $) }}
+          image: {{ include "insprd.images.image" (dict "image" .image "global" $) }}
           imagePullPolicy: {{ .imagePullPolicy }}
           {{- include "insprd.healthcheck" $ | nindent 10 }}
           ports:
@@ -37,7 +37,7 @@ spec:
             - name: INSPR_LBSIDECAR_CONFIGMAP
               value: "{{include "lbsidecar.fullname" $}}"
             - name: "INSPR_LBSIDECAR_IMAGE"
-              value: {{ include "common.images.image" ( dict "image" .sidecar.image "global" $.Values.global )}}
+              value: {{ include "insprd.images.image" ( dict "image" .sidecar.image "global" $.Values.global )}}
             - name: "NODES_APPS_NAMESPACE"
               value: {{ tpl .apps.namespace $ }}
             - name: "INSPR_ENV"

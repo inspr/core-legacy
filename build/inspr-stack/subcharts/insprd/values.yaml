@@ -21,7 +21,7 @@ apps:
   createNamespace: false
 
 ingress:
-  enabled: true
+  enabled: false
   host:
   class:
 
