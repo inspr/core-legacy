@@ -29,9 +29,9 @@ imagePullSecrets:
 {{/*
 Renders the image value while overriding the image registry
 
-{{ include "common.images.image" (dict "image" .Values.path.to.image "global" $.Values.global)}}
+{{ include "insprd.images.image" (dict "image" .Values.path.to.image "global" $.Values.global)}}
 */}}
-{{- define "common.images.image" -}}
+{{- define "insprd.images.image" -}}
 {{ $registry := .global.imageRegistry | default .image.registry -}}
 {{ if $registry -}}
 	'{{ $registry }}/{{ .image.repository }}:{{ .image.tag }}'

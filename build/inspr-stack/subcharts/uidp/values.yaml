@@ -2,7 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-global: {}
+global:
+  redis:
+    password:
 
 name: uidp
 
@@ -32,12 +34,18 @@ admin:
   password:
 
 redis:
-  password: 
-  host:
-  port:
+  create: true
+  fullNameOverride: redis
+  password:
+  existingSecret: "uidp-redis-secret"
+  existing:
+    host:
+    port:
+  cluster:
+    nodes: 3
 
 ingress:
-  enabled: true
+  enabled: false
   class: "nginx"
   host:
 
