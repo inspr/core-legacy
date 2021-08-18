@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 	"inspr.dev/inspr/pkg/cmd"
@@ -37,6 +38,9 @@ var initCommand = cmd.NewCmd("init").
 		config := insprConfiguration{}
 		fmt.Print("enter insprd IP or URL (localhost:8080):")
 		fmt.Scanln(&config.ServerIP)
+		if !strings.HasPrefix(config.ServerIP, "http") {
+			config.ServerIP = fmt.Sprintf("http://%s", config.ServerIP)
+		}
 		if config.ServerIP == "" {
 			config.ServerIP = "http://localhost:8080"
 		}
