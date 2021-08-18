@@ -31,7 +31,7 @@ deploy:
           sidecar.image: gcr.io/insprlabs/inspr/sidecar/lbsidecar
           auth.image: gcr.io/insprlabs/authsvc
           secretGenerator.image: gcr.io/insprlabs/secretgen
-        chartPath: build/inspr-stack/subcharts/insprd
+        chartPath: build/insprd
         imageStrategy:
           helm:
             explicitRegistry: true
@@ -57,7 +57,7 @@ profiles:
             artifactOverrides:
               image: gcr.io/insprlabs/uidp/redis/api
               secret.image: gcr.io/insprlabs/uidp/redis/secret
-            chartPath: build/inspr-stack/subcharts/uidp
+            chartPath: build/uidp
             imageStrategy:
               helm:
                 explicitRegistry: true
