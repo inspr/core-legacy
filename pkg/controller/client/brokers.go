@@ -17,13 +17,9 @@ type BrokersClient struct {
 func (bc *BrokersClient) Get(ctx context.Context) (*models.BrokersDI, error) {
 	resp := &models.BrokersDI{}
 
-	err := bc.reqClient.Send(
-		ctx,
-		"/brokers",
-		http.MethodGet,
-		nil,
-		resp)
-
+	err := bc.reqClient.
+		// Header(rest.HeaderScopeKey, "").
+		Send(ctx, "/brokers", http.MethodGet, nil, resp)
 	if err != nil {
 		return nil, err
 	}

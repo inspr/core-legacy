@@ -23,3 +23,6 @@ permissions:
     - "delete:channel"
     - "delete:type"
     - "delete:alias"
+
+    - "create:broker"
+    - "get:broker"

@@ -30,6 +30,7 @@ var routeTranslator = map[string]string{
 	"channels": "channel",
 	"types":    "type",
 	"auth":     "token",
+	"brokers":  "broker",
 }
 
 var defaultErr = ierrors.
