@@ -52,3 +52,48 @@ your.release.name   default     1           2021-08-19 10:55:57.498118205 -0300 
 ```
 $ helm uninstall <your.release.name>
 ```
+
+<br>
+
+# Usefull Overwrites  
+
+## Example 1
+
+Description -- ingress enable/
+
+```
+$ helm install <your.release.name> inspr/inspr-stack --set uidp.ingress.enabled=true
+```
+
+## Example 2
+
+Description -- change port
+
+```
+$ helm install <your.release.name> inspr/inspr-stack \
+--set insprd.service.port=<new.port> \
+--set uidp.service.port=<new.port>
+
+...
+
+--set global.inspr.port=<new.port>
+
+```
+
+## Example 3
+
+Description -- log level
+
+```
+$ helm install <your.release.name> inspr/inspr-stack --set global.logLevel=<your.logLvl>
+```
+
+## Exaple 4
+
+Description -- password admin
+
+```
+$ helm install <your.release.name> inspr/inspr-stack --set uidp.admin.password=<your.password>
+```
+
+To see all the possible values overrides go to [Values_configuration](../../docs/values_configuration.md)
