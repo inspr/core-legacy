@@ -1,12 +1,15 @@
-## Helm chart Configuration
+# Helm chart values Configuration
 
-The following table lists the configurable parameters of Inspr Helm Chart and their default values.
+The following table lists the configurable parameters of Inspr Helm Chart and their default values, they can be setted with the flag on the helm command to overwrite the default ones.
+
+## Insprd values
 
 | Charts | Parameter | Description | Default
 |--|--|--|--|
+| insprd | global.imagePullPolicy | Insprd's image pull policy | IfNotPresent |
 | insprd | name| Name of Insprd deployment | insprd |
+| insprd | image.registry | Insprd image | gcr.io/insprlabs |
 | insprd | image.repository | The name of the Docker image for the Insprd containers running | insprd |
-| insprd | imagePullPolicy | Insprd's image pull policy | IfNotPresent |
 | insprd | replicaCount | Number of replicas of Insprd (Inspr daemon) deployment | 1 |
 | insprd | logLevel | Configures the log verbosity of the injector for Insprd | info |
 | insprd | apps.namespace | Kubernetes namespace on which Inspr apps will be instantiated | "{{ .Release.Name }}-inspr-apps" |
@@ -19,6 +22,7 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 | insprd | service.type | Sets the type of service to create for Insprd | ClusterIP |
 | insprd | service.port | HTTP port of Insprd k8s service | 80 |
 | insprd | service.targetPort | Targeted port of Insprd port | 8080 |
+| insprd | sidecar.image.registry | Insprd's sidecar image | gcr.io/insprlabs |
 | insprd | sidecar.image.repository | The name of the Docker image for the Sidecar containers running | inspr/sidecar/lbsidecar |
 | insprd | sidecar.ports.client.read | Port which the Sidecar Client will receive requests | 3046 |
 | insprd | sidecar.ports.client.write | Port which the Load Balancer Sidecar will receive write requests from the Sidecar Client | 3048 |
@@ -32,6 +36,10 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 | insprd | auth.image.repository | The name of the Docker image for the Auth Service containers running | authsvc |
 | insprd | secretGenerator.image.registry | Secret Generator image | gcr.io/insprlabs |
 | insprd | secretGenerator.image.repository | The name of the Docker image for the Secret Generator containers running | secretgen |
+
+## UIDP values
+
+| Charts | Parameter | Description | Default
 |-|-|-|-|
 | uidp | global.redis.password | Set the global redis password | |
 | uidp | name| Name of UIDP deployment | uidp |
@@ -56,7 +64,14 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 | uidp | insprd.init.secret.key | The secret key value |  |
 | uidp | insprd.init.secret.name | Name of the key where the requested secret value is located in the Kubernetes secret |  |
 | uidp | insprd.token | Set the Insprd token |  |
-|-|-|-|-|
+
+
+## Inspr Stack values
+
+In this case whe we have the dependency of the inprd and UIDP you can change any value from them, just beeing necessary to add the following dependence.
+
+| Charts | Parameter | Description | Default
+|--|--|--|--|
 | inspr-stack | global.imagePullSecrets | References secrets to be used when pulling images from private registries | [] |
 | inspr-stack | global.logLevel | Configures the log verbosity of the injector | info |
 | inspr-stack | global.insprd.port | HTTP port of Insprd k8s service | 80 |
