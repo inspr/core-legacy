@@ -1,6 +1,11 @@
 
 # Changelog
 
+### #113 Story CORE-560 | CLI changes documentation
+- Doc:
+    - Updated docs and examples to host flag and Brokers command
+---
+
 ### #111 Feature | adds redis as a dependency for the uidp helm chart
 - features:
   - adds redis as a uidp helm dependency
