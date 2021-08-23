@@ -25,7 +25,7 @@ insprd:
   replicaCount: 1
 
   apps:
-    namespace:
+    createNamespace: true
 
   ingress:
     enabled: false
@@ -93,9 +93,7 @@ uidp:
     generatePassword: true
 
   redis:
-    password: ""
-    host:
-    port:
+    create: true
 
   ingress:
     enabled: false

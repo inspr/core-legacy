@@ -59,18 +59,6 @@ imagePullSecrets:
   {{- end }}
 {{- end -}}
 
-{{/*
-Renders the image value while overriding the image registry
-*/}}
-{{- define "common.images.image" -}}
-{{- $registry := .global.imageRegistry | default .image.registry -}}
-{{- if $registry -}}
-"{{ $registry }}/{{ .image.repository }}:{{ .image.tag }}"
-{{- else -}}
-"{{ .image.repository }}:{{ .image.tag }}"
-{{- end -}}
-{{- end -}}
-
 
 {{- define "insprd.address" -}}
 http://{{ include "insprd.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.global.insprd.service.port }}
