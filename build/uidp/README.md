@@ -51,3 +51,5 @@ your.release.name   default     1           2021-08-19 10:55:57.498118205 -0300 
 ```
 $ helm uninstall <your.release.name>
 ```
+
+To see usefull overwrites go to [Values_configuration](../../docs/values_configuration.md)

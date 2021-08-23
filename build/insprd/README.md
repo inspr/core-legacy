@@ -54,3 +54,30 @@ your.release.name   default     1           2021-08-19 10:50:33.742251146 -0300 
 $ helm uninstall <your.release.name>
 ```
 
+# Usefull Overwrites  
+
+## Example
+
+Installing two diferentes insprds communicating with the same uidp
+
+1- Install uidp in a cluster
+
+```
+$ helm install uidp -f uidp_values.yaml
+```
+
+2- Then install two insprd in different namespaces, what are the necessary configuration for the two different daemons to work with the single UIDP. 
+
+```
+$ helm install insprd_1 -n insprd_1 \
+--set apps.namespace=insprd_1 \
+--set init.generateKey=false \
+--set init.key=custoKey \
+ 
+$ helm install insprd_2 -n insprd_2 \
+--set apps.namespace=insprd_2 \
+--set init.generateKey=false \
+--set init.key=custoKey \
+```
+
+To see more usefull overwrites go to [Values_configuration](../../docs/values_configuration.md)
