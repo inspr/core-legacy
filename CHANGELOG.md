@@ -8,7 +8,7 @@
 ---
 
 ### #113 Story CORE-560 | CLI changes documentation
-- Doc:
+- doc:
     - Updated docs and examples to host flag and Brokers command
 ---
 
