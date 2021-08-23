@@ -72,12 +72,12 @@ $ helm install uidp -f uidp_values.yaml
 $ helm install insprd_1 -n insprd_1 \
 --set apps.namespace=insprd_1 \
 --set init.generateKey=false \
---set init.key=custoKey \
+--set init.key=customKey \
  
 $ helm install insprd_2 -n insprd_2 \
 --set apps.namespace=insprd_2 \
 --set init.generateKey=false \
---set init.key=custoKey \
+--set init.key=customKey \
 ```
 
 To see more usefull overwrites go to [Values_configuration](../../docs/values_configuration.md)

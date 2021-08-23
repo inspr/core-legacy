@@ -4,7 +4,7 @@
 ### #117 Story | Inspr stack workspace initialization
 - doc:
 	- Create helm installation guides to insprd, uidp and inspr-stack, with some overwrite examples
-	- Update the overwrite values configuration
+	- Update the overwrite values configuration table
 ---
 
 ### #113 Story CORE-560 | CLI changes documentation
