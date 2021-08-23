@@ -18,8 +18,10 @@ def main():
 
         try:
             client.write_message(PING_OUTPUT_CHANNEL, msg)
+            return Response(status=200)
         except:
             raise Exception
+        
 
 
     try:

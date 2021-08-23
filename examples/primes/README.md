@@ -19,7 +19,7 @@ Before running the Inspr CLI command to create the app in your cluster be sure t
 Also, this example uses Kafka as the Channels Message Broker, so it must be first installed in the cluster, and then you must install it on Insprd.  
 
 You can install Kafka in Insprd running the following command from within `/examples/primes` folder:
-`insprctl cluster config kafka yamls/kafka.yaml`.  
+`insprctl brokers kafka yamls/kafka.yaml`.  
 
 Now that everything is set and ready, the simpler way to test it is to run:
 ```

@@ -14,7 +14,7 @@ This demo creates two dApps, **chtest** and **chcheck**, that exchange messages 
 To run this demo, make sure you have Insprd and Kafka Message Broker installed in your cluster (the Channels communicate through Kafka).  
 Install Kafka in Insprd by running:
 ```
-insprctl cluster config kafka yamls/kafka.yaml
+insprctl brokers kafka yamls/kafka.yaml
 ```
 
 Then build the applications that are going to run in each dApp by executing the Makefile (type `make` in the terminal from within this example's folder).  

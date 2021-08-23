@@ -17,9 +17,10 @@ def main():
 
         try:
             client.write_message(PONG_OUTPUT_CHANNEL, msg)
+            return Response(status=200)
         except:
             raise Exception
-
+        
 
     try:
         client.write_message(PONG_OUTPUT_CHANNEL, msg)
