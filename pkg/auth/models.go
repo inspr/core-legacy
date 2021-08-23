@@ -31,11 +31,13 @@ const (
 	CreateChannel string = "create:channel"
 	CreateType    string = "create:type"
 	CreateAlias   string = "create:alias"
+	CreateBroker  string = "create:broker"
 
 	GetDapp    string = "get:dapp"
 	GetChannel string = "get:channel"
 	GetType    string = "get:type"
 	GetAlias   string = "get:alias"
+	GetBroker  string = "get:broker"
 
 	UpdateDapp    string = "update:dapp"
 	UpdateChannel string = "update:channel"
@@ -53,27 +55,28 @@ const (
 // AdminPermissions defines all the permissions that the admin user have
 // when the cluster is initialized
 var AdminPermissions = map[string][]string{
-	"": {
-		CreateDapp,
-		CreateChannel,
-		CreateType,
-		CreateAlias,
 
-		GetDapp,
-		GetChannel,
-		GetType,
-		GetAlias,
+	CreateDapp:    {""},
+	CreateChannel: {""},
+	CreateType:    {""},
+	CreateAlias:   {""},
+	CreateBroker:  {},
 
-		UpdateDapp,
-		UpdateChannel,
-		UpdateType,
-		UpdateAlias,
+	GetDapp:    {""},
+	GetChannel: {""},
+	GetType:    {""},
+	GetAlias:   {""},
+	GetBroker:  {},
 
-		DeleteDapp,
-		DeleteChannel,
-		DeleteType,
-		DeleteAlias,
+	UpdateDapp:    {""},
+	UpdateChannel: {""},
+	UpdateType:    {""},
+	UpdateAlias:   {""},
 
-		CreateToken,
-	},
+	DeleteDapp:    {""},
+	DeleteChannel: {""},
+	DeleteType:    {""},
+	DeleteAlias:   {""},
+
+	CreateToken: nil,
 }

@@ -258,12 +258,10 @@ func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
 	}
 
 	payload := auth.Payload{
-		UID: app.Meta.UUID,
-		Permissions: map[string][]string{
-			app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
-		},
-		Refresh:    []byte(scope),
-		RefreshURL: fmt.Sprintf("http://%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
+		UID:         app.Meta.UUID,
+		Permissions: permMapper(app.Spec.Auth.Permissions, app.Spec.Auth.Scope),
+		Refresh:     []byte(scope),
+		RefreshURL:  fmt.Sprintf("http://%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
 	}
 
 	token, err := no.auth.Tokenize(payload)
@@ -284,6 +282,14 @@ func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
 }
 
 // Auxiliar methods
+
+func permMapper(permissions utils.StringArray, scope string) map[string][]string {
+	perms := make(map[string][]string)
+	for _, perm := range permissions {
+		perms[perm] = []string{scope}
+	}
+	return perms
+}
 
 func withSecretDefinition(app *meta.App) k8s.ContainerOption {
 	env := corev1.EnvFromSource{
