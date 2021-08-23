@@ -446,9 +446,10 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 	for newUserPermItem, newUserPermScopes := range newUser.Permissions {
 		isAllowed := false
 		reqPermScopes, okPermItem := requester.Permissions[newUserPermItem]
-		_, okCreate := requester.Permissions[auth.CreateToken]
-		ok := !isCreation || okCreate
-		if ok && okPermItem {
+		_, okToken := requester.Permissions[auth.CreateToken]
+		if !isCreation && okToken {
+			isAllowed = true
+		} else if isCreation && okToken && okPermItem {
 			isAllowed = true
 			for _, newUserScope := range newUserPermScopes {
 				if !isScopeAllowed(newUserScope, reqPermScopes) {

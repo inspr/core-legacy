@@ -224,12 +224,12 @@ func TestClient_UpdatePassword(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Permissions: map[string][]string{auth.CreateToken: nil},
 		Password:    string(hashedAuxPass),
 	}
 	auxUser2 := User{
 		UID:         "user2",
-		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
+		Permissions: map[string][]string{auth.UpdateAlias: {"ascope"}},
 		Password:    string(hashedAuxPass),
 	}
 
