@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #117 Story | Inspr stack workspace initialization
+- doc:
+	- Create helm installation guides to insprd, uidp and inspr-stack, with some overwrite examples
+	- Update the overwrite values configuration
+---
+
 ### #111 Feature | adds redis as a dependency for the uidp helm chart
 - features:
   - adds redis as a uidp helm dependency
