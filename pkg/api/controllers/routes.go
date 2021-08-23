@@ -30,7 +30,7 @@ func (s *Server) initRoutes() {
 	s.mux.Handle("/brokers", brokersHandler.HandleGet().Get().JSON().Validate(s.auth))
 	s.mux.Handle(
 		"/brokers/"+metabrokers.Kafka,
-		brokersHandler.KafkaCreateHandler().Post().JSON(),
+		brokersHandler.KafkaCreateHandler().Post().JSON().Validate(s.auth),
 	)
 
 	s.mux.Handle("/auth", h.TokenHandler().Validate(s.auth))
