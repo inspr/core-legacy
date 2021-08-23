@@ -6,6 +6,11 @@
     - Updated docs and examples to host flag and Brokers command
 ---
 
+### #111 Feature | adds redis as a dependency for the uidp helm chart
+- features:
+  - adds redis as a uidp helm dependency
+---
+
 ### #112 Bug CORE-569 | Cli initialization not adding "http://" to ip
 - fix:
 	- added http:// on the `serverip` on the `insprctl init` command
