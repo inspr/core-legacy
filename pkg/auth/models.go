@@ -25,18 +25,6 @@ type Payload struct {
 	RefreshURL  string              `json:"refreshurl"`
 }
 
-/* TODO
-	- Invert the permissions scheme. map will be indexed by the permission and the value should be a list of scopes.
-		- Allows for the implementation of general permissions
-		- Less compromising for other authentication structures and methods
-		- Is acctually a lot more efficent size wise
-	- Check validate behaviour for general functions
-	- Check validate for init
-	- Check validade for token creation
-	- Check validade for brokers
-	- Move logic of validation from middleware. To Auth?
-TODONE */
-
 // All Permissions possible values
 const (
 	CreateDapp    string = "create:dapp"
