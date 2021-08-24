@@ -201,8 +201,10 @@ skaffold/run:
 skaffold/dev:
 	skaffold dev -p ${PROFILE} -n ${K8S_NAMESPACE}
 
+## Deletes the release and the namespace that it was created in
 skaffold/delete:
 	skaffold delete -p ${PROFILE} -n ${K8S_NAMESPACE}
+	kubectl delete namespace ${K8S_NAMESPACE}
 # }
 
 # semgrep {
@@ -226,16 +228,19 @@ secrets/insprd/init:
 
 ## gets and decodes the grafana admin password
 secrets/grafana/password:
-	@echo $(kubectl get secrets -n ${K8S_NAMESPACE} ${K8S_NAMESPACE}-grafana-admin -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 --decode)
+	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${K8S_NAMESPACE}-grafana-admin -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 --decode)
 # }
 
 # dashboards {
+## port forwards grafana and opens a browser session with it
 dashboards/grafana:
 	xdg-open http://localhost:3000
 	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=grafana" -o jsonpath="{.items[0].metadata.name}") 3000:3000
+
+## port forwards prometheus and opens a browser session on it
 dashboards/prometheus:
-	xdg-open http://localhost:3000
-	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=prometheus" -o jsonpath="{.items[0].metadata.name}") 3000:3000
+	xdg-open http://localhost:9090
+	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=prometheus" -o jsonpath="{.items[0].metadata.name}") 9090:9090
 # }
 
 # port forwards {
