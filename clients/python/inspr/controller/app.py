@@ -5,7 +5,7 @@ import controller_client as controller
 APP_ROUTE = "apps"
 
 class AppClient(controller.ControllerClient):
-    def Get(self, scope:str) -> dict:
+    def get(self, scope:str) -> dict:
         headers = self.get_header_with_scope(scope)
 
         try:
@@ -15,7 +15,7 @@ class AppClient(controller.ControllerClient):
         except Exception as e:
             raise Exception(f"Error while send a Get App request: {e}")
 
-    def Delete(self, scope:str, dryRun:bool) -> dict:
+    def delete(self, scope:str, dryRun:bool) -> dict:
         msg_body = {
             "dryRun": dryRun
         }
@@ -29,7 +29,7 @@ class AppClient(controller.ControllerClient):
         except Exception as e:
             raise Exception(f"Error while send a Delete App request: {e}")
 
-    def Post(self, scope:str, app:dict, dryRun:bool) -> dict:
+    def post(self, scope:str, app:dict, dryRun:bool) -> dict:
         msg_body = {
             "app": app,
             "dryRun": dryRun
@@ -44,7 +44,7 @@ class AppClient(controller.ControllerClient):
         except Exception as e:
             raise Exception(f"Error while send a Post App request: {e}")
 
-    def Update(self, scope:str, app:dict, dryRun:bool) -> dict:
+    def update(self, scope:str, app:dict, dryRun:bool) -> dict:
         msg_body = {
             "app": app,
             "dryRun": dryRun
