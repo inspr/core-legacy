@@ -8,7 +8,7 @@ spec:
   template:
     spec:
       restartPolicy: Never
-      serviceAccountName: '{{ include "uidp.fullname" $ }}-secret-generator'
+      serviceAccountName: '{{ include "uidp.fullname" $ }}'
       {{- if .Values.insprd.init.enabled }}
       initContainers:
       {{- include "insprd.init-check" $ | nindent 8 }}
