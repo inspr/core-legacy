@@ -19,9 +19,8 @@ class Client:
         msg_body = {
             "data": msg
         }
-        json_obj = json.dumps(msg_body, indent=4)
         try:
-            send_post_request(self.write_address + "/" + channel, json_obj)
+            send_post_request(self.write_address + "/" + channel, msg_body)
         except Exception as e:
             print(f"Error while trying to write message: {e}")
             raise Exception("failed to deliver message: channel: {}".format(channel))
