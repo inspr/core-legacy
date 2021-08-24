@@ -215,4 +215,36 @@ semgrep/run:
 	semgrep --config "p/trailofbits"
 # }
 
+# secrets {
+## gets and decodes the admin secret
+secrets/uidp/admin:
+	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${K8S_NAMESPACE}-init-secret -o jsonpath="{.data.ADMIN_PASSWORD}" | base64 --decode)
+
+## gets and decodes the insprd init key secret
+secrets/insprd/init:
+	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${K8S_NAMESPACE}-insprd-init-key -o jsonpath="{.data.key}" | base64 --decode)
+
+## gets and decodes the grafana admin password
+secrets/grafana/password:
+	@echo $(kubectl get secrets -n ${K8S_NAMESPACE} ${K8S_NAMESPACE}-grafana-admin -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 --decode)
+# }
+
+# dashboards {
+dashboards/grafana:
+	xdg-open http://localhost:3000
+	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=grafana" -o jsonpath="{.items[0].metadata.name}") 3000:3000
+dashboards/prometheus:
+	xdg-open http://localhost:3000
+	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=prometheus" -o jsonpath="{.items[0].metadata.name}") 3000:3000
+# }
+
+# port forwards {
+pf/insprd:
+	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=insprd" -o jsonpath="{.items[0].metadata.name}") 8080:8080
+pf/auth:
+	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=auth" -o jsonpath="{.items[0].metadata.name}") 8081:8081
+pf/uidp:
+	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=uidp" -o jsonpath="{.items[0].metadata.name}") 9001:9001
+# }
+
 
