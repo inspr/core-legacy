@@ -1,6 +1,12 @@
 
 # Changelog
 
+### #118 Story CORE-561 | Authentication foir broker commands
+- features:
+    - added header scope on broker requests
+    - configured validation for broker operations 
+---
+
 ### #113 Story CORE-560 | CLI changes documentation
 - Doc:
     - Updated docs and examples to host flag and Brokers command

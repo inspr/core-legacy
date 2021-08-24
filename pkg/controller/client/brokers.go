@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"inspr.dev/inspr/pkg/api/models"
+	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/rest/request"
 )
 
@@ -17,13 +18,9 @@ type BrokersClient struct {
 func (bc *BrokersClient) Get(ctx context.Context) (*models.BrokersDI, error) {
 	resp := &models.BrokersDI{}
 
-	err := bc.reqClient.Send(
-		ctx,
-		"/brokers",
-		http.MethodGet,
-		nil,
-		resp)
-
+	err := bc.reqClient.
+		Header(rest.HeaderScopeKey, "").
+		Send(ctx, "/brokers", http.MethodGet, nil, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -37,12 +34,9 @@ func (bc *BrokersClient) Create(ctx context.Context, brokerName string, config [
 		BrokerName:   brokerName,
 		FileContents: config,
 	}
-	err := bc.reqClient.Send(
-		ctx,
-		"/brokers/"+brokerName,
-		http.MethodPost,
-		dataBody,
-		nil)
+	err := bc.reqClient.
+		Header(rest.HeaderScopeKey, "").
+		Send(ctx, "/brokers/"+brokerName, http.MethodPost, dataBody, nil)
 
 	return err
 }
