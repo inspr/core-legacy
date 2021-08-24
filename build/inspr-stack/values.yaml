@@ -111,3 +111,5 @@ prometheus:
   enabled: true
 grafana:
   enabled: true
+  datasources:
+    secretName: "inspr-stack-grafana-data-source"
