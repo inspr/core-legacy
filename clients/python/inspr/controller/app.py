@@ -17,7 +17,7 @@ class AppClient(controller.ControllerClient):
 
     def delete(self, scope:str, dryRun:bool) -> dict:
         msg_body = {
-            "dryRun": dryRun
+            "dry": dryRun
         }
 
         headers = self.get_header_with_scope(scope)
@@ -32,7 +32,7 @@ class AppClient(controller.ControllerClient):
     def post(self, scope:str, app:dict, dryRun:bool) -> dict:
         msg_body = {
             "app": app,
-            "dryRun": dryRun
+            "dry": dryRun
         }
 
         headers = self.get_header_with_scope(scope)
@@ -47,7 +47,7 @@ class AppClient(controller.ControllerClient):
     def update(self, scope:str, app:dict, dryRun:bool) -> dict:
         msg_body = {
             "app": app,
-            "dryRun": dryRun
+            "dry": dryRun
         }
 
         headers = self.get_header_with_scope(scope)

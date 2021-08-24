@@ -7,7 +7,7 @@ CHANNEL_ROUTE = "channels"
 class ChannelClient(controller.ControllerClient):
     def get(self, scope:str, channel_name:str) -> dict:
         msg_body = {
-            "chName": channel_name
+            "chname": channel_name
         }
         
         headers = self.get_header_with_scope(scope)
@@ -21,8 +21,8 @@ class ChannelClient(controller.ControllerClient):
 
     def delele(self, scope:str, channel_name:str, dryRun:bool) -> dict:
         msg_body = {
-            "chName": channel_name,
-            "dryRun": dryRun
+            "chname": channel_name,
+            "dry": dryRun
         }
 
         headers = self.get_header_with_scope(scope)
@@ -37,7 +37,7 @@ class ChannelClient(controller.ControllerClient):
     def post(self, scope:str, channel:dict, dryRun:bool) -> dict:
         msg_body = {
             "channel": channel,
-            "dryRun": dryRun
+            "dry": dryRun
         }
 
         headers = self.get_header_with_scope(scope)
@@ -52,7 +52,7 @@ class ChannelClient(controller.ControllerClient):
     def update(self, scope:str, channel:dict, dryRun:bool) -> dict:
         msg_body = {
             "channel": channel,
-            "dryRun": dryRun
+            "dry": dryRun
         }
 
         headers = self.get_header_with_scope(scope)
