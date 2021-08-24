@@ -13,15 +13,16 @@ import (
 
 var clientSet kubernetes.Interface
 
-func initInsprd() ( string, error ){
+func initInsprd() (string, error) {
 
-	cont :=  client.NewControllerClient(client.ControllerConfig{
+	cont := client.NewControllerClient(client.ControllerConfig{
 		URL: os.Getenv("INSPRD_URL"),
 	})
 
 	token, err := cont.Authorization().Init(context.Background(), os.Getenv("INSPRD_INIT_KEY"))
 	return token, err
 }
+
 // initKube initializes a k8s operator with in cluster configuration
 func initKube() error {
 	config, err := rest.InClusterConfig()
@@ -43,7 +44,7 @@ func main() {
 	secretName := os.Getenv("SECRET_NAME")
 
 	initKube()
-	secret, err := clientSet.CoreV1().Secrets(namespace).Get(ctx,secretName, v1.GetOptions{})
+	secret, err := clientSet.CoreV1().Secrets(namespace).Get(ctx, secretName, v1.GetOptions{})
 	if err != nil {
 		panic(err)
 	}

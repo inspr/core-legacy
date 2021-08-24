@@ -161,3 +161,15 @@ readinessProbe:
 {{- define "uidp.redis.address" -}}
 http://{{ include "uidp.redis.host" . }}:{{ include "uidp.redis.port" . }}
 {{- end -}}
+
+{{- define "uidp.admin.password" -}}
+{{- if not (empty .Values.admin.password) -}}
+    {{- .Values.admin.password -}}
+{{- else -}}
+    {{- randAlphaNum 10 -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "uidp.security.refresh-key" -}}
+{{- printf "%x" (randAlphaNum 32) -}}
+{{- end -}}
