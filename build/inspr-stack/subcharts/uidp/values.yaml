@@ -17,6 +17,8 @@ imagePullPolicy: IfNotPresent
 
 logLevel: info
 
+replicaCount: 1
+
 service:
   type: ClusterIP
   port: 80
@@ -42,11 +44,11 @@ redis:
     host:
     port:
   cluster:
-    nodes: 3
+    nodes: 6
 
 ingress:
   enabled: false
-  class: "nginx"
+  class:
   host:
 
 insprd:
