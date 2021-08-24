@@ -25,6 +25,18 @@ type Payload struct {
 	RefreshURL  string              `json:"refreshurl"`
 }
 
+// ImportPermissionList converts Dapps auth permission scheme to paylod permissions
+func (pld *Payload) ImportPermissionList(permissions []string, scope string) {
+	pld.Permissions = make(map[string][]string)
+	for _, perm := range permissions {
+		if perm == CreateToken {
+			pld.Permissions[perm] = nil
+		} else {
+			pld.Permissions[perm] = []string{scope}
+		}
+	}
+}
+
 // All Permissions possible values
 const (
 	CreateDapp    string = "create:dapp"
