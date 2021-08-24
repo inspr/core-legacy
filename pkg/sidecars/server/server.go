@@ -117,8 +117,6 @@ func (s *Server) GetMetric(channel string) channelMetric {
 func (s *Server) Run(ctx context.Context) error {
 	mux := http.NewServeMux()
 
-	rest.AttachProfiler(mux)
-	mux.Handle("/log/level", alevel)
 	mux.Handle("/", s.writeMessageHandler().Post().JSON())
 
 	server := &http.Server{
@@ -130,6 +128,7 @@ func (s *Server) Run(ctx context.Context) error {
 	admin := http.NewServeMux()
 	admin.Handle("/log/level", alevel)
 	admin.Handle("/metrics", promhttp.Handler())
+	rest.AttachProfiler(admin)
 	adminServer := &http.Server{
 		Handler: admin,
 		Addr:    fmt.Sprintf("0.0.0.0:16001"),

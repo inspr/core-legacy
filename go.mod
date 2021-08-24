@@ -22,6 +22,7 @@ require (
 	github.com/spf13/viper v1.8.1
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20201217014255-9d1352758620
+	golang.org/x/sys v0.0.0-20210817134402-fefb4affbef3 // indirect
 	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect

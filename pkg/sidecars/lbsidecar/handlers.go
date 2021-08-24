@@ -85,7 +85,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		}
 		defer resp.Body.Close()
 
-		rest.JSON(w, resp.StatusCode, resp.Body)
+		rest.JSON(w, resp.StatusCode, nil)
 		s.GetMetric(channel).messagesSent.Inc()
 		elapsed := time.Since(start)
 		s.GetMetric(channel).writeMessageDuration.Observe(elapsed.Seconds())

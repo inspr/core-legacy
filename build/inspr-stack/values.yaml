@@ -40,7 +40,7 @@ insprd:
     targetPort: 8080
 
   sidecar:
-    image: 
+    image:
       registry: gcr.io/insprlabs
       repository: inspr/sidecar/lbsidecar
       tag: v0.1.3
@@ -62,7 +62,7 @@ insprd:
     image:
       registry: gcr.io/insprlabs
       repository: authsvc
-      tag: v0.1.3 
+      tag: v0.1.3
 
 uidp:
   name: uidp
@@ -108,4 +108,6 @@ uidp:
         name: '{{ include "insprd.fullname" $ }}-init-key'
 
 prometheus:
+  enabled: true
+grafana:
   enabled: true

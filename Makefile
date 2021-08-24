@@ -187,7 +187,7 @@ helm/install:
 # Skaffold {
 
 ## runs skaffold build with the PROFILE profile and outputs the image to OUTPUT_FILE if defined.
-skaffold/build: go/build
+skaffold/build:
 ifdef OUTPUT_FILE
 	skaffold build -p ${PROFILE} -o ${OUTPUT_FILE}
 else
@@ -195,11 +195,14 @@ else
 endif
 
 ## runs skaffold run with the PROFILE profile on the K8S_NAMESPACE namespace.
-skaffold/run: go/build
+skaffold/run:
 	skaffold run -p ${PROFILE} -n ${K8S_NAMESPACE}
 
 skaffold/dev:
 	skaffold dev -p ${PROFILE} -n ${K8S_NAMESPACE}
+
+skaffold/delete:
+	skaffold delete -p ${PROFILE} -n ${K8S_NAMESPACE}
 # }
 
 # semgrep {

@@ -45,9 +45,8 @@ func (s *Server) GetMetric(channel string) channelMetric {
 		messagesSent: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
-			Name:      "message_send_error",
+			Name:      "message_send",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
@@ -56,9 +55,8 @@ func (s *Server) GetMetric(channel string) channelMetric {
 		messageSendError: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
-			Name:      "messages_sent",
+			Name:      "message_send_error",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
@@ -68,9 +66,8 @@ func (s *Server) GetMetric(channel string) channelMetric {
 		messagesRead: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
-			Name:      "message_read_error",
+			Name:      "message_read",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
@@ -79,9 +76,8 @@ func (s *Server) GetMetric(channel string) channelMetric {
 		messageReadError: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
-			Name:      "messages_read",
+			Name:      "messages_read_error",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
@@ -93,7 +89,6 @@ func (s *Server) GetMetric(channel string) channelMetric {
 			Subsystem: "lbsidecar",
 			Name:      "read_message_duration",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
@@ -105,7 +100,6 @@ func (s *Server) GetMetric(channel string) channelMetric {
 			Subsystem: "lbsidecar",
 			Name:      "send_message_duration",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
@@ -117,7 +111,6 @@ func (s *Server) GetMetric(channel string) channelMetric {
 			Subsystem: "lbsidecar",
 			Name:      "read_message_throughput",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
@@ -129,7 +122,6 @@ func (s *Server) GetMetric(channel string) channelMetric {
 			Subsystem: "lbsidecar",
 			Name:      "send_message_throughput",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
@@ -171,6 +163,7 @@ func (s *Server) Run(ctx context.Context) error {
 	admin := http.NewServeMux()
 	admin.Handle("/log/level", alevel)
 	admin.Handle("/metrics", promhttp.Handler())
+	rest.AttachProfiler(admin)
 	adminServer := &http.Server{
 		Handler: admin,
 		Addr:    fmt.Sprintf("0.0.0.0:16000"),
@@ -186,8 +179,6 @@ func (s *Server) Run(ctx context.Context) error {
 
 	mux := http.NewServeMux()
 
-	rest.AttachProfiler(mux)
-	mux.Handle("/log/level", alevel)
 	mux.Handle("/", s.writeMessageHandler().Post().JSON())
 
 	writeServer := &http.Server{
