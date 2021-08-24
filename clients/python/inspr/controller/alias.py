@@ -4,7 +4,7 @@ import controller_client as controller
 
 ALIAS_ROUTE = "alias"
 
-class ChannelClient(controller.ControllerClient):
+class AliasClient(controller.ControllerClient):
     def get(self, scope:str, key:str) -> dict:
         msg_body = {
             "key": key
