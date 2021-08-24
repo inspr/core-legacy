@@ -70,6 +70,13 @@ var flagRegistry = []Flag{
 		DefValue:  "",
 		DefinedOn: []string{"all"},
 	},
+	{
+		Name:      "host",
+		Usage:     "set the host on the request header",
+		Value:     &InsprOptions.Host,
+		DefValue:  "",
+		DefinedOn: []string{"all"},
+	},
 }
 
 func methodNameByType(v reflect.Value) string {

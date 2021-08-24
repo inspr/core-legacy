@@ -14,7 +14,7 @@ spec:
       {{- include "common.images.pullSecrets" (dict "images" (list .Values.secretGenerator.image) "global" $) | nindent 6 }}
       containers:
       - name: secret-generator
-        image: {{ include "common.images.image" (dict "image" .Values.secretGenerator.image "global" .Values.global) }}
+        image: {{ include "insprd.images.image" (dict "image" .Values.secretGenerator.image "global" .Values.global) }}
         imagePullPolicy: IfNotPresent
         env:
           - name: K8S_NAMESPACE

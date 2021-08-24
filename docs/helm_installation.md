@@ -58,15 +58,6 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 
 Insprd will be exposed via NGINX by default, so you just need to have NGINX installed. Follow the instructions in the [official NGINX documentation](https://kubernetes.github.io/ingress-nginx/deploy/) to install it.
 
-
-### Hostname
-
-To properly access the cluster via the Inspr CLI it is necessary to configure the hostname in your machine to comport the Ingress host.
-
-This can be done in unix machines editting the file `etc/hosts` and adding `<cluster_IP> <insprIngress.host>`. For further understanding of what is happening access this [link](https://debian-handbook.info/browse/stable/sect.hostname-name-service.html)
-
-For Windows is recommended to follow the steps in [here](https://docs.microsoft.com/en-us/windows-server/networking/technologies/ipam/add-a-dns-resource-record).
-
 ## Exposing Inspr via port forward
 
 After installing Inspr, you can also expose the port without using NGINX. To do so, follow the commands below:

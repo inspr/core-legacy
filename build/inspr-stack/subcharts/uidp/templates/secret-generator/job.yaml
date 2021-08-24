@@ -15,7 +15,7 @@ spec:
       {{- end }}
       containers:
         - name: secret-generator
-          image: {{ include "common.images.image" (dict "image" .Values.secret.image "global" .) }}
+          image: {{ include "uidp.images.image" (dict "image" .Values.secret.image "global" .) }}
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           env:
             - name: K8S_NAMESPACE

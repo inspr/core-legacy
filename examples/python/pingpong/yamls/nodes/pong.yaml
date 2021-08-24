@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: dapp
+
+meta:
+  name: pong
+  parent: pptable
+spec:
+  logLevel: debug
+  node:
+    spec:
+      replicas: 1
+      image: gcr.io/insprlabs/inspr/example/python/pong:latest
+  boundary:
+    input:
+      - ponginput
+    output:
+      - pongoutput

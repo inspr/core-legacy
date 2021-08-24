@@ -334,7 +334,7 @@ sidecarAddr: "http://localhost"
 ' > kafkaConfig.yaml
 
 ### installs message broker into the cluster
-$ insprctl cluster config kafka kafkaConfig.yaml
+$ insprctl brokers kafka kafkaConfig.yaml
 
 ### deploys channels' type
 $ insprctl apply -k yamls/ctypes

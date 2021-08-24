@@ -74,6 +74,10 @@ func Test_doConfigChange(t *testing.T) {
 	fmt.Fprintf(bufResp, "Success: insprctl config [%v] changed to '%v'\n", "key_example", "new_value")
 	outResp, _ := ioutil.ReadAll(bufResp)
 
+	bufResp3 := bytes.NewBufferString("")
+	fmt.Fprintf(bufResp3, "Success: insprctl config [%v] changed to '%v'\n", "serverip", "http://new_value")
+	outResp3, _ := ioutil.ReadAll(bufResp3)
+
 	bufResp2 := bytes.NewBufferString("")
 	fmt.Fprintf(bufResp2, "error: key inserted does not exist in the insprctl config\n")
 	cliutils.SetOutput(bufResp2)
@@ -94,6 +98,11 @@ func Test_doConfigChange(t *testing.T) {
 			name:           "Should make the change and print the successful message",
 			flagsAndArgs:   []string{"key_example", "new_value"},
 			expectedOutput: outResp,
+		},
+		{
+			name:           "Should make the serverip http change",
+			flagsAndArgs:   []string{"serverip", "new_value"},
+			expectedOutput: outResp3,
 		},
 	}
 	for _, tt := range tests {
@@ -117,7 +126,11 @@ func setupViperTest(t *testing.T) string {
 	folder := t.TempDir()
 	config := struct {
 		KeyExample string `yaml:"key_example"`
-	}{}
+		ServerIp   string `yaml:"serverip"`
+	}{
+		KeyExample: "",
+		ServerIp:   "",
+	}
 	mars, _ := yaml.Marshal(config)
 	err := os.MkdirAll(filepath.Join(folder, ".inspr"), 0755)
 	if err != nil {

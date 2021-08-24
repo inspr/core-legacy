@@ -8,7 +8,7 @@ The test consists in initializing a dApp client that will write and read message
 ## How to run it:  
 To run this demo, it must be assured that Kafka is installed in the cluster. Then, Kafka must be installed in Insprd so Channels can use the Kafka Broker:  
 ```
-insprctl cluster config kafka yamls/kafka.yaml
+insprctl brokers kafka yamls/kafka.yaml
 ```  
 
 Also, the image originated from the Dockerfile in this folder also must already be created (run the Makefile to do so).  

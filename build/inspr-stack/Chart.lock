@@ -1,9 +1,9 @@
 dependencies:
 - name: uidp
   repository: file://subcharts/uidp
-  version: v0.1.1-1-g657ccbc
+  version: v0.1.3
 - name: insprd
   repository: file://subcharts/insprd
-  version: v0.1.1-1-g56c7ccbc
-digest: sha256:57d9369a6b3b935c3692f288bd3b4f6cca39d72c580c2ff7f8e97bdabdea59aa
-generated: "2021-07-11T23:13:27.486601381-03:00"
+  version: v0.1.3
+digest: sha256:38ab97145a2b07584d50eb33213ea2a2979b6b0ee2d4936852b8666e8ad10dbc
+generated: "2021-08-11T10:45:46.529241115-03:00"

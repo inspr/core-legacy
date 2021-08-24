@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -46,6 +47,11 @@ func doConfigChange(_ context.Context, args []string) error {
 	}
 
 	// updates
+	if key == cliutils.ServerIpKey() {
+		if !strings.HasPrefix(value, "http") {
+			value = fmt.Sprintf("http://%s", value)
+		}
+	}
 	if err := cliutils.ChangeViperValues(key, value); err != nil {
 		return err
 	}

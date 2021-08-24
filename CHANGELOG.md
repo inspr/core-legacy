@@ -1,6 +1,37 @@
 
 # Changelog
 
+### #113 Story CORE-560 | CLI changes documentation
+- Doc:
+    - Updated docs and examples to host flag and Brokers command
+---
+
+### #111 Feature | adds redis as a dependency for the uidp helm chart
+- features:
+  - adds redis as a uidp helm dependency
+---
+
+### #112 Bug CORE-569 | Cli initialization not adding "http://" to ip
+- fix:
+	- added http:// on the `serverip` on the `insprctl init` command
+---
+
+### #110 Story CORE-246 | Develop a client (for sidecar communication) with Python
+- features:
+    - Created the newClient, writeMessage, handleChannel and run functions for the lb sidecar client for python
+    - Created a ping pong example
+---
+
+### #108 Tech CORE-549 | Add support to request Host header in the cli
+- features:
+    - added host to the client structure in the request and controller pkg, to direct serverip requests
+    - created host flag `--host` to overwrite host configuration on insprctl commands without changing the host configured on the client
+    
+- tests:
+    - updated the set client argument to fit on the new host request call
+    - add on request_test.go `host` arg and `test_new_host` case  
+---
+
 ### #105 Tech CORE-442 | Refactor of the error structure in the project
 - features:
     - refactor of the ierror pkg, removal of the builder concept, now has

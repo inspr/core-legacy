@@ -118,6 +118,7 @@ func (s *Server) Run(ctx context.Context) error {
 	mux := http.NewServeMux()
 
 	rest.AttachProfiler(mux)
+	mux.Handle("/log/level", alevel)
 	mux.Handle("/", s.writeMessageHandler().Post().JSON())
 
 	server := &http.Server{
