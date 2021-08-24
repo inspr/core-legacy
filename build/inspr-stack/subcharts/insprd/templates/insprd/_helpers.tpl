@@ -26,6 +26,7 @@ If release name contains chart name it will be used as a full name.
 {{- define "insprd.labels" }}
 {{- include "common.labels" $ }}
 app: {{ include "insprd.fullname" $ }}
+app.kubernetes.io/name: {{ include "insprd.name" $ }}
 {{- end }}
 
 {{- define "insprd.selectorLabels" }}

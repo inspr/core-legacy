@@ -14,7 +14,9 @@ If release name contains chart name it will be used as a full name.
 {{- define "auth.labels"}}
 {{- include "common.labels" $ }}
 app: {{ include "auth.fullname" $ }}
+app.kubernetes.io/name: {{ .Values.auth.name | default "auth" }}
 {{- end -}}
+
 {{- define "auth.healthcheck" -}}
 {{ include "common.healthcheck" .Values.auth }}
 {{- end -}}
