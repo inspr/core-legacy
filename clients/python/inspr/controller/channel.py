@@ -34,7 +34,7 @@ class ChannelClient(controller.ControllerClient):
         except Exception as e:
             raise Exception(f"Error while send a Delete Channel request: {e}")
 
-    def post(self, scope:str, channel:dict, dryRun:bool) -> dict:
+    def create(self, scope:str, channel:dict, dryRun:bool) -> dict:
         msg_body = {
             "channel": channel,
             "dry": dryRun
@@ -47,7 +47,7 @@ class ChannelClient(controller.ControllerClient):
             print(resp, file=sys.stderr)
             return resp
         except Exception as e:
-            raise Exception(f"Error while send a Post Channel request: {e}")
+            raise Exception(f"Error while send a Create Channel request: {e}")
 
     def update(self, scope:str, channel:dict, dryRun:bool) -> dict:
         msg_body = {

@@ -29,7 +29,7 @@ class AppClient(controller.ControllerClient):
         except Exception as e:
             raise Exception(f"Error while send a Delete App request: {e}")
 
-    def post(self, scope:str, app:dict, dryRun:bool) -> dict:
+    def create(self, scope:str, app:dict, dryRun:bool) -> dict:
         msg_body = {
             "app": app,
             "dry": dryRun
@@ -42,7 +42,7 @@ class AppClient(controller.ControllerClient):
             print(resp, file=sys.stderr)
             return resp
         except Exception as e:
-            raise Exception(f"Error while send a Post App request: {e}")
+            raise Exception(f"Error while send a Create App request: {e}")
 
     def update(self, scope:str, app:dict, dryRun:bool) -> dict:
         msg_body = {

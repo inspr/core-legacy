@@ -34,7 +34,7 @@ class TypeClient(controller.ControllerClient):
         except Exception as e:
             raise Exception(f"Error while send a Delete Type request: {e}")
 
-    def post(self, scope:str, type:dict, dryRun:bool) -> dict:
+    def create(self, scope:str, type:dict, dryRun:bool) -> dict:
         msg_body = {
             "type": type,
             "dry": dryRun
@@ -47,7 +47,7 @@ class TypeClient(controller.ControllerClient):
             print(resp, file=sys.stderr)
             return resp
         except Exception as e:
-            raise Exception(f"Error while send a Post Type request: {e}")
+            raise Exception(f"Error while send a Create Type request: {e}")
 
     def update(self, scope:str, type:dict, dryRun:bool) -> dict:
         msg_body = {
