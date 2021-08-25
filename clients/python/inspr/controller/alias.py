@@ -1,10 +1,10 @@
 import sys
 from ..rest import *
-from .controller_client import *
+from .client import *
 
 ALIAS_ROUTE = "alias"
 
-class AliasClient(ControllerClient):
+class AliasClient(Client):
     def get(self, scope:str, key:str) -> dict:
         msg_body = {
             "key": key

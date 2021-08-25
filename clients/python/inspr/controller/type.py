@@ -1,10 +1,10 @@
 import sys
 from ..rest import *
-from .controller_client import *
+from .client import *
 
 TYPE_ROUTE = "types"
 
-class TypeClient(ControllerClient):
+class TypeClient(Client):
     def get(self, scope:str, type_name:str) -> dict:
         msg_body = {
             "typename": type_name

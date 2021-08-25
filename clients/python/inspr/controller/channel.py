@@ -1,10 +1,10 @@
 import sys
 from ..rest import *
-from .controller_client import *
+from .client import *
 
 CHANNEL_ROUTE = "channels"
 
-class ChannelClient(ControllerClient):
+class ChannelClient(Client):
     def get(self, scope:str, channel_name:str) -> dict:
         msg_body = {
             "chname": channel_name

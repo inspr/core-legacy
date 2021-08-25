@@ -1,10 +1,10 @@
 import sys
 from ..rest import *
-from .controller_client import *
+from .client import *
 
 APP_ROUTE = "apps"
 
-class AppClient(ControllerClient):
+class AppClient(Client):
     def get(self, scope:str) -> dict:
         headers = self.get_header_with_scope(scope)
 
