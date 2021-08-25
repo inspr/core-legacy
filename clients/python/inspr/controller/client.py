@@ -6,14 +6,14 @@ TOKEN = "INSPR_CONTROLLER_TOKEN"
 TOKEN_PATH = ".inspr/token"
 
 class Client:
-    def __init__(self, insprd_url, scope = "") -> None:
+    def __init__(self, insprd_url, global_scope = "") -> None:
         self.url = insprd_url
-        self.scope = scope
+        self.global_scope = global_scope
     
     def get_header_with_scope(self, scope:str) -> dict:
         headers = {
             "content-type": "application/json",
-            "Scope": scope,
+            "Scope": self.join_scopes(self.global_scope, scope),
             "Authorization": self.get_token() 
         }
         return headers
@@ -30,5 +30,13 @@ class Client:
         token = "Bearer " + token
         return token
 
-    def set_token(self, token:str) -> None:
-        os.environ[TOKEN] = token[len("Bearer "):]
+    def join_scopes(self, s1:str, s2:str) -> str:
+        if s2 == "":
+            return s1
+        
+        separator = ""
+        if s1 != "":
+            separator = "."
+        
+        new_scope = s1 + separator + s2
+        return new_scope
