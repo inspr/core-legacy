@@ -28,7 +28,7 @@ def send_update_request(url:str, body = {}, headers = {}) -> Response:
 
 def send_get_request(url:str, body = {}, headers = {}) -> Response:
     try:
-        resp = requests.get(url, data=body, headers=headers)
+        resp = requests.get(url, data=json.dumps(body), headers=headers)
         resp.raise_for_status()
     
     except requests.exceptions.RequestException as e:
@@ -39,7 +39,7 @@ def send_get_request(url:str, body = {}, headers = {}) -> Response:
 
 def send_delete_request(url:str, body = {}, headers = {}) -> Response:
     try:
-        resp = requests.delete(url, data=body, headers=headers)
+        resp = requests.delete(url, data=json.dumps(body), headers=headers)
         resp.raise_for_status()
     
     except requests.exceptions.RequestException as e:

@@ -11,7 +11,8 @@ class AppClient(ControllerClient):
         try:
             resp = send_get_request(self.url + "/" + APP_ROUTE, headers=headers)
             print(resp, file=sys.stderr)
-            return resp
+            return json.loads(resp.text)
+        
         except Exception as e:
             raise Exception(f"Error while send a Get App request: {e}")
 
