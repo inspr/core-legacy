@@ -1,10 +1,10 @@
 import sys
-import rest
-import controller_client as controller
+from ..rest import *
+from .controller_client import *
 
 CHANNEL_ROUTE = "channels"
 
-class ChannelClient(controller.ControllerClient):
+class ChannelClient(ControllerClient):
     def get(self, scope:str, channel_name:str) -> dict:
         msg_body = {
             "chname": channel_name
@@ -13,7 +13,7 @@ class ChannelClient(controller.ControllerClient):
         headers = self.get_header_with_scope(scope)
 
         try:
-            resp = rest.send_get_request(self.url + "/" + CHANNEL_ROUTE, body=msg_body, headers=headers)
+            resp = send_get_request(self.url + "/" + CHANNEL_ROUTE, body=msg_body, headers=headers)
             print(resp, file=sys.stderr)
             return resp
         except Exception as e:
@@ -28,7 +28,7 @@ class ChannelClient(controller.ControllerClient):
         headers = self.get_header_with_scope(scope)
 
         try:
-            resp = rest.send_delete_request(self.url + "/" + CHANNEL_ROUTE, body=msg_body, headers=headers)
+            resp = send_delete_request(self.url + "/" + CHANNEL_ROUTE, body=msg_body, headers=headers)
             print(resp, file=sys.stderr)
             return resp
         except Exception as e:
@@ -43,7 +43,7 @@ class ChannelClient(controller.ControllerClient):
         headers = self.get_header_with_scope(scope)
 
         try:
-            resp = rest.send_post_request(self.url + "/" + CHANNEL_ROUTE, msg_body, headers)
+            resp = send_post_request(self.url + "/" + CHANNEL_ROUTE, msg_body, headers)
             print(resp, file=sys.stderr)
             return resp
         except Exception as e:
@@ -58,7 +58,7 @@ class ChannelClient(controller.ControllerClient):
         headers = self.get_header_with_scope(scope)
 
         try:
-            resp = rest.send_update_request(self.url + "/" + CHANNEL_ROUTE, msg_body, headers)
+            resp = send_update_request(self.url + "/" + CHANNEL_ROUTE, msg_body, headers)
             print(resp, file=sys.stderr)
             return resp
         except Exception as e:
