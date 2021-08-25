@@ -34,11 +34,13 @@ inspr/insprd            v0.1.3          v0.1.3          Helm chart for installin
 ## Install Chart
 ---
 
+To install the insprd chart on helm run the following command(notice that the apps name space is being setting to true, overwriting the chart value and enabling the app.namespace to be created):
+
 ```
-$ helm install <your.release.name> inspr/insprd --set insprd.apps.createNamespace=true
+$ helm install <your.release.name> inspr/insprd --set apps.createNamespace=true
 ```
 
-Check your releases installed
+To check your releases installed:
 
 ```
 $ helm list

@@ -42,7 +42,7 @@ redis:
     host:
     port:
   cluster:
-    nodes: 6
+    nodes: 3
 
 ingress:
   enabled: false

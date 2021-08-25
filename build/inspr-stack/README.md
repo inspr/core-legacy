@@ -33,11 +33,13 @@ inspr/inspr-stack       v0.1.3          v0.1.3          Helm chart for installin
 ## Install Chart
 ---
 
+To install the inspr-stack chart on helm run the following command(notice that the apps name space is being setting to true, overwriting the chart value and enabling the app.namespace to be created):
+
 ```
 $ helm install <your.release.name> inspr/inspr-stack --set insprd.apps.createNamespace=true
 ```
 
-Check your releases installed
+To check your releases installed:
 
 ```
 $ helm list
@@ -59,7 +61,7 @@ $ helm uninstall <your.release.name>
 
 ## Example 1
 
-Description -- ingress enable/
+How to enable the uidp ingress configuration
 
 ```
 $ helm install <your.release.name> inspr/inspr-stack --set uidp.ingress.enabled=true
@@ -67,7 +69,7 @@ $ helm install <your.release.name> inspr/inspr-stack --set uidp.ingress.enabled=
 
 ## Example 2
 
-Description -- change port
+You can change the service port if the default one is already been used
 
 ```
 $ helm install <your.release.name> inspr/inspr-stack \
@@ -82,7 +84,7 @@ $ helm install <your.release.name> inspr/inspr-stack \
 
 ## Example 3
 
-Description -- log level
+There are more log levels that you can use on the cluster using
 
 ```
 $ helm install <your.release.name> inspr/inspr-stack --set global.logLevel=<your.logLvl>
@@ -90,7 +92,7 @@ $ helm install <your.release.name> inspr/inspr-stack --set global.logLevel=<your
 
 ## Exaple 4
 
-Description -- password admin
+Changing the uidp admin password to your own password
 
 ```
 $ helm install <your.release.name> inspr/inspr-stack --set uidp.admin.password=<your.password>

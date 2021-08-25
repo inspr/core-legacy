@@ -32,11 +32,13 @@ inspr/uidp              v0.1.3          v0.1.3          A Helm chart for Kuberne
 ## Install Chart
 ---
 
+To install the uidp chart on helm run the following command:
+
 ```
 $ helm install <your.release.name> inspr/uidp
 ```
 
-Check your releases installed
+To check your releases installed:
 
 ```
 $ helm list

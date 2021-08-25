@@ -1,6 +1,6 @@
 # Helm chart values Configuration
 
-The following table lists the configurable parameters of Inspr Helm Chart and their default values, they can be setted with the flag on the helm command to overwrite the default ones.
+The following table lists the configurable parameters of Inspr Helm Chart and their default values. They can be setted with the flag on the helm command to overwrite the default ones.
 
 ## Insprd values
 
@@ -11,7 +11,7 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 | insprd | image.registry | Insprd image | gcr.io/insprlabs |
 | insprd | image.repository | The name of the Docker image for the Insprd containers running | insprd |
 | insprd | replicaCount | Number of replicas of Insprd (Inspr daemon) deployment | 1 |
-| insprd | logLevel | Configures the log verbosity of the injector for Insprd | info |
+| insprd | logLevel | Configures the log verbosity of the injector for Insprd | info & debug |
 | insprd | apps.namespace | Kubernetes namespace on which Inspr apps will be instantiated | "{{ .Release.Name }}-inspr-apps" |
 | insprd | apps.createNamespace | Allow to create a separated name space for the insprd apps | false |
 | insprd | ingress.enable | If set to true, an Ingress service will be created. | false |
@@ -46,7 +46,7 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 | uidp | image.registry | UIDP image | gcr.io/insprlabs |
 | uidp | image.repository | The name of the Docker image for the UIDP containers running | uidp/redis/api |
 | uidp | imagePullPolicy | UIDP's image pull policy | IfNotPresent |
-| uidp | logLevel | Configures the log verbosity of the injector for UIDP | info |
+| uidp | logLevel | Configures the log verbosity of the injector for UIDP | info & debug |
 | uidp | service.type | Sets the type of service to create for UIDP | ClusterIP |
 | uidp | service.port | HTTP port of UIDP k8s service | 80 |
 | uidp | service.targetPort | Targeted port of UIDP port | 9001 |
