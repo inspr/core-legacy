@@ -84,7 +84,7 @@ $ helm install <your.release.name> inspr/inspr-stack \
 
 ## Example 3
 
-There are more log levels that you can use on the cluster using
+There are more log levels that you can use on the cluster besides the default one("info")
 
 ```
 $ helm install <your.release.name> inspr/inspr-stack --set global.logLevel=<your.logLvl>
