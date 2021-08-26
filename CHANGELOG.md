@@ -1,6 +1,13 @@
 
 # Changelog
 
+### #120 Story CORE-502 | Develop client (for controller dApps) for Python
+- features:
+    - models module added to inspr python lib (to define the changelog and inspr structure data types)
+    - rest module updated (added get, delete and update methods)
+    - controller-client module added to inspr python lib (with all the CRUD methods for apps, channels, types and alias)
+---
+
 ### #118 Story CORE-561 | Authentication foir broker commands
 - features:
     - added header scope on broker requests
