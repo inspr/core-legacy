@@ -12,12 +12,32 @@ spec:
       labels:
         {{- include "uidp.selectorLabels" . | nindent 8 }}
     spec:
+      serviceAccountName: '{{ include "uidp.fullname" $ }}'
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       initContainers:
       {{- include "insprd.init-check" . | nindent 8 }}
+
+      {{- if and .Values.insprd.init.enabled .Release.IsInstall }}
+        - name: secret-generator
+          image: {{ include "uidp.images.image" (dict "image" .Values.secret.image "global" .) }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          env:
+            - name: K8S_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: SECRET_NAME
+              value: {{ tpl .Values.secret.name . }}
+            - name: INSPRD_URL
+              value: {{ include "insprd.address" . }}
+            - name: INSPRD_INIT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ tpl .Values.insprd.init.secret.name . }}
+                  key: {{ .Values.insprd.init.secret.key }}
+      {{- end }}
+
       containers:
         - name: {{ include "uidp.fullname" . }}
           image: {{ include "uidp.images.image" (dict "image" .Values.image "global" $) }}
@@ -40,10 +60,12 @@ spec:
               value: {{ include "uidp.redis.port" . | quote }}
             - name: REFRESH_URL
               value: {{ if .Values.refreshURL }}{{ .Values.refreshURL }}{{ else }}http://{{ include "uidp.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}{{ end }}
+            {{- if .Values.redis.usePassword }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.redis.existingSecret }}
                   key: {{ .Values.redis.existingSecretPasswordKey | default "redis-password" }}
+            {{- end }}
           {{- include "uidp.healthcheck" .Values | nindent 10 }}
 

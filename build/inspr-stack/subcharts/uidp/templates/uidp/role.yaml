@@ -1,7 +1,10 @@
+{{- if .Values.insprd.init -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: '{{ include "uidp.fullname" $ }}-secret-generator'
+  labels:
+    {{- include "common.labels" $ | nindent 4 }}
 rules:
   - apiGroups:
       - ""
@@ -9,4 +12,7 @@ rules:
       - "secrets"
     verbs:
       - "get"
+      - "delete"
+      - "create"
       - "update"
+{{- end -}}

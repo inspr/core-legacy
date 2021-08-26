@@ -17,6 +17,17 @@ spec:
     spec:
       serviceAccountName: {{ include "insprd.fullname" $ }}
       {{- include "common.images.pullSecrets" (dict "images" (list .image) "global" $) | nindent 6 }}
+      initContainers:
+        - name: secret-generator
+          image: {{ include "insprd.images.image" (dict "image" $.Values.secretGenerator.image "global" $.Values.global) }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: K8S_NAMESPACE
+              value: '{{ $.Release.Namespace }}'
+            {{- if $.Values.init.generateKey }}
+            - name: INSPRD_INIT_KEY_SECRET_NAME
+              value: '{{- include "insprd.fullname" $ }}-init-key'
+            {{- end }}
       containers:
         - name: {{ include "insprd.fullname" $ }}
           image: {{ include "insprd.images.image" (dict "image" .image "global" $) }}
