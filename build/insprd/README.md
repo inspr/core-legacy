@@ -58,28 +58,87 @@ $ helm uninstall <your.release.name>
 
 # Usefull Overwrites  
 
-## Example
+Threre are more than one way to overwrite the chart values, you can set value on the command line or point to a overwrite_value file.
 
-Installing two diferentes insprds communicating with the same uidp
-
-1- Install uidp in a cluster
+Exemple command line with --set
 
 ```
-$ helm install uidp -f uidp_values.yaml
+$ helm install <your.release.name> inspr/inspr-stack --set <parameter>=<value>
 ```
 
-2- Then install two insprd in different namespaces, what are the necessary configuration for the two different daemons to work with the single UIDP. 
+## Example yaml file overwrite
+
+Exemple command line pointing to a file
 
 ```
-$ helm install insprd_1 -n insprd_1 \
---set apps.namespace=insprd_1 \
---set init.generateKey=false \
---set init.key=customKey \
- 
-$ helm install insprd_2 -n insprd_2 \
---set apps.namespace=insprd_2 \
---set init.generateKey=false \
---set init.key=customKey \
+$ helm install <your.release.name> inspr/inspr-stack -f your_values.yaml
 ```
 
-To see more usefull overwrites go to [Values_configuration](../../docs/values_configuration.md)
+Example of a .yaml file that overwrite the values for the installation of the insprd chart.
+
+```yaml
+global:
+  imagePullSecrets: []
+  imageRegistry:
+
+name: "insprd"
+image:
+  registry: gcr.io/insprlabs
+  repository: insprd
+  tag: v0.1.3
+imagePullPolicy: IfNotPresent
+
+replicaCount: 1
+logLevel: info
+
+apps:
+  namespace: "{{ .Release.Name }}-inspr-apps"
+  createNamespace: false
+
+ingress:
+  enabled: false
+  host:
+  class:
+
+init:
+  generateKey: true
+  key: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+sidecar:
+  image: 
+    registry: gcr.io/insprlabs
+    repository: inspr/sidecar/lbsidecar
+    tag: v0.1.3
+  ports:
+    client:
+      read: 3046
+      write: 3048
+    server:
+      read: 3047
+      write: 3051
+
+
+auth:
+  name: "auth"
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8081
+  image:
+    registry: gcr.io/insprlabs
+    repository: authsvc
+    tag: v0.1.3 
+
+secretGenerator:
+  image:
+    registry: gcr.io/insprlabs
+    repository: secretgen
+    tag: v0.1.3
+```
+
+To see usefull overwrites go to [Values_configuration](../../docs/values_configuration.md)

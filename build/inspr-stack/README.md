@@ -98,4 +98,122 @@ Changing the uidp admin password to your own password
 $ helm install <your.release.name> inspr/inspr-stack --set uidp.admin.password=<your.password>
 ```
 
+## Example yaml file overwrite
+
+Using a yaml file to overwrite the char values
+
+```
+$ helm install <your.release.name> inspr/inspr-stack -f your_values.yaml
+```
+
+The example of a .yaml file that overwrite the values for the installation of the inspr-stack which is the group of insprd and uidp subchart values.
+
+```yaml
+global:
+  imagePullSecrets: []
+  logLevel: info
+  imageRegistry:
+  insprd:
+    name: insprd
+    service:
+      port: 80
+
+
+insprd:
+  enabled: true
+  name: "insprd"
+  image:
+    registry: gcr.io/insprlabs
+    repository: insprd
+    tag: v0.1.3
+  imagePullPolicy: IfNotPresent
+
+  logLevel: info
+
+  replicaCount: 1
+
+  apps:
+    createNamespace: true
+
+  ingress:
+    enabled: false
+    host:
+    class:
+
+  initKey: ""
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8080
+
+  sidecar:
+    image: 
+      registry: gcr.io/insprlabs
+      repository: inspr/sidecar/lbsidecar
+      tag: v0.1.3
+    ports:
+      client:
+        read: 3046
+        write: 3048
+      server:
+        read: 3047
+        write: 3051
+
+  auth:
+    name: "auth"
+    logLevel: info
+    service:
+      type: ClusterIP
+      port: 80
+      targetPort: 8081
+    image:
+      registry: gcr.io/insprlabs
+      repository: authsvc
+      tag: v0.1.3 
+
+uidp:
+  name: uidp
+  enabled: true
+  logLevel: info
+  image:
+    registry: gcr.io/insprlabs
+    repository: uidp/redis/api
+    tag: v0.1.3
+
+  imagePullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 9001
+
+  secret:
+    name: '{{ .Release.Name }}-init-secret'
+    image:
+      registry: gcr.io/insprlabs
+      repository: uidp/redis/secret
+      tag: v0.1.3
+
+  admin:
+    password:
+    token:
+    generatePassword: true
+
+  redis:
+    create: true
+
+  ingress:
+    enabled: false
+    class:
+    host:
+
+  insprd:
+    init:
+      enabled: true
+      secret:
+        key: key
+        name: '{{ include "insprd.fullname" $ }}-init-key'
+```
+
 To see all the possible values overrides go to [Values_configuration](../../docs/values_configuration.md)

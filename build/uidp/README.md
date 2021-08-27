@@ -54,4 +54,98 @@ your.release.name   default     1           2021-08-19 10:55:57.498118205 -0300 
 $ helm uninstall <your.release.name>
 ```
 
+# Usefull Overwrites  
+
+Threre are more than one way to overwrite the chart values, you can set value on the command line or point to a overwrite_value file.
+
+Exemple command line with --set
+
+```
+$ helm install <your.release.name> inspr/inspr-stack --set <parameter>=<value>
+```
+
+Exemple command line pointing to a file
+
+```
+$ helm install <your.release.name> inspr/inspr-stack -f your_values.yaml
+```
+# Usefull Overwrites  
+
+Threre are more than one way to overwrite the chart values, you can set value on the command line or point to a overwrite_value file.
+
+Exemple command line with --set
+
+```
+$ helm install <your.release.name> inspr/inspr-stack --set <parameter>=<value>
+```
+
+## Example yaml file overwrite
+
+Exemple command line pointing to a file
+
+```
+$ helm install <your.release.name> inspr/inspr-stack -f your_values.yaml
+```
+
+Example of a .yaml file that overwrite the values for the installation of the uidp chart.
+
+```yaml
+global:
+  redis:
+    password:
+
+name: uidp
+
+image:
+  registry: gcr.io/insprlabs
+  repository: uidp/redis/api
+  tag: v0.1.3
+
+imagePullPolicy: IfNotPresent
+
+logLevel: info
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 9001
+
+secret:
+  name: '{{ .Release.Name }}-init-secret'
+  image:
+    registry: gcr.io/insprlabs
+    repository: uidp/redis/secret
+    tag: v0.1.3
+
+admin:
+  generatePassword: true
+  password:
+
+redis:
+  create: true
+  fullNameOverride: redis
+  password:
+  existingSecret: "uidp-redis-secret"
+  existing:
+    host:
+    port:
+  cluster:
+    nodes: 3
+
+ingress:
+  enabled: false
+  class: "nginx"
+  host:
+
+insprd:
+  name: "insprd"
+  init:
+    enabled: false
+    secret:
+      key:
+      name:
+  address: 'insprd'
+  token:
+```
+
 To see usefull overwrites go to [Values_configuration](../../docs/values_configuration.md)
