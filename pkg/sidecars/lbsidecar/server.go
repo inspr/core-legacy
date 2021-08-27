@@ -209,15 +209,15 @@ func (s *Server) Run(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		gracefulShutdown(writeServer, readServer, nil)
+		gracefulShutdown(writeServer, readServer, adminServer, nil)
 		return ctx.Err()
 	case errRead := <-errCh:
-		gracefulShutdown(writeServer, readServer, errRead)
+		gracefulShutdown(writeServer, readServer, adminServer, errRead)
 		return errRead
 	}
 }
 
-func gracefulShutdown(w, r *http.Server, err error) {
+func gracefulShutdown(w, r, a *http.Server, err error) {
 	logger.Info("gracefully shutting down...")
 
 	ctxShutdown, cancel := context.WithDeadline(
@@ -239,6 +239,11 @@ func gracefulShutdown(w, r *http.Server, err error) {
 
 	if err = r.Shutdown(ctxShutdown); err != nil {
 		logger.Fatal("error while shutting down LB Sidecar read server",
+			zap.Error(err))
+	}
+
+	if err = a.Shutdown(ctxShutdown); err != nil {
+		logger.Fatal("error while shutting down LB Sidecar admin server",
 			zap.Error(err))
 	}
 }

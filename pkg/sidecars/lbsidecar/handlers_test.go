@@ -99,7 +99,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 		},
 		{
 			name:    "Valid write request",
-			channel: "chan5",
+			channel: "chan5a",
 			msg: models.BrokerMessage{
 				Data: "randomMessage",
 			},
@@ -167,10 +167,9 @@ func TestServer_readMessageHandler(t *testing.T) {
 			setClientPort: true,
 		},
 		{
-			name:          "Invalid avro schema",
-			channel:       "chan1",
-			wantErr:       true,
-			setClientPort: true,
+			name:    "Invalid avro schema",
+			channel: "chan1",
+			wantErr: true,
 		},
 		{
 			name:    "Invalid message given schema",
@@ -178,21 +177,19 @@ func TestServer_readMessageHandler(t *testing.T) {
 			msg: models.BrokerMessage{
 				Data: randomStruct{},
 			},
-			wantErr:       true,
-			setClientPort: true,
+			wantErr: true,
 		},
 		{
-			name:    "Invalid request address",
+			name:    "Invalid scclient request address",
 			channel: "chan6",
 			msg: models.BrokerMessage{
 				Data: "randomMessage",
 			},
-			wantErr:       true,
-			setClientPort: true,
+			wantErr: true,
 		},
 		{
 			name:    "Valid write request",
-			channel: "chan5",
+			channel: "chan5b",
 			msg: models.BrokerMessage{
 				Data: "randomMessage",
 			},
@@ -244,7 +241,7 @@ func TestServer_readMessageHandler(t *testing.T) {
 type randomStruct struct{}
 
 func createMockEnvVars() {
-	customEnvValues := "chan1@randBroker3;chan3@randBroker4;chan4@randBroker2;chan5@randBroker1;chan6@randBroker5"
+	customEnvValues := "chan1@randBroker3;chan3@randBroker4;chan4@randBroker2;chan5a@randBroker1;chan5b@randBroker1;chan6@randBroker5"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
 
@@ -268,8 +265,10 @@ func createMockEnvVars() {
 
 	os.Setenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT", "1107")
 	os.Setenv("INSPR_SIDECAR_RANDBROKER1_ADDR", "http://localhost")
-	os.Setenv("chan5_SCHEMA", `{"type":"string"}`)
-	os.Setenv("chan5_RESOLVED", "chan5")
+	os.Setenv("chan5a_SCHEMA", `{"type":"string"}`)
+	os.Setenv("chan5a_RESOLVED", "chan5a")
+	os.Setenv("chan5b_SCHEMA", `{"type":"string"}`)
+	os.Setenv("chan5b_RESOLVED", "chan5b")
 
 }
 

@@ -111,7 +111,6 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
 		if clientReadPort == "" {
-
 			rest.ERROR(
 				w,
 				ierrors.New(
@@ -134,7 +133,7 @@ func (s *Server) readMessageHandler() rest.Handler {
 		}
 
 		logger.Info("sending message to node through: ",
-			zap.String("channel", channel))
+			zap.String("channel", channel), zap.String("node port", clientReadPort))
 
 		reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
 

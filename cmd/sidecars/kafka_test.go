@@ -8,6 +8,7 @@ import (
 	"inspr.dev/inspr/pkg/operator/k8s"
 	"inspr.dev/inspr/pkg/sidecars/models"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 // constants used for the tests
@@ -71,6 +72,10 @@ func TestKafkaToDeployment(t *testing.T) {
 					KafkaEnvConfig(deploymentKafkaConfig),
 					extractContainerOpts(KafkaSidecarConfig(deploymentKafkaConfig, &testPorts)),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
+					k8s.ContainerWithPorts(v1.ContainerPort{
+						Name:          "tcp-kfk-metrics",
+						ContainerPort: 16001,
+					}),
 				),
 			),
 		},

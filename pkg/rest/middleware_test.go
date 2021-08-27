@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -64,7 +62,6 @@ func TestHandler_JSON(t *testing.T) {
 }
 
 func TestHandler_Validate(t *testing.T) {
-	log.SetOutput(ioutil.Discard)
 	type args struct {
 		auth          auth.Auth
 		Authorization string
