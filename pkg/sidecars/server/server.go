@@ -131,7 +131,7 @@ func (s *Server) Run(ctx context.Context) error {
 	rest.AttachProfiler(admin)
 	adminServer := &http.Server{
 		Handler: admin,
-		Addr:    fmt.Sprintf("0.0.0.0:16001"),
+		Addr:    "0.0.0.0:16001",
 	}
 	go func() {
 		logger.Info("admin server listening at localhos:16001")
