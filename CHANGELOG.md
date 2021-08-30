@@ -6,6 +6,20 @@
     - configured prometheus and grafana charts on inspr-stack chart
 - fix:
     - renamed uidp directory
+---
+
+### #120 Story CORE-502 | Develop client (for controller dApps) for Python
+- features:
+    - models module added to inspr python lib (to define the changelog and inspr structure data types)
+    - rest module updated (added get, delete and update methods)
+    - controller-client module added to inspr python lib (with all the CRUD methods for apps, channels, types and alias)
+---
+
+### #118 Story CORE-561 | Authentication foir broker commands
+- features:
+    - added header scope on broker requests
+    - configured validation for broker operations 
+---
 
 ### #113 Story CORE-560 | CLI changes documentation
 - doc:

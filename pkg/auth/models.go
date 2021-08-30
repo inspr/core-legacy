@@ -31,11 +31,13 @@ const (
 	CreateChannel string = "create:channel"
 	CreateType    string = "create:type"
 	CreateAlias   string = "create:alias"
+	CreateBroker  string = "create:broker"
 
 	GetDapp    string = "get:dapp"
 	GetChannel string = "get:channel"
 	GetType    string = "get:type"
 	GetAlias   string = "get:alias"
+	GetBroker  string = "get:broker"
 
 	UpdateDapp    string = "update:dapp"
 	UpdateChannel string = "update:channel"
@@ -58,11 +60,13 @@ var AdminPermissions = map[string][]string{
 		CreateChannel,
 		CreateType,
 		CreateAlias,
+		CreateBroker,
 
 		GetDapp,
 		GetChannel,
 		GetType,
 		GetAlias,
+		GetBroker,
 
 		UpdateDapp,
 		UpdateChannel,
