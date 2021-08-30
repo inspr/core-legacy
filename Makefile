@@ -78,7 +78,7 @@ cli/insprctl/install:
 # }
 
 # inprov {
-## builds inprov to the bin directori
+## builds inprov to the bin directory
 cli/inprov/build:
 	go build -o bin ./cmd/uid_provider/inprov
 
