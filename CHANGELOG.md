@@ -1,8 +1,14 @@
 
 # Changelog
 
+### #109 Prometheus setup
+- features:
+    - configured prometheus and grafana charts on inspr-stack chart
+- fix:
+    - renamed uidp directory
+
 ### #113 Story CORE-560 | CLI changes documentation
-- Doc:
+- doc:
     - Updated docs and examples to host flag and Brokers command
 ---
 
