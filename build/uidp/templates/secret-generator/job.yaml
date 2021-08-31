@@ -1,3 +1,4 @@
+{{- if not .Release.IsUpgrade -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -7,7 +8,7 @@ spec:
   template:
     spec:
       restartPolicy: Never
-      serviceAccountName: '{{ include "uidp.fullname" $ }}-secret-generator'
+      serviceAccountName: '{{ include "uidp.fullname" $ }}'
       {{- if .Values.insprd.init.enabled }}
       initContainers:
       {{- include "insprd.init-check" $ | nindent 8 }}
@@ -36,3 +37,4 @@ spec:
             - name: ADMIN_PASSWORD_GENERATE
               value: "true"
             {{- end }}
+{{- end -}}

@@ -71,6 +71,10 @@ func TestKafkaToDeployment(t *testing.T) {
 					KafkaEnvConfig(deploymentKafkaConfig),
 					extractContainerOpts(KafkaSidecarConfig(deploymentKafkaConfig, &testPorts)),
 					k8s.ContainerWithPullPolicy(corev1.PullAlways),
+					k8s.ContainerWithPorts(corev1.ContainerPort{
+						Name:          "tcp-kfk-metrics",
+						ContainerPort: 16001,
+					}),
 				),
 			),
 		},

@@ -48,7 +48,6 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 	if err != nil {
 		return ierrors.Wrap(err, "error creating request")
 	}
-	defer req.Body.Close()
 
 	for key, values := range c.headers {
 		req.Header[key] = values

@@ -85,6 +85,10 @@ func getKafkaContainerOptions(app *meta.App, config KafkaConfig, envVars k8s.Con
 		KafkaEnvConfig(config),
 		envVars,
 		k8s.ContainerWithPullPolicy(corev1.PullAlways),
+		k8s.ContainerWithPorts(corev1.ContainerPort{
+			Name:          "tcp-kfk-metrics",
+			ContainerPort: 16001,
+		}),
 	}
 
 	return append(stdOptions, opts...)

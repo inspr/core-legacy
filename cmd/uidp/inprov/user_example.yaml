@@ -1,0 +1,28 @@
+uid: name
+password: password
+permissions:
+  "":
+    - "create:token"
+
+    - "create:dapp"
+    - "create:channel"
+    - "create:type"
+    - "create:alias"
+
+    - "get:dapp"
+    - "get:channel"
+    - "get:type"
+    - "get:alias"
+
+    - "update:dapp"
+    - "update:channel"
+    - "update:type"
+    - "update:alias"
+
+    - "delete:dapp"
+    - "delete:channel"
+    - "delete:type"
+    - "delete:alias"
+
+    - "create:broker"
+    - "get:broker"

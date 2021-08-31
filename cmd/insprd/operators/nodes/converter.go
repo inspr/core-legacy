@@ -61,18 +61,37 @@ func (no *NodeOperator) dappToService(app *meta.App) *kubeService {
 // dAppToDeployment translates the DApp to a k8s deployment
 func (no *NodeOperator) dAppToDeployment(app *meta.App, usePermTree bool) *kubeDeployment {
 	appDeployName := toDeploymentName(app)
+	appID := toAppID(app)
+	var depNames utils.StringArray
+	depNames = strings.Split(app.Meta.Parent, ".")
+	if depNames[0] == "" {
+		depNames = utils.StringArray{}
+	}
 	appLabels := map[string]string{
-		"inspr-app": toAppID(app),
+		"inspr-app": appID,
 	}
 	logger.Info("constructing deployment", zap.Bool("useperm", usePermTree))
 
 	nodeContainer := createNodeContainer(app, appDeployName)
 	scContainers := no.withAllSidecarsContainers(app, appDeployName, usePermTree)
 
+	appAnnotations := map[string]string{
+		"inspr.com/app-id":             appID,
+		"inspr.com/app-name":           app.Meta.Name,
+		"inspr.com/app-reference":      app.Meta.Reference,
+		"inspr.com/app-scope":          strings.Join(depNames, "-"),
+		"app.kubernetes.io/name":       app.Meta.Name,
+		"app.kubernetes.io/instance":   app.Meta.UUID,
+		"app.kubernetes.io/managed-by": "inspr",
+		"app.kubernetes.io/created-by": "inspr",
+		"prometheus.io/scrape":         "true",
+	}
+
 	return (*kubeDeployment)(
 		k8s.NewDeployment(
 			appDeployName,
 			k8s.WithLabels(appLabels),
+			k8s.WithAnnotations(appAnnotations),
 			k8s.WithContainer(
 				append(scContainers, nodeContainer)...,
 			),
@@ -91,7 +110,7 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 			panic(fmt.Sprintf("broker %v not allowed: %v", broker, err))
 		}
 
-		logger.Info("with all sidecars containers", zap.Bool("useperm", usePermTree))
+		logger.Debug("with all sidecars containers", zap.Bool("useperm", usePermTree))
 
 		container, addrEnvVar := factory(app,
 			getAvailiblePorts(),
@@ -107,7 +126,7 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 	}
 
 	lbSidecar := k8s.NewContainer(
-		appDeployName+"-lbsidecar",
+		"lbsidecar",
 		"",
 		no.withLBSidecarImage(app),
 		no.withBoundary(app, usePermTree),
@@ -356,6 +375,11 @@ func withLBSidecarPorts(app *meta.App) k8s.ContainerOption {
 				Value: strconv.Itoa(lbReadPort),
 			})
 		}
+
+		c.Ports = []corev1.ContainerPort{
+			{ContainerPort: 16000, Name: "tcp-lbs-metrics", Protocol: corev1.ProtocolTCP},
+		}
+
 	}
 }
 

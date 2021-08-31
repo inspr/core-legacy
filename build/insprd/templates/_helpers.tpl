@@ -57,7 +57,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "common.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "common.chart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 

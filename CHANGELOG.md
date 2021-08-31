@@ -7,6 +7,26 @@
 	- Update the overwrite values configuration table
 ---
 
+### #109 Prometheus setup
+- features:
+    - configured prometheus and grafana charts on inspr-stack chart
+- fix:
+    - renamed uidp directory
+---
+
+### #120 Story CORE-502 | Develop client (for controller dApps) for Python
+- features:
+    - models module added to inspr python lib (to define the changelog and inspr structure data types)
+    - rest module updated (added get, delete and update methods)
+    - controller-client module added to inspr python lib (with all the CRUD methods for apps, channels, types and alias)
+---
+
+### #118 Story CORE-561 | Authentication foir broker commands
+- features:
+    - added header scope on broker requests
+    - configured validation for broker operations 
+---
+
 ### #113 Story CORE-560 | CLI changes documentation
 - doc:
     - Updated docs and examples to host flag and Brokers command
@@ -95,6 +115,11 @@
 - features:
     - updated github integration scripts for helm chart release updating
 ---
+
+### #101 Fix | adds routine for collecting kafka events
+- fix:
+    - update kafka go version to 1.7.0
+    - adds go routine for collecting kafka writer events
 
 ### #98 Story CORE-493 | Restart Policy for Nodes
 - refactors:

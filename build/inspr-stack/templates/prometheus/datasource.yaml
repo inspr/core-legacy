@@ -1,0 +1,17 @@
+{{- if .Values.grafana.enabled -}}
+kind: Secret
+apiVersion: v1
+metadata:
+  name: inspr-stack-grafana-data-source
+stringData:
+  prometheus.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Inspr
+        url: http://{{ include "inspr-stack.prometheus.name" $ }}:9090
+        type: prometheus
+        access: proxy
+        isDefault: true
+        editable: false
+{{- end -}}
+
