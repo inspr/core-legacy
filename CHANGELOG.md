@@ -1,6 +1,11 @@
 
 # Changelog
 
+### #121 Quick gitgnore fix
+- fix:
+    - set up to not track new helm overwrites files
+---
+
 ### #109 Prometheus setup
 - features:
     - configured prometheus and grafana charts on inspr-stack chart
