@@ -140,7 +140,6 @@ func (s *Server) writeWithRetry(
 		if resp != nil {
 			defer resp.Body.Close()
 		}
-
 		status = resp.StatusCode
 		if err == nil && status == http.StatusOK {
 			return

@@ -7,25 +7,50 @@ build:
     - image: gcr.io/insprlabs/insprd
       context: .
       docker:
-        dockerfile: cmd/insprd/Dockerfile
+        dockerfile: ./build/Dockerfile
+        buildArgs:
+          TARGET: insprd
+
     - image: gcr.io/insprlabs/inspr/sidecar/lbsidecar
       context: .
       docker:
-        dockerfile: cmd/sidecars/lbsidecar/Dockerfile
+        dockerfile: ./build/Dockerfile
+        buildArgs:
+          TARGET: lbsidecar
+
     - image: gcr.io/insprlabs/authsvc
       context: .
       docker:
-        dockerfile: cmd/authsvc/Dockerfile
+        dockerfile: ./build/Dockerfile
+        buildArgs:
+          TARGET: authsvc
+
     - image: gcr.io/insprlabs/secretgen
       context: .
       docker:
-        dockerfile: cmd/authsvc/secret/Dockerfile
+        dockerfile: ./build/Dockerfile
+        buildArgs:
+          TARGET: authsec
+
+    - image: gcr.io/insprlabs/uidp/redis/secret
+      context: .
+      docker:
+        dockerfile: ./build/Dockerfile
+        buildArgs:
+          TARGET: uidpsec
+
+    - image: gcr.io/insprlabs/uidp/redis/api
+      context: .
+      docker:
+        dockerfile: ./build/Dockerfile
+        buildArgs:
+          TARGET: uidp
 deploy:
   helm:
     releases:
-      - name: insprd
+      - name: "{{ if .RELEASE_NAME }}{{ .RELEASE_NAME }}{{ else }}insprd{{ end }}"
         valuesFiles: 
-          - overwrite-insprd.yaml
+          - "{{ .VALUES }}"
         artifactOverrides:
           image: gcr.io/insprlabs/insprd
           sidecar.image: gcr.io/insprlabs/inspr/sidecar/lbsidecar
@@ -37,23 +62,12 @@ deploy:
             explicitRegistry: true
 profiles:
   - name: uidp
-    build:
-      tagPolicy:
-      artifacts:
-        - image: gcr.io/insprlabs/uidp/redis/secret
-          context: .
-          docker:
-            dockerfile: cmd/uid_provider/secret/Dockerfile
-        - image: gcr.io/insprlabs/uidp/redis/api
-          context: .
-          docker:
-            dockerfile: cmd/uid_provider/Dockerfile
     deploy:
       helm:
         releases:
-          - name: uidp
+          - name: "{{ if .RELEASE_NAME }}{{ .RELEASE_NAME }}{{ else }}uidp{{ end }}"
             valuesFiles: 
-              - overwrite-uidp.yaml
+              - "{{ .VALUES }}"
             artifactOverrides:
               image: gcr.io/insprlabs/uidp/redis/api
               secret.image: gcr.io/insprlabs/uidp/redis/secret
@@ -62,39 +76,13 @@ profiles:
               helm:
                 explicitRegistry: true
   - name: inspr-stack
-    build:
-      artifacts:
-        - image: gcr.io/insprlabs/insprd
-          context: .
-          docker:
-            dockerfile: cmd/insprd/Dockerfile
-        - image: gcr.io/insprlabs/inspr/sidecar/lbsidecar
-          context: .
-          docker:
-            dockerfile: cmd/sidecars/lbsidecar/Dockerfile
-        - image: gcr.io/insprlabs/authsvc
-          context: .
-          docker:
-            dockerfile: cmd/authsvc/Dockerfile
-        - image: gcr.io/insprlabs/secretgen
-          context: .
-          docker:
-            dockerfile: cmd/authsvc/secret/Dockerfile
-        - image: gcr.io/insprlabs/uidp/redis/secret
-          context: .
-          docker:
-            dockerfile: cmd/uid_provider/secret/Dockerfile
-        - image: gcr.io/insprlabs/uidp/redis/api
-          context: .
-          docker:
-            dockerfile: cmd/uid_provider/Dockerfile
     deploy:
       helm:
         releases:
-          - name: inspr-stack
+          - name: "{{ if .RELEASE_NAME }}{{ .RELEASE_NAME }}{{ else }}inspr-stack{{ end }}"
             createNamespace: true
             valuesFiles: 
-              - overwrite-stack.yaml
+              - "{{ .VALUES }}"
             artifactOverrides:
               uidp.image: gcr.io/insprlabs/uidp/redis/api
               uidp.secret.image: gcr.io/insprlabs/uidp/redis/secret

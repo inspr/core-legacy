@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/environment"
@@ -28,10 +29,10 @@ func init() {
 // writeMessageHandler handles requests sent to the write message server
 func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 		logger.Info("handling message write")
 
 		channel := strings.TrimPrefix(r.URL.Path, "/")
-
 		if !environment.OutputChannelList().Contains(channel) {
 			logger.Error(fmt.Sprintf("channel %s not found in output channel list", channel))
 
@@ -77,19 +78,24 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		if err != nil {
 			logger.Error("unable to send request to "+channelBroker+" sidecar",
 				zap.Any("error", err))
+			s.GetMetric(channel).messageSendError.Inc()
 
 			rest.ERROR(w, err)
 			return
 		}
 		defer resp.Body.Close()
 
-		rest.JSON(w, resp.StatusCode, resp.Body)
+		rest.JSON(w, resp.StatusCode, nil)
+		s.GetMetric(channel).messagesSent.Inc()
+		elapsed := time.Since(start)
+		s.GetMetric(channel).writeMessageDuration.Observe(elapsed.Seconds())
 	}
 }
 
 // readMessageHandler handles requests sent to the read message server
 func (s *Server) readMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 		logger.Info("handling message read")
 
 		channel := strings.TrimPrefix(r.URL.Path, "/")
@@ -105,7 +111,6 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
 		if clientReadPort == "" {
-
 			rest.ERROR(
 				w,
 				ierrors.New(
@@ -128,7 +133,7 @@ func (s *Server) readMessageHandler() rest.Handler {
 		}
 
 		logger.Info("sending message to node through: ",
-			zap.String("channel", channel))
+			zap.String("channel", channel), zap.String("node port", clientReadPort))
 
 		reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
 
@@ -142,6 +147,9 @@ func (s *Server) readMessageHandler() rest.Handler {
 		defer resp.Body.Close()
 
 		rest.JSON(w, resp.StatusCode, resp.Body)
+		elapsed := time.Since(start)
+		s.GetMetric(channel).readMessageDuration.Observe(elapsed.Seconds())
+		s.GetMetric(channel).messagesRead.Add(1)
 	}
 }
 

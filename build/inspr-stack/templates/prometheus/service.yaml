@@ -1,0 +1,20 @@
+{{- if .Values.prometheus.enabled -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "inspr-stack.prometheus.labels" . | nindent 4 }}
+  name: {{ include "inspr-stack.prometheus.name" . }}
+spec:
+  ports:
+    - name: http
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+  selector:
+    {{- include "inspr-stack.prometheus.selector-labels" . | nindent 4 }}
+  sessionAffinity: None
+  type: "ClusterIP"
+
+{{- end -}}

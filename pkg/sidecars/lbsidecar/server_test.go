@@ -24,6 +24,7 @@ func TestInit(t *testing.T) {
 			want: &Server{
 				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
 				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+				metrics:   map[string]channelMetric{},
 			},
 		},
 	}
