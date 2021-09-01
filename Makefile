@@ -132,55 +132,55 @@ ci/cli/push: ci/cli/build
 # uidp {
 ## packages the UIDP helm chart using the UIDP overrides file, which by default is uidp-overwrites.yaml
 helm/uidp/package:
-	helm package ./build/inspr-stack/subcharts/uidp -o charts -f ${UIDP_VALUES} -n ${K8S_NAMESPACE}
+	helm package ./build/uidp
 
 ## lints the UIDP helm chart using the UIDP overrides file.
 helm/uidp/lint:
-	helm lint ./build/inspr-stack/subcharts/uidp -o charts -f ${UIDP_VALUES} -n ${K8S_NAMESPACE}
+	helm lint ./build/uidp
 
 ## runs the UIDP helm chart tests using the UIDP overrides file,
 helm/uidp/test:
-	helm test ./build/inspr-stack/subcharts/uidp -o charts -f ${UIDP_VALUES} -n ${K8S_NAMESPACE}
+	helm test ${RELEASE_NAME}-insprd -n ${K8S_NAMESPACE}
 
 ## installs the uidp helm chart to the K8S_NAMESPACE using the uidp overrides file.
 helm/uidp/install:
-	helm install ./build/inspr-stack/subcharts/uidp -o charts -f ${UIDP_VALUES} -n ${K8S_NAMESPACE}
+	helm install ${RELEASE_NAME}-insprd ./build/uidp -f ${UIDP_VALUES} -n ${K8S_NAMESPACE}
 # }
 
 # insprd {
 ## packages the INSPRD helm chart using the INSPRD overrides file, which by default is insprd-overwrites.yaml
 helm/insprd/package:
-	helm package ./build/inspr-stack/subcharts/insprd -o charts -f ${INSPRD_VALUES} -n ${K8S_NAMESPACE}
+	helm package ./build/insprd
 
 ## lints the INSPRD helm chart using the INSPRD overrides file.
 helm/insprd/lint:
-	helm lint ./build/inspr-stack/subcharts/insprd -o charts -f ${INSPRD_VALUES} -n ${K8S_NAMESPACE}
+	helm lint ./build/insprd
 
 ## runs the INSPRD helm chart tests using the INSPRD overrides file,
 helm/insprd/test:
-	helm test ./build/inspr-stack/subcharts/insprd -o charts -f ${INSPRD_VALUES} -n ${K8S_NAMESPACE}
+	helm test ${RELEASE_NAME}-uidp -n ${K8S_NAMESPACE}
 
 ## installs the insprd helm chart to the K8S_NAMESPACE using the insprd overrides file.
 helm/insprd/install:
-	helm install ./build/inspr-stack/subcharts/insprd -o charts -f ${INSPRD_VALUES} -n ${K8S_NAMESPACE}
+	helm install ${RELEASE_NAME}-uidp ./build/insprd -f ${INSPRD_VALUES} -n ${K8S_NAMESPACE}
 # }
 
 # stack {
 ## packages the INSPR-STACK helm chart using the INSPR-STACK overrides file, which by default is stack-overwrites.yaml
 helm/package:
-	helm package ./build/inspr-stack -o charts -f ${VALUES} -n ${K8S_NAMESPACE}
+	helm package ./build/inspr-stack
 
 ## lints the INSPR-STACK helm chart using the INSPR-STACK overrides file.
 helm/lint:
-	helm lint ./build/inspr-stack -o charts -f ${VALUES} -n ${K8S_NAMESPACE}
+	helm lint ./build/inspr-stack
 
 ## runs the INSPR-STACK helm chart tests using the INSPR-STACK overrides file,
 helm/test:
-	helm test ./build/inspr-stack -o charts -f ${VALUES} -n ${K8S_NAMESPACE}
+	helm test ${RELEASE_NAME}-stack -n ${K8S_NAMESPACE}
 
 ## installs the inspr-stack helm chart to the K8S_NAMESPACE using the inspr-stack overrides file.
 helm/install:
-	helm install ./build/inspr-stack -o charts -f ${VALUES} -n ${K8S_NAMESPACE}
+	helm install ${RELEASE_NAME}-stack ./build/inspr-stack -f ${VALUES} -n ${K8S_NAMESPACE}
 # }
 # }
 
