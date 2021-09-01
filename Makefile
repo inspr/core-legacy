@@ -140,11 +140,11 @@ helm/uidp/lint:
 
 ## runs the UIDP helm chart tests using the UIDP overrides file,
 helm/uidp/test:
-	helm test ${RELEASE_NAME}-insprd -n ${K8S_NAMESPACE}
+	helm test ${RELEASE_NAME}-uidp -n ${K8S_NAMESPACE}
 
 ## installs the uidp helm chart to the K8S_NAMESPACE using the uidp overrides file.
 helm/uidp/install:
-	helm install ${RELEASE_NAME}-insprd ./build/uidp -f ${UIDP_VALUES} -n ${K8S_NAMESPACE}
+	helm install ${RELEASE_NAME}-uidp ./build/uidp -f ${UIDP_VALUES} -n ${K8S_NAMESPACE}
 # }
 
 # insprd {
@@ -158,11 +158,11 @@ helm/insprd/lint:
 
 ## runs the INSPRD helm chart tests using the INSPRD overrides file,
 helm/insprd/test:
-	helm test ${RELEASE_NAME}-uidp -n ${K8S_NAMESPACE}
+	helm test ${RELEASE_NAME}-insprd -n ${K8S_NAMESPACE}
 
 ## installs the insprd helm chart to the K8S_NAMESPACE using the insprd overrides file.
 helm/insprd/install:
-	helm install ${RELEASE_NAME}-uidp ./build/insprd -f ${INSPRD_VALUES} -n ${K8S_NAMESPACE}
+	helm install ${RELEASE_NAME}-insprd ./build/insprd -f ${INSPRD_VALUES} -n ${K8S_NAMESPACE}
 # }
 
 # stack {
