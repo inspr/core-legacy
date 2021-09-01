@@ -1,6 +1,13 @@
 
 # Changelog
 
+### #122 Story CORE-566 | Implement benchmarking dapp
+- feature:
+    - throughput bench marking dapp
+- fix:
+    - make target for getting grafana password
+---
+
 ### #121 Quick gitgnore fix
 - fix:
     - set up to not track new helm overwrites files
