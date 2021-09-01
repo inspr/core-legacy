@@ -144,7 +144,11 @@ helm/uidp/test:
 
 ## installs the uidp helm chart to the K8S_NAMESPACE using the uidp overrides file.
 helm/uidp/install:
-	helm install ${RELEASE_NAME}-uidp ./build/uidp -f ${UIDP_VALUES} -n ${K8S_NAMESPACE}
+	helm upgrade -i ${RELEASE_NAME}-uidp ./build/uidp -f ${UIDP_VALUES} -n ${K8S_NAMESPACE}
+
+## delete a helm release
+helm/uidp/uninstall:
+	helm uninstall ${RELEASE_NAME}-uidp -n ${K8S_NAMESPACE}
 # }
 
 # insprd {
@@ -162,7 +166,11 @@ helm/insprd/test:
 
 ## installs the insprd helm chart to the K8S_NAMESPACE using the insprd overrides file.
 helm/insprd/install:
-	helm install ${RELEASE_NAME}-insprd ./build/insprd -f ${INSPRD_VALUES} -n ${K8S_NAMESPACE}
+	helm upgrade -i ${RELEASE_NAME}-insprd ./build/insprd -f ${INSPRD_VALUES} -n ${K8S_NAMESPACE}
+
+## delete a helm release
+helm/insprd/uninstall:
+	helm uninstall ${RELEASE_NAME}-insprd -n ${K8S_NAMESPACE}
 # }
 
 # stack {
@@ -180,7 +188,11 @@ helm/test:
 
 ## installs the inspr-stack helm chart to the K8S_NAMESPACE using the inspr-stack overrides file.
 helm/install:
-	helm install ${RELEASE_NAME}-stack ./build/inspr-stack -f ${VALUES} -n ${K8S_NAMESPACE}
+	helm upgrade -i ${RELEASE_NAME}-stack ./build/inspr-stack -f ${VALUES} -n ${K8S_NAMESPACE}
+
+## delete a helm release
+helm/uninstall:
+	helm uninstall ${RELEASE_NAME}-stack -n ${K8S_NAMESPACE}
 # }
 # }
 
