@@ -16,7 +16,7 @@ export
 
 
 help:
-	@python ./scripts/makefile_help.py Makefile $C
+	@python3 ./scripts/makefile_help.py Makefile $C
 
 # golang {
 
