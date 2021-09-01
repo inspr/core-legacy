@@ -3,8 +3,10 @@
 
 ### #117 Story | Inspr stack workspace initialization
 - doc:
-	- Create helm installation guides to insprd, uidp and inspr-stack, with some overwrite examples
-	- Update the overwrite values configuration table
+	- create helm installation guides to insprd, uidp and inspr-stack, with some overwrite examples
+	- update the overwrite values configuration table
+- dev:
+    - update helm chart Makefile commands and paths
 ---
 
 ### #121 Quick gitgnore fix
