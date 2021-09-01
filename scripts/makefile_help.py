@@ -27,7 +27,7 @@ with open(argv[1]) as f:
             level -= 1
         if line[:2] == '##':
             if len(argv) >= 3 or helper == "":
-                helper += line[2:].removeprefix(" ")
+                helper += line[2:].strip(" ")
             continue
         if helper != "":
             helper = helper.strip()
