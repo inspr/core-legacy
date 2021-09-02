@@ -220,15 +220,15 @@ semgrep/run:
 # secrets {
 ## gets and decodes the admin secret
 secrets/uidp/admin:
-	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${K8S_NAMESPACE}-init-secret -o jsonpath="{.data.ADMIN_PASSWORD}" | base64 --decode)
+	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${RELEASE_NAME}-init-secret -o jsonpath="{.data.ADMIN_PASSWORD}" | base64 --decode)
 
 ## gets and decodes the insprd init key secret
 secrets/insprd/init:
-	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${K8S_NAMESPACE}-insprd-init-key -o jsonpath="{.data.key}" | base64 --decode)
+	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${RELEASE_NAME}-insprd-init-key -o jsonpath="{.data.key}" | base64 --decode)
 
 ## gets and decodes the grafana admin password
 secrets/grafana/password:
-	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${K8S_NAMESPACE}-grafana-admin -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 --decode)
+	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${RELEASE_NAME}-grafana-admin -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 --decode)
 # }
 
 # dashboards {
@@ -240,7 +240,7 @@ dashboards/grafana:
 ## port forwards prometheus and opens a browser session on it
 dashboards/prometheus:
 	xdg-open http://localhost:9090
-	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=prometheus" -o jsonpath="{.items[0].metadata.name}") 9090:9090
+	kubectl port-forward -n ${K8S_NAMESPACE} $(shell kubectl get pods --namespace ${K8S_NAMESPACE} -l "app.kubernetes.io/name=${RELEASE_NAME}-prometheus" -o jsonpath="{.items[0].metadata.name}") 9090:9090
 # }
 
 # port forwards {

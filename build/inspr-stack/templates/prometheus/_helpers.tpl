@@ -11,12 +11,27 @@
 {{- end }}
 {{- end -}}
 
+{{/*
+Common labels
+*/}}
 {{- define "inspr-stack.prometheus.labels" -}}
-{{- include "common.labels" . }}
-app: {{ include "inspr-stack.prometheus.name" . }}
+{{ include "inspr-stack.prometheus.selector-labels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 release: {{ .Release.Name }}
+{{- if .Values.prometheus.extraLabels }}
+{{ toYaml .Values.prometheus.extraLabels }}
+{{- end }}
 {{- end -}}
+
+{{/*
+Selector labels
+*/}}
 {{- define "inspr-stack.prometheus.selector-labels" -}}
 app: {{ include "inspr-stack.prometheus.name" .}}
-release: {{ .Release.Name }}
+app.kubernetes.io/name: {{ include "inspr-stack.prometheus.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
+
