@@ -9,9 +9,7 @@ import (
 	dappclient "inspr.dev/inspr/pkg/client"
 )
 
-const (
-	tCount int = 1
-)
+const tCount int = 1
 
 func main() {
 
