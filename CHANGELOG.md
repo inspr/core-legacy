@@ -1,6 +1,11 @@
 
 # Changelog
 
+### #123 Story CORE-565 | Develop sidecar throughput metrics
+- feature:
+    - created constants for the channels names in the ping pong example
+    - added a script to deploy the ping pong
+
 ### #122 Story CORE-566 | Implement benchmarking dapp
 - feature:
     - throughput bench marking dapp
