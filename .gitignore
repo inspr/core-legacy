@@ -3,6 +3,7 @@
 **/*.cov
 **/*.tmp
 overwrite-*.yaml
+*-overwrites.yaml
 external-dns-*.yaml
 my-notes.md
 bin/

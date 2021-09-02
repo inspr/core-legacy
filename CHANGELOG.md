@@ -1,6 +1,18 @@
 
 # Changelog
 
+### #122 Story CORE-566 | Implement benchmarking dapp
+- feature:
+    - throughput bench marking dapp
+- fix:
+    - make target for getting grafana password
+---
+
+### #121 Quick gitgnore fix
+- fix:
+    - set up to not track new helm overwrites files
+---
+
 ### #109 Prometheus setup
 - features:
     - configured prometheus and grafana charts on inspr-stack chart

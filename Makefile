@@ -16,7 +16,7 @@ export
 
 
 help:
-	@python ./scripts/makefile_help.py Makefile $C
+	@python3 ./scripts/makefile_help.py Makefile $C
 
 # golang {
 
@@ -228,7 +228,7 @@ secrets/insprd/init:
 
 ## gets and decodes the grafana admin password
 secrets/grafana/password:
-	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${K8S_NAMESPACE}-grafana-admin -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 --decode)
+	@echo $(shell kubectl get secrets -n ${K8S_NAMESPACE} ${RELEASE_NAME}-grafana-admin -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 --decode)
 # }
 
 # dashboards {
