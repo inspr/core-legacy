@@ -2,10 +2,20 @@
 .vscode
 **/*.cov
 **/*.tmp
+
+
+# Helm
+Chart.lock
+
+# Files to configure installations 
 overwrite-*.yaml
 *-overwrites.yaml
 external-dns-*.yaml
+
+# Custom notes for each developer
 my-notes.md
+
+# Binaries build via make skaffold/build
 bin/
 tags.out
 
