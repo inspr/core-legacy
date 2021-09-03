@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: dapp
+
+meta:
+  name: receiver
+  parent: bench
+spec:
+  logLevel: debug
+  node:
+    spec:
+      replicas: 1
+      image: gcr.io/insprlabs/inspr/example/receiver:latest
+  boundary:
+    input:
+      - receivech

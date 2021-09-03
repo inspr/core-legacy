@@ -8,7 +8,13 @@
     releaseName,this was changed to ${releaseName}-prometheus
   - Makefile dashboard/prometheus now works with the helmChart default values, doens't work if
     someone sets `values.prometheus.fullname` as this overwrites the template generated values.
+---
 
+### #122 Story CORE-566 | Implement benchmarking dapp
+- feature:
+    - throughput bench marking dapp
+- fix:
+    - make target for getting grafana password
 ---
 
 ### #121 Quick gitgnore fix
