@@ -121,7 +121,7 @@ global:
 
 insprd:
   enabled: true
-  name: "insprd"
+  name: insprd
   image:
     registry: gcr.io/insprlabs
     repository: insprd

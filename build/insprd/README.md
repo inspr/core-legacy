@@ -81,7 +81,7 @@ global:
   imagePullSecrets: []
   imageRegistry:
 
-name: "insprd"
+name: insprd
 image:
   registry: gcr.io/insprlabs
   repository: insprd
