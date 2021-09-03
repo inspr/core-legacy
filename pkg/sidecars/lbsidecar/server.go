@@ -16,14 +16,12 @@ import (
 )
 
 type channelMetric struct {
-	messagesRead          prometheus.Counter
-	messageSendError      prometheus.Counter
-	messageReadError      prometheus.Counter
-	messagesSent          prometheus.Counter
-	readMessageDuration   prometheus.Summary
-	writeMessageDuration  prometheus.Summary
-	readMessageThroughput prometheus.Summary
-	sendMessageThroughput prometheus.Summary
+	messagesRead         prometheus.Counter
+	messageSendError     prometheus.Counter
+	messageReadError     prometheus.Counter
+	messagesSent         prometheus.Counter
+	readMessageDuration  prometheus.Summary
+	writeMessageDuration prometheus.Summary
 }
 
 // Server is a struct that contains the variables necessary
@@ -99,28 +97,6 @@ func (s *Server) GetMetric(channel string) channelMetric {
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
 			Name:      "send_message_duration",
-			ConstLabels: prometheus.Labels{
-				"inspr_channel":          channel,
-				"inspr_resolved_channel": resolved,
-				"broker":                 broker,
-			},
-			Objectives: map[float64]float64{},
-		}),
-		readMessageThroughput: promauto.NewSummary(prometheus.SummaryOpts{
-			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "read_message_throughput",
-			ConstLabels: prometheus.Labels{
-				"inspr_channel":          channel,
-				"inspr_resolved_channel": resolved,
-				"broker":                 broker,
-			},
-			Objectives: map[float64]float64{},
-		}),
-		sendMessageThroughput: promauto.NewSummary(prometheus.SummaryOpts{
-			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "send_message_throughput",
 			ConstLabels: prometheus.Labels{
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
