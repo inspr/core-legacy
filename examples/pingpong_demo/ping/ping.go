@@ -7,9 +7,13 @@ import (
 	"log"
 
 	"context"
+
 	dappclient "inspr.dev/inspr/pkg/client"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
+
+const PING_READ = "pinginput"
+const PING_WRITE = "pingoutput"
 
 func main() {
 
@@ -18,11 +22,11 @@ func main() {
 	defer cancel()
 
 	sentMsg := "Ping!"
-	if err := client.WriteMessage(ctx, "pingoutput", sentMsg); err != nil {
+	if err := client.WriteMessage(ctx, PING_WRITE, sentMsg); err != nil {
 		fmt.Printf("an error occurred: %v", err)
 		return
 	}
-	client.HandleChannel("pinginput", func(ctx context.Context, body io.Reader) error {
+	client.HandleChannel(PING_READ, func(ctx context.Context, body io.Reader) error {
 		var ret models.BrokerMessage
 
 		decoder := json.NewDecoder(body)
@@ -32,7 +36,7 @@ func main() {
 
 		fmt.Println(ret)
 
-		if err := client.WriteMessage(ctx, "pingoutput", sentMsg); err != nil {
+		if err := client.WriteMessage(ctx, PING_WRITE, sentMsg); err != nil {
 			fmt.Println(err)
 			return err
 		}

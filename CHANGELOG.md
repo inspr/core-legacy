@@ -6,8 +6,15 @@
 	- update the overwrite values configuration table
 - dev:
     - update helm chart Makefile commands and paths
-### #123 prometheus chart selector labels setting incorrect name
+---
 
+### #124 Story CORE-565 | Develop sidecar throughput metrics
+- feature:
+    - created constants for the channels names in the ping pong example
+    - added a script to deploy the ping pong
+---
+
+### #123 prometheus chart selector labels setting incorrect name
 - fix:
   - Makefile using wrong variable in secrets commands
   - prometheus labels were being set to commonLabels, which was setting k8s.app to
