@@ -109,6 +109,7 @@ uidp:
 
 prometheus:
   enabled: true
+  
 grafana:
   enabled: true
   datasources:
