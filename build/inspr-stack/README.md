@@ -90,7 +90,7 @@ There are more log levels that you can use on the cluster besides the default on
 $ helm install <your.release.name> inspr/inspr-stack --set global.logLevel=<your.logLvl>
 ```
 
-## Exaple 4
+## Example 4
 
 Changing the uidp admin password to your own password
 
@@ -106,7 +106,7 @@ Using a yaml file to overwrite the char values
 $ helm install <your.release.name> inspr/inspr-stack -f your_values.yaml
 ```
 
-The example of a .yaml file that overwrite the values for the installation of the inspr-stack which is the group of insprd and uidp subchart values.
+The example of a .yaml file that overwrite the values for the installation of the inspr-stack, which is contemplates both insprd and uidp subchart values.
 
 ```yaml
 global:

@@ -65,12 +65,27 @@ The following table lists the configurable parameters of Inspr Helm Chart and th
 | uidp | insprd.init.secret.name | Name of the key where the requested secret value is located in the Kubernetes secret |  |
 | uidp | insprd.token | Set the Insprd token |  |
 
-
 ## Inspr Stack values
 
-In this case whe we have the dependency of the inprd and UIDP you can change any value from them, just beeing necessary to add the following dependence.
+When trying to use the inspr-stack chart we can define their values in a similar way to the insprd and UIDP, the difference is the necessity of adding their dependency before the parameter for the value that you want to change.
+
+Insprd example:
+```yaml
+...
+insprd: # <= dependency
+  name: insprd # <= parameter
+...
+```  
+
+UIDP example:
+```yaml
+...
+uidp: # <= dependency
+  name: uidp # <= parameter
+...
+```
 
 | Charts | Parameter | Description | Default
 |--|--|--|--|
-| inspr-stack | insprd.insprd_command | Description | default |
-| inspr-stack | uidp.uidp_command | Description | default |
+| inspr-stack | insprd.name | Name of insprd deployment | insprd |
+| inspr-stack | uidp.name | Name of UIDP deployment | uidp |
