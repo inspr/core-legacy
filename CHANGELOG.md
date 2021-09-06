@@ -1,5 +1,13 @@
 # Changelog
 
+### #117 Story | Inspr stack workspace initialization
+- doc:
+	- create helm installation guides to insprd, uidp and inspr-stack, with some overwrite examples
+	- update the overwrite values configuration table
+- dev:
+    - update helm chart Makefile commands and paths
+---
+
 ### #124 Story CORE-565 | Develop sidecar throughput metrics
 - feature:
     - created constants for the channels names in the ping pong example

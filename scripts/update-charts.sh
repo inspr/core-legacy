@@ -8,7 +8,7 @@ echo
 
 "
 
-CHARTS=(/inspr-stack /inspr-stack/subcharts/insprd /inspr-stack/subcharts/uidp)
+CHARTS=(/inspr-stack /insprd /uidp)
 
 echo "Creating new .tgz file..."
 for chart in ${CHARTS[@]}; do
