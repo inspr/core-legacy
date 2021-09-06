@@ -33,7 +33,7 @@ inspr/inspr-stack       v0.1.3          v0.1.3          Helm chart for installin
 ## Install Chart
 ---
 
-To install the inspr-stack chart on helm run the following command(notice that the apps name space is being setting to true, overwriting the chart value and enabling the app.namespace to be created):
+To install the inspr-stack chart on helm run the following command(notice that the apps namespace is being setting to true, overwriting the chart value and enabling the app.namespace to be created):
 
 ```
 $ helm install <your.release.name> inspr/inspr-stack --set insprd.apps.createNamespace=true
