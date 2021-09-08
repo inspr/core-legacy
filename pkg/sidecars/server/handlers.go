@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/environment"
@@ -19,6 +20,8 @@ const maxBrokerRetries = 5
 // handles the messages route in the server
 func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
 		logger.Info("handling message write")
 
 		channel := strings.TrimPrefix(r.URL.Path, "/")
@@ -47,6 +50,8 @@ func (s *Server) writeMessageHandler() rest.Handler {
 			return
 		}
 		rest.JSON(w, 200, nil)
+		elapsed := time.Since(start)
+		s.GetMetric(channel).writeMessageDuration.Observe(elapsed.Seconds())
 	}
 }
 
@@ -83,6 +88,8 @@ func (s *Server) channelReadMessageRoutine(
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
+			start := time.Now()
+
 			var err error
 			var brokerMsg []byte
 
@@ -100,6 +107,8 @@ func (s *Server) channelReadMessageRoutine(
 				return err
 			}
 			s.Reader.Commit(ctx, channel)
+			elapsed := time.Since(start)
+			s.GetMetric(channel).readMessageDuration.Observe(elapsed.Seconds())
 		}
 	}
 }
