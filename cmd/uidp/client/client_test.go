@@ -61,12 +61,12 @@ func TestClient_CreateUser(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Permissions: map[string][]string{auth.CreateToken: nil},
 		Password:    string(hashedAuxPass),
 	}
 	auxUser2 := User{
 		UID:         "user2",
-		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
+		Permissions: map[string][]string{auth.UpdateAlias: {"ascope"}},
 		Password:    string(hashedAuxPass),
 	}
 
@@ -106,9 +106,12 @@ func TestClient_CreateUser(t *testing.T) {
 				uid: auxUser2.UID,
 				pwd: auxPass,
 				newUser: User{
-					UID:         "user3",
-					Password:    "u3pwd",
-					Permissions: map[string][]string{"ascope.bscope": {auth.UpdateAlias, auth.CreateAlias}},
+					UID:      "user3",
+					Password: "u3pwd",
+					Permissions: map[string][]string{
+						auth.CreateAlias: {"ascope.bscope"},
+						auth.UpdateAlias: {"ascope.bscope"},
+					},
 				},
 			},
 			wantErr: true,
@@ -140,17 +143,17 @@ func TestClient_DeleteUser(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Permissions: map[string][]string{auth.CreateToken: nil},
 		Password:    string(hashedAuxPass),
 	}
 	auxUser2 := User{
 		UID:         "user2",
-		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
+		Permissions: map[string][]string{auth.UpdateAlias: {"ascope"}},
 		Password:    string(hashedAuxPass),
 	}
 	auxUser3 := User{
 		UID:         "user3",
-		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
+		Permissions: map[string][]string{auth.UpdateAlias: {"ascope"}},
 		Password:    string(hashedAuxPass),
 	}
 
@@ -221,12 +224,12 @@ func TestClient_UpdatePassword(t *testing.T) {
 	auxCtx := context.Background()
 	auxUser := User{
 		UID:         "user1",
-		Permissions: map[string][]string{"": {auth.CreateToken}},
+		Permissions: map[string][]string{auth.CreateToken: nil},
 		Password:    string(hashedAuxPass),
 	}
 	auxUser2 := User{
 		UID:         "user2",
-		Permissions: map[string][]string{"ascope": {auth.UpdateAlias}},
+		Permissions: map[string][]string{auth.UpdateAlias: {"ascope"}},
 		Password:    string(hashedAuxPass),
 	}
 
@@ -596,20 +599,33 @@ func Test_hasPermission(t *testing.T) {
 
 	auxCtx := context.Background()
 	auxUser := User{
-		UID:         "user1",
-		Permissions: map[string][]string{"": {auth.CreateToken}},
-		Password:    string(hashedAuxPass),
+		UID: "user1",
+		Permissions: map[string][]string{
+			auth.CreateToken:   nil,
+			auth.CreateChannel: {""},
+		},
+		Password: string(hashedAuxPass),
 	}
 	auxUser2 := User{
 		UID:         "user2",
 		Permissions: nil,
 		Password:    string(hashedAuxPass),
 	}
+	auxUser3 := User{
+		UID: "user3",
+		Permissions: map[string][]string{
+			auth.CreateToken:   nil,
+			auth.CreateChannel: {"a"},
+		},
+		Password: string(hashedAuxPass),
+	}
 
 	strData, _ := json.Marshal(auxUser)
 	redisClient.rdb.Set(auxCtx, auxUser.UID, strData, 0)
 	strData2, _ := json.Marshal(auxUser2)
 	redisClient.rdb.Set(auxCtx, auxUser2.UID, strData2, 0)
+	jsonUser3, _ := json.Marshal(auxUser3)
+	redisClient.rdb.Set(auxCtx, auxUser3.UID, jsonUser3, 0)
 
 	type args struct {
 		uid string
@@ -650,6 +666,14 @@ func Test_hasPermission(t *testing.T) {
 			name: "User is not admin",
 			args: args{
 				uid: "user2",
+				pwd: auxPass,
+			},
+			wantErr: true,
+		},
+		{
+			name: "User doent have enought permission",
+			args: args{
+				uid: "user3",
 				pwd: auxPass,
 			},
 			wantErr: true,
@@ -855,12 +879,10 @@ func insprServerHandler(w http.ResponseWriter, r *http.Request) {
 	rest.JSON(w, 200, val)
 }
 
-func Test_isPermissionAllowed(t *testing.T) {
+func Test_isScopeAllowed(t *testing.T) {
 	type args struct {
-		newUserPermissionScope   string
-		newUserPermissions       []string
-		requestorPermissionScope string
-		requestorPermissions     []string
+		newUserPermScope    string
+		requestorPermScopes []string
 	}
 	tests := []struct {
 		name string
@@ -868,40 +890,42 @@ func Test_isPermissionAllowed(t *testing.T) {
 		want bool
 	}{
 		{
-			name: "requestor permissions are enough to create new user",
+			name: "root scope allowed",
 			args: args{
-				newUserPermissionScope:   "a.b.c",
-				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
-				requestorPermissionScope: "a.b",
-				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel, auth.CreateToken},
+				newUserPermScope:    "",
+				requestorPermScopes: []string{"a.b", ""},
 			},
 			want: true,
 		},
 		{
-			name: "requestor permissions (scope) are not enough to create new user",
+			name: "root scope allower",
 			args: args{
-				newUserPermissionScope:   "a.b.c",
-				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
-				requestorPermissionScope: "a.b.c.d",
-				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp, auth.DeleteChannel},
+				newUserPermScope:    "a.b.c.d.etc",
+				requestorPermScopes: []string{""},
 			},
-			want: false,
+			want: true,
 		},
 		{
-			name: "requestor permissions (permissions) are not enough to create new user",
+			name: "scope is allowed",
 			args: args{
-				newUserPermissionScope:   "a.b.c",
-				newUserPermissions:       []string{auth.CreateAlias, auth.UpdateChannel, auth.CreateDapp},
-				requestorPermissionScope: "a.b",
-				requestorPermissions:     []string{auth.CreateAlias, auth.UpdateChannel},
+				newUserPermScope:    "a.b.c",
+				requestorPermScopes: []string{"a.b"},
+			},
+			want: true,
+		},
+		{
+			name: "scope is not allowed",
+			args: args{
+				newUserPermScope:    "a.b.c",
+				requestorPermScopes: []string{"a.b.c.d"},
 			},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isPermissionAllowed(tt.args.newUserPermissionScope, tt.args.requestorPermissionScope, tt.args.newUserPermissions, tt.args.requestorPermissions, true); got != tt.want {
-				t.Errorf("isPermissionAllowed() = %v, want %v", got, tt.want)
+			if got := isScopeAllowed(tt.args.newUserPermScope, tt.args.requestorPermScopes); got != tt.want {
+				t.Errorf("isScopeAllowed() = %v, want %v", got, tt.want)
 			}
 		})
 	}
