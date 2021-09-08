@@ -23,6 +23,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
+  "iteration": 1631115896193,
   "links": [],
   "panels": [
     {
@@ -99,7 +100,7 @@
           "exemplar": true,
           "expr": "rate(inspr_sidecar_send_message_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_sidecar_send_message_duration_count{inspr_app=\"${sender_name}\"}[1m])",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "kafka_sidecar",
           "refId": "A"
         },
         {
@@ -107,7 +108,7 @@
           "expr": "rate(inspr_lbsidecar_send_message_duration_sum{inspr_app=\"${receiver_name}\"}[1m]) \n/ \nrate(inspr_lbsidecar_send_message_duration_count{inspr_app=\"${receiver_name}\"}[1m])",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "lbsidecar",
           "refId": "B"
         }
       ],
@@ -155,9 +156,9 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+               "value": null
               },
-              
+              {
                 "color": "red",
                 "value": 80
               }
@@ -188,7 +189,7 @@
           "exemplar": true,
           "expr": "increase(inspr_lbsidecar_message_read{inspr_app=\"${receiver_name}\"}[1m])",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "lb_receiver",
           "refId": "A"
         },
         {
@@ -196,7 +197,7 @@
           "expr": "increase(inspr_lbsidecar_message_send{inspr_app=\"${sender_name}\"}[1m])",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "lb_sender",
           "refId": "B"
         }
       ],
@@ -780,5 +781,5 @@
   "timezone": "",
   "title": "Inspr query board",
   "uid": "DmC-E7Inz",
-  "version": 6
-}{
+  "version": 7
+} 
