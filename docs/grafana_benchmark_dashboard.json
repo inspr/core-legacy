@@ -22,8 +22,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
-  "iteration": 1631115896193,
+  "id": 2,
+  "iteration": 1631121817727,
   "links": [],
   "panels": [
     {
@@ -105,7 +105,7 @@
         },
         {
           "exemplar": true,
-          "expr": "rate(inspr_lbsidecar_send_message_duration_sum{inspr_app=\"${receiver_name}\"}[1m]) \n/ \nrate(inspr_lbsidecar_send_message_duration_count{inspr_app=\"${receiver_name}\"}[1m])",
+          "expr": "rate(inspr_lbsidecar_send_message_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_lbsidecar_send_message_duration_count{inspr_app=\"${sender_name}\"}[1m])",
           "hide": false,
           "interval": "",
           "legendFormat": "lbsidecar",
@@ -156,7 +156,7 @@
             "steps": [
               {
                 "color": "green",
-               "value": null
+                "value": null
               },
               {
                 "color": "red",
@@ -173,7 +173,7 @@
         "x": 12,
         "y": 0
       },
-      "id": 18,
+      "id": 19,
       "options": {
         "legend": {
           "calcs": [],
@@ -187,21 +187,21 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "increase(inspr_lbsidecar_message_read{inspr_app=\"${receiver_name}\"}[1m])",
+          "expr": "rate(inspr_sidecar_read_message_duration_sum{inspr_app=\"${receiver_name}\"}[1m]) \n/ \nrate(inspr_sidecar_read_message_duration_count{inspr_app=\"${receiver_name}\"}[1m])",
           "interval": "",
-          "legendFormat": "lb_receiver",
+          "legendFormat": "kafka_sidecar",
           "refId": "A"
         },
         {
           "exemplar": true,
-          "expr": "increase(inspr_lbsidecar_message_send{inspr_app=\"${sender_name}\"}[1m])",
+          "expr": "rate(inspr_lbsidecar_read_message_duration_sum{inspr_app=\"${receiver_name}\"}[1m]) \n/ \nrate(inspr_lbsidecar_read_message_duration_count{inspr_app=\"${receiver_name}\"}[1m])",
           "hide": false,
           "interval": "",
-          "legendFormat": "lb_sender",
+          "legendFormat": "lbsidecar",
           "refId": "B"
         }
       ],
-      "title": "Throughput (Reads x Writes)",
+      "title": "Message read delay",
       "type": "timeseries"
     },
     {
@@ -312,7 +312,7 @@
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -350,6 +350,95 @@
         "w": 12,
         "x": 12,
         "y": 8
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "increase(inspr_lbsidecar_message_read{inspr_app=\"${receiver_name}\"}[1m])",
+          "interval": "",
+          "legendFormat": "lb_receiver",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "increase(inspr_lbsidecar_message_send{inspr_app=\"${sender_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "lb_sender",
+          "refId": "B"
+        }
+      ],
+      "title": "Throughput (Reads x Writes)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
       },
       "id": 10,
       "options": {
@@ -443,7 +532,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 24
       },
       "id": 4,
       "options": {
@@ -532,7 +621,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 27
+        "y": 35
       },
       "id": 6,
       "options": {
@@ -638,7 +727,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 42
       },
       "id": 2,
       "options": {
@@ -719,7 +808,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 42
       },
       "id": 8,
       "options": {
@@ -780,6 +869,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Inspr query board",
-  "uid": "DmC-E7Inz",
-  "version": 7
-} 
+  "uid": "8N0ge7Snk",
+  "version": 1
+}
