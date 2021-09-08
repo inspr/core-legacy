@@ -1,5 +1,12 @@
 # Changelog
 
+
+### #125 Story CORE-567 | Create custom queries for Inspr's Prometheus metrics
+- doc:
+    - added the json for the internal confluence documentation
+- misc:
+    - added a deployScript in the `bench_mark` example
+
 ### #124 Story CORE-565 | Develop sidecar throughput metrics
 - feature:
     - created constants for the channels names in the ping pong example
