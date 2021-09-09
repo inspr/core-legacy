@@ -72,13 +72,13 @@ var AdminPermissions = map[string][]string{
 	CreateChannel: {""},
 	CreateType:    {""},
 	CreateAlias:   {""},
-	CreateBroker:  {},
+	CreateBroker:  nil,
 
 	GetDapp:    {""},
 	GetChannel: {""},
 	GetType:    {""},
 	GetAlias:   {""},
-	GetBroker:  {},
+	GetBroker:  nil,
 
 	UpdateDapp:    {""},
 	UpdateChannel: {""},

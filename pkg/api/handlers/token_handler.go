@@ -99,7 +99,7 @@ func (h *Handler) InitHandler() rest.Handler {
 		}
 		load := auth.Payload{
 			RefreshURL:  os.Getenv("REFRESH_URL"),
-			Permissions: map[string][]string{"": {auth.CreateToken}},
+			Permissions: map[string][]string{auth.CreateToken: nil},
 		}
 		l.Debug("sending request to auth for initialization")
 		token, err := h.Auth.Init(res.Key, load)

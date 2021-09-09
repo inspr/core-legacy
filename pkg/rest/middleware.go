@@ -8,7 +8,6 @@ import (
 	"inspr.dev/inspr/pkg/auth"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/logs"
-	"inspr.dev/inspr/pkg/utils"
 )
 
 // CRUDHandler handles crud requests to a given resource
@@ -114,28 +113,33 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		perm := operation + ":" + target
 		logger.Info("validating permissions for request", zap.String("operation", operation), zap.String("target", target))
 
-		for scope := range payload.Permissions {
-			logger.Debug("checking permissions for scope", zap.String("token-scope", scope))
+		authScopes, allowed := payload.Permissions[perm]
+		if allowed {
+			if len(authScopes) == 0 {
+				logger.Info("permission granted for request", zap.String("request", perm))
+				h(w, r)
+				return
+			}
 
-			// usually the request will one have one scope
-			for _, rs := range reqScopes {
-				logger.Debug("comparing scope with token scope", zap.String("request-scope", rs))
-
-				if strings.HasPrefix(rs, scope) &&
-					utils.Includes(payload.Permissions[scope], perm) {
-					logger.Info("permission granted for request", zap.String("request-scope", rs), zap.String("token-scope", scope), zap.String("request", perm))
-					h(w, r)
-					return
+			for _, scope := range authScopes {
+				for _, rs := range reqScopes {
+					logger.Debug("comparing scope with permission scope", zap.String("request-scope", rs))
+					if strings.HasPrefix(rs, scope) {
+						logger.Info("permission granted for request", zap.String("request-scope", rs), zap.String("token-scope", scope), zap.String("request", perm))
+						h(w, r)
+						return
+					}
 				}
 			}
 		}
 
-		// there were no valid operations
+		// required permission unavailable
 		logger.Info("insufficient credentials, refusing request", zap.String("requested-permission", perm), zap.Strings("requested-scopes", reqScopes))
 		ERROR(
 			w,
 			ierrors.New(
-				"not enought permissions to perform request",
+				"not enought permissions to perform request: %v",
+				payload.Permissions,
 			).Forbidden(),
 		)
 	}

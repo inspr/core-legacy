@@ -57,10 +57,10 @@ func (c *Client) initAdminUser() error {
 		logger.Error("error encrypting admin user", zap.Error(err))
 		return err
 	}
-	logger.Info("requesting new token from insprd")
+	logger.Info("requesting new token from insprd", zap.Any("payload", payload))
 	token, err := c.requestNewToken(context.Background(), *payload)
 	if err != nil {
-		logger.Error("error requesting new token", zap.Error(err), zap.String("insprd-address", c.insprdAddress))
+		logger.Error("error requesting new token", zap.Any("payload", payload), zap.Error(err), zap.String("insprd-address", c.insprdAddress))
 		return err
 	}
 	os.Setenv("ADMIN_TOKEN", token)
