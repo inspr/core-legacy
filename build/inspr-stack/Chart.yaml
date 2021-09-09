@@ -26,11 +26,11 @@ dependencies:
 - name: uidp
   condition: uidp.enabled
   version: v0.1.3
-  repository: file://subcharts/uidp
+  repository: file://../uidp
 - name: insprd
   condition: insprd.enabled
   version: v0.1.3
-  repository: file://subcharts/insprd
+  repository: file://../insprd
 - name: grafana
   condition: grafana.enabled
   version: 6.1.8
