@@ -20,26 +20,48 @@ located. In this documentation we are using gcloud dns provider and we own the
 inspr.dev domain, therefore the examples will be either using these values or
 `<clusterDomain>` to reference the url owned.
 
+Before actually specifying the values for the external-dns deployment we need to
+interact with the cloud provider and create a service.account that allows the
+application to interact with the DNS records of the project. Taking as a base
+the tutorial found
+[here](http://tech.paulcz.net/kubernetes-cookbook/gcp/gcp-external-dns/) we
+decided to setup the permissions as a k8s secrets that is stored in the cluster.
 
-When using helm to install, these settings can be passed via the `--set` flag
-like the example below:
+The set of instructions that create the secret containing the values are:
+```
+$ gcloud iam service-accounts create external-dns \
+    --display-name "Service account for ExternalDNS on GCP"
 
-```bash
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
+$ gcloud projects add-iam-policy-binding <GCP_PROJECT_ID> \
+    --role='roles/dns.admin' \
+    --member='serviceAccount:external-dns@<GCP_PROJECT_ID>.iam.gserviceaccount.com'
+...
 
-$ helm install my-release \
---set provider=google \
---set clusterdomain=inspr.dev \
---set policy=sync \
---set google.project=insprlabs \
-bitnami/external-dns
+$ gcloud iam service-accounts keys create credentials.json \
+    --iam-account external-dns@<GCP_PROJECT_ID>.iam.gserviceaccount.com
 ```
 
-Another way which is a bit more pratical is to use a yaml file to specify the
-changes that you want to enforce in the external-dns installation. The
-repository for the helm chart offers a [yaml
-file](https://github.com/bitnami/charts/blob/master/bitnami/external-dns/values.yaml)
-which can be used as a base by anyone, in our case we want only a small amount
+From the `credential.json` file create we can deploy a k8s secret that stores
+the information in a safe manner.
+
+```
+$ kubectl -n external-dns-gcp create secret \
+    generic external-dns \
+  --from-file=credentials.json=credentials.json
+```
+
+**Remind yourself to delete the `credential.json` and never store it in a public
+place, it contains the permissions to interact with the dns records of your
+project.**
+
+A pratical way to install the external-dns is to use a yaml file to specify the
+changes that you want to enforce in the helm chart installation. 
+
+There are two links that provides a description of the exitent values of the
+external-dns helm chart:
+- [github](https://github.com/bitnami/charts/blob/master/bitnami/external-dns/values.yaml)
+- [artifachub](https://artifacthub.io/packages/helm/bitnami/external-dns)
+Both of them can be used as a base by anyone, in our case we want only a small amount
 of changes so the yaml content below should suffice for the installation in the
 development environment.
 
@@ -49,7 +71,7 @@ development environment.
 # contains external-dns config
 
 # allows to delete the dns registry when deleting a service
-policy: sync 
+policy: upsert-only
 
 # specifies the suffix, only will act on ingresses and services that have their
 # host/annotation ending with this domain
@@ -59,6 +81,7 @@ clusterDomain: inspr.dev
 provider: google
 google: 
     project: insprlabs
+    serviceAccountSecret: external-dns
 ```
 
 With the file defined we can just run the following command
