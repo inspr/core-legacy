@@ -1,5 +1,14 @@
 # Changelog
 
+### #127 Story CORE-572 | Permission scheme inversion
+- features:
+  - refactored auth midleware
+  -  inverted permission scheme
+  - adapted validation methods
+  - refactored cluster init flow
+  - removed unused scope headers
+--- 
+
 ### #117 Story | Inspr stack workspace initialization
 - doc:
 	- create helm installation guides to insprd, uidp and inspr-stack, with some overwrite examples
