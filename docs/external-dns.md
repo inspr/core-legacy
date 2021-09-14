@@ -57,7 +57,7 @@ project.**
 A pratical way to install the external-dns is to use a yaml file to specify the
 changes that you want to enforce in the helm chart installation.
 
-There are two links that provides a description of the exitent values of the
+There are two links that provides a description of the existent values of the
 external-dns helm chart:
 
 - [github](https://github.com/bitnami/charts/blob/master/bitnami/external-dns/values.yaml)

@@ -122,7 +122,11 @@ func TestServer_writeMessageHandler(t *testing.T) {
 					return &mockWriter{
 						writeMessage: func(channel string, message []byte) error {
 							if !reflect.DeepEqual(message, tt.message) {
-								t.Errorf("Server_writeMessageHandler message = %v, want = %v", string(message), string(tt.message))
+								t.Errorf(
+									"Server_writeMessageHandler message = %v, want = %v",
+									string(message),
+									string(tt.message),
+								)
 							}
 
 							return nil
@@ -131,13 +135,18 @@ func TestServer_writeMessageHandler(t *testing.T) {
 				}
 			}
 			s := &Server{
-				Writer: tt.writerFunc(t),
+				Writer:  tt.writerFunc(t),
+				metrics: make(map[string]channelMetric),
 			}
 			server := httptest.NewServer(s.writeMessageHandler())
 			defer server.Close()
 			client := &http.Client{}
 
-			resp, err := client.Post(fmt.Sprintf("%s/%s", server.URL, tt.channel), "application/octet-stream", bytes.NewBuffer(tt.message))
+			resp, err := client.Post(
+				fmt.Sprintf("%s/%s", server.URL, tt.channel),
+				"application/octet-stream",
+				bytes.NewBuffer(tt.message),
+			)
 			if err != nil || resp.StatusCode != http.StatusOK {
 				err = rest.UnmarshalERROR(resp.Body)
 				if (err != nil) != tt.wantErr {
@@ -224,7 +233,12 @@ func TestServer_readMessageRoutine(t *testing.T) {
 					received = true
 					channel := strings.TrimPrefix(r.URL.Path, "/")
 					if channel != tt.channel {
-						t.Errorf("Server_readMessageRoutine %v = %v , want %v", "channel", channel, tt.channel)
+						t.Errorf(
+							"Server_readMessageRoutine %v = %v , want %v",
+							"channel",
+							channel,
+							tt.channel,
+						)
 					}
 
 					decoder := json.NewDecoder(r.Body)
@@ -233,11 +247,19 @@ func TestServer_readMessageRoutine(t *testing.T) {
 					}{}
 					err := decoder.Decode(&ret)
 					if (err != nil) != tt.wantErr {
-						t.Errorf("Server_readMessageRoutine err = %v, wantErr = %v", err, tt.wantErr)
+						t.Errorf(
+							"Server_readMessageRoutine err = %v, wantErr = %v",
+							err,
+							tt.wantErr,
+						)
 					}
 
 					if !reflect.DeepEqual(ret.Message, tt.message) {
-						t.Errorf("Server_readMessageRoutine message = %v, want %v", ret.Message, tt.message)
+						t.Errorf(
+							"Server_readMessageRoutine message = %v, want %v",
+							ret.Message,
+							tt.message,
+						)
 					}
 					encoder := json.NewEncoder(w)
 					encoder.Encode(struct {
@@ -259,7 +281,11 @@ func TestServer_readMessageRoutine(t *testing.T) {
 
 			case <-ctx.Done():
 				if received == tt.wantErr {
-					t.Errorf("Server_readMessageRoutine received = %v, wantErr = %v", received, tt.wantErr)
+					t.Errorf(
+						"Server_readMessageRoutine received = %v, wantErr = %v",
+						received,
+						tt.wantErr,
+					)
 				}
 			default:
 				return
