@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/environment"
@@ -86,19 +87,28 @@ func (s *Server) channelReadMessageRoutine(
 			var err error
 			var brokerMsg []byte
 
+			//TODO Metric readTimeDuration
+			reader := time.Now()
 			brokerMsg, err = s.readWithRetry(ctx, channel)
 			if err != nil {
 				return err
 			}
+			elapsedReader := time.Since(reader)
+			s.GetMetric(channel).readTimeDuration.Observe(elapsedReader.Seconds())
 
 			logger.Debug("trying to send request to loadbalancer",
 				zap.String("channel", channel),
 				zap.Any("message", brokerMsg))
 
+			//TODO Metrica writetimeduration
+			writer := time.Now()
 			status, err := s.writeWithRetry(ctx, channel, brokerMsg)
 			if err != nil || status != http.StatusOK {
 				return err
 			}
+			elapsedWriter := time.Since(writer)
+			s.GetMetric(channel).writeTimeDuration.Observe(elapsedWriter.Seconds())
+
 			s.Reader.Commit(ctx, channel)
 		}
 	}

@@ -19,8 +19,10 @@ import (
 )
 
 type channelMetric struct {
-	messagesRead prometheus.Counter
-	messagesSent prometheus.Counter
+	messagesRead      prometheus.Counter
+	messagesSent      prometheus.Counter
+	readTimeDuration  prometheus.Summary
+	writeTimeDuration prometheus.Summary
 }
 
 // Server is a struct that contains the variables necessary
@@ -86,7 +88,7 @@ func (s *Server) GetMetric(channel string) channelMetric {
 	s.metrics[channel] = channelMetric{
 		messagesSent: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
-			Subsystem: "lbsidecar",
+			Subsystem: "sidecar",
 			Name:      "messages_sent",
 			ConstLabels: prometheus.Labels{
 				"inspr_app_id":           environment.GetInsprAppID(),
@@ -98,7 +100,7 @@ func (s *Server) GetMetric(channel string) channelMetric {
 
 		messagesRead: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
-			Subsystem: "lbsidecar",
+			Subsystem: "sidecar",
 			Name:      "messages_read",
 			ConstLabels: prometheus.Labels{
 				"inspr_app_id":           environment.GetInsprAppID(),
@@ -106,6 +108,32 @@ func (s *Server) GetMetric(channel string) channelMetric {
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
 			},
+		}),
+
+		readTimeDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "sidecar",
+			Name:      "read_message_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_app_id":           environment.GetInsprAppID(),
+				"isnpr_channel":          channel,
+				"inspr_resolved_channel": resolved,
+				"broker":                 broker,
+			},
+			Objectives: make(map[float64]float64),
+		}),
+
+		writeTimeDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "sidecar",
+			Name:      "read_message_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_app_id":           environment.GetInsprAppID(),
+				"isnpr_channel":          channel,
+				"inspr_resolved_channel": resolved,
+				"broker":                 broker,
+			},
+			Objectives: make(map[float64]float64),
 		}),
 	}
 
