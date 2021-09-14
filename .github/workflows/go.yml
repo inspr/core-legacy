@@ -1,6 +1,6 @@
 name: Test and coverage
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   lint:
@@ -16,7 +16,7 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
-          args: -D errcheck -D deadcode -D varcheck
+          args: -D errcheck -D deadcode -D varcheck --timeout 5m
           skip-pkg-cache: true
 
   coverage:
