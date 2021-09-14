@@ -60,7 +60,7 @@ func (c *Client) initAdminUser() error {
 	logger.Info("requesting new token from insprd", zap.Any("payload", payload))
 	token, err := c.requestNewToken(context.Background(), *payload)
 	if err != nil {
-		logger.Error("error requesting new token", zap.Any("payload", payload), zap.Error(err), zap.String("insprd-address", c.insprdAddress))
+		logger.Error("error requesting new token", zap.Error(err), zap.String("insprd-address", c.insprdAddress))
 		return err
 	}
 	os.Setenv("ADMIN_TOKEN", token)
@@ -430,7 +430,7 @@ func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
 	return nil
 }
 
-func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string, newUser User, isCreation bool) error {
+func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string, opUser User, isCreation bool) error {
 	l := logger.With(zap.String("subSection", "permission"), zap.String("operation", "check"), zap.String("user", uid))
 	requester, err := get(ctx, rdb, uid)
 	if err != nil {
@@ -443,7 +443,7 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
 
-	for newUserPermItem, newUserPermScopes := range newUser.Permissions {
+	for newUserPermItem, newUserPermScopes := range opUser.Permissions {
 		isAllowed := false
 		reqPermScopes, okPermItem := requester.Permissions[newUserPermItem]
 		_, okToken := requester.Permissions[auth.CreateToken]
