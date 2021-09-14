@@ -1,4 +1,3 @@
-
 # Steps to install the external dns in the cluster
 
 [External-DNS](https://github.com/kubernetes-sigs/external-dns) is a tool that
@@ -8,9 +7,9 @@ in your kubernetes cluster with the purporse of associating a subdomain to them.
 ### Requirements
 
 For the usage of the commands in this documentation you will need:
+
 - helm
 - domain registered in a supported domain registry, list [here](https://github.com/kubernetes-sigs/external-dns#roadmap)
-
 
 ### Installation
 
@@ -28,6 +27,7 @@ the tutorial found
 decided to setup the permissions as a k8s secrets that is stored in the cluster.
 
 The set of instructions that create the secret containing the values are:
+
 ```
 $ gcloud iam service-accounts create external-dns \
     --display-name "Service account for ExternalDNS on GCP"
@@ -55,16 +55,16 @@ place, it contains the permissions to interact with the dns records of your
 project.**
 
 A pratical way to install the external-dns is to use a yaml file to specify the
-changes that you want to enforce in the helm chart installation. 
+changes that you want to enforce in the helm chart installation.
 
 There are two links that provides a description of the exitent values of the
 external-dns helm chart:
+
 - [github](https://github.com/bitnami/charts/blob/master/bitnami/external-dns/values.yaml)
 - [artifachub](https://artifacthub.io/packages/helm/bitnami/external-dns)
-Both of them can be used as a base by anyone, in our case we want only a small amount
-of changes so the yaml content below should suffice for the installation in the
-development environment.
-
+  Both of them can be used as a base by anyone, in our case we want only a small amount
+  of changes so the yaml content below should suffice for the installation in the
+  development environment.
 
 ```yaml
 # values.yaml
@@ -79,16 +79,16 @@ clusterDomain: inspr.dev
 
 # cloud provider configuration
 provider: google
-google: 
-    project: insprlabs
-    serviceAccountSecret: external-dns
+google:
+  project: insprlabs
+  serviceAccountSecret: external-dns
 ```
 
 With the file defined we can just run the following command
+
 ```bash
 $ helm install my-release -f values.yaml bitnami/external-dns
 ```
-
 
 After the installation the external-dns should be up and running in your
 cluster, therefore we only need to deploy a service with a annotation specifying
@@ -103,17 +103,35 @@ found
 ## Usage Examples
 
 #### Simple service with annotation
+
 ```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: via-ingress.external-dns-test.<cluster_domain>
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
+---
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: nginx.external-dns-test.<cluster_domain>
   name: nginx
 spec:
   ports:
-  - port: 80
-    targetPort: 80
+    - port: 80
+      targetPort: 80
   selector:
     app: nginx
   type: LoadBalancer
@@ -132,12 +150,14 @@ spec:
         app: nginx
     spec:
       containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
+        - image: nginx
+          name: nginx
+          ports:
+            - containerPort: 80
 ```
+
 #### Ingress with hostname
+
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -145,12 +165,12 @@ metadata:
   name: nginx
 spec:
   rules:
-  - host: via-ingress.external-dns-test.<cluster_domain>
-    http:
-      paths:
-      - backend:
-          serviceName: nginx
-          servicePort: 80
+    - host: via-ingress.external-dns-test.<cluster_domain>
+      http:
+        paths:
+          - backend:
+              serviceName: nginx
+              servicePort: 80
 ---
 apiVersion: v1
 kind: Service
@@ -158,8 +178,8 @@ metadata:
   name: nginx
 spec:
   ports:
-  - port: 80
-    targetPort: 80
+    - port: 80
+      targetPort: 80
   selector:
     app: nginx
   type: LoadBalancer
@@ -178,10 +198,8 @@ spec:
         app: nginx
     spec:
       containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
+        - image: nginx
+          name: nginx
+          ports:
+            - containerPort: 80
 ```
-
-
