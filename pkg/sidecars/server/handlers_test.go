@@ -97,13 +97,13 @@ func TestServer_writeMessageHandler(t *testing.T) {
 		},
 		{
 			name:    "invalid data for marshalling",
-			channel: "chan",
+			channel: "chan2",
 			message: []byte("invalid message"),
 			wantErr: true,
 		},
 		{
 			name:    "invalid broker response",
-			channel: "chan",
+			channel: "chan3",
 			message: []byte("this is an invalid message"),
 			wantErr: true,
 			writerFunc: func(t *testing.T) models.Writer {
@@ -136,7 +136,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			}
 			s := &Server{
 				Writer:  tt.writerFunc(t),
-				metrics: make(map[string]channelMetric),
+				metrics: map[string]channelMetric{},
 			}
 			server := httptest.NewServer(s.writeMessageHandler())
 			defer server.Close()
