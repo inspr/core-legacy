@@ -3,6 +3,7 @@
 ### #128 Story CORE-563 | Develop Sidecar metrics
 - feature:
   - Added two Prometheus Summary metrics for the sidecar
+---
 
 ### #125 Story CORE-567 | Create custom queries for Inspr's Prometheus metrics
 - doc:
