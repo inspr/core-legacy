@@ -1,5 +1,13 @@
 # Changelog
 
+
+### #125 Story CORE-567 | Create custom queries for Inspr's Prometheus metrics
+- doc:
+    - added the json for the internal confluence documentation
+- misc:
+    - added a deployScript in the `bench_mark` example
+---
+
 ### #117 Story | Inspr stack workspace initialization
 - doc:
 	- create helm installation guides to insprd, uidp and inspr-stack, with some overwrite examples
