@@ -19,8 +19,8 @@ import (
 )
 
 type channelMetric struct {
-	messagesRead prometheus.Counter
-	messagesSent prometheus.Counter
+	readMessageDuration  prometheus.Summary
+	writeMessageDuration prometheus.Summary
 }
 
 // Server is a struct that contains the variables necessary
@@ -84,28 +84,27 @@ func (s *Server) GetMetric(channel string) channelMetric {
 	resolved, _ := environment.GetResolvedChannel(channel, environment.GetInputChannelsData(), environment.GetOutputChannelsData())
 	broker, _ := environment.GetChannelBroker(channel)
 	s.metrics[channel] = channelMetric{
-		messagesSent: promauto.NewCounter(prometheus.CounterOpts{
+		readMessageDuration: promauto.NewSummary(prometheus.SummaryOpts{
 			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "messages_sent",
+			Subsystem: "sidecar",
+			Name:      "read_message_duration",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
 			},
+			Objectives: map[float64]float64{},
 		}),
-
-		messagesRead: promauto.NewCounter(prometheus.CounterOpts{
+		writeMessageDuration: promauto.NewSummary(prometheus.SummaryOpts{
 			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "messages_read",
+			Subsystem: "sidecar",
+			Name:      "send_message_duration",
 			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
 				"inspr_channel":          channel,
 				"inspr_resolved_channel": resolved,
 				"broker":                 broker,
 			},
+			Objectives: map[float64]float64{},
 		}),
 	}
 
