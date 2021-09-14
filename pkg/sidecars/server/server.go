@@ -21,8 +21,9 @@ import (
 type channelMetric struct {
 	readMessageDuration  prometheus.Summary
 	writeMessageDuration prometheus.Summary
-	readTimeDuration     prometheus.Summary
-	writeTimeDuration    prometheus.Summary
+	//TODO
+	readTimeDuration  prometheus.Summary
+	writeTimeDuration prometheus.Summary
 }
 
 // Server is a struct that contains the variables necessary
@@ -109,6 +110,7 @@ func (s *Server) GetMetric(channel string) channelMetric {
 			Objectives: map[float64]float64{},
 		}),
 
+		//TODO
 		readTimeDuration: promauto.NewSummary(prometheus.SummaryOpts{
 			Namespace: "inspr",
 			Subsystem: "sidecar",
@@ -122,6 +124,7 @@ func (s *Server) GetMetric(channel string) channelMetric {
 			Objectives: make(map[float64]float64),
 		}),
 
+		//TODO
 		writeTimeDuration: promauto.NewSummary(prometheus.SummaryOpts{
 			Namespace: "inspr",
 			Subsystem: "sidecar",
