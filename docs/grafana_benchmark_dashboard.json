@@ -22,8 +22,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
-  "iteration": 1631728066805,
+  "id": 2,
+  "iteration": 1631728226985,
   "links": [],
   "panels": [
     {
@@ -584,7 +584,7 @@
               "refId": "A"
             }
           ],
-          "title": "Panel Title",
+          "title": "Kafka Reader  Steps Durations",
           "type": "timeseries"
         }
       ],
@@ -767,7 +767,7 @@
             "h": 11,
             "w": 24,
             "x": 0,
-            "y": 12
+            "y": 4
           },
           "id": 4,
           "options": {
@@ -856,7 +856,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 23
+            "y": 15
           },
           "id": 6,
           "options": {
@@ -962,7 +962,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 30
+            "y": 22
           },
           "id": 2,
           "options": {
@@ -1043,7 +1043,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 30
+            "y": 22
           },
           "id": 8,
           "options": {
