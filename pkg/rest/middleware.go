@@ -77,7 +77,7 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		logger.Info("validating request")
 		if (len(headerContent) == 0) ||
 			(!strings.HasPrefix(headerContent[0], "Bearer ")) {
-			logger.Error("invalid token received", zap.Any("header", headerContent))
+			logger.Error("invalid token received")
 			ERROR(w, ierrors.New("invalid token format").Unauthorized())
 			return
 		}
