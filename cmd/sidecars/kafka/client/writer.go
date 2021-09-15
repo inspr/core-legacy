@@ -67,8 +67,6 @@ func (writer *Writer) getProducer() *kafka.Producer {
 func (writer *Writer) WriteMessage(channel string, message []byte) error {
 	outputChan := environment.GetOutputChannelsData()
 
-	//////////////////////////////////////////////////////////////////////
-
 	startResolveChannel := time.Now()
 
 	resolvedCh, err := environment.GetResolvedChannel(channel, nil, outputChan)
@@ -78,8 +76,6 @@ func (writer *Writer) WriteMessage(channel string, message []byte) error {
 
 	elapsedResolveChannel := time.Since(startResolveChannel)
 	writer.GetMetric(channel).resolveChannelDuration.Observe(elapsedResolveChannel.Seconds())
-
-	////////////////////////////////////////////////////////////////////
 
 	startProduce := time.Now()
 
@@ -96,8 +92,6 @@ func (writer *Writer) WriteMessage(channel string, message []byte) error {
 	elapsedProduce := time.Since(startProduce)
 	writer.GetMetric(channel).produceMessageDuration.Observe(elapsedProduce.Seconds())
 
-	/////////////////////////////////////////////////////////////////////
-
 	startFlush := time.Now()
 
 	logger.Debug("flushing the producer")
@@ -107,7 +101,6 @@ func (writer *Writer) WriteMessage(channel string, message []byte) error {
 	elapsedFlush := time.Since(startFlush)
 	writer.GetMetric(channel).flushDuration.Observe(elapsedFlush.Seconds())
 
-	////////////////////////////////////////////////////////////////////
 	return nil
 }
 
