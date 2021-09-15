@@ -138,8 +138,9 @@ func (h Handler) Validate(auth auth.Auth) Handler {
 		ERROR(
 			w,
 			ierrors.New(
-				"not enought permissions to perform request: %v",
-				payload.Permissions,
+				"not enought permissions to perform request: %s on %v",
+				perm,
+				reqScopes,
 			).Forbidden(),
 		)
 	}
