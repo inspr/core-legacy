@@ -92,6 +92,7 @@ func TestWriter_WriteMessage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &Writer{
 				producer: tt.fields.producer,
+				metrics:  map[string]writerMetrics{},
 			}
 			if err := writer.WriteMessage(tt.args.channel, tt.args.message); (err != nil) != tt.wantErr {
 				t.Errorf("Writer.WriteMessage() error = %v, wantErr %v", err, tt.wantErr)

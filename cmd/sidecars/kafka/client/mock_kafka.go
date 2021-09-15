@@ -114,5 +114,10 @@ func newMockWriter() (*Writer, error) {
 		"test.mock.num.brokers": 3,
 	})
 
-	return &Writer{kProd}, nil
+	newWriter := &Writer{
+		producer: kProd,
+		metrics:  make(map[string]writerMetrics),
+	}
+
+	return newWriter, nil
 }
