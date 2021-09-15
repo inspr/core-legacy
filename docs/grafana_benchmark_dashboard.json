@@ -22,8 +22,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1631121817727,
+  "id": 1,
+  "iteration": 1631716413235,
   "links": [],
   "panels": [
     {
@@ -832,6 +832,104 @@
       ],
       "title": "mem_alloc_bytes",
       "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 50
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_kafka_sidecar_writer_flush_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/\nrate(inspr_kafka_sidecar_writer_flush_duration_count{inspr_app=\"${sender_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Flush Dur",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_kafka_sidecar_writer_produce_message_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_kafka_sidecar_writer_produce_message_duration_count{inspr_app=\"${sender_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Produce Message Dur",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_kafka_sidecar_writer_resolve_channel_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_kafka_sidecar_writer_resolve_channel_duration_count{inspr_app=\"${sender_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Resolve Channel Dur",
+          "refId": "C"
+        }
+      ],
+      "title": "Kafka Writer Steps Durations",
+      "type": "timeseries"
     }
   ],
   "refresh": false,
@@ -869,6 +967,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Inspr query board",
-  "uid": "8N0ge7Snk",
-  "version": 1
+  "uid": "qh5vPsS7k",
+  "version": 3
 }
