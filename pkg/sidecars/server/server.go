@@ -21,9 +21,6 @@ import (
 type channelMetric struct {
 	readMessageDuration  prometheus.Summary
 	writeMessageDuration prometheus.Summary
-	//TODO
-	readTimeDuration  prometheus.Summary
-	writeTimeDuration prometheus.Summary
 }
 
 // Server is a struct that contains the variables necessary
@@ -84,7 +81,11 @@ func (s *Server) GetMetric(channel string) channelMetric {
 	if ok {
 		return metric
 	}
-	resolved, _ := environment.GetResolvedChannel(channel, environment.GetInputChannelsData(), environment.GetOutputChannelsData())
+	resolved, _ := environment.GetResolvedChannel(
+		channel,
+		environment.GetInputChannelsData(),
+		environment.GetOutputChannelsData(),
+	)
 	broker, _ := environment.GetChannelBroker(channel)
 	s.metrics[channel] = channelMetric{
 		readMessageDuration: promauto.NewSummary(prometheus.SummaryOpts{
@@ -108,34 +109,6 @@ func (s *Server) GetMetric(channel string) channelMetric {
 				"broker":                 broker,
 			},
 			Objectives: map[float64]float64{},
-		}),
-
-		//TODO
-		readTimeDuration: promauto.NewSummary(prometheus.SummaryOpts{
-			Namespace: "inspr",
-			Subsystem: "sidecar",
-			Name:      "read_message_duration",
-			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
-				"isnpr_channel":          channel,
-				"inspr_resolved_channel": resolved,
-				"broker":                 broker,
-			},
-			Objectives: make(map[float64]float64),
-		}),
-
-		//TODO
-		writeTimeDuration: promauto.NewSummary(prometheus.SummaryOpts{
-			Namespace: "inspr",
-			Subsystem: "sidecar",
-			Name:      "read_message_duration",
-			ConstLabels: prometheus.Labels{
-				"inspr_app_id":           environment.GetInsprAppID(),
-				"isnpr_channel":          channel,
-				"inspr_resolved_channel": resolved,
-				"broker":                 broker,
-			},
-			Objectives: make(map[float64]float64),
 		}),
 	}
 

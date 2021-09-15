@@ -37,7 +37,11 @@ func (reader *Reader) GetMetric(channel string) ReaderMetric {
 	if ok {
 		return metric
 	}
-	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannelsData(), globalEnv.GetOutputChannelsData())
+	resolved, _ := globalEnv.GetResolvedChannel(
+		channel,
+		globalEnv.GetInputChannelsData(),
+		globalEnv.GetOutputChannelsData(),
+	)
 	broker := "kafka"
 	reader.metric[channel] = ReaderMetric{
 		readKafkaTimeDuration: promauto.NewSummary(prometheus.SummaryOpts{
@@ -86,13 +90,7 @@ func NewReader() (*Reader, error) {
 		}
 	}
 
-	logger.Debug("new reader created!")
-
-	newReader := &Reader{
-		metric: make(map[string]ReaderMetric),
-	}
-
-	return newReader, nil
+	return &reader, nil
 }
 
 // Consumers returns a Reader's consumers
