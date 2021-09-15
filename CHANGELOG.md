@@ -4,7 +4,7 @@
 - feature:
   - added metrics to the kafka reader structure
   - created GetMetric function inside reader writer
-  - added metric for the resolve channel duration
+  - added metrics for the resolve channel duration
 ---
 
 ### #127 Story CORE-572 | Permission scheme inversion
