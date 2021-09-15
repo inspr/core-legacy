@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: dapp
+
+meta:
+  name: atest
+
+spec:
+  logLevel: debug
