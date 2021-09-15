@@ -29,13 +29,13 @@ type ReaderMetric struct {
 type Reader struct {
 	consumers map[string]Consumer
 	kafkaEnv  *Environment
-	metric    map[string]ReaderMetric
+	metrics   map[string]ReaderMetric
 }
 
 func (reader *Reader) GetMetric(channel string) ReaderMetric {
-	metric, ok := reader.metric[channel]
+	metrics, ok := reader.metrics[channel]
 	if ok {
-		return metric
+		return metrics
 	}
 	resolved, _ := globalEnv.GetResolvedChannel(
 		channel,
@@ -43,7 +43,7 @@ func (reader *Reader) GetMetric(channel string) ReaderMetric {
 		globalEnv.GetOutputChannelsData(),
 	)
 	broker := "kafka"
-	reader.metric[channel] = ReaderMetric{
+	reader.metrics[channel] = ReaderMetric{
 		readKafkaTimeDuration: promauto.NewSummary(prometheus.SummaryOpts{
 			Namespace: "inspr",
 			Subsystem: "kafka",
@@ -57,7 +57,7 @@ func (reader *Reader) GetMetric(channel string) ReaderMetric {
 		}),
 	}
 
-	return reader.metric[channel]
+	return reader.metrics[channel]
 }
 
 // NewReader return a new Reader
@@ -77,7 +77,7 @@ func NewReader() (*Reader, error) {
 	}
 
 	reader.consumers = make(map[string]Consumer)
-	reader.metric = make(map[string]ReaderMetric)
+	reader.metrics = make(map[string]ReaderMetric)
 
 	logger.Debug("creating new consumer for each channel")
 	for idx, ch := range channelsList {

@@ -127,8 +127,8 @@ func TestReader_ReadMessage(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*100)
 			defer cancel()
 			reader := &Reader{
-
 				consumers: tt.fields.consumers,
+				metrics:   make(map[string]ReaderMetric),
 			}
 
 			reader.consumers[tt.uniqueChannel].(*MockConsumer).CreateMessage()
