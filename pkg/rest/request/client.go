@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"inspr.dev/inspr/pkg/utils"
 )
 
 // Encoder encodes an interface into bytes
@@ -20,7 +22,7 @@ type Decoder interface{ Decode(interface{}) error }
 // JSONDecoderGenerator generates a decoder for json encoded requests
 func JSONDecoderGenerator(r io.Reader) Decoder { return json.NewDecoder(r) }
 
-type stringSlice []string
+// type stringSlice []string
 
 // Client is a generic rest client
 type Client struct {
@@ -28,7 +30,7 @@ type Client struct {
 	baseURL          string
 	encoder          Encoder
 	decoderGenerator DecoderGenerator
-	headers          map[string]stringSlice
+	headers          map[string]utils.StringArray
 	host             string
 	auth             Authenticator
 }
@@ -107,8 +109,10 @@ func (c Client) HTTPClient(client http.Client) Client {
 // Header adds the value into the slice located by the key in the client's header map.
 func (c Client) Header(key, value string) Client {
 	if c.headers == nil {
-		c.headers = make(map[string]stringSlice)
+		c.headers = make(map[string]utils.StringArray)
 	}
-	c.headers[key] = append(c.headers[key], value)
+	if !c.headers[key].Contains(value) {
+		c.headers[key] = append(c.headers[key], value)
+	}
 	return c
 }

@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestNewClient(t *testing.T) {
@@ -306,7 +308,7 @@ func TestClient_Token(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   map[string]stringSlice
+		want   map[string]utils.StringArray
 	}{
 		{
 			name: "basic_test_Token",
@@ -316,7 +318,7 @@ func TestClient_Token(t *testing.T) {
 			args: args{
 				token: []byte("mock_token"),
 			},
-			want: map[string]stringSlice{
+			want: map[string]utils.StringArray{
 				"Authorization": {"Bearer mock_token"},
 			},
 		},
@@ -347,7 +349,7 @@ func TestClient_Header(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   map[string]stringSlice
+		want   map[string]utils.StringArray
 	}{
 		{
 			name: "header_inserted_values",
@@ -358,7 +360,7 @@ func TestClient_Header(t *testing.T) {
 				key:   "key",
 				value: "Bearer token",
 			},
-			want: map[string]stringSlice{
+			want: map[string]utils.StringArray{
 				"key": {"Bearer token"},
 			},
 		},

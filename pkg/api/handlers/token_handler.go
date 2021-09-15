@@ -44,13 +44,12 @@ func (h *Handler) ControllerRefreshHandler() rest.Handler {
 		}
 		// refresh the payload with the current permissions of the dApp
 		payload := auth.Payload{
-			UID: app.Meta.UUID,
-			Permissions: map[string][]string{
-				app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
-			},
+			UID:        app.Meta.UUID,
 			Refresh:    []byte(appQuery),
 			RefreshURL: fmt.Sprintf("http://%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
 		}
+		payload.ImportPermissionList(app.Spec.Auth.Permissions, app.Spec.Auth.Scope)
+
 		l.Debug("sucessfully refreshed token")
 		rest.JSON(w, 200, payload)
 
@@ -100,7 +99,7 @@ func (h *Handler) InitHandler() rest.Handler {
 		}
 		load := auth.Payload{
 			RefreshURL:  os.Getenv("REFRESH_URL"),
-			Permissions: map[string][]string{"": {auth.CreateToken}},
+			Permissions: map[string][]string{auth.CreateToken: nil},
 		}
 		l.Debug("sending request to auth for initialization")
 		token, err := h.Auth.Init(res.Key, load)

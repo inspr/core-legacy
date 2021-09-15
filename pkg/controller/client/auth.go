@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"inspr.dev/inspr/pkg/auth"
-	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/rest/request"
 )
 
@@ -20,10 +19,6 @@ func (ac *AuthClient) GenerateToken(ctx context.Context, payload auth.Payload) (
 	authDI := auth.JwtDO{}
 
 	reqClient := ac.reqClient
-
-	for k := range payload.Permissions {
-		*reqClient = reqClient.Header(rest.HeaderScopeKey, k)
-	}
 
 	err := reqClient.Send(ctx, "/auth", http.MethodPost, payload, &authDI)
 	if err != nil {

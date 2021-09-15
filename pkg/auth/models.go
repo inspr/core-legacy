@@ -25,6 +25,18 @@ type Payload struct {
 	RefreshURL  string              `json:"refreshurl"`
 }
 
+// ImportPermissionList converts Dapps auth permission scheme to paylod permissions
+func (pld *Payload) ImportPermissionList(permissions []string, scope string) {
+	pld.Permissions = make(map[string][]string)
+	for _, perm := range permissions {
+		if perm == CreateToken {
+			pld.Permissions[perm] = nil
+		} else {
+			pld.Permissions[perm] = []string{scope}
+		}
+	}
+}
+
 // All Permissions possible values
 const (
 	CreateDapp    string = "create:dapp"
@@ -55,29 +67,28 @@ const (
 // AdminPermissions defines all the permissions that the admin user have
 // when the cluster is initialized
 var AdminPermissions = map[string][]string{
-	"": {
-		CreateDapp,
-		CreateChannel,
-		CreateType,
-		CreateAlias,
-		CreateBroker,
 
-		GetDapp,
-		GetChannel,
-		GetType,
-		GetAlias,
-		GetBroker,
+	CreateDapp:    {""},
+	CreateChannel: {""},
+	CreateType:    {""},
+	CreateAlias:   {""},
+	CreateBroker:  nil,
 
-		UpdateDapp,
-		UpdateChannel,
-		UpdateType,
-		UpdateAlias,
+	GetDapp:    {""},
+	GetChannel: {""},
+	GetType:    {""},
+	GetAlias:   {""},
+	GetBroker:  nil,
 
-		DeleteDapp,
-		DeleteChannel,
-		DeleteType,
-		DeleteAlias,
+	UpdateDapp:    {""},
+	UpdateChannel: {""},
+	UpdateType:    {""},
+	UpdateAlias:   {""},
 
-		CreateToken,
-	},
+	DeleteDapp:    {""},
+	DeleteChannel: {""},
+	DeleteType:    {""},
+	DeleteAlias:   {""},
+
+	CreateToken: nil,
 }
