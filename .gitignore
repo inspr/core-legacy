@@ -10,7 +10,7 @@ Chart.lock
 # Files to configure installations 
 overwrite-*.yaml
 *-overwrites.yaml
-external-dns-*.yaml
+external-dns*.yaml
 
 # Custom notes for each developer
 my-notes.md

@@ -46,7 +46,7 @@ redis:
 
 ingress:
   enabled: false
-  class: "nginx"
+  class:
   host:
 
 insprd:
