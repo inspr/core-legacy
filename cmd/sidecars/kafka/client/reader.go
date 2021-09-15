@@ -2,7 +2,10 @@ package kafkasc
 
 import (
 	"context"
+	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"go.uber.org/zap"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	globalEnv "inspr.dev/inspr/pkg/environment"
@@ -18,10 +21,39 @@ type Consumer interface {
 	Close() (err error)
 }
 
+type ReaderMetric struct {
+	readKafkaTimeDuration prometheus.Summary
+}
+
 // Reader reads/commit messages from the channels defined in the env
 type Reader struct {
 	consumers map[string]Consumer
 	kafkaEnv  *Environment
+	metric    map[string]ReaderMetric
+}
+
+func (reader *Reader) GetMetric(channel string) ReaderMetric {
+	metric, ok := reader.metric[channel]
+	if ok {
+		return metric
+	}
+	resolved, _ := globalEnv.GetResolvedChannel(channel, globalEnv.GetInputChannelsData(), globalEnv.GetOutputChannelsData())
+	broker := "kafka"
+	reader.metric[channel] = ReaderMetric{
+		readKafkaTimeDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "kafka",
+			Name:      "read_kafka_time_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_channel":          channel,
+				"inspr_resolved_channel": resolved,
+				"broker":                 broker,
+			},
+			Objectives: map[float64]float64{},
+		}),
+	}
+
+	return reader.metric[channel]
 }
 
 // NewReader return a new Reader
@@ -41,6 +73,7 @@ func NewReader() (*Reader, error) {
 	}
 
 	reader.consumers = make(map[string]Consumer)
+	reader.metric = make(map[string]ReaderMetric)
 
 	logger.Debug("creating new consumer for each channel")
 	for idx, ch := range channelsList {
@@ -54,7 +87,12 @@ func NewReader() (*Reader, error) {
 	}
 
 	logger.Debug("new reader created!")
-	return &reader, nil
+
+	newReader := &Reader{
+		metric: make(map[string]ReaderMetric),
+	}
+
+	return newReader, nil
 }
 
 // Consumers returns a Reader's consumers
@@ -73,6 +111,7 @@ func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, 
 	)
 	consumer := reader.consumers[channel]
 
+	readMsg := time.Now()
 	for {
 		select {
 		case <-ctx.Done():
@@ -83,6 +122,9 @@ func (reader *Reader) ReadMessage(ctx context.Context, channel string) ([]byte, 
 			case *kafka.Message:
 				topic := *ev.TopicPartition.Topic
 				logger.Info("reading message from topic", zap.String("topic", topic))
+
+				elapsed := time.Since(readMsg)
+				reader.GetMetric(channel).readKafkaTimeDuration.Observe(elapsed.Seconds())
 
 				return ev.Value, nil
 
