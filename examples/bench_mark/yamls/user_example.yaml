@@ -1,0 +1,59 @@
+uid: tester
+password: tester
+permissions:
+  "create:token": []
+
+  "create:dapp":
+    - "atest"
+    - "btest"
+  "create:channel":
+    - "atest"
+    - "btest"
+  "create:type":
+    - "atest"
+    - "btest"
+  "create:alias":
+    - "atest"
+    - "btest"
+
+  "get:dapp":
+    - "atest"
+    - "btest"
+  "get:channel":
+    - "atest"
+    - "btest"
+  "get:type":
+    - "atest"
+    - "btest"
+  "get:alias":
+    - "atest"
+    - "btest"
+
+  "update:dapp":
+    - "atest"
+    - "btest"
+  "update:channel":
+    - "atest"
+    - "btest"
+  "update:type":
+    - "atest"
+    - "btest"
+  "update:alias":
+    - "atest"
+    - "btest"
+
+  "delete:dapp":
+    - "atest"
+    - "btest"
+  "delete:channel":
+    - "atest"
+    - "btest"
+  "delete:type":
+    - "atest"
+    - "btest"
+  "delete:alias":
+    - "atest"
+    - "btest"
+
+  "create:broker": []
+  "get:broker": []
