@@ -3,7 +3,7 @@
 ### #127 Story CORE-572 | Permission scheme inversion
 - features:
   - refactored auth midleware
-  -  inverted permission scheme
+  - inverted permission scheme
   - adapted validation methods
   - refactored cluster init flow
   - removed unused scope headers
