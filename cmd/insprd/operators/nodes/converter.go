@@ -277,13 +277,11 @@ func (no *NodeOperator) toSecret(app *meta.App) *kubeSecret {
 	}
 
 	payload := auth.Payload{
-		UID: app.Meta.UUID,
-		Permissions: map[string][]string{
-			app.Spec.Auth.Scope: app.Spec.Auth.Permissions,
-		},
+		UID:        app.Meta.UUID,
 		Refresh:    []byte(scope),
 		RefreshURL: fmt.Sprintf("http://%v/refreshController", os.Getenv("INSPR_INSPRD_ADDRESS")),
 	}
+	payload.ImportPermissionList(app.Spec.Auth.Permissions, app.Spec.Auth.Scope)
 
 	token, err := no.auth.Tokenize(payload)
 	if err != nil {

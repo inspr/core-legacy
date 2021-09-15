@@ -1,5 +1,14 @@
 # Changelog
 
+### #127 Story CORE-572 | Permission scheme inversion
+- features:
+  - refactored auth midleware
+  - inverted permission scheme
+  - adapted validation methods
+  - refactored cluster init flow
+  - removed unused scope headers
+--- 
+
 ### #128 Story CORE-563 | Develop Sidecar metrics
 - feature:
   - Added two Prometheus Summary metrics for the sidecar

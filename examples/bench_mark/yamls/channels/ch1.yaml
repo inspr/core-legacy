@@ -3,6 +3,7 @@ kind: channel
 
 meta:
   name: benchannel
+  parent: atest
 spec:
   type: bechtype
   brokerlist:

@@ -20,7 +20,6 @@ import (
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/logs"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
-	"inspr.dev/inspr/pkg/utils"
 )
 
 var logger *zap.Logger
@@ -58,7 +57,7 @@ func (c *Client) initAdminUser() error {
 		logger.Error("error encrypting admin user", zap.Error(err))
 		return err
 	}
-	logger.Info("requesting new token from insprd")
+	logger.Info("requesting new token from insprd", zap.Any("payload", payload))
 	token, err := c.requestNewToken(context.Background(), *payload)
 	if err != nil {
 		logger.Error("error requesting new token", zap.Error(err), zap.String("insprd-address", c.insprdAddress))
@@ -431,52 +430,53 @@ func delete(ctx context.Context, rdb *redis.ClusterClient, key string) error {
 	return nil
 }
 
-func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string, newUser User, isCreation bool) error {
+func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd string, opUser User, isCreation bool) error {
 	l := logger.With(zap.String("subSection", "permission"), zap.String("operation", "check"), zap.String("user", uid))
-	requestor, err := get(ctx, rdb, uid)
+	requester, err := get(ctx, rdb, uid)
 	if err != nil {
 		l.Error("error getting user", zap.Error(err))
 		return err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(requestor.Password), []byte(pwd)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(requester.Password), []byte(pwd)); err != nil {
 		l.Debug("invalid password")
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
 
-	for newUserPermissionScope, newUserPermissions := range newUser.Permissions {
+	for newUserPermItem, newUserPermScopes := range opUser.Permissions {
 		isAllowed := false
-		for requestorPermissionScope, requestorPermissions := range requestor.Permissions {
-			if isPermissionAllowed(newUserPermissionScope, requestorPermissionScope, newUserPermissions, requestorPermissions, isCreation) {
-				isAllowed = true
-				break
+		reqPermScopes, okPermItem := requester.Permissions[newUserPermItem]
+		_, okToken := requester.Permissions[auth.CreateToken]
+		if !isCreation && okToken {
+			isAllowed = true
+		} else if isCreation && okToken && okPermItem {
+			isAllowed = true
+			for _, newUserScope := range newUserPermScopes {
+				if !isScopeAllowed(newUserScope, reqPermScopes) {
+					isAllowed = false
+					break
+				}
 			}
 		}
-
 		if !isAllowed {
 			l.Debug("user unauthorized")
 			return ierrors.New(
 				"not allowed to create/delete/update a user with current permissions",
 			).Forbidden()
 		}
-
 	}
 
 	return nil
 }
 
-func isPermissionAllowed(newUserPermissionScope, requestorPermissionScope string, newUserPermissions, requestorPermissions []string, isCreation bool) bool {
-	if !metautils.IsInnerScope(requestorPermissionScope, newUserPermissionScope) {
-		return false
-	}
-
-	for _, permission := range newUserPermissions {
-		if (isCreation && !utils.Includes(requestorPermissions, permission)) || !utils.Includes(requestorPermissions, auth.CreateToken) {
-			return false
+func isScopeAllowed(newUserPermScope string, requestorPermScopes []string) bool {
+	for _, scope := range requestorPermScopes {
+		if metautils.IsInnerScope(scope, newUserPermScope) {
+			return true
 		}
 	}
 
-	return true
+	return false
 }
 
 func getEnv(name string) string {

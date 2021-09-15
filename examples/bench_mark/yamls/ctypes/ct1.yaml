@@ -3,4 +3,5 @@ kind: type
 
 meta:
   name: bechtype
+  parent: atest
 schema: yamls/ctypes/schema.avsc
