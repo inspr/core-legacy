@@ -1,5 +1,12 @@
 # Changelog
 
+### #130 Story CORE-575 | Develop metrics for the sidecar broker Reader
+- feature:
+  - added metrics to the kafka reader structure
+  - created GetMetrics function inside reader writer
+  - added metric for the resolve channel duration
+---
+
 ### #127 Story CORE-572 | Permission scheme inversion
 - features:
   - refactored auth midleware
@@ -11,7 +18,7 @@
 
 ### #128 Story CORE-563 | Develop Sidecar metrics
 - feature:
-  - Added two Prometheus Summary metrics for the sidecar
+  - added two Prometheus Summary metrics for the sidecar
 ---
 
 ### #125 Story CORE-567 | Create custom queries for Inspr's Prometheus metrics
