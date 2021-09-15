@@ -90,6 +90,7 @@ func NewReader() (*Reader, error) {
 		}
 	}
 
+	logger.Debug("new reader created!")
 	return &reader, nil
 }
 
