@@ -3,7 +3,6 @@ kind: dapp
 
 meta:
   name: bench
-  parent: atest
 spec:
   aliases:
     sender.sendch:
