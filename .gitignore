@@ -3,10 +3,6 @@
 **/*.cov
 **/*.tmp
 
-
-# Helm
-Chart.lock
-
 # Files to configure installations 
 overwrite-*.yaml
 *-overwrites.yaml
