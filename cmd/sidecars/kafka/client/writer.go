@@ -11,12 +11,9 @@ import (
 	"inspr.dev/inspr/pkg/ierrors"
 )
 
-const flushTimeout = 1000
-
 type writerMetrics struct {
 	resolveChannelDuration prometheus.Summary
 	produceMessageDuration prometheus.Summary
-	flushDuration          prometheus.Summary
 }
 
 // Writer defines an interface for writing messages
@@ -92,15 +89,6 @@ func (writer *Writer) WriteMessage(channel string, message []byte) error {
 	elapsedProduce := time.Since(startProduce)
 	writer.GetMetric(channel).produceMessageDuration.Observe(elapsedProduce.Seconds())
 
-	startFlush := time.Now()
-
-	logger.Debug("flushing the producer")
-	writer.producer.Flush(flushTimeout)
-	logger.Debug("flushed")
-
-	elapsedFlush := time.Since(startFlush)
-	writer.GetMetric(channel).flushDuration.Observe(elapsedFlush.Seconds())
-
 	return nil
 }
 
@@ -126,12 +114,17 @@ func (writer *Writer) Close() {
 	writer.producer.Close()
 }
 
+// GetMetric returns the metrics related to the writer
 func (writer *Writer) GetMetric(channel string) writerMetrics {
 	metric, ok := writer.metrics[channel]
 	if ok {
 		return metric
 	}
-	resolved, _ := environment.GetResolvedChannel(channel, environment.GetInputChannelsData(), environment.GetOutputChannelsData())
+	resolved, _ := environment.GetResolvedChannel(
+		channel,
+		environment.GetInputChannelsData(),
+		environment.GetOutputChannelsData(),
+	)
 	broker := "kafka"
 	writer.metrics[channel] = writerMetrics{
 		resolveChannelDuration: promauto.NewSummary(prometheus.SummaryOpts{
@@ -156,19 +149,7 @@ func (writer *Writer) GetMetric(channel string) writerMetrics {
 			},
 			Objectives: map[float64]float64{},
 		}),
-		flushDuration: promauto.NewSummary(prometheus.SummaryOpts{
-			Namespace: "inspr",
-			Subsystem: "kafka_sidecar_writer",
-			Name:      "flush_duration",
-			ConstLabels: prometheus.Labels{
-				"inspr_channel":          channel,
-				"inspr_resolved_channel": resolved,
-				"broker":                 broker,
-			},
-			Objectives: map[float64]float64{},
-		}),
 	}
 
 	return writer.metrics[channel]
-
 }
