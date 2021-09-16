@@ -23,7 +23,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1631802902971,
+  "iteration": 1631803463322,
   "links": [],
   "panels": [
     {
@@ -978,7 +978,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "go_gc_duration_seconds{app_id=~\"atest-bench-receiver|atest-bench-sender\"}",
+              "expr": "go_gc_duration_seconds{app_id=~\"bench-receiver|bench-sender\"}",
               "interval": "",
               "legendFormat": "",
               "refId": "A"
@@ -1081,9 +1081,9 @@
     "list": [
       {
         "current": {
-          "selected": true,
-          "text": "atest-bench-sender",
-          "value": "atest-bench-sender"
+          "selected": false,
+          "text": "bench-sender",
+          "value": "bench-sender"
         },
         "description": "name of the dapp responsible for being a sender of information",
         "error": null,
@@ -1093,19 +1093,19 @@
         "options": [
           {
             "selected": true,
-            "text": "atest-bench-sender",
-            "value": "atest-bench-sender"
+            "text": "bench-sender",
+            "value": "bench-sender"
           }
         ],
-        "query": "atest-bench-sender",
+        "query": "bench-sender",
         "skipUrlSync": false,
         "type": "textbox"
       },
       {
         "current": {
-          "selected": true,
-          "text": "atest-bench-receiver",
-          "value": "atest-bench-receiver"
+          "selected": false,
+          "text": "bench-receiver",
+          "value": "bench-receiver"
         },
         "description": "name of the dapp responsible for being a receiver of information",
         "error": null,
@@ -1115,11 +1115,11 @@
         "options": [
           {
             "selected": true,
-            "text": "atest-bench-receiver",
-            "value": "atest-bench-receiver"
+            "text": "bench-receiver",
+            "value": "bench-receiver"
           }
         ],
-        "query": "atest-bench-receiver",
+        "query": "bench-receiver",
         "skipUrlSync": false,
         "type": "textbox"
       }
@@ -1133,5 +1133,5 @@
   "timezone": "",
   "title": "Inspr query board",
   "uid": "8YckN_S7k",
-  "version": 6
+  "version": 2
 }
