@@ -3,7 +3,7 @@ kind: dapp
 
 meta:
   name: receiver
-  parent: atest.bench
+  parent: bench
 spec:
   logLevel: debug
   node:
