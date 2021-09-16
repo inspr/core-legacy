@@ -22,8 +22,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1631728226985,
+  "id": 1,
+  "iteration": 1631802902971,
   "links": [],
   "panels": [
     {
@@ -978,7 +978,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "go_gc_duration_seconds{app_id=~\"bench-receiver|bench-sender\"}",
+              "expr": "go_gc_duration_seconds{app_id=~\"atest-bench-receiver|atest-bench-sender\"}",
               "interval": "",
               "legendFormat": "",
               "refId": "A"
@@ -1080,24 +1080,48 @@
   "templating": {
     "list": [
       {
+        "current": {
+          "selected": true,
+          "text": "atest-bench-sender",
+          "value": "atest-bench-sender"
+        },
         "description": "name of the dapp responsible for being a sender of information",
         "error": null,
-        "hide": 2,
+        "hide": 0,
         "label": null,
         "name": "sender_name",
-        "query": "bench-sender",
+        "options": [
+          {
+            "selected": true,
+            "text": "atest-bench-sender",
+            "value": "atest-bench-sender"
+          }
+        ],
+        "query": "atest-bench-sender",
         "skipUrlSync": false,
-        "type": "constant"
+        "type": "textbox"
       },
       {
+        "current": {
+          "selected": true,
+          "text": "atest-bench-receiver",
+          "value": "atest-bench-receiver"
+        },
         "description": "name of the dapp responsible for being a receiver of information",
         "error": null,
-        "hide": 2,
+        "hide": 0,
         "label": null,
         "name": "receiver_name",
-        "query": "bench-receiver",
+        "options": [
+          {
+            "selected": true,
+            "text": "atest-bench-receiver",
+            "value": "atest-bench-receiver"
+          }
+        ],
+        "query": "atest-bench-receiver",
         "skipUrlSync": false,
-        "type": "constant"
+        "type": "textbox"
       }
     ]
   },
@@ -1108,6 +1132,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Inspr query board",
-  "uid": "d2oIk8Inz",
-  "version": 3
+  "uid": "8YckN_S7k",
+  "version": 6
 }
