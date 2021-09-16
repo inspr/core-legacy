@@ -1,5 +1,10 @@
 # Changelog
 
+### #131 Hot-Fix (B.M example): benchmarking dapp
+- fix:
+  - changed default bench dapp scope 
+---
+
 ### #129 Story CORE-574 | Develop metrics for the sidecar broker Writer
 - feature:
   - added metrics to the kafka writer structure
