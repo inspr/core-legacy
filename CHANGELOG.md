@@ -1,5 +1,14 @@
 # Changelog
 
+### #129 Story CORE-574 | Develop metrics for the sidecar broker Writer
+- feature:
+  - added metrics to the kafka writer structure
+  - created GetMetrics function inside kafka writer
+  - added metric for the resolve channel duration
+  - added metric for the produce message duration
+  - added metric for the flush duration
+---
+
 ### #127 Story CORE-572 | Permission scheme inversion
 - features:
   - refactored auth midleware
@@ -11,7 +20,7 @@
 
 ### #128 Story CORE-563 | Develop Sidecar metrics
 - feature:
-  - Added two Prometheus Summary metrics for the sidecar
+  - added two Prometheus Summary metrics for the sidecar
 ---
 
 ### #125 Story CORE-567 | Create custom queries for Inspr's Prometheus metrics
