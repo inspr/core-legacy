@@ -81,7 +81,11 @@ func (s *Server) GetMetric(channel string) channelMetric {
 	if ok {
 		return metric
 	}
-	resolved, _ := environment.GetResolvedChannel(channel, environment.GetInputChannelsData(), environment.GetOutputChannelsData())
+	resolved, _ := environment.GetResolvedChannel(
+		channel,
+		environment.GetInputChannelsData(),
+		environment.GetOutputChannelsData(),
+	)
 	broker, _ := environment.GetChannelBroker(channel)
 	s.metrics[channel] = channelMetric{
 		readMessageDuration: promauto.NewSummary(prometheus.SummaryOpts{

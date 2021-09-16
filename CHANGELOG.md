@@ -1,5 +1,12 @@
 # Changelog
 
+### #130 Story CORE-575 | Develop metrics for the sidecar broker Reader
+- feature:
+  - added metrics to the kafka reader structure
+  - created GetMetric function inside reader writer
+  - added metric for the resolve channel duration
+---
+
 ### #131 Hot-Fix (B.M example): benchmarking dapp
 - fix:
   - changed default bench dapp scope 

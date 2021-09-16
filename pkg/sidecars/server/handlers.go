@@ -106,6 +106,7 @@ func (s *Server) channelReadMessageRoutine(
 			if err != nil || status != http.StatusOK {
 				return err
 			}
+
 			s.Reader.Commit(ctx, channel)
 			elapsed := time.Since(start)
 			s.GetMetric(channel).readMessageDuration.Observe(elapsed.Seconds())

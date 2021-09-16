@@ -23,7 +23,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1631716413243,
+  "iteration": 1631803463322,
   "links": [],
   "panels": [
     {
@@ -504,6 +504,87 @@
             }
           ],
           "title": "Kafka Writer Steps Durations",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 2
+          },
+          "id": 30,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "inspr_kafka_read_kafka_time_duration_sum{app_name=\"receiver\"}\n/\ninspr_kafka_read_kafka_time_duration_count{app_name=\"receiver\"}",
+              "interval": "",
+              "legendFormat": "Reader kafka duration",
+              "refId": "A"
+            }
+          ],
+          "title": "Kafka Reader  Steps Durations",
           "type": "timeseries"
         }
       ],
@@ -999,24 +1080,48 @@
   "templating": {
     "list": [
       {
+        "current": {
+          "selected": false,
+          "text": "bench-sender",
+          "value": "bench-sender"
+        },
         "description": "name of the dapp responsible for being a sender of information",
         "error": null,
-        "hide": 2,
+        "hide": 0,
         "label": null,
         "name": "sender_name",
+        "options": [
+          {
+            "selected": true,
+            "text": "bench-sender",
+            "value": "bench-sender"
+          }
+        ],
         "query": "bench-sender",
         "skipUrlSync": false,
-        "type": "constant"
+        "type": "textbox"
       },
       {
+        "current": {
+          "selected": false,
+          "text": "bench-receiver",
+          "value": "bench-receiver"
+        },
         "description": "name of the dapp responsible for being a receiver of information",
         "error": null,
-        "hide": 2,
+        "hide": 0,
         "label": null,
         "name": "receiver_name",
+        "options": [
+          {
+            "selected": true,
+            "text": "bench-receiver",
+            "value": "bench-receiver"
+          }
+        ],
         "query": "bench-receiver",
         "skipUrlSync": false,
-        "type": "constant"
+        "type": "textbox"
       }
     ]
   },
@@ -1027,6 +1132,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Inspr query board",
-  "uid": "qh5vPsS7k",
-  "version": 3
+  "uid": "8YckN_S7k",
+  "version": 2
 }
