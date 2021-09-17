@@ -23,573 +23,760 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1631803463322,
+  "iteration": 1631811645811,
   "links": [],
   "panels": [
     {
-      "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "filterable": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 50
+              },
+              {
+                "color": "#EAB839",
+                "value": 80
+              },
+              {
+                "color": "green",
+                "value": 100
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Kubernetes Pod"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 267
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Alive"
+            },
+            "properties": [
+              {
+                "id": "color"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background-solid"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Write Rate"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "gradient-gauge"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Read Rate"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "basic"
+              }
+            ]
+          }
+        ]
+      },
       "gridPos": {
-        "h": 1,
+        "h": 4,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 24,
-      "panels": [
+      "id": 32,
+      "options": {
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "8.1.1",
+      "targets": [
         {
-          "datasource": null,
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "smooth",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 1
-          },
-          "id": 16,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "rate(inspr_sidecar_send_message_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_sidecar_send_message_duration_count{inspr_app=\"${sender_name}\"}[1m])",
-              "interval": "",
-              "legendFormat": "kafka_sidecar",
-              "refId": "A"
-            },
-            {
-              "exemplar": true,
-              "expr": "rate(inspr_lbsidecar_send_message_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_lbsidecar_send_message_duration_count{inspr_app=\"${sender_name}\"}[1m])",
-              "hide": false,
-              "interval": "",
-              "legendFormat": "lbsidecar",
-              "refId": "B"
-            }
-          ],
-          "title": "Message write delay",
-          "type": "timeseries"
+          "exemplar": true,
+          "expr": "rate(inspr_lbsidecar_message_read{app_id=~\"$sender_name|$receiver_name\"}[1m])",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "Read"
         },
         {
-          "datasource": null,
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "smooth",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 1
-          },
-          "id": 19,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "rate(inspr_sidecar_read_message_duration_sum{inspr_app=\"${receiver_name}\"}[1m]) \n/ \nrate(inspr_sidecar_read_message_duration_count{inspr_app=\"${receiver_name}\"}[1m])",
-              "interval": "",
-              "legendFormat": "kafka_sidecar",
-              "refId": "A"
-            },
-            {
-              "exemplar": true,
-              "expr": "rate(inspr_lbsidecar_read_message_duration_sum{inspr_app=\"${receiver_name}\"}[1m]) \n/ \nrate(inspr_lbsidecar_read_message_duration_count{inspr_app=\"${receiver_name}\"}[1m])",
-              "hide": false,
-              "interval": "",
-              "legendFormat": "lbsidecar",
-              "refId": "B"
-            }
-          ],
-          "title": "Message read delay",
-          "type": "timeseries"
+          "exemplar": true,
+          "expr": "rate(inspr_lbsidecar_message_send{app_id=~\"$sender_name|$receiver_name\"}[1m])",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "Write"
         },
         {
-          "datasource": null,
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 9
-          },
-          "id": 12,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "rate(inspr_lbsidecar_message_send{}[5m]) ",
-              "interval": "",
-              "legendFormat": "send_message",
-              "refId": "A"
-            },
-            {
-              "exemplar": true,
-              "expr": "rate(inspr_lbsidecar_message_read{}[5m])",
-              "hide": false,
-              "interval": "",
-              "legendFormat": "read_message",
-              "refId": "B"
-            }
-          ],
-          "title": "message rates",
-          "type": "timeseries"
-        },
-        {
-          "datasource": null,
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "smooth",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 9
-          },
-          "id": 18,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "increase(inspr_lbsidecar_message_read{inspr_app=\"${receiver_name}\"}[1m])",
-              "interval": "",
-              "legendFormat": "lb_receiver",
-              "refId": "A"
-            },
-            {
-              "exemplar": true,
-              "expr": "increase(inspr_lbsidecar_message_send{inspr_app=\"${sender_name}\"}[1m])",
-              "hide": false,
-              "interval": "",
-              "legendFormat": "lb_sender",
-              "refId": "B"
-            }
-          ],
-          "title": "Throughput (Reads x Writes)",
-          "type": "timeseries"
+          "exemplar": true,
+          "expr": "up{app_id=~\"$sender_name|$receiver_name\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "Up"
         }
       ],
+      "title": "Panel Title",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "app_id": true,
+              "app_name": false,
+              "app_scope": false,
+              "broker": true,
+              "inspr_app": true,
+              "inspr_channel": true,
+              "inspr_resolved_channel": true,
+              "instance": true,
+              "job": true,
+              "pod_template_hash": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "Value #Read": "Read Rate",
+              "Value #Write": "Write Rate",
+              "app_id": "",
+              "app_name": "App",
+              "app_scope": "Scope",
+              "instance": "",
+              "kubernetes_pod_name": "Kubernetes Pod",
+              "up{app_id=\"bench-receiver\", app_name=\"receiver\", app_scope=\"bench\", inspr_app=\"bench-receiver\", instance=\"10.4.3.234:16000\", job=\"kubernetes-pods\", kubernetes_pod_name=\"node-8acb8c36-0412-438b-896d-dcda4196c65b-7bd764c75f-gcpnp\", pod_template_hash=\"7bd764c75f\"}": "Alive"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 24,
+      "panels": [],
       "title": "Message Durations",
       "type": "row"
     },
     {
-      "collapsed": true,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_sidecar_send_message_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_sidecar_send_message_duration_count{inspr_app=\"${sender_name}\"}[1m])",
+          "interval": "",
+          "legendFormat": "kafka_sidecar",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_lbsidecar_send_message_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_lbsidecar_send_message_duration_count{inspr_app=\"${sender_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "lbsidecar",
+          "refId": "B"
+        }
+      ],
+      "title": "Message write delay",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_sidecar_read_message_duration_sum{inspr_app=\"${receiver_name}\"}[1m]) \n/ \nrate(inspr_sidecar_read_message_duration_count{inspr_app=\"${receiver_name}\"}[1m])",
+          "interval": "",
+          "legendFormat": "kafka_sidecar",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_lbsidecar_read_message_duration_sum{inspr_app=\"${receiver_name}\"}[1m]) \n/ \nrate(inspr_lbsidecar_read_message_duration_count{inspr_app=\"${receiver_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "lbsidecar",
+          "refId": "B"
+        }
+      ],
+      "title": "Message read delay",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_lbsidecar_message_send{}[5m]) ",
+          "interval": "",
+          "legendFormat": "send_message",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_lbsidecar_message_read{}[5m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "read_message",
+          "refId": "B"
+        }
+      ],
+      "title": "message rates",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "increase(inspr_lbsidecar_message_read{inspr_app=\"${receiver_name}\"}[1m])",
+          "interval": "",
+          "legendFormat": "lb_receiver",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "increase(inspr_lbsidecar_message_send{inspr_app=\"${sender_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "lb_sender",
+          "refId": "B"
+        }
+      ],
+      "title": "Throughput (Reads x Writes)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 1
+        "y": 21
       },
       "id": 28,
-      "panels": [
-        {
-          "datasource": null,
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "smooth",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 2
-          },
-          "id": 20,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "rate(inspr_kafka_sidecar_writer_flush_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/\nrate(inspr_kafka_sidecar_writer_flush_duration_count{inspr_app=\"${sender_name}\"}[1m])",
-              "hide": false,
-              "interval": "",
-              "legendFormat": "Flush Dur",
-              "refId": "A"
-            },
-            {
-              "exemplar": true,
-              "expr": "rate(inspr_kafka_sidecar_writer_produce_message_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_kafka_sidecar_writer_produce_message_duration_count{inspr_app=\"${sender_name}\"}[1m])",
-              "hide": false,
-              "interval": "",
-              "legendFormat": "Produce Message Dur",
-              "refId": "B"
-            },
-            {
-              "exemplar": true,
-              "expr": "rate(inspr_kafka_sidecar_writer_resolve_channel_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_kafka_sidecar_writer_resolve_channel_duration_count{inspr_app=\"${sender_name}\"}[1m])",
-              "hide": false,
-              "interval": "",
-              "legendFormat": "Resolve Channel Dur",
-              "refId": "C"
-            }
-          ],
-          "title": "Kafka Writer Steps Durations",
-          "type": "timeseries"
-        },
-        {
-          "datasource": null,
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 2
-          },
-          "id": 30,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "inspr_kafka_read_kafka_time_duration_sum{app_name=\"receiver\"}\n/\ninspr_kafka_read_kafka_time_duration_count{app_name=\"receiver\"}",
-              "interval": "",
-              "legendFormat": "Reader kafka duration",
-              "refId": "A"
-            }
-          ],
-          "title": "Kafka Reader  Steps Durations",
-          "type": "timeseries"
-        }
-      ],
+      "panels": [],
       "title": "Kafka",
       "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_kafka_sidecar_writer_flush_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/\nrate(inspr_kafka_sidecar_writer_flush_duration_count{inspr_app=\"${sender_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Flush Dur",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_kafka_sidecar_writer_produce_message_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_kafka_sidecar_writer_produce_message_duration_count{inspr_app=\"${sender_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Produce Message Dur",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_kafka_sidecar_writer_resolve_channel_duration_sum{inspr_app=\"${sender_name}\"}[1m]) \n/ \nrate(inspr_kafka_sidecar_writer_resolve_channel_duration_count{inspr_app=\"${sender_name}\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Resolve Channel Dur",
+          "refId": "C"
+        }
+      ],
+      "title": "Kafka Writer Steps Durations",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 22
+      },
+      "id": 30,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "inspr_kafka_read_kafka_time_duration_sum{app_name=\"receiver\"}\n/\ninspr_kafka_read_kafka_time_duration_count{app_name=\"receiver\"}",
+          "interval": "",
+          "legendFormat": "Reader kafka duration",
+          "refId": "A"
+        }
+      ],
+      "title": "Kafka Reader  Steps Durations",
+      "type": "timeseries"
     },
     {
       "collapsed": true,
@@ -598,7 +785,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 2
+        "y": 30
       },
       "id": 26,
       "panels": [
@@ -707,7 +894,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 31
       },
       "id": 22,
       "panels": [
@@ -1080,58 +1267,72 @@
   "templating": {
     "list": [
       {
+        "allValue": null,
         "current": {
           "selected": false,
-          "text": "bench-sender",
-          "value": "bench-sender"
+          "text": [
+            "bench-receiver"
+          ],
+          "value": [
+            "bench-receiver"
+          ]
         },
+        "datasource": null,
+        "definition": "label_values(app_id)",
         "description": "name of the dapp responsible for being a sender of information",
         "error": null,
         "hide": 0,
+        "includeAll": false,
         "label": null,
+        "multi": true,
         "name": "sender_name",
-        "options": [
-          {
-            "selected": true,
-            "text": "bench-sender",
-            "value": "bench-sender"
-          }
-        ],
-        "query": "bench-sender",
+        "options": [],
+        "query": {
+          "query": "label_values(app_id)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
         "skipUrlSync": false,
-        "type": "textbox"
+        "sort": 0,
+        "type": "query"
       },
       {
+        "allValue": null,
         "current": {
-          "selected": false,
-          "text": "bench-receiver",
-          "value": "bench-receiver"
+          "selected": true,
+          "text": "bench-sender",
+          "value": "bench-sender"
         },
+        "datasource": null,
+        "definition": "label_values(app_id)",
         "description": "name of the dapp responsible for being a receiver of information",
         "error": null,
         "hide": 0,
+        "includeAll": false,
         "label": null,
+        "multi": false,
         "name": "receiver_name",
-        "options": [
-          {
-            "selected": true,
-            "text": "bench-receiver",
-            "value": "bench-receiver"
-          }
-        ],
-        "query": "bench-receiver",
+        "options": [],
+        "query": {
+          "query": "label_values(app_id)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
         "skipUrlSync": false,
-        "type": "textbox"
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Inspr query board",
-  "uid": "8YckN_S7k",
-  "version": 2
+  "uid": "vEzJFlInk",
+  "version": 3
 }
