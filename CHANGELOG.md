@@ -1,5 +1,12 @@
 # Changelog
 
+### #133 Feature Grafana dashboards | Automatically create becnhmark dashboard on grafana deploy
+- feature:
+  - Added support for custom dashboards in grafana values
+  - Added dashboard config map
+  - Moved dashboard file to the helm chart
+---
+
 ### #130 Story CORE-575 | Develop metrics for the sidecar broker Reader
 - feature:
   - added metrics to the kafka reader structure

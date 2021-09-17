@@ -112,5 +112,13 @@ prometheus:
   
 grafana:
   enabled: true
+
+  dashboardsProvider:
+    enabled: true
+
+  dashboardsConfigMaps:
+    - configMapName: inspr-stack-benchmark-configmap
+      fileName: benchmark-dashboard.json
+
   datasources:
     secretName: "inspr-stack-grafana-data-source"
