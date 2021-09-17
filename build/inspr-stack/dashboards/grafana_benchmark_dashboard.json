@@ -22,8 +22,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
-  "iteration": 1631811645811,
+  "id": 2,
+  "iteration": 1631892458771,
   "links": [],
   "panels": [
     {
@@ -1260,7 +1260,7 @@
       "type": "row"
     }
   ],
-  "refresh": false,
+  "refresh": "5m",
   "schemaVersion": 30,
   "style": "dark",
   "tags": [],
@@ -1269,13 +1269,9 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
-          "text": [
-            "bench-receiver"
-          ],
-          "value": [
-            "bench-receiver"
-          ]
+          "selected": true,
+          "text": "bench-sender",
+          "value": "bench-sender"
         },
         "datasource": null,
         "definition": "label_values(app_id)",
@@ -1284,7 +1280,7 @@
         "hide": 0,
         "includeAll": false,
         "label": null,
-        "multi": true,
+        "multi": false,
         "name": "sender_name",
         "options": [],
         "query": {
@@ -1301,8 +1297,8 @@
         "allValue": null,
         "current": {
           "selected": true,
-          "text": "bench-sender",
-          "value": "bench-sender"
+          "text": "bench-receiver",
+          "value": "bench-receiver"
         },
         "datasource": null,
         "definition": "label_values(app_id)",
@@ -1327,12 +1323,12 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Inspr query board",
   "uid": "vEzJFlInk",
-  "version": 3
+  "version": 1
 }
