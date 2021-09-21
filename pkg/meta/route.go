@@ -4,8 +4,8 @@ import (
 	"inspr.dev/inspr/pkg/utils"
 )
 
-// Route is an Inspr component that represents a route,
-// which is a http request address related to the endpoints
+// Route is an Inspr component that represents a route.
+// Endpoints is a list of allowed endpoints on regarding the route
 type Route struct {
 	Meta      Metadata          `yaml:"meta,omitempty" json:"meta"`
 	Endpoints utils.StringArray `yaml:"endpoints,omitempty"  json:"endpoints"`
