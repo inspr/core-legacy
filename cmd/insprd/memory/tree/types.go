@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"github.com/linkedin/goavro"
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
@@ -38,6 +39,12 @@ func (tmm *TypeMemoryManager) Create(scope string, insprType *meta.Type) error {
 	err := utils.StructureNameIsValid(insprType.Meta.Name)
 	if err != nil {
 		l.Error("invalid Type name")
+		return err
+	}
+
+	err = validAvroSchema(insprType.Schema)
+	if err != nil {
+		l.Error("invalid Type schema")
 		return err
 	}
 
@@ -220,4 +227,12 @@ func (trg *TypePermTreeGetter) Get(scope, name string) (*meta.Type, error) {
 	l.Info("unable to get Type in given scope (root-tree)")
 
 	return nil, ierrors.New("Type not found for given query on root").NotFound()
+}
+
+func validAvroSchema(schema string) error {
+	_, err := goavro.NewCodec(schema)
+	if err != nil {
+		return ierrors.Wrap(err, "invalid avro schema")
+	}
+	return nil
 }

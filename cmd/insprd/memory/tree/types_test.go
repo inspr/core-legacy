@@ -164,6 +164,30 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 		want    *meta.Type
 	}{
 		{
+			name: "Trying to create a new Type with invalid schema",
+			fields: fields{
+				root:   getMockTypes(),
+				appErr: nil,
+				mockA:  true,
+				mockC:  true,
+				mockCT: false,
+			},
+			args: args{
+				ct: &meta.Type{
+					Meta: meta.Metadata{
+						Name:        "ct7",
+						Reference:   "ct1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						UUID:        "",
+					},
+					Schema: "",
+				},
+				context: "",
+			},
+			wantErr: true,
+		},
+		{
 			name: "Creating a new Type on a valid app",
 			fields: fields{
 				root:   getMockTypes(),
@@ -181,7 +205,7 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 						Parent:      "",
 						UUID:        "",
 					},
-					Schema: "",
+					Schema: "{\"type\":\"string\"}",
 				},
 				context: "",
 			},
@@ -194,7 +218,7 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 					Parent:      "",
 					UUID:        "",
 				},
-				Schema: "",
+				Schema: "{\"type\":\"string\"}",
 			},
 		},
 		{
@@ -215,7 +239,7 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 						Parent:      "",
 						UUID:        "",
 					},
-					Schema: "",
+					Schema: "{\"type\":\"string\"}",
 				},
 				context: "",
 			},
@@ -249,7 +273,7 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 						Parent:      "",
 						UUID:        "",
 					},
-					Schema: "",
+					Schema: "{\"type\":\"string\"}",
 				},
 				context: "invalid.context",
 			},
@@ -274,7 +298,7 @@ func TestTypeMemoryManager_Create(t *testing.T) {
 						Parent:      "",
 						UUID:        "",
 					},
-					Schema: "",
+					Schema: "{\"type\":\"string\"}",
 				},
 				context: "",
 			},
