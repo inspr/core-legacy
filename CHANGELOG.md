@@ -1,5 +1,10 @@
 # Changelog
 
+### #136 Bug CORE-578 | Deploying Types without schemas
+- fix:
+    - implemented type scheme validation according to avro and Json rules 
+---
+
 ### #133 Feature Grafana dashboards | Automatically create becnhmark dashboard on grafana deploy
 - feature:
   - Added support for custom dashboards in grafana values
