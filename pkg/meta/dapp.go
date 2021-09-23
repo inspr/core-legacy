@@ -28,7 +28,7 @@ type NodeSpec struct {
 	RestartPolicy string               `yaml:"restartPolicy,omitempty" json:"restartPolicy"`
 	Environment   utils.EnvironmentMap `yaml:"environment,omitempty" json:"environment"`
 	SidecarPort   SidecarPort          `yaml:"sidecarPort,omitempty" json:"sidecarPort"`
-	Route         Route                `yaml:"route,omitempty" json:"route"`
+	Endpoints     utils.StringArray    `yaml:"endpoints,omitempty"  json:"endpoints"`
 }
 
 // App is an inspr component that represents an dApp. An App can contain other apps, channels and other components.
