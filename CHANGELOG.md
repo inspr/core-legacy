@@ -2,14 +2,21 @@
 
 ### #136 Bug CORE-578 | Deploying Types without schemas
 - fix:
-    - implemented type scheme validation according to avro and Json rules 
+    - implemented type scheme validation according to avro and Json rules
+---
+
+### #135 Story CORE-580 | Create Route structure on the Node definition
+- feature:
+  - created Route structure on the `pkg/meta`
+  - added route structure to the NodeSpec structure
+  - added route connection map to the AppSpec structure
 ---
 
 ### #133 Feature Grafana dashboards | Automatically create becnhmark dashboard on grafana deploy
 - feature:
-  - Added support for custom dashboards in grafana values
-  - Added dashboard config map
-  - Moved dashboard file to the helm chart
+  - added support for custom dashboards in grafana values
+  - added dashboard config map
+  - moved dashboard file to the helm chart
 ---
 
 ### #130 Story CORE-575 | Develop metrics for the sidecar broker Reader
