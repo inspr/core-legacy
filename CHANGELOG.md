@@ -1,5 +1,10 @@
 # Changelog
 
+### #136 Bug CORE-578 | Deploying Types without schemas
+- fix:
+    - implemented type scheme validation according to avro and Json rules
+---
+
 ### #135 Story CORE-580 | Create Route structure on the Node definition
 - feature:
   - created Route structure on the `pkg/meta`

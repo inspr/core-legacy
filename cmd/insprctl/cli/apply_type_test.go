@@ -23,8 +23,20 @@ func createSchema() string {
 
 func TestNewApplyType(t *testing.T) {
 	prepareToken(t)
-	chanTypeWithoutNameBytes, _ := yaml.Marshal(meta.Type{})
-	chanTypeDefaultBytes, _ := yaml.Marshal(meta.Type{Meta: meta.Metadata{Name: "mock"}})
+	typeWithoutNameBytes, _ := yaml.Marshal(meta.Type{
+		Schema: "{\"type\":\"string\"}",
+	})
+	typeWithoutSchema, _ := yaml.Marshal(meta.Type{
+		Meta: meta.Metadata{
+			Name: "mock",
+		},
+	})
+	typeDefaultBytes, _ := yaml.Marshal(meta.Type{
+		Meta: meta.Metadata{
+			Name: "mock",
+		},
+		Schema: "{\"type\":\"string\"}",
+	})
 	type args struct {
 		b []byte
 	}
@@ -36,21 +48,28 @@ func TestNewApplyType(t *testing.T) {
 		{
 			name: "default_test",
 			args: args{
-				b: chanTypeDefaultBytes,
+				b: typeDefaultBytes,
 			},
 			want: nil,
 		},
 		{
 			name: "type_without_name",
 			args: args{
-				b: chanTypeWithoutNameBytes,
+				b: typeWithoutNameBytes,
 			},
 			want: ierrors.New("type without name"),
 		},
 		{
+			name: "invalid scheme type",
+			args: args{
+				b: typeWithoutSchema,
+			},
+			want: ierrors.New("invalid type schema"),
+		},
+		{
 			name: "error_testing",
 			args: args{
-				b: chanTypeDefaultBytes,
+				b: typeDefaultBytes,
 			},
 			want: errors.New("new error"),
 		},
