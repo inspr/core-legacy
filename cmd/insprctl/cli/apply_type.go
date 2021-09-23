@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -44,8 +43,6 @@ func NewApplyType() RunMethod {
 		} else if !IsJSON(insprType.Schema) {
 			return ierrors.New("invalid type schema")
 		}
-
-		fmt.Println(insprType.Schema)
 
 		flagDryRun := cmd.InsprOptions.DryRun
 		flagIsUpdate := cmd.InsprOptions.Update
