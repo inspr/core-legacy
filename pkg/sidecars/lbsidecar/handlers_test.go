@@ -25,7 +25,7 @@ func createMockedServer(port, ch string, msg interface{}) *httptest.Server {
 
 	ts := httptest.NewUnstartedServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			channel := strings.TrimPrefix(r.URL.Path, "/")
+			channel := strings.TrimPrefix(r.URL.Path, "/channel/")
 
 			var receivedData models.BrokerMessage
 			json.NewDecoder(r.Body).Decode(&receivedData)
@@ -117,7 +117,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 
 			buf, _ := json.Marshal(tt.msg)
 			reqInfo, _ := http.NewRequest(http.MethodPost,
-				wServer.URL+"/"+tt.channel,
+				wServer.URL+"/channel/"+tt.channel,
 				bytes.NewBuffer(buf))
 
 			resp, err := req.Do(reqInfo)
@@ -216,7 +216,7 @@ func TestServer_readMessageHandler(t *testing.T) {
 				return
 			}
 			reqInfo, _ := http.NewRequest(http.MethodPost,
-				rServer.URL+"/"+tt.channel,
+				rServer.URL+"/channel/"+tt.channel,
 				bytes.NewBuffer(buf))
 
 			resp, err := req.Do(reqInfo)
