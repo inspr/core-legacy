@@ -270,9 +270,10 @@ func attachRoutes(app *meta.App) {
 			nodes++
 			if child.Spec.Node.Spec.Endpoints.Len() > 0 {
 				routes[name] = &meta.RouteConnection{
-					Address: child.Spec.Node.Meta.UUID,
+					Address:   child.Spec.Node.Meta.UUID,
+					Endpoints: make(utils.StringArray, 0),
 				}
-				copy(routes[name].Endpoints, child.Spec.Node.Spec.Endpoints)
+				routes[name].Endpoints = append(routes[name].Endpoints, child.Spec.Node.Spec.Endpoints...)
 			}
 		}
 	}
@@ -287,10 +288,15 @@ func resolveRoutes(app *meta.App) {
 		if child.Spec.Node.Meta.UUID != "" {
 			for route, data := range app.Spec.Routes {
 				if route != name {
-					child.Spec.Routes[route] = &meta.RouteConnection{
-						Address: data.Address,
+					if child.Spec.Routes == nil {
+						child.Spec.Routes = make(map[string]*meta.RouteConnection)
 					}
-					copy(child.Spec.Routes[route].Endpoints, data.Endpoints)
+					child.Spec.Routes[route] = &meta.RouteConnection{
+						Address:   data.Address,
+						Endpoints: make(utils.StringArray, 0),
+					}
+					child.Spec.Routes[route].Endpoints =
+						append(child.Spec.Routes[route].Endpoints, data.Endpoints...)
 				}
 			}
 		}
