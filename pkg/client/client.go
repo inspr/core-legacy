@@ -61,7 +61,7 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface
 	l.Debug("sending message to load balancer")
 	err := c.client.Send(
 		ctx,
-		"/"+channel,
+		"/channel/"+channel,
 		http.MethodPost,
 		data,
 		&resp)
@@ -75,7 +75,7 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface
 
 // HandleChannel handles messages received in a given channel.
 func (c *Client) HandleChannel(channel string, handler func(ctx context.Context, body io.Reader) error) {
-	c.mux.HandleFunc("/"+channel, func(w http.ResponseWriter, r *http.Request) {
+	c.mux.HandleFunc("/channel/"+channel, func(w http.ResponseWriter, r *http.Request) {
 		l := logger.With(zap.String("operation", "write"), zap.String("channel", channel))
 		// user defined handler. Returns error if the user wants to return it
 		l.Info("received read message request")

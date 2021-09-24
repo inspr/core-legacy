@@ -22,9 +22,8 @@ func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
-		logger.Info("handling message write")
-
-		channel := strings.TrimPrefix(r.URL.Path, "/")
+		channel := strings.TrimPrefix(r.URL.Path, "/channel/")
+		logger.Info("handling message write on " + channel)
 
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -137,7 +136,7 @@ func (s *Server) writeWithRetry(
 ) (status int, err error) {
 	var resp *http.Response
 	for i := 0; i <= maxBrokerRetries; i++ {
-		writeAddr := fmt.Sprintf("%s/%s", s.outAddr, channel)
+		writeAddr := fmt.Sprintf("%s/channel/%s", s.outAddr, channel)
 		logger.Debug("writing with retry",
 			zap.Any("addr", writeAddr),
 			zap.Any("write conter", i))

@@ -137,7 +137,7 @@ func (s *Server) Run(ctx context.Context) error {
 		Addr:    "0.0.0.0:16001",
 	}
 	go func() {
-		logger.Info("admin server listening at localhos:16001")
+		logger.Info("admin server listening at localhost:16001")
 		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
 			logger.Error("an error occurred in LB Sidecar write server",
