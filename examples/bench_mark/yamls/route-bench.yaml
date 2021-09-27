@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: dapp
+
+meta:
+  name: bench
+spec:
+  aliases:
+    sender.sendch:
+      target: benchannel
+    receiver.receivech:
+      target: benchannel
+  boundary:
+    input:
+      - benchannel
+    output:
+      - benchannel
+  apps:
+    sender:
+      meta:
+        name: sender
+        parent: bench
+      spec:
+        logLevel: debug
+        node:
+          spec:
+            replicas: 1
+            image: gcr.io/insprlabs/inspr/example/sender:latest
+        boundary:
+          output:
+            - sendch
+    receiver:
+      meta:
+        name: receiver
+        parent: bench
+      spec:
+        logLevel: debug
+        node:
+          spec:
+            replicas: 1
+            image: gcr.io/insprlabs/inspr/example/receiver:latest
+            endpoints:
+              - edp1
+              - edp2
+        boundary:
+          input:
+            - receivech
+
+
