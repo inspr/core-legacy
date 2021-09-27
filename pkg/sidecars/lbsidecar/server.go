@@ -153,12 +153,12 @@ func (s *Server) Run(ctx context.Context) error {
 		}
 	}()
 
-	mux := http.NewServeMux()
+	muxWriter := http.NewServeMux()
 
-	mux.Handle("/channel/", s.writeMessageHandler().Post().JSON())
+	muxWriter.Handle("/channel/", s.writeMessageHandler().Post().JSON())
 
 	writeServer := &http.Server{
-		Handler: mux,
+		Handler: muxWriter,
 		Addr:    s.writeAddr,
 	}
 	go func() {
@@ -169,8 +169,12 @@ func (s *Server) Run(ctx context.Context) error {
 		}
 	}()
 
+	muxReader := http.NewServeMux()
+
+	muxReader.Handle("/channel/", s.readMessageHandler().Post().JSON())
+
 	readServer := &http.Server{
-		Handler: s.readMessageHandler().Post().JSON(),
+		Handler: muxReader,
 		Addr:    s.readAddr,
 	}
 	go func() {
