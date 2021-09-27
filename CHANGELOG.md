@@ -1,5 +1,13 @@
 # Changelog
 
+### #138 Story CORE-581 | [BETA] Create a function to resolve Routes
+- features:
+  - resolution for routes on compound dApp structures.
+  - deployment of route data on lb sidecar for rerouting.
+- fix:
+  - simplified node's route structure.
+---
+
 ### #136 Bug CORE-578 | Deploying Types without schemas
 - fix:
     - implemented type scheme validation according to avro and Json rules
