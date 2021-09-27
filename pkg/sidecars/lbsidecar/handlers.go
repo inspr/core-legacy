@@ -30,9 +30,10 @@ func init() {
 func (s *Server) writeMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		logger.Info("handling message write")
 
-		channel := strings.TrimPrefix(r.URL.Path, "/")
+		channel := strings.TrimPrefix(r.URL.Path, "/channel/")
+		logger.Info("handling message write on " + channel)
+
 		if !environment.OutputChannelList().Contains(channel) {
 			logger.Error(fmt.Sprintf("channel %s not found in output channel list", channel))
 
@@ -56,7 +57,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		sidecarAddress := environment.GetBrokerSpecificSidecarAddr(channelBroker)
 		sidecarWritePort := environment.GetBrokerWritePort(channelBroker)
 
-		reqAddress := fmt.Sprintf("%s:%s/%s", sidecarAddress, sidecarWritePort, channel)
+		reqAddress := fmt.Sprintf("%s:%s/channel/%s", sidecarAddress, sidecarWritePort, channel)
 
 		logger.Debug("encoding message to Avro schema")
 
@@ -96,9 +97,9 @@ func (s *Server) writeMessageHandler() rest.Handler {
 func (s *Server) readMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		logger.Info("handling message read")
 
-		channel := strings.TrimPrefix(r.URL.Path, "/")
+		channel := strings.TrimPrefix(r.URL.Path, "/channel/")
+		logger.Info("handling message read on " + channel)
 
 		if !environment.InputChannelList().Contains(channel) {
 			logger.Error("channel " + channel + " not found in input channel list")
@@ -135,7 +136,7 @@ func (s *Server) readMessageHandler() rest.Handler {
 		logger.Info("sending message to node through: ",
 			zap.String("channel", channel), zap.String("node port", clientReadPort))
 
-		reqAddress := fmt.Sprintf("http://localhost:%v/%v", clientReadPort, channel)
+		reqAddress := fmt.Sprintf("http://localhost:%v/channel/%v", clientReadPort, channel)
 
 		resp, err := sendRequest(reqAddress, decodedMsg)
 		if err != nil {

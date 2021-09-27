@@ -171,7 +171,7 @@ func TestClient_WriteMessage(t *testing.T) {
 			if tt.cancelContext {
 				handler = mockHandlerFuncTimeout()
 			} else {
-				handler = mockHandlerFunc("/chan1", tt.args)
+				handler = mockHandlerFunc("/channel/chan1", tt.args)
 			}
 
 			s := httptest.NewServer(http.HandlerFunc(handler))
@@ -282,7 +282,7 @@ func TestClient_HandleChannel(t *testing.T) {
 			}{}
 			err := client.Send(
 				context.Background(),
-				tt.args.channel,
+				"/channel/"+tt.args.channel,
 				http.MethodPost,
 				struct{ Message interface{} }{tt.message},
 				&response)
@@ -353,7 +353,7 @@ func TestClient_Run(t *testing.T) {
 				errch <- client.Run(ctx)
 			}()
 
-			c := request.NewJSONClient("http://localhost:3304")
+			c := request.NewJSONClient("http://localhost:3304/channel")
 			var response struct {
 				Status string `json:"status"`
 			}

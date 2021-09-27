@@ -7,9 +7,18 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"os"
 
+	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/logs"
 )
+
+var logger *zap.Logger
+
+func init() {
+	logger, _ = logs.Logger(zap.Fields(zap.String("section", "sidecar-client"), zap.String("dapp-name", os.Getenv("INSPR_APP_ID"))))
+}
 
 const (
 	// DefaultHost is the the standard hostname, it is used in requests made by
@@ -45,6 +54,8 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 		c.routeToURL(route),
 		bytes.NewBuffer(buf),
 	)
+
+	logger.Debug("Sending request to:" + c.routeToURL(route))
 
 	if err != nil {
 		return ierrors.Wrap(err, "error creating request")

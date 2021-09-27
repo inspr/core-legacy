@@ -145,7 +145,7 @@ func (s *Server) Run(ctx context.Context) error {
 		Addr:    "0.0.0.0:16000",
 	}
 	go func() {
-		logger.Info("admin server listening at localhos:16000")
+		logger.Info("admin server listening at localhost:16000")
 		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
 			logger.Error("an error occurred in LB Sidecar write server",
@@ -153,12 +153,12 @@ func (s *Server) Run(ctx context.Context) error {
 		}
 	}()
 
-	mux := http.NewServeMux()
+	muxWriter := http.NewServeMux()
 
-	mux.Handle("/", s.writeMessageHandler().Post().JSON())
+	muxWriter.Handle("/channel/", s.writeMessageHandler().Post().JSON())
 
 	writeServer := &http.Server{
-		Handler: mux,
+		Handler: muxWriter,
 		Addr:    s.writeAddr,
 	}
 	go func() {
@@ -169,8 +169,12 @@ func (s *Server) Run(ctx context.Context) error {
 		}
 	}()
 
+	muxReader := http.NewServeMux()
+
+	muxReader.Handle("/channel/", s.readMessageHandler().Post().JSON())
+
 	readServer := &http.Server{
-		Handler: s.readMessageHandler().Post().JSON(),
+		Handler: muxReader,
 		Addr:    s.readAddr,
 	}
 	go func() {

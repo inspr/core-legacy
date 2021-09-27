@@ -143,7 +143,7 @@ func TestServer_writeMessageHandler(t *testing.T) {
 			client := &http.Client{}
 
 			resp, err := client.Post(
-				fmt.Sprintf("%s/%s", server.URL, tt.channel),
+				fmt.Sprintf("%s/channel/%s", server.URL, tt.channel),
 				"application/octet-stream",
 				bytes.NewBuffer(tt.message),
 			)
