@@ -5,14 +5,15 @@ with open("README.md", "r") as fh:
 
 setup(
     name="inspr",
-    version="0.0.2",
+    version="0.0.11",
     author="Inspr LLC",
     description="This module define APIs to interact with the Inspr environment",
     long_description=long_description,      # Long description read from the the readme file
     long_description_content_type="text/markdown",
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     packages=[
         "inspr",
+        "inspr.controller"
     ],
     requires=[
         "requests",
