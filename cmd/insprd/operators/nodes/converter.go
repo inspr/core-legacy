@@ -130,6 +130,7 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 		"",
 		no.withLBSidecarImage(app),
 		no.withBoundary(app, usePermTree),
+		no.withRoutes(app),
 		withLBSidecarPorts(app),
 		withLBSidecarConfiguration(),
 		k8s.ContainerWithEnv(sidecarAddrs...),
@@ -144,6 +145,18 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 	containers = append(containers, lbSidecar)
 
 	return containers
+}
+
+func (no *NodeOperator) withRoutes(app *meta.App) k8s.ContainerOption {
+	return func(c *corev1.Container) {
+		env := make(utils.EnvironmentMap)
+		for route, data := range app.Spec.Routes {
+			raw := "node-" + data.Address + ";"
+			raw = raw + data.Endpoints.Join(";")
+			env[route+"_ROUTE"] = raw
+		}
+		c.Env = append(c.Env, env.ParseToK8sArrEnv()...)
+	}
 }
 
 func (no *NodeOperator) getAllSidecarBrokers(app *meta.App, usePermTree bool) utils.StringArray {

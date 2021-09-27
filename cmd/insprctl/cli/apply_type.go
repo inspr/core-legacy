@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"os"
@@ -39,6 +40,8 @@ func NewApplyType() RunMethod {
 			if err != nil {
 				return err
 			}
+		} else if !IsJSON(insprType.Schema) {
+			return ierrors.New("invalid type schema")
 		}
 
 		flagDryRun := cmd.InsprOptions.DryRun
@@ -93,4 +96,9 @@ func injectedSchema(path string) (string, error) {
 	schema := string(file)
 
 	return schema, nil
+}
+
+func IsJSON(str string) bool {
+	var js json.RawMessage
+	return json.Unmarshal([]byte(str), &js) == nil
 }

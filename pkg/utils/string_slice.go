@@ -115,6 +115,19 @@ func (c StringArray) Contains(item string) bool {
 	return Includes(c, item)
 }
 
+//Equal compares two StringArrays and returns true if both have all of the same items
+func (c StringArray) Equal(other StringArray) bool {
+	if len(c) != len(other) {
+		return false
+	}
+	for _, item := range c {
+		if !other.Contains(item) {
+			return false
+		}
+	}
+	return true
+}
+
 // Join joins a string array with a given separator, returning the string generated
 func (c StringArray) Join(sep string) string {
 	return strings.Join(c, sep)

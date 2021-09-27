@@ -28,6 +28,7 @@ type NodeSpec struct {
 	RestartPolicy string               `yaml:"restartPolicy,omitempty" json:"restartPolicy"`
 	Environment   utils.EnvironmentMap `yaml:"environment,omitempty" json:"environment"`
 	SidecarPort   SidecarPort          `yaml:"sidecarPort,omitempty" json:"sidecarPort"`
+	Endpoints     utils.StringArray    `yaml:"endpoints,omitempty"  json:"endpoints"`
 }
 
 // App is an inspr component that represents an dApp. An App can contain other apps, channels and other components.
@@ -47,14 +48,15 @@ type AppBoundary struct {
 //
 // The boundary represent the possible connections to other apps, and the fields that can be overriten when instantiating the app.
 type AppSpec struct {
-	Node     Node                `yaml:"node,omitempty"   json:"node"`
-	Apps     map[string]*App     `yaml:"apps,omitempty"   json:"apps"`
-	Channels map[string]*Channel `yaml:"channels,omitempty"   json:"channels"`
-	Types    map[string]*Type    `yaml:"types,omitempty"   json:"types"`
-	Aliases  map[string]*Alias   `yaml:"aliases"   json:"aliases"`
-	Boundary AppBoundary         `yaml:"boundary,omitempty"   json:"boundary"`
-	Auth     AppAuth             `yaml:"auth"  json:"auth"`
-	LogLevel string              `yaml:"logLevel" json:"logLevel"`
+	Node     Node                        `yaml:"node,omitempty"   json:"node"`
+	Apps     map[string]*App             `yaml:"apps,omitempty"   json:"apps"`
+	Channels map[string]*Channel         `yaml:"channels,omitempty"   json:"channels"`
+	Types    map[string]*Type            `yaml:"types,omitempty"   json:"types"`
+	Aliases  map[string]*Alias           `yaml:"aliases"   json:"aliases"`
+	Boundary AppBoundary                 `yaml:"boundary,omitempty"   json:"boundary"`
+	Auth     AppAuth                     `yaml:"auth"  json:"auth"`
+	LogLevel string                      `yaml:"logLevel" json:"logLevel"`
+	Routes   map[string]*RouteConnection `yaml:"routes,omitempty" json:"routes"`
 }
 
 // AppAuth represents the permissions that a dApp (and its children) contains
