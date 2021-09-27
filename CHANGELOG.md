@@ -1,5 +1,16 @@
 # Changelog
 
+### #137 Story CORE-579 | Change lb-sidecars channel resolution to account for the '/channel' that will now be required
+- feature:
+  - server now watching just for the "/channel" prefix
+  - added "/channel" prefix when handling a channel
+  - added "/channel" prefix when writing a message
+- fix:
+  - fix python import module bug
+  - update/fix lb sidecar tests due to the change above
+  - update some logs in lb sidecar
+---
+
 ### #133 Feature Grafana dashboards | Automatically create becnhmark dashboard on grafana deploy
 - feature:
   - Added support for custom dashboards in grafana values
