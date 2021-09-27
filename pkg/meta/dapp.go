@@ -28,7 +28,7 @@ type NodeSpec struct {
 	RestartPolicy string               `yaml:"restartPolicy,omitempty" json:"restartPolicy"`
 	Environment   utils.EnvironmentMap `yaml:"environment,omitempty" json:"environment"`
 	SidecarPort   SidecarPort          `yaml:"sidecarPort,omitempty" json:"sidecarPort"`
-	Route         Route                `yaml:"route,omitempty" json:"route"`
+	Endpoints     utils.StringArray    `yaml:"endpoints,omitempty"  json:"endpoints"`
 }
 
 // App is an inspr component that represents an dApp. An App can contain other apps, channels and other components.
@@ -56,7 +56,7 @@ type AppSpec struct {
 	Boundary AppBoundary                 `yaml:"boundary,omitempty"   json:"boundary"`
 	Auth     AppAuth                     `yaml:"auth"  json:"auth"`
 	LogLevel string                      `yaml:"logLevel" json:"logLevel"`
-	Routes   map[string]*RouteConnection `yaml:"routeconnection,omitempty" json:"routeconnection"`
+	Routes   map[string]*RouteConnection `yaml:"routes,omitempty" json:"routes"`
 }
 
 // AppAuth represents the permissions that a dApp (and its children) contains
