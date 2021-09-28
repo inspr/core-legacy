@@ -154,6 +154,45 @@ func (s *Server) readMessageHandler() rest.Handler {
 	}
 }
 
+func (s *Server) routeReceiveHandler() rest.Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Verificar o endpoint
+		endpoint := strings.TrimPrefix(r.URL.Path, "/route/")
+
+		// Resolução de portas? Pode ser a mesma do readHandler (clientReadPort)
+		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
+		if clientReadPort == "" {
+			rest.ERROR(
+				w,
+				ierrors.New(
+					"[ENV VAR] INSPR_SCCLIENT_READ_PORT not found",
+				).NotFound(),
+			)
+			return
+		}
+
+		// Redirecionar a requisição
+		// localhost:port/route/endpoint
+		// Encontrar uma forma inteligente de redirecionar
+		client := http.DefaultClient
+		r.RequestURI = fmt.Sprintf("http://localhost:%v/route/%v", clientReadPort, endpoint)
+		resp, err := client.Do(r)
+
+		// Validar a resposta
+		// Talvez um tratamento de erro
+		if err != nil {
+			logger.Error("route: unable to send request from lbsidecar to node",
+				zap.Any("error", err))
+			rest.ERROR(w, err)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Retonar a resposta
+		rest.JSON(w, resp.StatusCode, resp.Body)
+	}
+}
+
 func sendRequest(addr string, body []byte) (*http.Response, error) {
 	client := http.DefaultClient
 	req, err := http.NewRequest(http.MethodPost, addr, bytes.NewBuffer(body))
