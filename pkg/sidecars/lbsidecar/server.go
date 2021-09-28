@@ -156,6 +156,7 @@ func (s *Server) Run(ctx context.Context) error {
 	muxWriter := http.NewServeMux()
 
 	muxWriter.Handle("/channel/", s.writeMessageHandler().Post().JSON())
+	muxWriter.Handle("/route/", s.sendRequest().JSON())
 
 	writeServer := &http.Server{
 		Handler: muxWriter,
