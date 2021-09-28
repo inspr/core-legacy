@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"inspr.dev/inspr/pkg/ierrors"
+	"inspr.dev/inspr/pkg/meta"
 	"inspr.dev/inspr/pkg/meta/brokers"
 	"inspr.dev/inspr/pkg/utils"
 )
@@ -73,6 +74,19 @@ func GetResolvedChannel(channel string, inputChan, outputChan []brokers.ChannelB
 	return "", ierrors.New(
 		"channel " + channel + " not listed as an input or output",
 	).InvalidChannel()
+}
+
+// GetRouteData returns the data of a resolved route
+func GetRouteData(route string) (*meta.RouteConnection, error) {
+	value, exists := os.LookupEnv(route + "_ROUTE")
+	if exists {
+		return nil, ierrors.New("invalid route: %s", route).BadRequest()
+	}
+	data := strings.Split(value, ";")
+	return &meta.RouteConnection{
+		Address:   data[0],
+		Endpoints: data[1:],
+	}, nil
 }
 
 func getChannelData(channelList string) []brokers.ChannelBroker {
