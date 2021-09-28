@@ -151,7 +151,7 @@ func (no *NodeOperator) withRoutes(app *meta.App) k8s.ContainerOption {
 	return func(c *corev1.Container) {
 		env := make(utils.EnvironmentMap)
 		for route, data := range app.Spec.Routes {
-			raw := "node-" + data.Address + ";"
+			raw := data.Address + ";"
 			raw = raw + data.Endpoints.Join(";")
 			env[route+"_ROUTE"] = raw
 		}
