@@ -94,7 +94,7 @@ func (c *Client) RouteSendRequest(ctx context.Context, route, path, method strin
 	l := logger.With(zap.String("operation", "sendRequest"), zap.String("route", route))
 
 	var resp interface{}
-	// sends a message to the corresponding channel route on the sidecar
+	// sends a message to the corresponding route on the sidecar
 	l.Debug("sending message to load balancer")
 	err := c.client.Send(
 		ctx,
