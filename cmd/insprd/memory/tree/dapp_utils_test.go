@@ -1324,3 +1324,113 @@ func TestSelectBrokerFromPriorityList(t *testing.T) {
 		})
 	}
 }
+
+func Test_attachRoutes(t *testing.T) {
+	type args struct {
+		app *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+		want *meta.App
+	}{
+		{
+			args: args{
+				app: &meta.App{
+					Spec: meta.AppSpec{
+						Apps: map[string]*meta.App{
+							"a1": {
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											UUID: "node",
+										},
+									},
+								},
+							},
+							"a2": {
+								Spec: meta.AppSpec{
+									Node: meta.Node{
+										Meta: meta.Metadata{
+											UUID: "node",
+										},
+										Spec: meta.NodeSpec{
+											Endpoints: utils.StringArray{"eda", "edb"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			name: "valid route resolution",
+			want: &meta.App{
+				Spec: meta.AppSpec{
+					Apps: map[string]*meta.App{
+						"a1": {
+							Spec: meta.AppSpec{
+								Node: meta.Node{
+									Meta: meta.Metadata{
+										Name: "a1",
+										UUID: "node",
+									},
+								},
+							},
+						},
+						"a2": {
+							Spec: meta.AppSpec{
+								Node: meta.Node{
+									Meta: meta.Metadata{
+										Name: "a2",
+										UUID: "node",
+									},
+									Spec: meta.NodeSpec{
+										Endpoints: utils.StringArray{"eda", "edb"},
+									},
+								},
+							},
+						},
+					},
+					Routes: map[string]*meta.RouteConnection{
+						"a2": {
+							Address:   "http://node-node:0",
+							Endpoints: utils.StringArray{"eda", "edb"},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			attachRoutes(tt.args.app)
+			if !testRoutes(tt.args.app, tt.want) {
+				t.Errorf("Test_attachRoutes() got = \n%v, want = \n%v", tt.args.app, tt.want)
+			}
+		})
+	}
+}
+
+func testRoutes(got, want *meta.App) bool {
+	for name, wantChild := range want.Spec.Apps {
+		gotChild, ok := got.Spec.Apps[name]
+		if !ok {
+			return false
+		}
+		if !testRoutes(gotChild, wantChild) {
+			return false
+		}
+	}
+
+	for route, wantData := range want.Spec.Routes {
+		gotData, routeMatch := got.Spec.Routes[route]
+		addMatch := wantData.Address == gotData.Address
+		edpMatch := wantData.Endpoints.Equal(gotData.Endpoints)
+
+		if !routeMatch || !addMatch || !edpMatch {
+			return false
+		}
+	}
+	return true
+}

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -44,6 +45,39 @@ func createMockedServer(port, ch string, msg interface{}) *httptest.Server {
 	ts.Listener = l
 
 	return ts
+}
+
+func createRouteMockedServer(port string, expectedMsg interface{}) *httptest.Server {
+	listener, err := net.Listen("tcp", "localhost:"+port)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				rest.ERROR(w, fmt.Errorf("error while reading msg body"))
+				return
+			}
+
+			fmt.Printf("receivedData = %v\n", string(body))
+
+			if expectedMsg != string(body) {
+				rest.ERROR(w, fmt.Errorf("invalid message"))
+				return
+			}
+
+			rest.JSON(w, http.StatusOK, nil)
+		}),
+	)
+
+	mockServer.Listener.Close()
+	mockServer.Listener = listener
+
+	return mockServer
+
 }
 
 func TestServer_writeMessageHandler(t *testing.T) {
@@ -238,6 +272,69 @@ func TestServer_readMessageHandler(t *testing.T) {
 	}
 }
 
+func TestServer_routeReceiveHandler(t *testing.T) {
+
+	createMockEnvVars()
+	defer deleteMockEnvVars()
+
+	rServer := httptest.NewServer(Init().routeReceiveHandler())
+	req := http.Client{}
+
+	tests := []struct {
+		name          string
+		msg           string
+		endpoint      string
+		port          string
+		setClientPort bool
+		wantErr       bool
+		want          rest.Handler
+	}{
+		{
+			name:          "Valid route request",
+			msg:           "Hello World!",
+			endpoint:      "hello",
+			port:          "1171",
+			setClientPort: true,
+		},
+		{
+			name:     "Invalid - port not set",
+			msg:      "Hello World!",
+			endpoint: "hello",
+			wantErr:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			if tt.setClientPort {
+				os.Setenv("INSPR_SCCLIENT_READ_PORT", "1171")
+				defer os.Unsetenv("INSPR_SCCLIENT_READ_PORT")
+			}
+
+			var testServer *httptest.Server
+			if tt.port != "" {
+				testServer = createRouteMockedServer(tt.port, tt.msg)
+				testServer.Start()
+				defer testServer.Close()
+			}
+
+			reqInfo, _ := http.NewRequest(http.MethodPost, rServer.URL+"/route/"+tt.endpoint, bytes.NewBuffer([]byte(tt.msg)))
+
+			resp, err := req.Do(reqInfo)
+			if err != nil {
+				t.Errorf("Error while doing the request: %v", err)
+				return
+			}
+
+			if resp.StatusCode != http.StatusOK && !tt.wantErr {
+				t.Errorf("Received status %v, wanted %v", resp.StatusCode, http.StatusOK)
+				return
+			}
+
+		})
+	}
+}
+
 type randomStruct struct{}
 
 func createMockEnvVars() {
@@ -292,4 +389,120 @@ func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_SIDECAR_RANDBROKER1_ADDR")
 	os.Unsetenv("chan5_SCHEMA")
 	os.Unsetenv("chan5_RESOLVED")
+
+}
+
+func TestServer_sendRequest(t *testing.T) {
+	createMockEnvVars()
+	defer deleteMockEnvVars()
+
+	wServer := httptest.NewServer(Init().sendRequest())
+	client := http.Client{}
+
+	tests := []struct {
+		name    string
+		path    string
+		msg     string
+		route   string
+		data    string
+		wantErr bool
+	}{
+		{
+			name:    "valid route request",
+			path:    "rt1/edp1",
+			msg:     "mock_string",
+			route:   "rt1_ROUTE",
+			data:    "http://localhost:3301;edp1;edp2",
+			wantErr: false,
+		},
+		{
+			name:    "invalid route request",
+			path:    "rt1/edp1",
+			msg:     "mock_string",
+			route:   "non_ROUTE",
+			data:    "http://localhost:3301;edp1;edp2",
+			wantErr: true,
+		},
+		{
+			name:    "invalid route endpoint",
+			path:    "rt1/edp3",
+			msg:     "mock_string",
+			route:   "rt1_ROUTE",
+			data:    "http://localhost:3301;edp1;edp2",
+			wantErr: true,
+		},
+		{
+			name:    "invalid route address",
+			path:    "rt1/edp1",
+			msg:     "mock_string",
+			route:   "rt1_ROUTE",
+			data:    "localhost:3301;edp1;edp2",
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			os.Setenv(tt.route, tt.data)
+			defer os.Unsetenv(tt.route)
+
+			testServer := createMockedRoute("3301", tt.msg)
+			testServer.Start()
+			defer testServer.Close()
+
+			buf, _ := json.Marshal(tt.msg)
+			reqInfo, _ := http.NewRequest(http.MethodPost,
+				wServer.URL+"/route/"+tt.path,
+				bytes.NewBuffer(buf))
+
+			resp, err := client.Do(reqInfo)
+			if err != nil {
+				if !tt.wantErr {
+					t.Errorf("Error while doing the request: %v", err)
+				}
+				return
+			}
+
+			if tt.wantErr && (resp.StatusCode == http.StatusOK) {
+				t.Errorf("Wanted error, received 'nil'")
+				return
+			}
+
+			if !tt.wantErr && (resp.StatusCode != http.StatusOK) {
+				t.Errorf("Received status %v, wanted %v", resp.StatusCode, http.StatusOK)
+				return
+			}
+		})
+	}
+}
+
+func createMockedRoute(port string, expectedMsg interface{}) *httptest.Server {
+	listener, err := net.Listen("tcp", "localhost:"+port)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+
+			var receivedData string
+			err := json.NewDecoder(r.Body).Decode(&receivedData)
+			if err != nil {
+				rest.ERROR(w, fmt.Errorf("error while reading msg body"))
+				return
+			}
+
+			if expectedMsg != receivedData {
+				rest.ERROR(w, fmt.Errorf("invalid message"))
+				return
+			}
+
+			rest.JSON(w, http.StatusOK, nil)
+		}),
+	)
+
+	mockServer.Listener.Close()
+	mockServer.Listener = listener
+
+	return mockServer
+
 }

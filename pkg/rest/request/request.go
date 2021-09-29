@@ -55,7 +55,7 @@ func (c Client) Send(ctx context.Context, route, method string, body, responsePt
 		bytes.NewBuffer(buf),
 	)
 
-	logger.Info("Sending request to:" + c.routeToURL(route))
+	logger.Debug("Sending request to:" + c.routeToURL(route))
 
 	if err != nil {
 		return ierrors.Wrap(err, "error creating request")

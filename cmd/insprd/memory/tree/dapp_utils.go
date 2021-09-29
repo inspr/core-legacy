@@ -2,6 +2,8 @@ package tree
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 
 	"go.uber.org/zap"
 	apimodels "inspr.dev/inspr/pkg/api/models"
@@ -111,9 +113,12 @@ func (amm *AppMemoryManager) addAppInTree(app, parentApp *meta.App) {
 	if !nodeIsEmpty(app.Spec.Node) {
 		app.Spec.Node.Meta.Parent = parentStr
 		app.Spec.Node.Meta.Name = app.Meta.Name
+		app.Spec.Node.Meta.UUID = app.Meta.UUID
 		if app.Spec.Node.Meta.Annotations == nil {
-			app.Spec.Node.Meta.Annotations = map[string]string{}
+			app.Spec.Node.Meta.Annotations = make(map[string]string)
 		}
+	} else {
+		attachRoutes(app)
 	}
 }
 
@@ -257,6 +262,51 @@ func nodeIsEmpty(node meta.Node) bool {
 	noImage := node.Spec.Image == ""
 
 	return noAnnotations && noName && noParent && noImage
+}
+
+func attachRoutes(app *meta.App) {
+	nodes := 0
+	routes := make(map[string]*meta.RouteConnection)
+	for name, child := range app.Spec.Apps {
+		if child.Spec.Node.Meta.UUID != "" {
+			nodes++
+			if child.Spec.Node.Spec.Endpoints.Len() > 0 {
+				port := child.Spec.Node.Spec.SidecarPort.LBRead
+				if port <= 0 {
+					port, _ = strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_READ_PORT"))
+				}
+				routes[name] = &meta.RouteConnection{
+					Address:   fmt.Sprintf("http://node-%s:%v", child.Spec.Node.Meta.UUID, port),
+					Endpoints: make(utils.StringArray, 0),
+				}
+				routes[name].Endpoints = append(routes[name].Endpoints, child.Spec.Node.Spec.Endpoints...)
+			}
+		}
+	}
+	if nodes > 1 && len(routes) > 0 {
+		app.Spec.Routes = routes
+		resolveRoutes(app)
+	}
+}
+
+func resolveRoutes(app *meta.App) {
+	for name, child := range app.Spec.Apps {
+		if child.Spec.Node.Meta.UUID != "" {
+			for route, data := range app.Spec.Routes {
+				if route != name {
+					if child.Spec.Routes == nil {
+						child.Spec.Routes = make(map[string]*meta.RouteConnection)
+					}
+					child.Spec.Routes[route] = &meta.RouteConnection{
+						Address:   data.Address,
+						Endpoints: make(utils.StringArray, 0),
+					}
+					child.Spec.Routes[route].Endpoints =
+						append(child.Spec.Routes[route].Endpoints, data.Endpoints...)
+				}
+			}
+		}
+	}
 }
 
 func getParentApp(childQuery string, tmm *treeMemoryManager) (*meta.App, error) {

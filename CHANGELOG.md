@@ -1,10 +1,55 @@
 # Changelog
 
+### #139 Story CORE-588 | [BETA] Configure routes reading on LB-sidecar
+- feature:
+  - added route receive handler to the lbsidecar handler
+  - lbsidecar read server now listens for the "/route" path
+  - added tests for the route receive handler
+--- 
+
+### #140 Story CORE-583 | [BETA] Configure routes writing on LB-sidecar
+- feature:
+  - lbsidecar routes request writer handler
+  - route redirect resolution
+  - route address port resoution
+---
+
+### #137 Story CORE-579 | Change lb-sidecars channel resolution to account for the '/channel' that will now be required
+- feature:
+  - server now watching just for the "/channel" prefix
+  - added "/channel" prefix when handling a channel
+  - added "/channel" prefix when writing a message
+- fix:
+  - fix python import module bug
+  - update/fix lb sidecar tests due to the change above
+  - update some logs in lb sidecar
+---
+
+### #138 Story CORE-581 | [BETA] Create a function to resolve Routes
+- features:
+  - resolution for routes on compound dApp structures.
+  - deployment of route data on lb sidecar for rerouting.
+- fix:
+  - simplified node's route structure.
+---
+
+### #136 Bug CORE-578 | Deploying Types without schemas
+- fix:
+    - implemented type scheme validation according to avro and Json rules
+---
+
+### #135 Story CORE-580 | Create Route structure on the Node definition
+- feature:
+  - created Route structure on the `pkg/meta`
+  - added route structure to the NodeSpec structure
+  - added route connection map to the AppSpec structure
+---
+
 ### #133 Feature Grafana dashboards | Automatically create becnhmark dashboard on grafana deploy
 - feature:
-  - Added support for custom dashboards in grafana values
-  - Added dashboard config map
-  - Moved dashboard file to the helm chart
+  - added support for custom dashboards in grafana values
+  - added dashboard config map
+  - moved dashboard file to the helm chart
 ---
 
 ### #130 Story CORE-575 | Develop metrics for the sidecar broker Reader
