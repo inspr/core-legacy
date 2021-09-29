@@ -394,8 +394,6 @@ func createMockedRoute(port string, expectedMsg interface{}) *httptest.Server {
 				return
 			}
 
-			// fmt.Printf("receivedData = %v\n", string(body))
-
 			if expectedMsg != receivedData {
 				rest.ERROR(w, fmt.Errorf("invalid message"))
 				return

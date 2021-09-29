@@ -1394,7 +1394,7 @@ func Test_attachRoutes(t *testing.T) {
 					},
 					Routes: map[string]*meta.RouteConnection{
 						"a2": {
-							Address:   "node",
+							Address:   "http://node-node:0",
 							Endpoints: utils.StringArray{"eda", "edb"},
 						},
 					},

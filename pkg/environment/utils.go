@@ -80,7 +80,7 @@ func GetResolvedChannel(channel string, inputChan, outputChan []brokers.ChannelB
 func GetRouteData(route string) (*meta.RouteConnection, error) {
 	value, exists := os.LookupEnv(route + "_ROUTE")
 	if !exists {
-		return nil, ierrors.New("invalid route: %s", route).BadRequest()
+		return nil, ierrors.New("%s route data not found in enviroment variables", route).BadRequest()
 	}
 	data := strings.Split(value, ";")
 	return &meta.RouteConnection{
