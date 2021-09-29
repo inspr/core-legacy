@@ -89,6 +89,28 @@ func (c *Client) HandleChannel(channel string, handler func(ctx context.Context,
 	})
 }
 
+// RouteSendRequest
+func (c *Client) RouteSendRequest(ctx context.Context, route, path, method string, body interface{}) (interface{}, error) {
+	l := logger.With(zap.String("operation", "sendRequest"), zap.String("route", route))
+
+	var resp interface{}
+	// sends a message to the corresponding channel route on the sidecar
+	l.Debug("sending message to load balancer")
+	err := c.client.Send(
+		ctx,
+		fmt.Sprintf("/route/%s/%s", route, path),
+		method,
+		body,
+		&resp)
+	if err != nil {
+		l.Error("error sending message to load balancer")
+		return nil, err
+	}
+	l.Info("message sent")
+
+	return resp, err
+}
+
 //Run runs the server with the handlers defined in HandleChannel
 func (c *Client) Run(ctx context.Context) error {
 
