@@ -79,7 +79,7 @@ func GetResolvedChannel(channel string, inputChan, outputChan []brokers.ChannelB
 // GetRouteData returns the data of a resolved route
 func GetRouteData(route string) (*meta.RouteConnection, error) {
 	value, exists := os.LookupEnv(route + "_ROUTE")
-	if exists {
+	if !exists {
 		return nil, ierrors.New("invalid route: %s", route).BadRequest()
 	}
 	data := strings.Split(value, ";")
