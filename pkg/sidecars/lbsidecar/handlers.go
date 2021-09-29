@@ -96,6 +96,47 @@ func (s *Server) writeMessageHandler() rest.Handler {
 
 // readMessageHandler handles requests sent to the read message server in the path
 // "/channel", for the lbsidecar
+func (s *Server) sendRequest() rest.Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/route/")
+		pathArgs := strings.Split(path, "/")
+		route := pathArgs[0]
+		endpoint := pathArgs[1]
+
+		logger.Info("handling route request on " + route)
+		resolved, err := environment.GetRouteData(route)
+
+		if err != nil {
+			logger.Error("unable to send request to "+route,
+				zap.Any("error", err))
+
+			rest.ERROR(w, err)
+		}
+
+		if !resolved.Endpoints.Contains(endpoint) {
+			err = ierrors.New("invalid endpoint: %s", endpoint).BadRequest()
+			logger.Error("unable to send request to "+path,
+				zap.Any("error", err))
+
+			rest.ERROR(w, err)
+		}
+		URL, _ := url.Parse(fmt.Sprintf("%s/%s", resolved.Address, path))
+		r.URL = URL
+		r.RequestURI = ""
+		r.Header.Set("X-Forwarded-For", r.RemoteAddr)
+		client := http.DefaultClient
+		resp, err := client.Do(r)
+		if err != nil {
+			rest.ERROR(w, err)
+			return
+		}
+		w.WriteHeader(resp.StatusCode)
+		io.Copy(w, resp.Body)
+		resp.Body.Close()
+	}
+}
+
+// readMessageHandler handles requests sent to the read message server
 func (s *Server) readMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()

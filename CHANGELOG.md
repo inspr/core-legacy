@@ -7,6 +7,13 @@
   - added tests for the route receive handler
 --- 
 
+### #140 Story CORE-583 | [BETA] Configure routes writing on LB-sidecar
+- feature:
+  - lbsidecar routes request writer handler
+  - route redirect resolution
+  - route address port resoution
+---
+
 ### #137 Story CORE-579 | Change lb-sidecars channel resolution to account for the '/channel' that will now be required
 - feature:
   - server now watching just for the "/channel" prefix

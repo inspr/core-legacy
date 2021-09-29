@@ -2,6 +2,8 @@ package tree
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 
 	"go.uber.org/zap"
 	apimodels "inspr.dev/inspr/pkg/api/models"
@@ -269,8 +271,12 @@ func attachRoutes(app *meta.App) {
 		if child.Spec.Node.Meta.UUID != "" {
 			nodes++
 			if child.Spec.Node.Spec.Endpoints.Len() > 0 {
+				port := child.Spec.Node.Spec.SidecarPort.LBRead
+				if port <= 0 {
+					port, _ = strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_READ_PORT"))
+				}
 				routes[name] = &meta.RouteConnection{
-					Address:   child.Spec.Node.Meta.UUID,
+					Address:   fmt.Sprintf("http://node-%s:%v", child.Spec.Node.Meta.UUID, port),
 					Endpoints: make(utils.StringArray, 0),
 				}
 				routes[name].Endpoints = append(routes[name].Endpoints, child.Spec.Node.Spec.Endpoints...)
