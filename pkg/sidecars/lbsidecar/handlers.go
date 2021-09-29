@@ -195,7 +195,8 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 		defer resp.Body.Close()
 
 		// Return the response
-		rest.JSON(w, resp.StatusCode, resp.Body)
+		w.WriteHeader(resp.StatusCode)
+		io.Copy(w, resp.Body)
 	}
 }
 
