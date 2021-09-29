@@ -1,5 +1,12 @@
 # Changelog
 
+### #139 Story CORE-588 | [BETA] Configure routes reading on LB-sidecar
+- feature:
+  - added route receive handler to the lbsidecar handler
+  - lbsidecar read server now listens for the "/route" path
+  - added tests for the route receive handler
+--- 
+
 ### #137 Story CORE-579 | Change lb-sidecars channel resolution to account for the '/channel' that will now be required
 - feature:
   - server now watching just for the "/channel" prefix
