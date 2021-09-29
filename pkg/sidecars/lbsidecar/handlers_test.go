@@ -56,7 +56,6 @@ func createRouteMockedServer(port string, expectedMsg interface{}) *httptest.Ser
 	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 
-			var receivedData string
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
 				rest.ERROR(w, fmt.Errorf("error while reading msg body"))
@@ -65,7 +64,7 @@ func createRouteMockedServer(port string, expectedMsg interface{}) *httptest.Ser
 
 			fmt.Printf("receivedData = %v\n", string(body))
 
-			if expectedMsg != receivedData {
+			if expectedMsg != string(body) {
 				rest.ERROR(w, fmt.Errorf("invalid message"))
 				return
 			}
@@ -283,7 +282,7 @@ func TestServer_routeReceiveHandler(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		msg           models.BrokerMessage
+		msg           string
 		endpoint      string
 		port          string
 		setClientPort bool
@@ -291,10 +290,8 @@ func TestServer_routeReceiveHandler(t *testing.T) {
 		want          rest.Handler
 	}{
 		{
-			name: "Valid route request",
-			msg: models.BrokerMessage{
-				Data: "Hello World!",
-			},
+			name:          "Valid route request",
+			msg:           "Hello World!",
 			endpoint:      "hello",
 			port:          "1171",
 			setClientPort: true,
@@ -310,12 +307,12 @@ func TestServer_routeReceiveHandler(t *testing.T) {
 
 			var testServer *httptest.Server
 			if tt.port != "" {
-				testServer = createRouteMockedServer(tt.port, tt.msg.Data.(string))
+				testServer = createRouteMockedServer(tt.port, tt.msg)
 				testServer.Start()
 				defer testServer.Close()
 			}
 
-			reqInfo, _ := http.NewRequest(http.MethodPost, rServer.URL+"/route/"+tt.endpoint, bytes.NewBuffer([]byte("Hello World")))
+			reqInfo, _ := http.NewRequest(http.MethodPost, rServer.URL+"/route/"+tt.endpoint, bytes.NewBuffer([]byte(tt.msg)))
 
 			resp, err := req.Do(reqInfo)
 			if err != nil {
@@ -323,9 +320,10 @@ func TestServer_routeReceiveHandler(t *testing.T) {
 				return
 			}
 
-			fmt.Println(resp)
-
-			t.FailNow()
+			if resp.StatusCode != http.StatusOK && !tt.wantErr {
+				t.Errorf("Received status %v, wanted %v", resp.StatusCode, http.StatusOK)
+				return
+			}
 
 		})
 	}
