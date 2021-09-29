@@ -296,6 +296,12 @@ func TestServer_routeReceiveHandler(t *testing.T) {
 			port:          "1171",
 			setClientPort: true,
 		},
+		{
+			name:     "Invalid - port not set",
+			msg:      "Hello World!",
+			endpoint: "hello",
+			wantErr:  true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
