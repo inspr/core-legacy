@@ -94,6 +94,8 @@ func (s *Server) writeMessageHandler() rest.Handler {
 	}
 }
 
+// readMessageHandler handles requests sent to the read message server in the path
+// "/channel", for the lbsidecar
 func (s *Server) sendRequest() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/route/")
@@ -192,6 +194,50 @@ func (s *Server) readMessageHandler() rest.Handler {
 		elapsed := time.Since(start)
 		s.GetMetric(channel).readMessageDuration.Observe(elapsed.Seconds())
 		s.GetMetric(channel).messagesRead.Add(1)
+	}
+}
+
+// routeReceiveHandler handles any requests received in the "/route" path, for the lbsidecar
+func (s *Server) routeReceiveHandler() rest.Handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Checking the endpoint
+		endpoint := strings.TrimPrefix(r.URL.Path, "/route/")
+
+		// port resolution: using the same as readHandler -> clientReadPort
+		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
+		if clientReadPort == "" {
+			rest.ERROR(
+				w,
+				ierrors.New(
+					"[ENV VAR] INSPR_SCCLIENT_READ_PORT not found",
+				).NotFound(),
+			)
+			return
+		}
+
+		// Redirect the request
+		// localhost:port/route/endpoint
+		client := http.DefaultClient
+
+		URL, _ := url.Parse(fmt.Sprintf("http://localhost:%v/route/%v", clientReadPort, endpoint))
+		r.URL = URL
+		r.RequestURI = ""
+		r.Header.Set("X-Forwarded-For", r.RemoteAddr)
+
+		resp, err := client.Do(r)
+
+		// Validate the response
+		if err != nil {
+			logger.Error("route: unable to send request from lbsidecar to node",
+				zap.Any("error", err))
+			rest.ERROR(w, err)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Return the response
+		w.WriteHeader(resp.StatusCode)
+		io.Copy(w, resp.Body)
 	}
 }
 

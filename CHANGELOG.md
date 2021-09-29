@@ -1,5 +1,12 @@
 # Changelog
 
+### #139 Story CORE-588 | [BETA] Configure routes reading on LB-sidecar
+- feature:
+  - added route receive handler to the lbsidecar handler
+  - lbsidecar read server now listens for the "/route" path
+  - added tests for the route receive handler
+--- 
+
 ### #140 Story CORE-583 | [BETA] Configure routes writing on LB-sidecar
 - feature:
   - lbsidecar routes request writer handler
