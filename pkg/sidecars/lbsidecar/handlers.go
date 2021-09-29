@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -93,7 +94,8 @@ func (s *Server) writeMessageHandler() rest.Handler {
 	}
 }
 
-// readMessageHandler handles requests sent to the read message server
+// readMessageHandler handles requests sent to the read message server in the path
+// "/channel", for the lbsidecar
 func (s *Server) readMessageHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -154,12 +156,13 @@ func (s *Server) readMessageHandler() rest.Handler {
 	}
 }
 
+// routeReceiveHandler handles any requests received in the "/route" path, for the lbsidecar
 func (s *Server) routeReceiveHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Verificar o endpoint
+		// Checking the endpoint
 		endpoint := strings.TrimPrefix(r.URL.Path, "/route/")
 
-		// Resolução de portas? Pode ser a mesma do readHandler (clientReadPort)
+		// port resolution: using the same as readHandler -> clientReadPort
 		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
 		if clientReadPort == "" {
 			rest.ERROR(
@@ -171,15 +174,18 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 			return
 		}
 
-		// Redirecionar a requisição
+		// Redirect the request
 		// localhost:port/route/endpoint
-		// Encontrar uma forma inteligente de redirecionar
 		client := http.DefaultClient
-		r.RequestURI = fmt.Sprintf("http://localhost:%v/route/%v", clientReadPort, endpoint)
+
+		URL, _ := url.Parse(fmt.Sprintf("http://localhost:%v/route/%v", clientReadPort, endpoint))
+		r.URL = URL
+		r.RequestURI = ""
+		r.Header.Set("X-Forwarded-For", r.RemoteAddr)
+
 		resp, err := client.Do(r)
 
-		// Validar a resposta
-		// Talvez um tratamento de erro
+		// Validate the response
 		if err != nil {
 			logger.Error("route: unable to send request from lbsidecar to node",
 				zap.Any("error", err))
@@ -188,7 +194,7 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 		}
 		defer resp.Body.Close()
 
-		// Retonar a resposta
+		// Return the response
 		rest.JSON(w, resp.StatusCode, resp.Body)
 	}
 }

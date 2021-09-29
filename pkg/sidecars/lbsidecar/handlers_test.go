@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -44,6 +45,40 @@ func createMockedServer(port, ch string, msg interface{}) *httptest.Server {
 	ts.Listener = l
 
 	return ts
+}
+
+func createRouteMockedServer(port string, expectedMsg interface{}) *httptest.Server {
+	listener, err := net.Listen("tcp", "localhost:"+port)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+
+			var receivedData string
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				rest.ERROR(w, fmt.Errorf("error while reading msg body"))
+				return
+			}
+
+			fmt.Printf("receivedData = %v\n", string(body))
+
+			if expectedMsg != receivedData {
+				rest.ERROR(w, fmt.Errorf("invalid message"))
+				return
+			}
+
+			rest.JSON(w, http.StatusOK, nil)
+		}),
+	)
+
+	mockServer.Listener.Close()
+	mockServer.Listener = listener
+
+	return mockServer
+
 }
 
 func TestServer_writeMessageHandler(t *testing.T) {
@@ -234,6 +269,64 @@ func TestServer_readMessageHandler(t *testing.T) {
 				t.Errorf("Received status %v, wanted %v", resp.StatusCode, http.StatusOK)
 				return
 			}
+		})
+	}
+}
+
+func TestServer_routeReceiveHandler(t *testing.T) {
+
+	createMockEnvVars()
+	defer deleteMockEnvVars()
+
+	rServer := httptest.NewServer(Init().routeReceiveHandler())
+	req := http.Client{}
+
+	tests := []struct {
+		name          string
+		msg           models.BrokerMessage
+		endpoint      string
+		port          string
+		setClientPort bool
+		wantErr       bool
+		want          rest.Handler
+	}{
+		{
+			name: "Valid route request",
+			msg: models.BrokerMessage{
+				Data: "Hello World!",
+			},
+			endpoint:      "hello",
+			port:          "1171",
+			setClientPort: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			if tt.setClientPort {
+				os.Setenv("INSPR_SCCLIENT_READ_PORT", "1171")
+				defer os.Unsetenv("INSPR_SCCLIENT_READ_PORT")
+			}
+
+			var testServer *httptest.Server
+			if tt.port != "" {
+				testServer = createRouteMockedServer(tt.port, tt.msg.Data.(string))
+				testServer.Start()
+				defer testServer.Close()
+			}
+
+			reqInfo, _ := http.NewRequest(http.MethodPost, rServer.URL+"/route/"+tt.endpoint, bytes.NewBuffer([]byte("Hello World")))
+
+			resp, err := req.Do(reqInfo)
+			if err != nil {
+				t.Errorf("Error while doing the request: %v", err)
+				return
+			}
+
+			fmt.Println(resp)
+
+			t.FailNow()
+
 		})
 	}
 }
