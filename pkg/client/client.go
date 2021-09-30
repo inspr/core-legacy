@@ -80,9 +80,9 @@ func (c *Client) HandleChannel(channel string, handler func(ctx context.Context,
 }
 
 // HandleRoute handles messages received in a given route.
-func (c *Client) HandleRoute(path string, handler func(ctx context.Context, body io.Reader) error) {
+func (c *Client) HandleRoute(path string, handler func(w http.ResponseWriter, r *http.Request)) {
 	path = strings.TrimPrefix(path, "/")
-	c.addHandlerToMux("/route/"+path, handler)
+	c.mux.HandleFunc("/route/"+path, handler)
 }
 
 //Run runs the server with the handlers defined in HandleChannel

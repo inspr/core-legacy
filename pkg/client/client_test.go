@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -297,7 +298,7 @@ func TestClient_HandleChannel(t *testing.T) {
 func TestClient_HandleRoute(t *testing.T) {
 	type args struct {
 		path    string
-		handler func(t *testing.T) func(ctx context.Context, body io.Reader) error
+		handler func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
 	}
 	tests := []struct {
 		name    string
@@ -310,20 +311,21 @@ func TestClient_HandleRoute(t *testing.T) {
 			msg:  "message",
 			args: args{
 				path: "hello/world",
-				handler: func(t *testing.T) func(ctx context.Context, body io.Reader) error {
-					return func(ctx context.Context, body io.Reader) error {
-
+				handler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+					return func(w http.ResponseWriter, r *http.Request) {
 						var msg string
-						decoder := json.NewDecoder(body)
+						decoder := json.NewDecoder(r.Body)
 						err := decoder.Decode(&msg)
 						if err != nil {
-							return err
+							t.Errorf("Client_HandleRoute message error = %v", err)
 						}
+
 						if msg != "message" {
+							fmt.Println(msg)
 							t.Errorf("Client_HandleRoute message = %v, want message", msg)
 						}
 
-						return nil
+						rest.JSON(w, http.StatusOK, nil)
 					}
 				},
 			},
