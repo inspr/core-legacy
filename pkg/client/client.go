@@ -112,7 +112,7 @@ func (c *Client) SendRequest(ctx context.Context, nodeName, path, method string,
 		body,
 		&resp)
 	if err != nil {
-		l.Error("error sending message to load balancer")
+		l.Error("error sending request to load balancer", zap.Error(err))
 		return nil, err
 	}
 	l.Info("message sent")

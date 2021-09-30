@@ -2,47 +2,32 @@ apiVersion: v1
 kind: dapp
 
 meta:
-  name: bench
+  name: router
 spec:
-  aliases:
-    sender.sendch:
-      target: benchannel
-    receiver.receivech:
-      target: benchannel
-  boundary:
-    input:
-      - benchannel
-    output:
-      - benchannel
   apps:
-    sender:
+    client:
       meta:
-        name: sender
-        parent: bench
+        name: client
+        parent: router
       spec:
         logLevel: debug
         node:
           spec:
             replicas: 1
-            image: gcr.io/insprlabs/inspr/example/sender:latest
-        boundary:
-          output:
-            - sendch
-    receiver:
+            image: gcr.io/insprlabs/inspr/example/route/client:latest
+    api:
       meta:
-        name: receiver
-        parent: bench
+        name: api
+        parent: router
       spec:
         logLevel: debug
         node:
           spec:
             replicas: 1
-            image: gcr.io/insprlabs/inspr/example/receiver:latest
+            image: gcr.io/insprlabs/inspr/example/route/api:latest
             endpoints:
-              - edp1
-              - edp2
-        boundary:
-          input:
-            - receivech
+              - add
+              - sub
+              - mul
 
 

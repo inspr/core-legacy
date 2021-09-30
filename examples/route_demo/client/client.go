@@ -9,7 +9,7 @@ import (
 	dappclient "inspr.dev/inspr/pkg/client"
 )
 
-const tCount int = 1
+// const tCount int = 1
 
 func main() {
 
@@ -24,10 +24,11 @@ func main() {
 
 	resp, err := client.SendRequest(ctx, "api", "add", http.MethodPost, req)
 	if err != nil {
-		fmt.Println("ERROR!\n\n\n\n")
+		fmt.Println("ERROR!!!!!!!!!!!!!!!!!!!!!!")
 		return
 	}
-	fmt.Println("\n-|-|-|-|-|-|-|-|-|-|-|-|-|-\n resp = %v", resp.(model.Response).Result)
+	fmt.Println("\n-|-|-|-|-|-|-|-|-|-|-|-|-|-")
+	fmt.Println(resp)
 	// for i := 0; i < tCount; i++ {
 	// 	go func() {
 	// 		for {
