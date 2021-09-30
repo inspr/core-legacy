@@ -19,13 +19,13 @@ func addHandler() rest.Handler {
 		var data model.Request
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
-			rest.ERROR(w, ierrors.New("Wrong request body type").BadRequest())
+			rest.ERROR(w, ierrors.New("wrong request body type").BadRequest())
 			return
 		}
 		resp := model.Response{
 			Result: data.Op1 + data.Op2,
 		}
-		fmt.Printf("Result: %v\n", resp.Result)
+		fmt.Printf("Add Result: %v\n", resp.Result)
 		rest.JSON(w, http.StatusOK, resp)
 	}
 }
@@ -35,13 +35,13 @@ func subHandler() rest.Handler {
 		var data model.Request
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
-			rest.ERROR(w, ierrors.New("Wrong request body type").BadRequest())
+			rest.ERROR(w, ierrors.New("wrong request body type").BadRequest())
 			return
 		}
 		resp := model.Response{
 			Result: data.Op1 - data.Op2,
 		}
-		fmt.Printf("Result: %v\n", resp.Result)
+		fmt.Printf("Sub Result: %v\n", resp.Result)
 		rest.JSON(w, http.StatusOK, resp)
 	}
 }
@@ -51,13 +51,13 @@ func mulHandler() rest.Handler {
 		var data model.Request
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
-			rest.ERROR(w, ierrors.New("Wrong request body type").BadRequest())
+			rest.ERROR(w, ierrors.New("wrong request body type").BadRequest())
 			return
 		}
 		resp := model.Response{
 			Result: data.Op1 * data.Op2,
 		}
-		fmt.Printf("Result: %v\n", resp.Result)
+		fmt.Printf("Mul Result: %v\n", resp.Result)
 		rest.JSON(w, http.StatusOK, resp)
 	}
 }
