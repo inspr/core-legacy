@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -80,6 +81,7 @@ func (c *Client) HandleChannel(channel string, handler func(ctx context.Context,
 
 // HandleRoute handles messages received in a given route.
 func (c *Client) HandleRoute(path string, handler func(ctx context.Context, body io.Reader) error) {
+	path = strings.TrimPrefix(path, "/")
 	c.addHandlerToMux("/route/"+path, handler)
 }
 
