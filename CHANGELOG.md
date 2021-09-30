@@ -6,6 +6,12 @@
   - added tests for handle route
 ---
 
+### #142 Story CORE-590 | [BETA] dApp client SendRequest
+-feature:
+  - create send request function for routes
+  - added tests for the send route request
+--- 
+
 ### #139 Story CORE-588 | [BETA] Configure routes reading on LB-sidecar
 - feature:
   - added route receive handler to the lbsidecar handler
