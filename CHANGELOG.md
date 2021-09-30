@@ -3,7 +3,6 @@
 ### #141 Story CORE-589 | [BETA] dApp client HandleRoute
 - feature:
   - created Handle Route function
-  - created an "add handle to mux" helper function for the handle channel and handle route
   - added tests for handle route
 ---
 
