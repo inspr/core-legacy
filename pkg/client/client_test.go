@@ -380,12 +380,12 @@ func TestClient_Run(t *testing.T) {
 	}
 }
 
-func TestClient_SendRouteRequest(t *testing.T) {
+func TestClient_SendRequest(t *testing.T) {
 	type args struct {
-		route  string
-		path   string
-		method string
-		body   interface{}
+		nodeName string
+		path     string
+		method   string
+		body     interface{}
 	}
 	tests := []struct {
 		name    string
@@ -396,21 +396,21 @@ func TestClient_SendRouteRequest(t *testing.T) {
 		{
 			name: "valid route request",
 			args: args{
-				route:  "rt1",
-				path:   "end1",
-				method: "POST",
-				body:   "test_body",
+				nodeName: "rt1",
+				path:     "end1",
+				method:   "POST",
+				body:     "test_body",
 			},
 			wantErr: false,
 			want:    "hello",
 		},
 		{
-			name: "Invalid request - no route",
+			name: "Invalid route request",
 			args: args{
-				route:  "rt1",
-				path:   "end1",
-				method: "GET",
-				body:   "test_body",
+				nodeName: "rt1",
+				path:     "end1",
+				method:   "GET",
+				body:     "test_body",
 			},
 			wantErr: true,
 			want:    "",
@@ -418,7 +418,7 @@ func TestClient_SendRouteRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testSever := createMockedLBsidecar("5100", tt.args.route, tt.args.path, tt.args.method, tt.want, tt.args.body)
+			testSever := createMockedLBsidecar("5100", tt.args.nodeName, tt.args.path, tt.args.method, tt.want, tt.args.body)
 
 			testSever.Start()
 			defer testSever.Close()
@@ -429,22 +429,22 @@ func TestClient_SendRouteRequest(t *testing.T) {
 					Pointer(),
 			}
 
-			resp, err := c.SendRouteRequest(context.Background(), tt.args.route, tt.args.path, tt.args.method, tt.args.body)
+			resp, err := c.SendRequest(context.Background(), tt.args.nodeName, tt.args.path, tt.args.method, tt.args.body)
 			if err != nil {
 				if !tt.wantErr {
-					t.Errorf("Client.SendRouteRequest() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("Client.SendRequest() error = %v, wantErr %v", err, tt.wantErr)
 				}
 				return
 			}
 			if resp != tt.want {
-				t.Errorf("Client.SendRouteRequest() = %v, want %v", resp, tt.want)
+				t.Errorf("Client.SendRequest() = %v, want %v", resp, tt.want)
 				return
 			}
 		})
 	}
 }
 
-func createMockedLBsidecar(port, route, path, method, want string, body interface{}) *httptest.Server {
+func createMockedLBsidecar(port, nodeName, path, method, want string, body interface{}) *httptest.Server {
 	listener, err := net.Listen("tcp", "localhost:"+port)
 	if err != nil {
 		log.Fatal(err)
@@ -465,7 +465,7 @@ func createMockedLBsidecar(port, route, path, method, want string, body interfac
 				return
 			}
 
-			if r.URL.Path != fmt.Sprintf("/route/%s/%s", route, path) {
+			if r.URL.Path != fmt.Sprintf("/route/%s/%s", nodeName, path) {
 				rest.ERROR(w, fmt.Errorf("invalid path"))
 				return
 			}
