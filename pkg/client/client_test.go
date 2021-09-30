@@ -492,7 +492,8 @@ func TestClient_SendRequest(t *testing.T) {
 					Pointer(),
 			}
 
-			resp, err := c.SendRequest(context.Background(), tt.args.nodeName, tt.args.path, tt.args.method, tt.args.body)
+			var resp string
+			err := c.SendRequest(context.Background(), tt.args.nodeName, tt.args.path, tt.args.method, tt.args.body, &resp)
 			if err != nil {
 				if !tt.wantErr {
 					t.Errorf("Client.SendRequest() error = %v, wantErr %v", err, tt.wantErr)
