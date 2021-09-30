@@ -76,7 +76,17 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface
 
 // HandleChannel handles messages received in a given channel.
 func (c *Client) HandleChannel(channel string, handler func(ctx context.Context, body io.Reader) error) {
-	c.addHandlerToMux("/channel/"+channel, handler)
+	c.mux.HandleFunc("/channel/"+channel, func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("received request in client handle channel", zap.String("Channel", channel))
+		// user defined handler. Returns error if the user wants to return it
+		err := handler(context.Background(), r.Body)
+		if err != nil {
+			logger.Error("error returned by client handler", zap.Error(err))
+			rest.ERROR(w, err)
+			return
+		}
+		rest.JSON(w, 200, nil)
+	})
 }
 
 // HandleRoute handles messages received in a given route.
@@ -122,18 +132,4 @@ func (c *Client) Run(ctx context.Context) error {
 		return err
 	}
 	return ctx.Err()
-}
-
-func (c *Client) addHandlerToMux(path string, handler func(ctx context.Context, body io.Reader) error) {
-	c.mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("received request in client handler", zap.String("Path", path))
-		// user defined handler. Returns error if the user wants to return it
-		err := handler(context.Background(), r.Body)
-		if err != nil {
-			logger.Error("error returned by client handler", zap.Error(err))
-			rest.ERROR(w, err)
-			return
-		}
-		rest.JSON(w, 200, nil)
-	})
 }
