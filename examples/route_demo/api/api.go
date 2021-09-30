@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -24,6 +25,7 @@ func addHandler() rest.Handler {
 		resp := model.Response{
 			Result: data.Op1 + data.Op2,
 		}
+		fmt.Printf("Result: %v\n", resp.Result)
 		rest.JSON(w, http.StatusOK, resp)
 	}
 }
@@ -39,6 +41,7 @@ func subHandler() rest.Handler {
 		resp := model.Response{
 			Result: data.Op1 - data.Op2,
 		}
+		fmt.Printf("Result: %v\n", resp.Result)
 		rest.JSON(w, http.StatusOK, resp)
 	}
 }
@@ -54,6 +57,7 @@ func mulHandler() rest.Handler {
 		resp := model.Response{
 			Result: data.Op1 * data.Op2,
 		}
+		fmt.Printf("Result: %v\n", resp.Result)
 		rest.JSON(w, http.StatusOK, resp)
 	}
 }
