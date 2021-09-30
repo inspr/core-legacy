@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -376,4 +378,115 @@ func TestClient_Run(t *testing.T) {
 
 		})
 	}
+}
+
+func TestClient_SendRequest(t *testing.T) {
+	type args struct {
+		nodeName string
+		path     string
+		method   string
+		body     interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+		want    string
+	}{
+		{
+			name: "valid route request",
+			args: args{
+				nodeName: "rt1",
+				path:     "end1",
+				method:   "POST",
+				body:     "test_body",
+			},
+			wantErr: false,
+			want:    "hello",
+		},
+		{
+			name: "Invalid route request",
+			args: args{
+				nodeName: "rt1",
+				path:     "end1",
+				method:   "GET",
+				body:     "test_body",
+			},
+			wantErr: true,
+			want:    "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testSever := createMockedLBsidecar("5100", tt.args.nodeName, tt.args.path, tt.args.method, tt.want, tt.args.body)
+
+			testSever.Start()
+			defer testSever.Close()
+
+			c := Client{
+				client: request.NewJSONClient(testSever.URL).
+					HTTPClient(*http.DefaultClient).
+					Pointer(),
+			}
+
+			resp, err := c.SendRequest(context.Background(), tt.args.nodeName, tt.args.path, tt.args.method, tt.args.body)
+			if err != nil {
+				if !tt.wantErr {
+					t.Errorf("Client.SendRequest() error = %v, wantErr %v", err, tt.wantErr)
+				}
+				return
+			}
+			if resp != tt.want {
+				t.Errorf("Client.SendRequest() = %v, want %v", resp, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func createMockedLBsidecar(port, nodeName, path, method, want string, body interface{}) *httptest.Server {
+	listener, err := net.Listen("tcp", "localhost:"+port)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+
+			var receivedData string
+			err := json.NewDecoder(r.Body).Decode(&receivedData)
+			if err != nil {
+				rest.ERROR(w, fmt.Errorf("error while reading msg body"))
+				return
+			}
+
+			if receivedData != body {
+				rest.ERROR(w, fmt.Errorf("invalid messagem body"))
+				return
+			}
+
+			if r.URL.Path != fmt.Sprintf("/route/%s/%s", nodeName, path) {
+				rest.ERROR(w, fmt.Errorf("invalid path"))
+				return
+			}
+
+			if r.Method != method {
+				rest.ERROR(w, fmt.Errorf("invalid method"))
+				return
+			}
+
+			if want == "" {
+				rest.ERROR(w, fmt.Errorf("bad request"))
+				return
+			}
+
+			rest.JSON(w, http.StatusOK, want)
+		}),
+	)
+
+	mockServer.Listener.Close()
+	mockServer.Listener = listener
+
+	return mockServer
+
 }
