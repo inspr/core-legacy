@@ -101,11 +101,12 @@ func (s *Server) sendRequest() rest.Handler {
 		route := pathArgs[0]
 		endpoint := pathArgs[1]
 
-		logger.Info("handling route request on " + route)
+		logger.Info("handling route request", zap.String("route", route), zap.String("path", path))
 		resolved, err := environment.GetRouteData(route)
 
 		if err != nil {
-			logger.Error("unable to send request to "+route,
+			logger.Error("unable to send request to route",
+				zap.String("route", route),
 				zap.Any("error", err))
 
 			rest.ERROR(w, err)
