@@ -201,6 +201,13 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 		// Checking the endpoint
 		endpoint := strings.TrimPrefix(r.URL.Path, "/route/")
 
+		splittedRoute := strings.SplitN(endpoint, "/", 2)
+		if len(splittedRoute) == 1 {
+			endpoint = ""
+		} else {
+			endpoint = splittedRoute[1]
+		}
+
 		// port resolution: using the same as readHandler -> clientReadPort
 		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
 		if clientReadPort == "" {
