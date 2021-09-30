@@ -380,7 +380,7 @@ func TestClient_Run(t *testing.T) {
 	}
 }
 
-func TestClient_RouteSendRequest(t *testing.T) {
+func TestClient_SendRouteRequest(t *testing.T) {
 	type args struct {
 		route  string
 		path   string
@@ -429,15 +429,15 @@ func TestClient_RouteSendRequest(t *testing.T) {
 					Pointer(),
 			}
 
-			resp, err := c.RouteSendRequest(context.Background(), tt.args.route, tt.args.path, tt.args.method, tt.args.body)
+			resp, err := c.SendRouteRequest(context.Background(), tt.args.route, tt.args.path, tt.args.method, tt.args.body)
 			if err != nil {
 				if !tt.wantErr {
-					t.Errorf("Client.RouteSendRequest() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("Client.SendRouteRequest() error = %v, wantErr %v", err, tt.wantErr)
 				}
 				return
 			}
 			if resp != tt.want {
-				t.Errorf("Client.RouteSendRequest() = %v, want %v", resp, tt.want)
+				t.Errorf("Client.SendRouteRequest() = %v, want %v", resp, tt.want)
 				return
 			}
 		})

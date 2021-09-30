@@ -89,8 +89,8 @@ func (c *Client) HandleChannel(channel string, handler func(ctx context.Context,
 	})
 }
 
-// RouteSendRequest
-func (c *Client) RouteSendRequest(ctx context.Context, route, path, method string, body interface{}) (interface{}, error) {
+// SendRouteRequest
+func (c *Client) SendRouteRequest(ctx context.Context, route, path, method string, body interface{}) (interface{}, error) {
 	l := logger.With(zap.String("operation", "sendRequest"), zap.String("route", route))
 
 	var resp interface{}
