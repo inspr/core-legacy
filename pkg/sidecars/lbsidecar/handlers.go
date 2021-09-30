@@ -119,11 +119,12 @@ func (s *Server) sendRequest() rest.Handler {
 
 			rest.ERROR(w, err)
 		}
-		URL, _ := url.Parse(fmt.Sprintf("%s/%s", resolved.Address, path))
+		URL, _ := url.Parse(fmt.Sprintf("%s/route/%s", resolved.Address, path))
 		r.URL = URL
 		r.RequestURI = ""
 		r.Header.Set("X-Forwarded-For", r.RemoteAddr)
 		client := http.DefaultClient
+		logger.Info("rerouting request", zap.String("route", route), zap.Any("URL", r.URL))
 		resp, err := client.Do(r)
 		if err != nil {
 			rest.ERROR(w, err)
