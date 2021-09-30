@@ -89,7 +89,7 @@ func (c *Client) HandleChannel(channel string, handler func(ctx context.Context,
 	})
 }
 
-// SendRouteRequest
+// SendRouteRequest receives the http request informations and send it to the sidecar server
 func (c *Client) SendRouteRequest(ctx context.Context, route, path, method string, body interface{}) (interface{}, error) {
 	l := logger.With(zap.String("operation", "sendRequest"), zap.String("route", route))
 
