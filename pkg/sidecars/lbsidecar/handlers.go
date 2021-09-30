@@ -119,20 +119,10 @@ func (s *Server) sendRequest() rest.Handler {
 
 			rest.ERROR(w, err)
 		}
-		URL, _ := url.Parse(fmt.Sprintf("%s/route/%s", resolved.Address, path))
-		r.URL = URL
-		r.RequestURI = ""
-		r.Header.Set("X-Forwarded-For", r.RemoteAddr)
-		client := http.DefaultClient
-		logger.Info("rerouting request", zap.String("route", route), zap.Any("URL", r.URL))
-		resp, err := client.Do(r)
-		if err != nil {
-			rest.ERROR(w, err)
-			return
-		}
-		w.WriteHeader(resp.StatusCode)
-		io.Copy(w, resp.Body)
-		resp.Body.Close()
+		URL := fmt.Sprintf("%s/route/%s", resolved.Address, path)
+
+		logger.Info("redirecting request", zap.String("route", route), zap.Any("URL", URL))
+		http.Redirect(w, r, URL, http.StatusPermanentRedirect)
 	}
 }
 
