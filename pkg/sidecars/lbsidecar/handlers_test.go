@@ -292,14 +292,14 @@ func TestServer_routeReceiveHandler(t *testing.T) {
 		{
 			name:          "Valid route request",
 			msg:           "Hello World!",
-			endpoint:      "hello",
+			endpoint:      "nodename/hello",
 			port:          "1171",
 			setClientPort: true,
 		},
 		{
 			name:     "Invalid - port not set",
 			msg:      "Hello World!",
-			endpoint: "hello",
+			endpoint: "nodename",
 			wantErr:  true,
 		},
 	}

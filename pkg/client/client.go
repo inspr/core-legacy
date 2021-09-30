@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -76,16 +77,24 @@ func (c *Client) WriteMessage(ctx context.Context, channel string, msg interface
 // HandleChannel handles messages received in a given channel.
 func (c *Client) HandleChannel(channel string, handler func(ctx context.Context, body io.Reader) error) {
 	c.mux.HandleFunc("/channel/"+channel, func(w http.ResponseWriter, r *http.Request) {
-		l := logger.With(zap.String("operation", "write"), zap.String("channel", channel))
+		logger.Info("received request on client handle channel", zap.String("channel", channel))
 		// user defined handler. Returns error if the user wants to return it
-		l.Info("received read message request")
 		err := handler(context.Background(), r.Body)
 		if err != nil {
-			l.Error("error handling message", zap.Error(err))
+			logger.Error("error returned by client handler", zap.Error(err))
 			rest.ERROR(w, err)
 			return
 		}
 		rest.JSON(w, 200, nil)
+	})
+}
+
+// HandleRoute handles messages received in a given route.
+func (c *Client) HandleRoute(path string, handler func(w http.ResponseWriter, r *http.Request)) {
+	path = strings.TrimPrefix(path, "/")
+	c.mux.HandleFunc("/route/"+path, func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("received request on client handle route", zap.String("route", path))
+		handler(w, r)
 	})
 }
 

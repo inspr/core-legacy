@@ -1,5 +1,11 @@
 # Changelog
 
+### #141 Story CORE-589 | [BETA] dApp client HandleRoute
+- feature:
+  - created Handle Route function
+  - added tests for handle route
+---
+
 ### #142 Story CORE-590 | [BETA] dApp client SendRequest
 -feature:
   - create send request function for routes

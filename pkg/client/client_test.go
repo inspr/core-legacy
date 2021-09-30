@@ -296,6 +296,69 @@ func TestClient_HandleChannel(t *testing.T) {
 	}
 }
 
+func TestClient_HandleRoute(t *testing.T) {
+	type args struct {
+		path    string
+		handler func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
+	}
+	tests := []struct {
+		name    string
+		args    args
+		msg     string
+		wantErr bool
+	}{
+		{
+			name: "valid route handle",
+			msg:  "message",
+			args: args{
+				path: "hello/world",
+				handler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+					return func(w http.ResponseWriter, r *http.Request) {
+						var msg string
+						decoder := json.NewDecoder(r.Body)
+						err := decoder.Decode(&msg)
+						if err != nil {
+							t.Errorf("Client_HandleRoute message error = %v", err)
+						}
+
+						if msg != "message" {
+							fmt.Println(msg)
+							t.Errorf("Client_HandleRoute message = %v, want message", msg)
+						}
+
+						rest.JSON(w, http.StatusOK, nil)
+					}
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			c := &Client{
+				mux: http.NewServeMux(),
+			}
+			c.HandleRoute(tt.args.path, tt.args.handler(t))
+			s := httptest.NewServer(c.mux)
+			client := request.NewJSONClient(s.URL)
+			response := struct {
+				Status string `json:"status"`
+			}{}
+			err := client.Send(
+				context.Background(),
+				"/route/"+tt.args.path,
+				http.MethodPost,
+				tt.msg,
+				&response)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client_HandleChannel response.Status = %v, wantErr = %v", response.Status, tt.wantErr)
+			}
+
+		})
+	}
+}
+
 func TestClient_Run(t *testing.T) {
 	environment.SetMockEnv()
 	defer environment.UnsetMockEnv()
