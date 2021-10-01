@@ -25,7 +25,7 @@ var lbsidecarPort int32
 func (no *NodeOperator) dappToService(app *meta.App) *kubeService {
 	logger.Info("creating kubernetes service")
 
-	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_PORT"))
+	temp, _ := strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_READ_PORT"))
 	lbsidecarPort = int32(temp)
 	appID := toAppID(app)
 	appDeployName := toDeploymentName(app)

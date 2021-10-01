@@ -173,7 +173,7 @@ func (s *Server) Run(ctx context.Context) error {
 	muxReader := http.NewServeMux()
 
 	muxReader.Handle("/channel/", s.readMessageHandler().Post().JSON())
-	muxReader.Handle("/route/", s.routeReceiveHandler().Post().JSON())
+	muxReader.Handle("/route/", s.routeReceiveHandler().JSON())
 
 	readServer := &http.Server{
 		Handler: muxReader,

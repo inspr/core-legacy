@@ -1,5 +1,12 @@
 # Changelog
 
+### #143 Story CORE-584 | [BETA] Create an example dApp to demonstrate how Routes work
+- features:
+  - new routes demo example
+  - changed lb's send request method to redirect request instead of rerouting it
+  - added lb's read port to dApp's service ports
+---
+
 ### #141 Story CORE-589 | [BETA] dApp client HandleRoute
 - feature:
   - created Handle Route function

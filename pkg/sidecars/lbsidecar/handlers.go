@@ -94,8 +94,6 @@ func (s *Server) writeMessageHandler() rest.Handler {
 	}
 }
 
-// readMessageHandler handles requests sent to the read message server in the path
-// "/channel", for the lbsidecar
 func (s *Server) sendRequest() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/route/")
@@ -103,11 +101,12 @@ func (s *Server) sendRequest() rest.Handler {
 		route := pathArgs[0]
 		endpoint := pathArgs[1]
 
-		logger.Info("handling route request on " + route)
+		logger.Info("handling route request", zap.String("route", route), zap.String("path", path))
 		resolved, err := environment.GetRouteData(route)
 
 		if err != nil {
-			logger.Error("unable to send request to "+route,
+			logger.Error("unable to send request to route",
+				zap.String("route", route),
 				zap.Any("error", err))
 
 			rest.ERROR(w, err)
@@ -120,19 +119,10 @@ func (s *Server) sendRequest() rest.Handler {
 
 			rest.ERROR(w, err)
 		}
-		URL, _ := url.Parse(fmt.Sprintf("%s/%s", resolved.Address, path))
-		r.URL = URL
-		r.RequestURI = ""
-		r.Header.Set("X-Forwarded-For", r.RemoteAddr)
-		client := http.DefaultClient
-		resp, err := client.Do(r)
-		if err != nil {
-			rest.ERROR(w, err)
-			return
-		}
-		w.WriteHeader(resp.StatusCode)
-		io.Copy(w, resp.Body)
-		resp.Body.Close()
+		URL := fmt.Sprintf("%s/route/%s", resolved.Address, path)
+
+		logger.Info("redirecting request", zap.String("route", route), zap.Any("URL", URL))
+		http.Redirect(w, r, URL, http.StatusPermanentRedirect)
 	}
 }
 
