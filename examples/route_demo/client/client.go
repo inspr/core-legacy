@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"inspr.dev/inspr/examples/route_demo/model"
 	dappclient "inspr.dev/inspr/pkg/client"
 )
-
-// const tCount int = 1
 
 func main() {
 	client := dappclient.NewAppClient()
@@ -17,24 +16,34 @@ func main() {
 	defer cancel()
 
 	var resp model.Response
+	var err error
 
 	req := model.Request{
 		Op1: 1,
 		Op2: 2,
 	}
 
-	err := client.SendRequest(ctx, "api", "add", http.MethodPost, req, &resp)
-	if err != nil {
-		fmt.Println("ERROR!!!!!!!")
-		fmt.Println(err)
-		return
+	time.Sleep(5 * time.Second)
+	for {
+		err = client.SendRequest(ctx, "api", "add", http.MethodPost, req, &resp)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(resp.Result)
+		}
+		req.Op1 = resp.Result
+		err = client.SendRequest(ctx, "api", "mul", http.MethodPost, req, &resp)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(resp.Result)
+		}
+		req.Op1 = resp.Result
+		err = client.SendRequest(ctx, "api", "sub", http.MethodPost, req, &resp)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(resp.Result)
+		}
 	}
-	fmt.Println("-|-|-|-|-|-|-|-|-|-|-|-|-|-")
-	fmt.Println(resp)
-	// for i := 0; i < tCount; i++ {
-	// 	go func() {
-	// 		for {
-	// 		}
-	// 	}()
-	// }
 }
