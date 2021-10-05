@@ -50,6 +50,8 @@ Note that the images fields of both the `client` and the `api` need to be filled
 
 The Inspr Client makes available two functions related to the routes feature:
 
+### Send Request
+
 ```go
 func SendRequest(ctx context.Context, nodeName, path, method string, body interface{}, responsePtr interface{})
 ```
@@ -82,6 +84,8 @@ client := insprclient.NewAppClient()
 err = client.SendRequest(ctx, "api", "add", http.MethodPost, req, &resp)
 ```
 
+### HandleRoute
+
 ```go
 func HandleRoute(path string, handler func(w http.ResponseWriter, r *http.Request))
 ```
@@ -111,7 +115,7 @@ client := insprclient.NewAppClient()
 client.HandleRoute("add", addHandler())
 ```
 
-Doing this with every route we need will make our dApp work as wanted. You can check the full example [here].
+Doing this with every route we need will make our dApp work as wanted. You can check the full code of this example [here](../examples/route_demo).
 
 ## Conclusion
 
