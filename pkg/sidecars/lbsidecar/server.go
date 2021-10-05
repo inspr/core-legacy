@@ -24,22 +24,88 @@ type channelMetric struct {
 	writeMessageDuration prometheus.Summary
 }
 
+type routeMetric struct {
+	routeReadError      prometheus.Counter
+	routeSendError      prometheus.Counter
+	routesendDuration   prometheus.Summary
+	routeHandleDuration prometheus.Summary
+}
+
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
-	writeAddr string
-	readAddr  string
-	metrics   map[string]channelMetric
+	writeAddr     string
+	readAddr      string
+	channelMetric map[string]channelMetric
+	routeMetric   map[string]routeMetric
 }
 
-func (s *Server) GetMetric(channel string) channelMetric {
-	metric, ok := s.metrics[channel]
+func (s *Server) GetMetricRoute(route string) routeMetric {
+	metric, ok := s.routeMetric[route]
 	if ok {
 		return metric
 	}
+
+	resolved, _ := environment.GetRouteData(route)
+	s.routeMetric[route] = routeMetric{
+		routeSendError: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "message_send_error",
+			ConstLabels: prometheus.Labels{
+				"inspr_route":          route,
+				"inspr_route_adress":   resolved.Address,
+				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
+			},
+		}),
+		routeReadError: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "message_read_error",
+			ConstLabels: prometheus.Labels{
+				"inspr_route":          route,
+				"inspr_route_adress":   resolved.Address,
+				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
+			},
+		}),
+
+		routesendDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_send_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_route":          route,
+				"inspr_route_adress":   resolved.Address,
+				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
+			},
+			Objectives: map[float64]float64{},
+		}),
+		routeHandleDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_handle_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_route":          route,
+				"inspr_route_adress":   resolved.Address,
+				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
+			},
+			Objectives: map[float64]float64{},
+		}),
+	}
+
+	return s.routeMetric[route]
+
+}
+
+func (s *Server) GetMetricChannel(channel string) channelMetric {
+	metric, ok := s.channelMetric[channel]
+	if ok {
+		return metric
+	}
+
 	resolved, _ := environment.GetResolvedChannel(channel, environment.GetInputChannelsData(), environment.GetOutputChannelsData())
 	broker, _ := environment.GetChannelBroker(channel)
-	s.metrics[channel] = channelMetric{
+	s.channelMetric[channel] = channelMetric{
 		messagesSent: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
@@ -106,7 +172,7 @@ func (s *Server) GetMetric(channel string) channelMetric {
 		}),
 	}
 
-	return s.metrics[channel]
+	return s.channelMetric[channel]
 
 }
 
@@ -126,7 +192,8 @@ func Init() *Server {
 	s.writeAddr = fmt.Sprintf(":%s", wAddr)
 	s.readAddr = fmt.Sprintf(":%s", rAddr)
 	logger = logger.With(zap.String("read-address", rAddr), zap.String("write-address", wAddr))
-	s.metrics = make(map[string]channelMetric)
+	s.channelMetric = make(map[string]channelMetric)
+	s.routeMetric = make(map[string]routeMetric)
 
 	return &s
 }
