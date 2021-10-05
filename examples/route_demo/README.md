@@ -5,7 +5,7 @@
 This folder contains the files necessary to run the routes example in your cluster. This example consists of 2 dApps:
 
 1. client -> sends requests to the api's route.
-2. api -> receives request from the client and performs a simple operation dictatade by the endpoint reached (*add*, *sub* or *mul*).
+2. api -> receives request from the client and performs a simple operation dictate by the endpoint reached (*add*, *sub* or *mul*).
 
 ## How to run it:
 
