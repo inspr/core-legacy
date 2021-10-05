@@ -17,7 +17,7 @@ Make sure the latest Inspr CLI version is installed.
 Before running the Inspr CLI command to create the app in your cluster be sure to set the [configuration](../../docs/readme.md) beforehand.  
 
 
-This example doesn't use brokers, therefore everything is set and ready, the simpler way to test it is to run:
+This example doesn't use brokers, therefore everything is set and ready and the simpler way to test it is to run:
 ```
 insprctl apply -f yamls/route-demo.yaml
 ```
