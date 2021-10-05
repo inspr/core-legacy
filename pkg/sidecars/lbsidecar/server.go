@@ -51,7 +51,7 @@ func (s *Server) GetMetricRoute(route string) routeMetric {
 		routeSendError: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
-			Name:      "message_send_error",
+			Name:      "request_send_error",
 			ConstLabels: prometheus.Labels{
 				"inspr_route":          route,
 				"inspr_route_adress":   resolved.Address,
@@ -61,7 +61,7 @@ func (s *Server) GetMetricRoute(route string) routeMetric {
 		routeReadError: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
-			Name:      "message_read_error",
+			Name:      "request_read_error",
 			ConstLabels: prometheus.Labels{
 				"inspr_route":          route,
 				"inspr_route_adress":   resolved.Address,
