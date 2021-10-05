@@ -96,6 +96,8 @@ func (s *Server) writeMessageHandler() rest.Handler {
 
 func (s *Server) sendRequest() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
 		path := strings.TrimPrefix(r.URL.Path, "/route/")
 		pathArgs := strings.Split(path, "/")
 		route := pathArgs[0]
@@ -124,6 +126,9 @@ func (s *Server) sendRequest() rest.Handler {
 
 		logger.Info("redirecting request", zap.String("route", route), zap.Any("URL", URL))
 		http.Redirect(w, r, URL, http.StatusPermanentRedirect)
+
+		elapsed := time.Since(start)
+		s.GetMetricRoute(path).routesendDuration.Observe(elapsed.Seconds())
 	}
 }
 
@@ -191,6 +196,8 @@ func (s *Server) readMessageHandler() rest.Handler {
 // routeReceiveHandler handles any requests received in the "/route" path, for the lbsidecar
 func (s *Server) routeReceiveHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
 		// Checking the endpoint
 		endpoint := strings.TrimPrefix(r.URL.Path, "/route/")
 
@@ -238,6 +245,9 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 		// Return the response
 		w.WriteHeader(resp.StatusCode)
 		io.Copy(w, resp.Body)
+
+		elapsed := time.Since(start)
+		s.GetMetricRoute(endpoint).routeHandleDuration.Observe(elapsed.Seconds())
 	}
 }
 
