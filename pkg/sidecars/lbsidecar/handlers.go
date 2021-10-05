@@ -80,7 +80,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		if err != nil {
 			logger.Error("unable to send request to "+channelBroker+" sidecar",
 				zap.Any("error", err))
-			s.GetMetric(channel).messageSendError.Inc()
+			s.GetMetricChannel(channel).messageSendError.Inc()
 
 			rest.ERROR(w, err)
 			return
@@ -88,9 +88,9 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		defer resp.Body.Close()
 
 		rest.JSON(w, resp.StatusCode, nil)
-		s.GetMetric(channel).messagesSent.Inc()
+		s.GetMetricChannel(channel).messagesSent.Inc()
 		elapsed := time.Since(start)
-		s.GetMetric(channel).writeMessageDuration.Observe(elapsed.Seconds())
+		s.GetMetricChannel(channel).writeMessageDuration.Observe(elapsed.Seconds())
 	}
 }
 
@@ -116,6 +116,7 @@ func (s *Server) sendRequest() rest.Handler {
 			err = ierrors.New("invalid endpoint: %s", endpoint).BadRequest()
 			logger.Error("unable to send request to "+path,
 				zap.Any("error", err))
+			s.GetMetricRoute(path).routeSendError.Inc()
 
 			rest.ERROR(w, err)
 		}
@@ -182,8 +183,8 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		rest.JSON(w, resp.StatusCode, resp.Body)
 		elapsed := time.Since(start)
-		s.GetMetric(channel).readMessageDuration.Observe(elapsed.Seconds())
-		s.GetMetric(channel).messagesRead.Add(1)
+		s.GetMetricChannel(channel).readMessageDuration.Observe(elapsed.Seconds())
+		s.GetMetricChannel(channel).messagesRead.Add(1)
 	}
 }
 
@@ -227,6 +228,8 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 		if err != nil {
 			logger.Error("route: unable to send request from lbsidecar to node",
 				zap.Any("error", err))
+			s.GetMetricRoute(endpoint).routeSendError.Inc()
+
 			rest.ERROR(w, err)
 			return
 		}
