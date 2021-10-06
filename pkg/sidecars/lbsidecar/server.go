@@ -40,7 +40,42 @@ type Server struct {
 	routeMetric   map[string]routeMetric
 }
 
-func (s *Server) GetMetricRoute(route string) routeMetric {
+func (s *Server) GetMetricHandlerRoute(route string) routeMetric {
+	metric, ok := s.routeMetric[route]
+	if ok {
+		return metric
+	}
+
+	if route == "" {
+		route = "/"
+	}
+
+	s.routeMetric[route] = routeMetric{
+		routeReadError: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_read_error",
+			ConstLabels: prometheus.Labels{
+				"inspr_route": route,
+			},
+		}),
+
+		routeHandleDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_handle_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_route": route,
+			},
+			Objectives: map[float64]float64{},
+		}),
+	}
+
+	return s.routeMetric[route]
+
+}
+
+func (s *Server) GetMetricSenderRoute(route string) routeMetric {
 	metric, ok := s.routeMetric[route]
 	if ok {
 		return metric
@@ -51,17 +86,7 @@ func (s *Server) GetMetricRoute(route string) routeMetric {
 		routeSendError: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
-			Name:      "request_send_error",
-			ConstLabels: prometheus.Labels{
-				"inspr_route":          route,
-				"inspr_route_adress":   resolved.Address,
-				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
-			},
-		}),
-		routeReadError: promauto.NewCounter(prometheus.CounterOpts{
-			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "request_read_error",
+			Name:      "route_request_send_error",
 			ConstLabels: prometheus.Labels{
 				"inspr_route":          route,
 				"inspr_route_adress":   resolved.Address,
@@ -72,18 +97,7 @@ func (s *Server) GetMetricRoute(route string) routeMetric {
 		routesendDuration: promauto.NewSummary(prometheus.SummaryOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
-			Name:      "route_send_duration",
-			ConstLabels: prometheus.Labels{
-				"inspr_route":          route,
-				"inspr_route_adress":   resolved.Address,
-				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
-			},
-			Objectives: map[float64]float64{},
-		}),
-		routeHandleDuration: promauto.NewSummary(prometheus.SummaryOpts{
-			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "route_handle_duration",
+			Name:      "route_request_send_duration",
 			ConstLabels: prometheus.Labels{
 				"inspr_route":          route,
 				"inspr_route_adress":   resolved.Address,
