@@ -47,3 +47,17 @@ def send_delete_request(url:str, body = {}, headers = {}) -> Response:
         raise HTTPError
     
     return resp
+
+
+def send_new_request(url:str, method:str, body = {}, headers = {}) -> Response:
+    if method == 'POST':
+        return send_post_request(url,body,headers)
+    elif method == 'GET':
+        return send_get_request(url,body,headers)
+    elif method == 'PUT':
+        return send_update_request(url,body,headers)
+    elif method == 'DELETE':
+        return send_delete_request(url,body,headers)
+    else:
+        raise Exception(f"Error while send request: Method '{method}' not allowed. The allowed methods are POST,GET,UPDATE,DELETE.")
+                
