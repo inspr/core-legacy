@@ -107,6 +107,8 @@ func (s *Server) sendRequest() rest.Handler {
 		resolved, err := environment.GetRouteData(route)
 
 		if err != nil {
+			s.GetMetricSenderRoute(route).routeSendError.Inc()
+
 			logger.Error("unable to send request to route",
 				zap.String("route", route),
 				zap.Any("error", err))
@@ -115,10 +117,12 @@ func (s *Server) sendRequest() rest.Handler {
 		}
 
 		if !resolved.Endpoints.Contains(endpoint) {
+
+			s.GetMetricSenderRoute(route).routeSendError.Inc()
+
 			err = ierrors.New("invalid endpoint: %s", endpoint).BadRequest()
 			logger.Error("unable to send request to "+path,
 				zap.Any("error", err))
-			s.GetMetricRoute(path).routeSendError.Inc()
 
 			rest.ERROR(w, err)
 		}
@@ -128,7 +132,7 @@ func (s *Server) sendRequest() rest.Handler {
 		http.Redirect(w, r, URL, http.StatusPermanentRedirect)
 
 		elapsed := time.Since(start)
-		s.GetMetricRoute(path).routesendDuration.Observe(elapsed.Seconds())
+		s.GetMetricSenderRoute(route).routesendDuration.Observe(elapsed.Seconds())
 	}
 }
 
@@ -201,16 +205,18 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 		// Checking the endpoint
 		endpoint := strings.TrimPrefix(r.URL.Path, "/route/")
 
-		splittedRoute := strings.SplitN(endpoint, "/", 2)
-		if len(splittedRoute) == 1 {
+		splitRoute := strings.SplitN(endpoint, "/", 2)
+		if len(splitRoute) == 1 {
 			endpoint = ""
 		} else {
-			endpoint = splittedRoute[1]
+			endpoint = splitRoute[1]
 		}
 
 		// port resolution: using the same as readHandler -> clientReadPort
 		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
 		if clientReadPort == "" {
+			s.GetMetricHandlerRoute(endpoint).routeReadError.Inc()
+
 			rest.ERROR(
 				w,
 				ierrors.New(
@@ -233,21 +239,22 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 
 		// Validate the response
 		if err != nil {
+			s.GetMetricHandlerRoute(endpoint).routeReadError.Inc()
+
 			logger.Error("route: unable to send request from lbsidecar to node",
 				zap.Any("error", err))
-			s.GetMetricRoute(endpoint).routeSendError.Inc()
 
 			rest.ERROR(w, err)
 			return
 		}
 		defer resp.Body.Close()
 
+		elapsed := time.Since(start)
+		s.GetMetricHandlerRoute(endpoint).routeHandleDuration.Observe(elapsed.Seconds())
+
 		// Return the response
 		w.WriteHeader(resp.StatusCode)
 		io.Copy(w, resp.Body)
-
-		elapsed := time.Since(start)
-		s.GetMetricRoute(endpoint).routeHandleDuration.Observe(elapsed.Seconds())
 	}
 }
 
