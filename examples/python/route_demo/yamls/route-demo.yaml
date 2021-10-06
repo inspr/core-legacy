@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: dapp
+
+meta:
+  name: router
+spec:
+  apps:
+    client:
+      meta:
+        name: client
+        parent: router
+      spec:
+        logLevel: debug
+        node:
+          spec:
+            replicas: 1
+            image: gcr.io/insprlabs/inspr/example/python/route/client:latest
+    api:
+      meta:
+        name: api
+        parent: router
+      spec:
+        logLevel: debug
+        node:
+          spec:
+            replicas: 1
+            image: gcr.io/insprlabs/inspr/example/python/route/api:latest
+            endpoints:
+              - add
+              - sub
+              - mul
+
