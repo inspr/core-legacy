@@ -1,5 +1,16 @@
 # Changelog
 
+### #145 Story CORE-585 | [BETA] Document the BETA-Routes feature
+- doc
+  - described how to use the routes on Inspr (beta)
+---
+
+### #144 Story CORE-599 | [BETA] Route-Demo readme
+- doc:
+  - described route demo example and how to deploy it
+  - renamed yaml file for best decryption
+---
+
 ### #143 Story CORE-584 | [BETA] Create an example dApp to demonstrate how Routes work
 - features:
   - new routes demo example
