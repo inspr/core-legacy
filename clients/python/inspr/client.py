@@ -44,7 +44,7 @@ class Client:
     def handle_route(self, path:str) -> Callable[[Callable[[Any], Any]], Callable[[Any], Any]]:
         def wrapper(handle_func: Callable[[Any], Any]):
             route = remove_prefix(path, '/')
-            self.app.add_url_rule("/route/" + route, endpoint = route, view_func = handle_func, methods=["GET", "DELETE", "POST", "PUT"])
+            self.app.add_url_rule("/route/" + route, endpoint = "/route/" + route, view_func = handle_func, methods=["GET", "DELETE", "POST", "PUT"])
             return handle_func
         return wrapper
 

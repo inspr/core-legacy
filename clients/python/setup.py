@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="inspr",
-    version="0.0.11",
+    version="0.0.12",
     author="Inspr LLC",
     description="This module define APIs to interact with the Inspr environment",
     long_description=long_description,      # Long description read from the the readme file
