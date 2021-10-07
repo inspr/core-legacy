@@ -18,7 +18,8 @@ Before running the Inspr CLI command to create the app in your cluster be sure t
 
 
 This example doesn't use brokers, therefore everything is set and ready and the simpler way to test it is to run:
-```
+
+```bash
 insprctl apply -f yamls/route-demo.yaml
 ```
 This will create the dApp `router` that contains all the needed structures in it (other dApps and Routes).

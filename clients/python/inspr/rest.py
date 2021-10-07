@@ -8,12 +8,12 @@ def send_post_request(url:str, body = {}, headers = {}) -> Response:
     try:
         resp = requests.post(url, data = json.dumps(body), headers=headers)
         resp.raise_for_status()
-    
+        return resp
+
     except requests.exceptions.RequestException as e:
         print(e, file=sys.stderr)
         raise HTTPError
-    
-    return resp
+
 
 def send_update_request(url:str, body = {}, headers = {}) -> Response:
     try:

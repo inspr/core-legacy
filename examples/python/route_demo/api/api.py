@@ -15,7 +15,7 @@ def main():
         total = op1 + op2
         print(total, file=sys.stderr)
 
-        return total, HTTPStatus.OK
+        return str(total), HTTPStatus.OK
 
     client.run()
     

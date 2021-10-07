@@ -48,10 +48,12 @@ class Client:
             return handle_func
         return wrapper
 
-    def send_request(self, node_name:str, path:str, method:str, body) -> None:
+    def send_request(self, node_name:str, path:str, method:str, body) -> Response:
         try:
             url = self.write_address + "/route/" + node_name + "/" + path
-            send_new_request(url, method, body)
+            resp = send_new_request(url, method, body)
+            return resp
+        
         except Exception as e:
             print(f"Error while trying to send request: {e}")
             raise Exception("failed to deliver message: route: {}".format(url))
