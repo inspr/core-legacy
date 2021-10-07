@@ -132,7 +132,7 @@ func (s *Server) sendRequest() rest.Handler {
 		http.Redirect(w, r, URL, http.StatusPermanentRedirect)
 
 		elapsed := time.Since(start)
-		s.GetMetricSenderRoute(route).routesendDuration.Observe(elapsed.Seconds())
+		s.GetMetricSenderRoute(route).routeSendDuration.Observe(elapsed.Seconds())
 	}
 }
 
@@ -211,6 +211,8 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 		} else {
 			endpoint = splitRoute[1]
 		}
+
+		logger.Info("COCI", zap.String("endpoint", endpoint), zap.Any("splitRoute", splitRoute))
 
 		// port resolution: using the same as readHandler -> clientReadPort
 		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")

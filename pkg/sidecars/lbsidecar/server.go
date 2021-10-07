@@ -27,7 +27,7 @@ type channelMetric struct {
 type routeMetric struct {
 	routeReadError      prometheus.Counter
 	routeSendError      prometheus.Counter
-	routesendDuration   prometheus.Summary
+	routeSendDuration   prometheus.Summary
 	routeHandleDuration prometheus.Summary
 }
 
@@ -173,7 +173,7 @@ func (s *Server) GetMetricSenderRoute(route string) routeMetric {
 			},
 		}),
 
-		routesendDuration: promauto.NewSummary(prometheus.SummaryOpts{
+		routeSendDuration: promauto.NewSummary(prometheus.SummaryOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
 			Name:      "route_request_send_duration",
@@ -229,7 +229,7 @@ func (s *Server) Run(ctx context.Context) error {
 		logger.Info("admin server listening at localhost:16000")
 		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
-			logger.Error("an error occurred in LB Sidecar write server",
+			logger.Error("an error occurred in LB Sidecar admin server",
 				zap.Error(err))
 		}
 	}()

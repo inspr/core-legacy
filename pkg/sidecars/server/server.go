@@ -140,7 +140,7 @@ func (s *Server) Run(ctx context.Context) error {
 		logger.Info("admin server listening at localhost:16001")
 		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
-			logger.Error("an error occurred in LB Sidecar write server",
+			logger.Error("an error occurred in Sidecar admin server",
 				zap.Error(err))
 		}
 	}()
