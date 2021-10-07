@@ -461,7 +461,7 @@ func Test_withLBSidecarPorts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := withLBSidecarPorts(tt.args.app)
+			option := overwritePortEnvs(tt.args.app)
 			got := &kubeCore.Container{}
 			option(got)
 
