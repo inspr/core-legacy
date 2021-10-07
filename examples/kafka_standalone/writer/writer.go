@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"inspr.dev/inspr/examples/kafka_standalone/vars"
@@ -31,6 +32,7 @@ func main() {
 			}
 		}
 	}()
+	time.Sleep(5 * time.Second)
 
 	// delivery_chan := make(chan kafka.Event, 10000)
 	err = p.Produce(&kafka.Message{
