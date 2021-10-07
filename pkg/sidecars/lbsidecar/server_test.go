@@ -22,9 +22,10 @@ func TestInit(t *testing.T) {
 		{
 			name: "Initializes a new server",
 			want: &Server{
-				writeAddr: fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
-				readAddr:  fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
-				metrics:   map[string]channelMetric{},
+				writeAddr:     fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
+				readAddr:      fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+				channelMetric: make(map[string]channelMetric),
+				routeMetric:   make(map[string]routeMetric),
 			},
 		},
 	}
