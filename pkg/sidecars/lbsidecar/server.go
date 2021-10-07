@@ -40,77 +40,6 @@ type Server struct {
 	routeMetric   map[string]routeMetric
 }
 
-func (s *Server) GetMetricHandlerRoute(route string) routeMetric {
-	metric, ok := s.routeMetric[route]
-	if ok {
-		return metric
-	}
-
-	if route == "" {
-		route = "/"
-	}
-
-	s.routeMetric[route] = routeMetric{
-		routeReadError: promauto.NewCounter(prometheus.CounterOpts{
-			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "route_request_read_error",
-			ConstLabels: prometheus.Labels{
-				"inspr_route": route,
-			},
-		}),
-
-		routeHandleDuration: promauto.NewSummary(prometheus.SummaryOpts{
-			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "route_request_handle_duration",
-			ConstLabels: prometheus.Labels{
-				"inspr_route": route,
-			},
-			Objectives: map[float64]float64{},
-		}),
-	}
-
-	return s.routeMetric[route]
-
-}
-
-func (s *Server) GetMetricSenderRoute(route string) routeMetric {
-	metric, ok := s.routeMetric[route]
-	if ok {
-		return metric
-	}
-
-	resolved, _ := environment.GetRouteData(route)
-	s.routeMetric[route] = routeMetric{
-		routeSendError: promauto.NewCounter(prometheus.CounterOpts{
-			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "route_request_send_error",
-			ConstLabels: prometheus.Labels{
-				"inspr_route":          route,
-				"inspr_route_adress":   resolved.Address,
-				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
-			},
-		}),
-
-		routesendDuration: promauto.NewSummary(prometheus.SummaryOpts{
-			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "route_request_send_duration",
-			ConstLabels: prometheus.Labels{
-				"inspr_route":          route,
-				"inspr_route_adress":   resolved.Address,
-				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
-			},
-			Objectives: map[float64]float64{},
-		}),
-	}
-
-	return s.routeMetric[route]
-
-}
-
 func (s *Server) GetMetricChannel(channel string) channelMetric {
 	metric, ok := s.channelMetric[channel]
 	if ok {
@@ -187,6 +116,77 @@ func (s *Server) GetMetricChannel(channel string) channelMetric {
 	}
 
 	return s.channelMetric[channel]
+
+}
+
+func (s *Server) GetMetricHandlerRoute(route string) routeMetric {
+	metric, ok := s.routeMetric[route]
+	if ok {
+		return metric
+	}
+
+	if route == "" {
+		route = "/"
+	}
+
+	s.routeMetric[route] = routeMetric{
+		routeReadError: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_read_error",
+			ConstLabels: prometheus.Labels{
+				"inspr_route": route,
+			},
+		}),
+
+		routeHandleDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_handle_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_route": route,
+			},
+			Objectives: map[float64]float64{},
+		}),
+	}
+
+	return s.routeMetric[route]
+
+}
+
+func (s *Server) GetMetricSenderRoute(route string) routeMetric {
+	metric, ok := s.routeMetric[route]
+	if ok {
+		return metric
+	}
+
+	resolved, _ := environment.GetRouteData(route)
+	s.routeMetric[route] = routeMetric{
+		routeSendError: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_send_error",
+			ConstLabels: prometheus.Labels{
+				"inspr_route":          route,
+				"inspr_route_adress":   resolved.Address,
+				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
+			},
+		}),
+
+		routesendDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_send_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_route":          route,
+				"inspr_route_adress":   resolved.Address,
+				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
+			},
+			Objectives: map[float64]float64{},
+		}),
+	}
+
+	return s.routeMetric[route]
 
 }
 
