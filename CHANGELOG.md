@@ -1,5 +1,14 @@
 # Changelog
 
+### $146 Story CORE-592 | [BETA] Create Route metrics to assert throughput.
+- feature:
+  - added metrics to the route send and handle structure
+  - created GetMetricHandlerRoute function inside the lbsidecar server
+  - created GetMetricSenderRoute function inside the lbsidecar server
+  - added metric for the resolve route send duration
+  - added metric for the produce route handle duration
+---
+
 ### #145 Story CORE-585 | [BETA] Document the BETA-Routes feature
 - doc
   - described how to use the routes on Inspr (beta)
