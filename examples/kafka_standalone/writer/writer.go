@@ -35,15 +35,20 @@ func main() {
 	time.Sleep(5 * time.Second)
 
 	// delivery_chan := make(chan kafka.Event, 10000)
-	err = p.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     &vars.Topic,
-			Partition: kafka.PartitionAny},
-		Value: []byte("hello_world")},
-		nil,
-	)
-	if err != nil {
-		fmt.Printf("Failed to produce message: %s\n", err.Error())
-		return
+
+	run := true
+	for run {
+		err = p.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{
+				Topic:     &vars.Topic,
+				Partition: kafka.PartitionAny},
+			Value: []byte("hello_world")},
+			nil,
+		)
+		if err != nil {
+			fmt.Printf("Failed to produce message: %s\n", err.Error())
+			run = false
+			return
+		}
 	}
 }
