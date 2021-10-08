@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 COPY client/client.py .
 
-CMD ["python3", "./client.py"]
+CMD ["python3", "-u", "./client.py"]

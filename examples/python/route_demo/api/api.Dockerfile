@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 COPY api/api.py .
 
-CMD ["python3", "./api.py"]
+CMD ["python3", "-u", "./api.py"]

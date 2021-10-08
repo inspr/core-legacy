@@ -16,6 +16,28 @@ def main():
         print(total, file=sys.stderr)
 
         return str(total), HTTPStatus.OK
+    
+    @client.handle_route("/sub")
+    def sub_handler():
+        data = request.get_json(force=True)
+        op1 = data["op1"]
+        op2 = data["op2"]
+
+        total = op1 - op2
+        print(total, file=sys.stderr)
+
+        return str(total), HTTPStatus.OK
+
+    @client.handle_route("/mul")
+    def sub_handler():
+        data = request.get_json(force=True)
+        op1 = data["op1"]
+        op2 = data["op2"]
+
+        total = op1 * op2
+        print(total, file=sys.stderr)
+
+        return str(total), HTTPStatus.OK
 
     client.run()
     

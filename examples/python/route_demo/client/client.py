@@ -1,5 +1,4 @@
 import inspr
-from flask import request
 import sys
 import time
 
@@ -18,11 +17,14 @@ def main():
 
     print("Python Client")
 
-    for i in range(0,5):
-        resp = client.send_request(API_NAME, ADD_PATH, method="POST", body=msg_body)
-        print("Request ", i)
-        print("Response () = ", resp, file=sys.stderr)
-        print(resp.json())
+    while True:
+        try:
+            resp = client.send_request(API_NAME, ADD_PATH, method="POST", body=msg_body)
+        except:
+            print("An error has occured", file=sys.stderr)
+            return
+
+        print("The result is ", resp.json())
         time.sleep(10)
 
 
