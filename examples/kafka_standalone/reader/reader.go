@@ -48,8 +48,6 @@ func main() {
 
 	run := true
 
-	fmt.Println("about to start server")
-
 	go func() {
 		fmt.Println("admin server listening at localhost:16000")
 		if err := adminServer.ListenAndServe(); err != nil {
