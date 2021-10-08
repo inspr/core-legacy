@@ -15,6 +15,10 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	go func() {
+		client.Run(ctx)
+	}()
+
 	var resp model.Response
 	var err error
 
