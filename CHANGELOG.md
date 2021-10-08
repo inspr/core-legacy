@@ -1,5 +1,14 @@
 # Changelog
 
+### #147 Story CORE-591 | Implement benchmarking dapp out of Inspr Stack
+- features:
+  - implemented k8s job for creating "kafka-test" topic on kafka
+  - implemented k8s job for deleting "kafka-test" topic on kafka
+  - implemented k8s deployment for app that sends messages non stop on "kafka-test" topic
+  - implemented k8s deployment for app that reads messages non stop from "kafka-test" topic
+  - created Makefile and dockerfiles to compile images
+---
+
 ### #145 Story CORE-585 | [BETA] Document the BETA-Routes feature
 - doc
   - described how to use the routes on Inspr (beta)
