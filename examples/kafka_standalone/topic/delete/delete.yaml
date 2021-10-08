@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: delete-test-topic
+
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: delete-test-topic
+        image: gcr.io/insprlabs/inspr/example/kafkasa/delete:latest
+        imagePullPolicy: IfNotPresent
+  backoffLimit: 4
