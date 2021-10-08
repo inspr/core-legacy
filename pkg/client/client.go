@@ -163,12 +163,12 @@ func (c *Client) SendRequest(ctx context.Context, nodeName, path, method string,
 		responsePtr)
 	if err != nil {
 		l.Error("error sending request to load balancer", zap.Error(err))
-		c.GetMetricSenderRouteClient(nodeName).routeSendErrorClient.Inc()
+		c.GetMetricSenderRouteClient(path).routeSendErrorClient.Inc()
 		return err
 	}
 
 	elapsed := time.Since(start)
-	c.GetMetricSenderRouteClient(nodeName).routeSendDurationClient.Observe(elapsed.Seconds())
+	c.GetMetricSenderRouteClient(path).routeSendDurationClient.Observe(elapsed.Seconds())
 
 	l.Info("message sent")
 
