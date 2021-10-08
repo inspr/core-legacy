@@ -470,8 +470,8 @@ func TestClient_SendRequest(t *testing.T) {
 		{
 			name: "Invalid route request",
 			args: args{
-				nodeName: "rt1",
-				path:     "end1",
+				nodeName: "rt2",
+				path:     "end2",
 				method:   "GET",
 				body:     "test_body",
 			},
@@ -490,6 +490,7 @@ func TestClient_SendRequest(t *testing.T) {
 				client: request.NewJSONClient(testSever.URL).
 					HTTPClient(*http.DefaultClient).
 					Pointer(),
+				metrics: make(map[string]routeMetric),
 			}
 
 			var resp string

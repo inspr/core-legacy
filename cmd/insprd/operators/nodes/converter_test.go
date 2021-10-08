@@ -382,13 +382,6 @@ func Test_withLBSidecarPorts(t *testing.T) {
 						Value: "1234",
 					},
 				},
-				Ports: []kubeCore.ContainerPort{
-					{
-						Name:          "tcp-lbs-metrics",
-						ContainerPort: 16000,
-						Protocol:      kubeCore.ProtocolTCP,
-					},
-				},
 			},
 		},
 		{
@@ -411,13 +404,6 @@ func Test_withLBSidecarPorts(t *testing.T) {
 					{
 						Name:  "INSPR_LBSIDECAR_READ_PORT",
 						Value: "1234",
-					},
-				},
-				Ports: []kubeCore.ContainerPort{
-					{
-						Name:          "tcp-lbs-metrics",
-						ContainerPort: 16000,
-						Protocol:      kubeCore.ProtocolTCP,
 					},
 				},
 			},
@@ -447,13 +433,6 @@ func Test_withLBSidecarPorts(t *testing.T) {
 					{
 						Name:  "INSPR_LBSIDECAR_READ_PORT",
 						Value: "1234",
-					},
-				},
-				Ports: []kubeCore.ContainerPort{
-					{
-						Name:          "tcp-lbs-metrics",
-						ContainerPort: 16000,
-						Protocol:      kubeCore.ProtocolTCP,
 					},
 				},
 			},
