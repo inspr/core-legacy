@@ -5,8 +5,10 @@
   - added metrics to the route send and handle structure
   - created GetMetricHandlerRoute function inside the lbsidecar server
   - created GetMetricSenderRoute function inside the lbsidecar server
+  - created GetMetricSenderRouteClient function inside the cliente
   - added metric for the resolve route send duration
   - added metric for the produce route handle duration
+  - added metrics to the client sender structure
 ---
 
 ### #147 Story CORE-591 | Implement benchmarking dapp out of Inspr Stack
