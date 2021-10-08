@@ -54,8 +54,8 @@ func (c *Client) GetMetricSenderRouteClient(route string) routeMetric {
 
 		routeSendDurationClient: promauto.NewSummary(prometheus.SummaryOpts{
 			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "route_request_send_duration_client",
+			Subsystem: "client",
+			Name:      "route_request_send_duration",
 			ConstLabels: prometheus.Labels{
 				"inspr_client_route": route,
 			},
@@ -64,8 +64,8 @@ func (c *Client) GetMetricSenderRouteClient(route string) routeMetric {
 
 		routeSendErrorClient: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
-			Subsystem: "lbsidecar",
-			Name:      "route_request_send_error_Client",
+			Subsystem: "client",
+			Name:      "route_request_send_error",
 			ConstLabels: prometheus.Labels{
 				"inspr_route": route,
 			},
@@ -163,7 +163,7 @@ func (c *Client) SendRequest(ctx context.Context, nodeName, path, method string,
 		responsePtr)
 	if err != nil {
 		l.Error("error sending request to load balancer", zap.Error(err))
-		// c.GetMetricSenderRouteClient(nodeName).routeSendErrorClient.Inc()
+		c.GetMetricSenderRouteClient(nodeName).routeSendErrorClient.Inc()
 		return err
 	}
 
