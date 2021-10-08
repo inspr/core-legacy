@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-test-topic
+
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: create-test-topic
+        image: gcr.io/insprlabs/inspr/example/kafkasa/create:latest
+        imagePullPolicy: IfNotPresent
+  backoffLimit: 4
