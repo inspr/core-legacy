@@ -14,11 +14,14 @@ spec:
     metadata:
       labels:
         app: reader
-
+      annotations:
+        prometheus.io/scrape: "true"
     spec:
       containers:
         - name: reader
           image: gcr.io/insprlabs/inspr/example/kafkasa/reader:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
-            - containerPort: 80
+            - name: reader-metrics
+              containerPort: 16000
+              protocol: TCP
