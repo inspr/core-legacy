@@ -11,6 +11,16 @@
   - added metrics to the client sender structure
 ---
 
+### #148 Story CORE-593 | [BETA] Python client SendRequest / [BETA] Python client HandleRoute
+- feature:
+  - added send new request function to python rest package. Now you can pass the method as a parameter.
+  - created send request method in python client
+  - created handle route method in python client
+  - created a full route demo example
+- fix:
+  - update lb sidecar to not crash when not finding the route env variables (added a return statement when an error occured)
+---
+
 ### #147 Story CORE-591 | Implement benchmarking dapp out of Inspr Stack
 - features:
   - implemented k8s job for creating "kafka-test" topic on kafka
@@ -21,7 +31,7 @@
 ---
 
 ### #145 Story CORE-585 | [BETA] Document the BETA-Routes feature
-- doc
+- doc:
   - described how to use the routes on Inspr (beta)
 ---
 

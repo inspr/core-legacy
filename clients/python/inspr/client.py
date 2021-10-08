@@ -40,6 +40,23 @@ class Client:
             self.app.add_url_rule("/channel/" + channel, endpoint = channel, view_func = route_func, methods=["POST"])
             return handle_func
         return wrapper
+    
+    def handle_route(self, path:str) -> Callable[[Callable[[Any], Any]], Callable[[Any], Any]]:
+        def wrapper(handle_func: Callable[[Any], Any]):
+            route = remove_prefix(path, '/')
+            self.app.add_url_rule("/route/" + route, endpoint = "/route/" + route, view_func = handle_func, methods=["GET", "DELETE", "POST", "PUT"])
+            return handle_func
+        return wrapper
+
+    def send_request(self, node_name:str, path:str, method:str, body) -> Response:
+        try:
+            url = self.write_address + "/route/" + node_name + "/" + path
+            resp = send_new_request(url, method, body)
+            return resp
+        
+        except Exception as e:
+            print(f"Error while trying to send request: {e}")
+            raise Exception("failed to deliver message: route: {}".format(url))
 
     def run(self) -> None:
         links = []
@@ -48,3 +65,9 @@ class Client:
         print("registered routes =", links, file=sys.stderr)
 
         self.app.run(port=self.read_port)
+
+
+def remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
