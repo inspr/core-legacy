@@ -34,8 +34,6 @@ func main() {
 	}()
 	time.Sleep(5 * time.Second)
 
-	// delivery_chan := make(chan kafka.Event, 10000)
-
 	run := true
 	for run {
 		err = p.Produce(&kafka.Message{
