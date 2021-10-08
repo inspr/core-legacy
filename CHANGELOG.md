@@ -1,5 +1,12 @@
 # Changelog
 
+
+### #149 Story CORE-600 | Add metrics to the throughput apps without inspr 
+- features:
+  - added duration metrics for writes and reads
+  - configured deployments to correctly integrate with Inspr's Prometheus
+---
+
 ### #147 Story CORE-591 | Implement benchmarking dapp out of Inspr Stack
 - features:
   - implemented k8s job for creating "kafka-test" topic on kafka
