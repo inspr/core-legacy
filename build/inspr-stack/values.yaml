@@ -119,6 +119,8 @@ grafana:
   dashboardsConfigMaps:
     - configMapName: inspr-stack-benchmark-configmap
       fileName: benchmark-dashboard.json
+    - configMapName: inspr-stack-route-configmap
+      fileName: route-dashboard.json
 
   datasources:
     secretName: "inspr-stack-grafana-data-source"
