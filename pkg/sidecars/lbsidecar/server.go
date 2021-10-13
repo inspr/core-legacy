@@ -40,7 +40,7 @@ type Server struct {
 	routeMetric   map[string]routeMetric
 }
 
-func (s *Server) GetMetricChannel(channel string) channelMetric {
+func (s *Server) GetChannelMetric(channel string) channelMetric {
 	metric, ok := s.channelMetric[channel]
 	if ok {
 		return metric
@@ -119,7 +119,7 @@ func (s *Server) GetMetricChannel(channel string) channelMetric {
 
 }
 
-func (s *Server) GetMetricHandlerRoute(route string) routeMetric {
+func (s *Server) GetRouteHandlerMetric(route string) routeMetric {
 	metric, ok := s.routeMetric[route]
 	if ok {
 		return metric
@@ -154,7 +154,7 @@ func (s *Server) GetMetricHandlerRoute(route string) routeMetric {
 
 }
 
-func (s *Server) GetMetricSenderRoute(route string) routeMetric {
+func (s *Server) getRouteSenderMetric(route string) routeMetric {
 	metric, ok := s.routeMetric[route]
 	if ok {
 		return metric
@@ -237,7 +237,7 @@ func (s *Server) Run(ctx context.Context) error {
 	muxWriter := http.NewServeMux()
 
 	muxWriter.Handle("/channel/", s.writeMessageHandler().Post().JSON())
-	muxWriter.Handle("/route/", s.sendRequest().JSON())
+	muxWriter.Handle("/route/", s.sendRouteRequest().JSON())
 
 	writeServer := &http.Server{
 		Handler: muxWriter,

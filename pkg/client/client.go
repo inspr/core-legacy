@@ -36,11 +36,11 @@ type Client struct {
 }
 
 type routeMetric struct {
-	routeSendDurationClient prometheus.Summary
-	routeSendErrorClient    prometheus.Counter
+	routeSendDuration prometheus.Summary
+	routeSendError    prometheus.Counter
 }
 
-func (c *Client) GetMetricSenderRouteClient(route string) routeMetric {
+func (c *Client) GetRouteMetric(route string) routeMetric {
 	metric, ok := c.metrics[route]
 	if ok {
 		return metric
@@ -52,7 +52,7 @@ func (c *Client) GetMetricSenderRouteClient(route string) routeMetric {
 
 	c.metrics[route] = routeMetric{
 
-		routeSendDurationClient: promauto.NewSummary(prometheus.SummaryOpts{
+		routeSendDuration: promauto.NewSummary(prometheus.SummaryOpts{
 			Namespace: "inspr",
 			Subsystem: "client",
 			Name:      "route_request_send_duration",
@@ -62,7 +62,7 @@ func (c *Client) GetMetricSenderRouteClient(route string) routeMetric {
 			Objectives: map[float64]float64{},
 		}),
 
-		routeSendErrorClient: promauto.NewCounter(prometheus.CounterOpts{
+		routeSendError: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "client",
 			Name:      "route_request_send_error",
@@ -151,8 +151,6 @@ func (c *Client) SendRequest(ctx context.Context, nodeName, path, method string,
 
 	start := time.Now()
 
-	logger.Info("COCI", zap.String("nodename", nodeName), zap.String("path", path))
-
 	// sends a message to the corresponding route on the sidecar
 	l.Debug("sending message to load balancer")
 	err := c.client.Send(
@@ -163,12 +161,12 @@ func (c *Client) SendRequest(ctx context.Context, nodeName, path, method string,
 		responsePtr)
 	if err != nil {
 		l.Error("error sending request to load balancer", zap.Error(err))
-		c.GetMetricSenderRouteClient(path).routeSendErrorClient.Inc()
+		c.GetRouteMetric(nodeName).routeSendError.Inc()
 		return err
 	}
 
 	elapsed := time.Since(start)
-	c.GetMetricSenderRouteClient(path).routeSendDurationClient.Observe(elapsed.Seconds())
+	c.GetRouteMetric(nodeName).routeSendDuration.Observe(elapsed.Seconds())
 
 	l.Info("message sent")
 
