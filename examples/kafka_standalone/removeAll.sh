@@ -1,5 +1,5 @@
 #!/bin/bash
 
-kubectl apply -n kafkasa -f ./topic/create/create.yaml
-sleep 10s
-kubectl delete namespace kafkasa
+kubectl apply -n kafkasa-apps -f ./topic/delete/delete.yaml
+sleep 5s
+kubectl delete namespace kafkasa-apps

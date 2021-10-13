@@ -14,11 +14,14 @@ spec:
     metadata:
       labels:
         app: writer
-
+      annotations:
+        prometheus.io/scrape: "true"
     spec:
       containers:
         - name: writer
           image: gcr.io/insprlabs/inspr/example/kafkasa/writer:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
-            - containerPort: 80
+            - name: writer-metrics
+              containerPort: 16000
+              protocol: TCP
