@@ -21,170 +21,22 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1634140268972,
+  "iteration": 1634144619579,
   "links": [],
   "panels": [
     {
+      "collapsed": false,
       "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 1,
+        "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 10,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "rate(inspr_client_route_request_send_duration_sum{inspr_app=\"${client_route}\"}[1m])\n/\nrate(inspr_client_route_request_send_duration_count{inspr_app=\"${client_route}\"}[1m])",
-          "interval": "",
-          "legendFormat": "Send duration",
-          "refId": "A"
-        }
-      ],
-      "title": "Send duration",
-      "type": "timeseries"
-    },
-    {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "rate(inspr_lbsidecar_route_request_handle_duration_sum{inspr_app=\"${API_route}\"}[1m])\n/\nrate(inspr_lbsidecar_route_request_handle_duration_count{inspr_app=\"${API_route}\"}[1m])",
-          "interval": "",
-          "legendFormat": "Handler duration",
-          "refId": "A"
-        }
-      ],
-      "title": "Handler duration",
-      "type": "timeseries"
+      "id": 13,
+      "panels": [],
+      "title": "Route panels",
+      "type": "row"
     },
     {
       "datasource": null,
@@ -242,7 +94,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 1
       },
       "id": 6,
       "options": {
@@ -331,7 +183,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 9
       },
       "id": 11,
       "options": {
@@ -361,7 +213,7 @@
           "refId": "B"
         }
       ],
-      "title": "Throughput(send x handle)",
+      "title": "Throughput (send x handle)",
       "type": "timeseries"
     },
     {
@@ -445,7 +297,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 24
+        "y": 17
       },
       "id": 8,
       "options": {
@@ -469,9 +321,121 @@
       ],
       "title": "Resolve node name duration",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 15,
+      "panels": [],
+      "title": "Error",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_client_route_request_send_error{}[5m])",
+          "interval": "",
+          "legendFormat": "Send",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_lbsidecar_route_request_read_error{}[5m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Read",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "rate(inspr_lbsidecar_route_request_send_error{}[5m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "LB send",
+          "refId": "C"
+        }
+      ],
+      "title": "Error count",
+      "transformations": [],
+      "type": "timeseries"
     }
   ],
-  "refresh": false,
+  "refresh": "5m",
   "schemaVersion": 30,
   "style": "dark",
   "tags": [],
@@ -480,10 +444,9 @@
       {
         "allValue": null,
         "current": {
-          "isNone": true,
-          "selected": true,
-          "text": "None",
-          "value": ""
+          "selected": false,
+          "text": "router-api",
+          "value": "router-api"
         },
         "datasource": null,
         "definition": "label_values(app_id)",
@@ -508,10 +471,9 @@
       {
         "allValue": null,
         "current": {
-          "isNone": true,
-          "selected": true,
-          "text": "None",
-          "value": ""
+          "selected": false,
+          "text": "router-client",
+          "value": "router-client"
         },
         "datasource": null,
         "definition": "label_values(app_id)",
@@ -543,5 +505,5 @@
   "timezone": "",
   "title": "Route dashboard",
   "uid": "lfXVXeD7k",
-  "version": 1
+  "version": 2
 }
