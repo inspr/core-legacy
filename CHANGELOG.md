@@ -1,5 +1,11 @@
 # Changelog
 
+### #149 Story CORE-600 | Add metrics to the throughput apps without inspr 
+- features:
+  - added duration metrics for writes and reads
+  - configured deployments to correctly integrate with Inspr's Prometheus
+---
+
 ### #148 Story CORE-593 | [BETA] Python client SendRequest / [BETA] Python client HandleRoute
 - feature:
   - added send new request function to python rest package. Now you can pass the method as a parameter.
