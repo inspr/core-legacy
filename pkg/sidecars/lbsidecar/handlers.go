@@ -80,7 +80,7 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		if err != nil {
 			logger.Error("unable to send request to "+channelBroker+" sidecar",
 				zap.Any("error", err))
-			s.GetMetric(channel).messageSendError.Inc()
+			s.GetChannelMetric(channel).messageSendError.Inc()
 
 			rest.ERROR(w, err)
 			return
@@ -88,14 +88,16 @@ func (s *Server) writeMessageHandler() rest.Handler {
 		defer resp.Body.Close()
 
 		rest.JSON(w, resp.StatusCode, nil)
-		s.GetMetric(channel).messagesSent.Inc()
+		s.GetChannelMetric(channel).messagesSent.Inc()
 		elapsed := time.Since(start)
-		s.GetMetric(channel).writeMessageDuration.Observe(elapsed.Seconds())
+		s.GetChannelMetric(channel).writeMessageDuration.Observe(elapsed.Seconds())
 	}
 }
 
-func (s *Server) sendRequest() rest.Handler {
+func (s *Server) sendRouteRequest() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
 		path := strings.TrimPrefix(r.URL.Path, "/route/")
 		pathArgs := strings.Split(path, "/")
 		route := pathArgs[0]
@@ -105,6 +107,8 @@ func (s *Server) sendRequest() rest.Handler {
 		resolved, err := environment.GetRouteData(route)
 
 		if err != nil {
+			s.getRouteSenderMetric(route).routeSendError.Inc()
+
 			logger.Error("unable to send request to route",
 				zap.String("route", route),
 				zap.Any("error", err))
@@ -114,6 +118,9 @@ func (s *Server) sendRequest() rest.Handler {
 		}
 
 		if !resolved.Endpoints.Contains(endpoint) {
+
+			s.getRouteSenderMetric(route).routeSendError.Inc()
+
 			err = ierrors.New("invalid endpoint: %s", endpoint).BadRequest()
 			logger.Error("unable to send request to "+path,
 				zap.Any("error", err))
@@ -125,6 +132,9 @@ func (s *Server) sendRequest() rest.Handler {
 
 		logger.Info("redirecting request", zap.String("route", route), zap.Any("URL", URL))
 		http.Redirect(w, r, URL, http.StatusPermanentRedirect)
+
+		elapsed := time.Since(start)
+		s.getRouteSenderMetric(route).routeSendDuration.Observe(elapsed.Seconds())
 	}
 }
 
@@ -184,27 +194,31 @@ func (s *Server) readMessageHandler() rest.Handler {
 
 		rest.JSON(w, resp.StatusCode, resp.Body)
 		elapsed := time.Since(start)
-		s.GetMetric(channel).readMessageDuration.Observe(elapsed.Seconds())
-		s.GetMetric(channel).messagesRead.Add(1)
+		s.GetChannelMetric(channel).readMessageDuration.Observe(elapsed.Seconds())
+		s.GetChannelMetric(channel).messagesRead.Add(1)
 	}
 }
 
 // routeReceiveHandler handles any requests received in the "/route" path, for the lbsidecar
 func (s *Server) routeReceiveHandler() rest.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
 		// Checking the endpoint
 		endpoint := strings.TrimPrefix(r.URL.Path, "/route/")
 
-		splittedRoute := strings.SplitN(endpoint, "/", 2)
-		if len(splittedRoute) == 1 {
+		splitRoute := strings.SplitN(endpoint, "/", 2)
+		if len(splitRoute) == 1 {
 			endpoint = ""
 		} else {
-			endpoint = splittedRoute[1]
+			endpoint = splitRoute[1]
 		}
 
 		// port resolution: using the same as readHandler -> clientReadPort
 		clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
 		if clientReadPort == "" {
+			s.GetRouteHandlerMetric(splitRoute[0]).routeReadError.Inc()
+
 			rest.ERROR(
 				w,
 				ierrors.New(
@@ -227,12 +241,18 @@ func (s *Server) routeReceiveHandler() rest.Handler {
 
 		// Validate the response
 		if err != nil {
+			s.GetRouteHandlerMetric(splitRoute[0]).routeReadError.Inc()
+
 			logger.Error("route: unable to send request from lbsidecar to node",
 				zap.Any("error", err))
+
 			rest.ERROR(w, err)
 			return
 		}
 		defer resp.Body.Close()
+
+		elapsed := time.Since(start)
+		s.GetRouteHandlerMetric(splitRoute[0]).routeHandleDuration.Observe(elapsed.Seconds())
 
 		// Return the response
 		w.WriteHeader(resp.StatusCode)

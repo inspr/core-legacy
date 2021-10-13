@@ -15,6 +15,11 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// This server is necessary to get the metrics set on the client
+	go func() {
+		client.Run(ctx)
+	}()
+
 	var resp model.Response
 	var err error
 

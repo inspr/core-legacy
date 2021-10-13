@@ -131,7 +131,8 @@ func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName s
 		no.withLBSidecarImage(app),
 		no.withBoundary(app, usePermTree),
 		no.withRoutes(app),
-		withLBSidecarPorts(app),
+		overwritePortEnvs(app),
+		withLBPort(),
 		withLBSidecarConfiguration(),
 		k8s.ContainerWithEnv(sidecarAddrs...),
 		withNodeID(app),
@@ -330,7 +331,8 @@ func createNodeContainer(app *meta.App, appDeployName string) corev1.Container {
 	return k8s.NewContainer(
 		appDeployName,
 		app.Spec.Node.Spec.Image,
-		withLBSidecarPorts(app),
+		overwritePortEnvs(app),
+		withNodePort(),
 		withSecretDefinition(app),
 		k8s.ContainerWithEnv(corev1.EnvVar{
 			Name:  "LOG_LEVEL",
@@ -355,6 +357,18 @@ func getAvailiblePorts() *models.SidecarConnections {
 	}
 }
 
+func withNodePort() k8s.ContainerOption {
+	return k8s.ContainerWithPorts(corev1.ContainerPort{
+		ContainerPort: 16002, Name: "tcp-nd-metrics", Protocol: corev1.ProtocolTCP,
+	})
+}
+
+func withLBPort() k8s.ContainerOption {
+	return k8s.ContainerWithPorts(corev1.ContainerPort{
+		ContainerPort: 16000, Name: "tcp-lbs-metrics", Protocol: corev1.ProtocolTCP,
+	})
+}
+
 func withLBSidecarConfiguration() k8s.ContainerOption {
 	return k8s.ContainerWithEnvFrom(
 		corev1.EnvFromSource{
@@ -367,9 +381,9 @@ func withLBSidecarConfiguration() k8s.ContainerOption {
 	)
 }
 
-// withLBSidecarPorts adds the load balancer sidecar ports if they are defined in the dApp definitions.
+// overwritePortEnvs adds the load balancer sidecar ports if they are defined in the dApp definitions.
 // On kubernetes, this overrides the defined configuration on the configmap
-func withLBSidecarPorts(app *meta.App) k8s.ContainerOption {
+func overwritePortEnvs(app *meta.App) k8s.ContainerOption {
 	return func(c *corev1.Container) {
 		lbWritePort := app.Spec.Node.Spec.SidecarPort.LBWrite
 		lbReadPort := app.Spec.Node.Spec.SidecarPort.LBRead
@@ -385,10 +399,6 @@ func withLBSidecarPorts(app *meta.App) k8s.ContainerOption {
 				Name:  "INSPR_LBSIDECAR_READ_PORT",
 				Value: strconv.Itoa(lbReadPort),
 			})
-		}
-
-		c.Ports = []corev1.ContainerPort{
-			{ContainerPort: 16000, Name: "tcp-lbs-metrics", Protocol: corev1.ProtocolTCP},
 		}
 
 	}

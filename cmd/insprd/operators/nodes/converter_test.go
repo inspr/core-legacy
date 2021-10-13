@@ -382,13 +382,6 @@ func Test_withLBSidecarPorts(t *testing.T) {
 						Value: "1234",
 					},
 				},
-				Ports: []kubeCore.ContainerPort{
-					{
-						Name:          "tcp-lbs-metrics",
-						ContainerPort: 16000,
-						Protocol:      kubeCore.ProtocolTCP,
-					},
-				},
 			},
 		},
 		{
@@ -411,13 +404,6 @@ func Test_withLBSidecarPorts(t *testing.T) {
 					{
 						Name:  "INSPR_LBSIDECAR_READ_PORT",
 						Value: "1234",
-					},
-				},
-				Ports: []kubeCore.ContainerPort{
-					{
-						Name:          "tcp-lbs-metrics",
-						ContainerPort: 16000,
-						Protocol:      kubeCore.ProtocolTCP,
 					},
 				},
 			},
@@ -449,19 +435,12 @@ func Test_withLBSidecarPorts(t *testing.T) {
 						Value: "1234",
 					},
 				},
-				Ports: []kubeCore.ContainerPort{
-					{
-						Name:          "tcp-lbs-metrics",
-						ContainerPort: 16000,
-						Protocol:      kubeCore.ProtocolTCP,
-					},
-				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := withLBSidecarPorts(tt.args.app)
+			option := overwritePortEnvs(tt.args.app)
 			got := &kubeCore.Container{}
 			option(got)
 
@@ -609,6 +588,68 @@ func TestNodeOperator_toSecret(t *testing.T) {
 			}
 			if got := no.toSecret(tt.args.app); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NodeOperator.toSecret() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_WithNodePort(t *testing.T) {
+	tests := []struct {
+		name string
+		want *kubeCore.Container
+	}{
+		{
+			name: "injection",
+			want: &kubeCore.Container{
+				Ports: []kubeCore.ContainerPort{
+					{
+						Name:          "tcp-nd-metrics",
+						ContainerPort: 16002,
+						Protocol:      kubeCore.ProtocolTCP,
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			options := withNodePort()
+			got := &kubeCore.Container{}
+			options(got)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("withNodePort() got = %v, want = %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_WithLBPort(t *testing.T) {
+	tests := []struct {
+		name string
+		want *kubeCore.Container
+	}{
+		{
+			name: "injection",
+			want: &kubeCore.Container{
+				Ports: []kubeCore.ContainerPort{
+					{
+						Name:          "tcp-lbs-metrics",
+						ContainerPort: 16000,
+						Protocol:      kubeCore.ProtocolTCP,
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			options := withLBPort()
+			got := &kubeCore.Container{}
+			options(got)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("withLBPort() got = %v, want = %v", got, tt.want)
 			}
 		})
 	}

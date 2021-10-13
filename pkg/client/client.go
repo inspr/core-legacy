@@ -10,6 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/rest"
@@ -29,6 +32,48 @@ type Client struct {
 	client   *request.Client
 	mux      *http.ServeMux
 	readAddr string
+	metrics  map[string]routeMetric
+}
+
+type routeMetric struct {
+	routeSendDuration prometheus.Summary
+	routeSendError    prometheus.Counter
+}
+
+func (c *Client) GetRouteMetric(route string) routeMetric {
+	metric, ok := c.metrics[route]
+	if ok {
+		return metric
+	}
+
+	if route == "" {
+		route = "/"
+	}
+
+	c.metrics[route] = routeMetric{
+
+		routeSendDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "client",
+			Name:      "route_request_send_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_client_route": route,
+			},
+			Objectives: map[float64]float64{},
+		}),
+
+		routeSendError: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "client",
+			Name:      "route_request_send_error",
+			ConstLabels: prometheus.Labels{
+				"inspr_route": route,
+			},
+		}),
+	}
+
+	return c.metrics[route]
+
 }
 
 // NewAppClient returns a new instance of the client of the AppClient package
@@ -38,6 +83,7 @@ func NewAppClient() *Client {
 	readAddr := fmt.Sprintf(":%s", os.Getenv("INSPR_SCCLIENT_READ_PORT"))
 	logger.Info("got configuration from environment variables")
 	logger = logger.With(zap.String("read-address", readAddr), zap.String("write-address", writeAddr))
+
 	return &Client{
 		readAddr: readAddr,
 		client: request.NewClient().
@@ -45,7 +91,8 @@ func NewAppClient() *Client {
 			Encoder(json.Marshal).
 			Decoder(request.JSONDecoderGenerator).
 			Pointer(),
-		mux: http.NewServeMux(),
+		mux:     http.NewServeMux(),
+		metrics: make(map[string]routeMetric),
 	}
 }
 
@@ -102,6 +149,8 @@ func (c *Client) HandleRoute(path string, handler func(w http.ResponseWriter, r 
 func (c *Client) SendRequest(ctx context.Context, nodeName, path, method string, body interface{}, responsePtr interface{}) error {
 	l := logger.With(zap.String("operation", "sendRequest"), zap.String("route", nodeName))
 
+	start := time.Now()
+
 	// sends a message to the corresponding route on the sidecar
 	l.Debug("sending message to load balancer")
 	err := c.client.Send(
@@ -112,8 +161,13 @@ func (c *Client) SendRequest(ctx context.Context, nodeName, path, method string,
 		responsePtr)
 	if err != nil {
 		l.Error("error sending request to load balancer", zap.Error(err))
+		c.GetRouteMetric(nodeName).routeSendError.Inc()
 		return err
 	}
+
+	elapsed := time.Since(start)
+	c.GetRouteMetric(nodeName).routeSendDuration.Observe(elapsed.Seconds())
+
 	l.Info("message sent")
 
 	return err
@@ -128,6 +182,20 @@ func (c *Client) Run(ctx context.Context) error {
 		Handler: c.mux,
 		Addr:    c.readAddr,
 	}
+
+	admin := http.NewServeMux()
+	admin.Handle("/metrics", promhttp.Handler())
+	adminServer := &http.Server{
+		Handler: admin,
+		Addr:    "0.0.0.0:16002",
+	}
+	go func() {
+		logger.Info("admin server listening at localhost:16002")
+		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("an error occurred in client admin server",
+				zap.Error(err))
+		}
+	}()
 
 	go func() {
 		if err = server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

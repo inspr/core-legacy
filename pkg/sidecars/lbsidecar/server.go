@@ -24,22 +24,31 @@ type channelMetric struct {
 	writeMessageDuration prometheus.Summary
 }
 
+type routeMetric struct {
+	routeReadError      prometheus.Counter
+	routeSendError      prometheus.Counter
+	routeSendDuration   prometheus.Summary
+	routeHandleDuration prometheus.Summary
+}
+
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
-	writeAddr string
-	readAddr  string
-	metrics   map[string]channelMetric
+	writeAddr     string
+	readAddr      string
+	channelMetric map[string]channelMetric
+	routeMetric   map[string]routeMetric
 }
 
-func (s *Server) GetMetric(channel string) channelMetric {
-	metric, ok := s.metrics[channel]
+func (s *Server) GetChannelMetric(channel string) channelMetric {
+	metric, ok := s.channelMetric[channel]
 	if ok {
 		return metric
 	}
+
 	resolved, _ := environment.GetResolvedChannel(channel, environment.GetInputChannelsData(), environment.GetOutputChannelsData())
 	broker, _ := environment.GetChannelBroker(channel)
-	s.metrics[channel] = channelMetric{
+	s.channelMetric[channel] = channelMetric{
 		messagesSent: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
@@ -106,7 +115,69 @@ func (s *Server) GetMetric(channel string) channelMetric {
 		}),
 	}
 
-	return s.metrics[channel]
+	return s.channelMetric[channel]
+
+}
+
+func (s *Server) GetRouteHandlerMetric(route string) routeMetric {
+	metric, ok := s.routeMetric[route]
+	if ok {
+		return metric
+	}
+
+	s.routeMetric[route] = routeMetric{
+		routeReadError: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_read_error",
+			ConstLabels: prometheus.Labels{
+				"inspr_route": route,
+			},
+		}),
+
+		routeHandleDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_handle_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_route": route,
+			},
+			Objectives: map[float64]float64{},
+		}),
+	}
+
+	return s.routeMetric[route]
+
+}
+
+func (s *Server) getRouteSenderMetric(route string) routeMetric {
+	metric, ok := s.routeMetric[route]
+	if ok {
+		return metric
+	}
+
+	s.routeMetric[route] = routeMetric{
+		routeSendError: promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_send_error",
+			ConstLabels: prometheus.Labels{
+				"inspr_route": route,
+			},
+		}),
+
+		routeSendDuration: promauto.NewSummary(prometheus.SummaryOpts{
+			Namespace: "inspr",
+			Subsystem: "lbsidecar",
+			Name:      "route_request_send_duration",
+			ConstLabels: prometheus.Labels{
+				"inspr_route": route,
+			},
+			Objectives: map[float64]float64{},
+		}),
+	}
+
+	return s.routeMetric[route]
 
 }
 
@@ -126,7 +197,8 @@ func Init() *Server {
 	s.writeAddr = fmt.Sprintf(":%s", wAddr)
 	s.readAddr = fmt.Sprintf(":%s", rAddr)
 	logger = logger.With(zap.String("read-address", rAddr), zap.String("write-address", wAddr))
-	s.metrics = make(map[string]channelMetric)
+	s.channelMetric = make(map[string]channelMetric)
+	s.routeMetric = make(map[string]routeMetric)
 
 	return &s
 }
@@ -148,7 +220,7 @@ func (s *Server) Run(ctx context.Context) error {
 		logger.Info("admin server listening at localhost:16000")
 		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
-			logger.Error("an error occurred in LB Sidecar write server",
+			logger.Error("an error occurred in LB Sidecar admin server",
 				zap.Error(err))
 		}
 	}()
@@ -156,7 +228,7 @@ func (s *Server) Run(ctx context.Context) error {
 	muxWriter := http.NewServeMux()
 
 	muxWriter.Handle("/channel/", s.writeMessageHandler().Post().JSON())
-	muxWriter.Handle("/route/", s.sendRequest().JSON())
+	muxWriter.Handle("/route/", s.sendRouteRequest().JSON())
 
 	writeServer := &http.Server{
 		Handler: muxWriter,

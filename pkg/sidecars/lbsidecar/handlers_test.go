@@ -396,7 +396,7 @@ func TestServer_sendRequest(t *testing.T) {
 	createMockEnvVars()
 	defer deleteMockEnvVars()
 
-	wServer := httptest.NewServer(Init().sendRequest())
+	wServer := httptest.NewServer(Init().sendRouteRequest())
 	client := http.Client{}
 
 	tests := []struct {
