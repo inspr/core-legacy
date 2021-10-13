@@ -110,6 +110,7 @@ func (s *Server) sendRequest() rest.Handler {
 				zap.Any("error", err))
 
 			rest.ERROR(w, err)
+			return
 		}
 
 		if !resolved.Endpoints.Contains(endpoint) {
@@ -118,6 +119,7 @@ func (s *Server) sendRequest() rest.Handler {
 				zap.Any("error", err))
 
 			rest.ERROR(w, err)
+			return
 		}
 		URL := fmt.Sprintf("%s/route/%s", resolved.Address, path)
 
