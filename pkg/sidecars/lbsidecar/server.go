@@ -125,10 +125,6 @@ func (s *Server) GetRouteHandlerMetric(route string) routeMetric {
 		return metric
 	}
 
-	if route == "" {
-		route = "/"
-	}
-
 	s.routeMetric[route] = routeMetric{
 		routeReadError: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
@@ -160,16 +156,13 @@ func (s *Server) getRouteSenderMetric(route string) routeMetric {
 		return metric
 	}
 
-	resolved, _ := environment.GetRouteData(route)
 	s.routeMetric[route] = routeMetric{
 		routeSendError: promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "inspr",
 			Subsystem: "lbsidecar",
 			Name:      "route_request_send_error",
 			ConstLabels: prometheus.Labels{
-				"inspr_route":          route,
-				"inspr_route_adress":   resolved.Address,
-				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
+				"inspr_route": route,
 			},
 		}),
 
@@ -178,9 +171,7 @@ func (s *Server) getRouteSenderMetric(route string) routeMetric {
 			Subsystem: "lbsidecar",
 			Name:      "route_request_send_duration",
 			ConstLabels: prometheus.Labels{
-				"inspr_route":          route,
-				"inspr_route_adress":   resolved.Address,
-				"inspr_route_endpoint": resolved.Endpoints.Join(";"),
+				"inspr_route": route,
 			},
 			Objectives: map[float64]float64{},
 		}),
