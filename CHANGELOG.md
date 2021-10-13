@@ -1,6 +1,12 @@
 # Changelog
 
-### $146 Story CORE-592 | [BETA] Create Route metrics to assert throughput.
+### #150 Story CORE-598 | [BETA] Create grafana dashboard to evaluate routes throughput
+- feature:
+  - Created grafana route dashboard 
+  - Added the route dashboard to the skaffold deploy
+---
+
+### #146 Story CORE-592 | [BETA] Create Route metrics to assert throughput.
 - feature:
   - added metrics to the route send and handle structure
   - created GetRouteHandlerMetric function inside the lbsidecar server
@@ -61,7 +67,7 @@
 ---
 
 ### #142 Story CORE-590 | [BETA] dApp client SendRequest
--feature:
+- feature:
   - create send request function for routes
   - added tests for the send route request
 --- 
