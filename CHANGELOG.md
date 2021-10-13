@@ -3,9 +3,9 @@
 ### $146 Story CORE-592 | [BETA] Create Route metrics to assert throughput.
 - feature:
   - added metrics to the route send and handle structure
-  - created GetMetricHandlerRoute function inside the lbsidecar server
-  - created GetMetricSenderRoute function inside the lbsidecar server
-  - created GetMetricSenderRouteClient function inside the cliente
+  - created GetRouteHandlerMetric function inside the lbsidecar server
+  - created getRouteSenderMetric function inside the lbsidecar server
+  - created GetRouteMetric function inside the cliente
   - added metric for the resolve route send duration
   - added metric for the produce route handle duration
   - added metrics to the client sender structure
