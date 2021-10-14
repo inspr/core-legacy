@@ -1,5 +1,10 @@
 # Changelog
 
+### #151 Fix CORE-601 | Unable to create user
+- fix:
+  - corrected permission check to include cases where scope doesn't apply.
+---
+
 ### #150 Story CORE-598 | [BETA] Create grafana dashboard to evaluate routes throughput
 - feature:
   - Created grafana route dashboard 
