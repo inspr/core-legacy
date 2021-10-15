@@ -21,7 +21,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1634144619579,
+  "iteration": 1634307028389,
   "links": [],
   "panels": [
     {
@@ -117,7 +117,7 @@
         },
         {
           "exemplar": true,
-          "expr": "rate(inspr_lbsidecar_route_request_handle_duration_sum{inspr_app=\"${API_route}\"}[1m])\n/\nrate(inspr_lbsidecar_route_request_handle_duration_count{inspr_app=\"${API_route}\"}[1m])",
+          "expr": "rate(inspr_client_route_request_handle_duration_count{inspr_app=\"${API_route}\"}[1m])\n/\nrate(inspr_client_route_request_handle_duration_sum{inspr_app=\"${API_route}\"}[1m])",
           "hide": false,
           "interval": "",
           "legendFormat": "Handler duration",
@@ -206,7 +206,7 @@
         },
         {
           "exemplar": true,
-          "expr": "rate(inspr_lbsidecar_route_request_handle_duration_count{inspr_app=\"${API_route}\"}[1m])\n/\nrate(inspr_lbsidecar_route_request_handle_duration_sum{inspr_app=\"${API_route}\"}[1m])",
+          "expr": "rate(inspr_client_route_request_handle_duration_count{inspr_app=\"${API_route}\"}[1m])\n/\nrate(inspr_client_route_request_handle_duration_sum{inspr_app=\"${API_route}\"}[1m])",
           "hide": false,
           "interval": "",
           "legendFormat": "Handler duration",
