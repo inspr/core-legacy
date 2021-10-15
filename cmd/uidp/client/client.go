@@ -443,23 +443,25 @@ func hasPermission(ctx context.Context, rdb *redis.ClusterClient, uid, pwd strin
 		return fmt.Errorf("invalid password for user %v", uid)
 	}
 
-	for newUserPermItem, newUserPermScopes := range opUser.Permissions {
+	_, okToken := requester.Permissions[auth.CreateToken]
+	for newPermItem, newPermScopes := range opUser.Permissions {
 		isAllowed := false
-		reqPermScopes, okPermItem := requester.Permissions[newUserPermItem]
-		_, okToken := requester.Permissions[auth.CreateToken]
+		reqPermScopes, okPermItem := requester.Permissions[newPermItem]
 		if !isCreation && okToken {
 			isAllowed = true
 		} else if isCreation && okToken && okPermItem {
 			isAllowed = true
-			for _, newUserScope := range newUserPermScopes {
-				if !isScopeAllowed(newUserScope, reqPermScopes) {
-					isAllowed = false
-					break
+			if newPermScopes != nil || reqPermScopes != nil {
+				for _, newUserScope := range newPermScopes {
+					if !isScopeAllowed(newUserScope, reqPermScopes) {
+						isAllowed = false
+						break
+					}
 				}
 			}
 		}
 		if !isAllowed {
-			l.Debug("user unauthorized")
+			l.Debug("user unauthorized", zap.Any("requester", requester.Permissions), zap.Any("opUser", opUser.Permissions))
 			return ierrors.New(
 				"not allowed to create/delete/update a user with current permissions",
 			).Forbidden()

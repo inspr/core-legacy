@@ -1,8 +1,6 @@
 uid: name
 password: password
 permissions:
-  "create:token":
-    - ""
   "create:dapp":
     - ""
   "create:channel":
@@ -36,9 +34,9 @@ permissions:
     - ""
   "delete:type":
     - ""
-  "delete:alias"
+  "delete:alias":
+    - ""
 
-  "create:broker":
-    - ""
-  "get:broker":
-    - ""
+  "create:broker": null
+  "get:broker": null
+  "create:token": null

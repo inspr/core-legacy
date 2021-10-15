@@ -68,27 +68,28 @@ const (
 // when the cluster is initialized
 var AdminPermissions = map[string][]string{
 
-	CreateDapp:    {""},
+	CreateAlias: {""},
+	DeleteAlias: {""},
+	GetAlias:    {""},
+	UpdateAlias: {""},
+
 	CreateChannel: {""},
-	CreateType:    {""},
-	CreateAlias:   {""},
-	CreateBroker:  nil,
-
-	GetDapp:    {""},
-	GetChannel: {""},
-	GetType:    {""},
-	GetAlias:   {""},
-	GetBroker:  nil,
-
-	UpdateDapp:    {""},
-	UpdateChannel: {""},
-	UpdateType:    {""},
-	UpdateAlias:   {""},
-
-	DeleteDapp:    {""},
 	DeleteChannel: {""},
-	DeleteType:    {""},
-	DeleteAlias:   {""},
+	GetChannel:    {""},
+	UpdateChannel: {""},
+
+	CreateDapp: {""},
+	DeleteDapp: {""},
+	GetDapp:    {""},
+	UpdateDapp: {""},
+
+	CreateType: {""},
+	DeleteType: {""},
+	GetType:    {""},
+	UpdateType: {""},
+
+	GetBroker:    nil,
+	CreateBroker: nil,
 
 	CreateToken: nil,
 }
