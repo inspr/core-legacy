@@ -1,5 +1,10 @@
 # Changelog
 
+### #152 Fix CORE-602 | Wrong metrics on the dashboard query
+- fix:
+  - corrected metrics used on the route dashboard query
+---
+
 ### #151 Fix CORE-601 | Unable to create user
 - fix:
   - corrected permission check to include cases where scope doesn't apply.
