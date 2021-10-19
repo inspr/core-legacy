@@ -99,7 +99,7 @@ name: uidp
 image:
   registry: gcr.io/insprlabs
   repository: uidp/redis/api
-  tag: v0.1.3
+  tag: v0.1.4
 
 imagePullPolicy: IfNotPresent
 
@@ -115,7 +115,7 @@ secret:
   image:
     registry: gcr.io/insprlabs
     repository: uidp/redis/secret
-    tag: v0.1.3
+    tag: v0.1.4
 
 admin:
   generatePassword: true

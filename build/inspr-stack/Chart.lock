@@ -1,10 +1,10 @@
 dependencies:
 - name: uidp
   repository: file://../uidp
-  version: v0.1.3
+  version: v0.1.4
 - name: insprd
   repository: file://../insprd
-  version: v0.1.3
+  version: v0.1.4
 - name: grafana
   repository: https://charts.bitnami.com/bitnami
   version: 6.1.8
