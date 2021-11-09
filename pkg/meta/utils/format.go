@@ -42,6 +42,15 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 			aliasTree.Add("Target: " + alias.Target)
 		}
 	}
+	if len(app.Spec.Routes) > 0 {
+		routes := spec.Add("Routes")
+		for routeName, routeConnection := range app.Spec.Routes {
+			routeEndpoint := routes.Add(routeName)
+			for _, endpoint := range routeConnection.Endpoints {
+				routeEndpoint.Add(endpoint)
+			}
+		}
+	}
 	if app.Spec.Node.Spec.Image != "" {
 		node := spec.Add("Node")
 
