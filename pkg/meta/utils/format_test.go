@@ -2,6 +2,8 @@ package utils
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -260,4 +262,122 @@ func TestPrintAliasTree(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_addAppsTree(t *testing.T) {
+	type args struct {
+		spec gotree.Tree
+		app  *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "my awesome test",
+			args: args{
+				spec: gotree.New("myapp"),
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "myapp",
+					},
+					Spec: meta.AppSpec{
+						Apps: map[string]*meta.App{
+							"app1": {},
+						},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.spec.Items())
+			addAppsTree(tt.args.spec, tt.args.app)
+
+			apps, _ := findByName(tt.args.spec.Items(), "Apps")
+			app1, _ := findByName(apps.Items(), "app1")
+			fmt.Println(app1.Text())
+
+			//fmt.Println(tt.args.spec.Items())
+			t.FailNow()
+		})
+	}
+}
+
+func Test_addAliasesTree(t *testing.T) {
+	type args struct {
+		spec gotree.Tree
+		app  *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "my awesome test",
+			args: args{
+				spec: gotree.New("myapp"),
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "myapp",
+					},
+					Spec: meta.AppSpec{
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+						Aliases: map[string]*meta.Alias{
+							"myalias": {
+								Target: "myawesometarget",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.spec.Items())
+			addAliasesTree(tt.args.spec, tt.args.app)
+
+			aliases, err := findByName(tt.args.spec.Items(), "Aliases")
+			if err != nil {
+				fmt.Println(err)
+				t.FailNow()
+			}
+			myalias, err := findByName(aliases.Items(), "myalias")
+			if err != nil {
+				fmt.Println(err)
+				t.FailNow()
+			}
+			mytarget, err := findByName(myalias.Items(), "Target: myawesometarget")
+			if err != nil {
+				fmt.Println(err)
+				t.FailNow()
+			}
+
+			fmt.Println(mytarget.Text())
+
+		})
+	}
+}
+
+func findByName(treeArr []gotree.Tree, name string) (gotree.Tree, error) {
+	for _, item := range treeArr {
+		if item.Text() == name {
+			return item, nil
+		}
+	}
+	return nil, errors.New("cannot find " + name)
 }
