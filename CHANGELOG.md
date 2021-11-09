@@ -1,5 +1,20 @@
 # Changelog
 
+### #156 Story CORE-616 | Describe Routes
+- feature
+  - add route to describe command
+  - refactored PrintAppTree function
+  - create auxiliar functions to PrintAppTree
+---
+
+### #155 Bug CORE-615 | Describe command problems
+- feature:
+  - update gitignore to ignore for a "my-script.sh" file
+  - update node sidecar port definitions with the default if none was specified
+  - added "Port" prefix to the describe command when listing the node ports
+  - if a node has no replicas, make it equal to 1
+---
+
 ### #151 Fix CORE-601 | Unable to create user
 - fix:
   - corrected permission check to include cases where scope doesn't apply.

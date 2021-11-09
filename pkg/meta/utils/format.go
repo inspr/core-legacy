@@ -26,18 +26,7 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 
 	addAliasesTree(spec, app)
 
-<<<<<<< HEAD
 	addRoutesTree(spec, app)
-=======
-		if len(app.Spec.Node.Spec.Ports) > 0 {
-			ports := spec.Add("Ports")
-			for index, nodePort := range app.Spec.Node.Spec.Ports {
-				npIndex := ports.Add("Port " + strconv.Itoa(index+1))
-				npIndex.Add(fmt.Sprintf("Port: %d", nodePort.Port))
-				npIndex.Add(fmt.Sprintf("TargetPort: %d", nodePort.TargetPort))
-			}
-		}
->>>>>>> origin/develop
 
 	addNodesTree(spec, app)
 
