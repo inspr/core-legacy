@@ -519,17 +519,17 @@ func Test_addRoutesTree(t *testing.T) {
 
 			Routes, err := findByName(tt.args.spec.Items(), "Routes")
 			if err != nil {
-				t.Errorf("AliasesTree.findByName() error = %v", err)
+				t.Errorf("RoutesTree.findByName() error = %v", err)
 			}
 
 			myroute, err := findByName(Routes.Items(), "myroute")
 			if err != nil {
-				t.Errorf("AliasesTree.findByName() error = %v", err)
+				t.Errorf("RoutesTree.findByName() error = %v", err)
 			}
 
 			_, err = findByName(myroute.Items(), "endpoint1")
 			if err != nil {
-				t.Errorf("AliasesTree.findByName() error = %v", err)
+				t.Errorf("RoutesTree.findByName() error = %v", err)
 			}
 
 		})
@@ -578,11 +578,11 @@ func Test_addPermissionsTree(t *testing.T) {
 
 			Permissions, err := findByName(tt.args.auth.Items(), "Permissions")
 			if err != nil {
-				t.Errorf("AppTree.findByName() error = %v", err)
+				t.Errorf("PermissionsTree.findByName() error = %v", err)
 			}
 			_, err = findByName(Permissions.Items(), "permition1")
 			if err != nil {
-				t.Errorf("AppTree.findByName() error = %v", err)
+				t.Errorf("PermissionsTree.findByName() error = %v", err)
 			}
 		})
 	}
