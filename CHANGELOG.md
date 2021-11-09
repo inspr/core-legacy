@@ -4,7 +4,8 @@
 - feature
   - add route to describe command
   - refactored PrintAppTree function
-  - create auxiliar functions to PrintAppTree
+  - create auxiliary functions to PrintAppTree
+  - create test to the auxiliary funtions
 ---
 
 ### #155 Bug CORE-615 | Describe command problems
