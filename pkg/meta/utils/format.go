@@ -14,100 +14,28 @@ func PrintAppTree(app *meta.App, out io.Writer) {
 	tree := gotree.New(app.Meta.Name)
 	meta := tree.Add("Meta")
 
+	spec := tree.Add("Spec")
+
 	populateMeta(meta, &app.Meta)
 
-	spec := tree.Add("Spec")
-	if len(app.Spec.Apps) > 0 {
-		apps := spec.Add("Apps")
-		for appName := range app.Spec.Apps {
-			apps.Add(appName)
-		}
-	}
-	if len(app.Spec.Channels) > 0 {
-		channels := spec.Add("Channels")
-		for chName := range app.Spec.Channels {
-			channels.Add(chName)
-		}
-	}
-	if len(app.Spec.Types) > 0 {
-		insprTypes := spec.Add("Types")
-		for typeName := range app.Spec.Types {
-			insprTypes.Add(typeName)
-		}
-	}
-	if len(app.Spec.Aliases) > 0 {
-		aliases := spec.Add("Aliases")
-		for aliasKey, alias := range app.Spec.Aliases {
-			aliasTree := aliases.Add(aliasKey)
-			aliasTree.Add("Target: " + alias.Target)
-		}
-	}
-	if len(app.Spec.Routes) > 0 {
-		routes := spec.Add("Routes")
-		for routeName, routeConnection := range app.Spec.Routes {
-			routeEndpoint := routes.Add(routeName)
-			for _, endpoint := range routeConnection.Endpoints {
-				routeEndpoint.Add(endpoint)
-			}
-		}
-	}
-	if app.Spec.Node.Spec.Image != "" {
-		node := spec.Add("Node")
+	addAppsTree(spec, app)
 
-		nodeMeta := node.Add("Meta")
-		populateMeta(nodeMeta, &app.Spec.Node.Meta)
+	addChannelsTree(spec, app)
 
-		nodeSpec := node.Add("Spec")
+	addTypesTree(spec, app)
 
-		nodeSpec.Add("Image: " + app.Spec.Node.Spec.Image)
+	addAliasesTree(spec, app)
 
-		if len(app.Spec.Node.Spec.Environment) > 0 {
-			env := spec.Add("Environment")
-			for name, value := range app.Spec.Types {
-				env.Add(fmt.Sprintf("%s: %s", name, value))
-			}
-		}
-		nodeSpec.Add(fmt.Sprintf("Replicas: %d", app.Spec.Node.Spec.Replicas))
+	addRoutesTree(spec, app)
 
-		sidecarPort := nodeSpec.Add("SidecarPort")
-		sidecarPort.Add(fmt.Sprintf("LBRead: %d", app.Spec.Node.Spec.SidecarPort.LBRead))
-		sidecarPort.Add(fmt.Sprintf("LBWrite: %d", app.Spec.Node.Spec.SidecarPort.LBWrite))
+	addNodesTree(spec, app)
 
-		if len(app.Spec.Node.Spec.Ports) > 0 {
-			ports := spec.Add("Ports")
-			for index, nodePort := range app.Spec.Node.Spec.Ports {
-				npIndex := ports.Add(strconv.Itoa(index))
-				npIndex.Add(fmt.Sprintf("Port: %d", nodePort.Port))
-				npIndex.Add(fmt.Sprintf("TargetPort: %d", nodePort.TargetPort))
-			}
-		}
-
-	}
-	if len(app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)) > 0 {
-		boundary := spec.Add("Boundary")
-		if len(app.Spec.Boundary.Input) > 0 {
-			input := boundary.Add("Input")
-			for _, ch := range app.Spec.Boundary.Input {
-				input.Add(ch)
-			}
-		}
-		if len(app.Spec.Boundary.Output) > 0 {
-			output := boundary.Add("Output")
-			for _, ch := range app.Spec.Boundary.Output {
-				output.Add(ch)
-			}
-		}
-	}
+	addBoundarysTree(spec, app)
 
 	auth := spec.Add("Auth")
 	auth.Add("Scope: " + app.Spec.Auth.Scope)
 
-	if len(app.Spec.Auth.Permissions) > 0 {
-		permissions := auth.Add("Permissions")
-		for _, permission := range app.Spec.Auth.Permissions {
-			permissions.Add(permission)
-		}
-	}
+	addPermissionsTree(spec, app)
 
 	fmt.Fprintln(out, tree.Print())
 
@@ -149,7 +77,7 @@ func PrintChannelTree(ch *meta.Channel, out io.Writer) {
 	fmt.Fprintln(out, channel.Print())
 }
 
-// PrintTypeTree prints the channel structure
+// PrintTypeTree prints the type structure
 func PrintTypeTree(t *meta.Type, out io.Writer) {
 	insprType := gotree.New(t.Meta.Name)
 	meta := insprType.Add("Meta")
@@ -197,6 +125,117 @@ func populateMeta(metaTree gotree.Tree, meta *meta.Metadata) {
 		annotations = metaTree.Add("Annotations")
 		for noteName, note := range meta.Annotations {
 			annotations.Add(noteName + ": " + note)
+		}
+	}
+}
+
+func addAppsTree(spec gotree.Tree, app *meta.App) {
+	if len(app.Spec.Apps) > 0 {
+		apps := spec.Add("Apps")
+		for appName := range app.Spec.Apps {
+			apps.Add(appName)
+		}
+	}
+}
+
+func addChannelsTree(spec gotree.Tree, app *meta.App) {
+	if len(app.Spec.Channels) > 0 {
+		channels := spec.Add("Channels")
+		for chName := range app.Spec.Channels {
+			channels.Add(chName)
+		}
+	}
+}
+
+func addTypesTree(spec gotree.Tree, app *meta.App) {
+	if len(app.Spec.Types) > 0 {
+		insprTypes := spec.Add("Types")
+		for typeName := range app.Spec.Types {
+			insprTypes.Add(typeName)
+		}
+	}
+}
+
+func addAliasesTree(spec gotree.Tree, app *meta.App) {
+	if len(app.Spec.Aliases) > 0 {
+		aliases := spec.Add("Aliases")
+		for aliasKey, alias := range app.Spec.Aliases {
+			aliasTree := aliases.Add(aliasKey)
+			aliasTree.Add("Target: " + alias.Target)
+		}
+	}
+}
+
+func addRoutesTree(spec gotree.Tree, app *meta.App) {
+	if len(app.Spec.Routes) > 0 {
+		routes := spec.Add("Routes")
+		for routeName, routeConnection := range app.Spec.Routes {
+			routeEndpoint := routes.Add(routeName)
+			for _, endpoint := range routeConnection.Endpoints {
+				routeEndpoint.Add(endpoint)
+			}
+		}
+	}
+}
+
+func addNodesTree(spec gotree.Tree, app *meta.App) {
+	if app.Spec.Node.Spec.Image != "" {
+		node := spec.Add("Node")
+
+		nodeMeta := node.Add("Meta")
+		populateMeta(nodeMeta, &app.Spec.Node.Meta)
+
+		nodeSpec := node.Add("Spec")
+
+		nodeSpec.Add("Image: " + app.Spec.Node.Spec.Image)
+
+		if len(app.Spec.Node.Spec.Environment) > 0 {
+			env := spec.Add("Environment")
+			for name, value := range app.Spec.Types {
+				env.Add(fmt.Sprintf("%s: %s", name, value))
+			}
+		}
+		nodeSpec.Add(fmt.Sprintf("Replicas: %d", app.Spec.Node.Spec.Replicas))
+
+		sidecarPort := nodeSpec.Add("SidecarPort")
+		sidecarPort.Add(fmt.Sprintf("LBRead: %d", app.Spec.Node.Spec.SidecarPort.LBRead))
+		sidecarPort.Add(fmt.Sprintf("LBWrite: %d", app.Spec.Node.Spec.SidecarPort.LBWrite))
+
+		if len(app.Spec.Node.Spec.Ports) > 0 {
+			ports := spec.Add("Ports")
+			for index, nodePort := range app.Spec.Node.Spec.Ports {
+				npIndex := ports.Add("Port " + strconv.Itoa(index+1))
+				npIndex.Add(fmt.Sprintf("Port: %d", nodePort.Port))
+				npIndex.Add(fmt.Sprintf("TargetPort: %d", nodePort.TargetPort))
+			}
+		}
+
+	}
+}
+
+func addBoundarysTree(spec gotree.Tree, app *meta.App) {
+	if len(app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)) > 0 {
+		boundary := spec.Add("Boundary")
+		if len(app.Spec.Boundary.Input) > 0 {
+			input := boundary.Add("Input")
+			for _, ch := range app.Spec.Boundary.Input {
+				input.Add(ch)
+			}
+		}
+		if len(app.Spec.Boundary.Output) > 0 {
+			output := boundary.Add("Output")
+			for _, ch := range app.Spec.Boundary.Output {
+				output.Add(ch)
+			}
+		}
+	}
+}
+
+func addPermissionsTree(auth gotree.Tree, app *meta.App) {
+	if len(app.Spec.Auth.Permissions) > 0 {
+		permissions := auth.Add("Permissions")
+		for _, permission := range app.Spec.Auth.Permissions {
+			permissions.Add(permission)
 		}
 	}
 }
