@@ -98,6 +98,12 @@ func recursiveSchemaInjection(app *meta.App) error {
 		alias.Meta.Name = aliasName
 	}
 
+	if app.Spec.Node.Spec.Image != "" {
+		if app.Spec.Node.Spec.Replicas == 0 {
+			app.Spec.Node.Spec.Replicas = 1
+		}
+	}
+
 	for appName, childApp := range app.Spec.Apps {
 		childApp.Meta.Name = appName
 		err = recursiveSchemaInjection(childApp)

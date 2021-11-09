@@ -85,7 +85,7 @@ name: insprd
 image:
   registry: gcr.io/insprlabs
   repository: insprd
-  tag: v0.1.3
+  tag: v0.1.4
 imagePullPolicy: IfNotPresent
 
 replicaCount: 1
@@ -113,7 +113,7 @@ sidecar:
   image: 
     registry: gcr.io/insprlabs
     repository: inspr/sidecar/lbsidecar
-    tag: v0.1.3
+    tag: v0.1.4
   ports:
     client:
       read: 3046
@@ -132,13 +132,13 @@ auth:
   image:
     registry: gcr.io/insprlabs
     repository: authsvc
-    tag: v0.1.3 
+    tag: v0.1.4 
 
 secretGenerator:
   image:
     registry: gcr.io/insprlabs
     repository: secretgen
-    tag: v0.1.3
+    tag: v0.1.4
 ```
 
 To see usefull overwrites go to [Values_configuration](../../docs/values_configuration.md)

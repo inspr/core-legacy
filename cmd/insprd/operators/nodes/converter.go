@@ -393,12 +393,17 @@ func overwritePortEnvs(app *meta.App) k8s.ContainerOption {
 				Name:  "INSPR_LBSIDECAR_WRITE_PORT",
 				Value: strconv.Itoa(lbWritePort),
 			})
+		} else {
+			app.Spec.Node.Spec.SidecarPort.LBWrite, _ = strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_WRITE_PORT"))
 		}
+
 		if lbReadPort > 0 {
 			c.Env = append(c.Env, corev1.EnvVar{
 				Name:  "INSPR_LBSIDECAR_READ_PORT",
 				Value: strconv.Itoa(lbReadPort),
 			})
+		} else {
+			app.Spec.Node.Spec.SidecarPort.LBRead, _ = strconv.Atoi(os.Getenv("INSPR_LBSIDECAR_READ_PORT"))
 		}
 
 	}

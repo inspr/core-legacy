@@ -125,7 +125,7 @@ insprd:
   image:
     registry: gcr.io/insprlabs
     repository: insprd
-    tag: v0.1.3
+    tag: v0.1.4
   imagePullPolicy: IfNotPresent
 
   logLevel: info
@@ -151,7 +151,7 @@ insprd:
     image: 
       registry: gcr.io/insprlabs
       repository: inspr/sidecar/lbsidecar
-      tag: v0.1.3
+      tag: v0.1.4
     ports:
       client:
         read: 3046
@@ -170,7 +170,7 @@ insprd:
     image:
       registry: gcr.io/insprlabs
       repository: authsvc
-      tag: v0.1.3 
+      tag: v0.1.4 
 
 uidp:
   name: uidp
@@ -179,7 +179,7 @@ uidp:
   image:
     registry: gcr.io/insprlabs
     repository: uidp/redis/api
-    tag: v0.1.3
+    tag: v0.1.4
 
   imagePullPolicy: IfNotPresent
 
@@ -193,7 +193,7 @@ uidp:
     image:
       registry: gcr.io/insprlabs
       repository: uidp/redis/secret
-      tag: v0.1.3
+      tag: v0.1.4
 
   admin:
     password:
