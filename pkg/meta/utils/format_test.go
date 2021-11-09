@@ -356,11 +356,11 @@ func Test_addChannelsTree(t *testing.T) {
 
 			Channels, err := findByName(tt.args.spec.Items(), "Channels")
 			if err != nil {
-				t.Errorf("AppTree.findByName() error = %v", err)
+				t.Errorf("ChannelsTree(.findByName() error = %v", err)
 			}
 			_, err = findByName(Channels.Items(), "channel1")
 			if err != nil {
-				t.Errorf("AppTree.findByName() error = %v", err)
+				t.Errorf("ChannelsTree(.findByName() error = %v", err)
 			}
 		})
 	}
@@ -407,11 +407,11 @@ func Test_addTypesTree(t *testing.T) {
 
 			Types, err := findByName(tt.args.spec.Items(), "Types")
 			if err != nil {
-				t.Errorf("AppTree.findByName() error = %v", err)
+				t.Errorf("TypesTree.findByName() error = %v", err)
 			}
 			_, err = findByName(Types.Items(), "type1")
 			if err != nil {
-				t.Errorf("AppTree.findByName() error = %v", err)
+				t.Errorf("TypesTree.findByName() error = %v", err)
 			}
 		})
 	}
