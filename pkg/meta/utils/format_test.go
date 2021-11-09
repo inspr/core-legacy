@@ -83,6 +83,7 @@ func TestPrintAppTree(t *testing.T) {
 						Apps:     map[string]*meta.App{},
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
+						Routes:   map[string]*meta.RouteConnection{},
 						Boundary: meta.AppBoundary{
 							Input:  utils.StringArray{"input1", "input2"},
 							Output: utils.StringArray{"output1", "output2"},
