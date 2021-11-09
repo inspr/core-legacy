@@ -13,7 +13,6 @@ spec:
         logLevel: debug
         node:
           spec:
-            replicas: 1
             image: gcr.io/insprlabs/inspr/example/python/client:latest
     api:
       meta:

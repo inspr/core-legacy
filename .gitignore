@@ -11,6 +11,9 @@ external-dns*.yaml
 # Custom notes for each developer
 my-notes.md
 
+# Custom script for each developer
+my-script.sh
+
 # Binaries build via make skaffold/build
 bin/
 tags.out
