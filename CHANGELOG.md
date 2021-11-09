@@ -1,5 +1,11 @@
 # Changelog
 
+### #156 Story CORE-616 | Describe Routes
+- feature
+  - add route to describe command
+  - refactored PrintAppTree function
+  - create auxiliar functions to PrintAppTree
+
 ### #151 Fix CORE-601 | Unable to create user
 - fix:
   - corrected permission check to include cases where scope doesn't apply.
