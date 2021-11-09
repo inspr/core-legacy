@@ -307,11 +307,10 @@ func Test_addAppsTree(t *testing.T) {
 			if err != nil {
 				t.Errorf("AppTree.findByName() error = %v", err)
 			}
-			app1, err := findByName(apps.Items(), "app1")
+			_, err = findByName(apps.Items(), "app1")
 			if err != nil {
 				t.Errorf("AppTree.findByName() error = %v", err)
 			}
-			fmt.Println(app1.Text())
 		})
 	}
 }
@@ -359,11 +358,10 @@ func Test_addChannelsTree(t *testing.T) {
 			if err != nil {
 				t.Errorf("AppTree.findByName() error = %v", err)
 			}
-			channel1, err := findByName(Channels.Items(), "channel1")
+			_, err = findByName(Channels.Items(), "channel1")
 			if err != nil {
 				t.Errorf("AppTree.findByName() error = %v", err)
 			}
-			fmt.Println(channel1.Text())
 		})
 	}
 }
@@ -411,11 +409,10 @@ func Test_addTypesTree(t *testing.T) {
 			if err != nil {
 				t.Errorf("AppTree.findByName() error = %v", err)
 			}
-			type1, err := findByName(Types.Items(), "type1")
+			_, err = findByName(Types.Items(), "type1")
 			if err != nil {
 				t.Errorf("AppTree.findByName() error = %v", err)
 			}
-			fmt.Println(type1.Text())
 		})
 	}
 }
@@ -471,13 +468,10 @@ func Test_addAliasesTree(t *testing.T) {
 				t.Errorf("AliasesTree.findByName() error = %v", err)
 			}
 
-			mytarget, err := findByName(myalias.Items(), "Target: myawesometarget")
+			_, err = findByName(myalias.Items(), "Target: myawesometarget")
 			if err != nil {
 				t.Errorf("AliasesTree.findByName() error = %v", err)
 			}
-
-			fmt.Println(mytarget.Text())
-
 		})
 	}
 }
@@ -533,12 +527,10 @@ func Test_addRoutesTree(t *testing.T) {
 				t.Errorf("AliasesTree.findByName() error = %v", err)
 			}
 
-			endpoint, err := findByName(myroute.Items(), "endpoint1")
+			_, err = findByName(myroute.Items(), "endpoint1")
 			if err != nil {
 				t.Errorf("AliasesTree.findByName() error = %v", err)
 			}
-
-			fmt.Println(endpoint.Text())
 
 		})
 	}
@@ -588,11 +580,10 @@ func Test_addPermissionsTree(t *testing.T) {
 			if err != nil {
 				t.Errorf("AppTree.findByName() error = %v", err)
 			}
-			permition1, err := findByName(Permissions.Items(), "permition1")
+			_, err = findByName(Permissions.Items(), "permition1")
 			if err != nil {
 				t.Errorf("AppTree.findByName() error = %v", err)
 			}
-			fmt.Println(permition1.Text())
 		})
 	}
 }
