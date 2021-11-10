@@ -38,6 +38,7 @@ func (k *kubeService) update(no *NodeOperator) error {
 	if k.ResourceVersion == "" {
 		k.ResourceVersion = currSvc.ResourceVersion
 	}
+
 	if k.ObjectMeta.ResourceVersion == "" {
 		k.ObjectMeta.ResourceVersion = currSvc.ObjectMeta.ResourceVersion
 	}
