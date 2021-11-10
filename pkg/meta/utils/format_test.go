@@ -2,6 +2,8 @@ package utils
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -83,6 +85,7 @@ func TestPrintAppTree(t *testing.T) {
 						Apps:     map[string]*meta.App{},
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
+						Routes:   map[string]*meta.RouteConnection{},
 						Boundary: meta.AppBoundary{
 							Input:  utils.StringArray{"input1", "input2"},
 							Output: utils.StringArray{"output1", "output2"},
@@ -259,4 +262,337 @@ func TestPrintAliasTree(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_addAppsTree(t *testing.T) {
+	type args struct {
+		spec gotree.Tree
+		app  *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Add app test",
+			args: args{
+				spec: gotree.New("myapp"),
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "myapp",
+					},
+					Spec: meta.AppSpec{
+						Apps: map[string]*meta.App{
+							"app1": {},
+						},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+						Aliases: map[string]*meta.Alias{},
+						Routes:  map[string]*meta.RouteConnection{},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.spec.Items())
+			addAppsTree(tt.args.spec, tt.args.app)
+
+			apps, err := findByName(tt.args.spec.Items(), "Apps")
+			if err != nil {
+				t.Errorf("AppTree.findByName() error = %v", err)
+			}
+			_, err = findByName(apps.Items(), "app1")
+			if err != nil {
+				t.Errorf("AppTree.findByName() error = %v", err)
+			}
+		})
+	}
+}
+
+func Test_addChannelsTree(t *testing.T) {
+	type args struct {
+		spec gotree.Tree
+		app  *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Add channel test",
+			args: args{
+				spec: gotree.New("myapp"),
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "myapp",
+					},
+					Spec: meta.AppSpec{
+						Apps: map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{
+							"channel1": {},
+						},
+						Types: map[string]*meta.Type{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+						Aliases: map[string]*meta.Alias{},
+						Routes:  map[string]*meta.RouteConnection{},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.spec.Items())
+			addChannelsTree(tt.args.spec, tt.args.app)
+
+			Channels, err := findByName(tt.args.spec.Items(), "Channels")
+			if err != nil {
+				t.Errorf("ChannelsTree(.findByName() error = %v", err)
+			}
+			_, err = findByName(Channels.Items(), "channel1")
+			if err != nil {
+				t.Errorf("ChannelsTree(.findByName() error = %v", err)
+			}
+		})
+	}
+}
+
+func Test_addTypesTree(t *testing.T) {
+	type args struct {
+		spec gotree.Tree
+		app  *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Add type test",
+			args: args{
+				spec: gotree.New("myapp"),
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "myapp",
+					},
+					Spec: meta.AppSpec{
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types: map[string]*meta.Type{
+							"type1": {},
+						},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+						Aliases: map[string]*meta.Alias{},
+						Routes:  map[string]*meta.RouteConnection{},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.spec.Items())
+			addTypesTree(tt.args.spec, tt.args.app)
+
+			Types, err := findByName(tt.args.spec.Items(), "Types")
+			if err != nil {
+				t.Errorf("TypesTree.findByName() error = %v", err)
+			}
+			_, err = findByName(Types.Items(), "type1")
+			if err != nil {
+				t.Errorf("TypesTree.findByName() error = %v", err)
+			}
+		})
+	}
+}
+
+func Test_addAliasesTree(t *testing.T) {
+	type args struct {
+		spec gotree.Tree
+		app  *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Add aliases test",
+			args: args{
+				spec: gotree.New("myapp"),
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "myapp",
+					},
+					Spec: meta.AppSpec{
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+						Aliases: map[string]*meta.Alias{
+							"myalias": {
+								Target: "myawesometarget",
+							},
+						},
+						Routes: map[string]*meta.RouteConnection{},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.spec.Items())
+			addAliasesTree(tt.args.spec, tt.args.app)
+
+			aliases, err := findByName(tt.args.spec.Items(), "Aliases")
+			if err != nil {
+				t.Errorf("AliasesTree.findByName() error = %v", err)
+			}
+
+			myalias, err := findByName(aliases.Items(), "myalias")
+			if err != nil {
+				t.Errorf("AliasesTree.findByName() error = %v", err)
+			}
+
+			_, err = findByName(myalias.Items(), "Target: myawesometarget")
+			if err != nil {
+				t.Errorf("AliasesTree.findByName() error = %v", err)
+			}
+		})
+	}
+}
+
+func Test_addRoutesTree(t *testing.T) {
+	type args struct {
+		spec gotree.Tree
+		app  *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Add route test",
+			args: args{
+				spec: gotree.New("myapp"),
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "myapp",
+					},
+					Spec: meta.AppSpec{
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+						Aliases: map[string]*meta.Alias{},
+						Routes: map[string]*meta.RouteConnection{
+							"myroute": {
+								Endpoints: []string{"endpoint1"},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.spec.Items())
+			addRoutesTree(tt.args.spec, tt.args.app)
+
+			Routes, err := findByName(tt.args.spec.Items(), "Routes")
+			if err != nil {
+				t.Errorf("RoutesTree.findByName() error = %v", err)
+			}
+
+			myroute, err := findByName(Routes.Items(), "myroute")
+			if err != nil {
+				t.Errorf("RoutesTree.findByName() error = %v", err)
+			}
+
+			_, err = findByName(myroute.Items(), "endpoint1")
+			if err != nil {
+				t.Errorf("RoutesTree.findByName() error = %v", err)
+			}
+
+		})
+	}
+}
+
+func Test_addPermissionsTree(t *testing.T) {
+	type args struct {
+		auth gotree.Tree
+		app  *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Add permition test",
+			args: args{
+				auth: gotree.New("myapp"),
+				app: &meta.App{
+					Meta: meta.Metadata{
+						Name: "myapp",
+					},
+					Spec: meta.AppSpec{
+						Apps:     map[string]*meta.App{},
+						Channels: map[string]*meta.Channel{},
+						Types:    map[string]*meta.Type{},
+						Boundary: meta.AppBoundary{
+							Input:  []string{},
+							Output: []string{},
+						},
+						Aliases: map[string]*meta.Alias{},
+						Routes:  map[string]*meta.RouteConnection{},
+						Auth: meta.AppAuth{
+							Permissions: []string{"permition1"},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.args.auth.Items())
+			addPermissionsTree(tt.args.auth, tt.args.app)
+
+			Permissions, err := findByName(tt.args.auth.Items(), "Permissions")
+			if err != nil {
+				t.Errorf("PermissionsTree.findByName() error = %v", err)
+			}
+			_, err = findByName(Permissions.Items(), "permition1")
+			if err != nil {
+				t.Errorf("PermissionsTree.findByName() error = %v", err)
+			}
+		})
+	}
+}
+
+func findByName(treeArr []gotree.Tree, name string) (gotree.Tree, error) {
+	for _, item := range treeArr {
+		if item.Text() == name {
+			return item, nil
+		}
+	}
+	return nil, errors.New("cannot find " + name)
 }
