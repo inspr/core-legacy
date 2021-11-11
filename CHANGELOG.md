@@ -1,5 +1,11 @@
 # Changelog
 
+### #157 Bug CORE-617 | Update dapp error
+- fix:
+  - set ClusterIP and ClusterIPs fields to be the same as the one before the update (node operator update function)
+  - set ResorceVersion and ObjectMeta.ResourceVersion to be the same as the one before the update (node operator update function)
+---
+
 ### #155 Bug CORE-615 | Describe command problems
 - feature:
   - update gitignore to ignore for a "my-script.sh" file
