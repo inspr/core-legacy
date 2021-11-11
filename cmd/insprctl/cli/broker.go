@@ -16,13 +16,13 @@ func NewBrokerCmd() *cobra.Command {
 
 	kafkaCmd := cmd.NewCmd("kafka").
 		WithDescription("Configures a kafka broker on insprd by importing a valid yaml file carring configurations for the kafka broker").
-		WithExample("kafka kafka.yaml", "brokers kafka <file>").
+		WithExample("install kafka broker from a kafka.yaml", "brokers kafka <file>").
 		ExactArgs(1, kafkaConfig)
 
 	return cmd.NewCmd("brokers").
 		WithDescription("Retrieves brokers currently installed").
 		WithLongDescription(`Broker is the command that returns the brokers already installed on the cluster.
-		It also has subcommands which installs a specific broker on the cluster`).
+It also has subcommands which installs a specific broker on the cluster`).
 		WithExample("get brokers already installed on the cluster", "brokers").
 		WithExample("install kafka broker from a kafka.yaml", "brokers kafka <file>").
 		AddSubCommand(kafkaCmd).
