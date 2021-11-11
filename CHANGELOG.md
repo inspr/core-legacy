@@ -6,6 +6,14 @@
   - set ResorceVersion and ObjectMeta.ResourceVersion to be the same as the one before the update (node operator update function)
 ---
 
+### #156 Story CORE-616 | Describe Routes
+- feature:
+  - add route to describe command
+  - refactored PrintAppTree function
+  - create auxiliary functions to PrintAppTree
+  - create tests to the auxiliary funtions
+---
+
 ### #155 Bug CORE-615 | Describe command problems
 - feature:
   - update gitignore to ignore for a "my-script.sh" file
