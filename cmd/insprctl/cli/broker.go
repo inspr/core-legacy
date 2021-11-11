@@ -21,9 +21,10 @@ func NewBrokerCmd() *cobra.Command {
 
 	return cmd.NewCmd("brokers").
 		WithDescription("Retrieves brokers currently installed").
-		WithLongDescription(`Broker takes a command of (brokers) to get installed brokers,
-and a subcommand of (kafka) to install a new kafka broker`).
+		WithLongDescription(`Broker its the command that returns the brokers already installed on the cluster,
+		and has the kafka subcommand wich installs the kafka broker on the cluster`).
 		WithExample("get brokers", "brokers").
+		WithExample("install kafka broker from a kafka.yaml", "brokers kafka <file>").
 		AddSubCommand(kafkaCmd).
 		NoArgs(getBrokers)
 }
