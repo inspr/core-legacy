@@ -1,7 +1,13 @@
 # Changelog
 
+### #157 Bug CORE-617 | Update dapp error
+- fix:
+  - set ClusterIP and ClusterIPs fields to be the same as the one before the update (node operator update function)
+  - set ResorceVersion and ObjectMeta.ResourceVersion to be the same as the one before the update (node operator update function)
+---
+
 ### #156 Story CORE-616 | Describe Routes
-- feature
+- feature:
   - add route to describe command
   - refactored PrintAppTree function
   - create auxiliary functions to PrintAppTree
