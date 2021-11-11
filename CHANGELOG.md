@@ -1,5 +1,11 @@
 # Changelog
 
+### #158 Story CORE-614 | Brokers command helper is very unclear
+- fix:
+  - update the brokers command helper to have a better description
+  - add a kafka example to the brokers command helper
+---
+
 ### #157 Bug CORE-617 | Update dapp error
 - fix:
   - set ClusterIP and ClusterIPs fields to be the same as the one before the update (node operator update function)
