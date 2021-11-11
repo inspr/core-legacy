@@ -28,6 +28,21 @@ func (k *kubeService) create(no *NodeOperator) error {
 }
 func (k *kubeService) update(no *NodeOperator) error {
 	logger.Info("updating service resource on kubernetes", zap.String("service-name", k.ObjectMeta.Name))
+	currSvc, _ := no.Services().Get(context.Background(), k.ObjectMeta.Name, v1.GetOptions{})
+
+	// ClusterIP needs to remain the same
+	k.Spec.ClusterIP = currSvc.Spec.ClusterIP
+	k.Spec.ClusterIPs = currSvc.Spec.ClusterIPs
+
+	// ResourceVersion needs to be specified
+	if k.ResourceVersion == "" {
+		k.ResourceVersion = currSvc.ResourceVersion
+	}
+
+	if k.ObjectMeta.ResourceVersion == "" {
+		k.ObjectMeta.ResourceVersion = currSvc.ObjectMeta.ResourceVersion
+	}
+
 	_, err := no.Services().Update(context.Background(), (*corev1.Service)(k), v1.UpdateOptions{})
 	if err != nil {
 		logger.Error("unable to update service resource on kubernetes", zap.String("service-name", k.ObjectMeta.Name))
@@ -38,7 +53,7 @@ func (k *kubeService) del(no *NodeOperator) error {
 	logger.Info("deleting service resource on kubernetes", zap.String("service-name", k.ObjectMeta.Name))
 	err := no.Services().Delete(context.Background(), k.Name, v1.DeleteOptions{})
 	if err != nil {
-		logger.Error("unable to update service resource on kubernetes", zap.String("service-name", k.ObjectMeta.Name))
+		logger.Error("unable to delete service resource on kubernetes", zap.String("service-name", k.ObjectMeta.Name))
 	}
 	return err
 }
