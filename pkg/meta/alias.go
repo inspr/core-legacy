@@ -15,7 +15,7 @@ that the resource is available in the specified child of the dapp. When ommited,
 resource is available in the parent of the current dapp.
 
 Destination is the dapp in which the alias is assigned. When filled in, it means that the resource is
-intended for a specific child of the dapp. When ommited, it means that the resource is available
+intended for a specific child of the dapp. When ommited, it means that the resource is intended for
 outside the context of the dapp.
 
 */
