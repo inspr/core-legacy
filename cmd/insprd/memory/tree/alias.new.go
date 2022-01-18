@@ -131,6 +131,10 @@ func (amm *AliasMemoryManagerNew) Update(scope string, alias *meta.Alias) error 
 
 }
 
+// Delete receives a scope and a alias name. The scope
+// defines the path to the dApp that cointains the Alias to be deleted. If the dApp
+// has an alias that has the same key as the key passed as an argument, that alias
+// is removed from the dApp Aliases only if it's not being used
 func (amm *AliasMemoryManagerNew) Delete(scope, name string) error {
 	l := amm.logger.With(
 		zap.String("operation", "delete"),
@@ -144,11 +148,48 @@ func (amm *AliasMemoryManagerNew) Delete(scope, name string) error {
 		return ierrors.Wrap(err, "cannot delete alias because the dapp was not found")
 	}
 
-	if _, ok := app.Spec.Aliases[name]; !ok {
+	alias, ok := app.Spec.Aliases[name]
+	if !ok {
 		return ierrors.New(
 			"alias not found with the given name %v", name,
 		).NotFound()
 	}
+
+	if alias.Destination != "" {
+		child := app.Spec.Apps[alias.Destination]
+		if child.Spec.Boundary.Input.Contains(alias.Meta.Name) || child.Spec.Boundary.Output.Contains(alias.Meta.Name) {
+			l.Debug("unable to delete Alias that is being used by a dApp")
+			return ierrors.New(
+				"can't delete the alias since it's being used by the child app: %v",
+				alias.Destination,
+			).BadRequest()
+		}
+
+		for _, childAlias := range child.Spec.Aliases {
+			if childAlias.Resource == alias.Meta.Name {
+				l.Debug("unable to delete Alias that is being used by a child dApp")
+				return ierrors.New(
+					"can't delete the alias since it's being used by the child app: %v",
+					alias.Destination,
+				).BadRequest()
+			}
+		}
+	} else {
+		parent, _ := getParentApp(scope, amm.treeMemoryManager)
+		for _, parentAlias := range parent.Spec.Aliases {
+			if parentAlias.Source == app.Meta.Name && parentAlias.Resource == alias.Meta.Name {
+				l.Debug("unable to delete Alias that is being used by the parent dApp")
+				return ierrors.New(
+					"can't delete the alias since it's being used by the parent app: %v",
+					parent.Meta.Name,
+				).BadRequest()
+			}
+		}
+
+	}
+
+	l.Debug("removing Alias")
+	delete(app.Spec.Aliases, name)
 
 	return nil
 }

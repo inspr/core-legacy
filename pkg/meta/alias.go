@@ -8,7 +8,7 @@ to be accessed in a higher or lower context.
 
 Meta.Name is the new name given for the resource.
 
-Resource is the name of the resource (channel or route) that is being referenced by the alias.
+Resource is the name of the resource (channel or route or another alias) that is being referenced by the alias.
 
 Source is the dapp that contains the resource that is being referenced.  When filled in, it means
 that the resource is available in the specified child of the dapp. When ommited, it means that the
