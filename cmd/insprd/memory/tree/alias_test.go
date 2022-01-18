@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestMemoryManager_Alias(t *testing.T) {
@@ -438,13 +439,37 @@ func getMockAlias() *meta.App {
 						Node: meta.Node{},
 						Apps: map[string]*meta.App{
 							"appUpdate1": {
+								Meta: meta.Metadata{
+									Name: "appUpdate1",
+								},
 								Spec: meta.AppSpec{
 									Routes: map[string]*meta.RouteConnection{
 										"route_1": &meta.RouteConnection{},
 									},
+									Apps: map[string]*meta.App{
+										"app_1_1": &meta.App{},
+									},
+									Aliases: map[string]*meta.Alias{
+										"my_brand_new_alias": &meta.Alias{
+											Meta: meta.Metadata{
+												Name: "my_brand_new_alias",
+											},
+											Resource:    "my_alias",
+											Destination: "app_1_1",
+											Source:      "",
+										},
+									},
 								},
 							},
-							"appUpdate2": {},
+							"appUpdate2": {
+								Spec: meta.AppSpec{
+									Boundary: meta.AppBoundary{
+										Output: utils.StringArray{
+											"my_other_alias",
+										},
+									},
+								},
+							},
 						},
 						Channels: map[string]*meta.Channel{
 							"ch1app1": {
@@ -487,6 +512,22 @@ func getMockAlias() *meta.App {
 								Resource:    "channel1",
 								Source:      "",
 								Destination: "appUpdate1",
+							},
+							"my_other_alias": {
+								Meta: meta.Metadata{
+									Name: "my_other_alias",
+								},
+								Resource:    "channel1",
+								Source:      "",
+								Destination: "appUpdate2",
+							},
+							"my_awesome_alias": {
+								Meta: meta.Metadata{
+									Name: "my_awesome_alias",
+								},
+								Resource:    "route_1",
+								Source:      "appUpdate1",
+								Destination: "",
 							},
 						},
 
@@ -537,6 +578,14 @@ func getMockAlias() *meta.App {
 				},
 				"app2.aliaschannel": {
 					Target: "channel2",
+				},
+
+				"my_crazy_alias": {
+					Meta: meta.Metadata{
+						Name: "my_crazy_alias",
+					},
+					Resource: "my_awesome_alias",
+					Source:   "app1",
 				},
 			},
 		},

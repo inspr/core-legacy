@@ -373,3 +373,100 @@ func TestAliasMemoryManagerNew_Update(t *testing.T) {
 		})
 	}
 }
+
+func TestAliasMemoryManagerNew_Delete(t *testing.T) {
+	type fields struct {
+		root *meta.App
+	}
+	type args struct {
+		scope string
+		name  string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "invalid scope - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "invalid.app",
+				name:  "my_alias",
+			},
+			wantErr: true,
+		},
+		{
+			name: "alias do not exist - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				name:  "invalid.alias",
+			},
+			wantErr: true,
+		},
+		{
+			name: "alias exist but its being used by the child dapp in another alias - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				name:  "my_alias",
+			},
+			wantErr: true,
+		},
+		{
+			name: "alias exist but its being used by the child dapp in its boudaries - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				name:  "my_other_alias",
+			},
+			wantErr: true,
+		},
+		{
+			name: "alias exist but its being used by the parent dapp - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				name:  "my_awesome_alias",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Valid delete - it should not return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1.appUpdate1",
+				name:  "my_brand_new_alias",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			mem := &treeMemoryManager{
+				root: tt.fields.root,
+				tree: tt.fields.root,
+			}
+
+			amm := mem.Alias()
+			if err := amm.Delete(tt.args.scope, tt.args.name); (err != nil) != tt.wantErr {
+				t.Errorf("AliasMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
