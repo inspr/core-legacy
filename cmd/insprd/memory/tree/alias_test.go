@@ -22,7 +22,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 			fields: fields{
 				root: getMockAlias(),
 			},
-			want: &AliasMemoryManager{
+			want: &AliasMemoryManagerNew{
 				&treeMemoryManager{
 					root: getMockAlias(),
 				},
@@ -36,7 +36,7 @@ func TestMemoryManager_Alias(t *testing.T) {
 				root: tt.fields.root,
 			}
 
-			if got := tmm.Alias(); !reflect.DeepEqual(got.(*AliasMemoryManager).root, tt.want.(*AliasMemoryManager).root) {
+			if got := tmm.Alias(); !reflect.DeepEqual(got.(*AliasMemoryManagerNew).root, tt.want.(*AliasMemoryManagerNew).root) {
 				t.Errorf("MemoryManager.Alias() = %v, want %v", got, tt.want)
 			}
 		})
@@ -132,7 +132,7 @@ func TestAliasMemoryManager_Create(t *testing.T) {
 				tree: tt.fields.root,
 			}
 			amm := mem.Alias()
-			if err := amm.Create(tt.args.query, tt.args.targetBoundary, tt.args.alias); (err != nil) != tt.wantErr {
+			if err := amm.Create(tt.args.query, tt.args.alias); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -288,7 +288,7 @@ func TestAliasMemoryManager_Update(t *testing.T) {
 			}
 			amm := mem.Alias()
 
-			if err := amm.Update(tt.args.context, tt.args.aliasKey, tt.args.alias); (err != nil) != tt.wantErr {
+			if err := amm.Update(tt.args.context, tt.args.alias); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -437,7 +437,13 @@ func getMockAlias() *meta.App {
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
 						Apps: map[string]*meta.App{
-							"appUpdate1": {},
+							"appUpdate1": {
+								Spec: meta.AppSpec{
+									Routes: map[string]*meta.RouteConnection{
+										"route_1": &meta.RouteConnection{},
+									},
+								},
+							},
 							"appUpdate2": {},
 						},
 						Channels: map[string]*meta.Channel{
@@ -472,6 +478,18 @@ func getMockAlias() *meta.App {
 								ConnectedChannels: []string{"ch2app1Update", "ch1app1"},
 							},
 						},
+
+						Aliases: map[string]*meta.Alias{
+							"my_alias": {
+								Meta: meta.Metadata{
+									Name: "my_alias",
+								},
+								Resource:    "channel1",
+								Source:      "",
+								Destination: "appUpdate1",
+							},
+						},
+
 						Boundary: meta.AppBoundary{
 							Input:  []string{"channel1", "aliaschannel", "aliaschannel2"},
 							Output: []string{},

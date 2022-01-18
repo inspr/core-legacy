@@ -16,7 +16,7 @@ type AliasMemoryManagerNew struct {
 
 // Alias is a MemoryManager method that provides an access point for Alias
 func (tmm *treeMemoryManager) AliasNew() AliasMemory {
-	return &AliasMemoryManager{
+	return &AliasMemoryManagerNew{
 		treeMemoryManager: tmm,
 		logger:            logger.With(zap.String("subSection", "alias")),
 	}
