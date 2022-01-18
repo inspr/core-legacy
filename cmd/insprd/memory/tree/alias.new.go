@@ -25,7 +25,7 @@ func (tmm *treeMemoryManager) AliasNew() AliasMemory {
 // Get receives a scope and an alias key. The scope defines
 // the path to a dApp. If this dApp has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
-func (amm *AliasMemoryManagerNew) GetNew(scope, name string) (*meta.Alias, error) {
+func (amm *AliasMemoryManagerNew) Get(scope, name string) (*meta.Alias, error) {
 	l := amm.logger.With(
 		zap.String("operation", "get"),
 		zap.String("alias", name),
@@ -192,6 +192,37 @@ func (amm *AliasMemoryManagerNew) Delete(scope, name string) error {
 	delete(app.Spec.Aliases, name)
 
 	return nil
+}
+
+// AliasPermTreeGetter returns a getter that gets alias from the root structure of the app, without the current changes.
+// The getter does not allow changes in the structure, just visualization.
+type AliasPermTreeGetterNew struct {
+	*PermTreeGetter
+	logs *zap.Logger
+}
+
+func (amm *AliasPermTreeGetterNew) Get(scope, name string) (*meta.Alias, error) {
+	l := amm.logs.With(
+		zap.String("operation", "root-get"),
+		zap.String("alias", name),
+		zap.String("scope", scope),
+	)
+	l.Debug("trying to get an Alias")
+
+	app, err := amm.Apps().Get(scope)
+	if err != nil {
+		l.Debug("unable to get Alias because the app was not found")
+		return nil, err
+	}
+
+	if _, ok := app.Spec.Aliases[name]; !ok {
+		l.Debug("alias not found with the given name")
+		return nil, ierrors.New(
+			"alias not found with the given name %v", name,
+		).NotFound()
+	}
+
+	return app.Spec.Aliases[name], nil
 }
 
 func (amm *AliasMemoryManagerNew) checkSource(scope string, app *meta.App, alias *meta.Alias) error {
