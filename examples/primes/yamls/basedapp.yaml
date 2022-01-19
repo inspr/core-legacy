@@ -6,11 +6,11 @@ meta:
 spec:
   aliases:
     filter.filterinput:
-      target: primesch1
+      resource: primesch1
     filter.filteroutput:
-      target: primesch2
+      resource: primesch2
     printer.printerinput:
-      target: primesch2
+      resource: primesch2
 
   boundary:
     input:

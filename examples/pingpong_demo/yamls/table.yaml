@@ -6,13 +6,13 @@ meta:
 spec:
   aliases:
     ping.pingoutput:
-      target: ppchannel1
+      resource: ppchannel1
     ping.pinginput:
-      target: ppchannel2
+      resource: ppchannel2
     pong.ponginput:
-      target: ppchannel1
+      resource: ppchannel1
     pong.pongoutput:
-      target: ppchannel2
+      resource: ppchannel2
   boundary:
     input:
       - ppchannel2

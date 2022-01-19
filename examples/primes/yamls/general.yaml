@@ -36,11 +36,11 @@ spec:
 
   aliases:
     primes.filterinput:
-      target: primesch1
+      resource: primesch1
     primes.filteroutput:
-      target: primesch2
+      resource: primesch2
     primes.printerinput:
-      target: primesch2
+      resource: primesch2
 
   apps:
     # number generators
