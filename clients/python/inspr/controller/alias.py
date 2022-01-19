@@ -6,9 +6,9 @@ from .client import *
 ALIAS_ROUTE = "alias"
 
 class AliasClient(Client):
-    def get(self, scope:str, key:str) -> InsprStructure:
+    def get(self, scope:str, name:str) -> InsprStructure:
         msg_body = {
-            "key": key
+            "name": name
         }
         
         headers = self.get_header_with_scope(scope)
@@ -19,9 +19,9 @@ class AliasClient(Client):
         except Exception as e:
             raise Exception(f"Error while send a Get Alias request: {e}")
 
-    def delele(self, scope:str, key:str, dryRun:bool) -> Changelog:
+    def delele(self, scope:str, name:str, dryRun:bool) -> Changelog:
         msg_body = {
-            "key": key,
+            "name": name,
             "dry": dryRun
         }
 
@@ -33,10 +33,9 @@ class AliasClient(Client):
         except Exception as e:
             raise Exception(f"Error while send a Delete Alias request: {e}")
 
-    def create(self, scope:str, target:str, alias:dict, dryRun:bool) -> Changelog:
+    def create(self, scope:str, alias:dict, dryRun:bool) -> Changelog:
         msg_body = {
             "alias": alias,
-            "target": target,
             "dry": dryRun
         }
 
@@ -48,10 +47,9 @@ class AliasClient(Client):
         except Exception as e:
             raise Exception(f"Error while send a Create Alias request: {e}")
 
-    def update(self, scope:str, target:str, alias:dict, dryRun:bool) -> Changelog:
+    def update(self, scope:str, alias:dict, dryRun:bool) -> Changelog:
         msg_body = {
             "alias": alias,
-            "target": target,
             "dry": dryRun
         }
 
