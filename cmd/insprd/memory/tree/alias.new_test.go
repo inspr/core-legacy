@@ -1,10 +1,12 @@
 package tree
 
 import (
+	"crypto/sha256"
 	"reflect"
 	"testing"
 
 	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestMemoryManager_AliasNew(t *testing.T) {
@@ -469,4 +471,182 @@ func TestAliasMemoryManagerNew_Delete(t *testing.T) {
 			}
 		})
 	}
+}
+
+func getMockAlias() *meta.App {
+	root := meta.App{
+		Meta: meta.Metadata{
+			Name:        "",
+			Reference:   "",
+			Annotations: map[string]string{},
+			Parent:      "",
+			UUID:        "",
+		},
+		Spec: meta.AppSpec{
+			Node: meta.Node{},
+			Apps: map[string]*meta.App{
+				"app1": {
+					Meta: meta.Metadata{
+						Name:        "app1",
+						Reference:   "app1",
+						Annotations: map[string]string{},
+						Parent:      "",
+						UUID:        "",
+					},
+					Spec: meta.AppSpec{
+						Node: meta.Node{},
+						Apps: map[string]*meta.App{
+							"appUpdate1": {
+								Meta: meta.Metadata{
+									Name: "appUpdate1",
+								},
+								Spec: meta.AppSpec{
+									Routes: map[string]*meta.RouteConnection{
+										"route_1": {},
+									},
+									Apps: map[string]*meta.App{
+										"app_1_1": {},
+									},
+									Aliases: map[string]*meta.Alias{
+										"my_brand_new_alias": {
+											Meta: meta.Metadata{
+												Name: "my_brand_new_alias",
+											},
+											Resource:    "my_alias",
+											Destination: "app_1_1",
+											Source:      "",
+										},
+									},
+								},
+							},
+							"appUpdate2": {
+								Spec: meta.AppSpec{
+									Boundary: meta.AppBoundary{
+										Output: utils.StringArray{
+											"my_other_alias",
+										},
+									},
+								},
+							},
+						},
+						Channels: map[string]*meta.Channel{
+							"ch1app1": {
+								Meta: meta.Metadata{
+									Name:   "ch1app1",
+									Parent: "",
+								},
+								Spec: meta.ChannelSpec{
+									Type: "ctUpdate1",
+								},
+							},
+							"ch2app1Update": {
+								Meta: meta.Metadata{
+									Name:   "ch2app1Update",
+									Parent: "app1",
+								},
+								Spec: meta.ChannelSpec{
+									Type: "ctUpdate1",
+								},
+							},
+						},
+						Types: map[string]*meta.Type{
+							"ctUpdate1": {
+								Meta: meta.Metadata{
+									Name:        "ctUpdate1",
+									Reference:   "app1.ctUpdate1",
+									Annotations: map[string]string{},
+									Parent:      "app1",
+									UUID:        "",
+								},
+								ConnectedChannels: []string{"ch2app1Update", "ch1app1"},
+							},
+						},
+
+						Aliases: map[string]*meta.Alias{
+							"my_alias": {
+								Meta: meta.Metadata{
+									Name: "my_alias",
+								},
+								Resource:    "channel1",
+								Source:      "",
+								Destination: "appUpdate1",
+							},
+							"my_other_alias": {
+								Meta: meta.Metadata{
+									Name: "my_other_alias",
+								},
+								Resource:    "channel1",
+								Source:      "",
+								Destination: "appUpdate2",
+							},
+							"my_awesome_alias": {
+								Meta: meta.Metadata{
+									Name: "my_awesome_alias",
+								},
+								Resource:    "route_1",
+								Source:      "appUpdate1",
+								Destination: "",
+							},
+						},
+
+						Boundary: meta.AppBoundary{
+							Input:  []string{"channel1", "aliaschannel", "aliaschannel2"},
+							Output: []string{},
+						},
+					},
+				},
+				"app2": {},
+			},
+			Channels: map[string]*meta.Channel{
+				"channel1": {
+					Meta: meta.Metadata{
+						Name:   "channel1",
+						Parent: "",
+					},
+					ConnectedApps: []string{"app1"},
+					Spec: meta.ChannelSpec{
+						Type: "type1",
+					},
+				},
+				"channel2": {
+					Meta: meta.Metadata{
+						Name:   "channel2",
+						Parent: "",
+					},
+					Spec: meta.ChannelSpec{
+						Type: "type1",
+					},
+				},
+			},
+			Types: map[string]*meta.Type{
+				"type1": {
+					Meta: meta.Metadata{
+						Name: "type1",
+					},
+					Schema: string(sha256.New().Sum([]byte("hello"))),
+				},
+			},
+			Boundary: meta.AppBoundary{
+				Input:  []string{"somechannel"},
+				Output: []string{},
+			},
+			Aliases: map[string]*meta.Alias{
+				"app1.aliaschannel": {
+					Target: "channel2",
+				},
+				"app2.aliaschannel": {
+					Target: "channel2",
+				},
+
+				"my_crazy_alias": {
+					Meta: meta.Metadata{
+						Name: "my_crazy_alias",
+					},
+					Resource: "my_awesome_alias",
+					Source:   "app1",
+				},
+			},
+		},
+	}
+	return &root
 }
