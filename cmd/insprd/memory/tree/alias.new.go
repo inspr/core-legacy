@@ -9,14 +9,14 @@ import (
 
 // AliasMemoryManager implements the Alias interface
 // and provides methods for operating on Aliases
-type AliasMemoryManagerNew struct {
+type AliasMemoryManager struct {
 	*treeMemoryManager
 	logger *zap.Logger
 }
 
 // Alias is a MemoryManager method that provides an access point for Alias
-func (tmm *treeMemoryManager) AliasNew() AliasMemory {
-	return &AliasMemoryManagerNew{
+func (tmm *treeMemoryManager) Alias() AliasMemory {
+	return &AliasMemoryManager{
 		treeMemoryManager: tmm,
 		logger:            logger.With(zap.String("subSection", "alias")),
 	}
@@ -25,7 +25,7 @@ func (tmm *treeMemoryManager) AliasNew() AliasMemory {
 // Get receives a scope and an alias key. The scope defines
 // the path to a dApp. If this dApp has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
-func (amm *AliasMemoryManagerNew) Get(scope, name string) (*meta.Alias, error) {
+func (amm *AliasMemoryManager) Get(scope, name string) (*meta.Alias, error) {
 	l := amm.logger.With(
 		zap.String("operation", "get"),
 		zap.String("alias", name),
@@ -51,7 +51,7 @@ func (amm *AliasMemoryManagerNew) Get(scope, name string) (*meta.Alias, error) {
 
 // Create receives a scope that defines a path to the dapp and an Alias
 // to be added in this dapp
-func (amm *AliasMemoryManagerNew) Create(scope string, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) Create(scope string, alias *meta.Alias) error {
 	l := amm.logger.With(
 		zap.String("operation", "create"),
 		zap.Any("alias", alias),
@@ -92,7 +92,7 @@ func (amm *AliasMemoryManagerNew) Create(scope string, alias *meta.Alias) error 
 // defines the path to the dApp that contains the Alias. If the dApp has
 // an alias that has the same name as the one passed as an argument,
 // that alias will be replaced by the new alias
-func (amm *AliasMemoryManagerNew) Update(scope string, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) Update(scope string, alias *meta.Alias) error {
 	l := amm.logger.With(
 		zap.String("operation", "update"),
 		zap.Any("alias", alias),
@@ -135,7 +135,7 @@ func (amm *AliasMemoryManagerNew) Update(scope string, alias *meta.Alias) error 
 // defines the path to the dApp that cointains the Alias to be deleted. If the dApp
 // has an alias that has the same key as the key passed as an argument, that alias
 // is removed from the dApp Aliases only if it's not being used
-func (amm *AliasMemoryManagerNew) Delete(scope, name string) error {
+func (amm *AliasMemoryManager) Delete(scope, name string) error {
 	l := amm.logger.With(
 		zap.String("operation", "delete"),
 		zap.Any("alias", name),
@@ -196,12 +196,12 @@ func (amm *AliasMemoryManagerNew) Delete(scope, name string) error {
 
 // AliasPermTreeGetter returns a getter that gets alias from the root structure of the app, without the current changes.
 // The getter does not allow changes in the structure, just visualization.
-type AliasPermTreeGetterNew struct {
+type AliasPermTreeGetter struct {
 	*PermTreeGetter
 	logs *zap.Logger
 }
 
-func (amm *AliasPermTreeGetterNew) Get(scope, name string) (*meta.Alias, error) {
+func (amm *AliasPermTreeGetter) Get(scope, name string) (*meta.Alias, error) {
 	l := amm.logs.With(
 		zap.String("operation", "root-get"),
 		zap.String("alias", name),
@@ -225,7 +225,7 @@ func (amm *AliasPermTreeGetterNew) Get(scope, name string) (*meta.Alias, error) 
 	return app.Spec.Aliases[name], nil
 }
 
-func (amm *AliasMemoryManagerNew) checkSource(scope string, app *meta.App, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) checkSource(scope string, app *meta.App, alias *meta.Alias) error {
 	var source *meta.App
 	if alias.Source == "" {
 		parentApp, err := getParentApp(scope, amm.treeMemoryManager)
@@ -250,7 +250,7 @@ func (amm *AliasMemoryManagerNew) checkSource(scope string, app *meta.App, alias
 	return nil
 }
 
-func (amm *AliasMemoryManagerNew) checkDestination(app *meta.App, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) checkDestination(app *meta.App, alias *meta.Alias) error {
 	if alias.Destination != "" {
 		_, ok := app.Spec.Apps[alias.Destination]
 		if !ok {

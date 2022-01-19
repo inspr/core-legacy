@@ -9,7 +9,7 @@ import (
 	"inspr.dev/inspr/pkg/utils"
 )
 
-func TestMemoryManager_AliasNew(t *testing.T) {
+func TestMemoryManager_Alias(t *testing.T) {
 	type fields struct {
 		root *meta.App
 	}
@@ -19,11 +19,11 @@ func TestMemoryManager_AliasNew(t *testing.T) {
 		want   AliasMemory
 	}{
 		{
-			name: "It should return a pointer to AliasMemoryManagerNew.",
+			name: "It should return a pointer to AliasMemoryManager.",
 			fields: fields{
 				root: getMockAlias(),
 			},
-			want: &AliasMemoryManagerNew{
+			want: &AliasMemoryManager{
 				&treeMemoryManager{
 					root: getMockAlias(),
 				},
@@ -37,14 +37,14 @@ func TestMemoryManager_AliasNew(t *testing.T) {
 				root: tt.fields.root,
 			}
 
-			if got := tmm.AliasNew(); !reflect.DeepEqual(got.(*AliasMemoryManagerNew).root, tt.want.(*AliasMemoryManagerNew).root) {
+			if got := tmm.Alias(); !reflect.DeepEqual(got.(*AliasMemoryManager).root, tt.want.(*AliasMemoryManager).root) {
 				t.Errorf("MemoryManager.Alias() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestAliasMemoryManagerNew_Create(t *testing.T) {
+func TestAliasMemoryManager_Create(t *testing.T) {
 	type fields struct {
 		root *meta.App
 	}
@@ -172,7 +172,7 @@ func TestAliasMemoryManagerNew_Create(t *testing.T) {
 	}
 }
 
-func TestAliasMemoryManagerNew_Get(t *testing.T) {
+func TestAliasMemoryManager_Get(t *testing.T) {
 	type fields struct {
 		root *meta.App
 	}
@@ -249,7 +249,7 @@ func TestAliasMemoryManagerNew_Get(t *testing.T) {
 	}
 }
 
-func TestAliasMemoryManagerNew_Update(t *testing.T) {
+func TestAliasMemoryManager_Update(t *testing.T) {
 	type fields struct {
 		root *meta.App
 	}
@@ -376,7 +376,7 @@ func TestAliasMemoryManagerNew_Update(t *testing.T) {
 	}
 }
 
-func TestAliasMemoryManagerNew_Delete(t *testing.T) {
+func TestAliasMemoryManager_Delete(t *testing.T) {
 	type fields struct {
 		root *meta.App
 	}
