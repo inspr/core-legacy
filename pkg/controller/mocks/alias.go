@@ -21,7 +21,7 @@ func NewAliasMock(err error) controller.AliasInterface {
 }
 
 // Get is the AliasMock Get
-func (am *AliasMock) Get(ctx context.Context, scope, key string) (*meta.Alias, error) {
+func (am *AliasMock) Get(ctx context.Context, scope, name string) (*meta.Alias, error) {
 	if am.err != nil {
 		return &meta.Alias{}, am.err
 	}
@@ -29,7 +29,7 @@ func (am *AliasMock) Get(ctx context.Context, scope, key string) (*meta.Alias, e
 }
 
 // Create is the AliasMock Create
-func (am *AliasMock) Create(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+func (am *AliasMock) Create(ctx context.Context, scope string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	if am.err != nil {
 		return diff.Changelog{}, am.err
 	}
@@ -37,7 +37,7 @@ func (am *AliasMock) Create(ctx context.Context, scope, target string, alias *me
 }
 
 // Delete is the AliasMock Delete
-func (am *AliasMock) Delete(ctx context.Context, scope, key string, dryRun bool) (diff.Changelog, error) {
+func (am *AliasMock) Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error) {
 	if am.err != nil {
 		return diff.Changelog{}, am.err
 	}
@@ -45,7 +45,7 @@ func (am *AliasMock) Delete(ctx context.Context, scope, key string, dryRun bool)
 }
 
 // Update is the AliasMock Update
-func (am *AliasMock) Update(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+func (am *AliasMock) Update(ctx context.Context, scope string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	if am.err != nil {
 		return diff.Changelog{}, am.err
 	}

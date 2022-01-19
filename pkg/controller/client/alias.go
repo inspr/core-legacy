@@ -17,11 +17,11 @@ type AliasClient struct {
 }
 
 // Get gets a alias from the Insprd
-// The scope refers to the parent app of the given alias, represented with a dot separated query
-// such as app1.app2. The key is the key of the alias
-func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias, error) {
+// The scope refers to the app of the given alias, represented with a dot separated query
+// such as app1.app2. The name is the name of the alias
+func (ac *AliasClient) Get(ctx context.Context, scope, name string) (*meta.Alias, error) {
 	aliasQuery := models.AliasQueryDI{
-		Key: key,
+		Name: name,
 	}
 
 	var resp meta.Alias
@@ -37,11 +37,10 @@ func (ac *AliasClient) Get(ctx context.Context, scope, key string) (*meta.Alias,
 }
 
 // Create creates an alias inside the Insprd
-// The scope refers to the parent app of the given alias, represented with a dot separated query
-// such as app1.app2. The parameter "target" refers to where the alias will point to
-func (ac *AliasClient) Create(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+// The scope refers to the app of the given alias, represented with a dot separated query
+// such as app1.app2.
+func (ac *AliasClient) Create(ctx context.Context, scope string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasDI{
-		Target: target,
 		Alias:  *alias,
 		DryRun: dryRun,
 	}
@@ -58,11 +57,11 @@ func (ac *AliasClient) Create(ctx context.Context, scope, target string, alias *
 }
 
 // Delete deletes a alias inside the Insprd
-// The scope refers to the parent app of the given alias, represented with a dot separated query
-// such as app1.app2. The key is the key of the alias to be deleted.
-func (ac *AliasClient) Delete(ctx context.Context, scope, key string, dryRun bool) (diff.Changelog, error) {
+// The scope refers to the app of the given alias, represented with a dot separated query
+// such as app1.app2. The name is the name of the alias to be deleted.
+func (ac *AliasClient) Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasQueryDI{
-		Key:    key,
+		Name:   name,
 		DryRun: dryRun,
 	}
 	var resp diff.Changelog
@@ -78,11 +77,10 @@ func (ac *AliasClient) Delete(ctx context.Context, scope, key string, dryRun boo
 }
 
 // Update updates a alias inside the Insprd
-// The scope refers to the parent app of the given alias, represented with a dot separated query
+// The scope refers to the app of the given alias, represented with a dot separated query
 // such as app1.app2. Works similarly to the Create method.
-func (ac *AliasClient) Update(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
+func (ac *AliasClient) Update(ctx context.Context, scope string, alias *meta.Alias, dryRun bool) (diff.Changelog, error) {
 	aliasQuery := models.AliasDI{
-		Target: target,
 		Alias:  *alias,
 		DryRun: dryRun,
 	}
