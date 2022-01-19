@@ -151,10 +151,10 @@ func (change *Change) diffAliases(from, to metautils.MAliases) {
 		toStr := "<nil>"
 
 		if orig {
-			fromStr = from[alias].Target
+			fromStr = "{...}"
 			op = Delete
 		} else {
-			toStr = to[alias].Target
+			toStr = "{...}"
 			op = Create
 		}
 
@@ -175,11 +175,11 @@ func (change *Change) diffAliases(from, to metautils.MAliases) {
 	for alias := range intersection {
 		fromApp := from[alias]
 		toApp := to[alias]
-		if fromApp.Target != toApp.Target {
+		if fromApp.Resource != toApp.Resource {
 			change.Diff = append(change.Diff, Difference{
 				Field:     fmt.Sprintf("Spec.Aliases[%s]", alias),
-				From:      fromApp.Target,
-				To:        toApp.Target,
+				From:      fromApp.Resource,
+				To:        toApp.Resource,
 				Kind:      AliasKind,
 				Name:      alias,
 				Operation: Update,

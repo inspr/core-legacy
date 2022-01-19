@@ -166,11 +166,11 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 		return err
 	}
 	for key, val := range parentApp.Spec.Aliases {
-		if ch, ok := parentApp.Spec.Channels[val.Target]; ok {
+		if ch, ok := parentApp.Spec.Channels[val.Resource]; ok {
 			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
 			continue
 		}
-		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(val.Target) {
+		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(val.Resource) {
 			continue
 		}
 		merr.Add(ierrors.New(
@@ -396,14 +396,14 @@ func validAliases(app *meta.App) error {
 	var msg utils.StringArray
 
 	for key, val := range app.Spec.Aliases {
-		if ch, ok := app.Spec.Channels[val.Target]; ok {
+		if ch, ok := app.Spec.Channels[val.Resource]; ok {
 			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
 			continue
 		}
-		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val.Target) {
+		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val.Resource) {
 			continue
 		}
-		msg = append(msg, fmt.Sprintf("alias '%s' points to an unexistent channel '%s'", key, val.Target))
+		msg = append(msg, fmt.Sprintf("alias '%s' points to an unexistent channel '%s'", key, val.Resource))
 	}
 
 	if len(msg) > 0 {

@@ -125,7 +125,7 @@ func TestAliasClient_Create(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "alias_name",
 					},
-					Target: "alias_target",
+					Resource: "alias_target",
 				},
 			},
 			wantErr: false,
@@ -284,7 +284,7 @@ func TestAliasClient_Update(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "alias_name",
 					},
-					Target: "alias_target",
+					Resource: "alias_target",
 				},
 			},
 			wantErr: false,

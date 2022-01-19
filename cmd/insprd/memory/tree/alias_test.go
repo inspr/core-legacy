@@ -632,10 +632,10 @@ func getMockAlias() *meta.App {
 			},
 			Aliases: map[string]*meta.Alias{
 				"app1.aliaschannel": {
-					Target: "channel2",
+					Resource: "channel2",
 				},
 				"app2.aliaschannel": {
-					Target: "channel2",
+					Resource: "channel2",
 				},
 
 				"my_crazy_alias": {

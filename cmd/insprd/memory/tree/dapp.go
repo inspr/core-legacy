@@ -301,7 +301,7 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 	for key := range unresolved {
 		val := boundaries[key]
 		if alias, ok := app.Spec.Aliases[val]; ok { //resolve in aliases
-			val = alias.Target //setup for alias resolve
+			val = alias.Resource //setup for alias resolve
 		} else {
 			_, val, _ = metautils.RemoveLastPartInScope(val) //setup for direct resolve
 		}

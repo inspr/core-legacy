@@ -54,7 +54,9 @@ var (
 	aliasTree = "alias_name" +
 		"\n└── Meta" +
 		"\n│   ├── Name: alias_name" +
-		"\n└── Target: alias_target" +
+		"\n└── Resource: alias_Resource" +
+		"\n└── Source: " +
+		"\n└── Destination: " +
 		"\n\n"
 )
 
@@ -243,7 +245,7 @@ func TestPrintAliasTree(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "alias_name",
 					},
-					Target: "alias_target",
+					Resource: "alias_Resource",
 				},
 			},
 			wantOut: aliasTree,
@@ -444,7 +446,7 @@ func Test_addAliasesTree(t *testing.T) {
 						},
 						Aliases: map[string]*meta.Alias{
 							"myalias": {
-								Target: "myawesometarget",
+								Resource: "myawesomeResource",
 							},
 						},
 						Routes: map[string]*meta.RouteConnection{},
@@ -468,7 +470,7 @@ func Test_addAliasesTree(t *testing.T) {
 				t.Errorf("AliasesTree.findByName() error = %v", err)
 			}
 
-			_, err = findByName(myalias.Items(), "Target: myawesometarget")
+			_, err = findByName(myalias.Items(), "Resource: myawesomeResource")
 			if err != nil {
 				t.Errorf("AliasesTree.findByName() error = %v", err)
 			}

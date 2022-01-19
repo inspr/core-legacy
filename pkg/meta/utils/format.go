@@ -104,7 +104,9 @@ func PrintAliasTree(al *meta.Alias, out io.Writer) {
 
 	populateMeta(meta, &al.Meta)
 
-	alias.Add("Target: " + al.Target)
+	alias.Add("Resource: " + al.Resource)
+	alias.Add("Source: " + al.Source)
+	alias.Add("Destination: " + al.Destination)
 
 	fmt.Fprintln(out, alias.Print())
 }
@@ -161,7 +163,9 @@ func addAliasesTree(spec gotree.Tree, app *meta.App) {
 		aliases := spec.Add("Aliases")
 		for aliasKey, alias := range app.Spec.Aliases {
 			aliasTree := aliases.Add(aliasKey)
-			aliasTree.Add("Target: " + alias.Target)
+			aliasTree.Add("Resource: " + alias.Resource)
+			aliasTree.Add("Source: " + alias.Source)
+			aliasTree.Add("Destination: " + alias.Destination)
 		}
 	}
 }

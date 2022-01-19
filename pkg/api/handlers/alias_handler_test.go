@@ -32,7 +32,7 @@ type AliasAPITest struct {
 func AliasDICases(funcName string) []AliasAPITest {
 	parsedAliasDI, _ := json.Marshal(models.AliasDI{
 		Alias: meta.Alias{
-			Target: "mock_Alias",
+			Resource: "mock_Alias",
 		},
 	})
 	wrongFormatData := []byte{1}

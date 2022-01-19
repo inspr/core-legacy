@@ -1155,18 +1155,18 @@ func TestChange_diffAliases(t *testing.T) {
 			args: args{
 				from: map[string]*meta.Alias{
 					"alias1": {
-						Target: "target1",
+						Resource: "Resource1",
 					},
 					"alias2": {
-						Target: "target2",
+						Resource: "Resource2",
 					},
 				},
 				to: map[string]*meta.Alias{
 					"alias1": {
-						Target: "target1",
+						Resource: "Resource1",
 					},
 					"alias2": {
-						Target: "target2",
+						Resource: "Resource2",
 					},
 				},
 			},
@@ -1186,18 +1186,18 @@ func TestChange_diffAliases(t *testing.T) {
 			args: args{
 				from: map[string]*meta.Alias{
 					"alias1": {
-						Target: "target3",
+						Resource: "Resource3",
 					},
 					"alias2": {
-						Target: "target2",
+						Resource: "Resource2",
 					},
 				},
 				to: map[string]*meta.Alias{
 					"alias1": {
-						Target: "target1",
+						Resource: "Resource1",
 					},
 					"alias2": {
-						Target: "target2",
+						Resource: "Resource2",
 					},
 				},
 			},
@@ -1207,8 +1207,8 @@ func TestChange_diffAliases(t *testing.T) {
 				Diff: []Difference{
 					{
 						Field:     "Spec.Aliases[alias1]",
-						From:      "target3",
-						To:        "target1",
+						From:      "Resource3",
+						To:        "Resource1",
 						Kind:      AliasKind,
 						Name:      "alias1",
 						Operation: Update,
@@ -1228,15 +1228,15 @@ func TestChange_diffAliases(t *testing.T) {
 			args: args{
 				from: map[string]*meta.Alias{
 					"alias1": {
-						Target: "target1",
+						Resource: "Resource1",
 					},
 				},
 				to: map[string]*meta.Alias{
 					"alias1": {
-						Target: "target1",
+						Resource: "Resource1",
 					},
 					"alias2": {
-						Target: "target2",
+						Resource: "Resource2",
 					},
 				},
 			},
@@ -1247,7 +1247,7 @@ func TestChange_diffAliases(t *testing.T) {
 					{
 						Field:     "Spec.Aliases[alias2]",
 						From:      "<nil>",
-						To:        "target2",
+						To:        "{...}",
 						Kind:      AliasKind,
 						Name:      "alias2",
 						Operation: Create,
@@ -1267,16 +1267,16 @@ func TestChange_diffAliases(t *testing.T) {
 			args: args{
 				from: map[string]*meta.Alias{
 					"alias1": {
-						Target: "target1",
+						Resource: "Resource1",
 					},
 
 					"alias2": {
-						Target: "target2",
+						Resource: "Resource2",
 					},
 				},
 				to: map[string]*meta.Alias{
 					"alias1": {
-						Target: "target1",
+						Resource: "Resource1",
 					},
 				},
 			},
@@ -1286,7 +1286,7 @@ func TestChange_diffAliases(t *testing.T) {
 				Diff: []Difference{
 					{
 						Field:     "Spec.Aliases[alias2]",
-						From:      "target2",
+						From:      "{...}",
 						To:        "<nil>",
 						Kind:      AliasKind,
 						Name:      "alias2",

@@ -136,7 +136,7 @@ func getMockApp() *meta.App {
 					Meta: meta.Metadata{
 						Name: "alias.name",
 					},
-					Target: "alias_target",
+					Resource: "alias_target",
 				},
 			},
 		},

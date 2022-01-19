@@ -1195,16 +1195,16 @@ func Test_validAliases(t *testing.T) {
 		Spec: meta.AppSpec{
 			Aliases: map[string]*meta.Alias{
 				"valid.alias1": {
-					Target: "ch1",
+					Resource: "ch1",
 				},
 				"valid.alias2": {
-					Target: "ch2",
+					Resource: "ch2",
 				},
 				"invalid.alias1": {
-					Target: "ch3",
+					Resource: "ch3",
 				},
 				"invalid.alias2": {
-					Target: "ch4",
+					Resource: "ch4",
 				},
 			},
 			Channels: map[string]*meta.Channel{

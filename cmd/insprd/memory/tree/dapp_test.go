@@ -512,7 +512,7 @@ func getMockApp() *meta.App {
 									},
 									Aliases: map[string]*meta.Alias{
 										"bound8.alias": {
-											Target: "notch",
+											Resource: "notch",
 										},
 									},
 								},
@@ -544,16 +544,16 @@ func getMockApp() *meta.App {
 						},
 						Aliases: map[string]*meta.Alias{
 							"bound2.alias1": {
-								Target: "bdch1",
+								Resource: "bdch1",
 							},
 							"bound2.alias2": {
-								Target: "bdch2",
+								Resource: "bdch2",
 							},
 							"bound4.alias3": {
-								Target: "bdch2",
+								Resource: "bdch2",
 							},
 							"bound6.alias3": {
-								Target: "bdch2",
+								Resource: "bdch2",
 							},
 						},
 					},
@@ -619,10 +619,10 @@ func getMockApp() *meta.App {
 						},
 						Aliases: map[string]*meta.Alias{
 							"aliasSon.alias1": {
-								Target: "channel1",
+								Resource: "channel1",
 							},
 							"aliasSon.alias2": {
-								Target: "channel2",
+								Resource: "channel2",
 							},
 						},
 					},
@@ -1672,7 +1672,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Spec: meta.AppSpec{
 						Aliases: map[string]*meta.Alias{
 							"app6.output1": {
-								Target: "fakeChannel",
+								Resource: "fakeChannel",
 							},
 						},
 						Apps: map[string]*meta.App{
