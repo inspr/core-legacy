@@ -606,7 +606,7 @@ func Test_deleteAlias(t *testing.T) {
 
 		fmt.Println(scope)
 		if (scope != "appParent" && scope != "") ||
-			(data.Key != "alias.name" && data.Key != "appParent.alias.name") {
+			(data.Name != "alias.name" && data.Name != "appParent.alias.name") {
 
 			rest.ERROR(w, ierrors.New("error test"))
 			return

@@ -411,7 +411,7 @@ func Test_displayAlias(t *testing.T) {
 			fmt.Println(err)
 		}
 
-		al := getMockApp().Spec.Aliases[data.Key]
+		al := getMockApp().Spec.Aliases[data.Name]
 
 		rest.JSON(w, http.StatusOK, al)
 	}
