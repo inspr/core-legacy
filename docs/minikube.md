@@ -291,10 +291,11 @@ spec:
       environment:
         SUPER_SECRET_0001: "false"
   boundary:
-    input:
-      - pinginput
-    output:
-      - pingoutput
+    channels:
+      input:
+        - pinginput
+      output:
+        - pingoutput
 ```
 
 If you like, you can use the repository that already contains the pingpong examples folder, but for better understanding of how the development process with the Inspr platform works it is recommended to follow the steps below.
@@ -366,10 +367,11 @@ spec:
       environment:
         SUPER_SECRET_0001: "false"
   boundary:
-    input:
-      - pinginput
-    output:
-      - pingoutput
+    channels:
+      input:
+        - pinginput
+      output:
+        - pingoutput
 
 ```
 

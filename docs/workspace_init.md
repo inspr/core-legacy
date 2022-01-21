@@ -348,12 +348,13 @@ spec:
     pong.pongoutput:
       resource: ppchannel2
   boundary:
-    input:
-      - ppchannel2
-      - ppchannel1
-    output:
-      - ppchannel2
-      - ppchannel1
+	channels:
+	  input:
+	    - ppchannel2
+	    - ppchannel1
+	  output:
+	    - ppchannel2
+	    - ppchannel1
 ```
 
 The next file to be created is _ping.app.yaml_, in which we describe the Node that contains Ping. For better organization, let's create a new folder inside of "/yamls" called "nodes", inside of which we will store the Nodes YAMLs:
@@ -379,10 +380,11 @@ spec:
 	  environment:
         SUPER_SECRET_0001: "false"
   boundary:
-    input:
-      - pinginput
-    output:
-      - pingoutput
+	channels:
+	  input:
+		- pinginput
+	  output:
+		- pingoutput
 ```
 
 The `image` field must be a reference to the same image built in the step **"Docker Image deployment"**. Also, the `environment` field is defined just so we can see that the environment variable "SUPER_SECRET_0001" will be created in the cluster, inside Ping's deployment.
@@ -405,10 +407,11 @@ spec:
     spec:
       image: CONTAINER_REGISTRY_REF/app/pong:TAG_NAME
   boundary:
-    input:
-      - ponginput
-    output:
-      - pongoutput
+	channels:
+	  input:
+		- ponginput
+	  output:
+		- pongoutput
 ```
 
 Notice that we didn't specify the number of replicas for Pong. This is to show that, **if not specified, the default number of replicas is created, which is one replica.**

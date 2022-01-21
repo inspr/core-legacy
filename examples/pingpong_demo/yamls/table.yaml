@@ -14,9 +14,10 @@ spec:
     pong.pongoutput:
       resource: ppchannel2
   boundary:
-    input:
-      - ppchannel2
-      - ppchannel1
-    output:
-      - ppchannel2
-      - ppchannel1
+    channels:
+      input:
+        - ppchannel2
+        - ppchannel1
+      output:
+        - ppchannel2
+        - ppchannel1

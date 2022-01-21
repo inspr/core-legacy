@@ -9,7 +9,8 @@ spec:
     spec:
       image: gcr.io/insprlabs/inspr/example/pong:latest
   boundary:
-    input:
-      - ponginput
-    output:
-      - pongoutput
+    channels:
+      input:
+        - ponginput
+      output:
+        - pongoutput

@@ -12,8 +12,9 @@ spec:
       replicas: 1
 
   boundary:
-    output:
-      - mbch1
-    input:
-      - mbch1
+    channels:
+      output:
+        - mbch1
+      input:
+        - mbch1
 

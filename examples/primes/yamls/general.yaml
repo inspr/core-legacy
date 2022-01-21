@@ -55,19 +55,21 @@ spec:
             environment:
               MODULE: 300
         boundary:
-          output:
-            - primesch1
+          channels:
+            output:
+              - primesch1
 
     primes:
       meta:
         name: primes
       spec:
         boundary:
-          input:
-            - filterinput
-            - printerinput
-          output:
-            - filteroutput
+          channels:
+            input:
+              - filterinput
+              - printerinput
+            output:
+              - filteroutput
 
         apps:
           # filters primes
@@ -82,10 +84,11 @@ spec:
                   image: gcr.io/insprlabs/inspr/examples/primes/filter:latest
                   replicas: 2
               boundary:
-                input:
-                  - filterinput
-                output:
-                  - filteroutput
+                channels:
+                  input:
+                    - filterinput
+                  output:
+                    - filteroutput
 
           # prints the filtered
           printer:
@@ -101,5 +104,6 @@ spec:
                   image: gcr.io/insprlabs/inspr/examples/primes/printer:latest
                   replicas: 1
               boundary:
-                input:
-                  - printerinput
+                channels:
+                  input:
+                    - printerinput

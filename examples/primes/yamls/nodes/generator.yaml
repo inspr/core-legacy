@@ -16,5 +16,6 @@ spec:
       environment:
         MODULE: 100
   boundary:
-    output:
-      - primesch1
+    channels:
+      output:
+        - primesch1

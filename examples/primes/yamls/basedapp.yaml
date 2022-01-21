@@ -13,9 +13,10 @@ spec:
       resource: primesch2
 
   boundary:
-    input:
-      - primesch1
-      - primesch2
-    output:
-      - primesch1
-      - primesch2
+    channels:
+      input:
+        - primesch1
+        - primesch2
+      output:
+        - primesch1
+        - primesch2

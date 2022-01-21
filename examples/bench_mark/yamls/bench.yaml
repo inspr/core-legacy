@@ -10,7 +10,8 @@ spec:
     receiver.receivech:
       resource: benchannel
   boundary:
-    input:
-      - benchannel
-    output:
-      - benchannel
+    channels:
+      input:
+        - benchannel
+      output:
+        - benchannel

@@ -11,5 +11,6 @@ spec:
       replicas: 1
       image: gcr.io/insprlabs/inspr/example/receiver:latest
   boundary:
-    input:
-      - receivech
+    channels:
+      input:
+        - receivech

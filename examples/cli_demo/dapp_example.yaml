@@ -4,8 +4,9 @@ meta:
   name: "app1"
 spec:
   boundary:
-    input:
-      - "bananita"
+    channels:
+      input:
+        - "bananita"
   types:
     ct1:
       schema: '{"type":"string"}'
@@ -17,5 +18,6 @@ spec:
     app4:
       spec:
         boundary:
-          input:
-          - "ch1"
+          channels:
+            input:
+            - "ch1"

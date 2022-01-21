@@ -10,10 +10,11 @@ spec:
     receiver.receivech:
       resource: benchannel
   boundary:
-    input:
-      - benchannel
-    output:
-      - benchannel
+    channels:
+      input:
+        - benchannel
+      output:
+        - benchannel
   apps:
     sender:
       meta:
@@ -26,8 +27,9 @@ spec:
             replicas: 1
             image: gcr.io/insprlabs/inspr/example/sender:latest
         boundary:
-          output:
-            - sendch
+          channels:
+            output:
+              - sendch
     receiver:
       meta:
         name: receiver
@@ -42,7 +44,8 @@ spec:
               - edp1
               - edp2
         boundary:
-          input:
-            - receivech
+          channels:
+            input:
+              - receivech
 
 
