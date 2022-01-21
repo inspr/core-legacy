@@ -66,8 +66,10 @@ func getMockApp() *meta.App {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -95,8 +97,10 @@ func getMockApp() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app1"},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app1"},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -120,8 +124,10 @@ func getMockApp() *meta.App {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -161,8 +167,10 @@ func getMockApp() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app2"},
-										Output: []string{"ch2app2"},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app2"},
+											Output: []string{"ch2app2"},
+										},
 									},
 								},
 							},
@@ -218,8 +226,10 @@ func getMockApp() *meta.App {
 										},
 									},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app2"},
-										Output: []string{"ch2app2"},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app2"},
+											Output: []string{"ch2app2"},
+										},
 									},
 								},
 							},
@@ -242,8 +252,10 @@ func getMockApp() *meta.App {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -316,8 +328,10 @@ func getMockApp() *meta.App {
 												Channels: map[string]*meta.Channel{},
 												Types:    map[string]*meta.Type{},
 												Boundary: meta.AppBoundary{
-													Input:  []string{"alias1"},
-													Output: []string{"alias2"},
+													Channels: meta.Boundary{
+														Input:  []string{"alias1"},
+														Output: []string{"alias2"},
+													},
 												},
 											},
 										},
@@ -325,8 +339,10 @@ func getMockApp() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"alias1"},
-										Output: []string{"alias2"},
+										Channels: meta.Boundary{
+											Input:  []string{"alias1"},
+											Output: []string{"alias2"},
+										},
 									},
 								},
 							},
@@ -377,8 +393,10 @@ func getMockApp() *meta.App {
 												Channels: map[string]*meta.Channel{},
 												Types:    map[string]*meta.Type{},
 												Boundary: meta.AppBoundary{
-													Input:  []string{"alias1"},
-													Output: []string{"alias2"},
+													Channels: meta.Boundary{
+														Input:  []string{"alias1"},
+														Output: []string{"alias2"},
+													},
 												},
 											},
 										},
@@ -386,8 +404,10 @@ func getMockApp() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"alias1"},
-										Output: []string{"alias2"},
+										Channels: meta.Boundary{
+											Input:  []string{"alias1"},
+											Output: []string{"alias2"},
+										},
 									},
 								},
 							},
@@ -416,8 +436,10 @@ func getMockApp() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1"},
-										Output: []string{"alias3"},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1"},
+											Output: []string{"alias3"},
+										},
 									},
 								},
 							},
@@ -446,8 +468,10 @@ func getMockApp() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1"},
-										Output: []string{"alias4"},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1"},
+											Output: []string{"alias4"},
+										},
 									},
 								},
 							},
@@ -498,8 +522,10 @@ func getMockApp() *meta.App {
 												Channels: map[string]*meta.Channel{},
 												Types:    map[string]*meta.Type{},
 												Boundary: meta.AppBoundary{
-													Input:  []string{"bdch1"},
-													Output: []string{"alias3"},
+													Channels: meta.Boundary{
+														Input:  []string{"bdch1"},
+														Output: []string{"alias3"},
+													},
 												},
 											},
 										},
@@ -507,8 +533,10 @@ func getMockApp() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"bdch1"},
-										Output: []string{"alias3"},
+										Channels: meta.Boundary{
+											Input:  []string{"bdch1"},
+											Output: []string{"alias3"},
+										},
 									},
 									Aliases: map[string]*meta.Alias{
 										"bound8.alias": {
@@ -539,8 +567,10 @@ func getMockApp() *meta.App {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 						Aliases: map[string]*meta.Alias{
 							"bound2.alias1": {
@@ -571,11 +601,13 @@ func getMockApp() *meta.App {
 								},
 								Spec: meta.AppSpec{
 									Boundary: meta.AppBoundary{
-										Input: utils.StringArray{
-											"channel1",
-										},
-										Output: utils.StringArray{
-											"channel2",
+										Channels: meta.Boundary{
+											Input: utils.StringArray{
+												"channel1",
+											},
+											Output: utils.StringArray{
+												"channel2",
+											},
 										},
 									},
 								},
@@ -587,11 +619,13 @@ func getMockApp() *meta.App {
 								},
 								Spec: meta.AppSpec{
 									Boundary: meta.AppBoundary{
-										Input: utils.StringArray{
-											"alias1",
-										},
-										Output: utils.StringArray{
-											"alias2S",
+										Channels: meta.Boundary{
+											Input: utils.StringArray{
+												"alias1",
+											},
+											Output: utils.StringArray{
+												"alias2S",
+											},
 										},
 									},
 								},
@@ -681,8 +715,10 @@ func getMockApp() *meta.App {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Input:  []string{},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{},
+					Output: []string{},
+				},
 			},
 		},
 	}
@@ -845,8 +881,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -866,8 +904,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Channels: map[string]*meta.Channel{},
 					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
+						Channels: meta.Boundary{
+							Input:  []string{},
+							Output: []string{},
+						},
 					},
 				},
 			},
@@ -898,8 +938,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -919,8 +961,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Channels: map[string]*meta.Channel{},
 					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
+						Channels: meta.Boundary{
+							Input:  []string{},
+							Output: []string{},
+						},
 					},
 				},
 			},
@@ -951,8 +995,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -986,8 +1032,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -1021,8 +1069,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -1056,8 +1106,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -1077,8 +1129,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Channels: map[string]*meta.Channel{},
 					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
+						Channels: meta.Boundary{
+							Input:  []string{},
+							Output: []string{},
+						},
 					},
 				},
 			},
@@ -1109,8 +1163,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app2"},
+								Output: []string{"ch2app2"},
+							},
 						},
 					},
 				},
@@ -1130,8 +1186,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Channels: map[string]*meta.Channel{},
 					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
-						Input:  []string{"ch1app2"},
-						Output: []string{"ch2app2"},
+						Channels: meta.Boundary{
+							Input:  []string{"ch1app2"},
+							Output: []string{"ch2app2"},
+						},
 					},
 				},
 			},
@@ -1162,8 +1220,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2invalid"},
-							Output: []string{"ch2app2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app2invalid"},
+								Output: []string{"ch2app2"},
+							},
 						},
 					},
 				},
@@ -1210,8 +1270,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -1256,8 +1318,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -1288,8 +1352,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Channels: map[string]*meta.Channel{},
 					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
+						Channels: meta.Boundary{
+							Input:  []string{},
+							Output: []string{},
+						},
 					},
 				},
 			},
@@ -1329,8 +1395,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"channel1"},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{"channel1"},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -1355,8 +1423,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app2"},
+								Output: []string{"ch2app2"},
+							},
 						},
 					},
 				},
@@ -1416,8 +1486,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app2"},
+								Output: []string{"ch2app2"},
+							},
 						},
 					},
 				},
@@ -1466,8 +1538,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app2"},
+								Output: []string{"ch2app2"},
+							},
 						},
 					},
 				},
@@ -1510,8 +1584,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -1556,8 +1632,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -1588,8 +1666,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 					Channels: map[string]*meta.Channel{},
 					Types:    map[string]*meta.Type{},
 					Boundary: meta.AppBoundary{
-						Input:  []string{},
-						Output: []string{},
+						Channels: meta.Boundary{
+							Input:  []string{},
+							Output: []string{},
+						},
 					},
 				},
 			},
@@ -1640,8 +1720,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"input1"},
-							Output: []string{"output1"},
+							Channels: meta.Boundary{
+								Input:  []string{"input1"},
+								Output: []string{"output1"},
+							},
 						},
 					},
 				},
@@ -1698,8 +1780,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 										},
 									},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"output1"},
-										Output: []string{"output1"},
+										Channels: meta.Boundary{
+											Input:  []string{"output1"},
+											Output: []string{"output1"},
+										},
 									},
 								},
 							},
@@ -1716,8 +1800,10 @@ func TestAppMemoryManager_Create(t *testing.T) {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch1app2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app2"},
+								Output: []string{"ch1app2"},
+							},
 						},
 					},
 				},
@@ -1936,8 +2022,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -1998,8 +2086,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -2049,8 +2139,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -2149,8 +2241,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -2219,8 +2313,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						},
 					},
 					Boundary: meta.AppBoundary{
-						Input:  []string{"ch1"},
-						Output: []string{"ch2"},
+						Channels: meta.Boundary{
+							Input:  []string{"ch1"},
+							Output: []string{"ch2"},
+						},
 					},
 				},
 			},
@@ -2260,8 +2356,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -2297,8 +2395,10 @@ func TestAppMemoryManager_Update(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},

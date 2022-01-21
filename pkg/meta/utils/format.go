@@ -218,17 +218,17 @@ func addNodesTree(spec gotree.Tree, app *meta.App) {
 }
 
 func addBoundarysTree(spec gotree.Tree, app *meta.App) {
-	if len(app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)) > 0 {
+	if len(app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output)) > 0 {
 		boundary := spec.Add("Boundary")
-		if len(app.Spec.Boundary.Input) > 0 {
+		if len(app.Spec.Boundary.Channels.Input) > 0 {
 			input := boundary.Add("Input")
-			for _, ch := range app.Spec.Boundary.Input {
+			for _, ch := range app.Spec.Boundary.Channels.Input {
 				input.Add(ch)
 			}
 		}
-		if len(app.Spec.Boundary.Output) > 0 {
+		if len(app.Spec.Boundary.Channels.Output) > 0 {
 			output := boundary.Add("Output")
-			for _, ch := range app.Spec.Boundary.Output {
+			for _, ch := range app.Spec.Boundary.Channels.Output {
 				output.Add(ch)
 			}
 		}

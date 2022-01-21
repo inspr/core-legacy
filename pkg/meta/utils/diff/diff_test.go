@@ -362,27 +362,31 @@ func TestChange_diffBoudaries(t *testing.T) {
 			fields: fields{},
 			args: args{
 				boundOrig: meta.AppBoundary{
-					Input: []string{
-						"a",
-						"b",
-						"c",
-					},
-					Output: []string{
-						"a",
-						"b",
-						"c",
+					Channels: meta.Boundary{
+						Input: []string{
+							"a",
+							"b",
+							"c",
+						},
+						Output: []string{
+							"a",
+							"b",
+							"c",
+						},
 					},
 				},
 				boundCurr: meta.AppBoundary{
-					Input: []string{
-						"a",
-						"b",
-						"c",
-					},
-					Output: []string{
-						"a",
-						"b",
-						"c",
+					Channels: meta.Boundary{
+						Input: []string{
+							"a",
+							"b",
+							"c",
+						},
+						Output: []string{
+							"a",
+							"b",
+							"c",
+						},
 					},
 				},
 			},
@@ -393,27 +397,31 @@ func TestChange_diffBoudaries(t *testing.T) {
 			fields: fields{},
 			args: args{
 				boundOrig: meta.AppBoundary{
-					Input: []string{
-						"a",
-						"b",
-						"c",
-					},
-					Output: []string{
-						"a",
-						"b",
-						"c",
+					Channels: meta.Boundary{
+						Input: []string{
+							"a",
+							"b",
+							"c",
+						},
+						Output: []string{
+							"a",
+							"b",
+							"c",
+						},
 					},
 				},
 				boundCurr: meta.AppBoundary{
-					Input: []string{
-						"a",
-						"b",
-						"d",
-					},
-					Output: []string{
-						"a",
-						"b",
-						"d",
+					Channels: meta.Boundary{
+						Input: []string{
+							"a",
+							"b",
+							"d",
+						},
+						Output: []string{
+							"a",
+							"b",
+							"d",
+						},
 					},
 				},
 			},
@@ -1489,8 +1497,10 @@ func getMockRootApp() *meta.App {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -1530,8 +1540,10 @@ func getMockRootApp() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1"},
-										Output: []string{"ch2"},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1"},
+											Output: []string{"ch2"},
+										},
 									},
 								},
 							},
@@ -1554,8 +1566,10 @@ func getMockRootApp() *meta.App {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -1603,8 +1617,10 @@ func getMockRootApp() *meta.App {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Input:  []string{},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{},
+					Output: []string{},
+				},
 			},
 		},
 	}
@@ -1662,8 +1678,10 @@ func getMockRootApp2() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1"},
-										Output: []string{"ch2"},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1"},
+											Output: []string{"ch2"},
+										},
 									},
 								},
 							},
@@ -1686,8 +1704,10 @@ func getMockRootApp2() *meta.App {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch2"},
+							},
 						},
 					},
 				},
@@ -1716,8 +1736,10 @@ func getMockRootApp2() *meta.App {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Input:  []string{},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{},
+					Output: []string{},
+				},
 			},
 		},
 	}

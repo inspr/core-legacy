@@ -54,8 +54,10 @@ func Test_validAppStructure(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app2"},
+								Output: []string{"ch2app2"},
+							},
 						},
 					},
 				},
@@ -94,8 +96,10 @@ func Test_validAppStructure(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app2"},
+								Output: []string{"ch2app2"},
+							},
 						},
 					},
 				},
@@ -137,8 +141,10 @@ func Test_validAppStructure(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app2"},
-							Output: []string{"ch2app2"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app2"},
+								Output: []string{"ch2app2"},
+							},
 						},
 					},
 				},
@@ -178,8 +184,10 @@ func Test_validAppStructure(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1app1"},
-							Output: []string{"ch2app1"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1app1"},
+								Output: []string{"ch2app1"},
+							},
 						},
 					},
 				},
@@ -354,8 +362,10 @@ func Test_checkAndUpdates(t *testing.T) {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app1"},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app1"},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -391,8 +401,10 @@ func Test_checkAndUpdates(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -429,8 +441,10 @@ func Test_checkAndUpdates(t *testing.T) {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app1"},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app1"},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -466,8 +480,10 @@ func Test_checkAndUpdates(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -505,8 +521,10 @@ func Test_checkAndUpdates(t *testing.T) {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app1"},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app1"},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -542,8 +560,10 @@ func Test_checkAndUpdates(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -581,8 +601,10 @@ func Test_checkAndUpdates(t *testing.T) {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app1"},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app1"},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -618,8 +640,10 @@ func Test_checkAndUpdates(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -1216,7 +1240,9 @@ func Test_validAliases(t *testing.T) {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Output: []string{"ch2"},
+				Channels: meta.Boundary{
+					Output: []string{"ch2"},
+				},
 			},
 		},
 	}

@@ -121,8 +121,10 @@ func TestAppClient_Get(t *testing.T) {
 						},
 					},
 					Boundary: meta.AppBoundary{
-						Input:  []string{"channel1"},
-						Output: []string{"channel2"},
+						Channels: meta.Boundary{
+							Input:  []string{"channel1"},
+							Output: []string{"channel2"},
+						},
 					},
 				},
 			},
@@ -214,8 +216,10 @@ func TestAppClient_Create(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"channel1"},
-							Output: []string{"channel2"},
+							Channels: meta.Boundary{
+								Input:  []string{"channel1"},
+								Output: []string{"channel2"},
+							},
 						},
 					},
 				},
@@ -308,8 +312,10 @@ func TestAppClient_Update(t *testing.T) {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"channel1"},
-							Output: []string{"channel2"},
+							Channels: meta.Boundary{
+								Input:  []string{"channel1"},
+								Output: []string{"channel2"},
+							},
 						},
 					},
 				},

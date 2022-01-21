@@ -522,8 +522,10 @@ func getMockAlias() *meta.App {
 							"appUpdate2": {
 								Spec: meta.AppSpec{
 									Boundary: meta.AppBoundary{
-										Output: utils.StringArray{
-											"my_other_alias",
+										Channels: meta.Boundary{
+											Output: utils.StringArray{
+												"my_other_alias",
+											},
 										},
 									},
 								},
@@ -590,8 +592,10 @@ func getMockAlias() *meta.App {
 						},
 
 						Boundary: meta.AppBoundary{
-							Input:  []string{"channel1", "aliaschannel", "aliaschannel2"},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{"channel1", "aliaschannel", "aliaschannel2"},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -627,8 +631,10 @@ func getMockAlias() *meta.App {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Input:  []string{"somechannel"},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{"somechannel"},
+					Output: []string{},
+				},
 			},
 			Aliases: map[string]*meta.Alias{
 				"app1.aliaschannel": {

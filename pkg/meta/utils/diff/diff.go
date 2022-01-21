@@ -274,11 +274,11 @@ func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 	var orig string
 	var curr string
 
-	origSet, _ := metautils.MakeStrSet(boundOrig.Input)
-	currSet, _ := metautils.MakeStrSet(boundCurr.Input)
+	origSet, _ := metautils.MakeStrSet(boundOrig.Channels.Input)
+	currSet, _ := metautils.MakeStrSet(boundCurr.Channels.Input)
 
 	inputSet := metautils.DisjunctSet(origSet, currSet)
-	inputOrig, _ := metautils.MakeStrSet(boundOrig.Input)
+	inputOrig, _ := metautils.MakeStrSet(boundOrig.Channels.Input)
 	for k := range inputSet {
 		var op Operation
 		orig = "<nil>"
@@ -305,11 +305,11 @@ func (change *Change) diffBoudaries(boundOrig, boundCurr meta.AppBoundary) {
 		change.Operation |= op
 	}
 
-	origSetOut, _ := metautils.MakeStrSet(boundOrig.Output)
-	currSetOut, _ := metautils.MakeStrSet(boundCurr.Output)
+	origSetOut, _ := metautils.MakeStrSet(boundOrig.Channels.Output)
+	currSetOut, _ := metautils.MakeStrSet(boundCurr.Channels.Output)
 
 	outputSet := metautils.DisjunctSet(origSetOut, currSetOut)
-	outputOrig, _ := metautils.MakeStrSet(boundOrig.Output)
+	outputOrig, _ := metautils.MakeStrSet(boundOrig.Channels.Output)
 	for k := range outputSet {
 		var op Operation
 		orig = "<nil>"

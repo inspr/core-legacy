@@ -170,7 +170,7 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
 			continue
 		}
-		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(val.Resource) {
+		if parentApp.Spec.Boundary.Channels.Input.Union(parentApp.Spec.Boundary.Channels.Output).Contains(val.Resource) {
 			continue
 		}
 		merr.Add(ierrors.New(
@@ -182,7 +182,7 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 		return &merr
 	}
 
-	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Channels.Input, app.Spec.Boundary.Channels.Output)
 	for _, boundary := range appBoundary {
 		aliasKey, _ := metautils.JoinScopes(app.Meta.Name, boundary)
 		if _, ok := parentApp.Spec.Aliases[aliasKey]; ok {
@@ -192,7 +192,7 @@ func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
 			ch.ConnectedApps = append(ch.ConnectedApps, app.Meta.Name)
 			continue
 		}
-		if parentApp.Spec.Boundary.Input.Union(parentApp.Spec.Boundary.Output).Contains(boundary) {
+		if parentApp.Spec.Boundary.Channels.Input.Union(parentApp.Spec.Boundary.Channels.Output).Contains(boundary) {
 			continue
 		}
 		merr.Add(ierrors.New(
@@ -330,7 +330,7 @@ func getParentApp(childQuery string, tmm *treeMemoryManager) (*meta.App, error) 
 }
 
 func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
-	boundaries := app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output)
+	boundaries := app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output)
 	channels := app.Spec.Channels
 	types := app.Spec.Types
 
@@ -360,8 +360,8 @@ func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
 				}
 
-				appInputs := app.Spec.Apps[appName].Spec.Boundary.Input
-				appOutputs := app.Spec.Apps[appName].Spec.Boundary.Output
+				appInputs := app.Spec.Apps[appName].Spec.Boundary.Channels.Input
+				appOutputs := app.Spec.Apps[appName].Spec.Boundary.Channels.Output
 				appBoundary := utils.StringSliceUnion(appInputs, appOutputs)
 
 				if !utils.Includes(appBoundary, channelName) {
@@ -400,7 +400,7 @@ func validAliases(app *meta.App) error {
 			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
 			continue
 		}
-		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val.Resource) {
+		if app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output).Contains(val.Resource) {
 			continue
 		}
 		msg = append(msg, fmt.Sprintf("alias '%s' points to an unexistent channel '%s'", key, val.Resource))
