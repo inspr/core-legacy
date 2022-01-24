@@ -34,6 +34,8 @@ type routeMetric struct {
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
+	// brokerHandlers map[string]models.BrokerHandler
+	// client         *http.Client
 	writeAddr     string
 	readAddr      string
 	channelMetric map[string]channelMetric

@@ -2,6 +2,7 @@ package lbsidecar
 
 import (
 	"bytes"
+	//"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -22,6 +23,8 @@ import (
 
 var logger *zap.Logger
 var alevel *zap.AtomicLevel
+
+// const maxBrokerRetries = 5
 
 func init() {
 	logger, alevel = logs.Logger(zap.Fields(zap.String("section", "load-balancer-sidecar")))
@@ -328,3 +331,110 @@ func getResolvedChannel(channel string) (string, error) {
 	}
 	return resolvedCh, nil
 }
+
+// func (s *Server) readMessageRoutine(ctx context.Context) error {
+// 	// s.runningRead = true
+// 	// defer func() { s.runningRead = false }()
+
+// 	errch := make(chan error)
+// 	newCtx, cancel := context.WithCancel(ctx)
+// 	defer cancel()
+
+// 	for _, channel := range environment.InputBrokerChannels("broker") {
+// 		// separates several threads for each channel of this broker
+// 		go func(routeChan string) { errch <- s.channelReadMessageRoutine(newCtx, routeChan) }(
+// 			channel,
+// 		)
+// 	}
+
+// 	select {
+// 	case err := <-errch:
+// 		return err
+// 	case <-ctx.Done():
+// 		return ctx.Err()
+// 	}
+
+// }
+
+// func (s *Server) channelReadMessageRoutine(
+// 	ctx context.Context,
+// 	channel string,
+// ) error {
+// 	for {
+// 		select {
+// 		case <-ctx.Done():
+// 			return ctx.Err()
+// 		default:
+// 			start := time.Now()
+
+// 			var err error
+// 			var brokerMsg []byte
+
+// 			brokerMsg, err = s.readWithRetry(ctx, channel)
+// 			if err != nil {
+// 				return err
+// 			}
+
+// 			logger.Debug("trying to send request to loadbalancer",
+// 				zap.String("channel", channel),
+// 				zap.Any("message", brokerMsg))
+
+// 			status, err := s.writeWithRetry(ctx, channel, brokerMsg)
+// 			if err != nil || status != http.StatusOK {
+// 				return err
+// 			}
+
+// 			// s.Reader.Commit(ctx, channel)
+// 			elapsed := time.Since(start)
+// 			s.GetChannelMetric(channel).readMessageDuration.Observe(elapsed.Seconds())
+// 		}
+// 	}
+// }
+
+// func (s *Server) readWithRetry(
+// 	ctx context.Context,
+// 	channel string,
+// ) (brokerMsg []byte, err error) {
+// 	for i := 0; ; i++ {
+// 		brokerMsg, err = s.brokerHandlers["broker"].Reader().ReadMessage(ctx, channel)
+// 		if err != nil {
+// 			if i == maxBrokerRetries {
+// 				return
+// 			}
+// 			continue
+// 		}
+// 		return
+// 	}
+// }
+
+// func (s *Server) writeWithRetry(
+// 	ctx context.Context,
+// 	channel string,
+// 	data []byte,
+// ) (status int, err error) {
+// 	var resp *http.Response
+// 	for i := 0; i <= maxBrokerRetries; i++ {
+// 		writeAddr := fmt.Sprintf("%s/channel/%s", s.writeAddr, channel)
+// 		logger.Debug("writing with retry",
+// 			zap.Any("addr", writeAddr),
+// 			zap.Any("write conter", i))
+
+// 		resp, err = s.client.Post(
+// 			writeAddr,
+// 			"application/octet-stream",
+// 			bytes.NewBuffer(data),
+// 		)
+// 		if resp != nil {
+// 			defer resp.Body.Close()
+// 		}
+// 		status = resp.StatusCode
+// 		if err == nil && status == http.StatusOK {
+// 			return
+// 		}
+// 		err = rest.UnmarshalERROR(resp.Body)
+// 	}
+
+// 	logger.Debug("unable to send message to lbsidecar",
+// 		zap.Error(err))
+// 	return
+// }

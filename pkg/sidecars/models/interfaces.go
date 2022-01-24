@@ -16,3 +16,8 @@ type Writer interface {
 	WriteMessage(channel string, msg []byte) error
 	Close()
 }
+
+type BrokerKInterface interface {
+	Reader() Reader
+	Writer() Writer
+}
