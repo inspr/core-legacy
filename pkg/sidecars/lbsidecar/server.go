@@ -203,7 +203,7 @@ func Init(handlers ...*models.BrokerHandler) *Server {
 	logger = logger.With(zap.String("read-address", rAddr), zap.String("write-address", wAddr))
 	s.channelMetric = make(map[string]channelMetric)
 	s.routeMetric = make(map[string]routeMetric)
-
+	s.brokerHandlers = make(map[string]*models.BrokerHandler)
 	for _, handler := range handlers {
 		s.brokerHandlers[handler.Broker] = handler
 	}

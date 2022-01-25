@@ -102,33 +102,37 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App, usePermTree bool) *kubeD
 func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName string, usePermTree bool) []corev1.Container {
 	var containers []corev1.Container
 	var sidecarAddrs []corev1.EnvVar
-	for _, broker := range no.getAllSidecarBrokers(app, usePermTree) {
+	// for _, broker := range no.getAllSidecarBrokers(app, usePermTree) {
 
-		factory, err := no.brokers.Factory().Get(broker)
+	// 	factory, err := no.brokers.Factory().Get(broker)
 
-		if err != nil {
-			panic(fmt.Sprintf("broker %v not allowed: %v", broker, err))
-		}
+	// 	if err != nil {
+	// 		panic(fmt.Sprintf("broker %v not allowed: %v", broker, err))
+	// 	}
 
-		logger.Debug("with all sidecars containers", zap.Bool("useperm", usePermTree))
+	// 	logger.Debug("with all sidecars containers", zap.Bool("useperm", usePermTree))
 
-		container, addrEnvVar := factory(app,
-			getAvailiblePorts(),
-			no.withBoundary(app, usePermTree),
-			k8s.ContainerWithEnv(corev1.EnvVar{
-				Name:  "LOG_LEVEL",
-				Value: app.Spec.LogLevel,
-			}),
-			withLBSidecarConfiguration())
+	// 	container, addrEnvVar := factory(app,
+	// 		getAvailiblePorts(),
+	// 		no.withBoundary(app, usePermTree),
+	// 		k8s.ContainerWithEnv(corev1.EnvVar{
+	// 			Name:  "LOG_LEVEL",
+	// 			Value: app.Spec.LogLevel,
+	// 		}),
+	// 		withLBSidecarConfiguration())
 
-		containers = append(containers, container)
-		sidecarAddrs = append(sidecarAddrs, addrEnvVar...)
+	// 	containers = append(containers, container)
+	// 	sidecarAddrs = append(sidecarAddrs, addrEnvVar...)
+	// }
+
+	factory, err := no.brokers.Factory().Get("kafka")
+	if err != nil {
+		panic(fmt.Sprintf("broker %v not allowed: %v", "kafka", err))
 	}
 
-	lbSidecar := k8s.NewContainer(
-		"lbsidecar",
-		"",
-		no.withLBSidecarImage(app),
+	lbSidecar, _ := factory(app, nil,
+		no.withLBSidecarName(),
+		no.withLBSidecarImage(),
 		no.withBoundary(app, usePermTree),
 		no.withRoutes(app),
 		overwritePortEnvs(app),
@@ -264,9 +268,16 @@ func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.Contai
 }
 
 // withLBSidecarImage adds the sidecar image to the dApp
-func (no *NodeOperator) withLBSidecarImage(app *meta.App) k8s.ContainerOption {
+func (no *NodeOperator) withLBSidecarImage() k8s.ContainerOption {
 	return func(c *corev1.Container) {
 		c.Image = environment.GetSidecarImage()
+	}
+}
+
+// withLBSidecarName adds the sidecar name to the container
+func (no *NodeOperator) withLBSidecarName() k8s.ContainerOption {
+	return func(c *corev1.Container) {
+		c.Name = "lbsidecar"
 	}
 }
 
