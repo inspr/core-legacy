@@ -15,14 +15,23 @@ type ConnectionVariables struct {
 // BrokerHandler is a structure dedicated to agregating the interfaces of a broker.
 // This object implements the BrokerInterface.
 type BrokerHandler struct {
-	writer Writer
+	Broker string
 	reader Reader
+	writer Writer
+}
+
+func NewBrokerHandler(broker string, reader Reader, writer Writer) *BrokerHandler {
+	return &BrokerHandler{
+		Broker: broker,
+		reader: reader,
+		writer: writer,
+	}
 }
 
 func (bh *BrokerHandler) Writer() Writer {
 	return bh.writer
 }
 
-func (bh BrokerHandler) Reader() Reader {
+func (bh *BrokerHandler) Reader() Reader {
 	return bh.reader
 }

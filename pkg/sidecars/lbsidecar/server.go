@@ -13,6 +13,7 @@ import (
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/environment"
 	"inspr.dev/inspr/pkg/rest"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 type channelMetric struct {
@@ -34,12 +35,13 @@ type routeMetric struct {
 // Server is a struct that contains the variables necessary
 // to handle the necessary routes of the rest API
 type Server struct {
-	// brokerHandlers map[string]models.BrokerHandler
-	// client         *http.Client
-	writeAddr     string
-	readAddr      string
-	channelMetric map[string]channelMetric
-	routeMetric   map[string]routeMetric
+	brokerHandlers map[string]*models.BrokerHandler
+	runningRead    bool
+	runningWrite   bool
+	writeAddr      string
+	readAddr       string
+	channelMetric  map[string]channelMetric
+	routeMetric    map[string]routeMetric
 }
 
 func (s *Server) GetChannelMetric(channel string) channelMetric {
@@ -184,7 +186,7 @@ func (s *Server) getRouteSenderMetric(route string) routeMetric {
 }
 
 // Init - initializes a new configured server
-func Init() *Server {
+func Init(handlers ...*models.BrokerHandler) *Server {
 	s := Server{}
 
 	wAddr, exists := os.LookupEnv("INSPR_LBSIDECAR_WRITE_PORT")
@@ -201,6 +203,10 @@ func Init() *Server {
 	logger = logger.With(zap.String("read-address", rAddr), zap.String("write-address", wAddr))
 	s.channelMetric = make(map[string]channelMetric)
 	s.routeMetric = make(map[string]routeMetric)
+
+	for _, handler := range handlers {
+		s.brokerHandlers[handler.Broker] = handler
+	}
 
 	return &s
 }
@@ -237,6 +243,8 @@ func (s *Server) Run(ctx context.Context) error {
 		Addr:    s.writeAddr,
 	}
 	go func() {
+		s.runningWrite = true
+		defer func() { s.runningWrite = false }()
 		if err := writeServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
 			logger.Error("an error occurred in LB Sidecar write server",
@@ -246,7 +254,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 	muxReader := http.NewServeMux()
 
-	muxReader.Handle("/channel/", s.readMessageHandler().Post().JSON())
+	// muxReader.Handle("/channel/", s.readMessageHandler().Post().JSON())
 	muxReader.Handle("/route/", s.routeReceiveHandler().JSON())
 
 	readServer := &http.Server{
@@ -260,6 +268,9 @@ func (s *Server) Run(ctx context.Context) error {
 				zap.Error(err))
 		}
 	}()
+
+	// create read message routine and captures its error
+	go func() { errCh <- s.readMessageRoutine(ctx) }()
 
 	logger.Info("LB Sidecar listener is up...")
 

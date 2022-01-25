@@ -17,7 +17,7 @@ type Writer interface {
 	Close()
 }
 
-type BrokerKInterface interface {
+type BrokerInterface interface {
 	Reader() Reader
 	Writer() Writer
 }
