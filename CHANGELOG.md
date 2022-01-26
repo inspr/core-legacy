@@ -1,5 +1,22 @@
 # Changelog
 
+### #164 Story CORE-406 | Modify alias and boundary structure to accommodate Routes
+- feature:
+  As the Alias structure changed, it was necessary to change the Alias API inside Insprd:
+    - The create, update, delete and get methods have been changed to support the new structure
+    - Checks related to the new framework have also been added
+    - The handlers have been modified
+    - The client for both Go and Python has also been modified to support the new Alias.
+    - All tests related to the above modules have also been updated
+    - Some tests were added, such as the validation of new Alias fields
+    - Examples have been changed and docs also updated.
+
+  Regarding Boundary:
+    - All usages have been changed to match the new structure which now has both Channels and Routes.
+    - Examples have been changed (but not yet tested)
+    - And docs have also been updated (but not yet fully verified)
+---
+
 ### #158 Story CORE-614 | Brokers command helper is very unclear
 - fix:
   - update the brokers command helper to have a better description

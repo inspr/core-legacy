@@ -11,7 +11,8 @@ spec:
       replicas: 1
       image: gcr.io/insprlabs/inspr/example/python/pong:latest
   boundary:
-    input:
-      - ponginput
-    output:
-      - pongoutput
+    channels:
+      input:
+        - ponginput
+      output:
+        - pongoutput

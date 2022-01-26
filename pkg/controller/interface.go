@@ -52,9 +52,9 @@ type AuthorizationInterface interface {
 // state of the Alias in the cluster
 type AliasInterface interface {
 	Get(ctx context.Context, scope, key string) (*meta.Alias, error)
-	Create(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
-	Delete(ctx context.Context, scope, key string, dryRun bool) (diff.Changelog, error)
-	Update(ctx context.Context, scope, target string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
+	Create(ctx context.Context, scope string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
+	Delete(ctx context.Context, scope, name string, dryRun bool) (diff.Changelog, error)
+	Update(ctx context.Context, scope string, alias *meta.Alias, dryRun bool) (diff.Changelog, error)
 }
 
 // BrokersInterface is the interface that allows to

@@ -161,8 +161,8 @@ func (no *NodeOperator) withRoutes(app *meta.App) k8s.ContainerOption {
 }
 
 func (no *NodeOperator) getAllSidecarBrokers(app *meta.App, usePermTree bool) utils.StringArray {
-	input := app.Spec.Boundary.Input
-	output := app.Spec.Boundary.Output
+	input := app.Spec.Boundary.Channels.Input
+	output := app.Spec.Boundary.Channels.Output
 	channels := input.Union(output)
 
 	logger.Debug("resolving Node Boundary in the cluster",
@@ -204,8 +204,8 @@ func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.Contai
 		return nil
 	}
 	return func(c *corev1.Container) {
-		input := app.Spec.Boundary.Input
-		output := app.Spec.Boundary.Output
+		input := app.Spec.Boundary.Channels.Input
+		output := app.Spec.Boundary.Channels.Output
 		channels := input.Union(output)
 
 		logger.Debug("with boundary", zap.Bool("useperm", usePermTree))

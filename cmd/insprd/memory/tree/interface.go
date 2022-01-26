@@ -59,14 +59,14 @@ type TypeGetInterface interface {
 type AliasMemory interface {
 	TransactionInterface
 	AliasGetInterface
-	Create(scope, targetBoundary string, alias *meta.Alias) error
-	Update(scope, aliasKey string, alias *meta.Alias) error
-	Delete(scope, aliasKey string) error
+	Create(scope string, alias *meta.Alias) error
+	Delete(scope, name string) error
+	Update(scope string, alias *meta.Alias) error
 }
 
 // AliasGetInterface is an interface to get alias types from memory
 type AliasGetInterface interface {
-	Get(scope, aliasKey string) (*meta.Alias, error)
+	Get(scope, name string) (*meta.Alias, error)
 }
 
 // Manager is the interface that allows the management

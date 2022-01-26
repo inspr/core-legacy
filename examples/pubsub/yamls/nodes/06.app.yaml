@@ -10,5 +10,6 @@ spec:
       replicas: 1
       image: gcr.io/insprlabs/inspr/examples/slackpub:latest
   boundary:
-    input:
-      - pubsubch
+    channels:
+      input:
+        - pubsubch

@@ -13,5 +13,6 @@ spec:
         - port: 80
           targetPort: 8080
   boundary:
-    output:
-      - pubsubch
+    channels:
+      output:
+        - pubsubch

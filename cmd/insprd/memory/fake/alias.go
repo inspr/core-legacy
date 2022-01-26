@@ -13,7 +13,7 @@ type Alias struct {
 }
 
 // Get - simple mock
-func (a *Alias) Get(scope, aliasKey string) (*meta.Alias, error) {
+func (a *Alias) Get(scope, name string) (*meta.Alias, error) {
 	if a.fail != nil {
 		return nil, a.fail
 	}
@@ -27,21 +27,21 @@ func (a *Alias) Get(scope, aliasKey string) (*meta.Alias, error) {
 }
 
 // Create - simple mock
-func (a *Alias) Create(query, targetBoundary string, alias *meta.Alias) error {
+func (a *Alias) Create(scope string, alias *meta.Alias) error {
 	if a.fail != nil {
 		return a.fail
 	}
 
-	_, ok := a.alias[query]
+	_, ok := a.alias[scope]
 	if ok {
-		return ierrors.New("alias %s already exists", query).AlreadyExists()
+		return ierrors.New("alias %s already exists", scope).AlreadyExists()
 	}
-	a.alias[query] = alias
+	a.alias[scope] = alias
 	return nil
 }
 
 // Delete - simple mock
-func (a *Alias) Delete(scope, aliasKey string) error {
+func (a *Alias) Delete(scope, name string) error {
 	if a.fail != nil {
 		return a.fail
 	}
@@ -56,7 +56,7 @@ func (a *Alias) Delete(scope, aliasKey string) error {
 }
 
 // Update - simple mock
-func (a *Alias) Update(scope, aliasKey string, alias *meta.Alias) error {
+func (a *Alias) Update(scope string, alias *meta.Alias) error {
 	if a.fail != nil {
 		return a.fail
 	}

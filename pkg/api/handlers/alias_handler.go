@@ -43,14 +43,13 @@ func (ah *AliasHandler) HandleCreate() rest.Handler {
 
 		l = l.With(
 			zap.Any("alias", data.Alias),
-			zap.String("targed", data.Target),
 			zap.String("scope", scope),
 			zap.Bool("dry-run", data.DryRun),
 		)
 		l.Debug("initiating Alias create transaction")
 		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Tree().Alias().Create(scope, data.Target, &data.Alias)
+		err = ah.Memory.Tree().Alias().Create(scope, &data.Alias)
 		if err != nil {
 			l.Error("unable to create Alias", zap.Error(err))
 			rest.ERROR(w, err)
@@ -106,14 +105,14 @@ func (ah *AliasHandler) HandleGet() rest.Handler {
 		}
 
 		l = l.With(
-			zap.String("alias key", data.Key),
+			zap.String("alias name", data.Name),
 			zap.String("scope", scope),
 			zap.Bool("dry-run", data.DryRun),
 		)
 		l.Debug("initiating Alias get transaction")
 		ah.Memory.Tree().InitTransaction()
 
-		app, err := ah.Memory.Tree().Perm().Alias().Get(scope, data.Key)
+		app, err := ah.Memory.Tree().Perm().Alias().Get(scope, data.Name)
 		if err != nil {
 			l.Error("unable to get Alias", zap.Error(err))
 			rest.ERROR(w, err)
@@ -145,7 +144,6 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 		}
 		l = l.With(
 			zap.Any("alias", data.Alias),
-			zap.String("targed", data.Target),
 			zap.String("scope", scope),
 			zap.Bool("dry-run", data.DryRun),
 		)
@@ -153,7 +151,7 @@ func (ah *AliasHandler) HandleUpdate() rest.Handler {
 		l.Debug("initiating Alias update transaction")
 		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Tree().Alias().Update(scope, data.Target, &data.Alias)
+		err = ah.Memory.Tree().Alias().Update(scope, &data.Alias)
 		if err != nil {
 			l.Error("unable to update Alias", zap.Error(err))
 			rest.ERROR(w, err)
@@ -208,14 +206,14 @@ func (ah *AliasHandler) HandleDelete() rest.Handler {
 			return
 		}
 		l = l.With(
-			zap.String("alias key", data.Key),
+			zap.String("alias key", data.Name),
 			zap.String("scope", scope),
 			zap.Bool("dry-run", data.DryRun),
 		)
 		l.Debug("initiating Alias delete transaction")
 		ah.Memory.Tree().InitTransaction()
 
-		err = ah.Memory.Tree().Alias().Delete(scope, data.Key)
+		err = ah.Memory.Tree().Alias().Delete(scope, data.Name)
 		if err != nil {
 			l.Error("unable to delete Alias", zap.Error(err))
 			rest.ERROR(w, err)

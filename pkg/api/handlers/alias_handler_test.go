@@ -32,7 +32,7 @@ type AliasAPITest struct {
 func AliasDICases(funcName string) []AliasAPITest {
 	parsedAliasDI, _ := json.Marshal(models.AliasDI{
 		Alias: meta.Alias{
-			Target: "mock_Alias",
+			Resource: "mock_Alias",
 		},
 	})
 	wrongFormatData := []byte{1}
@@ -111,7 +111,7 @@ func AliasDICases(funcName string) []AliasAPITest {
 // For example, HandleGetAliasByRef and HandleDelete use these test cases
 func AliasQueryDICases(funcName string) []AliasAPITest {
 	parsedAliasQueryDI, _ := json.Marshal(models.AliasQueryDI{
-		Key:    "mock_Alias",
+		Name:   "mock_Alias",
 		DryRun: false,
 	})
 	wrongFormatData := []byte{1}
@@ -252,7 +252,7 @@ func TestAliasHandler_HandleGetAlias(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Tree().Alias().Create("", "ch", &meta.Alias{Target: "mock_Alias"})
+			tt.ah.Memory.Tree().Alias().Create("", &meta.Alias{Resource: "mock_Alias"})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -277,7 +277,7 @@ func TestAliasHandler_HandleUpdate(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Tree().Alias().Create("", "ch", &meta.Alias{Target: "mock_Alias"})
+			tt.ah.Memory.Tree().Alias().Create("", &meta.Alias{Resource: "mock_Alias"})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))
@@ -302,7 +302,7 @@ func TestAliasHandler_HandleDelete(t *testing.T) {
 			ts := httptest.NewServer(handlerFunc)
 			defer ts.Close()
 
-			tt.ah.Memory.Tree().Alias().Create("", "ch", &meta.Alias{Target: "mock_Alias"})
+			tt.ah.Memory.Tree().Alias().Create("", &meta.Alias{Resource: "mock_Alias"})
 
 			client := ts.Client()
 			res, err := client.Post(ts.URL, "application/json", bytes.NewBuffer(tt.send.body))

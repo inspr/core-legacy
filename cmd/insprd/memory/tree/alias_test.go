@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/utils"
 )
 
 func TestMemoryManager_Alias(t *testing.T) {
@@ -48,9 +49,8 @@ func TestAliasMemoryManager_Create(t *testing.T) {
 		root *meta.App
 	}
 	type args struct {
-		query          string
-		targetBoundary string
-		alias          *meta.Alias
+		scope string
+		alias *meta.Alias
 	}
 	tests := []struct {
 		name    string
@@ -64,35 +64,8 @@ func TestAliasMemoryManager_Create(t *testing.T) {
 				root: getMockAlias(),
 			},
 			args: args{
-				query:          "invalid.app",
-				targetBoundary: "ch1",
-				alias:          &meta.Alias{},
-			},
-			wantErr: true,
-		},
-		{
-			name: "app exist, but target boundary dont - it should return an error",
-			fields: fields{
-				root: getMockAlias(),
-			},
-			args: args{
-				query:          "app1",
-				targetBoundary: "invalid",
-				alias:          &meta.Alias{},
-			},
-			wantErr: true,
-		},
-		{
-			name: "target channel don't exist in parent - it should return an error",
-			fields: fields{
-				root: getMockAlias(),
-			},
-			args: args{
-				query:          "app1",
-				targetBoundary: "channel1",
-				alias: &meta.Alias{
-					Target: "invalid",
-				},
+				scope: "invalid.app",
+				alias: &meta.Alias{},
 			},
 			wantErr: true,
 		},
@@ -102,24 +75,84 @@ func TestAliasMemoryManager_Create(t *testing.T) {
 				root: getMockAlias(),
 			},
 			args: args{
-				query:          "app1",
-				targetBoundary: "aliaschannel",
+				scope: "app1",
 				alias: &meta.Alias{
-					Target: "channel1",
+					Meta: meta.Metadata{
+						Name: "my_alias",
+					},
+					Source:      "appUpdate1",
+					Resource:    "route_1",
+					Destination: "",
 				},
 			},
 			wantErr: true,
 		},
 		{
-			name: "Valid query - it should not return an error",
+			name: "invalid source - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				query:          "app1",
-				targetBoundary: "aliaschannel2",
+				scope: "app1",
 				alias: &meta.Alias{
-					Target: "channel1",
+					Meta: meta.Metadata{
+						Name: "my_new_alias",
+					},
+					Source: "invalid_child",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid resource - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				alias: &meta.Alias{
+					Meta: meta.Metadata{
+						Name: "my_new_alias",
+					},
+					Source:      "appUpdate1",
+					Resource:    "invalid",
+					Destination: "",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid destination - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				alias: &meta.Alias{
+					Meta: meta.Metadata{
+						Name: "my_new_alias",
+					},
+					Source:      "appUpdate1",
+					Resource:    "route_1",
+					Destination: "invalid",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "valid creation - it should not return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				alias: &meta.Alias{
+					Meta: meta.Metadata{
+						Name: "my_new_alias",
+					},
+					Source:      "appUpdate1",
+					Resource:    "route_1",
+					Destination: "appUpdate2",
 				},
 			},
 			wantErr: false,
@@ -132,7 +165,7 @@ func TestAliasMemoryManager_Create(t *testing.T) {
 				tree: tt.fields.root,
 			}
 			amm := mem.Alias()
-			if err := amm.Create(tt.args.query, tt.args.targetBoundary, tt.args.alias); (err != nil) != tt.wantErr {
+			if err := amm.Create(tt.args.scope, tt.args.alias); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -144,8 +177,8 @@ func TestAliasMemoryManager_Get(t *testing.T) {
 		root *meta.App
 	}
 	type args struct {
-		context  string
-		aliasKey string
+		scope string
+		name  string
 	}
 	tests := []struct {
 		name    string
@@ -155,52 +188,56 @@ func TestAliasMemoryManager_Get(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "invalid context - it should return an error",
+			name: "invalid scope - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "invalid.context",
-				aliasKey: "app1.aliaschannel",
+				scope: "invalid.app",
+				name:  "my_alias",
 			},
 			wantErr: true,
 		},
 		{
-			name: "alias key not exist - it should return an error",
+			name: "alias name not exist - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "",
-				aliasKey: "invalid.alias",
+				scope: "app1",
+				name:  "invalid.alias",
 			},
 			wantErr: true,
 		},
 		{
-			name: "Valid query, alias key exist - it should not return an error",
+			name: "Valid scope, alias name exist - it should not return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "",
-				aliasKey: "app1.aliaschannel",
+				scope: "app1",
+				name:  "my_alias",
 			},
 			wantErr: false,
 			want: &meta.Alias{
-				Target: "channel2",
+				Meta: meta.Metadata{
+					Name: "my_alias",
+				},
+				Resource:    "channel1",
+				Source:      "",
+				Destination: "appUpdate1",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			mem := &treeMemoryManager{
 				root: tt.fields.root,
 				tree: tt.fields.root,
 			}
 			amm := mem.Alias()
 
-			got, err := amm.Get(tt.args.context, tt.args.aliasKey)
+			got, err := amm.Get(tt.args.scope, tt.args.name)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -217,9 +254,8 @@ func TestAliasMemoryManager_Update(t *testing.T) {
 		root *meta.App
 	}
 	type args struct {
-		context  string
-		aliasKey string
-		alias    *meta.Alias
+		scope string
+		alias *meta.Alias
 	}
 	tests := []struct {
 		name    string
@@ -228,53 +264,98 @@ func TestAliasMemoryManager_Update(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "invalid context - it should return an error",
+			name: "invalid scope - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "invalid.context",
-				aliasKey: "app1.aliaschannel",
-				alias:    &meta.Alias{},
+				scope: "invalid.app",
+				alias: &meta.Alias{},
 			},
 			wantErr: true,
 		},
 		{
-			name: "alias key not exist - it should return an error",
+			name: "alias do not exist - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "",
-				aliasKey: "invalid.alias",
-				alias:    &meta.Alias{},
-			},
-			wantErr: true,
-		},
-		{
-			name: "target channel don't exist in parent - it should return an error",
-			fields: fields{
-				root: getMockAlias(),
-			},
-			args: args{
-				context:  "",
-				aliasKey: "app1.aliaschannel",
+				scope: "app1",
 				alias: &meta.Alias{
-					Target: "invalid",
+					Meta: meta.Metadata{
+						Name: "invalid.alias",
+					},
+					Source: "invalid_child",
 				},
 			},
 			wantErr: true,
 		},
 		{
-			name: "Valid query - it should not return an error",
+			name: "invalid source - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "",
-				aliasKey: "app1.aliaschannel",
+				scope: "app1",
 				alias: &meta.Alias{
-					Target: "channel1",
+					Meta: meta.Metadata{
+						Name: "my_alias",
+					},
+					Source: "invalid_child",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid resource - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				alias: &meta.Alias{
+					Meta: meta.Metadata{
+						Name: "my_alias",
+					},
+					Source:      "appUpdate1",
+					Resource:    "invalid",
+					Destination: "",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid destination - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				alias: &meta.Alias{
+					Meta: meta.Metadata{
+						Name: "my_alias",
+					},
+					Source:      "appUpdate1",
+					Resource:    "route_1",
+					Destination: "invalid",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "Valid update - it should not return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				alias: &meta.Alias{
+					Meta: meta.Metadata{
+						Name: "my_alias",
+					},
+					Source:      "appUpdate1",
+					Resource:    "route_1",
+					Destination: "appUpdate2",
 				},
 			},
 			wantErr: false,
@@ -288,7 +369,7 @@ func TestAliasMemoryManager_Update(t *testing.T) {
 			}
 			amm := mem.Alias()
 
-			if err := amm.Update(tt.args.context, tt.args.aliasKey, tt.args.alias); (err != nil) != tt.wantErr {
+			if err := amm.Update(tt.args.scope, tt.args.alias); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -300,8 +381,8 @@ func TestAliasMemoryManager_Delete(t *testing.T) {
 		root *meta.App
 	}
 	type args struct {
-		context  string
-		aliasKey string
+		scope string
+		name  string
 	}
 	tests := []struct {
 		name    string
@@ -310,46 +391,68 @@ func TestAliasMemoryManager_Delete(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "invalid context - it should return an error",
+			name: "invalid scope - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "invalid.context",
-				aliasKey: "app1.aliaschannel",
+				scope: "invalid.app",
+				name:  "my_alias",
 			},
 			wantErr: true,
 		},
 		{
-			name: "alias key not exist - it should return an error",
+			name: "alias do not exist - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "",
-				aliasKey: "invalid.alias",
+				scope: "app1",
+				name:  "invalid.alias",
 			},
 			wantErr: true,
 		},
 		{
-			name: "alias exist but its being used - it should return an error",
+			name: "alias exist but its being used by the child dapp in another alias - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "",
-				aliasKey: "app1.aliaschannel",
+				scope: "app1",
+				name:  "my_alias",
 			},
 			wantErr: true,
 		},
 		{
-			name: "Valid query - it should not return an error",
+			name: "alias exist but its being used by the child dapp in its boudaries - it should return an error",
 			fields: fields{
 				root: getMockAlias(),
 			},
 			args: args{
-				context:  "",
-				aliasKey: "app2.aliaschannel",
+				scope: "app1",
+				name:  "my_other_alias",
+			},
+			wantErr: true,
+		},
+		{
+			name: "alias exist but its being used by the parent dapp - it should return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1",
+				name:  "my_awesome_alias",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Valid delete - it should not return an error",
+			fields: fields{
+				root: getMockAlias(),
+			},
+			args: args{
+				scope: "app1.appUpdate1",
+				name:  "my_brand_new_alias",
 			},
 			wantErr: false,
 		},
@@ -363,52 +466,8 @@ func TestAliasMemoryManager_Delete(t *testing.T) {
 			}
 
 			amm := mem.Alias()
-			if err := amm.Delete(tt.args.context, tt.args.aliasKey); (err != nil) != tt.wantErr {
+			if err := amm.Delete(tt.args.scope, tt.args.name); (err != nil) != tt.wantErr {
 				t.Errorf("AliasMemoryManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_validTargetChannel(t *testing.T) {
-	type args struct {
-		parentApp     *meta.App
-		targetChannel string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "target channel doesn't exist in app - it should return an error",
-			args: args{
-				parentApp:     getMockAlias(),
-				targetChannel: "invalid_channel",
-			},
-			wantErr: true,
-		},
-		{
-			name: "channel exist in app channels - it should not return an error",
-			args: args{
-				parentApp:     getMockAlias(),
-				targetChannel: "channel1",
-			},
-			wantErr: false,
-		},
-		{
-			name: "channel exist in app boundary - it should not return an error",
-			args: args{
-				parentApp:     getMockAlias(),
-				targetChannel: "somechannel",
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := validTargetChannel(tt.args.parentApp, tt.args.targetChannel); (err != nil) != tt.wantErr {
-				t.Errorf("validTargetChannel() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -437,8 +496,40 @@ func getMockAlias() *meta.App {
 					Spec: meta.AppSpec{
 						Node: meta.Node{},
 						Apps: map[string]*meta.App{
-							"appUpdate1": {},
-							"appUpdate2": {},
+							"appUpdate1": {
+								Meta: meta.Metadata{
+									Name: "appUpdate1",
+								},
+								Spec: meta.AppSpec{
+									Routes: map[string]*meta.RouteConnection{
+										"route_1": {},
+									},
+									Apps: map[string]*meta.App{
+										"app_1_1": {},
+									},
+									Aliases: map[string]*meta.Alias{
+										"my_brand_new_alias": {
+											Meta: meta.Metadata{
+												Name: "my_brand_new_alias",
+											},
+											Resource:    "my_alias",
+											Destination: "app_1_1",
+											Source:      "",
+										},
+									},
+								},
+							},
+							"appUpdate2": {
+								Spec: meta.AppSpec{
+									Boundary: meta.AppBoundary{
+										Channels: meta.Boundary{
+											Output: utils.StringArray{
+												"my_other_alias",
+											},
+										},
+									},
+								},
+							},
 						},
 						Channels: map[string]*meta.Channel{
 							"ch1app1": {
@@ -472,9 +563,39 @@ func getMockAlias() *meta.App {
 								ConnectedChannels: []string{"ch2app1Update", "ch1app1"},
 							},
 						},
+
+						Aliases: map[string]*meta.Alias{
+							"my_alias": {
+								Meta: meta.Metadata{
+									Name: "my_alias",
+								},
+								Resource:    "channel1",
+								Source:      "",
+								Destination: "appUpdate1",
+							},
+							"my_other_alias": {
+								Meta: meta.Metadata{
+									Name: "my_other_alias",
+								},
+								Resource:    "channel1",
+								Source:      "",
+								Destination: "appUpdate2",
+							},
+							"my_awesome_alias": {
+								Meta: meta.Metadata{
+									Name: "my_awesome_alias",
+								},
+								Resource:    "route_1",
+								Source:      "appUpdate1",
+								Destination: "",
+							},
+						},
+
 						Boundary: meta.AppBoundary{
-							Input:  []string{"channel1", "aliaschannel", "aliaschannel2"},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{"channel1", "aliaschannel", "aliaschannel2"},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -510,15 +631,25 @@ func getMockAlias() *meta.App {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Input:  []string{"somechannel"},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{"somechannel"},
+					Output: []string{},
+				},
 			},
 			Aliases: map[string]*meta.Alias{
 				"app1.aliaschannel": {
-					Target: "channel2",
+					Resource: "channel2",
 				},
 				"app2.aliaschannel": {
-					Target: "channel2",
+					Resource: "channel2",
+				},
+
+				"my_crazy_alias": {
+					Meta: meta.Metadata{
+						Name: "my_crazy_alias",
+					},
+					Resource: "my_awesome_alias",
+					Source:   "app1",
 				},
 			},
 		},

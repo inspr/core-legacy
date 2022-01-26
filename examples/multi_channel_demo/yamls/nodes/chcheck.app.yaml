@@ -11,9 +11,10 @@ spec:
         SUPER_SECRET_0001: "false"
       image: gcr.io/insprlabs/inspr/example/chcheck:latest
   boundary:
-    input:
-      - testch1
-      - testch2
-      - testch3
-    output:
-      - checkch
+    channels:
+      input:
+        - testch1
+        - testch2
+        - testch3
+      output:
+        - checkch
