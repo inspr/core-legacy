@@ -1,5 +1,12 @@
 # Changelog
 
+### #165 Story CORE-620 | adapt lb-sidecar to accept dynamically configurable brokers
+- dev:
+  - changed all broker related operations and responsabilities to lb-sidecar
+  - created a dinamycally operable broker configurator on lb-sidecar
+  - disabled deployment of broker specific sidecar
+---
+
 ### #158 Story CORE-614 | Brokers command helper is very unclear
 - fix:
   - update the brokers command helper to have a better description
