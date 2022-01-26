@@ -376,7 +376,7 @@ func (s *Server) channelReadMessageRoutine(
 				zap.String("channel", channel),
 				zap.Any("message", brokerMsg))
 
-			status, err := s.writeWithRetry(ctx, channel, brokerMsg) // change to sendo to client
+			status, err := s.forwardToNode(ctx, channel, brokerMsg) // change to sendo to client
 			if err != nil || status != http.StatusOK {
 				return err
 			}
@@ -384,6 +384,7 @@ func (s *Server) channelReadMessageRoutine(
 			s.brokerHandlers[broker].Reader().Commit(ctx, channel)
 			elapsed := time.Since(start)
 			s.GetChannelMetric(channel).readMessageDuration.Observe(elapsed.Seconds())
+			s.GetChannelMetric(channel).messagesRead.Add(1)
 		}
 	}
 }
@@ -404,20 +405,12 @@ func (s *Server) readWithRetry(
 	}
 }
 
-func (s *Server) writeWithRetry(
+func (s *Server) forwardToNode(
 	ctx context.Context,
 	channel string,
 	data []byte,
 ) (status int, err error) {
 	var resp *http.Response
-	clientReadPort := os.Getenv("INSPR_SCCLIENT_READ_PORT")
-	if clientReadPort == "" {
-		err = ierrors.New(
-			"[ENV VAR] INSPR_SCCLIENT_READ_PORT not found",
-		).NotFound()
-
-		return
-	}
 
 	logger.Debug("decoding message from Avro schema")
 
@@ -430,30 +423,19 @@ func (s *Server) writeWithRetry(
 		return
 	}
 
-	for i := 0; i <= maxBrokerRetries; i++ {
+	logger.Info("sending message to node through: ",
+		zap.String("channel", channel), zap.String("node address", s.clientAddr))
 
-		logger.Info("sending message to node through: ",
-			zap.String("channel", channel), zap.String("node port", clientReadPort))
+	requestAddress := fmt.Sprintf("%v/channel/%v", s.clientAddr, channel)
 
-		clientAddress := fmt.Sprintf("http://localhost:%v/channel/%v", clientReadPort, channel)
-
-		resp, err = sendRequest(clientAddress, decodedMsg)
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-
-		if err == nil && status == http.StatusOK {
-			return
-		}
-
+	resp, err = sendRequest(requestAddress, decodedMsg)
+	if err != nil {
 		logger.Error("unable to send request from lbsidecar to node",
 			zap.Any("error", err))
-
-		err = rest.UnmarshalERROR(resp.Body)
-
+		return
 	}
+	defer resp.Body.Close()
 
-	logger.Debug("unable to send message to lbsidecar",
-		zap.Error(err))
+	status = resp.StatusCode
 	return
 }

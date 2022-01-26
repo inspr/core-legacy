@@ -40,6 +40,7 @@ type Server struct {
 	runningWrite   bool
 	writeAddr      string
 	readAddr       string
+	clientAddr     string
 	channelMetric  map[string]channelMetric
 	routeMetric    map[string]routeMetric
 }
@@ -193,11 +194,18 @@ func Init(handlers ...*models.BrokerHandler) *Server {
 	if !exists {
 		panic("[ENV VAR] INSPR_LBSIDECAR_WRITE_PORT not found")
 	}
+
 	rAddr, exists := os.LookupEnv("INSPR_LBSIDECAR_READ_PORT")
 	if !exists {
 		panic("[ENV VAR] INSPR_LBSIDECAR_READ_PORT not found")
 	}
 
+	clientReadPort, exists := os.LookupEnv("INSPR_SCCLIENT_READ_PORT")
+	if !exists {
+		panic("[ENV VAR] INSPR_SCCLIENT_READ_PORT not found")
+	}
+
+	s.clientAddr = fmt.Sprintf("http://localhost:%v", clientReadPort)
 	s.writeAddr = fmt.Sprintf(":%s", wAddr)
 	s.readAddr = fmt.Sprintf(":%s", rAddr)
 	logger = logger.With(zap.String("read-address", rAddr), zap.String("write-address", wAddr))
