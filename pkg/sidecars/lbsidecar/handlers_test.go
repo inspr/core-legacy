@@ -173,105 +173,6 @@ func TestServer_writeMessageHandler(t *testing.T) {
 	}
 }
 
-func TestServer_readMessageHandler(t *testing.T) {
-	createMockEnvVars()
-	defer deleteMockEnvVars()
-
-	rServer := httptest.NewServer(Init().readMessageHandler())
-	req := http.Client{}
-
-	tests := []struct {
-		name          string
-		channel       string
-		msg           models.BrokerMessage
-		port          string
-		setClientPort bool
-		wantErr       bool
-	}{
-		{
-			name:    "Channel not listed in 'INSPR_INPUT_CHANNELS'",
-			channel: "invalidChan1",
-			wantErr: true,
-		},
-
-		{
-			name:          "Channel avro schema not defined",
-			channel:       "chan4",
-			wantErr:       true,
-			setClientPort: true,
-		},
-		{
-			name:    "Invalid avro schema",
-			channel: "chan1",
-			wantErr: true,
-		},
-		{
-			name:    "Invalid message given schema",
-			channel: "chan3",
-			msg: models.BrokerMessage{
-				Data: randomStruct{},
-			},
-			wantErr: true,
-		},
-		{
-			name:    "Invalid scclient request address",
-			channel: "chan6",
-			msg: models.BrokerMessage{
-				Data: "randomMessage",
-			},
-			wantErr: true,
-		},
-		{
-			name:    "Valid write request",
-			channel: "chan5b",
-			msg: models.BrokerMessage{
-				Data: "randomMessage",
-			},
-			port:          "1117",
-			setClientPort: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.setClientPort {
-				os.Setenv("INSPR_SCCLIENT_READ_PORT", "1117")
-				defer os.Unsetenv("INSPR_SCCLIENT_READ_PORT")
-			}
-			var testServer *httptest.Server
-			if tt.port != "" {
-				testServer = createMockedServer(tt.port, tt.channel, tt.msg.Data.(string))
-				testServer.Start()
-				defer testServer.Close()
-			}
-
-			buf, err := encode(tt.channel, tt.msg.Data)
-			if err != nil && !tt.wantErr {
-				t.Errorf("Unable to encode request: %v", err)
-				return
-			}
-			reqInfo, _ := http.NewRequest(http.MethodPost,
-				rServer.URL+"/channel/"+tt.channel,
-				bytes.NewBuffer(buf))
-
-			resp, err := req.Do(reqInfo)
-			if err != nil {
-				t.Errorf("Error while doing the request: %v", err)
-				return
-			}
-
-			if tt.wantErr && (resp.StatusCode == http.StatusOK) {
-				t.Errorf("Wanted error, received 'nil'")
-				return
-			}
-
-			if !tt.wantErr && (resp.StatusCode != http.StatusOK) {
-				t.Errorf("Received status %v, wanted %v", resp.StatusCode, http.StatusOK)
-				return
-			}
-		})
-	}
-}
-
 func TestServer_routeReceiveHandler(t *testing.T) {
 
 	createMockEnvVars()
@@ -297,10 +198,11 @@ func TestServer_routeReceiveHandler(t *testing.T) {
 			setClientPort: true,
 		},
 		{
-			name:     "Invalid - port not set",
-			msg:      "Hello World!",
-			endpoint: "nodename",
-			wantErr:  true,
+			name:          "Invalid - port not set",
+			msg:           "Hello World!",
+			endpoint:      "nodename",
+			wantErr:       true,
+			setClientPort: true,
 		},
 	}
 	for _, tt := range tests {

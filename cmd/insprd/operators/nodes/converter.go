@@ -12,7 +12,6 @@ import (
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
 	"inspr.dev/inspr/pkg/operator/k8s"
-	"inspr.dev/inspr/pkg/sidecars/models"
 	"inspr.dev/inspr/pkg/utils"
 
 	corev1 "k8s.io/api/core/v1"
@@ -102,28 +101,6 @@ func (no *NodeOperator) dAppToDeployment(app *meta.App, usePermTree bool) *kubeD
 func (no *NodeOperator) withAllSidecarsContainers(app *meta.App, appDeployName string, usePermTree bool) []corev1.Container {
 	var containers []corev1.Container
 	var sidecarAddrs []corev1.EnvVar
-	// for _, broker := range no.getAllSidecarBrokers(app, usePermTree) {
-
-	// 	factory, err := no.brokers.Factory().Get(broker)
-
-	// 	if err != nil {
-	// 		panic(fmt.Sprintf("broker %v not allowed: %v", broker, err))
-	// 	}
-
-	// 	logger.Debug("with all sidecars containers", zap.Bool("useperm", usePermTree))
-
-	// 	container, addrEnvVar := factory(app,
-	// 		getAvailiblePorts(),
-	// 		no.withBoundary(app, usePermTree),
-	// 		k8s.ContainerWithEnv(corev1.EnvVar{
-	// 			Name:  "LOG_LEVEL",
-	// 			Value: app.Spec.LogLevel,
-	// 		}),
-	// 		withLBSidecarConfiguration())
-
-	// 	containers = append(containers, container)
-	// 	sidecarAddrs = append(sidecarAddrs, addrEnvVar...)
-	// }
 
 	factory, err := no.brokers.Factory().Get("kafka")
 	if err != nil {
@@ -351,21 +328,6 @@ func createNodeContainer(app *meta.App, appDeployName string) corev1.Container {
 		}),
 		withLBSidecarConfiguration(),
 	)
-}
-
-func getAvailiblePorts() *models.SidecarConnections {
-	ports, err := utils.GetFreePorts(2)
-	if err != nil {
-		logger.Error("unable to get free ports for broker sidecar: %v",
-			zap.Any("error", err))
-
-		panic(fmt.Sprintf("error while getting free ports: %v", err))
-
-	}
-	return &models.SidecarConnections{
-		InPort:  int32(ports[0]),
-		OutPort: int32(ports[1]),
-	}
 }
 
 func withNodePort() k8s.ContainerOption {

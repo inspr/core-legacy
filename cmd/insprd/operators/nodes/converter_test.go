@@ -453,7 +453,6 @@ func Test_withLBSidecarPorts(t *testing.T) {
 
 func TestNodeOperator_withLBSidecarImage(t *testing.T) {
 	type args struct {
-		app *meta.App
 	}
 	tests := []struct {
 		name string
