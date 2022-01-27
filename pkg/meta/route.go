@@ -6,6 +6,7 @@ import (
 
 // RouteConnection is the structure to the pod address and its endpoints
 type RouteConnection struct {
+	Meta      Metadata
 	Address   string
 	Endpoints utils.StringArray
 }

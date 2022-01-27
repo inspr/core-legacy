@@ -290,6 +290,132 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (m
 	return boundaries, nil
 }
 
+func (amm *AppMemoryManager) ResolveBoundaryNew(app *meta.App, usePermTree bool) (map[string]string, map[string]string, error) {
+	parent, _ := amm.GetParent(app, usePermTree)
+
+	merr := ierrors.MultiError{
+		Errors: []error{},
+	}
+
+	resolvedRoutes := make(map[string]string)
+	boundaries := app.Spec.Boundary.Routes
+	for _, bound := range boundaries {
+		resolvedBound, err := amm.recursivelyResolveUp(parent, app.Meta.Name, bound, usePermTree, "route")
+		if err != nil {
+			merr.Add(ierrors.Wrap(err, fmt.Sprintf("invalid route boundary: %s invalid", bound)))
+		}
+		resolvedRoutes[bound] = resolvedBound
+	}
+
+	resolvedChannels := make(map[string]string)
+	boundaries = app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output)
+	for _, bound := range boundaries {
+		resolvedBound, err := amm.recursivelyResolveUp(parent, app.Meta.Name, bound, usePermTree, "channel")
+		if err != nil {
+			merr.Add(ierrors.Wrap(err, fmt.Sprintf("invalid channel boundary: %s invalid", bound)))
+		}
+		resolvedChannels[bound] = resolvedBound
+	}
+
+	if !merr.Empty() {
+		return nil, nil, &merr
+	}
+
+	return resolvedRoutes, resolvedChannels, nil
+
+}
+
+func (amm *AppMemoryManager) recursivelyResolveUp(app *meta.App, requester string, resource string, usePermTree bool, resourceType string) (string, error) {
+	scope, ok := amm.checkForResource(app, resource, resourceType)
+	if ok {
+		return scope, nil
+	}
+
+	alias, ok := app.Spec.Aliases[resource]
+
+	if ok && alias.Destination == requester {
+		if alias.Source == "" {
+			parent, err := amm.GetParent(app, usePermTree)
+			if err != nil {
+				return "", err
+			}
+			return amm.recursivelyResolveUp(parent, app.Meta.Name, alias.Resource, usePermTree, resourceType)
+
+		} else {
+			// THIS IS THE MEDIUM POINT -> IT ONLY PASSES ONE TIME HERE
+			if child, ok := app.Spec.Apps[alias.Source]; ok {
+				return amm.recursivelyResolveDown(child, app.Meta.Name, alias.Resource, resourceType)
+			}
+		}
+
+	}
+
+	return "", ierrors.New("cannot find resource %v", resource)
+}
+
+func (amm *AppMemoryManager) recursivelyResolveDown(app *meta.App, requester string, resource string, resourceType string) (string, error) {
+	scope, ok := amm.checkForResource(app, resource, resourceType)
+	if ok {
+		return scope, nil
+	}
+
+	alias, ok := app.Spec.Aliases[resource]
+
+	if ok && alias.Destination != "" {
+		return "", ierrors.New("cannot find resource %v", resource)
+	}
+
+	if ok && alias.Source != "" {
+		if child, ok := app.Spec.Apps[alias.Source]; ok {
+			return amm.recursivelyResolveDown(child, app.Meta.Name, alias.Resource, resourceType)
+		}
+	}
+
+	return "", ierrors.New("cannot find resource %v", resource)
+
+}
+
+func (amm *AppMemoryManager) checkForResource(app *meta.App, resource, resourceType string) (string, bool) {
+	if resourceType == "route" {
+		if route, ok := app.Spec.Routes[resource]; ok {
+			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+			scope, _ = metautils.JoinScopes(scope, route.Meta.Name)
+			return scope, true
+		}
+	}
+
+	if resourceType == "channel" {
+		if channel, ok := app.Spec.Channels[resource]; ok {
+			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+			scope, _ = metautils.JoinScopes(scope, channel.Meta.Name)
+			return scope, true
+		}
+	}
+
+	return "", false
+}
+
+func (amm *AppMemoryManager) GetParent(app *meta.App, usePermTree bool) (*meta.App, error) {
+	var parentApp *meta.App
+
+	if usePermTree {
+		parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
+		if err != nil {
+			return nil, err
+		}
+		parentApp = parApp
+
+	} else {
+		parApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
+		if err != nil {
+			return nil, err
+		}
+		parentApp = parApp
+	}
+
+	return parentApp, nil
+}
+
 func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[string]string, unresolved metautils.StrSet, usePermTree bool) error {
 	_ = amm.logger.With(zap.String("operation", "boundary-resolution"))
 	merr := ierrors.MultiError{
