@@ -386,8 +386,7 @@ func validAliases(app *meta.App) error {
 	var msg utils.StringArray
 
 	for key, val := range app.Spec.Aliases {
-		if ch, ok := app.Spec.Channels[val.Resource]; ok {
-			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
+		if _, ok := app.Spec.Channels[val.Resource]; ok {
 			continue
 		}
 		if app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output).Contains(val.Resource) {

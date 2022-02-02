@@ -203,7 +203,6 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	}
 
 	ch.ConnectedApps = oldCh.ConnectedApps
-	ch.ConnectedAliases = oldCh.ConnectedAliases
 	ch.Meta.UUID = oldCh.Meta.UUID
 
 	ch.Spec.SelectedBroker = oldCh.Spec.SelectedBroker
