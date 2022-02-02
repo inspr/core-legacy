@@ -9,7 +9,6 @@ import (
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
-	"inspr.dev/inspr/pkg/utils"
 )
 
 // AppMemoryManager implements the App interface
@@ -98,15 +97,13 @@ func (amm *AppMemoryManager) Create(scope string, app *meta.App, brokers *apimod
 	l.Debug("adding dApp to the memory tree")
 	amm.addAppInTree(app, parentApp)
 
-	l.Debug("trying to resolve dApp boundaries")
+	l.Debug("trying to resolve dApp boundaries and updating connected dApps to resolved Channels and Routes")
 	appErr = amm.recursiveBoundaryValidation(app)
 	if appErr != nil {
 		l.Debug("unable to resolve dApps boundaries - refusing request")
 		return appErr
 	}
 
-	l.Debug("updating connected dApps and Aliases to resolved Channels")
-	amm.connectAppsBoundaries(app)
 	return nil
 }
 
@@ -138,15 +135,46 @@ func (amm *AppMemoryManager) Delete(query string) error {
 		return errParent
 	}
 
-	l.Debug("updating Channels to which the dApp was connected")
-
-	amm.removeFromParentBoundary(app, parent)
+	l.Debug("checking if some of the dapp resource is used by the parent")
+	if amm.isAppUsed(app, parent) {
+		l.Debug("unable to delete dapp for it's being used")
+		return ierrors.New(
+			"dapp cannot be deleted as it is being used by the parent apps",
+		).BadRequest()
+	}
 
 	l.Debug("removing dApp from its parent")
-
 	delete(parent.Spec.Apps, app.Meta.Name)
 
 	return nil
+}
+
+// isAppUsed checks if the current dapp has some alias, channel or route that is being used by
+// the parent dapp
+func (amm *AppMemoryManager) isAppUsed(app, parent *meta.App) bool {
+	for _, alias := range parent.Spec.Aliases {
+		if alias.Source == app.Meta.Name {
+			for chName := range app.Spec.Channels {
+				if alias.Resource == chName {
+					return true
+				}
+			}
+
+			for routeName := range app.Spec.Routes {
+				if alias.Resource == routeName {
+					return true
+				}
+			}
+
+			for aliasName := range app.Spec.Aliases {
+				if alias.Resource == aliasName {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 // Update receives a pointer to a dApp and the path to where this dApp is inside the memory tree.
@@ -192,8 +220,6 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App, brokers *apimod
 	}
 
 	l.Debug("deleting old dApp")
-	amm.removeFromParentBoundary(app, parent)
-
 	delete(parent.Spec.Apps, currentApp.Meta.Name)
 
 	l.Debug("creating new dApp")
@@ -471,24 +497,4 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 	}
 
 	return amm.recursivelyResolve(parentApp, boundaries, unresolved, usePermTree)
-}
-
-func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
-	l := amm.logger.With(
-		zap.String("operation", "boundary-removal"),
-		zap.String("dApp", app.Meta.Name),
-		zap.String("parent", parent.Meta.Name),
-	)
-	l.Debug("removing dApp from parent's Channels connected apps list")
-
-	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Channels.Input, app.Spec.Boundary.Channels.Output)
-	resolution, _ := amm.ResolveBoundary(app, false)
-	for _, chName := range appBoundary {
-		resolved := resolution[chName]
-		_, chName, _ := metautils.RemoveLastPartInScope(resolved)
-		if _, ok := parent.Spec.Channels[chName]; ok {
-			parent.Spec.Channels[chName].ConnectedApps = utils.
-				Remove(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
-		}
-	}
 }
