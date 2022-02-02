@@ -12,6 +12,9 @@ import (
 )
 
 func Test_validAppStructure(t *testing.T) {
+	type fields struct {
+		root *meta.App
+	}
 	type args struct {
 		app       meta.App
 		parentApp meta.App
@@ -19,11 +22,15 @@ func Test_validAppStructure(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
+		fields  fields
 		args    args
 		wantErr bool
 	}{
 		{
 			name: "All valid structures",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
 					Available: []string{"some_broker"},
@@ -66,6 +73,9 @@ func Test_validAppStructure(t *testing.T) {
 		},
 		{
 			name: "invalidapp name - empty",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
 					Available: []string{"some_broker"},
@@ -109,6 +119,9 @@ func Test_validAppStructure(t *testing.T) {
 		},
 		{
 			name: "invalidapp substructure",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
 					Available: []string{"some_broker"},
@@ -154,6 +167,9 @@ func Test_validAppStructure(t *testing.T) {
 		},
 		{
 			name: "invalidapp - parent has Node structure",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
 					Available: []string{"some_broker"},
@@ -198,7 +214,15 @@ func Test_validAppStructure(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validAppStructure(&tt.args.app, &tt.args.parentApp, tt.args.brokers)
+
+			amm := &AppMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
+					root: tt.fields.root,
+					tree: tt.fields.root,
+				},
+			}
+
+			err := amm.validAppStructure(&tt.args.app, &tt.args.parentApp, tt.args.brokers)
 			if tt.wantErr && (err == nil) {
 				t.Errorf("validAppStructure(): wanted error but received 'nil'")
 				return
@@ -1044,16 +1068,23 @@ func Test_validAliases(t *testing.T) {
 			},
 		},
 	}
+	type fields struct {
+		root *meta.App
+	}
 	type args struct {
 		app *meta.App
 	}
 	tests := []struct {
+		fields  fields
 		name    string
 		args    args
 		wantErr bool
 	}{
 		{
 			name: "test alias validation",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				app: &appTest,
 			},
@@ -1062,7 +1093,13 @@ func Test_validAliases(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validAliases(tt.args.app)
+			amm := &AppMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
+					root: tt.fields.root,
+					tree: tt.fields.root,
+				},
+			}
+			err := amm.validAliases(tt.args.app)
 			if tt.wantErr && (err == nil) {
 				t.Errorf("validAliases(): wanted error but received 'nil'")
 				return

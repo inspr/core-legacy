@@ -58,7 +58,7 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App
 		app.Spec.Node.Meta.Parent = parentScope
 	}
 
-	merr.Add(validAppStructure(app, parentApp, brokers))
+	merr.Add(amm.validAppStructure(app, parentApp, brokers))
 	for _, childApp := range app.Spec.Apps {
 		merr.Add(amm.recursiveCheckAndRefineApp(childApp, app, brokers))
 	}
@@ -70,7 +70,7 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App
 	return nil
 }
 
-func validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
+func (amm *AppMemoryManager) validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
@@ -86,7 +86,7 @@ func validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) e
 	}
 
 	merr.Add(checkAndUpdates(app, brokers))
-	merr.Add(validAliases(app))
+	merr.Add(amm.validAliases(app))
 
 	if !merr.Empty() {
 		return &merr
@@ -345,20 +345,6 @@ func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 				)
 			}
 
-			for _, appName := range channel.ConnectedApps {
-				if _, ok := app.Spec.Apps[appName]; !ok {
-					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
-				}
-
-				appInputs := app.Spec.Apps[appName].Spec.Boundary.Channels.Input
-				appOutputs := app.Spec.Apps[appName].Spec.Boundary.Channels.Output
-				appBoundary := utils.StringSliceUnion(appInputs, appOutputs)
-
-				if !utils.Includes(appBoundary, channelName) {
-					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
-				}
-			}
-
 			connectedChannels := types[channel.Spec.Type].ConnectedChannels
 			if !utils.Includes(connectedChannels, channelName) {
 				types[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
@@ -382,17 +368,22 @@ func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 	return nil
 }
 
-func validAliases(app *meta.App) error {
+func (amm *AppMemoryManager) validAliases(app *meta.App) error {
 	var msg utils.StringArray
 
-	for key, val := range app.Spec.Aliases {
-		if _, ok := app.Spec.Channels[val.Resource]; ok {
-			continue
+	for _, alias := range app.Spec.Aliases {
+		scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+		err := amm.Alias().CheckSource(scope, app, alias)
+		if err != nil {
+			return err
 		}
-		if app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output).Contains(val.Resource) {
-			continue
+
+		err = amm.Alias().CheckDestination(app, alias)
+		if err != nil {
+			return err
 		}
-		msg = append(msg, fmt.Sprintf("alias '%s' points to an unexistent channel '%s'", key, val.Resource))
+
+		alias.Meta = metautils.InjectUUID(alias.Meta)
 	}
 
 	if len(msg) > 0 {

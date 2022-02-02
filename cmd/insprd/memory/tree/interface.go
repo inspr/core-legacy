@@ -62,6 +62,8 @@ type AliasMemory interface {
 	Create(scope string, alias *meta.Alias) error
 	Delete(scope, name string) error
 	Update(scope string, alias *meta.Alias) error
+	CheckSource(scope string, app *meta.App, alias *meta.Alias) error
+	CheckDestination(app *meta.App, alias *meta.Alias) error
 }
 
 // AliasGetInterface is an interface to get alias types from memory

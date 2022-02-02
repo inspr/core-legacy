@@ -70,12 +70,12 @@ func (amm *AliasMemoryManager) Create(scope string, alias *meta.Alias) error {
 		return ierrors.New("alias already exists in dApp").AlreadyExists()
 	}
 
-	err = amm.checkSource(scope, app, alias)
+	err = amm.CheckSource(scope, app, alias)
 	if err != nil {
 		return err
 	}
 
-	err = amm.checkDestination(app, alias)
+	err = amm.CheckDestination(app, alias)
 	if err != nil {
 		return err
 	}
@@ -112,12 +112,12 @@ func (amm *AliasMemoryManager) Update(scope string, alias *meta.Alias) error {
 		return ierrors.New("alias was not found in dApp").NotFound()
 	}
 
-	err = amm.checkSource(scope, app, alias)
+	err = amm.CheckSource(scope, app, alias)
 	if err != nil {
 		return err
 	}
 
-	err = amm.checkDestination(app, alias)
+	err = amm.CheckDestination(app, alias)
 	if err != nil {
 		return err
 	}
@@ -223,7 +223,7 @@ func (amm *AliasPermTreeGetter) Get(scope, name string) (*meta.Alias, error) {
 	return app.Spec.Aliases[name], nil
 }
 
-func (amm *AliasMemoryManager) checkSource(scope string, app *meta.App, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) CheckSource(scope string, app *meta.App, alias *meta.Alias) error {
 	var source *meta.App
 	if alias.Source == "" {
 		parentApp, err := getParentApp(scope, amm.treeMemoryManager)
@@ -248,7 +248,7 @@ func (amm *AliasMemoryManager) checkSource(scope string, app *meta.App, alias *m
 	return nil
 }
 
-func (amm *AliasMemoryManager) checkDestination(app *meta.App, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) CheckDestination(app *meta.App, alias *meta.Alias) error {
 	if alias.Destination != "" {
 		_, ok := app.Spec.Apps[alias.Destination]
 		if !ok {

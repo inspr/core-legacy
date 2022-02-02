@@ -67,3 +67,11 @@ func (a *Alias) Update(scope string, alias *meta.Alias) error {
 	a.alias[scope] = alias
 	return nil
 }
+
+func (a *Alias) CheckSource(scope string, app *meta.App, alias *meta.Alias) error {
+	return nil
+}
+
+func (a *Alias) CheckDestination(app *meta.App, alias *meta.Alias) error {
+	return nil
+}
