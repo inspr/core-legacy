@@ -155,43 +155,41 @@ func (amm *AliasMemoryManager) Delete(scope, name string) error {
 		).NotFound()
 	}
 
-	if alias.Destination != "" {
-		child := app.Spec.Apps[alias.Destination]
-		if child.Spec.Boundary.Channels.Input.Contains(alias.Meta.Name) || child.Spec.Boundary.Channels.Output.Contains(alias.Meta.Name) {
-			l.Debug("unable to delete Alias that is being used by a dApp")
-			return ierrors.New(
-				"can't delete the alias since it's being used by the child app: %v",
-				alias.Destination,
-			).BadRequest()
-		}
-
-		for _, childAlias := range child.Spec.Aliases {
-			if childAlias.Resource == alias.Meta.Name {
-				l.Debug("unable to delete Alias that is being used by a child dApp")
-				return ierrors.New(
-					"can't delete the alias since it's being used by the child app: %v",
-					alias.Destination,
-				).BadRequest()
-			}
-		}
-	} else {
-		parent, _ := getParentApp(scope, amm.treeMemoryManager)
-		for _, parentAlias := range parent.Spec.Aliases {
-			if parentAlias.Source == app.Meta.Name && parentAlias.Resource == alias.Meta.Name {
-				l.Debug("unable to delete Alias that is being used by the parent dApp")
-				return ierrors.New(
-					"can't delete the alias since it's being used by the parent app: %v",
-					parent.Meta.Name,
-				).BadRequest()
-			}
-		}
-
+	if amm.isAliasUsed(app, alias) {
+		l.Debug("unable to delete Alias for it's being used")
+		return ierrors.New(
+			"alias cannot be deleted as it is being used by other apps",
+		).BadRequest()
 	}
 
 	l.Debug("removing Alias")
 	delete(app.Spec.Aliases, name)
 
 	return nil
+}
+
+func (amm *AliasMemoryManager) isAliasUsed(app *meta.App, alias *meta.Alias) bool {
+	if alias.Destination != "" {
+		child := app.Spec.Apps[alias.Destination]
+		if child.Spec.Boundary.Channels.Input.Contains(alias.Meta.Name) || child.Spec.Boundary.Channels.Output.Contains(alias.Meta.Name) {
+			return true
+		}
+
+		for _, childAlias := range child.Spec.Aliases {
+			if childAlias.Resource == alias.Meta.Name {
+				return true
+			}
+		}
+	} else {
+		parent, _ := amm.Apps().Get(app.Meta.Parent)
+		for _, parentAlias := range parent.Spec.Aliases {
+			if parentAlias.Source == app.Meta.Name && parentAlias.Resource == alias.Meta.Name {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 // AliasPermTreeGetter returns a getter that gets alias from the root structure of the app, without the current changes.
