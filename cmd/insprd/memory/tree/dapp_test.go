@@ -1439,7 +1439,7 @@ func TestAppMemoryManager_Create(t *testing.T) {
 				if err != nil {
 					t.Errorf("cant get channel channel1")
 				}
-				if !utils.Includes(ch.ConnectedApps, "app8") {
+				if !utils.Includes(ch.ConnectedApps, "app2.app7.app8") {
 					fmt.Println(ch.ConnectedApps)
 					t.Errorf("connectedApps of channel1 dont have app8")
 				}
@@ -1915,26 +1915,6 @@ func TestAppMemoryManager_Delete(t *testing.T) {
 			wantErr: true,
 			want:    nil,
 		},
-		{
-			name: "It should update the channel's connectedApps",
-			fields: fields{
-				root: getMockApp(),
-			},
-			args: args{
-				query: "app1.thenewapp",
-			},
-			wantErr: false,
-			checkFunction: func(t *testing.T, tmm *treeMemoryManager) {
-				am := tmm.Channels()
-				ch, err := am.Get("app1", "ch1app1")
-				if err != nil {
-					t.Errorf("cant get channel ch1app1")
-				}
-				if utils.Includes(ch.ConnectedApps, "thenewapp") {
-					t.Errorf("connectedApps of ch1app1 still have thenewapp")
-				}
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -2320,103 +2300,6 @@ func TestAppMemoryManager_Update(t *testing.T) {
 						},
 					},
 				},
-			},
-		},
-		{
-			name: "Valid -  check if connectedApps is updated due to invalid changes in channel structure",
-			fields: fields{
-				root: getMockApp(),
-			},
-			args: args{
-				brokers: &apimodels.BrokersDI{
-					Available: []string{"kafka"},
-					Default:   "kafka",
-				},
-				query: "app1",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app1",
-						Reference:   "app1",
-						Annotations: map[string]string{},
-						Parent:      "",
-						UUID:        "",
-					},
-					Spec: meta.AppSpec{
-						Node: meta.Node{},
-						Apps: map[string]*meta.App{
-							"thenewapp": {
-								Meta: meta.Metadata{
-									Name:        "thenewapp",
-									Reference:   "app1.thenewapp",
-									Annotations: map[string]string{},
-									Parent:      "app1",
-									UUID:        "",
-								},
-								Spec: meta.AppSpec{
-									Apps:     map[string]*meta.App{},
-									Channels: map[string]*meta.Channel{},
-									Types:    map[string]*meta.Type{},
-									Boundary: meta.AppBoundary{
-										Channels: meta.Boundary{
-											Input:  []string{},
-											Output: []string{},
-										},
-									},
-								},
-							},
-						},
-						Channels: map[string]*meta.Channel{
-							"ch1app1": {
-								Meta: meta.Metadata{
-									Name:   "ch1app1",
-									Parent: "",
-								},
-								ConnectedApps: []string{"thenewapp"},
-								Spec: meta.ChannelSpec{
-									Type: "newType",
-								},
-							},
-							"ch2app1": {
-								Meta: meta.Metadata{
-									Name:   "ch2app1",
-									Parent: "",
-								},
-								Spec: meta.ChannelSpec{},
-							},
-						},
-						Types: map[string]*meta.Type{
-							"newType": {
-								Meta: meta.Metadata{
-									Name:        "newType",
-									Reference:   "app1.newType",
-									Annotations: map[string]string{},
-									Parent:      "app1",
-									UUID:        "",
-								},
-							},
-						},
-						Boundary: meta.AppBoundary{
-							Channels: meta.Boundary{
-								Input:  []string{},
-								Output: []string{},
-							},
-						},
-					},
-				},
-			},
-			wantErr: false,
-			want:    nil,
-			checkFunction: func(t *testing.T, tmm *treeMemoryManager) {
-				am := tmm.Channels()
-
-				ch, err := am.Get("app1", "ch1app1")
-				if err != nil {
-					t.Errorf("cant get channel ch1app1")
-				}
-
-				if utils.Includes(ch.ConnectedApps, "thenewapp") {
-					t.Errorf("connectedApps of ch1app1 still have 'thenewapp'")
-				}
 			},
 		},
 	}

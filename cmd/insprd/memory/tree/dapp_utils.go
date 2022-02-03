@@ -129,17 +129,14 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 		Errors: []error{},
 	}
 
-	if app.Spec.Node.Spec.Image != "" {
-		resolvedRoutes, resolvedChannels, err := amm.ResolveBoundaryNew(app, false)
-		if err != nil {
-			merr.Add(ierrors.New(err))
-			return &merr
-		}
-
-		amm.updateChannelsConnectedApps(app, resolvedChannels)
-		amm.updateRoutesConnectedApps(app, resolvedRoutes)
-
+	resolvedRoutes, resolvedChannels, err := amm.ResolveBoundaryNew(app, false)
+	if err != nil {
+		merr.Add(ierrors.New(err))
+		return &merr
 	}
+
+	amm.updateChannelsConnectedApps(app, resolvedChannels)
+	amm.updateRoutesConnectedApps(app, resolvedRoutes)
 
 	for _, childApp := range app.Spec.Apps {
 		err := amm.recursiveBoundaryValidation(childApp)
