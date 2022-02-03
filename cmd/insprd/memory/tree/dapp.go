@@ -87,15 +87,15 @@ func (amm *AppMemoryManager) Create(scope string, app *meta.App, brokers *apimod
 		).InvalidApp()
 	}
 
+	l.Debug("adding dApp to the memory tree")
+	amm.addAppInTree(app, parentApp)
+
 	l.Debug("checking dApp structure")
 	appErr := amm.checkApp(app, parentApp, brokers)
 	if appErr != nil {
 		l.Debug("dapp invalid - refusing request")
 		return appErr
 	}
-
-	l.Debug("adding dApp to the memory tree")
-	amm.addAppInTree(app, parentApp)
 
 	l.Debug("trying to resolve dApp boundaries and updating connected dApps to resolved Channels and Routes")
 	appErr = amm.recursiveBoundaryValidation(app)

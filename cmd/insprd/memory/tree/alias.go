@@ -226,7 +226,7 @@ func (amm *AliasPermTreeGetter) Get(scope, name string) (*meta.Alias, error) {
 func (amm *AliasMemoryManager) CheckSource(scope string, app *meta.App, alias *meta.Alias) error {
 	var source *meta.App
 	if alias.Source == "" {
-		parentApp, err := getParentApp(scope, amm.treeMemoryManager)
+		parentApp, err := amm.Apps().Get(app.Meta.Parent)
 		if err != nil {
 			return ierrors.Wrap(err, "cannot find parent dapp")
 		}
