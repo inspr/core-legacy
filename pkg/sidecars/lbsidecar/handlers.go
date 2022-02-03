@@ -266,9 +266,6 @@ func getResolvedChannel(channel string) (string, error) {
 }
 
 func (s *Server) readMessageRoutine(ctx context.Context) error {
-	s.runningRead = true
-	defer func() { s.runningRead = false }()
-
 	errch := make(chan error)
 	newCtx, cancel := context.WithCancel(ctx)
 	defer cancel()

@@ -36,8 +36,6 @@ type routeMetric struct {
 // to handle the necessary routes of the rest API
 type Server struct {
 	brokerHandlers map[string]*models.BrokerHandler
-	runningRead    bool
-	runningWrite   bool
 	writeAddr      string
 	readAddr       string
 	clientAddr     string
@@ -251,8 +249,6 @@ func (s *Server) Run(ctx context.Context) error {
 		Addr:    s.writeAddr,
 	}
 	go func() {
-		s.runningWrite = true
-		defer func() { s.runningWrite = false }()
 		if err := writeServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
 			logger.Error("an error occurred in LB Sidecar write server",

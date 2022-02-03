@@ -30,8 +30,6 @@ func TestInit(t *testing.T) {
 				routeMetric:    make(map[string]routeMetric),
 				brokerHandlers: make(map[string]*models.BrokerHandler),
 				clientAddr:     "http://localhost:1171",
-				runningRead:    false,
-				runningWrite:   false,
 			},
 		},
 	}
