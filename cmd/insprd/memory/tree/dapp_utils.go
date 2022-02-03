@@ -129,7 +129,7 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 		Errors: []error{},
 	}
 
-	resolvedRoutes, resolvedChannels, err := amm.ResolveBoundaryNew(app, false)
+	resolvedRoutes, resolvedChannels, err := amm.ResolveBoundary(app, false)
 	if err != nil {
 		merr.Add(ierrors.New(err))
 		return &merr

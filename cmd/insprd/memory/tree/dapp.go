@@ -273,50 +273,7 @@ func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
 
 }
 
-// ResolveBoundary is the recursive method that resolves connections for dApp boundaries
-// returns a map of boundary to  their respective resolved channel query
-func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
-	l := amm.logger.With(zap.String("operation", "boundary-resolution"), zap.String("dapp", app.Meta.Name))
-	l.Debug("received boundary resolution request", zap.Bool("useperm", usePermTree))
-
-	boundaries := make(map[string]string)
-	unresolved := metautils.StrSet{}
-	for _, bound := range app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output) {
-		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
-		unresolved[bound] = true
-	}
-
-	var parentApp *meta.App
-
-	if usePermTree {
-		parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
-		if err != nil {
-			return nil, err
-		}
-		parentApp = parApp
-
-	} else {
-		parApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
-		if err != nil {
-			return nil, err
-		}
-		parentApp = parApp
-	}
-
-	l.Debug("recursively resolving dApp boundaries",
-		zap.Any("boundaries", boundaries))
-
-	err := amm.recursivelyResolve(parentApp, boundaries, unresolved, usePermTree)
-	if err != nil {
-		l.Debug("couldn't resolve boundaries for given dApp",
-			zap.String("parent", parentApp.Meta.Name),
-			zap.Any("boundaries", boundaries))
-		return nil, err
-	}
-	return boundaries, nil
-}
-
-func (amm *AppMemoryManager) ResolveBoundaryNew(app *meta.App, usePermTree bool) (map[string]string, map[string]string, error) {
+func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, map[string]string, error) {
 	parent, _ := amm.GetParent(app, usePermTree)
 
 	merr := ierrors.MultiError{
@@ -440,61 +397,4 @@ func (amm *AppMemoryManager) GetParent(app *meta.App, usePermTree bool) (*meta.A
 	}
 
 	return parentApp, nil
-}
-
-func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[string]string, unresolved metautils.StrSet, usePermTree bool) error {
-	_ = amm.logger.With(zap.String("operation", "boundary-resolution"))
-	merr := ierrors.MultiError{
-		Errors: []error{},
-	}
-	if len(unresolved) == 0 {
-		return nil
-	}
-	for key := range unresolved {
-		val := boundaries[key]
-		if alias, ok := app.Spec.Aliases[val]; ok { //resolve in aliases
-			val = alias.Resource //setup for alias resolve
-		} else {
-			_, val, _ = metautils.RemoveLastPartInScope(val) //setup for direct resolve
-		}
-		if ch, ok := app.Spec.Channels[val]; ok { // resolve in channels (direct or through alias)
-			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
-			boundaries[key], _ = metautils.JoinScopes(scope, ch.Meta.Name) // if channel exists, resolve
-			delete(unresolved, key)
-			continue
-		}
-		if app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output).Contains(val) { //resolve in boundaries
-			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, val) // if boundary exists, setup to resolve in parernt
-			continue
-		}
-		merr.Add(ierrors.New("invalid boundary: %s invalid", key))
-		delete(unresolved, key)
-
-	}
-	if !merr.Empty() {
-		// throwing erros for boundaries couldn't be resolved because of some invalid boundary
-		for key := range unresolved {
-			merr.Add(ierrors.New("invalid boundary: %s unresolved", key))
-		}
-		return &merr
-	}
-
-	var parentApp *meta.App
-
-	if usePermTree {
-		parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
-		if err != nil {
-			return err
-		}
-		parentApp = parApp
-
-	} else {
-		parApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
-		if err != nil {
-			return err
-		}
-		parentApp = parApp
-	}
-
-	return amm.recursivelyResolve(parentApp, boundaries, unresolved, usePermTree)
 }

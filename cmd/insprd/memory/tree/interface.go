@@ -31,7 +31,7 @@ type AppMemory interface {
 	Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error
 	Delete(query string) error
 	Update(query string, app *meta.App, brokers *apimodels.BrokersDI) error
-	ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error)
+	ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, map[string]string, error)
 }
 
 // AppGetInterface is an interface to get apps from memory
