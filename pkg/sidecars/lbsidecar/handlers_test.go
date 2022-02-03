@@ -3,6 +3,7 @@ package lbsidecar
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,9 +11,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
@@ -80,94 +83,122 @@ func createRouteMockedServer(port string, expectedMsg interface{}) *httptest.Ser
 
 }
 
-func TestServer_writeMessageHandler(t *testing.T) {
+type mockWriter struct {
+	writeMessage func(channel string, message []byte) error
+}
 
+func (m *mockWriter) WriteMessage(channel string, message []byte) error {
+	return m.writeMessage(channel, message)
+}
+
+func (m *mockWriter) Close() {}
+
+func (m *mockWriter) Producer() *kafka.Producer { return nil }
+
+func TestServer_writeMessageHandler(t *testing.T) {
 	createMockEnvVars()
 	defer deleteMockEnvVars()
-
-	wServer := httptest.NewServer(Init().writeMessageHandler())
-	req := http.Client{}
-
 	tests := []struct {
-		name    string
-		channel string
-		msg     models.BrokerMessage
-		port    string
-		wantErr bool
+		readerFunc func(t *testing.T) models.Reader
+		writerFunc func(t *testing.T) models.Writer
+		channel    string
+		name       string
+		wantErr    bool
+		message    models.BrokerMessage
 	}{
 		{
-			name:    "Channel not listed in 'INSPR_OUTPUT_CHANNELS'",
-			channel: "invalidChan1",
+			name:    "correct behaviour test",
+			channel: "chan",
+			message: models.BrokerMessage{
+				Data: "randomMessage",
+			},
+		},
+		{
+			name:    "invalid channel",
+			channel: "invalid",
+			message: models.BrokerMessage{
+				Data: "randomMessage",
+			},
 			wantErr: true,
 		},
 		{
-			name:    "Env var '<chan>_BROKER' doesn't exist",
+			name:    "invalid data for marshalling",
 			channel: "chan2",
+			message: models.BrokerMessage{
+				Data: 45,
+			},
 			wantErr: true,
 		},
 		{
-			name:    "Channel avro schema not defined",
-			channel: "chan4",
-			wantErr: true,
-		},
-		{
-			name:    "Invalid avro schema",
-			channel: "chan1",
-			wantErr: true,
-		},
-		{
-			name:    "Invalid message given schema",
+			name:    "invalid broker response",
 			channel: "chan3",
-			msg: models.BrokerMessage{
-				Data: randomStruct{},
-			},
-			wantErr: true,
-		},
-		{
-			name:    "Invalid request address",
-			channel: "chan6",
-			msg: models.BrokerMessage{
+			message: models.BrokerMessage{
 				Data: "randomMessage",
 			},
 			wantErr: true,
-		},
-		{
-			name:    "Valid write request",
-			channel: "chan5a",
-			msg: models.BrokerMessage{
-				Data: "randomMessage",
+			writerFunc: func(t *testing.T) models.Writer {
+				return &mockWriter{
+					writeMessage: func(channel string, message []byte) error {
+						return errors.New("this is an error")
+					},
+				}
 			},
-			port: "1107",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var testServer *httptest.Server
-			if tt.port != "" {
-				testServer = createMockedServer(tt.port, tt.channel, nil)
-				testServer.Start()
-				defer testServer.Close()
+			if tt.writerFunc == nil {
+				tt.writerFunc = func(t *testing.T) models.Writer {
+					return &mockWriter{
+						writeMessage: func(channel string, message []byte) error {
+							// this should check two things, if the test channel was resolved correctly
+							// and if the test message was correctly encoded
+
+							if channel != tt.channel {
+								t.Errorf(
+									"Server_writeMessageHandler channel resolved to = %s, expected = %s",
+									channel,
+									tt.channel,
+								)
+							}
+
+							resolvedCh, _ := getResolvedChannel(channel)
+
+							bMessage, err := readMessage(resolvedCh, message)
+							if err != nil {
+								t.Error(err)
+							}
+
+							if !reflect.DeepEqual(bMessage, tt.message) {
+								t.Errorf(
+									"Server_writeMessageHandler message = %v, want = %v",
+									bMessage,
+									tt.message,
+								)
+							}
+
+							return nil
+						},
+					}
+				}
 			}
+			bh := models.NewBrokerHandler("someBroker", nil, tt.writerFunc(t))
+			s := Init(bh)
+			server := httptest.NewServer(s.writeMessageHandler())
+			defer server.Close()
+			client := &http.Client{}
 
-			buf, _ := json.Marshal(tt.msg)
-			reqInfo, _ := http.NewRequest(http.MethodPost,
-				wServer.URL+"/channel/"+tt.channel,
-				bytes.NewBuffer(buf))
-
-			resp, err := req.Do(reqInfo)
-			if err != nil {
-				t.Errorf("Error while doing the request: %v", err)
-				return
-			}
-
-			if tt.wantErr && (resp.StatusCode == http.StatusOK) {
-				t.Errorf("Wanted error, received 'nil'")
-				return
-			}
-
-			if !tt.wantErr && (resp.StatusCode != http.StatusOK) {
-				t.Errorf("Received status %v, wanted %v", resp.StatusCode, http.StatusOK)
-				return
+			buf, _ := json.Marshal(tt.message)
+			resp, err := client.Post(
+				fmt.Sprintf("%s/channel/%s", server.URL, tt.channel),
+				"application/octet-stream",
+				bytes.NewBuffer(buf),
+			)
+			if err != nil || resp.StatusCode != http.StatusOK {
+				err = rest.UnmarshalERROR(resp.Body)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("Server_writeMessageHandler err = %v, wantErr = %v", err, tt.wantErr)
+				}
 			}
 		})
 	}
@@ -208,11 +239,6 @@ func TestServer_routeReceiveHandler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			if tt.setClientPort {
-				os.Setenv("INSPR_SCCLIENT_READ_PORT", "1171")
-				defer os.Unsetenv("INSPR_SCCLIENT_READ_PORT")
-			}
-
 			var testServer *httptest.Server
 			if tt.port != "" {
 				testServer = createRouteMockedServer(tt.port, tt.msg)
@@ -237,61 +263,36 @@ func TestServer_routeReceiveHandler(t *testing.T) {
 	}
 }
 
-type randomStruct struct{}
-
 func createMockEnvVars() {
-	customEnvValues := "chan1@randBroker3;chan3@randBroker4;chan4@randBroker2;chan5a@randBroker1;chan5b@randBroker1;chan6@randBroker5"
+	customEnvValues := "chan@someBroker;testing@someBroker;chan2@someBroker"
 	os.Setenv("INSPR_INPUT_CHANNELS", customEnvValues)
 	os.Setenv("INSPR_OUTPUT_CHANNELS", customEnvValues)
 
 	os.Setenv("INSPR_LBSIDECAR_WRITE_PORT", "1127")
 	os.Setenv("INSPR_LBSIDECAR_READ_PORT", "1137")
+	os.Setenv("INSPR_SCCLIENT_READ_PORT", "1171")
 
-	os.Setenv("INSPR_SIDECAR_RANDBROKER2_WRITE_PORT", "somePort1")
-	os.Setenv("INSPR_SIDECAR_RANDBROKER2_ADDR", "someAddr1")
+	os.Setenv("chan_RESOLVED", "someTopic")
+	os.Setenv("testing_RESOLVED", "someTopic")
+	os.Setenv("chan2_RESOLVED", "someTopic")
 
-	os.Setenv("INSPR_SIDECAR_RANDBROKER3_WRITE_PORT", "somePort1")
-	os.Setenv("INSPR_SIDECAR_RANDBROKER3_ADDR", "someAddr1")
-	os.Setenv("chan1_SCHEMA", "someSchema")
-
-	os.Setenv("INSPR_SIDECAR_RANDBROKER4_WRITE_PORT", "somePort1")
-	os.Setenv("INSPR_SIDECAR_RANDBROKER4_ADDR", "someAddr1")
-	os.Setenv("chan3_SCHEMA", `{"type":"string"}`)
-
-	os.Setenv("INSPR_SIDECAR_RANDBROKER5_WRITE_PORT", "somePort1")
-	os.Setenv("INSPR_SIDECAR_RANDBROKER5_ADDR", "someAddr1")
-	os.Setenv("chan6_SCHEMA", `{"type":"string"}`)
-
-	os.Setenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT", "1107")
-	os.Setenv("INSPR_SIDECAR_RANDBROKER1_ADDR", "http://localhost")
-	os.Setenv("chan5a_SCHEMA", `{"type":"string"}`)
-	os.Setenv("chan5a_RESOLVED", "chan5a")
-	os.Setenv("chan5b_SCHEMA", `{"type":"string"}`)
-	os.Setenv("chan5b_RESOLVED", "chan5b")
+	os.Setenv("someTopic_SCHEMA", `{"type":"string"}`)
 
 }
 
 func deleteMockEnvVars() {
 	os.Unsetenv("INSPR_INPUT_CHANNELS")
 	os.Unsetenv("INSPR_OUTPUT_CHANNELS")
+
 	os.Unsetenv("INSPR_LBSIDECAR_WRITE_PORT")
 	os.Unsetenv("INSPR_LBSIDECAR_READ_PORT")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER2_WRITE_PORT")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER2_ADDR")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER3_WRITE_PORT")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER3_ADDR")
-	os.Unsetenv("chan1_SCHEMA")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER4_WRITE_PORT")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER4_ADDR")
-	os.Unsetenv("chan3_SCHEMA")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER5_WRITE_PORT")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER5_ADDR")
-	os.Unsetenv("chan6_SCHEMA")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER1_WRITE_PORT")
-	os.Unsetenv("INSPR_SIDECAR_RANDBROKER1_ADDR")
-	os.Unsetenv("chan5_SCHEMA")
-	os.Unsetenv("chan5_RESOLVED")
+	os.Unsetenv("INSPR_SCCLIENT_READ_PORT")
 
+	os.Unsetenv("chan_RESOLVED")
+	os.Unsetenv("testing_RESOLVED")
+	os.Unsetenv("chan2_RESOLVED")
+
+	os.Unsetenv("someTopic_SCHEMA")
 }
 
 func TestServer_sendRequest(t *testing.T) {
