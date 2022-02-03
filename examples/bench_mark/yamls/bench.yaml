@@ -5,13 +5,9 @@ meta:
   name: bench
 spec:
   aliases:
-    sender.sendch:
+    sendch:
+      destination: sender
       resource: benchannel
-    receiver.receivech:
+    receivech:
+      destination: receiver
       resource: benchannel
-  boundary:
-    channels:
-      input:
-        - benchannel
-      output:
-        - benchannel
