@@ -101,8 +101,9 @@ spec:
         - port: 80
           targetPort: 8080
   boundary:
-    output:
-      - pubsubch #Channel created above
+    channels:
+      output:
+        - pubsubch #Channel created above
 ```
 
 Now all there is left to is creating the subscribers' dApps. Since we could build any number of subscribers, depending on what clients we would like to interact with, consider the following example a template for their files.
@@ -121,8 +122,9 @@ spec:
       replicas: 1
       image: <reference to this app's image>
   boundary:
-    input:
-      - pubsubch #Channel created above
+    channels:
+      input:
+        - pubsubch #Channel created above
 ```
 
 These are all the basic building blocks we'll need !

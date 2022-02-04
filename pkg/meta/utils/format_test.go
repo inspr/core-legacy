@@ -54,7 +54,9 @@ var (
 	aliasTree = "alias_name" +
 		"\n└── Meta" +
 		"\n│   ├── Name: alias_name" +
-		"\n└── Target: alias_target" +
+		"\n└── Resource: alias_Resource" +
+		"\n└── Source: " +
+		"\n└── Destination: " +
 		"\n\n"
 )
 
@@ -87,8 +89,10 @@ func TestPrintAppTree(t *testing.T) {
 						Types:    map[string]*meta.Type{},
 						Routes:   map[string]*meta.RouteConnection{},
 						Boundary: meta.AppBoundary{
-							Input:  utils.StringArray{"input1", "input2"},
-							Output: utils.StringArray{"output1", "output2"},
+							Channels: meta.Boundary{
+								Input:  utils.StringArray{"input1", "input2"},
+								Output: utils.StringArray{"output1", "output2"},
+							},
 						},
 					},
 				},
@@ -243,7 +247,7 @@ func TestPrintAliasTree(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "alias_name",
 					},
-					Target: "alias_target",
+					Resource: "alias_Resource",
 				},
 			},
 			wantOut: aliasTree,
@@ -288,8 +292,10 @@ func Test_addAppsTree(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 						Aliases: map[string]*meta.Alias{},
 						Routes:  map[string]*meta.RouteConnection{},
@@ -339,8 +345,10 @@ func Test_addChannelsTree(t *testing.T) {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 						Aliases: map[string]*meta.Alias{},
 						Routes:  map[string]*meta.RouteConnection{},
@@ -390,8 +398,10 @@ func Test_addTypesTree(t *testing.T) {
 							"type1": {},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 						Aliases: map[string]*meta.Alias{},
 						Routes:  map[string]*meta.RouteConnection{},
@@ -439,12 +449,14 @@ func Test_addAliasesTree(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 						Aliases: map[string]*meta.Alias{
 							"myalias": {
-								Target: "myawesometarget",
+								Resource: "myawesomeResource",
 							},
 						},
 						Routes: map[string]*meta.RouteConnection{},
@@ -468,7 +480,7 @@ func Test_addAliasesTree(t *testing.T) {
 				t.Errorf("AliasesTree.findByName() error = %v", err)
 			}
 
-			_, err = findByName(myalias.Items(), "Target: myawesometarget")
+			_, err = findByName(myalias.Items(), "Resource: myawesomeResource")
 			if err != nil {
 				t.Errorf("AliasesTree.findByName() error = %v", err)
 			}
@@ -498,8 +510,10 @@ func Test_addRoutesTree(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 						Aliases: map[string]*meta.Alias{},
 						Routes: map[string]*meta.RouteConnection{
@@ -558,8 +572,10 @@ func Test_addPermissionsTree(t *testing.T) {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{},
+								Output: []string{},
+							},
 						},
 						Aliases: map[string]*meta.Alias{},
 						Routes:  map[string]*meta.RouteConnection{},

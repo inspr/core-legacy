@@ -1,9 +1,6 @@
 package tree
 
 import (
-	"fmt"
-	"strings"
-
 	"go.uber.org/zap"
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
@@ -11,7 +8,7 @@ import (
 )
 
 // AliasMemoryManager implements the Alias interface
-// and provides methos for operating on Aliass
+// and provides methods for operating on Aliases
 type AliasMemoryManager struct {
 	*treeMemoryManager
 	logger *zap.Logger
@@ -28,98 +25,74 @@ func (tmm *treeMemoryManager) Alias() AliasMemory {
 // Get receives a scope and an alias key. The scope defines
 // the path to a dApp. If this dApp has a pointer to a alias that has the
 // same key as the key passed as an argument, the pointer to that alias is returned
-func (amm *AliasMemoryManager) Get(scope, aliasKey string) (*meta.Alias, error) {
+func (amm *AliasMemoryManager) Get(scope, name string) (*meta.Alias, error) {
 	l := amm.logger.With(
 		zap.String("operation", "get"),
-		zap.String("alias", aliasKey),
+		zap.String("alias", name),
 		zap.String("scope", scope),
 	)
 	l.Debug("trying to get an Alias")
 
 	app, err := amm.treeMemoryManager.Apps().Get(scope)
 	if err != nil {
-		l.Debug("unable to get Alias")
+		l.Debug("unable to get Alias because the app was not found")
 		return nil, err
 	}
 
-	// check if alias key exist in scope
-	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		l.Debug("alias not found for the key")
+	if _, ok := app.Spec.Aliases[name]; !ok {
+		l.Debug("alias not found with the given name")
 		return nil, ierrors.New(
-			"alias not found for the given key %v", aliasKey,
-		).BadRequest()
+			"alias not found with the given name %v", name,
+		).NotFound()
 	}
 
-	//return alias
-	return app.Spec.Aliases[aliasKey], nil
+	return app.Spec.Aliases[name], nil
 }
 
-// Create receives a scope that defines a path to the dApp.
-// The new alias will be created inside this dApp's parent.
-func (amm *AliasMemoryManager) Create(scope, targetBoundary string, alias *meta.Alias) error {
+// Create receives a scope that defines a path to the dapp and an Alias
+// to be added in this dapp
+func (amm *AliasMemoryManager) Create(scope string, alias *meta.Alias) error {
 	l := amm.logger.With(
 		zap.String("operation", "create"),
 		zap.Any("alias", alias),
 		zap.String("scope", scope),
 	)
-	// get app from scope
+	l.Debug("trying to create an Alias")
+
 	app, err := amm.Apps().Get(scope)
 	if err != nil {
-		l.Debug("parent app not found")
+		l.Debug("unable to create Alias because the app was not found")
 		return err
 	}
 
-	l.Debug("checking if dApp boundary is valid for given Alias")
-	// check if targetBoundary exists in app
-	appBound := app.Spec.Boundary
-	if !appBound.Input.Contains(targetBoundary) && !appBound.Output.Contains(targetBoundary) {
-		l.Debug("invalid dApp boundary for Alias",
-			zap.String("targeted boundary", targetBoundary))
-		return ierrors.New(
-			"target boundary doesn't exist in %v", app.Meta.Name,
-		).BadRequest()
-	}
-
-	// get parentApp of app
-	parentApp, _ := getParentApp(scope, amm.treeMemoryManager)
-
-	targetChannel := alias.Target
-
-	l.Debug("checking if Alias targeted Channel exists")
-	// check if targetChannel exists in channels or boundaries of parentApp
-	err = validTargetChannel(parentApp, targetChannel)
-	if err != nil {
-		l.Debug("unable to create Alias - invalid targeted channel or boundary in parent dApp",
-			zap.String("parent", parentApp.Meta.Name),
-			zap.String("targeted boundary", targetChannel))
-		return err
-	}
-
-	aliasKey := app.Meta.Name + "." + targetBoundary
-
-	l.Debug("checking if Alias already exists")
-	// check if alias is already there
-	if _, ok := parentApp.Spec.Aliases[aliasKey]; ok {
+	if _, ok := app.Spec.Aliases[alias.Meta.Name]; ok {
 		l.Debug("alias already exists")
-		return ierrors.New("alias already exists in parent dApp").BadRequest()
+		return ierrors.New("alias already exists in dApp").AlreadyExists()
+	}
+
+	err = amm.checkSource(scope, app, alias)
+	if err != nil {
+		return err
+	}
+
+	err = amm.checkDestination(app, alias)
+	if err != nil {
+		return err
 	}
 
 	alias.Meta = utils.InjectUUID(alias.Meta)
-
 	l.Debug("adding Alias to dApp",
-		zap.String("dApp", parentApp.Meta.Name))
-	// add new alias to Aliases list in parentApp
-	parentApp.Spec.Aliases[aliasKey] = alias
+		zap.String("dApp", app.Meta.Name))
+	app.Spec.Aliases[alias.Meta.Name] = alias
 
 	return nil
-
 }
 
-// Update receives a scope a alias key and a alias. The scope
+// Update receives a scope and a alias object. The scope
 // defines the path to the dApp that contains the Alias. If the dApp has
-// a alias that has the given alias key passed as an argument,
+// an alias that has the same name as the one passed as an argument,
 // that alias will be replaced by the new alias
-func (amm *AliasMemoryManager) Update(scope, aliasKey string, alias *meta.Alias) error {
+func (amm *AliasMemoryManager) Update(scope string, alias *meta.Alias) error {
 	l := amm.logger.With(
 		zap.String("operation", "update"),
 		zap.Any("alias", alias),
@@ -127,81 +100,96 @@ func (amm *AliasMemoryManager) Update(scope, aliasKey string, alias *meta.Alias)
 	)
 	l.Debug("trying to update an Alias")
 
-	l.Debug("checking if Alias to be updated exists in given scope")
-	// check if alias key exist in scope
-	oldAlias, err := amm.Get(scope, aliasKey)
+	app, err := amm.treeMemoryManager.Apps().Get(scope)
 	if err != nil {
-		newError := ierrors.Wrap(
-			err,
-			fmt.Sprintf("alias '%s' not found on scope '%s'", aliasKey, scope),
-		)
-		return newError
-	}
-	parentApp, _ := amm.treeMemoryManager.Apps().Get(scope)
-
-	l.Debug("validating Alias")
-	// valid target channel
-	err = validTargetChannel(parentApp, alias.Target)
-	if err != nil {
-		l.Debug("unable to update Alias - invalid targeted channel or boundary in parent dApp",
-			zap.String("parent", parentApp.Meta.Name),
-			zap.String("targeted boundary", alias.Target))
+		l.Debug("unable to update Alias because the app was not found")
 		return err
 	}
 
-	alias.Meta.UUID = oldAlias.Meta.UUID
+	selectedAlias, ok := app.Spec.Aliases[alias.Meta.Name]
+	if !ok {
+		l.Debug("alias was not found")
+		return ierrors.New("alias was not found in dApp").NotFound()
+	}
+
+	err = amm.checkSource(scope, app, alias)
+	if err != nil {
+		return err
+	}
+
+	err = amm.checkDestination(app, alias)
+	if err != nil {
+		return err
+	}
+
+	alias.Meta.UUID = selectedAlias.Meta.UUID
 	l.Debug("replacing old Alias with the new one",
-		zap.String("parent", parentApp.Meta.Name))
-	//update alias
-	parentApp.Spec.Aliases[aliasKey] = alias
+		zap.String("dapp", app.Meta.Name))
+	app.Spec.Aliases[alias.Meta.Name] = alias
 
 	return nil
+
 }
 
-// Delete receives a scope and a alias key. The scope
+// Delete receives a scope and a alias name. The scope
 // defines the path to the dApp that cointains the Alias to be deleted. If the dApp
 // has an alias that has the same key as the key passed as an argument, that alias
 // is removed from the dApp Aliases only if it's not being used
-func (amm *AliasMemoryManager) Delete(scope, aliasKey string) error {
+func (amm *AliasMemoryManager) Delete(scope, name string) error {
 	l := amm.logger.With(
 		zap.String("operation", "delete"),
-		zap.Any("alias", aliasKey),
+		zap.Any("alias", name),
 		zap.String("scope", scope),
 	)
 	l.Debug("trying to delete an Alias")
-	// get app from scope
+
 	app, err := amm.treeMemoryManager.Apps().Get(scope)
 	if err != nil {
-		return err
+		return ierrors.Wrap(err, "cannot delete alias because the dapp was not found")
 	}
 
-	l.Debug("checking if Alias to be deleted exists in given scope")
-	// check if alias key exist in scope
-	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
+	alias, ok := app.Spec.Aliases[name]
+	if !ok {
 		return ierrors.New(
-			"alias not found for the given key %v", aliasKey,
-		).BadRequest()
+			"alias not found with the given name %v", name,
+		).NotFound()
 	}
 
-	childName := strings.Split(aliasKey, ".")[0]
-	target := strings.Split(aliasKey, ".")[1]
-
-	l.Debug("checking if Alias can be deleted")
-	// check if its being used by a child app
-	if childApp, ok := app.Spec.Apps[childName]; ok {
-		childBound := childApp.Spec.Boundary
-		if childBound.Input.Contains(target) || childBound.Output.Contains(target) {
+	if alias.Destination != "" {
+		child := app.Spec.Apps[alias.Destination]
+		if child.Spec.Boundary.Channels.Input.Contains(alias.Meta.Name) || child.Spec.Boundary.Channels.Output.Contains(alias.Meta.Name) {
 			l.Debug("unable to delete Alias that is being used by a dApp")
 			return ierrors.New(
-				"can't delete the alias since it's being used by a child app",
+				"can't delete the alias since it's being used by the child app: %v",
+				alias.Destination,
 			).BadRequest()
 		}
+
+		for _, childAlias := range child.Spec.Aliases {
+			if childAlias.Resource == alias.Meta.Name {
+				l.Debug("unable to delete Alias that is being used by a child dApp")
+				return ierrors.New(
+					"can't delete the alias since it's being used by the child app: %v",
+					alias.Destination,
+				).BadRequest()
+			}
+		}
+	} else {
+		parent, _ := getParentApp(scope, amm.treeMemoryManager)
+		for _, parentAlias := range parent.Spec.Aliases {
+			if parentAlias.Source == app.Meta.Name && parentAlias.Resource == alias.Meta.Name {
+				l.Debug("unable to delete Alias that is being used by the parent dApp")
+				return ierrors.New(
+					"can't delete the alias since it's being used by the parent app: %v",
+					parent.Meta.Name,
+				).BadRequest()
+			}
+		}
+
 	}
 
-	l.Debug("removing Alias from its parents 'Aliases' structure")
-
-	// delete alias
-	delete(app.Spec.Aliases, aliasKey)
+	l.Debug("removing Alias")
+	delete(app.Spec.Aliases, name)
 
 	return nil
 }
@@ -213,43 +201,61 @@ type AliasPermTreeGetter struct {
 	logs *zap.Logger
 }
 
-// Get receives a scope and a alias key. The scope defines
-// the path to an App. If this App has a pointer to a alias that has the
-// same key as the key passed as an argument, the pointer to that alias is returned
-// This method is used to get the structure as it is in the cluster, before any modifications.
-func (amm *AliasPermTreeGetter) Get(scope, aliasKey string) (*meta.Alias, error) {
+func (amm *AliasPermTreeGetter) Get(scope, name string) (*meta.Alias, error) {
 	l := amm.logs.With(
 		zap.String("operation", "root-get"),
-		zap.String("alias", aliasKey),
+		zap.String("alias", name),
 		zap.String("scope", scope),
 	)
 	l.Debug("trying to get an Alias")
-	// get app from scope
+
 	app, err := amm.Apps().Get(scope)
 	if err != nil {
-		l.Debug("unable to get Alias")
+		l.Debug("unable to get Alias because the app was not found")
 		return nil, err
 	}
 
-	// check if alias key exist in scope
-	if _, ok := app.Spec.Aliases[aliasKey]; !ok {
-		l.Debug("alias doesn't exist")
+	if _, ok := app.Spec.Aliases[name]; !ok {
+		l.Debug("alias not found with the given name")
 		return nil, ierrors.New(
-			"alias not found for the given key %v", aliasKey,
-		).BadRequest()
+			"alias not found with the given name %v", name,
+		).NotFound()
 	}
 
-	//return alias
-	return app.Spec.Aliases[aliasKey], nil
+	return app.Spec.Aliases[name], nil
 }
 
-func validTargetChannel(app *meta.App, targetChannel string) error {
-	logger.Debug("validating if Alias targets a valid Channel")
-	parentBound := app.Spec.Boundary
-	if _, ok := app.Spec.Channels[targetChannel]; !ok && !parentBound.Input.Contains(targetChannel) && !parentBound.Output.Contains(targetChannel) {
-		logger.Debug("alias targets an invalid Channel")
-		return ierrors.New("channel doesn't exist in app").BadRequest()
+func (amm *AliasMemoryManager) checkSource(scope string, app *meta.App, alias *meta.Alias) error {
+	var source *meta.App
+	if alias.Source == "" {
+		parentApp, err := getParentApp(scope, amm.treeMemoryManager)
+		if err != nil {
+			return ierrors.Wrap(err, "cannot find parent dapp")
+		}
+		source = parentApp
+	} else {
+		childApp, ok := app.Spec.Apps[alias.Source]
+		if !ok {
+			return ierrors.New("cannot find source child dapp with the name '%v'", alias.Source).NotFound()
+		}
+		source = childApp
 	}
 
+	_, hasChannel := source.Spec.Channels[alias.Resource]
+	_, hasRoute := source.Spec.Routes[alias.Resource]
+	if !hasChannel && !hasRoute {
+		return ierrors.New("cannot find resource with the name '%v'", alias.Resource).NotFound()
+	}
+
+	return nil
+}
+
+func (amm *AliasMemoryManager) checkDestination(app *meta.App, alias *meta.Alias) error {
+	if alias.Destination != "" {
+		_, ok := app.Spec.Apps[alias.Destination]
+		if !ok {
+			return ierrors.New("cannot find destination child dapp with the name '%v'", alias.Destination).NotFound()
+		}
+	}
 	return nil
 }

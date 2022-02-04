@@ -225,7 +225,7 @@ var updatedAliases func(handler *Handler) diff.DifferenceReaction = func(handler
 			logger.Info("updating alias and components that are dependent on it", zap.Any("alias", d.Name))
 			newScope, _ := utils.JoinScopes(scope, appName)
 			app, err := handler.Memory.Tree().Apps().Get(newScope)
-			if err == nil && app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(boundaryName) {
+			if err == nil && app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output).Contains(boundaryName) {
 				_, err := handler.Operator.Nodes().UpdateNode(context.Background(), app)
 				if err != nil {
 					l.Error("unable to delete node", zap.String("node", app.Meta.Name), zap.String("scope", app.Meta.Parent), zap.Error(err))

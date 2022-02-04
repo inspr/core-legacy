@@ -255,7 +255,7 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (m
 
 	boundaries := make(map[string]string)
 	unresolved := metautils.StrSet{}
-	for _, bound := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
+	for _, bound := range app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output) {
 		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
 		unresolved[bound] = true
 	}
@@ -301,7 +301,7 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 	for key := range unresolved {
 		val := boundaries[key]
 		if alias, ok := app.Spec.Aliases[val]; ok { //resolve in aliases
-			val = alias.Target //setup for alias resolve
+			val = alias.Resource //setup for alias resolve
 		} else {
 			_, val, _ = metautils.RemoveLastPartInScope(val) //setup for direct resolve
 		}
@@ -311,7 +311,7 @@ func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[st
 			delete(unresolved, key)
 			continue
 		}
-		if app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output).Contains(val) { //resolve in boundaries
+		if app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output).Contains(val) { //resolve in boundaries
 			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, val) // if boundary exists, setup to resolve in parernt
 			continue
 		}
@@ -355,7 +355,7 @@ func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
 	)
 	l.Debug("removing dApp from parent's Channels connected apps list")
 
-	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Input, app.Spec.Boundary.Output)
+	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Channels.Input, app.Spec.Boundary.Channels.Output)
 	resolution, _ := amm.ResolveBoundary(app, false)
 	for _, chName := range appBoundary {
 		resolved := resolution[chName]

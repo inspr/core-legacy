@@ -13,7 +13,8 @@ spec:
       environment:
         SUPER_SECRET_0001: "false"
   boundary:
-    input:
-      - pinginput
-    output:
-      - pingoutput
+    channels:
+      input:
+        - pinginput
+      output:
+        - pingoutput

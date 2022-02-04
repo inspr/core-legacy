@@ -160,9 +160,11 @@ func TestNodeOperator_withBoundary(t *testing.T) { //TODO needs more testing, lo
 					},
 					Spec: meta.AppSpec{
 						Boundary: meta.AppBoundary{
-							Input: []string{
-								"channel1",
-								"channel2",
+							Channels: meta.Boundary{
+								Input: []string{
+									"channel1",
+									"channel2",
+								},
 							},
 						},
 						Channels: map[string]*meta.Channel{
@@ -220,9 +222,11 @@ func TestNodeOperator_withBoundary(t *testing.T) { //TODO needs more testing, lo
 					},
 					Spec: meta.AppSpec{
 						Boundary: meta.AppBoundary{
-							Output: []string{
-								"channel1",
-								"channel2",
+							Channels: meta.Boundary{
+								Output: []string{
+									"channel1",
+									"channel2",
+								},
 							},
 						},
 						Channels: map[string]*meta.Channel{

@@ -72,7 +72,7 @@ func (a *Apps) Update(scope string, app *meta.App, brokers *apimodels.BrokersDI)
 // ResolveBoundary mock
 func (*Apps) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
 	ret := map[string]string{}
-	for _, ch := range app.Spec.Boundary.Input.Union(app.Spec.Boundary.Output) {
+	for _, ch := range app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output) {
 		ret[ch] = ch
 	}
 	return ret, nil

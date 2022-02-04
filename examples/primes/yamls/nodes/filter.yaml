@@ -15,7 +15,8 @@ spec:
       replicas: 1
 
   boundary:
-    input:
-      - filterinput
-    output:
-      - filteroutput
+    channels:
+      input:
+        - filterinput
+      output:
+        - filteroutput

@@ -54,8 +54,10 @@ func getMockAppWithoutApp1() *meta.App {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Input:  []string{},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{},
+					Output: []string{},
+				},
 			},
 		},
 	}
@@ -98,8 +100,10 @@ func getMockAppWithoutCh1() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app1"},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app1"},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -107,8 +111,10 @@ func getMockAppWithoutCh1() *meta.App {
 						Channels: map[string]*meta.Channel{},
 						Types:    map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch1"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch1"},
+							},
 						},
 					},
 				},
@@ -126,8 +132,10 @@ func getMockAppWithoutCh1() *meta.App {
 			},
 			Types: map[string]*meta.Type{},
 			Boundary: meta.AppBoundary{
-				Input:  []string{},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{},
+					Output: []string{},
+				},
 			},
 		},
 	}
@@ -170,8 +178,10 @@ func getMockAppWithoutCt1() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app1"},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app1"},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -188,8 +198,10 @@ func getMockAppWithoutCt1() *meta.App {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch1"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch1"},
+							},
 						},
 					},
 				},
@@ -207,8 +219,10 @@ func getMockAppWithoutCt1() *meta.App {
 			},
 			Types: map[string]*meta.Type{},
 			Boundary: meta.AppBoundary{
-				Input:  []string{},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{},
+					Output: []string{},
+				},
 			},
 		},
 	}
@@ -260,8 +274,10 @@ func getMockAppWithoutAlias() *meta.App {
 									Channels: map[string]*meta.Channel{},
 									Types:    map[string]*meta.Type{},
 									Boundary: meta.AppBoundary{
-										Input:  []string{"ch1app1"},
-										Output: []string{},
+										Channels: meta.Boundary{
+											Input:  []string{"ch1app1"},
+											Output: []string{},
+										},
 									},
 								},
 							},
@@ -278,8 +294,10 @@ func getMockAppWithoutAlias() *meta.App {
 						},
 						Types: map[string]*meta.Type{},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"ch1"},
-							Output: []string{"ch1"},
+							Channels: meta.Boundary{
+								Input:  []string{"ch1"},
+								Output: []string{"ch1"},
+							},
 						},
 					},
 				},
@@ -308,8 +326,10 @@ func getMockAppWithoutAlias() *meta.App {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Input:  []string{},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{},
+					Output: []string{},
+				},
 			},
 			Aliases: map[string]*meta.Alias{},
 		},
@@ -606,7 +626,7 @@ func Test_deleteAlias(t *testing.T) {
 
 		fmt.Println(scope)
 		if (scope != "appParent" && scope != "") ||
-			(data.Key != "alias.name" && data.Key != "appParent.alias.name") {
+			(data.Name != "alias.name" && data.Name != "appParent.alias.name") {
 
 			rest.ERROR(w, ierrors.New("error test"))
 			return

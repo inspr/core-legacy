@@ -52,10 +52,11 @@ spec:
       environment:
         MODULE: 100
   boundary:
-    input:
-      - primes_ch2
-    output:
-      - primes_ch1   
+    channels:
+      input:
+        - primes_ch2
+      output:
+        - primes_ch1   
 ```
 
 [back](index.md)

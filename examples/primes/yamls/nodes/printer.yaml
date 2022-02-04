@@ -16,5 +16,6 @@ spec:
       environment:
         teste_env: test
   boundary:
-    input:
-      - printerinput
+    channels:
+      input:
+        - printerinput

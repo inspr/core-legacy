@@ -706,8 +706,10 @@ func getMockChannels() *meta.App {
 							},
 						},
 						Boundary: meta.AppBoundary{
-							Input:  []string{"channel1"},
-							Output: []string{},
+							Channels: meta.Boundary{
+								Input:  []string{"channel1"},
+								Output: []string{},
+							},
 						},
 					},
 				},
@@ -743,8 +745,10 @@ func getMockChannels() *meta.App {
 				},
 			},
 			Boundary: meta.AppBoundary{
-				Input:  []string{},
-				Output: []string{},
+				Channels: meta.Boundary{
+					Input:  []string{},
+					Output: []string{},
+				},
 			},
 		},
 	}

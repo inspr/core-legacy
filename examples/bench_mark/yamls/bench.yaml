@@ -6,11 +6,12 @@ meta:
 spec:
   aliases:
     sender.sendch:
-      target: benchannel
+      resource: benchannel
     receiver.receivech:
-      target: benchannel
+      resource: benchannel
   boundary:
-    input:
-      - benchannel
-    output:
-      - benchannel
+    channels:
+      input:
+        - benchannel
+      output:
+        - benchannel

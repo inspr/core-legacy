@@ -40,6 +40,11 @@ type App struct {
 // AppBoundary represents the connections this app can make to other apps. These are the fields that can be overriten
 // by the ChannelAliases when instantiating the app.
 type AppBoundary struct {
+	Channels Boundary          `yaml:"channels,omitempty" json:"channels"`
+	Routes   utils.StringArray `yaml:"routes,omitempty" json:"routes"`
+}
+
+type Boundary struct {
 	Input  utils.StringArray `yaml:"input,omitempty" json:"input"`
 	Output utils.StringArray `yaml:"output,omitempty" json:"output"`
 }

@@ -40,7 +40,7 @@ func TestAliasClient_Get(t *testing.T) {
 					Name:      "app2",
 					Reference: "app1",
 				},
-				Target: "alias_target",
+				Resource: "alias_resource",
 			},
 		},
 		{
@@ -82,8 +82,8 @@ func TestAliasClient_Get(t *testing.T) {
 				if scope != tt.args.context {
 					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
-				if di.Key != tt.args.name {
-					t.Errorf("name set incorrectly. want = %v, got = %v", di.Key, tt.args.name)
+				if di.Name != tt.args.name {
+					t.Errorf("name set incorrectly. want = %v, got = %v", di.Name, tt.args.name)
 				}
 
 				encoder.Encode(tt.want)
@@ -125,7 +125,7 @@ func TestAliasClient_Create(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "alias_name",
 					},
-					Target: "alias_target",
+					Resource: "alias_target",
 				},
 			},
 			wantErr: false,
@@ -181,7 +181,7 @@ func TestAliasClient_Create(t *testing.T) {
 			ac := &AliasClient{
 				reqClient: request.NewJSONClient(s.URL),
 			}
-			if _, err := ac.Create(tt.args.ctx, tt.args.context, "alias_target", tt.args.ch, false); (err != nil) != tt.wantErr {
+			if _, err := ac.Create(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AliasClient.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -246,8 +246,8 @@ func TestAliasClient_Delete(t *testing.T) {
 				if scope != tt.args.context {
 					t.Errorf("context set incorrectly. want = %v, got = %v", scope, tt.args.context)
 				}
-				if di.Key != tt.args.name {
-					t.Errorf("name set incorrectly. want = %v, got = %v", di.Key, tt.args.name)
+				if di.Name != tt.args.name {
+					t.Errorf("name set incorrectly. want = %v, got = %v", di.Name, tt.args.name)
 				}
 
 				encoder.Encode(diff.Changelog{})
@@ -284,7 +284,7 @@ func TestAliasClient_Update(t *testing.T) {
 					Meta: meta.Metadata{
 						Name: "alias_name",
 					},
-					Target: "alias_target",
+					Resource: "alias_target",
 				},
 			},
 			wantErr: false,
@@ -340,7 +340,7 @@ func TestAliasClient_Update(t *testing.T) {
 			ac := &AliasClient{
 				reqClient: request.NewJSONClient(s.URL),
 			}
-			if _, err := ac.Update(tt.args.ctx, tt.args.context, "alias_target", tt.args.ch, false); (err != nil) != tt.wantErr {
+			if _, err := ac.Update(tt.args.ctx, tt.args.context, tt.args.ch, false); (err != nil) != tt.wantErr {
 				t.Errorf("AliasClient.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
