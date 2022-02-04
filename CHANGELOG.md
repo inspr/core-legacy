@@ -1,5 +1,14 @@
 # Changelog
 
+### #166 Story CORE-629 | Channel resolution refactor for new aliases
+- feature:
+  - Created a new resolution function, following the new alias/boundary pattern
+  - Removed ConnectedAliases from the ChannelStructure
+  - ConnectedDapps is no more used to verify if a channel can be deleted. The use of this field its when you want to update the dapps there are connected to the channel due to some modification in the channel (like some variable in the sidecar of the dapp). The same is proposed to routes when the basic route api is created.
+  - isAppUsed, isChannelUsed and isAliasUsed were created. Those functions have the goal to check if the strcuture is used, so it cannot be deleted. IMPORTANT: it doesnt used the connectedDapps.
+  - Updated all the tests related to the modifications above
+---
+
 ### #164 Story CORE-406 | Modify alias and boundary structure to accommodate Routes
 - feature:
   As the Alias structure changed, it was necessary to change the Alias API inside Insprd:
