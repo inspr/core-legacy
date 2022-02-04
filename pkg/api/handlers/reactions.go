@@ -118,9 +118,8 @@ var updatedTypes func(handler *Handler) diff.DifferenceReaction = func(handler *
 			for _, channelName := range ct.ConnectedChannels { // for each channel connected to the Type
 				channel, _ := handler.Memory.Tree().Channels().Get(scope, channelName)
 
-				for _, appName := range channel.ConnectedApps { // for each app connected to each channel
-					newScope, _ := utils.JoinScopes(scope, appName)
-					app, _ := handler.Memory.Tree().Apps().Get(newScope) // get the app definition from memory
+				for _, appScope := range channel.ConnectedApps { // for each app connected to each channel
+					app, _ := handler.Memory.Tree().Apps().Get(appScope) // get the app definition from memory
 
 					if app.Spec.Node.Spec.Image != "" { // if the app is a node, update it
 						l.Debug("updating node that depends on type", zap.String("node", app.Meta.Name), zap.String("scope", app.Meta.Parent))
@@ -162,8 +161,8 @@ var updatedChannels func(handler *Handler) diff.DifferenceReaction = func(handle
 			}
 			// this updates the connected nodes, so that the environment variables are consistent with
 			// the channel definition
-			for _, appName := range channel.ConnectedApps { // for each app connected to each channel
-				app, _ := handler.Memory.Tree().Apps().Get(scope + "." + appName)
+			for _, appScope := range channel.ConnectedApps { // for each app connected to each channel
+				app, _ := handler.Memory.Tree().Apps().Get(appScope)
 
 				if app.Spec.Node.Spec.Image != "" { // if the app is a node, update it
 					l.Debug("updating node that depends on channel", zap.String("node", app.Meta.Name), zap.String("scope", app.Meta.Parent))

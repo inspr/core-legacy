@@ -58,7 +58,7 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App
 		app.Spec.Node.Meta.Parent = parentScope
 	}
 
-	merr.Add(validAppStructure(app, parentApp, brokers))
+	merr.Add(amm.validAppStructure(app, parentApp, brokers))
 	for _, childApp := range app.Spec.Apps {
 		merr.Add(amm.recursiveCheckAndRefineApp(childApp, app, brokers))
 	}
@@ -70,7 +70,7 @@ func (amm *AppMemoryManager) recursiveCheckAndRefineApp(app, parentApp *meta.App
 	return nil
 }
 
-func validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
+func (amm *AppMemoryManager) validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
@@ -86,7 +86,7 @@ func validAppStructure(app, parentApp *meta.App, brokers *apimodels.BrokersDI) e
 	}
 
 	merr.Add(checkAndUpdates(app, brokers))
-	merr.Add(validAliases(app))
+	merr.Add(amm.validAliases(app))
 
 	if !merr.Empty() {
 		return &merr
@@ -128,13 +128,18 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
-	_, err := amm.ResolveBoundary(app, false)
+
+	resolvedRoutes, resolvedChannels, err := amm.ResolveBoundary(app, false)
 	if err != nil {
 		merr.Add(ierrors.New(err))
 		return &merr
 	}
+
+	amm.updateChannelsConnectedApps(app, resolvedChannels)
+	amm.updateRoutesConnectedApps(app, resolvedRoutes)
+
 	for _, childApp := range app.Spec.Apps {
-		err = amm.recursiveBoundaryValidation(childApp)
+		err := amm.recursiveBoundaryValidation(childApp)
 		if err != nil {
 			merr.Add(err)
 		}
@@ -147,63 +152,45 @@ func (amm *AppMemoryManager) recursiveBoundaryValidation(app *meta.App) error {
 	return nil
 }
 
-// connectAppsBoundaries  is used when creating dApps. Once the boundaries are validated by
-// 'recursiveBoundaryValidation', the Channels are updated so that they receive their new
-// connected aliases and connected dApps
-func (amm *AppMemoryManager) connectAppsBoundaries(app *meta.App) error {
-	for _, childApp := range app.Spec.Apps {
-		amm.connectAppsBoundaries(childApp)
+// updateChannelsConnectedApps update all the channels that the app is using, adding the app scope
+// to the connectedApps channel list
+func (amm *AppMemoryManager) updateChannelsConnectedApps(app *meta.App, resolved map[string]string) {
+	appScope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+	for _, chPath := range resolved {
+		scope, chName, _ := metautils.RemoveLastPartInScope(chPath)
+		channel, _ := amm.Channels().Get(scope, chName)
+		channel.ConnectedApps = append(channel.ConnectedApps, appScope)
 	}
-	return amm.connectAppBoundary(app)
 }
 
-func (amm *AppMemoryManager) connectAppBoundary(app *meta.App) error {
-	merr := ierrors.MultiError{
-		Errors: []error{},
-	}
-	parentApp, err := amm.Get(app.Meta.Parent)
-	if err != nil {
-		return err
-	}
-	for key, val := range parentApp.Spec.Aliases {
-		if ch, ok := parentApp.Spec.Channels[val.Resource]; ok {
-			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
-			continue
+// (TO BE DONE WHEN THE NEW ROUTE API IS CREATED) updateROutesConnectedApps update all the routes
+// that the app is using, adding the app scope to the connectedApps route list
+func (amm *AppMemoryManager) updateRoutesConnectedApps(app *meta.App, resolved map[string]string) {
+
+}
+
+func getConnectedAliases(app, parent *meta.App, resource string) utils.StringArray {
+	connectedAliases := utils.StringArray{}
+
+	for _, alias := range parent.Spec.Aliases {
+		if alias.Source == app.Meta.Name && alias.Resource == resource {
+			scope, _ := metautils.JoinScopes(parent.Meta.Parent, parent.Meta.Name)
+			scope, _ = metautils.JoinScopes(scope, alias.Meta.Name)
+			connectedAliases = append(connectedAliases, scope)
 		}
-		if parentApp.Spec.Boundary.Channels.Input.Union(parentApp.Spec.Boundary.Channels.Output).Contains(val.Resource) {
-			continue
-		}
-		merr.Add(ierrors.New(
-			"%s's alias %s points to an non-existent channel",
-			parentApp.Meta.Name, key,
-		))
-	}
-	if !merr.Empty() {
-		return &merr
 	}
 
-	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Channels.Input, app.Spec.Boundary.Channels.Output)
-	for _, boundary := range appBoundary {
-		aliasKey, _ := metautils.JoinScopes(app.Meta.Name, boundary)
-		if _, ok := parentApp.Spec.Aliases[aliasKey]; ok {
-			continue
+	for _, child := range app.Spec.Apps {
+		for _, alias := range child.Spec.Aliases {
+			if alias.Resource == resource {
+				scope, _ := metautils.JoinScopes(child.Meta.Parent, child.Meta.Name)
+				scope, _ = metautils.JoinScopes(scope, alias.Meta.Name)
+				connectedAliases = append(connectedAliases, scope)
+			}
 		}
-		if ch, ok := parentApp.Spec.Channels[boundary]; ok {
-			ch.ConnectedApps = append(ch.ConnectedApps, app.Meta.Name)
-			continue
-		}
-		if parentApp.Spec.Boundary.Channels.Input.Union(parentApp.Spec.Boundary.Channels.Output).Contains(boundary) {
-			continue
-		}
-		merr.Add(ierrors.New(
-			"%s boundary '%s' is invalid",
-			parentApp.Meta.Name, boundary,
-		))
 	}
-	if !merr.Empty() {
-		return &merr
-	}
-	return nil
+
+	return connectedAliases
 }
 
 // updateUUID is used by 'addAppInTree' so that new dApps are injected with an UUID, or
@@ -355,20 +342,6 @@ func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 				)
 			}
 
-			for _, appName := range channel.ConnectedApps {
-				if _, ok := app.Spec.Apps[appName]; !ok {
-					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
-				}
-
-				appInputs := app.Spec.Apps[appName].Spec.Boundary.Channels.Input
-				appOutputs := app.Spec.Apps[appName].Spec.Boundary.Channels.Output
-				appBoundary := utils.StringSliceUnion(appInputs, appOutputs)
-
-				if !utils.Includes(appBoundary, channelName) {
-					app.Spec.Channels[channelName].ConnectedApps = utils.Remove(channel.ConnectedApps, appName)
-				}
-			}
-
 			connectedChannels := types[channel.Spec.Type].ConnectedChannels
 			if !utils.Includes(connectedChannels, channelName) {
 				types[channel.Spec.Type].ConnectedChannels = append(connectedChannels, channelName)
@@ -392,18 +365,22 @@ func checkAndUpdates(app *meta.App, brokers *apimodels.BrokersDI) error {
 	return nil
 }
 
-func validAliases(app *meta.App) error {
+func (amm *AppMemoryManager) validAliases(app *meta.App) error {
 	var msg utils.StringArray
 
-	for key, val := range app.Spec.Aliases {
-		if ch, ok := app.Spec.Channels[val.Resource]; ok {
-			ch.ConnectedAliases = append(ch.ConnectedAliases, key)
-			continue
+	for _, alias := range app.Spec.Aliases {
+		scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+		err := amm.Alias().CheckSource(scope, app, alias)
+		if err != nil {
+			return err
 		}
-		if app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output).Contains(val.Resource) {
-			continue
+
+		err = amm.Alias().CheckDestination(app, alias)
+		if err != nil {
+			return err
 		}
-		msg = append(msg, fmt.Sprintf("alias '%s' points to an unexistent channel '%s'", key, val.Resource))
+
+		alias.Meta = metautils.InjectUUID(alias.Meta)
 	}
 
 	if len(msg) > 0 {

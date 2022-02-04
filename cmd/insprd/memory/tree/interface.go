@@ -31,7 +31,7 @@ type AppMemory interface {
 	Create(scope string, app *meta.App, brokers *apimodels.BrokersDI) error
 	Delete(query string) error
 	Update(query string, app *meta.App, brokers *apimodels.BrokersDI) error
-	ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error)
+	ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, map[string]string, error)
 }
 
 // AppGetInterface is an interface to get apps from memory
@@ -62,6 +62,8 @@ type AliasMemory interface {
 	Create(scope string, alias *meta.Alias) error
 	Delete(scope, name string) error
 	Update(scope string, alias *meta.Alias) error
+	CheckSource(scope string, app *meta.App, alias *meta.Alias) error
+	CheckDestination(app *meta.App, alias *meta.Alias) error
 }
 
 // AliasGetInterface is an interface to get alias types from memory

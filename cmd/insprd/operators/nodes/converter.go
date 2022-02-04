@@ -152,7 +152,7 @@ func (no *NodeOperator) getAllSidecarBrokers(app *meta.App, usePermTree bool) ut
 		zap.String("app:", app.Meta.Name),
 	)
 
-	resolves, err := no.memory.Apps().ResolveBoundary(app, usePermTree)
+	_, resolvedChannel, err := no.memory.Apps().ResolveBoundary(app, usePermTree)
 	if err != nil {
 		logger.Error("unable to resolve Node boundaries",
 			zap.Any("boundaries", app.Spec.Boundary))
@@ -160,7 +160,7 @@ func (no *NodeOperator) getAllSidecarBrokers(app *meta.App, usePermTree bool) ut
 	}
 
 	set, _ := metautils.MakeStrSet(channels.Map(func(boundary string) string {
-		resolved := resolves[boundary]
+		resolved := resolvedChannel[boundary]
 		parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 		var ch *meta.Channel
 		if usePermTree {
@@ -191,7 +191,7 @@ func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.Contai
 
 		logger.Debug("with boundary", zap.Bool("useperm", usePermTree))
 
-		resolves, err := no.memory.Apps().ResolveBoundary(app, usePermTree)
+		_, resolvedChannel, err := no.memory.Apps().ResolveBoundary(app, usePermTree)
 		if err != nil {
 			logger.Error("unable to resolve Node boundaries",
 				zap.Any("boundaries", app.Spec.Boundary))
@@ -199,11 +199,11 @@ func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.Contai
 		}
 
 		inputEnv := input.Map(func(boundary string) string {
-			return no.returnChannelBroker(boundary, resolves[boundary])
+			return no.returnChannelBroker(boundary, resolvedChannel[boundary])
 		})
 
 		outputEnv := output.Map(func(boundary string) string {
-			return no.returnChannelBroker(boundary, resolves[boundary])
+			return no.returnChannelBroker(boundary, resolvedChannel[boundary])
 		})
 
 		env := utils.EnvironmentMap{
@@ -213,7 +213,7 @@ func (no *NodeOperator) withBoundary(app *meta.App, usePermTree bool) k8s.Contai
 
 		logger.Debug("resolving with Node Boundary", zap.Bool("useperm", usePermTree))
 		channels.Map(func(boundary string) string {
-			resolved := resolves[boundary]
+			resolved := resolvedChannel[boundary]
 			parent, chName, _ := metautils.RemoveLastPartInScope(resolved)
 			var ch *meta.Channel
 			var ct *meta.Type

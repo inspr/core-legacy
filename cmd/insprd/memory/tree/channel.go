@@ -154,18 +154,15 @@ func (chh *ChannelMemoryManager) Delete(scope, name string) error {
 		return newError
 	}
 
-	l.Debug("checking if Channel can be deleted")
-	if len(channel.ConnectedApps) > 0 || len(channel.ConnectedAliases) > 0 {
-		l.Debug("unable to delete Channel for it's being used",
-			zap.Any("connected-dapps", channel.ConnectedApps),
-			zap.Any("connected-aliases", channel.ConnectedAliases))
+	parentApp, _ := chh.Apps().Get(scope)
 
+	l.Debug("checking if Channel can be deleted")
+	if chh.isChannelUsed(parentApp, name) {
+		l.Debug("unable to delete Channel for it's being used")
 		return ierrors.New(
 			"channel cannot be deleted as it is being used by other apps",
 		).BadRequest()
 	}
-
-	parentApp, _ := chh.Apps().Get(scope)
 
 	insprType := parentApp.Spec.Types[channel.Spec.Type]
 
@@ -206,7 +203,6 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	}
 
 	ch.ConnectedApps = oldCh.ConnectedApps
-	ch.ConnectedAliases = oldCh.ConnectedAliases
 	ch.Meta.UUID = oldCh.Meta.UUID
 
 	ch.Spec.SelectedBroker = oldCh.Spec.SelectedBroker
@@ -229,6 +225,19 @@ func (chh *ChannelMemoryManager) Update(scope string, ch *meta.Channel) error {
 	parentApp.Spec.Channels[ch.Meta.Name] = ch
 
 	return nil
+}
+
+func (cmm *ChannelMemoryManager) isChannelUsed(app *meta.App, chName string) bool {
+	for _, child := range app.Spec.Apps {
+		if child.Spec.Boundary.Channels.Input.Union(child.Spec.Boundary.Channels.Output).Contains(chName) {
+			return true
+		}
+	}
+
+	parent, _ := cmm.Apps().Get(app.Meta.Parent)
+	connectedAliases := getConnectedAliases(app, parent, chName)
+
+	return len(connectedAliases) > 0
 }
 
 // ChannelPermTreeGetter returns a getter that gets channels from the root structure of the app, without the current changes.

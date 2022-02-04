@@ -67,13 +67,6 @@ func PrintChannelTree(ch *meta.Channel, out io.Writer) {
 		}
 	}
 
-	if len(ch.ConnectedAliases) > 0 {
-		conAliases := channel.Add("ConnectedAliases")
-		for _, alias := range ch.ConnectedAliases {
-			conAliases.Add(alias)
-		}
-	}
-
 	fmt.Fprintln(out, channel.Print())
 }
 

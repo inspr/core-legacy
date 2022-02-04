@@ -15,7 +15,6 @@
 | spec               |                                                                                                                                                                                                                                            |
 | &rarr; type        | This field is reponsible for the definition of the what type of message will be send through the channel, the content is a string the represents the name of a inspr structure called Type that has the `avro` definitions of the message. |
 | connectedapps      | List of dApp names that are using this Channel, this is injected by the Inspr daemon                                                                                                                                                       |
-| connectedaliasses  | A simple list of the aliases that are being used to reference this channel.                                                                                                                                                                |
 
 ## YAML example
 ```yaml

@@ -12,6 +12,9 @@ import (
 )
 
 func Test_validAppStructure(t *testing.T) {
+	type fields struct {
+		root *meta.App
+	}
 	type args struct {
 		app       meta.App
 		parentApp meta.App
@@ -19,11 +22,15 @@ func Test_validAppStructure(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
+		fields  fields
 		args    args
 		wantErr bool
 	}{
 		{
 			name: "All valid structures",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
 					Available: []string{"some_broker"},
@@ -66,6 +73,9 @@ func Test_validAppStructure(t *testing.T) {
 		},
 		{
 			name: "invalidapp name - empty",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
 					Available: []string{"some_broker"},
@@ -109,6 +119,9 @@ func Test_validAppStructure(t *testing.T) {
 		},
 		{
 			name: "invalidapp substructure",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
 					Available: []string{"some_broker"},
@@ -154,6 +167,9 @@ func Test_validAppStructure(t *testing.T) {
 		},
 		{
 			name: "invalidapp - parent has Node structure",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				brokers: &apimodels.BrokersDI{
 					Available: []string{"some_broker"},
@@ -198,7 +214,15 @@ func Test_validAppStructure(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validAppStructure(&tt.args.app, &tt.args.parentApp, tt.args.brokers)
+
+			amm := &AppMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
+					root: tt.fields.root,
+					tree: tt.fields.root,
+				},
+			}
+
+			err := amm.validAppStructure(&tt.args.app, &tt.args.parentApp, tt.args.brokers)
 			if tt.wantErr && (err == nil) {
 				t.Errorf("validAppStructure(): wanted error but received 'nil'")
 				return
@@ -666,208 +690,6 @@ func Test_checkAndUpdates(t *testing.T) {
 	}
 }
 
-func TestAppMemoryManager_connectAppBoundary(t *testing.T) {
-	type fields struct {
-		MemoryManager *treeMemoryManager
-		root          *meta.App
-		appErr        error
-		mockA         bool
-		mockC         bool
-		mockCT        bool
-	}
-	type args struct {
-		app *meta.App
-	}
-	tests := []struct {
-		name        string
-		fields      fields
-		args        args
-		wantedApps  map[string]utils.StringArray
-		wantedAlias map[string]utils.StringArray
-		wantErr     bool
-		sourceApp   string
-	}{
-		{
-			name: "Valid - direct connect",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound6"],
-			},
-			wantedApps: map[string]utils.StringArray{
-				"bdch1": {"bound6"},
-				"bdch2": nil,
-			},
-			wantedAlias: map[string]utils.StringArray{
-				"bdch1": {"bound2.alias1"},
-				"bdch2": {"bound2.alias2", "bound4.alias3", "bound6.alias3"},
-			},
-			sourceApp: "bound",
-			wantErr:   false,
-		},
-		{
-			name: "Invalid - app with bad parent",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["boundNP"],
-			},
-			wantErr: true,
-		},
-		{
-			name: "Invalid - parent with bad alias",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound6"].Spec.Apps["bound7"],
-			},
-			wantErr: true,
-		},
-		{
-			name: "Valid - resolve boundary through recursive alias",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"].Spec.Apps["bound3"],
-			},
-			sourceApp: "bound2",
-			wantErr:   false,
-		},
-		{
-			name: "Invalid - bad reference",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound5"],
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			mem := &MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
-			}
-			amm := mem.Apps().(*AppMemoryManager)
-			err := amm.connectAppBoundary(tt.args.app)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.connectAppsThroughAliases() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			got, _ := amm.Get(tt.sourceApp)
-			for ch, conn := range tt.wantedApps {
-				if len(got.Spec.Channels[ch].ConnectedApps) != len(conn) {
-					t.Errorf("AppMemoryManager.connectAppBoundary() on %s.ConnectedApps = %v, want = %v", ch, got.Spec.Channels[ch].ConnectedApps, conn)
-					return
-				}
-				for _, app := range conn {
-					if !got.Spec.Channels[ch].ConnectedApps.Contains(app) {
-						t.Errorf("AppMemoryManager.connectAppBoundary() on %s.ConnectedApps = %v, want = %v", ch, got.Spec.Channels[ch].ConnectedApps, conn)
-						return
-					}
-				}
-			}
-			for ch, conn := range tt.wantedAlias {
-				if len(got.Spec.Channels[ch].ConnectedAliases) != len(conn) {
-					t.Errorf("AppMemoryManager.connectAppBoundary()  on %s.ConnectedAliases = %v, want = %v", ch, got.Spec.Channels[ch].ConnectedAliases, conn)
-					return
-				}
-				for _, alias := range conn {
-					if !got.Spec.Channels[ch].ConnectedAliases.Contains(alias) {
-						t.Errorf("AppMemoryManager.connectAppBoundary() on %s.ConnectedApps = %v, want = %v", ch, got.Spec.Channels[ch].ConnectedApps, conn)
-						return
-					}
-				}
-			}
-		})
-	}
-}
-
-func TestAppMemoryManager_connectAppsBoundaries(t *testing.T) {
-	type fields struct {
-		MemoryManager *treeMemoryManager
-		root          *meta.App
-		appErr        error
-		mockA         bool
-		mockC         bool
-		mockCT        bool
-	}
-	type args struct {
-		app *meta.App
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "Full coverage",
-			fields: fields{
-				root:   getMockApp(),
-				appErr: nil,
-				mockC:  false,
-				mockCT: false,
-				mockA:  false,
-			},
-			args: args{
-				app: getMockApp().Spec.Apps["bound"].Spec.Apps["bound2"],
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			mem := &MockManager{
-				treeMemoryManager: &treeMemoryManager{
-					root: tt.fields.root,
-					tree: tt.fields.root,
-				},
-				appErr: tt.fields.appErr,
-				mockC:  tt.fields.mockC,
-				mockA:  tt.fields.mockA,
-				mockCT: tt.fields.mockCT,
-			}
-			amm := mem.Apps().(*AppMemoryManager)
-			if err := amm.connectAppsBoundaries(tt.args.app); (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.connectAppsBoundaries() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestAppMemoryManager_addAppInTree(t *testing.T) {
 	type fields struct {
 		MemoryManager *treeMemoryManager
@@ -1246,16 +1068,23 @@ func Test_validAliases(t *testing.T) {
 			},
 		},
 	}
+	type fields struct {
+		root *meta.App
+	}
 	type args struct {
 		app *meta.App
 	}
 	tests := []struct {
+		fields  fields
 		name    string
 		args    args
 		wantErr bool
 	}{
 		{
 			name: "test alias validation",
+			fields: fields{
+				root: getMockApp(),
+			},
 			args: args{
 				app: &appTest,
 			},
@@ -1264,7 +1093,13 @@ func Test_validAliases(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validAliases(tt.args.app)
+			amm := &AppMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
+					root: tt.fields.root,
+					tree: tt.fields.root,
+				},
+			}
+			err := amm.validAliases(tt.args.app)
 			if tt.wantErr && (err == nil) {
 				t.Errorf("validAliases(): wanted error but received 'nil'")
 				return

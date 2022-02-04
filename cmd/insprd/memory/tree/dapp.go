@@ -9,8 +9,10 @@ import (
 	"inspr.dev/inspr/pkg/ierrors"
 	"inspr.dev/inspr/pkg/meta"
 	metautils "inspr.dev/inspr/pkg/meta/utils"
-	"inspr.dev/inspr/pkg/utils"
 )
+
+const CHANNEL = 1
+const ROUTE = 2
 
 // AppMemoryManager implements the App interface
 // and provides methos for operating on dApps
@@ -98,15 +100,13 @@ func (amm *AppMemoryManager) Create(scope string, app *meta.App, brokers *apimod
 	l.Debug("adding dApp to the memory tree")
 	amm.addAppInTree(app, parentApp)
 
-	l.Debug("trying to resolve dApp boundaries")
+	l.Debug("trying to resolve dApp boundaries and updating connected dApps to resolved Channels and Routes")
 	appErr = amm.recursiveBoundaryValidation(app)
 	if appErr != nil {
 		l.Debug("unable to resolve dApps boundaries - refusing request")
 		return appErr
 	}
 
-	l.Debug("updating connected dApps and Aliases to resolved Channels")
-	amm.connectAppsBoundaries(app)
 	return nil
 }
 
@@ -138,15 +138,46 @@ func (amm *AppMemoryManager) Delete(query string) error {
 		return errParent
 	}
 
-	l.Debug("updating Channels to which the dApp was connected")
-
-	amm.removeFromParentBoundary(app, parent)
+	l.Debug("checking if some of the dapp resource is used by the parent")
+	if amm.isAppUsed(app, parent) {
+		l.Debug("unable to delete dapp for it's being used")
+		return ierrors.New(
+			"dapp cannot be deleted as it is being used by the parent apps",
+		).BadRequest()
+	}
 
 	l.Debug("removing dApp from its parent")
-
 	delete(parent.Spec.Apps, app.Meta.Name)
 
 	return nil
+}
+
+// isAppUsed checks if the current dapp has some alias, channel or route that is being used by
+// the parent dapp
+func (amm *AppMemoryManager) isAppUsed(app, parent *meta.App) bool {
+	for _, alias := range parent.Spec.Aliases {
+		if alias.Source == app.Meta.Name {
+			for chName := range app.Spec.Channels {
+				if alias.Resource == chName {
+					return true
+				}
+			}
+
+			for routeName := range app.Spec.Routes {
+				if alias.Resource == routeName {
+					return true
+				}
+			}
+
+			for aliasName := range app.Spec.Aliases {
+				if alias.Resource == aliasName {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 // Update receives a pointer to a dApp and the path to where this dApp is inside the memory tree.
@@ -192,8 +223,6 @@ func (amm *AppMemoryManager) Update(query string, app *meta.App, brokers *apimod
 	}
 
 	l.Debug("deleting old dApp")
-	amm.removeFromParentBoundary(app, parent)
-
 	delete(parent.Spec.Apps, currentApp.Meta.Name)
 
 	l.Debug("creating new dApp")
@@ -247,122 +276,128 @@ func (amm *AppPermTreeGetter) Get(query string) (*meta.App, error) {
 
 }
 
-// ResolveBoundary is the recursive method that resolves connections for dApp boundaries
-// returns a map of boundary to  their respective resolved channel query
-func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, error) {
-	l := amm.logger.With(zap.String("operation", "boundary-resolution"), zap.String("dapp", app.Meta.Name))
-	l.Debug("received boundary resolution request", zap.Bool("useperm", usePermTree))
+func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (map[string]string, map[string]string, error) {
+	parent, _ := amm.GetParent(app, usePermTree)
 
-	boundaries := make(map[string]string)
-	unresolved := metautils.StrSet{}
-	for _, bound := range app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output) {
-		boundaries[bound] = fmt.Sprintf("%s.%s", app.Meta.Name, bound)
-		unresolved[bound] = true
-	}
-
-	var parentApp *meta.App
-
-	if usePermTree {
-		parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
-		if err != nil {
-			return nil, err
-		}
-		parentApp = parApp
-
-	} else {
-		parApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
-		if err != nil {
-			return nil, err
-		}
-		parentApp = parApp
-	}
-
-	l.Debug("recursively resolving dApp boundaries",
-		zap.Any("boundaries", boundaries))
-
-	err := amm.recursivelyResolve(parentApp, boundaries, unresolved, usePermTree)
-	if err != nil {
-		l.Debug("couldn't resolve boundaries for given dApp",
-			zap.String("parent", parentApp.Meta.Name),
-			zap.Any("boundaries", boundaries))
-		return nil, err
-	}
-	return boundaries, nil
-}
-
-func (amm *AppMemoryManager) recursivelyResolve(app *meta.App, boundaries map[string]string, unresolved metautils.StrSet, usePermTree bool) error {
-	_ = amm.logger.With(zap.String("operation", "boundary-resolution"))
 	merr := ierrors.MultiError{
 		Errors: []error{},
 	}
-	if len(unresolved) == 0 {
-		return nil
-	}
-	for key := range unresolved {
-		val := boundaries[key]
-		if alias, ok := app.Spec.Aliases[val]; ok { //resolve in aliases
-			val = alias.Resource //setup for alias resolve
-		} else {
-			_, val, _ = metautils.RemoveLastPartInScope(val) //setup for direct resolve
-		}
-		if ch, ok := app.Spec.Channels[val]; ok { // resolve in channels (direct or through alias)
-			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
-			boundaries[key], _ = metautils.JoinScopes(scope, ch.Meta.Name) // if channel exists, resolve
-			delete(unresolved, key)
-			continue
-		}
-		if app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output).Contains(val) { //resolve in boundaries
-			boundaries[key], _ = metautils.JoinScopes(app.Meta.Name, val) // if boundary exists, setup to resolve in parernt
-			continue
-		}
-		merr.Add(ierrors.New("invalid boundary: %s invalid", key))
-		delete(unresolved, key)
 
+	resolvedRoutes := make(map[string]string)
+	boundaries := app.Spec.Boundary.Routes
+	for _, bound := range boundaries {
+		resolvedBound, err := amm.recursivelyResolveUp(parent, app.Meta.Name, bound, usePermTree, ROUTE)
+		if err != nil {
+			merr.Add(ierrors.Wrap(err, fmt.Sprintf("invalid route boundary: %s invalid", bound)))
+		}
+		resolvedRoutes[bound] = resolvedBound
 	}
+
+	resolvedChannels := make(map[string]string)
+	boundaries = app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output)
+	for _, bound := range boundaries {
+		resolvedBound, err := amm.recursivelyResolveUp(parent, app.Meta.Name, bound, usePermTree, CHANNEL)
+		if err != nil {
+			merr.Add(ierrors.Wrap(err, fmt.Sprintf("invalid channel boundary: %s invalid", bound)))
+		}
+		resolvedChannels[bound] = resolvedBound
+	}
+
 	if !merr.Empty() {
-		// throwing erros for boundaries couldn't be resolved because of some invalid boundary
-		for key := range unresolved {
-			merr.Add(ierrors.New("invalid boundary: %s unresolved", key))
-		}
-		return &merr
+		return nil, nil, &merr
 	}
 
+	return resolvedRoutes, resolvedChannels, nil
+
+}
+
+func (amm *AppMemoryManager) recursivelyResolveUp(app *meta.App, requester string, resource string, usePermTree bool, resourceType int) (string, error) {
+	scope, ok := amm.checkForResource(app, resource, resourceType)
+	if ok {
+		return scope, nil
+	}
+
+	alias, ok := app.Spec.Aliases[resource]
+
+	if ok && alias.Destination == requester {
+		if alias.Source == "" {
+			parent, err := amm.GetParent(app, usePermTree)
+			if err != nil {
+				return "", err
+			}
+			return amm.recursivelyResolveUp(parent, app.Meta.Name, alias.Resource, usePermTree, resourceType)
+
+		} else {
+			// THIS IS THE MEDIUM POINT -> IT ONLY PASSES ONE TIME HERE
+			if child, ok := app.Spec.Apps[alias.Source]; ok {
+				return amm.recursivelyResolveDown(child, app.Meta.Name, alias.Resource, resourceType)
+			}
+		}
+
+	}
+
+	return "", ierrors.New("cannot find resource %v", resource)
+}
+
+func (amm *AppMemoryManager) recursivelyResolveDown(app *meta.App, requester string, resource string, resourceType int) (string, error) {
+	scope, ok := amm.checkForResource(app, resource, resourceType)
+	if ok {
+		return scope, nil
+	}
+
+	alias, ok := app.Spec.Aliases[resource]
+
+	if ok && alias.Destination != "" {
+		return "", ierrors.New("cannot find resource %v", resource)
+	}
+
+	if ok && alias.Source != "" {
+		if child, ok := app.Spec.Apps[alias.Source]; ok {
+			return amm.recursivelyResolveDown(child, app.Meta.Name, alias.Resource, resourceType)
+		}
+	}
+
+	return "", ierrors.New("cannot find resource %v", resource)
+
+}
+
+func (amm *AppMemoryManager) checkForResource(app *meta.App, resource string, resourceType int) (string, bool) {
+	if resourceType == ROUTE {
+		if route, ok := app.Spec.Routes[resource]; ok {
+			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+			scope, _ = metautils.JoinScopes(scope, route.Meta.Name)
+			return scope, true
+		}
+	}
+
+	if resourceType == CHANNEL {
+		if channel, ok := app.Spec.Channels[resource]; ok {
+			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
+			scope, _ = metautils.JoinScopes(scope, channel.Meta.Name)
+			return scope, true
+		}
+	}
+
+	return "", false
+}
+
+func (amm *AppMemoryManager) GetParent(app *meta.App, usePermTree bool) (*meta.App, error) {
 	var parentApp *meta.App
 
 	if usePermTree {
 		parApp, err := amm.Perm().Apps().Get(app.Meta.Parent)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		parentApp = parApp
 
 	} else {
 		parApp, err := amm.treeMemoryManager.Apps().Get(app.Meta.Parent)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		parentApp = parApp
 	}
 
-	return amm.recursivelyResolve(parentApp, boundaries, unresolved, usePermTree)
-}
-
-func (amm *AppMemoryManager) removeFromParentBoundary(app, parent *meta.App) {
-	l := amm.logger.With(
-		zap.String("operation", "boundary-removal"),
-		zap.String("dApp", app.Meta.Name),
-		zap.String("parent", parent.Meta.Name),
-	)
-	l.Debug("removing dApp from parent's Channels connected apps list")
-
-	appBoundary := utils.StringSliceUnion(app.Spec.Boundary.Channels.Input, app.Spec.Boundary.Channels.Output)
-	resolution, _ := amm.ResolveBoundary(app, false)
-	for _, chName := range appBoundary {
-		resolved := resolution[chName]
-		_, chName, _ := metautils.RemoveLastPartInScope(resolved)
-		if _, ok := parent.Spec.Channels[chName]; ok {
-			parent.Spec.Channels[chName].ConnectedApps = utils.
-				Remove(parent.Spec.Channels[chName].ConnectedApps, app.Meta.Name)
-		}
-	}
+	return parentApp, nil
 }
