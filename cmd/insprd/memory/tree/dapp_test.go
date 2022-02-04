@@ -2366,8 +2366,6 @@ func TestAppMemoryManager_ResolveBoundary(t *testing.T) {
 			},
 			want1: map[string]string{
 				"ten": "C.D.thirteen",
-<<<<<<< HEAD
-=======
 			},
 			wantErr: false,
 		},
@@ -2691,51 +2689,20 @@ func TestAppMemoryManager_isAppUsed(t *testing.T) {
 			args: args{
 				app:    getIsAppUsedAlias().Spec.Apps["B"],
 				parent: getIsAppUsedAlias(),
->>>>>>> develop
 			},
 			want: true,
 		},
 		{
-<<<<<<< HEAD
-			name: "cannot find boundaries - should return errors",
-			fields: fields{
-				root: aliasMockedAppError(),
-				tree: aliasMockedAppError(),
-			},
-			args: args{
-				app:         aliasMockedAppError().Spec.Apps["A"].Spec.Apps["N"],
-				usePermTree: true,
-=======
 			name: "app is not being used",
 			args: args{
 				app:    getIsAppUsedNotUsed().Spec.Apps["B"],
 				parent: getIsAppUsedNotUsed(),
->>>>>>> develop
 			},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-<<<<<<< HEAD
-			mem := &treeMemoryManager{
-				root: tt.fields.root,
-				tree: tt.fields.tree,
-			}
-			amm := mem.Apps().(*AppMemoryManager)
-
-			got, got1, err := amm.ResolveBoundary(tt.args.app, tt.args.usePermTree)
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("AppMemoryManager.ResolveBoundaryNew() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AppMemoryManager.ResolveBoundaryNew() got = %v, want %v", got, tt.want)
-			}
-			if !reflect.DeepEqual(got1, tt.want1) {
-				t.Errorf("AppMemoryManager.ResolveBoundaryNew() got1 = %v, want %v", got1, tt.want1)
-=======
 			amm := &AppMemoryManager{
 				treeMemoryManager: &treeMemoryManager{
 					root: getMockApp(),
@@ -2743,87 +2710,11 @@ func TestAppMemoryManager_isAppUsed(t *testing.T) {
 			}
 			if got := amm.isAppUsed(tt.args.app, tt.args.parent); got != tt.want {
 				t.Errorf("AppMemoryManager.isAppUsed() = %v, want %v", got, tt.want)
->>>>>>> develop
 			}
 		})
 	}
 }
 
-<<<<<<< HEAD
-func aliasMockedApp() *meta.App {
-	return &meta.App{
-		Meta: meta.Metadata{
-			Name:   "",
-			Parent: "",
-		},
-		Spec: meta.AppSpec{
-			Aliases: map[string]*meta.Alias{
-				"three": {
-					Meta: meta.Metadata{
-						Name: "three",
-					},
-					Resource:    "two",
-					Source:      "C",
-					Destination: "A",
-				},
-				"eleven": {
-					Meta: meta.Metadata{
-						Name: "eleven",
-					},
-					Resource:    "twelve",
-					Source:      "C",
-					Destination: "A",
-				},
-			},
-			Channels: map[string]*meta.Channel{},
-			Routes:   map[string]*meta.RouteConnection{},
-			Apps: map[string]*meta.App{
-				"A": {
-					Meta: meta.Metadata{
-						Name:   "A",
-						Parent: "",
-					},
-					Spec: meta.AppSpec{
-						Aliases: map[string]*meta.Alias{
-							"four": {
-								Meta: meta.Metadata{
-									Name: "four",
-								},
-								Resource:    "three",
-								Source:      "",
-								Destination: "N",
-							},
-							"ten": {
-								Meta: meta.Metadata{
-									Name: "ten",
-								},
-								Resource:    "eleven",
-								Source:      "",
-								Destination: "N",
-							},
-						},
-						Channels: map[string]*meta.Channel{},
-						Routes:   map[string]*meta.RouteConnection{},
-						Apps: map[string]*meta.App{
-							"N": {
-								Meta: meta.Metadata{
-									Name:   "N",
-									Parent: "A",
-								},
-								Spec: meta.AppSpec{
-									Boundary: meta.AppBoundary{
-										Routes: utils.StringArray{
-											"four",
-										},
-										Channels: meta.Boundary{
-											Input: utils.StringArray{
-												"ten",
-											},
-										},
-									},
-									Channels: map[string]*meta.Channel{},
-									Routes:   map[string]*meta.RouteConnection{},
-=======
 func getIsAppUsedChannel() *meta.App {
 	return &meta.App{
 		Meta: meta.Metadata{
@@ -2841,66 +2732,16 @@ func getIsAppUsedChannel() *meta.App {
 							"channel": {
 								Meta: meta.Metadata{
 									Name: "channel",
->>>>>>> develop
 								},
 							},
 						},
 					},
 				},
-<<<<<<< HEAD
-
-				"C": {
-					Meta: meta.Metadata{
-						Name:   "C",
-						Parent: "",
-					},
-					Spec: meta.AppSpec{
-						Aliases: map[string]*meta.Alias{
-							"two": {
-								Resource:    "one",
-								Source:      "D",
-								Destination: "",
-							},
-
-							"twelve": {
-								Resource:    "thirteen",
-								Source:      "D",
-								Destination: "",
-							},
-						},
-						Channels: map[string]*meta.Channel{},
-						Routes:   map[string]*meta.RouteConnection{},
-						Apps: map[string]*meta.App{
-							"D": {
-								Meta: meta.Metadata{
-									Name:   "D",
-									Parent: "C",
-								},
-								Spec: meta.AppSpec{
-									Routes: map[string]*meta.RouteConnection{
-										"one": {
-											Meta: meta.Metadata{
-												Name: "one",
-											},
-										},
-									},
-									Channels: map[string]*meta.Channel{
-										"thirteen": {
-											Meta: meta.Metadata{
-												Name: "thirteen",
-											},
-										},
-									},
-								},
-							},
-						},
-=======
 			},
 			Aliases: map[string]*meta.Alias{
 				"myalias": {
 					Meta: meta.Metadata{
 						Name: "myalias",
->>>>>>> develop
 					},
 					Resource:    "channel",
 					Source:      "B",
@@ -2911,89 +2752,6 @@ func getIsAppUsedChannel() *meta.App {
 	}
 }
 
-<<<<<<< HEAD
-func aliasMockedAppError() *meta.App {
-	return &meta.App{
-		Meta: meta.Metadata{
-			Name:   "",
-			Parent: "",
-		},
-		Spec: meta.AppSpec{
-			Aliases: map[string]*meta.Alias{
-				"three": {
-					Meta: meta.Metadata{
-						Name: "three",
-					},
-					Resource:    "two",
-					Source:      "C",
-					Destination: "A",
-				},
-				"twenty-one": {
-					Meta: meta.Metadata{
-						Name: "twenty-one",
-					},
-					Resource:    "twenty-two",
-					Source:      "C",
-					Destination: "A",
-				},
-			},
-			Channels: map[string]*meta.Channel{},
-			Routes:   map[string]*meta.RouteConnection{},
-			Apps: map[string]*meta.App{
-				"A": {
-					Meta: meta.Metadata{
-						Name:   "A",
-						Parent: "",
-					},
-					Spec: meta.AppSpec{
-						Aliases: map[string]*meta.Alias{
-							"four": {
-								Meta: meta.Metadata{
-									Name: "four",
-								},
-								Resource:    "three",
-								Source:      "",
-								Destination: "N",
-							},
-							"ten": {
-								Meta: meta.Metadata{
-									Name: "ten",
-								},
-								Resource:    "eleven",
-								Source:      "",
-								Destination: "N",
-							},
-							"twenty": {
-								Meta: meta.Metadata{
-									Name: "twenty",
-								},
-								Resource:    "twenty-one",
-								Source:      "",
-								Destination: "N",
-							},
-						},
-						Channels: map[string]*meta.Channel{},
-						Routes:   map[string]*meta.RouteConnection{},
-						Apps: map[string]*meta.App{
-							"N": {
-								Meta: meta.Metadata{
-									Name:   "N",
-									Parent: "A",
-								},
-								Spec: meta.AppSpec{
-									Boundary: meta.AppBoundary{
-										Routes: utils.StringArray{
-											"four",
-											"ten",
-											"twenty",
-										},
-									},
-									Channels: map[string]*meta.Channel{},
-									Routes:   map[string]*meta.RouteConnection{},
-								},
-							},
-						},
-=======
 func getIsAppUsedRoute() *meta.App {
 	return &meta.App{
 		Meta: meta.Metadata{
@@ -3021,45 +2779,11 @@ func getIsAppUsedRoute() *meta.App {
 				"myalias": {
 					Meta: meta.Metadata{
 						Name: "myalias",
->>>>>>> develop
 					},
 					Resource:    "route",
 					Source:      "B",
 					Destination: "",
 				},
-<<<<<<< HEAD
-
-				"C": {
-					Meta: meta.Metadata{
-						Name:   "C",
-						Parent: "",
-					},
-					Spec: meta.AppSpec{
-						Aliases: map[string]*meta.Alias{
-							"two": {
-								Resource:    "one",
-								Source:      "D",
-								Destination: "",
-							},
-
-							"twenty-two": {
-								Resource:    "twenty-three",
-								Source:      "D",
-								Destination: "B",
-							},
-						},
-						Channels: map[string]*meta.Channel{},
-						Routes:   map[string]*meta.RouteConnection{},
-						Apps: map[string]*meta.App{
-							"D": {
-								Meta: meta.Metadata{
-									Name:   "D",
-									Parent: "C",
-								},
-								Spec: meta.AppSpec{},
-							},
-						},
-=======
 			},
 		},
 	}
@@ -3095,7 +2819,6 @@ func getIsAppUsedAlias() *meta.App {
 				"myalias": {
 					Meta: meta.Metadata{
 						Name: "myalias",
->>>>>>> develop
 					},
 					Resource:    "myawesomealias",
 					Source:      "B",
@@ -3104,8 +2827,6 @@ func getIsAppUsedAlias() *meta.App {
 			},
 		},
 	}
-<<<<<<< HEAD
-=======
 }
 
 func getIsAppUsedNotUsed() *meta.App {
@@ -3135,5 +2856,4 @@ func getIsAppUsedNotUsed() *meta.App {
 			},
 		},
 	}
->>>>>>> develop
 }
