@@ -1,5 +1,14 @@
 # Changelog
 
+### #165 Story CORE-620 | adapt lb-sidecar to accept dynamically configurable brokers
+- feature:
+  - changed all broker related operations and responsabilities to lb-sidecar
+  - created a dinamycally operable broker configurator on lb-sidecar
+  - disabled deployment of broker specific sidecar
+- test:
+  - updated mocked broker structures to work for new lbsidecar testing
+---
+
 ### #164 Story CORE-406 | Modify alias and boundary structure to accommodate Routes
 - feature:
   As the Alias structure changed, it was necessary to change the Alias API inside Insprd:

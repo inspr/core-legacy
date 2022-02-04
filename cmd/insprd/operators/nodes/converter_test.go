@@ -457,7 +457,6 @@ func Test_withLBSidecarPorts(t *testing.T) {
 
 func TestNodeOperator_withLBSidecarImage(t *testing.T) {
 	type args struct {
-		app *meta.App
 	}
 	tests := []struct {
 		name string
@@ -478,7 +477,7 @@ func TestNodeOperator_withLBSidecarImage(t *testing.T) {
 			os.Setenv("INSPR_LBSIDECAR_IMAGE", tt.env)
 			defer os.Unsetenv("INSPR_LBSIDECAR_IMAGE")
 			no := &NodeOperator{}
-			option := no.withLBSidecarImage(tt.args.app)
+			option := no.withLBSidecarImage()
 			got := &kubeCore.Container{}
 			option(got)
 

@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"go.uber.org/zap"
+	kafkasc "inspr.dev/inspr/cmd/sidecars/kafka/client"
+	"inspr.dev/inspr/pkg/environment"
 	"inspr.dev/inspr/pkg/logs"
 	"inspr.dev/inspr/pkg/sidecars/lbsidecar"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 var logger *zap.Logger
@@ -19,9 +23,36 @@ func init() {
 
 func main() {
 	ctx := context.Background()
+	var reader models.Reader
+	var writer models.Writer
+	var err error
+
+	logger.Info("instantiating Kafka Sidecar reader")
+	if len(environment.GetInputChannelsData()) != 0 {
+		reader, err = kafkasc.NewReader()
+		if err != nil {
+			logger.Error("unable to instantiate Kafka Sidecar reader")
+
+			fmt.Println(err)
+			return
+		}
+	}
+
+	logger.Info("instantiating Kafka Sidecar writer")
+	if len(environment.GetOutputChannelsData()) != 0 {
+		writer, err = kafkasc.NewWriter()
+		if err != nil {
+			logger.Error("unable to instantiate Kafka Sidecar writer")
+
+			fmt.Println(err)
+			return
+		}
+	}
+
+	kafkaHandler := models.NewBrokerHandler("kafka", reader, writer)
 
 	logger.Info("initializing LB Sidecar server")
-	lbServer := lbsidecar.Init()
+	lbServer := lbsidecar.Init(kafkaHandler)
 
 	logger.Info("running LB Sidecar server")
 	if err := lbServer.Run(ctx); err != nil {

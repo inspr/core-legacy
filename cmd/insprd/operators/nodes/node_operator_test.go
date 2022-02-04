@@ -6,10 +6,13 @@ import (
 	"os"
 	"testing"
 
+	memoryMock "inspr.dev/inspr/cmd/insprd/memory/fake"
 	"inspr.dev/inspr/cmd/insprd/memory/tree"
 	authmock "inspr.dev/inspr/pkg/auth/mocks"
 	"inspr.dev/inspr/pkg/environment"
 	"inspr.dev/inspr/pkg/meta"
+	"inspr.dev/inspr/pkg/operator/k8s"
+	"inspr.dev/inspr/pkg/sidecars/models"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"k8s.io/client-go/kubernetes"
@@ -206,7 +209,15 @@ func TestNodeOperator_CreateNode(t *testing.T) {
 				clientSet: tt.fields.clientSet,
 				auth:      authmock.NewMockAuth(nil),
 				memory:    tree.GetTreeMemory(),
+				brokers:   memoryMock.MockBrokerMemory(nil),
 			}
+			nop.brokers.Factory().Subscribe("kafka", func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) (kubeCore.Container, []kubeCore.EnvVar) {
+				return k8s.NewContainer(
+					"",
+					"",
+					opts...,
+				), nil
+			})
 			tree.GetTreeMemory().InitTransaction()
 			_, err := nop.CreateNode(tt.args.ctx, tt.args.app)
 			tree.GetTreeMemory().Cancel()
@@ -341,7 +352,15 @@ func TestNodeOperator_UpdateNode(t *testing.T) {
 				clientSet: tt.fields.clientSet,
 				auth:      authmock.NewMockAuth(nil),
 				memory:    tree.GetTreeMemory(),
+				brokers:   memoryMock.MockBrokerMemory(nil),
 			}
+			nop.brokers.Factory().Subscribe("kafka", func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) (kubeCore.Container, []kubeCore.EnvVar) {
+				return k8s.NewContainer(
+					"",
+					"",
+					opts...,
+				), nil
+			})
 			tree.GetTreeMemory().InitTransaction()
 			_, err := nop.UpdateNode(tt.args.ctx, tt.args.app)
 			tree.GetTreeMemory().Cancel()
@@ -460,7 +479,17 @@ func TestNodeOperator_DeleteNode(t *testing.T) {
 				clientSet: tt.fields.clientSet,
 				memory:    mem,
 				auth:      authmock.NewMockAuth(nil),
+				brokers:   memoryMock.MockBrokerMemory(nil),
 			}
+
+			nop.brokers.Factory().Subscribe("kafka", func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) (kubeCore.Container, []kubeCore.EnvVar) {
+				return k8s.NewContainer(
+					"",
+					"",
+					opts...,
+				), nil
+			})
+
 			if err := nop.DeleteNode(tt.args.ctx, tt.args.nodeContext, tt.args.nodeName); (err != nil) != tt.wantErr {
 				t.Errorf("NodeOperator.DeleteNode() error = %v, wantErr %v", err, tt.wantErr)
 			}
