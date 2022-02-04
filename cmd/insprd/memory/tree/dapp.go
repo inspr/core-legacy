@@ -11,6 +11,9 @@ import (
 	metautils "inspr.dev/inspr/pkg/meta/utils"
 )
 
+const CHANNEL = 1
+const ROUTE = 2
+
 // AppMemoryManager implements the App interface
 // and provides methos for operating on dApps
 type AppMemoryManager struct {
@@ -96,6 +99,9 @@ func (amm *AppMemoryManager) Create(scope string, app *meta.App, brokers *apimod
 		l.Debug("dapp invalid - refusing request")
 		return appErr
 	}
+
+	l.Debug("adding dApp to the memory tree")
+	amm.addAppInTree(app, parentApp)
 
 	l.Debug("trying to resolve dApp boundaries and updating connected dApps to resolved Channels and Routes")
 	appErr = amm.recursiveBoundaryValidation(app)
@@ -283,7 +289,7 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (m
 	resolvedRoutes := make(map[string]string)
 	boundaries := app.Spec.Boundary.Routes
 	for _, bound := range boundaries {
-		resolvedBound, err := amm.recursivelyResolveUp(parent, app.Meta.Name, bound, usePermTree, "route")
+		resolvedBound, err := amm.recursivelyResolveUp(parent, app.Meta.Name, bound, usePermTree, ROUTE)
 		if err != nil {
 			merr.Add(ierrors.Wrap(err, fmt.Sprintf("invalid route boundary: %s invalid", bound)))
 		}
@@ -293,7 +299,7 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (m
 	resolvedChannels := make(map[string]string)
 	boundaries = app.Spec.Boundary.Channels.Input.Union(app.Spec.Boundary.Channels.Output)
 	for _, bound := range boundaries {
-		resolvedBound, err := amm.recursivelyResolveUp(parent, app.Meta.Name, bound, usePermTree, "channel")
+		resolvedBound, err := amm.recursivelyResolveUp(parent, app.Meta.Name, bound, usePermTree, CHANNEL)
 		if err != nil {
 			merr.Add(ierrors.Wrap(err, fmt.Sprintf("invalid channel boundary: %s invalid", bound)))
 		}
@@ -308,7 +314,7 @@ func (amm *AppMemoryManager) ResolveBoundary(app *meta.App, usePermTree bool) (m
 
 }
 
-func (amm *AppMemoryManager) recursivelyResolveUp(app *meta.App, requester string, resource string, usePermTree bool, resourceType string) (string, error) {
+func (amm *AppMemoryManager) recursivelyResolveUp(app *meta.App, requester string, resource string, usePermTree bool, resourceType int) (string, error) {
 	scope, ok := amm.checkForResource(app, resource, resourceType)
 	if ok {
 		return scope, nil
@@ -336,7 +342,7 @@ func (amm *AppMemoryManager) recursivelyResolveUp(app *meta.App, requester strin
 	return "", ierrors.New("cannot find resource %v", resource)
 }
 
-func (amm *AppMemoryManager) recursivelyResolveDown(app *meta.App, requester string, resource string, resourceType string) (string, error) {
+func (amm *AppMemoryManager) recursivelyResolveDown(app *meta.App, requester string, resource string, resourceType int) (string, error) {
 	scope, ok := amm.checkForResource(app, resource, resourceType)
 	if ok {
 		return scope, nil
@@ -358,8 +364,8 @@ func (amm *AppMemoryManager) recursivelyResolveDown(app *meta.App, requester str
 
 }
 
-func (amm *AppMemoryManager) checkForResource(app *meta.App, resource, resourceType string) (string, bool) {
-	if resourceType == "route" {
+func (amm *AppMemoryManager) checkForResource(app *meta.App, resource string, resourceType int) (string, bool) {
+	if resourceType == ROUTE {
 		if route, ok := app.Spec.Routes[resource]; ok {
 			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
 			scope, _ = metautils.JoinScopes(scope, route.Meta.Name)
@@ -367,7 +373,7 @@ func (amm *AppMemoryManager) checkForResource(app *meta.App, resource, resourceT
 		}
 	}
 
-	if resourceType == "channel" {
+	if resourceType == CHANNEL {
 		if channel, ok := app.Spec.Channels[resource]; ok {
 			scope, _ := metautils.JoinScopes(app.Meta.Parent, app.Meta.Name)
 			scope, _ = metautils.JoinScopes(scope, channel.Meta.Name)

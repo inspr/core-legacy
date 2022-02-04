@@ -10,7 +10,11 @@ type Factory struct {
 
 // Subscribe mock of factory subscription method
 func (f *Factory) Subscribe(broker string, factory models.SidecarFactory) error {
-	return f.fail
+	if f.fail != nil {
+		return f.fail
+	}
+	f.abstract[broker] = factory
+	return nil
 }
 
 // Get mock of factory get method

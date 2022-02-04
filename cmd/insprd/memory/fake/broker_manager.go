@@ -3,6 +3,7 @@ package fake
 import (
 	"inspr.dev/inspr/cmd/insprd/memory/brokers"
 	metabroker "inspr.dev/inspr/pkg/meta/brokers"
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 // BrokersMock is the struct with the necessary implementations
@@ -22,6 +23,9 @@ func MockBrokerMemory(failErr error) brokers.Manager {
 			Available: metabroker.BrokerStatusArray{
 				"default_mock": nil,
 			},
+		},
+		factory: &Factory{
+			abstract: make(map[string]models.SidecarFactory),
 		},
 	}
 }
