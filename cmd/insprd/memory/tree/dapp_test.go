@@ -2657,3 +2657,203 @@ func aliasMockedAppError() *meta.App {
 		},
 	}
 }
+
+func TestAppMemoryManager_isAppUsed(t *testing.T) {
+	type args struct {
+		app    *meta.App
+		parent *meta.App
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "channel declared in app is being used",
+			args: args{
+				app:    getIsAppUsedChannel().Spec.Apps["B"],
+				parent: getIsAppUsedChannel(),
+			},
+			want: true,
+		},
+		{
+			name: "route declared in app is being used",
+			args: args{
+				app:    getIsAppUsedRoute().Spec.Apps["B"],
+				parent: getIsAppUsedRoute(),
+			},
+			want: true,
+		},
+		{
+			name: "alias declared in app is being used",
+			args: args{
+				app:    getIsAppUsedAlias().Spec.Apps["B"],
+				parent: getIsAppUsedAlias(),
+			},
+			want: true,
+		},
+		{
+			name: "app is not being used",
+			args: args{
+				app:    getIsAppUsedNotUsed().Spec.Apps["B"],
+				parent: getIsAppUsedNotUsed(),
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			amm := &AppMemoryManager{
+				treeMemoryManager: &treeMemoryManager{
+					root: getMockApp(),
+				},
+			}
+			if got := amm.isAppUsed(tt.args.app, tt.args.parent); got != tt.want {
+				t.Errorf("AppMemoryManager.isAppUsed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func getIsAppUsedChannel() *meta.App {
+	return &meta.App{
+		Meta: meta.Metadata{
+			Name: "",
+		},
+		Spec: meta.AppSpec{
+			Apps: map[string]*meta.App{
+				"B": {
+					Meta: meta.Metadata{
+						Name:   "B",
+						Parent: "",
+					},
+					Spec: meta.AppSpec{
+						Channels: map[string]*meta.Channel{
+							"channel": {
+								Meta: meta.Metadata{
+									Name: "channel",
+								},
+							},
+						},
+					},
+				},
+			},
+			Aliases: map[string]*meta.Alias{
+				"myalias": {
+					Meta: meta.Metadata{
+						Name: "myalias",
+					},
+					Resource:    "channel",
+					Source:      "B",
+					Destination: "",
+				},
+			},
+		},
+	}
+}
+
+func getIsAppUsedRoute() *meta.App {
+	return &meta.App{
+		Meta: meta.Metadata{
+			Name: "",
+		},
+		Spec: meta.AppSpec{
+			Apps: map[string]*meta.App{
+				"B": {
+					Meta: meta.Metadata{
+						Name:   "B",
+						Parent: "",
+					},
+					Spec: meta.AppSpec{
+						Routes: map[string]*meta.RouteConnection{
+							"route": {
+								Meta: meta.Metadata{
+									Name: "route",
+								},
+							},
+						},
+					},
+				},
+			},
+			Aliases: map[string]*meta.Alias{
+				"myalias": {
+					Meta: meta.Metadata{
+						Name: "myalias",
+					},
+					Resource:    "route",
+					Source:      "B",
+					Destination: "",
+				},
+			},
+		},
+	}
+}
+
+func getIsAppUsedAlias() *meta.App {
+	return &meta.App{
+		Meta: meta.Metadata{
+			Name: "",
+		},
+		Spec: meta.AppSpec{
+			Apps: map[string]*meta.App{
+				"B": {
+					Meta: meta.Metadata{
+						Name:   "B",
+						Parent: "",
+					},
+					Spec: meta.AppSpec{
+						Aliases: map[string]*meta.Alias{
+							"myawesomealias": {
+								Meta: meta.Metadata{
+									Name: "myawesomealias",
+								},
+								Resource:    "C.Route",
+								Source:      "C",
+								Destination: "",
+							},
+						},
+					},
+				},
+			},
+			Aliases: map[string]*meta.Alias{
+				"myalias": {
+					Meta: meta.Metadata{
+						Name: "myalias",
+					},
+					Resource:    "myawesomealias",
+					Source:      "B",
+					Destination: "",
+				},
+			},
+		},
+	}
+}
+
+func getIsAppUsedNotUsed() *meta.App {
+	return &meta.App{
+		Meta: meta.Metadata{
+			Name: "",
+		},
+		Spec: meta.AppSpec{
+			Apps: map[string]*meta.App{
+				"B": {
+					Meta: meta.Metadata{
+						Name:   "B",
+						Parent: "",
+					},
+					Spec: meta.AppSpec{},
+				},
+			},
+			Aliases: map[string]*meta.Alias{
+				"myalias": {
+					Meta: meta.Metadata{
+						Name: "myalias",
+					},
+					Resource:    "myawesomealias",
+					Source:      "B",
+					Destination: "",
+				},
+			},
+		},
+	}
+}
