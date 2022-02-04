@@ -23,7 +23,7 @@ And finally apply the Inspr structures in Insprd:
 ```
 insprctl apply -f yamls/01.cht.yaml
 insprctl apply -k yamls/channels
-insprctl apply -k nodes
+insprctl apply -k yamls/nodes
 ```
 
 Now it's all set! If everything worked fine two new deployments should've been created in `inspr-apps` namespace in your Kubernetes cluster, and you can check it's pods to verify that the correct messages are being exchanged between **chtest** and **chcheck**.
