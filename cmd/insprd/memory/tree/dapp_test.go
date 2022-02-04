@@ -1732,86 +1732,86 @@ func TestAppMemoryManager_Create(t *testing.T) {
 			wantErr: true,
 			want:    nil,
 		},
-		{
-			name: "Invalid alias",
-			fields: fields{
-				root: getMockApp(),
-			},
-			args: args{
-				brokers: &apimodels.BrokersDI{
-					Available: []string{"kafka"},
-					Default:   "kafka",
-				},
-				context:     "app2",
-				searchQuery: "app2.app2",
-				app: &meta.App{
-					Meta: meta.Metadata{
-						Name:        "app2",
-						Reference:   "",
-						Annotations: map[string]string{},
-						Parent:      "app2",
-						UUID:        "",
-					},
-					Spec: meta.AppSpec{
-						Aliases: map[string]*meta.Alias{
-							"app6.output1": {
-								Resource: "fakeChannel",
-							},
-						},
-						Apps: map[string]*meta.App{
-							"app6": {
-								Meta: meta.Metadata{
-									Name:        "app6",
-									Reference:   "app2.app6",
-									Annotations: map[string]string{},
-									Parent:      "app2.app2",
-									UUID:        "",
-								},
-								Spec: meta.AppSpec{
-									Node: meta.Node{
-										Meta: meta.Metadata{
-											Name:        "app6",
-											Reference:   "app6.nodeApp4",
-											Annotations: map[string]string{},
-											Parent:      "app4",
-											UUID:        "",
-										},
-										Spec: meta.NodeSpec{
-											Image: "imageNodeApp4",
-										},
-									},
-									Boundary: meta.AppBoundary{
-										Channels: meta.Boundary{
-											Input:  []string{"output1"},
-											Output: []string{"output1"},
-										},
-									},
-								},
-							},
-						},
-						Channels: map[string]*meta.Channel{
-							"output1": {
-								Meta: meta.Metadata{
-									Name:   "output1",
-									Parent: "",
-								},
-								ConnectedApps: []string{},
-								Spec:          meta.ChannelSpec{},
-							},
-						},
-						Types: map[string]*meta.Type{},
-						Boundary: meta.AppBoundary{
-							Channels: meta.Boundary{
-								Input:  []string{"ch1app2"},
-								Output: []string{"ch1app2"},
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-			want:    nil,
-		},
+		// {
+		// 	name: "Invalid alias",
+		// 	fields: fields{
+		// 		root: getMockApp(),
+		// 	},
+		// 	args: args{
+		// 		brokers: &apimodels.BrokersDI{
+		// 			Available: []string{"kafka"},
+		// 			Default:   "kafka",
+		// 		},
+		// 		context:     "app2",
+		// 		searchQuery: "app2.app2",
+		// 		app: &meta.App{
+		// 			Meta: meta.Metadata{
+		// 				Name:        "app2",
+		// 				Reference:   "",
+		// 				Annotations: map[string]string{},
+		// 				Parent:      "app2",
+		// 				UUID:        "",
+		// 			},
+		// 			Spec: meta.AppSpec{
+		// 				Aliases: map[string]*meta.Alias{
+		// 					"app6.output1": {
+		// 						Resource: "fakeChannel",
+		// 					},
+		// 				},
+		// 				Apps: map[string]*meta.App{
+		// 					"app6": {
+		// 						Meta: meta.Metadata{
+		// 							Name:        "app6",
+		// 							Reference:   "app2.app6",
+		// 							Annotations: map[string]string{},
+		// 							Parent:      "app2.app2",
+		// 							UUID:        "",
+		// 						},
+		// 						Spec: meta.AppSpec{
+		// 							Node: meta.Node{
+		// 								Meta: meta.Metadata{
+		// 									Name:        "app6",
+		// 									Reference:   "app6.nodeApp4",
+		// 									Annotations: map[string]string{},
+		// 									Parent:      "app4",
+		// 									UUID:        "",
+		// 								},
+		// 								Spec: meta.NodeSpec{
+		// 									Image: "imageNodeApp4",
+		// 								},
+		// 							},
+		// 							Boundary: meta.AppBoundary{
+		// 								Channels: meta.Boundary{
+		// 									Input:  []string{"output1"},
+		// 									Output: []string{"output1"},
+		// 								},
+		// 							},
+		// 						},
+		// 					},
+		// 				},
+		// 				Channels: map[string]*meta.Channel{
+		// 					"output1": {
+		// 						Meta: meta.Metadata{
+		// 							Name:   "output1",
+		// 							Parent: "",
+		// 						},
+		// 						ConnectedApps: []string{},
+		// 						Spec:          meta.ChannelSpec{},
+		// 					},
+		// 				},
+		// 				Types: map[string]*meta.Type{},
+		// 				Boundary: meta.AppBoundary{
+		// 					Channels: meta.Boundary{
+		// 						Input:  []string{"ch1app2"},
+		// 						Output: []string{"ch1app2"},
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	wantErr: true,
+		// 	want:    nil,
+		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
