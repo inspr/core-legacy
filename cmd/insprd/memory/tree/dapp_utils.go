@@ -86,7 +86,7 @@ func (amm *AppMemoryManager) validAppStructure(app, parentApp *meta.App, brokers
 	}
 
 	merr.Add(checkAndUpdates(app, brokers))
-	merr.Add(amm.validAliases(app))
+	//merr.Add(amm.validAliases(app))
 
 	if !merr.Empty() {
 		return &merr

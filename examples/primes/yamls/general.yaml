@@ -34,14 +34,6 @@ spec:
         brokerlist:
           - kafka
 
-  aliases:
-    primes.filterinput:
-      resource: primesch1
-    primes.filteroutput:
-      resource: primesch2
-    primes.printerinput:
-      resource: primesch2
-
   apps:
     # number generators
     generator:
@@ -63,13 +55,16 @@ spec:
       meta:
         name: primes
       spec:
-        boundary:
-          channels:
-            input:
-              - filterinput
-              - printerinput
-            output:
-              - filteroutput
+        aliases:
+          filterinput:
+            destination: filter
+            resource: primesch1
+          filteroutput:
+            destination: filter
+            resource: primesch2
+          printerinput:
+            destination: printer
+            resource: primesch2
 
         apps:
           # filters primes

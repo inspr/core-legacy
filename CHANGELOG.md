@@ -1,5 +1,10 @@
 # Changelog
 
+### #167 Story CORE-630 | Examples refactor
+- feature:
+  - Update all the examples to use the new alias/boundary structure and resolution
+---
+
 ### #166 Story CORE-629 | Channel resolution refactor for new aliases
 - feature:
   - Created a new resolution function, following the new alias/boundary pattern

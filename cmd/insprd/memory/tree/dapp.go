@@ -90,6 +90,9 @@ func (amm *AppMemoryManager) Create(scope string, app *meta.App, brokers *apimod
 		).InvalidApp()
 	}
 
+	l.Debug("adding dApp to the memory tree")
+	amm.addAppInTree(app, parentApp)
+
 	l.Debug("checking dApp structure")
 	appErr := amm.checkApp(app, parentApp, brokers)
 	if appErr != nil {
