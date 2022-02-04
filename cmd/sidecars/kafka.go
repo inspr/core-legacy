@@ -45,6 +45,18 @@ func KafkaToDeployment(config KafkaConfig) models.SidecarFactory {
 	}
 }
 
+func SimpleKafkaToDeployment(config KafkaConfig) models.SidecarFactory {
+	os.Setenv("INSPR_SIDECAR_KAFKA_BOOTSTRAP_SERVERS", config.BootstrapServers)
+	return func(app *meta.App, conn *models.SidecarConnections, opts ...k8s.ContainerOption) (corev1.Container, []corev1.EnvVar) {
+		opts = append(opts, KafkaEnvConfig(config))
+		return k8s.NewContainer(
+			"",
+			"",
+			opts...,
+		), nil
+	}
+}
+
 // KafkaEnvConfig adds the necessary env variables to configure kafka
 func KafkaEnvConfig(config KafkaConfig) k8s.ContainerOption {
 	return k8s.ContainerWithEnv(

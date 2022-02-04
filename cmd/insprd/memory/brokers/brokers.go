@@ -67,7 +67,7 @@ func (bmm *brokerMemoryManager) Create(config brokers.BrokerConfiguration) error
 	case brokers.Kafka:
 		l.Debug("configuring broker as kafka brojer")
 		obj, _ := config.(*sidecars.KafkaConfig)
-		factory = sidecars.KafkaToDeployment(*obj)
+		factory = sidecars.SimpleKafkaToDeployment(*obj)
 	default:
 		l.Debug("found unsupported broker config, rejecting request")
 		return ierrors.New("broker %s is not supported", broker)

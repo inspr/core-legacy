@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"inspr.dev/inspr/pkg/sidecars/models"
 )
 
 // The environment variables used here are declared in handlers_test.go
@@ -22,10 +24,12 @@ func TestInit(t *testing.T) {
 		{
 			name: "Initializes a new server",
 			want: &Server{
-				writeAddr:     fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
-				readAddr:      fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
-				channelMetric: make(map[string]channelMetric),
-				routeMetric:   make(map[string]routeMetric),
+				writeAddr:      fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_WRITE_PORT")),
+				readAddr:       fmt.Sprintf(":%s", os.Getenv("INSPR_LBSIDECAR_READ_PORT")),
+				channelMetric:  make(map[string]channelMetric),
+				routeMetric:    make(map[string]routeMetric),
+				brokerHandlers: make(map[string]*models.BrokerHandler),
+				clientAddr:     "http://localhost:1171",
 			},
 		},
 	}
