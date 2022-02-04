@@ -5,19 +5,16 @@ meta:
   name: pptable
 spec:
   aliases:
-    ping.pingoutput:
+    pingoutput:
+      destination: ping
       resource: ppchannel1
-    ping.pinginput:
+    pinginput:
+      destination: ping
       resource: ppchannel2
-    pong.ponginput:
+    ponginput:
+      destination: pong
       resource: ppchannel1
-    pong.pongoutput:
+    pongoutput:
+      destination: pong
       resource: ppchannel2
-  boundary:
-    channels:
-      input:
-        - ppchannel2
-        - ppchannel1
-      output:
-        - ppchannel2
-        - ppchannel1
+
