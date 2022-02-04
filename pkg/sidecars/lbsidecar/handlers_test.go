@@ -15,7 +15,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"inspr.dev/inspr/pkg/rest"
 	"inspr.dev/inspr/pkg/sidecars/models"
 )
