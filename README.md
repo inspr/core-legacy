@@ -1,14 +1,11 @@
 <br>
 <br>
 <div align="center">
-    <img 
-        srcset="https://storage.googleapis.com/inspr/logo.png 1x, https://storage.googleapis.com/inspr/logo%402x.png 2x, https://storage.googleapis.com/inspr/logo%403x.png 3x"
-        src="https://storage.googleapis.com/inspr/logo%403x.png" 
-        width="128" 
-        title="Inspr Logo"></img>
+<img src="https://inspr.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FinsprLogoText%403x.c641b400.png&w=200&q=100"/> 
 </div>
 
 <h2 align="center">A Cloud Native Application Mesh.</h2>
+<p> Inspr is a tool that helps you develop and manage distributed applications.</p>
 <p align="center">Describe, connect, secure, test and deploy distributed applications with less effort.</p>
 
 <p align="center">
