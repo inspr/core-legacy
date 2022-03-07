@@ -1,7 +1,8 @@
 <br>
 <br>
 <div align="center">
-<img src="https://inspr.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FinsprLogoText%403x.c641b400.png&w=200&q=100"/> 
+<!-- <img src="https://inspr.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FinsprLogoText%403x.c641b400.png&w=200&q=100"/>  -->
+<img src="./docs/img/brand@2x.png" width="336px"/>
 </div>
 
 <h2 align="center">A Cloud Native Application Mesh.</h2>
@@ -38,7 +39,6 @@
     </a>
 </p> -->
 
-
 ---
 
 <br>
@@ -48,6 +48,7 @@
 For Inspr’s point of view, a dApp is defined as an abstraction on top of the concept of a microservice. We extend the model by adding patterns of composition, communication, security, and adaptability to the application during runtime.
 
 ## 🎛 Compose
+
 <div align="center">
 <img 
     src="./docs/img/dapp-compose.png" 
@@ -57,7 +58,7 @@ For Inspr’s point of view, a dApp is defined as an abstraction on top of the c
 
 With Inspr one dApp can be connected to another and those two will become a new application. Consider as an example where we’re creating a online shop called “Sammyfy”. To build this product we’ll need a few services such as payment, catalog, and delivery.
 
-Of course, we could create those three services and interconnect them by using Rest API or even something more robust like brokers. But it would still be hard and painful to manage all the dApps together. That’s why Inspr exists, so you can manage all three applications as one. 
+Of course, we could create those three services and interconnect them by using Rest API or even something more robust like brokers. But it would still be hard and painful to manage all the dApps together. That’s why Inspr exists, so you can manage all three applications as one.
 
 ## 📡 Comunicate
 
@@ -72,8 +73,8 @@ Of course, we could create those three services and interconnect them by using R
 
 ## 🎮 Adapt
 
-
 ---
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
@@ -86,6 +87,7 @@ Of course, we could create those three services and interconnect them by using R
 ## 🎉 Getting Started
 
 ### Cluster
+
 First of all, it's important to have access to a Kubernetes cluster that is up and running. The cluster can be hosted on a local machine, or via a cloud service like GCloud or AWS (more info about cluster creation [here](https://kubernetes.io/docs/tutorials/kubernetes-basics/create-cluster/)).
 
 The recommended way to install Inspr in a Kubernetes cluster is by using Helm.  
@@ -101,24 +103,29 @@ helm repo add inspr https://inspr-charts.storage.googleapis.com
 helm install inspr_name inspr/insprd
 ```
 
-Additionally you can check the default values file for the Helm chart. 
+Additionally you can check the default values file for the Helm chart.
 They are included in the `build/helm` folder and can be edited for further refinement and customization of it's properties.
 
 ### CLI
-After installing Insprd in the cluster, the Inspr CLI must be installed so that it is possible to create and manage Inspr structures in the cluster. 
+
+After installing Insprd in the cluster, the Inspr CLI must be installed so that it is possible to create and manage Inspr structures in the cluster.
 
 To install the CLI get the latest release for your architecture from the [`releases`](https://github.com/inspr/inspr/releases) page and add it to your PATH.  
 For **Linux / Mac** you can install the latest version by running the following command on the terminal:
+
 ```bash
 curl -s https://storage.googleapis.com/inspr-cli/install_cli.sh | bash
-```  
+```
 
 You can check if the installation was successful by typing `inspr -h` on your terminal.  
-Before starting to use the CLI, be sure to check that it is referencing your cluster. First check the current config using: 
+Before starting to use the CLI, be sure to check that it is referencing your cluster. First check the current config using:
+
 ```bash
 insprctl config list
 ```
+
 And if the `serverip` is not the hostname currently being used to access the cluster IP, it must be modified:
+
 ```bash
 insprctl config serverip http://<your_domain>.com
 ```
